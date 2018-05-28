@@ -1,0 +1,7 @@
+{
+  "id": "default",
+  "host": "192.168.4.128",
+  "port": "8888",
+  "problemsDir": "/home/aron/njudge_problems",
+  "secretKey": "titkos"
+}
