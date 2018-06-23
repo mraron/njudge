@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/urfave/cli"
-	"os"
-	"log"
-	"errors"
 	"encoding/json"
+	"errors"
 	"github.com/mraron/njudge/judge"
+	"github.com/mraron/njudge/web"
+	"github.com/urfave/cli"
+	"log"
+	"os"
 )
 
 func main() {
@@ -17,15 +18,15 @@ func main() {
 
 	app.Commands = []cli.Command{
 		{
-			Name:    "judge",
-			Usage:   "start a judging server",
+			Name:  "judge",
+			Usage: "start a judging server",
 			Flags: []cli.Flag{
 				cli.StringFlag{
-					Name: "config, c",
+					Name:  "config, c",
 					Usage: "Load configuration from `FILE`",
 				},
 			},
-			Action:  func(c *cli.Context) error {
+			Action: func(c *cli.Context) error {
 				name := c.String("config")
 				if len(name) == 0 {
 					return errors.New("config file is required")
@@ -49,10 +50,35 @@ func main() {
 			},
 		},
 		{
-			Name:    "web",
-			Usage:   "start a web server",
-			Action:  func(c *cli.Context) error {
-				return nil
+			Name:  "web",
+			Usage: "start a web server",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "config, c",
+					Usage: "Load configuration from `FILE`",
+				},
+			},
+			Action: func(c *cli.Context) error {
+				name := c.String("config")
+				if len(name) == 0 {
+					return errors.New("config file is required")
+				}
+
+				f, err := os.Open(name)
+				if err != nil {
+					return err
+				}
+
+				server := &web.Server{}
+
+				dec := json.NewDecoder(f)
+
+				err = dec.Decode(server)
+				if err != nil {
+					return err
+				}
+
+				return server.Run()
 			},
 		},
 	}

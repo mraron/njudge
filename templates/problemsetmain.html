@@ -1,0 +1,14 @@
+{{template "header" .}}
+<br>
+<div class="table-responsive">
+    <table class="table table-bordered" >
+        <thead><tr><td>Név</td><td>Cím</td></tr></thead>
+        <tbody>
+        {{ range $j := .Data }}
+        {{$i := problem $j}}
+        <tr><td>{{$i.Name}}</td><td><a href="{{$i.Name}}/">{{(translateContent "hungarian" $i.Titles).String}}</a></td></tr>
+        {{end}}
+        </tbody>
+    </table>
+</div>
+{{template "footer" .}}
