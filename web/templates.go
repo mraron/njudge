@@ -3,6 +3,7 @@ package web
 import (
 	"github.com/labstack/echo"
 	"github.com/mraron/njudge/utils/problems"
+	"github.com/mraron/njudge/web/models"
 	"html/template"
 	"io"
 )
@@ -72,6 +73,12 @@ func (s *Server) templatefuncs() template.FuncMap {
 		},
 		"str2html": func(s string) template.HTML {
 			return template.HTML(s)
+		},
+		"logged": func(c echo.Context) bool {
+			return nil != c.Get("user").(*models.User)
+		},
+		"user": func(c echo.Context) *models.User {
+			return c.Get("user").(*models.User)
 		},
 	}
 }

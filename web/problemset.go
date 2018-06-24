@@ -9,7 +9,6 @@ import (
 	"mime"
 	"net/http"
 	"path/filepath"
-	"strconv"
 )
 
 func (s *Server) getProblemsetMain(c echo.Context) error {

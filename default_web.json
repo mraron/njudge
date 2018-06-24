@@ -1,5 +1,9 @@
 {
   "port": "5555",
   "problemsDir": "/home/aron/njudge_problems",
-  "templatesDir": "/home/aron/go/src/github.com/mraron/njudge/templates"
+  "templatesDir": "/home/aron/go/src/github.com/mraron/njudge/templates",
+  "mailAccount": "[SECRET]",
+  "mailServerHost": "[SECRET]",
+  "mailServerPort": "[SECRET]",
+  "mailAccountPassword": "[SECRET]"
 }

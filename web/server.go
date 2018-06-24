@@ -16,6 +16,10 @@ import (
 	"github.com/mraron/njudge/web/models"
 	_ "mime"
 	"strconv"
+
+	"fmt"
+	"github.com/gorilla/sessions"
+	"github.com/labstack/echo-contrib/session"
 )
 
 type Server struct {
@@ -23,12 +27,17 @@ type Server struct {
 	ProblemsDir  string
 	TemplatesDir string
 
+	MailAccount         string
+	MailServerHost      string
+	MailServerPort      string
+	MailAccountPassword string
+
 	problems map[string]problems.Problem
 	db       *sqlx.DB
 }
 
-func New(port string, problemsDir string, templatesDir string) *Server {
-	return &Server{port, problemsDir, templatesDir, make(map[string]problems.Problem), nil}
+func New(port string, problemsDir string, templatesDir string, mailServerAccount, mailServerHost, mailServerPort, mailAccountPassword string) *Server {
+	return &Server{port, problemsDir, templatesDir, mailServerAccount, mailServerHost, mailServerPort, mailAccountPassword, make(map[string]problems.Problem), nil}
 }
 
 func (s *Server) updateProblems() {
@@ -64,9 +73,27 @@ func (s *Server) connectToDB() {
 	}
 }
 
+func (s *Server) internalError(c echo.Context, err error, msg string) error {
+	c.Logger().Print("internal error:", err)
+	return c.Render(http.StatusInternalServerError, "error.html", msg)
+}
+
 func (s *Server) Run() error {
 	e := echo.New()
 	e.Use(middleware.Logger())
+	e.Use(session.Middleware(sessions.NewCookieStore([]byte("titkosdolog"))))
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			user, err := s.currentUser(c)
+			c.Set("user", user)
+
+			if err != nil {
+				return err
+			}
+
+			return next(c)
+		}
+	})
 
 	t := &Template{
 		templates: template.Must(template.New("templater").Funcs(s.templatefuncs()).ParseGlob(filepath.Join(s.TemplatesDir, "*.html"))),
@@ -86,6 +113,16 @@ func (s *Server) Run() error {
 	ps.GET("/:name/:problem/attachment/:attachment/", s.getProblemsetProblemAttachment)
 	ps.GET("/:name/:problem/:file", s.getProblemsetProblemFile)
 
+	u := e.Group("/user")
+
+	u.GET("/login", s.getUserLogin)
+	u.POST("/login", s.postUserLogin)
+	u.GET("/logout", s.getUserLogout)
+	u.GET("/register", s.getUserRegister)
+	u.POST("/register", s.postUserRegister)
+	u.GET("/activate", s.getUserActivate)
+	u.GET("/activate/:name/:key", s.getActivateUser)
+
 	v1 := e.Group("/api/v1")
 
 	v1.GET("/problem_rels", s.getAPIProblemRels)
@@ -104,6 +141,7 @@ func (s *Server) Run() error {
 }
 
 func (s *Server) getHome(c echo.Context) error {
+	fmt.Println("főoldal")
 	return c.Render(http.StatusOK, "home.html", s.problems)
 }
 
