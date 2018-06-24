@@ -4,6 +4,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/mraron/njudge/utils/problems"
 	"github.com/mraron/njudge/web/models"
+	"github.com/mraron/njudge/web/roles"
 	"html/template"
 	"io"
 )
@@ -79,6 +80,9 @@ func (s *Server) templatefuncs() template.FuncMap {
 		},
 		"user": func(c echo.Context) *models.User {
 			return c.Get("user").(*models.User)
+		},
+		"canView": func(role roles.Role, entity roles.Entity) bool {
+			return roles.Can(role, roles.ActionView, entity)
 		},
 	}
 }

@@ -15,8 +15,7 @@ func (s *Server) getProblemsetMain(c echo.Context) error {
 	name := c.Param("name")
 	lst, err := models.ProblemsFromProblemset(s.db, name)
 	if err != nil {
-		fmt.Println(err)
-		return err
+		return s.internalError(c, err, "Belső hiba.")
 	}
 
 	if len(lst) == 0 {
@@ -28,10 +27,10 @@ func (s *Server) getProblemsetMain(c echo.Context) error {
 
 func (s *Server) getProblemsetProblem(c echo.Context) error {
 	name, problem := c.Param("name"), c.Param("problem")
+
 	lst, err := models.ProblemsFromProblemset(s.db, name)
 	if err != nil {
-		fmt.Println(err)
-		return err
+		return s.internalError(c, err, "Belső hiba.")
 	}
 
 	ok := false

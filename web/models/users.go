@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"errors"
-	"fmt"
+	"github.com/mraron/njudge/web/roles"
 	"strconv"
 )
 
@@ -14,6 +14,7 @@ type User struct {
 	HashedPassword []byte `db:"password"`
 	Email          string
 	ActivationKey  sql.NullString `db:"activation_key"`
+	Role           roles.Role
 }
 
 func (u User) Value() (driver.Value, error) {
@@ -44,8 +45,7 @@ func (u *User) Scan(value interface{}) error {
 	}
 
 	row := db.QueryRow("SELECT * FROM users WHERE id=$1", id)
-	if err = row.Scan(&u.Id, &u.Name, &u.HashedPassword, &u.Email, &u.ActivationKey); err != nil {
-		fmt.Println("ez hiba", err)
+	if err = row.Scan(&u.Id, &u.Name, &u.HashedPassword, &u.Email, &u.ActivationKey, &u.Role); err != nil {
 		return err
 	}
 

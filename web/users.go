@@ -73,7 +73,6 @@ func (s *Server) postUserLogin(c echo.Context) error {
 		return c.Render(http.StatusOK, "login.html", []string{"Hiba: az account nincs aktiválva."})
 	}
 
-	fmt.Println(u)
 	storage, _ := session.Get("user", c)
 	storage.Values["id"] = u.Id
 
@@ -102,8 +101,6 @@ func (s *Server) postUserRegister(c echo.Context) error {
 		tx     *sql.Tx
 	)
 
-	fmt.Println("eddig1")
-
 	if u := c.Get("user").(*models.User); u != nil {
 		return c.Render(http.StatusOK, "error.html", "Már be vagy lépve...")
 	}
@@ -121,8 +118,6 @@ func (s *Server) postUserRegister(c echo.Context) error {
 		}
 	}
 
-	fmt.Println("eddig2")
-
 	used("name", c.FormValue("name"), "A név foglalt")
 	used("email", c.FormValue("email"), "Az email cím foglalt")
 
@@ -131,13 +126,10 @@ func (s *Server) postUserRegister(c echo.Context) error {
 	required("password2", "A jelszó ellenörző mező szükséges")
 	required("email", "Az email mező szükséges")
 
-	fmt.Println("eddig3")
-
 	if c.FormValue("password") != c.FormValue("password2") {
 		errors = append(errors, "A két jelszó nem egyezik meg")
 	}
 
-	fmt.Println("eddig4")
 	if len(errors) > 0 {
 		return c.Render(http.StatusOK, "register.html", errors)
 	}
@@ -148,42 +140,35 @@ func (s *Server) postUserRegister(c echo.Context) error {
 		}
 	}
 
-	fmt.Println("eddig5")
-
 	transaction := func() {
 		defer func() {
 			if p := recover(); p != nil {
 				tx.Rollback()
 				err = p.(error)
-				fmt.Println(err)
 			}
 		}()
 
 		tx, err := s.db.Begin()
 		mustPanic(err)
-		fmt.Println("addig")
+
 		hashed, err := bcrypt.GenerateFromPassword([]byte(c.FormValue("password")), bcrypt.DefaultCost)
-		fmt.Println(err)
 		mustPanic(err)
-		fmt.Println("addig2")
-		_, err = tx.Exec("INSERT INTO users (name,password,email,activation_key) VALUES ($1,$2,$3,$4)", c.FormValue("name"), hashed, c.FormValue("email"), key)
-		fmt.Println(err)
+
+		_, err = tx.Exec("INSERT INTO users (name,password,email,activation_key,role) VALUES ($1,$2,$3,$4,$5)", c.FormValue("name"), hashed, c.FormValue("email"), key, "user")
 		mustPanic(err)
-		fmt.Println("addig3")
+
 		m := Mail{}
 		m.Recipients = []string{c.FormValue("email")}
 		m.Message = fmt.Sprintf(`Kedves %s!<br> Köszönjük a registrációt. Aktiváló link: <a href="http://localhost:8080/user/activate/%s/%s">http://localhost:8080/user/activate/%s/%s</a>`, c.FormValue("name"), c.FormValue("name"), key, c.FormValue("name"), key)
 		m.Subject = "Regisztráció aktiválása"
 		mustPanic(s.SendMail(m))
-		fmt.Println("addig4")
+
 		mustPanic(tx.Commit())
 	}
-	fmt.Println("eddig6")
 
 	if transaction(); err != nil {
 		return s.internalError(c, err, "Belső hiba.")
 	}
-	fmt.Println("eddig7")
 
 	return c.Redirect(http.StatusFound, "/user/activate")
 }

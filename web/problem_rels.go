@@ -4,11 +4,17 @@ import (
 	"fmt"
 	"github.com/labstack/echo"
 	"github.com/mraron/njudge/web/models"
+	"github.com/mraron/njudge/web/roles"
 	"net/http"
 	"strconv"
 )
 
 func (s *Server) getAPIProblemRels(c echo.Context) error {
+	u := c.Get("user").(*models.User)
+	if !roles.Can(u.Role, roles.ActionView, "api/v1/problem_rels") {
+		return s.unauthorizedError(c)
+	}
+
 	data, err := parsePaginationData(c)
 	if err != nil {
 		fmt.Println(err)
@@ -25,6 +31,11 @@ func (s *Server) getAPIProblemRels(c echo.Context) error {
 }
 
 func (s *Server) postAPIProblemRel(c echo.Context) error {
+	u := c.Get("user").(*models.User)
+	if !roles.Can(u.Role, roles.ActionCreate, "api/v1/problem_rels") {
+		return s.unauthorizedError(c)
+	}
+
 	pr := new(models.ProblemRel)
 	if err := c.Bind(pr); err != nil {
 		return err
@@ -34,6 +45,11 @@ func (s *Server) postAPIProblemRel(c echo.Context) error {
 }
 
 func (s *Server) getAPIProblemRel(c echo.Context) error {
+	u := c.Get("user").(*models.User)
+	if !roles.Can(u.Role, roles.ActionView, "api/v1/problem_rels") {
+		return s.unauthorizedError(c)
+	}
+
 	id_ := c.Param("id")
 
 	id, err := strconv.Atoi(id_)
@@ -52,6 +68,11 @@ func (s *Server) getAPIProblemRel(c echo.Context) error {
 }
 
 func (s *Server) deleteAPIProblemRel(c echo.Context) error {
+	u := c.Get("user").(*models.User)
+	if !roles.Can(u.Role, roles.ActionDelete, "api/v1/problem_rels") {
+		return s.unauthorizedError(c)
+	}
+
 	id_ := c.Param("id")
 
 	id, err := strconv.Atoi(id_)
@@ -70,6 +91,11 @@ func (s *Server) deleteAPIProblemRel(c echo.Context) error {
 }
 
 func (s *Server) putAPIProblemRel(c echo.Context) error {
+	u := c.Get("user").(*models.User)
+	if !roles.Can(u.Role, roles.ActionEdit, "api/v1/problem_rels") {
+		return s.unauthorizedError(c)
+	}
+
 	id_ := c.Param("id")
 
 	id, err := strconv.Atoi(id_)

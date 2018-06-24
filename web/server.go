@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
+	"github.com/mraron/njudge/web/roles"
 )
 
 type Server struct {
@@ -78,6 +79,10 @@ func (s *Server) internalError(c echo.Context, err error, msg string) error {
 	return c.Render(http.StatusInternalServerError, "error.html", msg)
 }
 
+func (s *Server) unauthorizedError(c echo.Context) error {
+	return c.String(http.StatusUnauthorized, "unauthorized")
+}
+
 func (s *Server) Run() error {
 	e := echo.New()
 	e.Use(middleware.Logger())
@@ -88,7 +93,7 @@ func (s *Server) Run() error {
 			c.Set("user", user)
 
 			if err != nil {
-				return err
+				return s.internalError(c, err, "belső hiba")
 			}
 
 			return next(c)
@@ -146,6 +151,11 @@ func (s *Server) getHome(c echo.Context) error {
 }
 
 func (s *Server) getAdmin(c echo.Context) error {
+	u := c.Get("user").(*models.User)
+	if !roles.Can(u.Role, roles.ActionView, "admin_panel") {
+		return c.Render(http.StatusUnauthorized, "error.html", "Engedély megtagadva.")
+	}
+
 	return c.Render(http.StatusOK, "admin.html", nil)
 }
 

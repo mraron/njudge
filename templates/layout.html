@@ -43,6 +43,9 @@
                         {{(user .Context).Name}}
                     </a>
                     <div class="dropdown-menu" aria-labelledby="userDropdown">
+                        {{if canView (user .Context).Role "admin_panel"}}
+                            <a class="dropdown-item" href="/admin">Admin</a>
+                        {{end}}
                         <a class="dropdown-item" href="/user/logout">Kilépés</a>
                     </div>
                 </li>
