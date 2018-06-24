@@ -9,6 +9,7 @@ import (
 	"mime"
 	"net/http"
 	"path/filepath"
+	"strconv"
 )
 
 func (s *Server) getProblemsetMain(c echo.Context) error {
@@ -94,7 +95,7 @@ func (s *Server) getProblemsetProblemFile(c echo.Context) error {
 	return c.Blob(http.StatusOK, mime.TypeByExtension(filepath.Ext(fileLoc)), f)
 }
 
-func (s *Server) GetProblemsetProblemAttachment(c echo.Context) error {
+func (s *Server) getProblemsetProblemAttachment(c echo.Context) error {
 	p, attachment := s.problems[c.Param("problem")], c.Param("attachment")
 	if p == nil {
 		return c.String(http.StatusNotFound, "no such problem")

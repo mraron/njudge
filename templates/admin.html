@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>njudge admin</title>
+    <link rel="stylesheet" href="/static/ng-admin.min.css">
+</head>
+<body ng-app="njudge">
+<div ui-view="ng-admin"></div>
+<script src="/static/ng-admin.min.js"></script>
+<script type="text/javascript">
+    var njudge = angular.module('njudge', ['ng-admin']);
+    njudge.config(['NgAdminConfigurationProvider', function(NgAdminConfigurationProvider) {
+        var nga = NgAdminConfigurationProvider;
+        // create an admin application
+        var admin = nga.application('njudge admin').baseApiUrl("http://192.168.4.128:5555/api/v1/");
+
+        var problem_rel = nga.entity('problem_rels').identifier(nga.field('Id'));
+        problem_rel.listView().fields([
+            nga.field('Id').isDetailLink(true),
+            nga.field('Problemset'),
+            nga.field('Problem')
+        ]);
+
+        problem_rel.creationView().fields([
+            nga.field('Problemset'),
+            nga.field('Problem')
+        ]);
+
+        problem_rel.editionView().fields(problem_rel.creationView().fields());
+
+        admin.addEntity(problem_rel)
+
+        nga.configure(admin);
+    }]);
+</script>
+</body>
+</html>

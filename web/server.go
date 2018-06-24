@@ -13,7 +13,9 @@ import (
 
 	_ "github.com/lib/pq"
 	_ "github.com/mraron/njudge/utils/problems/polygon"
+	"github.com/mraron/njudge/web/models"
 	_ "mime"
+	"strconv"
 )
 
 type Server struct {
@@ -74,20 +76,67 @@ func (s *Server) Run() error {
 
 	e.GET("/", s.getHome)
 
+	e.Static("/static", "public")
+
 	ps := e.Group("/problemset")
 
 	ps.GET("/:name/", s.getProblemsetMain)
 	ps.GET("/:name/:problem/", s.getProblemsetProblem)
 	ps.GET("/:name/:problem/pdf/:language/", s.getProblemsetProblemPDFLanguage)
-	ps.GET("/:name/:problem/attachment/:attachment/", s.GetProblemsetProblemAttachment)
+	ps.GET("/:name/:problem/attachment/:attachment/", s.getProblemsetProblemAttachment)
 	ps.GET("/:name/:problem/:file", s.getProblemsetProblemFile)
+
+	v1 := e.Group("/api/v1")
+
+	v1.GET("/problem_rels", s.getAPIProblemRels)
+	v1.POST("/problem_rels", s.postAPIProblemRel)
+	v1.GET("/problem_rels/:id", s.getAPIProblemRel)
+	v1.PUT("/problem_rels/:id", s.putAPIProblemRel)
+	v1.DELETE("/problem_rels/:id", s.deleteAPIProblemRel)
+
+	e.GET("/admin", s.getAdmin)
 
 	s.updateProblems()
 	s.connectToDB()
+	models.SetDatabase(s.db)
 
 	return e.Start(":" + s.Port)
 }
 
 func (s *Server) getHome(c echo.Context) error {
 	return c.Render(http.StatusOK, "home.html", s.problems)
+}
+
+func (s *Server) getAdmin(c echo.Context) error {
+	return c.Render(http.StatusOK, "admin.html", nil)
+}
+
+type paginationData struct {
+	_page      int
+	_perPage   int
+	_sortDir   string
+	_sortField string
+}
+
+func parsePaginationData(c echo.Context) (*paginationData, error) {
+	res := &paginationData{}
+	var err error
+
+	_page := c.QueryParam("_page")
+	_perPage := c.QueryParam("_perPage")
+
+	res._sortDir = c.QueryParam("_sortDir")
+	res._sortField = c.QueryParam("_sortField")
+
+	res._page, err = strconv.Atoi(_page)
+	if err != nil {
+		return nil, err
+	}
+
+	res._perPage, err = strconv.Atoi(_perPage)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }

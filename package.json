@@ -1,0 +1,8 @@
+{
+  "name": "njudge",
+  "version": "0.1.0",
+  "author": "Áron Noszály",
+  "dependencies": {
+    "ng-admin": "*"
+  }
+}
