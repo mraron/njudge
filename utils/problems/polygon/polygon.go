@@ -30,7 +30,7 @@ const htmlTemplate = `<link href="problem-statement.css" rel="stylesheet" type="
 <div class="header">
 	<div class="title">{{.Name}}</div>
 	<div class="time-limit"><div class="property-title">tesztenkénti időlimit</div> {{.TimeLimit}} ms</DIV>
-	<div class="memory-limit"><div class="property-title">tesztenkénti memórialimit</div> {{.MemoryLimit}} bájt</div>
+	<div class="memory-limit"><div class="property-title">tesztenkénti memórialimit</div> {{div .MemoryLimit 1048576}} MiB</div>
 	<div class="input-file"><div class="property-title">inputfájl</div> {{if .InputFile}} {{.InputFile}} {{else}} stdin {{end}}</div>
 	<div class="output-file"><div class="property-title">outputfájl</div> {{if .OutputFile}} {{.OutputFile}} {{else}} stdout {{end}} </div>
 </div><p></p><p></p>
@@ -471,7 +471,7 @@ func identifier(path string) bool {
 func init() {
 	problems.RegisterType("polygon", parser, identifier)
 
-	if tmpl, err := template.New("polygonHtmlTemplate").Parse(htmlTemplate); err != nil {
+	if tmpl, err := template.New("polygonHtmlTemplate").Funcs(template.FuncMap{"div": func(a, b int) int { return a / b }}).Parse(htmlTemplate); err != nil {
 		panic(err)
 	} else {
 		htmlTmpl = tmpl

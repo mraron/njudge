@@ -20,7 +20,10 @@ import (
 	"fmt"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
+	"github.com/labstack/gommon/log"
+	"github.com/mraron/njudge/judge"
 	"github.com/mraron/njudge/web/roles"
+	"time"
 )
 
 type Server struct {
@@ -33,12 +36,15 @@ type Server struct {
 	MailServerPort      string
 	MailAccountPassword string
 
+	GluePort string
+
+	judges   []*models.Judge
 	problems map[string]problems.Problem
 	db       *sqlx.DB
 }
 
-func New(port string, problemsDir string, templatesDir string, mailServerAccount, mailServerHost, mailServerPort, mailAccountPassword string) *Server {
-	return &Server{port, problemsDir, templatesDir, mailServerAccount, mailServerHost, mailServerPort, mailAccountPassword, make(map[string]problems.Problem), nil}
+func New(port string, problemsDir string, templatesDir string, mailServerAccount, mailServerHost, mailServerPort, mailAccountPassword string, glueport string) *Server {
+	return &Server{port, problemsDir, templatesDir, mailServerAccount, mailServerHost, mailServerPort, mailAccountPassword, glueport, make([]*models.Judge, 0), make(map[string]problems.Problem), nil}
 }
 
 func (s *Server) updateProblems() {
@@ -74,6 +80,47 @@ func (s *Server) connectToDB() {
 	}
 }
 
+func (s *Server) loadJudgesFromDB() {
+	var err error
+	s.judges, err = models.GetJudges(s.db)
+
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (s *Server) syncJudges() {
+	for {
+		s.loadJudgesFromDB()
+		for _, j := range s.judges {
+			st, err := judge.NewFromUrl("http://" + j.Host + ":" + j.Port)
+
+			if err != nil {
+				log.Print("trying to access judge on ", j.Host, j.Port, " getting error ", err)
+				j.Online = false
+				j.Ping = -1
+				err = j.Update(s.db)
+				if err != nil {
+					log.Print("also error occured while updating", err)
+				}
+
+				continue
+			}
+
+			j.Online = true
+			j.State = st
+			j.Ping = 1
+
+			err = j.Update(s.db)
+			if err != nil {
+				log.Print("trying to access judge on", j.Host, j.Port, " unsuccesful update in database", err)
+				continue
+			}
+		}
+		time.Sleep(10 * time.Second)
+	}
+}
+
 func (s *Server) internalError(c echo.Context, err error, msg string) error {
 	c.Logger().Print("internal error:", err)
 	return c.Render(http.StatusInternalServerError, "error.html", msg)
@@ -83,7 +130,74 @@ func (s *Server) unauthorizedError(c echo.Context) error {
 	return c.String(http.StatusUnauthorized, "unauthorized")
 }
 
-func (s *Server) Run() error {
+func (s *Server) runGlue() {
+	g := echo.New()
+	g.Use(middleware.Logger())
+
+	g.POST("/callback/:id", func(c echo.Context) error {
+		id_ := c.Param("id")
+
+		id, err := strconv.Atoi(id_)
+		if err != nil {
+			return s.internalError(c, err, "err")
+		}
+
+		st := judge.Status{}
+		if err = c.Bind(&st); err != nil {
+			return s.internalError(c, err, "err")
+		}
+
+		if st.Done {
+			verdict := models.Verdict(st.Status.Verdict())
+			if st.Status.Compiled == false {
+				verdict = models.VERDICT_CE
+			}
+
+			if _, err := s.db.Exec("UPDATE submissions SET verdict=$1, status=$2, ontest=NULL, judged=$3 WHERE id=$4", verdict, st.Status, time.Now(), id); err != nil {
+				return s.internalError(c, err, "err")
+			}
+		} else {
+			if _, err := s.db.Exec("UPDATE submissions SET ontest=$1, status=$2, verdict=$3 WHERE id=$4", st.Test, st.Status, models.VERDICT_RU, id); err != nil {
+				log.Print("can't realtime update status", err)
+			}
+		}
+
+		return c.String(http.StatusOK, "ok")
+	})
+
+	panic(g.Start(":" + s.GluePort))
+}
+
+func (s *Server) judger() {
+	for {
+		time.Sleep(1 * time.Second)
+
+		ss := []models.Submission{}
+
+		if err := s.db.Select(&ss, "SELECT * FROM submissions WHERE started=false ORDER BY id ASC LIMIT 1"); err != nil {
+			log.Print("judger query error", err)
+			continue
+		}
+
+		if len(ss) == 0 {
+			continue
+		}
+
+		for _, sub := range ss {
+			for _, j := range s.judges {
+				if j.State.SupportsProblem(sub.Problem) {
+					j.State.Submit(judge.Submission{sub.Problem, sub.Language, sub.Source, "http://192.168.4.128:" + s.GluePort + "/callback/" + strconv.Itoa(int(sub.Id))})
+					if _, err := s.db.Exec("UPDATE submissions SET started=true WHERE id=$1", sub.Id); err != nil {
+						log.Print("FATAL: ", err)
+					}
+					break
+				}
+			}
+		}
+	}
+}
+
+func (s *Server) Run() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(session.Middleware(sessions.NewCookieStore([]byte("titkosdolog"))))
@@ -109,14 +223,23 @@ func (s *Server) Run() error {
 	e.GET("/", s.getHome)
 
 	e.Static("/static", "public")
+	e.GET("/submission/:id", s.getSubmission)
 
-	ps := e.Group("/problemset")
+	ps := e.Group("/problemset", func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			fmt.Println("teszt", c.Param("name"))
+			c.Set("problemset", c.Param("name"))
+			return next(c)
+		}
+	})
 
 	ps.GET("/:name/", s.getProblemsetMain)
 	ps.GET("/:name/:problem/", s.getProblemsetProblem)
 	ps.GET("/:name/:problem/pdf/:language/", s.getProblemsetProblemPDFLanguage)
 	ps.GET("/:name/:problem/attachment/:attachment/", s.getProblemsetProblemAttachment)
 	ps.GET("/:name/:problem/:file", s.getProblemsetProblemFile)
+	ps.POST("/:name/submit", s.postProblemsetSubmit)
+	ps.GET("/status", s.getProblemsetStatus)
 
 	u := e.Group("/user")
 
@@ -136,13 +259,29 @@ func (s *Server) Run() error {
 	v1.PUT("/problem_rels/:id", s.putAPIProblemRel)
 	v1.DELETE("/problem_rels/:id", s.deleteAPIProblemRel)
 
+	v1.GET("/judges", s.getAPIJudges)
+	v1.POST("/judges", s.postAPIJudges)
+	v1.GET("/judges/:id", s.getAPIJudge)
+	v1.PUT("/judges/:id", s.putAPIJudge)
+	v1.DELETE("/judges/:id", s.deleteAPIJudge)
+
 	e.GET("/admin", s.getAdmin)
 
 	s.updateProblems()
 	s.connectToDB()
 	models.SetDatabase(s.db)
+	s.loadJudgesFromDB()
+	go s.syncJudges()
+	go s.runGlue()
+	go s.judger()
 
-	return e.Start(":" + s.Port)
+	fmt.Println("Ohoho started")
+
+	for idx, judge := range s.judges {
+		fmt.Println(idx, judge)
+	}
+
+	panic(e.Start(":" + s.Port))
 }
 
 func (s *Server) getHome(c echo.Context) error {

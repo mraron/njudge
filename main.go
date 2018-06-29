@@ -78,7 +78,8 @@ func main() {
 					return err
 				}
 
-				return server.Run()
+				server.Run()
+				return nil
 			},
 		},
 	}

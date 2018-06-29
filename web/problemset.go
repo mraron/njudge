@@ -108,3 +108,12 @@ func (s *Server) getProblemsetProblemAttachment(c echo.Context) error {
 
 	return c.String(http.StatusNotFound, "no such attachment")
 }
+
+func (s *Server) getProblemsetStatus(c echo.Context) error {
+	sbs := make([]models.Submission, 0)
+	if err := s.db.Select(&sbs, "SELECT * FROM submissions ORDER BY id DESC"); err != nil {
+		return s.internalError(c, err, "Belső hiba.")
+	}
+
+	return c.Render(http.StatusOK, "status.html", sbs)
+}

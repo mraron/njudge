@@ -1,0 +1,60 @@
+{{template "header" .}}
+
+
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <tbody>
+        {{template "submissionRow" .Data}}
+        </tbody>
+    </table>
+</div>
+
+{{if ne .Data.Language "zip"}}
+<pre><code class="{{.Data.Language}}">{{.Data.Source}}</code></pre>
+{{end}}
+
+{{$status := .Data.Status}}
+{{if eq .Data.Status.FeedbackType 0}}
+{{range $testset := .Data.Status.Feedback}}
+{{range $i, $e := $testset.Testcases}}
+{{$ind := add $i 1}}
+<div class="card">
+    <div class="card-header {{if and (eq $e.VerdictName 0) ($status.Compiled)}}bg-success{{else}}bg-danger{{end}}"><span class="fa fa-{{if and (eq $e.VerdictName 0) ($status.Compiled)}}check{{else}}times{{end}}"></span> {{$ind}} - {{if $status.Compiled}}{{$e.VerdictName.String}}{{else}}Fordítási hiba{{end}}</div>
+    <div class="card-body">
+        <span class="fa fa-hdd"></span> Memória: {{$e.MemoryUsed}}KB <br><span class="fa fa-clock"></span> Idő:{{$e.TimeSpent}}<br><br>
+        Program kimenete:
+        <code><pre>{{$e.Output}}</pre></code>
+        Elvárt kimenete:
+        <code><pre>{{$e.ExpectedOutput}}</pre></code>
+        Checker kimenete:
+        <code><pre>{{$e.CheckerOutput}}</pre></code>
+    </div>
+</div>
+<br>
+{{end}}
+{{end}}
+{{end}}
+
+{{if eq .Data.Status.FeedbackType 1}}
+<div class="table-responsived">
+    <table class="table table-bordered">
+        <thead>
+        <tr><td>Teszthalmaz</td><td>Verdikt</td><td>Pont</td><td>Idő</td><td>Memória</td></tr>
+        {{range $testset := .Data.Status.Feedback}}
+        {{range $ind, $val := $testset.Testcases}}
+        <tr>
+            <td>{{$testset.Name}}</td><td><span class="text-{{if eq $val.VerdictName 0}}success{{else}}info{{end}}">{{$val.VerdictName.String}}</span></td><td>{{$val.Score}}/{{$val.MaxScore}}</td><td>{{$val.TimeSpent}}</td><td>{{$val.MemoryUsed}}</td>
+        </tr>
+        {{end}}
+        {{end}}
+
+        </thead>
+    </table>
+</div>
+
+{{end}}
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+{{template "footer" .}}

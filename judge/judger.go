@@ -1,26 +1,27 @@
 package judge
 
 import (
-	"github.com/mraron/njudge/utils/problems"
-	"net/http"
-	"encoding/json"
 	"bytes"
-	"time"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/mraron/njudge/utils/language"
+	"github.com/mraron/njudge/utils/problems"
 	"github.com/satori/go.uuid"
+	"net/http"
 	"os"
+	"time"
 )
 
 type Status struct {
-	Test string
+	Test   string
 	Status problems.Status
-	Time time.Time
+	Done   bool
+	Time   time.Time
 }
 
 type Callbacker interface {
-	Callback(string, problems.Status) error
+	Callback(string, problems.Status, bool) error
 }
 
 type HTTPCallback struct {
@@ -31,8 +32,8 @@ func NewHTTPCallback(url string) HTTPCallback {
 	return HTTPCallback{url}
 }
 
-func (h HTTPCallback) Callback(test string, status problems.Status) error {
-	raw := Status{ test ,status, time.Now()}
+func (h HTTPCallback) Callback(test string, status problems.Status, done bool) error {
+	raw := Status{test, status, done, time.Now()}
 
 	buf := &bytes.Buffer{}
 
@@ -60,7 +61,7 @@ func Judge(p problems.Problem, src string, lang language.Language, sandbox langu
 		return err
 	}
 
-	f, err := os.Create("/tmp/judge_"+id.String())
+	f, err := os.Create("/tmp/judge_" + id.String())
 	if err != nil {
 		return err
 	}
@@ -72,11 +73,10 @@ func Judge(p problems.Problem, src string, lang language.Language, sandbox langu
 
 	f.Close()
 
-	f, err = os.Open("/tmp/judge_"+id.String())
+	f, err = os.Open("/tmp/judge_" + id.String())
 	if err != nil {
 		return err
 	}
-
 
 	stderr := bytes.Buffer{}
 	bin, err := p.Compile(sandbox, lang, f, &stderr)
@@ -86,14 +86,14 @@ func Judge(p problems.Problem, src string, lang language.Language, sandbox langu
 		st.Compiled = false
 		st.CompilerOutput = stderr.String()
 
-		return c.Callback("", st)
+		return c.Callback("", st, true)
 	}
 
 	var (
-		testNotifier = make(chan string)
+		testNotifier   = make(chan string)
 		statusNotifier = make(chan problems.Status)
-		ran = make(chan bool)
-		st problems.Status
+		ran            = make(chan bool)
+		st             problems.Status
 	)
 
 	go func() {
@@ -108,7 +108,7 @@ func Judge(p problems.Problem, src string, lang language.Language, sandbox langu
 		case test := <-testNotifier:
 			status := <-statusNotifier
 
-			err = c.Callback(test, status)
+			err = c.Callback(test, status, false)
 
 			if err != nil {
 				return err
@@ -120,8 +120,7 @@ func Judge(p problems.Problem, src string, lang language.Language, sandbox langu
 		}
 	}
 
+	os.Remove("/tmp/judge_" + id.String())
 
-	os.Remove("/tmp/judge_"+id.String())
-
-	return c.Callback("", st)
+	return c.Callback("", st, true)
 }

@@ -38,7 +38,6 @@ func (pr *ProblemRel) Insert(db *sqlx.DB) error {
 	err := res.Scan(&id)
 
 	if err != nil {
-		fmt.Println(err, "safsdf2")
 		return err
 	}
 

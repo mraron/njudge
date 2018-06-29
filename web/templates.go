@@ -1,12 +1,14 @@
 package web
 
 import (
+	"fmt"
 	"github.com/labstack/echo"
 	"github.com/mraron/njudge/utils/problems"
 	"github.com/mraron/njudge/web/models"
 	"github.com/mraron/njudge/web/roles"
 	"html/template"
 	"io"
+	"time"
 )
 
 type Template struct {
@@ -83,6 +85,21 @@ func (s *Server) templatefuncs() template.FuncMap {
 		},
 		"canView": func(role roles.Role, entity roles.Entity) bool {
 			return roles.Can(role, roles.ActionView, entity)
+		},
+		"get": func(c echo.Context, key string) interface{} {
+			return c.Get(key)
+		},
+		"fixedlen": func(a int, len int) string {
+			return fmt.Sprintf(fmt.Sprintf("%%0%dd", len), a)
+		},
+		"month2int": func(month time.Month) int {
+			return int(month)
+		},
+		"decr": func(val int) int {
+			return val - 1
+		},
+		"add": func(a, b int) int {
+			return a + b
 		},
 	}
 }

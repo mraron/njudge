@@ -2,4 +2,18 @@
 
 {{template "problem" .Data}}
 
+{{if logged .Context}}
+<form action="/problemset/{{get .Context "problemset"}}/submit" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="problem" value="{{.Data.Name}}">
+    <input type="file" name="source">
+
+    <select name="language">
+    {{range $l := .Data.Languages}}
+        <option value="{{$l.Id}}">{{$l.Name}}</option>
+    {{end}}
+    </select>
+    <input type="submit">
+</form>
+{{end}}
+
 {{template "footer" .}}

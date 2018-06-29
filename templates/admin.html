@@ -16,19 +16,61 @@
 
         var problem_rel = nga.entity('problem_rels').identifier(nga.field('Id'));
         problem_rel.listView().fields([
-            nga.field('Id').isDetailLink(true),
+            nga.field('Id'),
             nga.field('Problemset'),
             nga.field('Problem')
-        ]);
+        ]).listActions(['edit']);
 
         problem_rel.creationView().fields([
-            nga.field('Problemset'),
-            nga.field('Problem')
+            nga.field('Problemset').validation({ required: true }),
+            nga.field('Problem').validation({ required: true })
         ]);
 
         problem_rel.editionView().fields(problem_rel.creationView().fields());
 
+        var judge = nga.entity("judges").identifier(nga.field('Id'));
+        judge.listView().fields([
+            nga.field('Id'),
+            nga.field('Name'),
+            nga.field('Host'),
+            nga.field('Port'),
+            nga.field('Load'),
+            nga.field('Uptime'),
+            nga.field('Ping'),
+            nga.field('Online'),
+        ]).listActions(['edit','show']);
+
+        judge.creationView().fields([
+            nga.field('Host').validation({ required: true }),
+            nga.field('Port').validation({ required: true })
+        ]);
+
+        judge.editionView().fields(judge.creationView().fields());
+
+
+        judge.showView().fields([
+            nga.field('Id'),
+            nga.field('Name'),
+            nga.field('Host'),
+            nga.field('Port'),
+            nga.field('Load'),
+            nga.field('ProblemsDir'),
+            nga.field('ProblemList','json'),
+            nga.field('Uptime'),
+            nga.field('Ping'),
+            nga.field('Online'),
+        ]).actions(['list', 'delete', 'edit']);
+
         admin.addEntity(problem_rel)
+        admin.addEntity(judge)
+
+        admin.menu(nga.menu()
+                .addChild(nga.menu(problem_rel).title('Problem relations').icon('<span class="glyphicon glyphicon-link"></span>'))
+                .addChild(nga.menu(judge).title('Judges').icon('<span class="glyphicon glyphicon-wrench"></span>'))
+
+        );
+
+
 
         nga.configure(admin);
     }]);

@@ -77,17 +77,20 @@ func (s *Server) deleteAPIProblemRel(c echo.Context) error {
 
 	id, err := strconv.Atoi(id_)
 	if err != nil {
-		fmt.Println(err)
-		return err
+		return s.internalError(c, err, "error")
 	}
 
 	pr, err := models.ProblemRelFromId(s.db, id)
 	if err != nil {
-		fmt.Println(err)
-		return err
+		return s.internalError(c, err, "error")
 	}
 
-	return pr.Delete(s.db)
+	err = pr.Delete(s.db)
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	return c.String(http.StatusOK, "ok")
 }
 
 func (s *Server) putAPIProblemRel(c echo.Context) error {

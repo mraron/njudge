@@ -78,4 +78,9 @@ func init() {
 	AddRule("api/v1/problem_rels", ActionCreate, Role("admin"))
 	AddRule("api/v1/problem_rels", ActionDelete, Role("admin"))
 	AddRule("api/v1/problem_rels", ActionEdit, Role("admin"))
+
+	AddRule("api/v1/judges", ActionView, Role("admin"))
+	AddRule("api/v1/judges", ActionCreate, Role("admin"))
+	AddRule("api/v1/judges", ActionDelete, Role("admin"))
+	AddRule("api/v1/judges", ActionEdit, Role("admin"))
 }
