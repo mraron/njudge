@@ -3,17 +3,25 @@
 {{template "problem" .Data}}
 
 {{if logged .Context}}
-<form action="/problemset/{{get .Context "problemset"}}/submit" method="post" enctype="multipart/form-data">
-    <input type="hidden" name="problem" value="{{.Data.Name}}">
-    <input type="file" name="source">
+<br>
+<div class="card">
+    <div class="card-header">
+        Megoldás beküldése
+    </div>
+    <div class="card-body">
+        <input type="file" name="source" id="fileInput">
+        <br>
+        <br>
+        <select name="language" class="form-control" id="languagesList">
+            {{range $l := .Data.Languages}}
+                <option value="{{$l.Id}}">{{$l.Name}}</option>
+            {{end}}
+        </select>
+        <br>
+        <input type="submit" class="btn btn-primary">
+    </div>
+</div>
 
-    <select name="language">
-    {{range $l := .Data.Languages}}
-        <option value="{{$l.Id}}">{{$l.Name}}</option>
-    {{end}}
-    </select>
-    <input type="submit">
-</form>
 {{end}}
 
 {{template "footer" .}}

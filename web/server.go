@@ -1,32 +1,31 @@
 package web
 
 import (
-	"github.com/jmoiron/sqlx"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
-	"github.com/mraron/njudge/utils/problems"
-	_ "github.com/mraron/njudge/web/models"
-	"html/template"
-	"io/ioutil"
-	"net/http"
-	"path/filepath"
-
-	_ "github.com/lib/pq"
-	_ "github.com/mraron/njudge/utils/problems/polygon"
-	"github.com/mraron/njudge/web/models"
-	_ "mime"
-	"strconv"
-
 	"fmt"
 	"github.com/gorilla/sessions"
+	"github.com/jmoiron/sqlx"
+	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/session"
+	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/log"
+	_ "github.com/lib/pq"
 	"github.com/mraron/njudge/judge"
+	"github.com/mraron/njudge/utils/problems"
+	_ "github.com/mraron/njudge/utils/problems/polygon"
+	"github.com/mraron/njudge/web/models"
+	_ "github.com/mraron/njudge/web/models"
 	"github.com/mraron/njudge/web/roles"
+	"html/template"
+	"io/ioutil"
+	_ "mime"
+	"net/http"
+	"path/filepath"
+	"strconv"
 	"time"
 )
 
 type Server struct {
+	Hostname     string
 	Port         string
 	ProblemsDir  string
 	TemplatesDir string
@@ -36,6 +35,11 @@ type Server struct {
 	MailServerPort      string
 	MailAccountPassword string
 
+	DBAccount  string
+	DBPassword string
+	DBHost     string
+	DBName     string
+
 	GluePort string
 
 	judges   []*models.Judge
@@ -43,9 +47,10 @@ type Server struct {
 	db       *sqlx.DB
 }
 
+/*
 func New(port string, problemsDir string, templatesDir string, mailServerAccount, mailServerHost, mailServerPort, mailAccountPassword string, glueport string) *Server {
 	return &Server{port, problemsDir, templatesDir, mailServerAccount, mailServerHost, mailServerPort, mailAccountPassword, glueport, make([]*models.Judge, 0), make(map[string]problems.Problem), nil}
-}
+}*/
 
 func (s *Server) updateProblems() {
 	if s.problems == nil {
@@ -66,6 +71,8 @@ func (s *Server) updateProblems() {
 			if err == nil {
 				s.problems[p.Name()] = p
 				pList = append(pList, p.Name())
+			} else {
+				log.Print(err)
 			}
 		}
 	}
@@ -73,7 +80,7 @@ func (s *Server) updateProblems() {
 
 func (s *Server) connectToDB() {
 	var err error
-	s.db, err = sqlx.Open("postgres", "postgres://mraron:***REMOVED***@localhost/mraron")
+	s.db, err = sqlx.Open("postgres", "postgres://"+s.DBAccount+":"+s.DBPassword+"@"+s.DBHost+"/"+s.DBName)
 
 	if err != nil {
 		panic(err)
@@ -186,7 +193,7 @@ func (s *Server) judger() {
 		for _, sub := range ss {
 			for _, j := range s.judges {
 				if j.State.SupportsProblem(sub.Problem) {
-					j.State.Submit(judge.Submission{sub.Problem, sub.Language, sub.Source, "http://192.168.4.128:" + s.GluePort + "/callback/" + strconv.Itoa(int(sub.Id))})
+					j.State.Submit(judge.Submission{sub.Problem, sub.Language, sub.Source, "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(int(sub.Id))})
 					if _, err := s.db.Exec("UPDATE submissions SET started=true WHERE id=$1", sub.Id); err != nil {
 						log.Print("FATAL: ", err)
 					}

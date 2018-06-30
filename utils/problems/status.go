@@ -1,13 +1,16 @@
 package problems
 
 import (
-	"time"
-	"database/sql/driver"
 	"bytes"
+	"database/sql/driver"
 	"encoding/json"
 	"errors"
+	"time"
 )
 
+//
+// Represents a verdict of a testcase
+//
 type VerdictName int
 
 const (
@@ -38,6 +41,9 @@ func (v VerdictName) String() string {
 	return "..."
 }
 
+//
+// Represents a feedback type, it's mainly for the frontend eg. in FEEDBACK_CF we actually output the contestant's output and the jury's output too whereas in for example FEEDBACK_ACM we only use standard ACM feedback (just the verdict)
+//
 type FeedbackType int
 
 const (
@@ -49,13 +55,16 @@ const (
 func FeedbackFromString(str string) FeedbackType {
 	if str == "ioi" {
 		return FEEDBACK_IOI
-	}else if str == "acm" {
+	} else if str == "acm" {
 		return FEEDBACK_ACM
 	}
 
 	return FEEDBACK_CF
 }
 
+//
+// Represents the scoring of a group of tests, SCORING_GROUP means that if there's a non accepted testcase in the group then the whole group scores 0 points, SCORING_SUM means that the score of the group is the sum of scores of individual scores.
+//
 type ScoringType int
 
 const (
@@ -71,25 +80,95 @@ func ScoringFromString(str string) ScoringType {
 	return SCORING_SUM
 }
 
+//
+// Testcase represents a testcase in the status of a submission
+//
 type Testcase struct {
-	Testset string
-	VerdictName VerdictName
-	Score float64
-	MaxScore float64
-	Output string
+	Testset        string
+	Group          string
+	VerdictName    VerdictName
+	Score          float64
+	MaxScore       float64
+	Output         string
 	ExpectedOutput string
-	CheckerOutput string
-	TimeSpent time.Duration
-	MemoryUsed int
+	CheckerOutput  string
+	TimeSpent      time.Duration
+	MemoryUsed     int
 }
 
+//
+// Testset represents some set of tests, for example pretests and systests should be testsets.
+// It's important that a testset is not a group! Groups are inside a testset.
+//
 type Testset struct {
-	Name string
-	Scoring ScoringType
+	Name      string
+	Groups    []Group
 	Testcases []Testcase
 }
 
-func (ts Testset) Score() float64 {
+func (ts Testset) Score() (res float64) {
+	for _, g := range ts.Groups {
+		res += g.Score()
+	}
+
+	return
+}
+
+func (ts Testset) MaxScore() (res float64) {
+	for _, g := range ts.Groups {
+		res += g.MaxScore()
+	}
+
+	return
+}
+
+func (ts Testset) FirstNonAC() int {
+	for _, g := range ts.Groups {
+		if g.FirstNonAC() != -1 {
+			return g.FirstNonAC()
+		}
+	}
+
+	return -1
+}
+
+func (ts Testset) MaxMemoryUsage() int {
+	mx := 0
+	for _, g := range ts.Groups {
+		if mx < g.MaxMemoryUsage() {
+			mx = g.MaxMemoryUsage()
+		}
+	}
+
+	return mx
+}
+
+func (ts Testset) IsAC() bool {
+	return ts.FirstNonAC() == -1
+}
+
+func (ts Testset) MaxTimeSpent() time.Duration {
+	mx := time.Duration(0)
+	for _, g := range ts.Groups {
+		if mx < g.MaxTimeSpent() {
+			mx = g.MaxTimeSpent()
+		}
+	}
+
+	return mx
+}
+
+//
+// Represents a group of testcases inside a testset
+//
+type Group struct {
+	Name         string
+	Scoring      ScoringType
+	Testcases    []Testcase
+	Dependencies []string //@TODO: actually support this
+}
+
+func (ts Group) Score() float64 {
 	switch ts.Scoring {
 	case SCORING_GROUP:
 		for _, val := range ts.Testcases {
@@ -111,7 +190,7 @@ func (ts Testset) Score() float64 {
 	return -1.0
 }
 
-func (ts Testset) MaxScore() float64 {
+func (ts Group) MaxScore() float64 {
 	sum := 0.0
 	for _, val := range ts.Testcases {
 		sum += val.MaxScore
@@ -120,7 +199,7 @@ func (ts Testset) MaxScore() float64 {
 	return sum
 }
 
-func (ts Testset) FirstNonAC() (int) {
+func (ts Group) FirstNonAC() int {
 	for ind, val := range ts.Testcases {
 		if val.VerdictName != VERDICT_AC {
 			return ind + 1
@@ -130,11 +209,11 @@ func (ts Testset) FirstNonAC() (int) {
 	return -1
 }
 
-func (ts Testset) IsAC() bool {
+func (ts Group) IsAC() bool {
 	return ts.FirstNonAC() == -1
 }
 
-func (ts Testset) MaxMemoryUsage() int {
+func (ts Group) MaxMemoryUsage() int {
 	mx := 0
 	for _, val := range ts.Testcases {
 		if mx < val.MemoryUsed {
@@ -145,7 +224,7 @@ func (ts Testset) MaxMemoryUsage() int {
 	return mx
 }
 
-func (ts Testset) MaxTimeSpent() time.Duration {
+func (ts Group) MaxTimeSpent() time.Duration {
 	mx := time.Duration(0)
 	for _, val := range ts.Testcases {
 		if mx < val.TimeSpent {
@@ -156,11 +235,14 @@ func (ts Testset) MaxTimeSpent() time.Duration {
 	return mx
 }
 
+//
+// Represents the status of a submission after judging
+//
 type Status struct {
-	Compiled bool
+	Compiled       bool
 	CompilerOutput string
-	FeedbackType FeedbackType
-	Feedback []Testset
+	FeedbackType   FeedbackType
+	Feedback       []Testset
 }
 
 func (v Status) Score() (ans float64) {
@@ -228,7 +310,7 @@ func (v Status) Verdict() VerdictName {
 	return v.IndexTestcase(v.FirstNonAC()).VerdictName
 }
 
-func (v Status) IsAC() (bool) {
+func (v Status) IsAC() bool {
 	for _, val := range v.Feedback {
 		if !val.IsAC() {
 			return false
@@ -260,7 +342,7 @@ func (v Status) MaxTimeSpent() time.Duration {
 	return res
 }
 
-func (v Status) FirstNonAC() (int) {
+func (v Status) FirstNonAC() int {
 	ind := 1
 	for _, val := range v.Feedback {
 		for _, val2 := range val.Testcases {
@@ -268,7 +350,7 @@ func (v Status) FirstNonAC() (int) {
 				return ind
 			}
 
-			ind ++
+			ind++
 		}
 	}
 

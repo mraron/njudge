@@ -60,6 +60,8 @@ type SampleTest struct {
 	Output string
 }
 
+// @TODO: add scoring, explore what is it like
+
 type JSONStatement struct {
 	Name        string
 	TimeLimit   int
@@ -89,6 +91,17 @@ type Test struct {
 	Cmd    string `xml:"cmd,attr"`
 	Sample bool   `xml:"sample,attr"`
 	Score  int    `xml:"score,attr"`
+	Group  string `xml:"group,attr"`
+
+	Input  string
+	Answer string
+	Index  int
+}
+
+type Group struct {
+	Name    string  `xml:"name,attr"`
+	Scoring string  `xml:"scoring,attr"`
+	Score   float64 `xml:"score,attr"`
 }
 
 type Judging struct {
@@ -98,14 +111,15 @@ type Judging struct {
 	OutputFile string `xml:"output-file,attr"`
 
 	TestSet []struct {
-		Name              string `xml:"name,attr"`
-		TimeLimit         int    `xml:"time-limit"`
-		MemoryLimit       int    `xml:"memory-limit"`
-		TestCount         int    `xml:"test-count"`
-		InputPathPattern  string `xml:"input-path-pattern"`
-		AnswerPathPattern string `xml:"answer-path-pattern"`
-		Scoring           string `xml:"scoring,attr"`
-		Tests             []Test `xml:"tests>test"`
+		Name              string  `xml:"name,attr"`
+		TimeLimit         int     `xml:"time-limit"`
+		MemoryLimit       int     `xml:"memory-limit"`
+		TestCount         int     `xml:"test-count"`
+		InputPathPattern  string  `xml:"input-path-pattern"`
+		AnswerPathPattern string  `xml:"answer-path-pattern"`
+		Scoring           string  `xml:"scoring,attr"`
+		Tests             []Test  `xml:"tests>test"`
+		Groups            []Group `xml:"groups>group"`
 	} `xml:"testset"`
 }
 
@@ -252,102 +266,138 @@ func (p Problem) Run(s language.Sandbox, lang language.Language, bin io.Reader, 
 	ans.Compiled = true
 	ans.Feedback = make([]problems.Testset, 0)
 	ans.FeedbackType = problems.FeedbackFromString(p.FeedbackType)
-
+	fmt.Println("itt1")
 	if binaryContents, err = ioutil.ReadAll(bin); err != nil {
 		return ans, err
 	}
-
-	for tsid, ts := range p.Judging.TestSet {
+	fmt.Println("itt2")
+	for _, ts := range p.Judging.TestSet {
+		fmt.Println("ott")
 		ans.Feedback = append(ans.Feedback, problems.Testset{Name: ts.Name})
 		testset := &ans.Feedback[len(ans.Feedback)-1]
-		testset.Scoring = problems.ScoringFromString(ts.Scoring)
-		for tc := 1; tc <= ts.TestCount; tc++ {
-			testNotifier <- strconv.Itoa(tc)
-			statusNotifier <- ans
 
-			testLocation, answerLocation := fmt.Sprintf(filepath.Join(p.Path, ts.InputPathPattern), tc), fmt.Sprintf(filepath.Join(p.Path, ts.AnswerPathPattern), tc)
+		tcbygroup := make(map[string][]Test)
+		for ind, tc := range ts.Tests {
+			tc.Input, tc.Answer = fmt.Sprintf(filepath.Join(p.Path, ts.InputPathPattern), ind+1), fmt.Sprintf(filepath.Join(p.Path, ts.AnswerPathPattern), ind+1)
+			tc.Index = ind + 1
 
-			testcase, err := os.Open(testLocation)
-			if err != nil {
-				return ans, err
+			if len(tcbygroup[tc.Group]) == 0 {
+				tcbygroup[tc.Group] = make([]Test, 0)
 			}
 
-			stdout := &bytes.Buffer{}
+			tcbygroup[tc.Group] = append(tcbygroup[tc.Group], tc)
+		}
+		fmt.Println(len(ts.Groups), "REVIVE")
+		if len(ts.Groups) == 0 {
+			fmt.Println(len(ts.Groups), "wuwtuaofjsdléfklék")
+			ts.Groups = append(ts.Groups, Group{"", "sum", -1.0})
+		}
 
-			answerFile, err := os.Open(answerLocation)
-			if err != nil {
-				return ans, err
-			}
+		for _, grp := range ts.Groups {
+			testset.Groups = append(testset.Groups, problems.Group{})
+			group := &testset.Groups[len(testset.Groups)-1]
 
-			answerContents, err := ioutil.ReadAll(answerFile)
-			if err != nil {
-				return ans, err
-			}
+			group.Name = grp.Name
+			group.Scoring = problems.ScoringFromString(grp.Scoring)
 
-			res, err := lang.Run(s, bytes.NewReader(binaryContents), testcase, stdout, time.Duration(ts.TimeLimit)*time.Millisecond, ts.MemoryLimit)
-			if err != nil {
-				return ans, err
-			}
+			for _, tc := range tcbygroup[grp.Name] {
+				testNotifier <- strconv.Itoa(tc.Index)
+				statusNotifier <- ans
 
-			if res.Verdict == language.VERDICT_OK {
-				checkerOutput := &bytes.Buffer{}
-				programOutput := stdout.String()
+				testLocation, answerLocation := tc.Input, tc.Answer
 
-				expectedOutput := string(answerContents)
-
-				cmd := exec.Command(filepath.Join(p.Path, "check"), testLocation, "/dev/stdin", answerLocation)
-				cmd.Stdin = stdout
-				cmd.Stdout = checkerOutput
-				cmd.Stderr = checkerOutput
-
-				err = cmd.Run()
-
-				/*	if err != nil {
-					ans.Feedback = append(ans.Feedback, problems.Testcase{VerdictName: problems.VERDICT_XX, MemoryUsed: res.Memory, TimeSpent: res.Time})
+				testcase, err := os.Open(testLocation)
+				if err != nil {
 					return ans, err
-				}*/
+				}
 
-				testset.Testcases = append(testset.Testcases, problems.Testcase{MaxScore: float64(p.Judging.TestSet[tsid].Tests[tc-1].Score), Testset: ts.Name, MemoryUsed: res.Memory, TimeSpent: res.Time, Output: truncate(programOutput), ExpectedOutput: truncate(expectedOutput), CheckerOutput: truncate(checkerOutput.String())})
+				stdout := &bytes.Buffer{}
 
-				if err == nil && cmd.ProcessState.Success() {
-					testset.Testcases[len(testset.Testcases)-1].VerdictName = problems.VERDICT_AC
-					testset.Testcases[len(testset.Testcases)-1].Score = testset.Testcases[len(testset.Testcases)-1].MaxScore
+				answerFile, err := os.Open(answerLocation)
+				if err != nil {
+					return ans, err
+				}
+
+				answerContents, err := ioutil.ReadAll(answerFile)
+				if err != nil {
+					return ans, err
+				}
+
+				res, err := lang.Run(s, bytes.NewReader(binaryContents), testcase, stdout, time.Duration(ts.TimeLimit)*time.Millisecond, ts.MemoryLimit)
+				if err != nil {
+					return ans, err
+				}
+
+				if res.Verdict == language.VERDICT_OK {
+					checkerOutput := &bytes.Buffer{}
+					programOutput := stdout.String()
+
+					expectedOutput := string(answerContents)
+
+					cmd := exec.Command(filepath.Join(p.Path, "check"), testLocation, "/dev/stdin", answerLocation)
+					cmd.Stdin = stdout
+					cmd.Stdout = checkerOutput
+					cmd.Stderr = checkerOutput
+
+					err = cmd.Run()
+
+					/*	if err != nil {
+						ans.Feedback = append(ans.Feedback, problems.Testcase{VerdictName: problems.VERDICT_XX, MemoryUsed: res.Memory, TimeSpent: res.Time})
+						return ans, err
+					}*/
+
+					testset.Testcases = append(testset.Testcases, problems.Testcase{MaxScore: float64(tc.Score), Testset: ts.Name, MemoryUsed: res.Memory, TimeSpent: res.Time, Output: truncate(programOutput), ExpectedOutput: truncate(expectedOutput), CheckerOutput: truncate(checkerOutput.String()), Group: grp.Name})
+					group.Testcases = append(group.Testcases, problems.Testcase{MaxScore: float64(tc.Score), Testset: ts.Name, MemoryUsed: res.Memory, TimeSpent: res.Time, Output: truncate(programOutput), ExpectedOutput: truncate(expectedOutput), CheckerOutput: truncate(checkerOutput.String()), Group: grp.Name})
+
+					if err == nil && cmd.ProcessState.Success() {
+						testset.Testcases[len(testset.Testcases)-1].VerdictName = problems.VERDICT_AC
+						testset.Testcases[len(testset.Testcases)-1].Score = testset.Testcases[len(testset.Testcases)-1].MaxScore
+
+						group.Testcases[len(group.Testcases)-1].VerdictName = problems.VERDICT_AC
+						group.Testcases[len(group.Testcases)-1].Score = group.Testcases[len(group.Testcases)-1].MaxScore
+					} else {
+						testset.Testcases[len(testset.Testcases)-1].VerdictName = problems.VERDICT_WA
+						testset.Testcases[len(testset.Testcases)-1].Score = 0
+
+						group.Testcases[len(group.Testcases)-1].VerdictName = problems.VERDICT_WA
+						group.Testcases[len(group.Testcases)-1].Score = 0
+
+						if problems.FeedbackFromString(p.FeedbackType) != problems.FEEDBACK_IOI {
+							return ans, nil
+						}
+					}
 				} else {
-					testset.Testcases[len(testset.Testcases)-1].VerdictName = problems.VERDICT_WA
-					testset.Testcases[len(testset.Testcases)-1].Score = 0
+					curr := problems.Testcase{}
+					curr.Testset = ts.Name
+					switch res.Verdict {
+					case language.VERDICT_RE:
+						curr.VerdictName = problems.VERDICT_RE
+					case language.VERDICT_XX:
+						curr.VerdictName = problems.VERDICT_XX
+					case language.VERDICT_ML:
+						curr.VerdictName = problems.VERDICT_ML
+					case language.VERDICT_TL:
+						curr.VerdictName = problems.VERDICT_TL
+					}
+
+					curr.Group = grp.Name
+					curr.MemoryUsed = res.Memory
+					curr.TimeSpent = res.Time
+					curr.Score = 0
+					curr.MaxScore = float64(tc.Score)
+					curr.Output = truncate(stdout.String()) //now it's stderr
+					curr.ExpectedOutput = truncate(string(answerContents))
+
+					testset.Testcases = append(testset.Testcases, curr)
+					group.Testcases = append(group.Testcases, curr)
+
 					if problems.FeedbackFromString(p.FeedbackType) != problems.FEEDBACK_IOI {
 						return ans, nil
 					}
 				}
-			} else {
-				curr := problems.Testcase{}
-				curr.Testset = ts.Name
-				switch res.Verdict {
-				case language.VERDICT_RE:
-					curr.VerdictName = problems.VERDICT_RE
-				case language.VERDICT_XX:
-					curr.VerdictName = problems.VERDICT_XX
-				case language.VERDICT_ML:
-					curr.VerdictName = problems.VERDICT_ML
-				case language.VERDICT_TL:
-					curr.VerdictName = problems.VERDICT_TL
-				}
-
-				curr.MemoryUsed = res.Memory
-				curr.TimeSpent = res.Time
-				curr.Score = 0
-				curr.MaxScore = float64(p.Judging.TestSet[tsid].Tests[tc-1].Score)
-				curr.Output = truncate(stdout.String()) //now it's stderr
-				curr.ExpectedOutput = truncate(string(answerContents))
-
-				testset.Testcases = append(testset.Testcases, curr)
-
-				if problems.FeedbackFromString(p.FeedbackType) != problems.FEEDBACK_IOI {
-					return ans, nil
-				}
 			}
-
 		}
+
 	}
 
 	return ans, nil

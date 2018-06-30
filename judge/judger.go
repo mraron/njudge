@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/labstack/gommon/log"
 	"github.com/mraron/njudge/utils/language"
 	"github.com/mraron/njudge/utils/problems"
+	"github.com/mraron/njudge/utils/problems/polygon"
 	"github.com/satori/go.uuid"
 	"net/http"
 	"os"
@@ -56,18 +58,22 @@ func (h HTTPCallback) Callback(test string, status problems.Status, done bool) e
 }
 
 func Judge(p problems.Problem, src string, lang language.Language, sandbox language.Sandbox, c Callbacker) error {
+	log.Print(p.(polygon.Problem).Judging.TestSet[0])
 	id, err := uuid.NewV4()
 	if err != nil {
+		log.Print(err)
 		return err
 	}
-
+	log.Print("itt?")
 	f, err := os.Create("/tmp/judge_" + id.String())
 	if err != nil {
+		log.Print(err)
 		return err
 	}
 
 	_, err = f.Write([]byte(src))
 	if err != nil {
+		log.Print(err)
 		return err
 	}
 
@@ -75,6 +81,7 @@ func Judge(p problems.Problem, src string, lang language.Language, sandbox langu
 
 	f, err = os.Open("/tmp/judge_" + id.String())
 	if err != nil {
+		log.Print(err)
 		return err
 	}
 
@@ -86,6 +93,7 @@ func Judge(p problems.Problem, src string, lang language.Language, sandbox langu
 		st.Compiled = false
 		st.CompilerOutput = stderr.String()
 
+		log.Print(err)
 		return c.Callback("", st, true)
 	}
 
@@ -111,6 +119,7 @@ func Judge(p problems.Problem, src string, lang language.Language, sandbox langu
 			err = c.Callback(test, status, false)
 
 			if err != nil {
+				log.Print(err)
 				return err
 			}
 		case <-ran:

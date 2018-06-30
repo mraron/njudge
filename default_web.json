@@ -1,9 +1,15 @@
 {
+  "hostname": "192.168.4.128",
   "port": "5555",
   "problemsDir": "/home/aron/njudge_problems",
   "templatesDir": "/home/aron/go/src/github.com/mraron/njudge/templates",
   "mailAccount": "[SECRET]",
   "mailServerHost": "[SECRET]",
   "mailServerPort": "[SECRET]",
-  "mailAccountPassword": "[SECRET]"
+  "mailAccountPassword": "[SECRET]",
+  "gluePort": "3000",
+  "DBName": "[SECRET]",
+  "DBAccount": "[SECRET]",
+  "DBPassword": "[SECRET]",
+  "DBHost": "[SECRET]"
 }

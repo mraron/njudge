@@ -39,11 +39,11 @@
 <div class="table-responsived">
     <table class="table table-bordered">
         <thead>
-        <tr><td>Teszthalmaz</td><td>Verdikt</td><td>Pont</td><td>Idő</td><td>Memória</td></tr>
+        <tr><td>Teszt</td><td>Verdikt</td><td>Pont</td><td>Idő</td><td>Memória</td></tr>
         {{range $testset := .Data.Status.Feedback}}
         {{range $ind, $val := $testset.Testcases}}
         <tr>
-            <td>{{$testset.Name}}</td><td><span class="text-{{if eq $val.VerdictName 0}}success{{else}}info{{end}}">{{$val.VerdictName.String}}</span></td><td>{{$val.Score}}/{{$val.MaxScore}}</td><td>{{$val.TimeSpent}}</td><td>{{$val.MemoryUsed}}</td>
+            <td>{{$testset.Name}}.{{$val.Group}}</td><td><span class="text-{{if eq $val.VerdictName 0}}success{{else}}info{{end}}">{{$val.VerdictName.String}}</span></td><td>{{$val.Score}}/{{$val.MaxScore}}</td><td>{{$val.TimeSpent}}</td><td>{{$val.MemoryUsed}}</td>
         </tr>
         {{end}}
         {{end}}
