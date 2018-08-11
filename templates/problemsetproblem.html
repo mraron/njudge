@@ -9,16 +9,19 @@
         Megoldás beküldése
     </div>
     <div class="card-body">
-        <input type="file" name="source" id="fileInput">
-        <br>
-        <br>
-        <select name="language" class="form-control" id="languagesList">
-            {{range $l := .Data.Languages}}
-                <option value="{{$l.Id}}">{{$l.Name}}</option>
-            {{end}}
-        </select>
-        <br>
-        <input type="submit" class="btn btn-primary">
+        <form action="/problemset/{{get .Context "problemset"}}/submit" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="problem" value="{{.Data.Name}}">
+            <input type="file" name="source" id="fileInput">
+            <br>
+            <br>
+            <select name="language" class="form-control" id="languagesList">
+                {{range $l := .Data.Languages}}
+                    <option value="{{$l.Id}}">{{$l.Name}}</option>
+                {{end}}
+            </select>
+            <br>
+            <input type="submit" class="btn btn-primary">
+        </form>
     </div>
 </div>
 
