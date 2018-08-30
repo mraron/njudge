@@ -10,6 +10,7 @@ import (
 	"math/rand"
 	"net/http"
 	"time"
+	"github.com/jinzhu/gorm"
 )
 
 func GenerateActivationKey(length int) string {
@@ -39,7 +40,7 @@ func (s *Server) currentUser(c echo.Context) (*models.User, error) {
 		return nil, nil
 	}
 
-	err = s.db.Get(u, "SELECT id FROM users WHERE id=$1", storage.Values["id"])
+	err = s.db.Where("id = ?", storage.Values["id"]).First(u).Error
 	return u, err
 }
 
@@ -61,7 +62,7 @@ func (s *Server) postUserLogin(c echo.Context) error {
 		return c.Render(http.StatusOK, "error.html", "Már be vagy lépve...")
 	}
 
-	if err = s.db.Get(u, "SELECT id FROM users WHERE name=$1", c.FormValue("name")); err != nil {
+	if err = s.db.Where("name = ?", c.FormValue("name")).First(&u).Error; err != nil {
 		return s.internalError(c, err, "Belső hiba #1")
 	}
 
@@ -74,7 +75,7 @@ func (s *Server) postUserLogin(c echo.Context) error {
 	}
 
 	storage, _ := session.Get("user", c)
-	storage.Values["id"] = u.Id
+	storage.Values["id"] = u.ID
 
 	if err = storage.Save(c.Request(), c.Response()); err != nil {
 		return s.internalError(c, err, "Belső hiba #2")
@@ -106,8 +107,8 @@ func (s *Server) postUserRegister(c echo.Context) error {
 	}
 
 	used := func(col, value, msg string) {
-		u := ""
-		if s.db.Get(&u, "SELECT name FROM users WHERE"+col+"=$1", value); u != "" {
+		u := &models.User{}
+		if err := s.db.Where("col = ?", value).First(u); err != nil && u.Name!="" {
 			errors = append(errors, msg)
 		}
 	}
@@ -148,14 +149,24 @@ func (s *Server) postUserRegister(c echo.Context) error {
 			}
 		}()
 
-		tx, err := s.db.Begin()
-		mustPanic(err)
+		tx := s.db.Begin()
 
 		hashed, err := bcrypt.GenerateFromPassword([]byte(c.FormValue("password")), bcrypt.DefaultCost)
 		mustPanic(err)
 
-		_, err = tx.Exec("INSERT INTO users (name,password,email,activation_key,role) VALUES ($1,$2,$3,$4,$5)", c.FormValue("name"), hashed, c.FormValue("email"), key, "user")
+		user := &models.User{}
+		user.Name = c.FormValue("name")
+		user.HashedPassword = hashed
+		user.Email = c.FormValue("email")
+		user.ActivationKey.String = key
+		user.ActivationKey.Valid = true
+		user.Role = "user"
+
+		err = s.db.Save(user).Error
 		mustPanic(err)
+
+		//_, err = tx.Exec("INSERT INTO users (name,password,email,activation_key,role) VALUES ($1,$2,$3,$4,$5)", c.FormValue("name"), hashed, c.FormValue("email"), key, "user")
+
 
 		m := Mail{}
 		m.Recipients = []string{c.FormValue("email")}
@@ -163,7 +174,7 @@ func (s *Server) postUserRegister(c echo.Context) error {
 		m.Subject = "Regisztráció aktiválása"
 		mustPanic(s.SendMail(m))
 
-		mustPanic(tx.Commit())
+		mustPanic(tx.Commit().Error)
 	}
 
 	if transaction(); err != nil {
@@ -201,14 +212,14 @@ func (s *Server) getActivateUser(c echo.Context) error {
 	var (
 		user *models.User
 		err  error
-		tx   *sql.Tx
+		tx   *gorm.DB
 	)
 
 	if u := c.Get("user").(*models.User); u != nil {
 		return c.Render(http.StatusOK, "error.html", "Már be vagy lépve...")
 	}
 
-	if err = s.db.Get(&user, "SELECT id FROM users WHERE name=$1", c.Param("name")); err != nil {
+	if err = s.db.Where("name = ?", c.Param("name")).First(&user).Error; err != nil {
 		return s.internalError(c, err, "Belső hiba #1")
 	}
 
@@ -220,15 +231,17 @@ func (s *Server) getActivateUser(c echo.Context) error {
 		return c.Render(http.StatusOK, "error.html", "Hibás aktiválási kulcs. Biztos jó linkre kattintottál?")
 	}
 
-	if tx, err = s.db.Begin(); err != nil {
+	if tx = s.db.Begin(); err != nil {
 		return s.internalError(c, err, "Belső hiba #2")
 	}
 
-	if _, err = tx.Exec("UPDATE users SET activation_key=NULL WHERE name=$1", c.Param("name")); err != nil {
+	user.ActivationKey.String = ""
+	user.ActivationKey.Valid = false
+	if err = tx.Save(user).Error; err != nil {
 		return s.internalError(c, err, "Belső hiba #3")
 	}
 
-	if err = tx.Commit(); err != nil {
+	if err = tx.Commit().Error; err != nil {
 		return s.internalError(c, err, "Belső hiba #4")
 	}
 

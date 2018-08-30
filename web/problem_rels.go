@@ -38,10 +38,15 @@ func (s *Server) postAPIProblemRel(c echo.Context) error {
 
 	pr := new(models.ProblemRel)
 	if err := c.Bind(pr); err != nil {
-		return err
+		return s.internalError(c, err, err.Error())
 	}
 
-	return pr.Insert(s.db)
+	err := s.db.Create(pr).Error
+	if err != nil {
+		return s.internalError(c, err, err.Error())
+	}
+
+	return c.String(http.StatusOK, "ok")
 }
 
 func (s *Server) getAPIProblemRel(c echo.Context) error {
@@ -85,7 +90,7 @@ func (s *Server) deleteAPIProblemRel(c echo.Context) error {
 		return s.internalError(c, err, "error")
 	}
 
-	err = pr.Delete(s.db)
+	err = s.db.Delete(pr).Error
 	if err != nil {
 		return s.internalError(c, err, "error")
 	}
@@ -103,14 +108,19 @@ func (s *Server) putAPIProblemRel(c echo.Context) error {
 
 	id, err := strconv.Atoi(id_)
 	if err != nil {
-		return err
+		return s.internalError(c, err, "error")
 	}
 
 	pr := new(models.ProblemRel)
 	if err = c.Bind(pr); err != nil {
-		return err
+		return s.internalError(c, err, "error")
 	}
 
-	pr.Id = int64(id)
-	return pr.Update(s.db)
+	pr.ID = uint(id)
+	err = s.db.Save(pr).Error
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	return c.String(http.StatusOK, "ok")
 }

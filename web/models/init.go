@@ -1,9 +1,11 @@
 package models
 
-import "github.com/jmoiron/sqlx"
+import (
+	"github.com/jinzhu/gorm"
+)
 
-var db *sqlx.DB
+var db *gorm.DB
 
-func SetDatabase(db_ *sqlx.DB) {
+func SetDatabase(db_ *gorm.DB) {
 	db = db_
 }

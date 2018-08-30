@@ -4,22 +4,22 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"errors"
-	"github.com/jmoiron/sqlx"
 	"github.com/mraron/njudge/web/roles"
 	"strconv"
+	"github.com/jinzhu/gorm"
 )
 
 type User struct {
-	Id             int64
-	Name           string
-	HashedPassword []byte `db:"password"`
-	Email          string
-	ActivationKey  sql.NullString `db:"activation_key"`
-	Role           roles.Role
+	gorm.Model
+	Name           string `gorm:"column:name"`
+	HashedPassword []byte `gorm:"column:password"`
+	Email          string `gorm:"column:email"`
+	ActivationKey  sql.NullString `gorm:"column:activation_key"`
+	Role           roles.Role `gorm:"column:role"`
 }
 
 func (u User) Value() (driver.Value, error) {
-	return driver.Value(u.Id), nil
+	return driver.Value(u.ID), nil
 }
 
 func (u *User) Scan(value interface{}) error {
@@ -45,26 +45,26 @@ func (u *User) Scan(value interface{}) error {
 		return errors.New("can't scan user from this type")
 	}
 
-	row := db.QueryRow("SELECT * FROM users WHERE id=$1", id)
-	if err = row.Scan(&u.Id, &u.Name, &u.HashedPassword, &u.Email, &u.ActivationKey, &u.Role); err != nil {
+	if err = db.Model(&User{}).Where("id = ?", id).First(u).Error; err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func UserFromId(db *sqlx.DB, id int) (ans User, err error) {
-	err = db.Get(&ans, "SELECT * FROM users WHERE id=$1", id)
+func UserFromId(db *gorm.DB, id int) (ans User, err error) {
+	err = db.Model(&User{}).Where("id = ?", id).First(&ans).Error
 	return
 }
 
+/*
 func (u User) Delete(db *sqlx.DB) (err error) {
-	_, err = db.Exec("DELETE FROM users WHERE id=$1", u.Id)
+	_, err = db.Exec("DELETE FROM users WHERE id=$1", u.ID)
 	return
 }
 
 func (u User) Update(db *sqlx.DB) (err error) {
-	_, err = db.Exec("UPDATE users SET name=$1, password=$2, email=$3, activation_key=$4, role=$5 WHERE id=$6", u.Name, u.HashedPassword, u.Email, u.ActivationKey, u.Role, u.Id)
+	_, err = db.Exec("UPDATE users SET name=$1, password=$2, email=$3, activation_key=$4, role=$5 WHERE id=$6", u.Name, u.HashedPassword, u.Email, u.ActivationKey, u.Role, u.ID)
 	return
 }
 
@@ -78,7 +78,7 @@ func (u *User) Insert(db *sqlx.DB) error {
 		return err
 	}
 
-	u.Id = id
+	u.ID = id
 
 	return nil
-}
+}*/

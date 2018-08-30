@@ -3,7 +3,6 @@ package web
 import (
 	"fmt"
 	"github.com/gorilla/sessions"
-	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/middleware"
@@ -22,6 +21,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+	"github.com/jinzhu/gorm"
 )
 
 type Server struct {
@@ -44,7 +44,7 @@ type Server struct {
 
 	judges   []*models.Judge
 	problems map[string]problems.Problem
-	db       *sqlx.DB
+	db       *gorm.DB
 }
 
 /*
@@ -80,11 +80,24 @@ func (s *Server) updateProblems() {
 
 func (s *Server) connectToDB() {
 	var err error
-	s.db, err = sqlx.Open("postgres", "postgres://"+s.DBAccount+":"+s.DBPassword+"@"+s.DBHost+"/"+s.DBName)
+	s.db, err = gorm.Open("postgres", "postgres://"+s.DBAccount+":"+s.DBPassword+"@"+s.DBHost+"/"+s.DBName)
 
 	if err != nil {
 		panic(err)
 	}
+
+	s.db.AutoMigrate(&models.Judge{})
+	fmt.Println("ej")
+	s.db.AutoMigrate(&models.ProblemRel{})
+	fmt.Println("ej")
+	s.db.AutoMigrate(&models.User{})
+	fmt.Println("ej")
+
+	s.db.AutoMigrate(&models.Submission{})
+	//s.db.Model(&models.Submission{}).Related(&models.User{	})
+	fmt.Println("ej")
+	fmt.Println("ej")
+
 }
 
 func (s *Server) loadJudgesFromDB() {
@@ -106,7 +119,7 @@ func (s *Server) syncJudges() {
 				log.Print("trying to access judge on ", j.Host, j.Port, " getting error ", err)
 				j.Online = false
 				j.Ping = -1
-				err = j.Update(s.db)
+				err = s.db.Save(j).Error
 				if err != nil {
 					log.Print("also error occured while updating", err)
 				}
@@ -118,7 +131,7 @@ func (s *Server) syncJudges() {
 			j.State = st
 			j.Ping = 1
 
-			err = j.Update(s.db)
+			err = s.db.Save(j).Error
 			if err != nil {
 				log.Print("trying to access judge on", j.Host, j.Port, " unsuccesful update in database", err)
 				continue
@@ -160,11 +173,31 @@ func (s *Server) runGlue() {
 				verdict = models.VERDICT_CE
 			}
 
-			if _, err := s.db.Exec("UPDATE submissions SET verdict=$1, status=$2, ontest=NULL, judged=$3 WHERE id=$4", verdict, st.Status, time.Now(), id); err != nil {
+			submission := new(models.Submission)
+			if err := s.db.Where("id = ?", id).First(&submission).Error; err != nil {
+				return s.internalError(c, err, "err")
+			}
+
+			submission.Verdict = verdict
+			submission.Status = st.Status
+			submission.Judged.Time = time.Now()
+			submission.Judged.Valid = true
+
+			if err := s.db.Save(submission).Error; err != nil {
 				return s.internalError(c, err, "err")
 			}
 		} else {
-			if _, err := s.db.Exec("UPDATE submissions SET ontest=$1, status=$2, verdict=$3 WHERE id=$4", st.Test, st.Status, models.VERDICT_RU, id); err != nil {
+			submission := new(models.Submission)
+			if err := s.db.Where("id = ?", id).First(&submission).Error; err != nil {
+				return s.internalError(c, err, "err")
+			}
+
+			submission.OnTest.String = st.Test
+			submission.OnTest.Valid = true
+			submission.Status = st.Status
+			submission.Verdict = models.VERDICT_RU
+
+			if err := s.db.Save(submission).Error; err != nil {
 				log.Print("can't realtime update status", err)
 			}
 		}
@@ -193,8 +226,9 @@ func (s *Server) judger() {
 		for _, sub := range ss {
 			for _, j := range s.judges {
 				if j.State.SupportsProblem(sub.Problem) {
-					j.State.Submit(judge.Submission{sub.Problem, sub.Language, sub.Source, "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(int(sub.Id))})
-					if _, err := s.db.Exec("UPDATE submissions SET started=true WHERE id=$1", sub.Id); err != nil {
+					j.State.Submit(judge.Submission{sub.Problem, sub.Language, sub.Source, "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(int(sub.ID))})
+					sub.Started = true
+					if err := s.db.Save(sub).Error; err != nil {
 						log.Print("FATAL: ", err)
 					}
 					break
@@ -212,7 +246,6 @@ func (s *Server) Run() {
 		return func(c echo.Context) error {
 			user, err := s.currentUser(c)
 			c.Set("user", user)
-
 			if err != nil {
 				return s.internalError(c, err, "belső hiba")
 			}

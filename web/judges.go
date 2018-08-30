@@ -24,7 +24,7 @@ type Judge struct {
 }
 
 func NewJudgeFromModelsJudge(j *models.Judge) (res Judge) {
-	res.Id = j.Id
+	res.Id = int64(j.ID)
 	res.Host = j.Host
 	res.Port = j.Port
 	res.Ping = j.Ping
@@ -77,9 +77,8 @@ func (s *Server) postAPIJudges(c echo.Context) error {
 		return s.internalError(c, err, "error")
 	}
 
-	err := j.Insert(s.db)
+	err := s.db.Model(&models.Judge{}).Create(j).Error
 	if err != nil {
-		fmt.Println("itt")
 		return s.internalError(c, err, "error")
 	}
 
@@ -125,7 +124,7 @@ func (s *Server) deleteAPIJudge(c echo.Context) error {
 		return s.internalError(c, err, "error")
 	}
 
-	err = j.Delete(s.db)
+	err = s.db.Model(&models.Judge{}).Delete(j).Error
 	if err != nil {
 		return s.internalError(c, err, "error")
 	}
@@ -160,7 +159,7 @@ func (s *Server) putAPIJudge(c echo.Context) error {
 	model.Host = j.Host
 	model.Port = j.Port
 
-	err = model.Update(s.db)
+	err = s.db.Model(&models.Judge{}).Save(model).Error
 	fmt.Println(err)
 	if err != nil {
 		return s.internalError(c, err, "error")

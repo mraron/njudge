@@ -111,7 +111,7 @@ func (s *Server) getProblemsetProblemAttachment(c echo.Context) error {
 
 func (s *Server) getProblemsetStatus(c echo.Context) error {
 	sbs := make([]models.Submission, 0)
-	if err := s.db.Select(&sbs, "SELECT * FROM submissions ORDER BY id DESC"); err != nil {
+	if err := s.db.Order("id DESC").Find(&sbs).Error; err != nil {
 		return s.internalError(c, err, "Belső hiba.")
 	}
 

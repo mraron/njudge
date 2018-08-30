@@ -4,11 +4,11 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"errors"
-	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
-	"github.com/mraron/njudge/utils/problems"
 	"strconv"
 	"time"
+	"github.com/jinzhu/gorm"
+	"github.com/mraron/njudge/utils/problems"
 )
 
 type Verdict int
@@ -59,24 +59,25 @@ func (v Verdict) Value() (driver.Value, error) {
 }
 
 type Submission struct {
-	Id         int64
-	Status     problems.Status
-	Verdict    Verdict
-	OnTest     sql.NullString `db:"ontest"`
-	User       *User
-	Submitted  time.Time
-	Judged     pq.NullTime
-	Problemset string
-	Problem    string
-	Language   string
-	Private    bool
-	Source     string
-	Started    bool
+	gorm.Model
+	Status     problems.Status `gorm:"column:status"`
+	Verdict    Verdict `gorm:"column:verdict"`
+	OnTest     sql.NullString `gorm:"column:ontest"`
+	User       *User `sql:"type:integer" gorm:"column:userid"`
+	Submitted  time.Time `gorm:"column:submitted"`
+	Judged     pq.NullTime `gorm:"column:judged"`
+	Problemset string `gorm:"column:problemset"`
+	Problem    string `gorm:"column:problem"`
+	Language   string `gorm:"column:language"`
+	Private    bool `gorm:"column:private"`
+	Source     string `gorm:"column:source"`
+	Started    bool `gorm:"column:started"`
 }
 
-func SubmissionFromId(db *sqlx.DB, id int64) (*Submission, error) {
+
+func SubmissionFromId(db *gorm.DB, id int64) (*Submission, error) {
 	s := new(Submission)
-	err := db.Get(s, "SELECT * FROM submissions WHERE id=$1", id)
+	err := db.Model(&Submission{}).Where("id = ?", id).First(s).Error
 
 	return s, err
 }

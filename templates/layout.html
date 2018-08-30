@@ -137,9 +137,9 @@
 
 {{define "submissionRow"}}
 <tr>
-    <td><a href="/submission/{{.Id}}">{{.Id}}</a></td>
+    <td><a href="/submission/{{.ID}}">{{.ID}}</a></td>
     <td>{{.Submitted.Year}}. {{fixedlen (month2int .Submitted.Month) 2}}. {{fixedlen .Submitted.Day 2}} {{fixedlen .Submitted.Hour 2}}:{{fixedlen .Submitted.Minute 2}}:{{fixedlen .Submitted.Second 2}}</td>
-    <td>{{.User.Name}}</td>
+    <td>{{.User.Name}} {{.User}}</td>
     <td><a href="/problemset/{{.Problemset}}/{{.Problem}}/">{{translateContent "hungarian" (problem .Problem).Titles}}</a></td>
     <td>{{.Language}}</td>
     <td>

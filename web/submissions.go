@@ -10,6 +10,7 @@ import (
 	"os"
 	"strconv"
 	"time"
+	"github.com/lib/pq"
 )
 
 func (s *Server) postProblemsetSubmit(c echo.Context) error {
@@ -76,20 +77,26 @@ func (s *Server) postProblemsetSubmit(c echo.Context) error {
 			}
 		}()
 
-		tx, err = s.db.Begin()
+		tx := s.db.Begin()
 		mustPanic(err)
 
-		last := 0
-		res, err := tx.Query("INSERT INTO submissions (status,\"user\",verdict,ontest,submitted,judged,problem,language,private,problemset,source,started) VALUES ($1,$2,$3,NULL,$4,NULL,$5,$6,false,$7, $8,false) RETURNING id", problems.Status{}, u, models.VERDICT_UP, time.Now(), s.problems[c.FormValue("problem")].Name(), c.FormValue("language"), c.Get("problemset"), contents)
+		sub := &models.Submission{}
+		sub.Status = problems.Status{}
+		sub.User = u
+		sub.Verdict = models.VERDICT_UP
+		sub.OnTest = sql.NullString{}
+		sub.Submitted = time.Now()
+		sub.Judged = pq.NullTime{}
+		sub.Problem = s.problems[c.FormValue("problem")].Name()
+		sub.Language = c.FormValue("language")
+		sub.Source = string(contents)
+		sub.Problemset = c.Get("problemset").(string)
+		err = tx.Save(sub).Error
 		mustPanic(err)
 
-		res.Next()
-
-		err = res.Scan(&last)
-		mustPanic(err)
-
-		err = res.Close()
-		mustPanic(err)
+		last := sub.ID
+		//res, err := tx.Query("INSERT INTO submissions (status,\"user\",verdict,ontest,submitted,judged,problem,language,private,problemset,source,started) VALUES ($1,$2,$3,NULL,$4,NULL,$5,$6,false,$7, $8,false) RETURNING id", problems.Status{}, u, models.VERDICT_UP, time.Now(), s.problems[c.FormValue("problem")].Name(), c.FormValue("language"), c.Get("problemset"), contents)
+		//mustPanic(err)
 
 		fs, err := os.Create("submissions/" + strconv.Itoa(int(last)))
 		mustPanic(err)
@@ -97,7 +104,7 @@ func (s *Server) postProblemsetSubmit(c echo.Context) error {
 		_, err = fs.Write(contents)
 		mustPanic(err)
 
-		err = tx.Commit()
+		err = tx.Commit().Error
 		mustPanic(err)
 	}
 
