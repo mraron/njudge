@@ -15,6 +15,8 @@ import (
 	"github.com/mraron/njudge/web/models"
 	_ "github.com/mraron/njudge/web/models"
 	"github.com/mraron/njudge/web/roles"
+	"github.com/volatiletech/sqlboiler/boil"
+	. "github.com/volatiletech/sqlboiler/queries/qm"
 	"html/template"
 	"io/ioutil"
 	_ "mime"
@@ -85,11 +87,13 @@ func (s *Server) connectToDB() {
 	if err != nil {
 		panic(err)
 	}
+
+	boil.SetDB(s.db)
 }
 
 func (s *Server) loadJudgesFromDB() {
 	var err error
-	s.judges, err = models.GetJudges(s.db)
+	s.judges, err = models.Judges().All(s.db)
 
 	if err != nil {
 		panic(err)
@@ -106,7 +110,7 @@ func (s *Server) syncJudges() {
 				log.Print("trying to access judge on ", j.Host, j.Port, " getting error ", err)
 				j.Online = false
 				j.Ping = -1
-				err = j.Update(s.db)
+				_, err = j.Update(s.db, boil.Infer())
 				if err != nil {
 					log.Print("also error occured while updating", err)
 				}
@@ -115,10 +119,10 @@ func (s *Server) syncJudges() {
 			}
 
 			j.Online = true
-			j.State = st
+			j.State, _ = st.Value()
 			j.Ping = 1
 
-			err = j.Update(s.db)
+			_, err = j.Update(s.db, boil.Infer())
 			if err != nil {
 				log.Print("trying to access judge on", j.Host, j.Port, " unsuccesful update in database", err)
 				continue
@@ -155,16 +159,16 @@ func (s *Server) runGlue() {
 		}
 
 		if st.Done {
-			verdict := models.Verdict(st.Status.Verdict())
+			verdict := Verdict(st.Status.Verdict())
 			if st.Status.Compiled == false {
-				verdict = models.VERDICT_CE
+				verdict = VERDICT_CE
 			}
 
 			if _, err := s.db.Exec("UPDATE submissions SET verdict=$1, status=$2, ontest=NULL, judged=$3 WHERE id=$4", verdict, st.Status, time.Now(), id); err != nil {
 				return s.internalError(c, err, "err")
 			}
 		} else {
-			if _, err := s.db.Exec("UPDATE submissions SET ontest=$1, status=$2, verdict=$3 WHERE id=$4", st.Test, st.Status, models.VERDICT_RU, id); err != nil {
+			if _, err := s.db.Exec("UPDATE submissions SET ontest=$1, status=$2, verdict=$3 WHERE id=$4", st.Test, st.Status, VERDICT_RU, id); err != nil {
 				log.Print("can't realtime update status", err)
 			}
 		}
@@ -179,9 +183,8 @@ func (s *Server) judger() {
 	for {
 		time.Sleep(1 * time.Second)
 
-		ss := []models.Submission{}
-
-		if err := s.db.Select(&ss, "SELECT * FROM submissions WHERE started=false ORDER BY id ASC LIMIT 1"); err != nil {
+		ss, err := models.Submissions(Where("started=?", false), OrderBy("id ASC"), Limit(1)).All(s.db)
+		if err != nil {
 			log.Print("judger query error", err)
 			continue
 		}
@@ -192,9 +195,12 @@ func (s *Server) judger() {
 
 		for _, sub := range ss {
 			for _, j := range s.judges {
-				if j.State.SupportsProblem(sub.Problem) {
-					j.State.Submit(judge.Submission{sub.Problem, sub.Language, sub.Source, "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(int(sub.Id))})
-					if _, err := s.db.Exec("UPDATE submissions SET started=true WHERE id=$1", sub.Id); err != nil {
+				server := &judge.Server{}
+				server.Scan(j.State)
+
+				if server.SupportsProblem(sub.Problem) {
+					server.Submit(judge.Submission{sub.Problem, sub.Language, sub.Source, "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(int(sub.ID))})
+					if _, err := s.db.Exec("UPDATE submissions SET started=true WHERE id=$1", sub.ID); err != nil {
 						log.Print("FATAL: ", err)
 					}
 					break
@@ -211,11 +217,12 @@ func (s *Server) Run() {
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			user, err := s.currentUser(c)
-			c.Set("user", user)
-
+			fmt.Println(c.Request().URL, user, err)
 			if err != nil {
 				return s.internalError(c, err, "belső hiba")
 			}
+
+			c.Set("user", user)
 
 			return next(c)
 		}
@@ -276,7 +283,8 @@ func (s *Server) Run() {
 
 	s.updateProblems()
 	s.connectToDB()
-	models.SetDatabase(s.db)
+	boil.SetDB(s.db)
+
 	s.loadJudgesFromDB()
 	go s.syncJudges()
 	go s.runGlue()
@@ -298,7 +306,7 @@ func (s *Server) getHome(c echo.Context) error {
 
 func (s *Server) getAdmin(c echo.Context) error {
 	u := c.Get("user").(*models.User)
-	if !roles.Can(u.Role, roles.ActionView, "admin_panel") {
+	if !roles.Can(roles.Role(u.Role), roles.ActionView, "admin_panel") {
 		return c.Render(http.StatusUnauthorized, "error.html", "Engedély megtagadva.")
 	}
 

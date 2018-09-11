@@ -13,9 +13,9 @@
 <pre><code class="{{.Data.Language}}">{{.Data.Source}}</code></pre>
 {{end}}
 
-{{$status := .Data.Status}}
-{{if eq .Data.Status.FeedbackType 0}}
-{{range $testset := .Data.Status.Feedback}}
+{{$status := parseStatus .Data.Status}}
+{{if eq $status.FeedbackType 0}}
+{{range $testset := $status.Feedback}}
 {{range $i, $e := $testset.Testcases}}
 {{$ind := add $i 1}}
 <div class="card">
@@ -35,12 +35,12 @@
 {{end}}
 {{end}}
 
-{{if eq .Data.Status.FeedbackType 1}}
+{{if eq $status.FeedbackType 1}}
 <div class="table-responsived">
     <table class="table table-bordered">
         <thead>
         <tr><td>Teszt</td><td>Verdikt</td><td>Pont</td><td>Idő</td><td>Memória</td></tr>
-        {{range $testset := .Data.Status.Feedback}}
+        {{range $testset := $status.Feedback}}
         {{range $ind, $val := $testset.Testcases}}
         <tr>
             <td>{{$testset.Name}}.{{$val.Group}}</td><td><span class="text-{{if eq $val.VerdictName 0}}success{{else}}info{{end}}">{{$val.VerdictName.String}}</span></td><td>{{$val.Score}}/{{$val.MaxScore}}</td><td>{{$val.TimeSpent}}</td><td>{{$val.MemoryUsed}}</td>

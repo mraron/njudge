@@ -13,7 +13,6 @@ import (
 	"path/filepath"
 
 	"bytes"
-	"database/sql/driver"
 	"encoding/json"
 	"fmt"
 	"github.com/kataras/go-errors"
@@ -216,9 +215,9 @@ func (s *Server) postJudge() echo.HandlerFunc {
 	}
 }
 
-func (s Server) Value() (driver.Value, error) {
+func (s Server) Value() (string, error) {
 	val, err := json.Marshal(s)
-	return driver.Value(val), err
+	return string(val), err
 }
 
 func (u *Server) Scan(value interface{}) error {

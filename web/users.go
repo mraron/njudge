@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/mraron/njudge/web/models"
+	. "github.com/volatiletech/sqlboiler/queries/qm"
 	"golang.org/x/crypto/bcrypt"
 	"math/rand"
 	"net/http"
@@ -33,13 +34,16 @@ func (s *Server) currentUser(c echo.Context) (*models.User, error) {
 		err error
 	)
 
-	storage, _ := session.Get("user", c)
+	storage, err := session.Get("user", c)
+	if err != nil {
+		panic(err)
+	}
 
 	if _, ok := storage.Values["id"]; !ok {
 		return nil, nil
 	}
 
-	err = s.db.Get(u, "SELECT id FROM users WHERE id=$1", storage.Values["id"])
+	u, err = models.Users(Where("id=?", storage.Values["id"])).One(s.db)
 	return u, err
 }
 
@@ -61,11 +65,13 @@ func (s *Server) postUserLogin(c echo.Context) error {
 		return c.Render(http.StatusOK, "error.html", "Már be vagy lépve...")
 	}
 
-	if err = s.db.Get(u, "SELECT id FROM users WHERE name=$1", c.FormValue("name")); err != nil {
+	u, err = models.Users(Where("name=?", c.FormValue("name"))).One(s.db)
+	if err != nil {
 		return s.internalError(c, err, "Belső hiba #1")
 	}
 
-	if err = bcrypt.CompareHashAndPassword(u.HashedPassword, []byte(c.FormValue("password"))); err != nil {
+	if err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(c.FormValue("password"))); err != nil {
+		fmt.Println([]byte(u.Password), "-", []byte(c.FormValue("password")))
 		return c.Render(http.StatusOK, "login.html", []string{"Hibás felhasználónév és jelszó páros."})
 	}
 
@@ -74,7 +80,7 @@ func (s *Server) postUserLogin(c echo.Context) error {
 	}
 
 	storage, _ := session.Get("user", c)
-	storage.Values["id"] = u.Id
+	storage.Values["id"] = u.ID
 
 	if err = storage.Save(c.Request(), c.Response()); err != nil {
 		return s.internalError(c, err, "Belső hiba #2")
@@ -208,7 +214,7 @@ func (s *Server) getActivateUser(c echo.Context) error {
 		return c.Render(http.StatusOK, "error.html", "Már be vagy lépve...")
 	}
 
-	if err = s.db.Get(&user, "SELECT id FROM users WHERE name=$1", c.Param("name")); err != nil {
+	if user, err = models.Users(Where("name=?", c.Param("name"))).One(s.db); err != nil {
 		return s.internalError(c, err, "Belső hiba #1")
 	}
 

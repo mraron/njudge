@@ -1,0 +1,15 @@
+package web
+
+type Verdict int
+
+const (
+	VERDICT_AC Verdict = iota
+	VERDICT_WA
+	VERDICT_RE
+	VERDICT_TL
+	VERDICT_ML
+	VERDICT_XX
+	VERDICT_CE
+	VERDICT_RU
+	VERDICT_UP
+)

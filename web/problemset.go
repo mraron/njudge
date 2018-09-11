@@ -5,6 +5,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/mraron/njudge/utils/problems/polygon"
 	"github.com/mraron/njudge/web/models"
+	. "github.com/volatiletech/sqlboiler/queries/qm"
 	"io/ioutil"
 	"mime"
 	"net/http"
@@ -13,7 +14,8 @@ import (
 
 func (s *Server) getProblemsetMain(c echo.Context) error {
 	name := c.Param("name")
-	lst, err := models.ProblemsFromProblemset(s.db, name)
+	lst, err := models.ProblemRels(Where("problemset=?", name)).All(s.db)
+	//lst, err := models.ProblemsFromProblemset(s.db, name)
 	if err != nil {
 		return s.internalError(c, err, "Belső hiba.")
 	}
@@ -28,14 +30,14 @@ func (s *Server) getProblemsetMain(c echo.Context) error {
 func (s *Server) getProblemsetProblem(c echo.Context) error {
 	name, problem := c.Param("name"), c.Param("problem")
 
-	lst, err := models.ProblemsFromProblemset(s.db, name)
+	lst, err := models.ProblemRels(Where("problemset=?", name)).All(s.db)
 	if err != nil {
 		return s.internalError(c, err, "Belső hiba.")
 	}
 
 	ok := false
 	for _, val := range lst {
-		if val == problem {
+		if val.Problem == problem {
 			ok = true
 		}
 
@@ -110,8 +112,8 @@ func (s *Server) getProblemsetProblemAttachment(c echo.Context) error {
 }
 
 func (s *Server) getProblemsetStatus(c echo.Context) error {
-	sbs := make([]models.Submission, 0)
-	if err := s.db.Select(&sbs, "SELECT * FROM submissions ORDER BY id DESC"); err != nil {
+	sbs, err := models.Submissions(OrderBy("id DESC")).All(s.db)
+	if err != nil {
 		return s.internalError(c, err, "Belső hiba.")
 	}
 

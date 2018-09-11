@@ -3,39 +3,45 @@ package web
 import (
 	"fmt"
 	"github.com/labstack/echo"
+	"github.com/mraron/njudge/judge"
 	"github.com/mraron/njudge/web/models"
 	"github.com/mraron/njudge/web/roles"
+	"github.com/volatiletech/sqlboiler/boil"
+	. "github.com/volatiletech/sqlboiler/queries/qm"
 	"net/http"
 	"strconv"
 	"time"
 )
 
 type Judge struct {
-	Id          int64
-	Name        string
-	Host        string
-	Port        string
-	Load        float64
-	ProblemsDir string
-	ProblemList []string
-	Uptime      time.Duration
-	Ping        int
-	Online      bool
+	Id          int64         `json:"id"`
+	Name        string        `json:"name"`
+	Host        string        `json:"host"`
+	Port        string        `json:"port"`
+	Load        float64       `json:"load"`
+	ProblemsDir string        `json:"problems_dir"`
+	ProblemList []string      `json:"problems_list"`
+	Uptime      time.Duration `json:"uptime"`
+	Ping        int           `json:"ping"`
+	Online      bool          `json:"online"`
 }
 
 func NewJudgeFromModelsJudge(j *models.Judge) (res Judge) {
-	res.Id = j.Id
+	res.Id = int64(j.ID)
 	res.Host = j.Host
 	res.Port = j.Port
 	res.Ping = j.Ping
 	res.Online = j.Online
 
-	if j.State != nil {
-		res.Name = j.State.Id
-		res.Load = j.State.Load
-		res.ProblemsDir = j.State.ProblemsDir
-		res.ProblemList = j.State.ProblemList
-		res.Uptime = j.State.Uptime
+	server := &judge.Server{}
+	err := server.Scan(j.State)
+
+	if err != nil {
+		res.Name = server.Id
+		res.Load = server.Load
+		res.ProblemsDir = server.ProblemsDir
+		res.ProblemList = server.ProblemList
+		res.Uptime = server.Uptime
 	}
 
 	return
@@ -43,7 +49,7 @@ func NewJudgeFromModelsJudge(j *models.Judge) (res Judge) {
 
 func (s *Server) getAPIJudges(c echo.Context) error {
 	u := c.Get("user").(*models.User)
-	if !roles.Can(u.Role, roles.ActionView, "api/v1/judges") {
+	if !roles.Can(roles.Role(u.Role), roles.ActionView, "api/v1/judges") {
 		return s.unauthorizedError(c)
 	}
 
@@ -52,7 +58,7 @@ func (s *Server) getAPIJudges(c echo.Context) error {
 		return s.internalError(c, err, "error")
 	}
 
-	lst, err := models.JudgesAPIGet(s.db, data._page, data._perPage, data._sortDir, data._sortField)
+	lst, err := models.Judges(OrderBy(data._sortField+" "+data._sortDir), Limit(data._perPage), Offset(data._perPage*(data._page-1))).All(s.db)
 	if err != nil {
 		return s.internalError(c, err, "error")
 	}
@@ -67,7 +73,7 @@ func (s *Server) getAPIJudges(c echo.Context) error {
 
 func (s *Server) postAPIJudges(c echo.Context) error {
 	u := c.Get("user").(*models.User)
-	if !roles.Can(u.Role, roles.ActionCreate, "api/v1/judges") {
+	if !roles.Can(roles.Role(u.Role), roles.ActionCreate, "api/v1/judges") {
 		return s.unauthorizedError(c)
 	}
 	fmt.Println("itt")
@@ -77,7 +83,7 @@ func (s *Server) postAPIJudges(c echo.Context) error {
 		return s.internalError(c, err, "error")
 	}
 
-	err := j.Insert(s.db)
+	err := j.Insert(s.db, boil.Infer())
 	if err != nil {
 		fmt.Println("itt")
 		return s.internalError(c, err, "error")
@@ -88,7 +94,7 @@ func (s *Server) postAPIJudges(c echo.Context) error {
 
 func (s *Server) getAPIJudge(c echo.Context) error {
 	u := c.Get("user").(*models.User)
-	if !roles.Can(u.Role, roles.ActionView, "api/v1/judges") {
+	if !roles.Can(roles.Role(u.Role), roles.ActionView, "api/v1/judges") {
 		return s.unauthorizedError(c)
 	}
 
@@ -99,7 +105,7 @@ func (s *Server) getAPIJudge(c echo.Context) error {
 		return s.internalError(c, err, "error")
 	}
 
-	j, err := models.JudgeFromId(s.db, id)
+	j, err := models.Judges(Where("id=?", id)).One(s.db)
 	if err != nil {
 		return s.internalError(c, err, "error")
 	}
@@ -109,7 +115,7 @@ func (s *Server) getAPIJudge(c echo.Context) error {
 
 func (s *Server) deleteAPIJudge(c echo.Context) error {
 	u := c.Get("user").(*models.User)
-	if !roles.Can(u.Role, roles.ActionDelete, "api/v1/judges") {
+	if !roles.Can(roles.Role(u.Role), roles.ActionDelete, "api/v1/judges") {
 		return s.unauthorizedError(c)
 	}
 
@@ -119,13 +125,13 @@ func (s *Server) deleteAPIJudge(c echo.Context) error {
 	if err != nil {
 		return s.internalError(c, err, "error")
 	}
-	fmt.Println("wut")
-	j, err := models.JudgeFromId(s.db, id)
+
+	j, err := models.Judges(Where("id=?", id)).One(s.db)
 	if err != nil {
 		return s.internalError(c, err, "error")
 	}
 
-	err = j.Delete(s.db)
+	_, err = j.Delete(s.db)
 	if err != nil {
 		return s.internalError(c, err, "error")
 	}
@@ -135,7 +141,7 @@ func (s *Server) deleteAPIJudge(c echo.Context) error {
 
 func (s *Server) putAPIJudge(c echo.Context) error {
 	u := c.Get("user").(*models.User)
-	if !roles.Can(u.Role, roles.ActionEdit, "api/v1/judges") {
+	if !roles.Can(roles.Role(u.Role), roles.ActionEdit, "api/v1/judges") {
 		return s.unauthorizedError(c)
 	}
 
@@ -151,7 +157,7 @@ func (s *Server) putAPIJudge(c echo.Context) error {
 		return s.internalError(c, err, "error")
 	}
 
-	model, err := models.JudgeFromId(s.db, id)
+	model, err := models.Judges(Where("id=?", id)).One(s.db)
 	if err != nil {
 		return s.internalError(c, err, "error")
 	}
@@ -160,7 +166,7 @@ func (s *Server) putAPIJudge(c echo.Context) error {
 	model.Host = j.Host
 	model.Port = j.Port
 
-	err = model.Update(s.db)
+	_, err = model.Update(s.db, boil.Infer())
 	fmt.Println(err)
 	if err != nil {
 		return s.internalError(c, err, "error")

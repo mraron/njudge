@@ -1,8 +1,10 @@
 package web
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/labstack/echo"
+	"github.com/labstack/gommon/log"
 	"github.com/mraron/njudge/utils/problems"
 	"github.com/mraron/njudge/web/models"
 	"github.com/mraron/njudge/web/roles"
@@ -83,8 +85,8 @@ func (s *Server) templatefuncs() template.FuncMap {
 		"user": func(c echo.Context) *models.User {
 			return c.Get("user").(*models.User)
 		},
-		"canView": func(role roles.Role, entity roles.Entity) bool {
-			return roles.Can(role, roles.ActionView, entity)
+		"canView": func(role string, entity roles.Entity) bool {
+			return roles.Can(roles.Role(role), roles.ActionView, entity)
 		},
 		"get": func(c echo.Context, key string) interface{} {
 			return c.Get(key)
@@ -100,6 +102,15 @@ func (s *Server) templatefuncs() template.FuncMap {
 		},
 		"add": func(a, b int) int {
 			return a + b
+		},
+		"parseStatus": func(s string) *problems.Status {
+			st := &problems.Status{}
+			err := json.Unmarshal([]byte(s), st)
+			if err != nil {
+				log.Debug(err)
+			}
+
+			return st
 		},
 	}
 }

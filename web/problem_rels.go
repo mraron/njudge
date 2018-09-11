@@ -5,26 +5,31 @@ import (
 	"github.com/labstack/echo"
 	"github.com/mraron/njudge/web/models"
 	"github.com/mraron/njudge/web/roles"
+	"github.com/volatiletech/sqlboiler/boil"
+	. "github.com/volatiletech/sqlboiler/queries/qm"
 	"net/http"
 	"strconv"
 )
 
 func (s *Server) getAPIProblemRels(c echo.Context) error {
+	fmt.Println("!!!")
 	u := c.Get("user").(*models.User)
-	if !roles.Can(u.Role, roles.ActionView, "api/v1/problem_rels") {
+
+	if !roles.Can(roles.Role(u.Role), roles.ActionView, "api/v1/problem_rels") {
 		return s.unauthorizedError(c)
 	}
-
+	fmt.Println("!!!")
 	data, err := parsePaginationData(c)
 	if err != nil {
-		fmt.Println(err)
-		return err
+		fmt.Println(err, "!!!!!")
+		return s.internalError(c, err, "error")
 	}
 
-	lst, err := models.ProblemRelAPIGet(s.db, data._page, data._perPage, data._sortDir, data._sortField)
+	lst, err := models.ProblemRels(OrderBy(data._sortField+" "+data._sortDir), Limit(data._perPage), Offset(data._perPage*(data._page-1))).All(s.db)
+	fmt.Println(lst)
 	if err != nil {
 		fmt.Println(err, "models")
-		return err
+		return s.internalError(c, err, "error")
 	}
 
 	return c.JSON(http.StatusOK, lst)
@@ -32,21 +37,21 @@ func (s *Server) getAPIProblemRels(c echo.Context) error {
 
 func (s *Server) postAPIProblemRel(c echo.Context) error {
 	u := c.Get("user").(*models.User)
-	if !roles.Can(u.Role, roles.ActionCreate, "api/v1/problem_rels") {
+	if !roles.Can(roles.Role(u.Role), roles.ActionCreate, "api/v1/problem_rels") {
 		return s.unauthorizedError(c)
 	}
 
 	pr := new(models.ProblemRel)
 	if err := c.Bind(pr); err != nil {
-		return err
+		return s.internalError(c, err, "error")
 	}
 
-	return pr.Insert(s.db)
+	return pr.Insert(s.db, boil.Infer())
 }
 
 func (s *Server) getAPIProblemRel(c echo.Context) error {
 	u := c.Get("user").(*models.User)
-	if !roles.Can(u.Role, roles.ActionView, "api/v1/problem_rels") {
+	if !roles.Can(roles.Role(u.Role), roles.ActionView, "api/v1/problem_rels") {
 		return s.unauthorizedError(c)
 	}
 
@@ -54,14 +59,14 @@ func (s *Server) getAPIProblemRel(c echo.Context) error {
 
 	id, err := strconv.Atoi(id_)
 	if err != nil {
-		fmt.Println(err)
-		return err
+		fmt.Println(err, "!!!!!!")
+		return s.internalError(c, err, "error")
 	}
 
-	pr, err := models.ProblemRelFromId(s.db, id)
+	pr, err := models.ProblemRels(Where("id=?", id)).One(s.db)
 	if err != nil {
-		fmt.Println(err)
-		return err
+		fmt.Println(err, "!!!!!!!!!!!!!!!!!!!!!!!")
+		return s.internalError(c, err, "error")
 	}
 
 	return c.JSON(http.StatusOK, pr)
@@ -69,7 +74,7 @@ func (s *Server) getAPIProblemRel(c echo.Context) error {
 
 func (s *Server) deleteAPIProblemRel(c echo.Context) error {
 	u := c.Get("user").(*models.User)
-	if !roles.Can(u.Role, roles.ActionDelete, "api/v1/problem_rels") {
+	if !roles.Can(roles.Role(u.Role), roles.ActionDelete, "api/v1/problem_rels") {
 		return s.unauthorizedError(c)
 	}
 
@@ -80,12 +85,12 @@ func (s *Server) deleteAPIProblemRel(c echo.Context) error {
 		return s.internalError(c, err, "error")
 	}
 
-	pr, err := models.ProblemRelFromId(s.db, id)
+	pr, err := models.ProblemRels(Where("id=?", id)).One(s.db)
 	if err != nil {
 		return s.internalError(c, err, "error")
 	}
 
-	err = pr.Delete(s.db)
+	_, err = pr.Delete(s.db)
 	if err != nil {
 		return s.internalError(c, err, "error")
 	}
@@ -95,7 +100,7 @@ func (s *Server) deleteAPIProblemRel(c echo.Context) error {
 
 func (s *Server) putAPIProblemRel(c echo.Context) error {
 	u := c.Get("user").(*models.User)
-	if !roles.Can(u.Role, roles.ActionEdit, "api/v1/problem_rels") {
+	if !roles.Can(roles.Role(u.Role), roles.ActionEdit, "api/v1/problem_rels") {
 		return s.unauthorizedError(c)
 	}
 
@@ -103,14 +108,20 @@ func (s *Server) putAPIProblemRel(c echo.Context) error {
 
 	id, err := strconv.Atoi(id_)
 	if err != nil {
-		return err
+		return s.internalError(c, err, "error")
 	}
 
 	pr := new(models.ProblemRel)
 	if err = c.Bind(pr); err != nil {
-		return err
+		return s.internalError(c, err, "error")
 	}
 
-	pr.Id = int64(id)
-	return pr.Update(s.db)
+	pr.ID = id
+	_, err = pr.Update(s.db, boil.Infer())
+
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	return c.String(http.StatusOK, "ok")
 }

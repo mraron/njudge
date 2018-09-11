@@ -137,13 +137,15 @@
 
 {{define "submissionRow"}}
 <tr>
-    <td><a href="/submission/{{.Id}}">{{.Id}}</a></td>
+    <td><a href="/submission/{{.ID}}">{{.ID}}</a></td>
     <td>{{.Submitted.Year}}. {{fixedlen (month2int .Submitted.Month) 2}}. {{fixedlen .Submitted.Day 2}} {{fixedlen .Submitted.Hour 2}}:{{fixedlen .Submitted.Minute 2}}:{{fixedlen .Submitted.Second 2}}</td>
-    <td>{{.User.Name}}</td>
+    <td>{{.User.OneG.Name}}</td>
     <td><a href="/problemset/{{.Problemset}}/{{.Problem}}/">{{translateContent "hungarian" (problem .Problem).Titles}}</a></td>
     <td>{{.Language}}</td>
     <td>
-    {{if eq .Status.FeedbackType 0}}
+    {{$status := parseStatus .Status}}
+
+    {{if eq $status.FeedbackType 0}}
     {{if .Judged.Valid}}
     {{if eq .Verdict 0}}
     <span class="text-success">Elfogadva<span>
@@ -151,8 +153,8 @@
     {{if eq .Verdict 6}}
         Fordítási Hiba
     {{else}}
-        <span class="text-info">{{$tc := .Status.FirstNonAC}}
-        {{(.Status.IndexTestcase $tc).VerdictName}}
+        <span class="text-info">{{$tc := $status.FirstNonAC}}
+        {{($status.IndexTestcase $tc).VerdictName}}
             a(z) {{$tc}}. teszteseten</span>
     {{end}}
     {{end}}
@@ -161,21 +163,21 @@
         <span class="text-muted">Beküldve</span>
     {{else}}
         <span class="text-info">
-                        Fut {{if .OnTest.Valid}} {{.OnTest.String}}. teszteseten {{end}}
+                        Fut {{if .Ontest.Valid}} {{.Ontest.String}}. teszteseten {{end}}
                     </span>
     {{end}}
     {{end}}
     {{end}}
-    {{if eq .Status.FeedbackType 1}}
+    {{if eq $status.FeedbackType 1}}
     {{if .Judged.Valid}}
-    {{if .Status.IsAC}}
-    <span class="text-success">Elfogadva {{.Status.Score}}/{{.Status.MaxScore}}<span>
+    {{if $status.IsAC}}
+    <span class="text-success">Elfogadva {{$status.Score}}/{{$status.MaxScore}}<span>
     {{else}}
 
     {{if eq .Verdict 6}}
         Fordítási Hiba
     {{else}}
-    <span class="text-info">{{(.Status.IndexTestcase .Status.FirstNonAC).VerdictName}} {{.Status.Score}}/{{.Status.MaxScore}}<span>
+    <span class="text-info">{{($status.IndexTestcase $status.FirstNonAC).VerdictName}} {{$status.Score}}/{{$status.MaxScore}}<span>
     {{end}}
     {{end}}
     {{else}}
@@ -186,19 +188,19 @@
     {{end}}
     {{end}}
     {{end}}
-    {{if eq .Status.FeedbackType 2}}
+    {{if eq $status.FeedbackType 2}}
     {{if .Judged.Valid}}
-    {{if .Status.IsAC}}
+    {{if $status.IsAC}}
     <span class="text-success">Elfogadva<span>
     {{else}}
     {{if eq .Verdict 6}}
         Fordítási Hiba
     {{else}}
-    <span class="text-info">{{(index .Status.Feedback (decr .Status.FirstNonAC)).VerdictName}}<span>
+    <span class="text-info">{{(index $status.Feedback (decr $status.FirstNonAC)).VerdictName}}<span>
     {{end}}
     {{end}}
     {{else}}
-    {{if ne .Status.Compiled true}}
+    {{if ne $status.Compiled true}}
         <span class="text-danger">Fordítási hiba</span>
     {{else}}
     {{if eq .Verdict 8}}
@@ -210,7 +212,7 @@
     {{end}}
     {{end}}
     </td>
-    <td>{{.Status.MaxTimeSpent}}</td>
-    <td>{{.Status.MaxMemoryUsage}} KiB</td>
+    <td>{{$status.MaxTimeSpent}}</td>
+    <td>{{$status.MaxMemoryUsage}} KiB</td>
 </tr>
 {{end}}

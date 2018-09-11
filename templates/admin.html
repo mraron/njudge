@@ -14,11 +14,11 @@
         // create an admin application
         var admin = nga.application('njudge admin').baseApiUrl("http://192.168.4.128:5555/api/v1/");
 
-        var problem_rel = nga.entity('problem_rels').identifier(nga.field('Id'));
+        var problem_rel = nga.entity('problem_rels').identifier(nga.field('id'));
         problem_rel.listView().fields([
-            nga.field('Id'),
-            nga.field('Problemset'),
-            nga.field('Problem')
+            nga.field('id'),
+            nga.field('problemset'),
+            nga.field('problem')
         ]).listActions(['edit']);
 
         problem_rel.creationView().fields([
@@ -28,37 +28,37 @@
 
         problem_rel.editionView().fields(problem_rel.creationView().fields());
 
-        var judge = nga.entity("judges").identifier(nga.field('Id'));
+        var judge = nga.entity("judges").identifier(nga.field('id'));
         judge.listView().fields([
-            nga.field('Id'),
-            nga.field('Name'),
-            nga.field('Host'),
-            nga.field('Port'),
-            nga.field('Load'),
-            nga.field('Uptime'),
-            nga.field('Ping'),
-            nga.field('Online'),
+            nga.field('id'),
+            nga.field('name'),
+            nga.field('host'),
+            nga.field('port'),
+            nga.field('load'),
+            nga.field('uptime'),
+            nga.field('ping'),
+            nga.field('online'),
         ]).listActions(['edit','show']);
 
         judge.creationView().fields([
-            nga.field('Host').validation({ required: true }),
-            nga.field('Port').validation({ required: true })
+            nga.field('host').validation({ required: true }),
+            nga.field('port').validation({ required: true })
         ]);
 
         judge.editionView().fields(judge.creationView().fields());
 
 
         judge.showView().fields([
-            nga.field('Id'),
-            nga.field('Name'),
-            nga.field('Host'),
-            nga.field('Port'),
-            nga.field('Load'),
-            nga.field('ProblemsDir'),
-            nga.field('ProblemList','json'),
-            nga.field('Uptime'),
-            nga.field('Ping'),
-            nga.field('Online'),
+            nga.field('id'),
+            nga.field('name'),
+            nga.field('host'),
+            nga.field('port'),
+            nga.field('load'),
+            nga.field('problems_dir'),
+            nga.field('problems_list','json'),
+            nga.field('uptime'),
+            nga.field('ping'),
+            nga.field('online'),
         ]).actions(['list', 'delete', 'edit']);
 
         admin.addEntity(problem_rel)
