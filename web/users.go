@@ -71,7 +71,6 @@ func (s *Server) postUserLogin(c echo.Context) error {
 	}
 
 	if err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(c.FormValue("password"))); err != nil {
-		fmt.Println([]byte(u.Password), "-", []byte(c.FormValue("password")))
 		return c.Render(http.StatusOK, "login.html", []string{"Hibás felhasználónév és jelszó páros."})
 	}
 

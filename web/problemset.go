@@ -1,7 +1,6 @@
 package web
 
 import (
-	"fmt"
 	"github.com/labstack/echo"
 	"github.com/mraron/njudge/utils/problems/polygon"
 	"github.com/mraron/njudge/web/models"
@@ -102,7 +101,6 @@ func (s *Server) getProblemsetProblemAttachment(c echo.Context) error {
 	}
 
 	for _, val := range p.Attachments() {
-		fmt.Println(val.Name, attachment)
 		if val.Name == attachment {
 			return c.Blob(http.StatusOK, mime.TypeByExtension(filepath.Ext(val.Name)), val.Contents)
 		}

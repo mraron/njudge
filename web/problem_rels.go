@@ -1,7 +1,6 @@
 package web
 
 import (
-	"fmt"
 	"github.com/labstack/echo"
 	"github.com/mraron/njudge/web/models"
 	"github.com/mraron/njudge/web/roles"
@@ -12,23 +11,19 @@ import (
 )
 
 func (s *Server) getAPIProblemRels(c echo.Context) error {
-	fmt.Println("!!!")
 	u := c.Get("user").(*models.User)
 
 	if !roles.Can(roles.Role(u.Role), roles.ActionView, "api/v1/problem_rels") {
 		return s.unauthorizedError(c)
 	}
-	fmt.Println("!!!")
+
 	data, err := parsePaginationData(c)
 	if err != nil {
-		fmt.Println(err, "!!!!!")
 		return s.internalError(c, err, "error")
 	}
 
 	lst, err := models.ProblemRels(OrderBy(data._sortField+" "+data._sortDir), Limit(data._perPage), Offset(data._perPage*(data._page-1))).All(s.db)
-	fmt.Println(lst)
 	if err != nil {
-		fmt.Println(err, "models")
 		return s.internalError(c, err, "error")
 	}
 
@@ -55,17 +50,15 @@ func (s *Server) getAPIProblemRel(c echo.Context) error {
 		return s.unauthorizedError(c)
 	}
 
-	id_ := c.Param("id")
+	idStr := c.Param("id")
 
-	id, err := strconv.Atoi(id_)
+	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		fmt.Println(err, "!!!!!!")
 		return s.internalError(c, err, "error")
 	}
 
 	pr, err := models.ProblemRels(Where("id=?", id)).One(s.db)
 	if err != nil {
-		fmt.Println(err, "!!!!!!!!!!!!!!!!!!!!!!!")
 		return s.internalError(c, err, "error")
 	}
 

@@ -217,7 +217,6 @@ func (s *Server) Run() {
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			user, err := s.currentUser(c)
-			fmt.Println(c.Request().URL, user, err)
 			if err != nil {
 				return s.internalError(c, err, "belső hiba")
 			}
@@ -241,7 +240,6 @@ func (s *Server) Run() {
 
 	ps := e.Group("/problemset", func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			fmt.Println("teszt", c.Param("name"))
 			c.Set("problemset", c.Param("name"))
 			return next(c)
 		}
@@ -290,8 +288,6 @@ func (s *Server) Run() {
 	go s.runGlue()
 	go s.judger()
 
-	fmt.Println("Ohoho started")
-
 	for idx, judge := range s.judges {
 		fmt.Println(idx, judge)
 	}
@@ -300,7 +296,6 @@ func (s *Server) Run() {
 }
 
 func (s *Server) getHome(c echo.Context) error {
-	fmt.Println("főoldal")
 	return c.Render(http.StatusOK, "home.html", s.problems)
 }
 

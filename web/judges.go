@@ -1,7 +1,6 @@
 package web
 
 import (
-	"fmt"
 	"github.com/labstack/echo"
 	"github.com/mraron/njudge/judge"
 	"github.com/mraron/njudge/web/models"
@@ -76,16 +75,14 @@ func (s *Server) postAPIJudges(c echo.Context) error {
 	if !roles.Can(roles.Role(u.Role), roles.ActionCreate, "api/v1/judges") {
 		return s.unauthorizedError(c)
 	}
-	fmt.Println("itt")
+
 	j := new(models.Judge)
 	if err := c.Bind(j); err != nil {
-		fmt.Println(err)
 		return s.internalError(c, err, "error")
 	}
 
 	err := j.Insert(s.db, boil.Infer())
 	if err != nil {
-		fmt.Println("itt")
 		return s.internalError(c, err, "error")
 	}
 
@@ -162,12 +159,10 @@ func (s *Server) putAPIJudge(c echo.Context) error {
 		return s.internalError(c, err, "error")
 	}
 
-	fmt.Println(j.Host, j.Port)
 	model.Host = j.Host
 	model.Port = j.Port
 
 	_, err = model.Update(s.db, boil.Infer())
-	fmt.Println(err)
 	if err != nil {
 		return s.internalError(c, err, "error")
 	}
