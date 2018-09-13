@@ -23,6 +23,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -44,9 +45,10 @@ type Server struct {
 
 	GluePort string
 
-	judges   []*models.Judge
-	problems map[string]problems.Problem
-	db       *sqlx.DB
+	judges        []*models.Judge
+	problems      map[string]problems.Problem
+	problemsMutex sync.Mutex
+	db            *sqlx.DB
 }
 
 /*
@@ -54,29 +56,52 @@ func New(port string, problemsDir string, templatesDir string, mailServerAccount
 	return &Server{port, problemsDir, templatesDir, mailServerAccount, mailServerHost, mailServerPort, mailAccountPassword, glueport, make([]*models.Judge, 0), make(map[string]problems.Problem), nil}
 }*/
 
-func (s *Server) updateProblems() {
-	if s.problems == nil {
-		s.problems = make(map[string]problems.Problem)
-	}
+func (s *Server) getProblem(name string) problems.Problem {
+	s.problemsMutex.Lock()
+	p := s.problems[name]
+	s.problemsMutex.Unlock()
 
-	files, err := ioutil.ReadDir(s.ProblemsDir)
-	if err != nil {
-		panic(err)
-	}
+	return p
+}
 
-	pList := make([]string, 0)
+func (s *Server) getProblemExists(name string) (problems.Problem, bool) {
+	s.problemsMutex.Lock()
+	p, ok := s.problems[name]
+	s.problemsMutex.Unlock()
 
-	for _, f := range files {
-		if f.IsDir() {
-			path := filepath.Join(s.ProblemsDir, f.Name())
-			p, err := problems.Parse(path)
-			if err == nil {
-				s.problems[p.Name()] = p
-				pList = append(pList, p.Name())
-			} else {
-				log.Print(err)
+	return p, ok
+}
+
+func (s *Server) runUpdateProblems() {
+	for {
+		s.problemsMutex.Lock()
+		if s.problems == nil {
+			s.problems = make(map[string]problems.Problem)
+		}
+
+		files, err := ioutil.ReadDir(s.ProblemsDir)
+		if err != nil {
+			panic(err)
+		}
+
+		pList := make([]string, 0)
+
+		for _, f := range files {
+			if f.IsDir() {
+				path := filepath.Join(s.ProblemsDir, f.Name())
+				p, err := problems.Parse(path)
+				if err == nil {
+					s.problems[p.Name()] = p
+					pList = append(pList, p.Name())
+				} else {
+					log.Print(err)
+				}
 			}
 		}
+
+		s.problemsMutex.Unlock()
+
+		time.Sleep(20 * time.Second)
 	}
 }
 
@@ -100,7 +125,7 @@ func (s *Server) loadJudgesFromDB() {
 	}
 }
 
-func (s *Server) syncJudges() {
+func (s *Server) runSyncJudges() {
 	for {
 		s.loadJudgesFromDB()
 		for _, j := range s.judges {
@@ -179,7 +204,7 @@ func (s *Server) runGlue() {
 	panic(g.Start(":" + s.GluePort))
 }
 
-func (s *Server) judger() {
+func (s *Server) runJudger() {
 	for {
 		time.Sleep(1 * time.Second)
 
@@ -199,7 +224,11 @@ func (s *Server) judger() {
 				server.Scan(j.State)
 
 				if server.SupportsProblem(sub.Problem) {
-					server.Submit(judge.Submission{sub.Problem, sub.Language, sub.Source, "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(int(sub.ID))})
+					err := server.Submit(judge.Submission{sub.Problem, sub.Language, sub.Source, "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(int(sub.ID))})
+					if err != nil {
+						log.Print("Trying to submit to server", j.Host, j.Port, "Error", err)
+						continue
+					}
 					if _, err := s.db.Exec("UPDATE submissions SET started=true WHERE id=$1", sub.ID); err != nil {
 						log.Print("FATAL: ", err)
 					}
@@ -279,14 +308,12 @@ func (s *Server) Run() {
 
 	e.GET("/admin", s.getAdmin)
 
-	s.updateProblems()
 	s.connectToDB()
-	boil.SetDB(s.db)
 
-	s.loadJudgesFromDB()
-	go s.syncJudges()
+	go s.runUpdateProblems()
+	go s.runSyncJudges()
 	go s.runGlue()
-	go s.judger()
+	go s.runJudger()
 
 	for idx, judge := range s.judges {
 		fmt.Println(idx, judge)
@@ -296,7 +323,7 @@ func (s *Server) Run() {
 }
 
 func (s *Server) getHome(c echo.Context) error {
-	return c.Render(http.StatusOK, "home.html", s.problems)
+	return c.Render(http.StatusOK, "home.html", nil)
 }
 
 func (s *Server) getAdmin(c echo.Context) error {
@@ -306,34 +333,4 @@ func (s *Server) getAdmin(c echo.Context) error {
 	}
 
 	return c.Render(http.StatusOK, "admin.html", nil)
-}
-
-type paginationData struct {
-	_page      int
-	_perPage   int
-	_sortDir   string
-	_sortField string
-}
-
-func parsePaginationData(c echo.Context) (*paginationData, error) {
-	res := &paginationData{}
-	var err error
-
-	_page := c.QueryParam("_page")
-	_perPage := c.QueryParam("_perPage")
-
-	res._sortDir = c.QueryParam("_sortDir")
-	res._sortField = c.QueryParam("_sortField")
-
-	res._page, err = strconv.Atoi(_page)
-	if err != nil {
-		return nil, err
-	}
-
-	res._perPage, err = strconv.Atoi(_perPage)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
 }

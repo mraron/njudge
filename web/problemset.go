@@ -49,11 +49,11 @@ func (s *Server) getProblemsetProblem(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, nil)
 	}
 
-	return c.Render(http.StatusOK, "problemsetproblem.html", s.problems[problem])
+	return c.Render(http.StatusOK, "problemsetproblem.html", s.getProblem(problem))
 }
 
 func (s *Server) getProblemsetProblemPDFLanguage(c echo.Context) error {
-	p, lang := s.problems[c.Param("problem")], c.Param("language")
+	p, lang := s.getProblem(c.Param("problem")), c.Param("language")
 
 	if p == nil {
 		return c.String(http.StatusNotFound, "no such problem")
@@ -67,7 +67,7 @@ func (s *Server) getProblemsetProblemPDFLanguage(c echo.Context) error {
 }
 
 func (s *Server) getProblemsetProblemFile(c echo.Context) error {
-	p := s.problems[c.Param("problem")]
+	p := s.getProblem(c.Param("problem"))
 
 	if p == nil {
 		return c.String(http.StatusNotFound, "not found")
@@ -95,7 +95,7 @@ func (s *Server) getProblemsetProblemFile(c echo.Context) error {
 }
 
 func (s *Server) getProblemsetProblemAttachment(c echo.Context) error {
-	p, attachment := s.problems[c.Param("problem")], c.Param("attachment")
+	p, attachment := s.getProblem(c.Param("problem")), c.Param("attachment")
 	if p == nil {
 		return c.String(http.StatusNotFound, "no such problem")
 	}

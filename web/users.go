@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/session"
+	"github.com/labstack/gommon/log"
 	"github.com/mraron/njudge/web/models"
 	. "github.com/volatiletech/sqlboiler/queries/qm"
 	"golang.org/x/crypto/bcrypt"
@@ -67,7 +68,8 @@ func (s *Server) postUserLogin(c echo.Context) error {
 
 	u, err = models.Users(Where("name=?", c.FormValue("name"))).One(s.db)
 	if err != nil {
-		return s.internalError(c, err, "Belső hiba #1")
+		log.Error("Possible just wrong credentials, but", err)
+		return c.Render(http.StatusOK, "login.html", []string{"Hibás felhasználónév és jelszó páros."})
 	}
 
 	if err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(c.FormValue("password"))); err != nil {

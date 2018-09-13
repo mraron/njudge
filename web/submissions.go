@@ -27,7 +27,7 @@ func (s *Server) postProblemsetSubmit(c echo.Context) error {
 	}
 
 	problemName := c.FormValue("problem")
-	if p, ok = s.problems[problemName]; !ok {
+	if p, ok = s.getProblemExists(problemName); !ok {
 		return c.Render(http.StatusOK, "error.html", "Hibás feladatazonosító.")
 	}
 
@@ -81,7 +81,7 @@ func (s *Server) postProblemsetSubmit(c echo.Context) error {
 		mustPanic(err)
 
 		last := 0
-		res, err := tx.Query("INSERT INTO submissions (status,\"user_id\",verdict,ontest,submitted,judged,problem,language,private,problemset,source,started) VALUES ($1,$2,$3,NULL,$4,NULL,$5,$6,false,$7, $8,false) RETURNING id", problems.Status{}, u.ID, VERDICT_UP, time.Now(), s.problems[c.FormValue("problem")].Name(), c.FormValue("language"), c.Get("problemset"), contents)
+		res, err := tx.Query("INSERT INTO submissions (status,\"user_id\",verdict,ontest,submitted,judged,problem,language,private,problemset,source,started) VALUES ($1,$2,$3,NULL,$4,NULL,$5,$6,false,$7, $8,false) RETURNING id", problems.Status{}, u.ID, VERDICT_UP, time.Now(), s.getProblem(c.FormValue("problem")).Name(), c.FormValue("language"), c.Get("problemset"), contents)
 		mustPanic(err)
 
 		res.Next()
