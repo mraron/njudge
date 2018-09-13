@@ -1,4 +1,4 @@
 njudge
 web.json
-#web/_models/*
-#web/sqlboiler-psql
+web/_models/*
+web/sqlboiler-psql
