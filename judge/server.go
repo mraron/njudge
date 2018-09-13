@@ -119,15 +119,17 @@ func (s *Server) Run() error {
 	e.POST("/update", s.postUpdateProblems())
 	e.POST("/judge", s.postJudge())
 
-	go s.updateLoad()
-	go s.updateUptime()
-	go s.updateProblems()
-	go s.judger()
+	go s.runUpdateLoad()
+	go s.runUpdateUptime()
+	go s.runUpdateProblems()
+	go s.runJudger()
 
 	return e.Start(":" + s.Port)
 }
 
-func (s *Server) updateProblems() {
+
+//@TODO make it a background process
+func (s *Server) runUpdateProblems() {
 	files, err := ioutil.ReadDir(s.ProblemsDir)
 	if err != nil {
 		panic(err)
@@ -149,7 +151,7 @@ func (s *Server) updateProblems() {
 	s.ProblemList = pList
 }
 
-func (s *Server) updateLoad() {
+func (s *Server) runUpdateLoad() {
 	for {
 		l, err := load.Avg()
 
@@ -163,14 +165,14 @@ func (s *Server) updateLoad() {
 	}
 }
 
-func (s *Server) updateUptime() {
+func (s *Server) runUpdateUptime() {
 	for {
 		s.Uptime = time.Since(s.start)
 		time.Sleep(1 * time.Second)
 	}
 }
 
-func (s *Server) judger() {
+func (s *Server) runJudger() {
 	for {
 		sub := <-s.queue
 
@@ -195,7 +197,7 @@ func (s *Server) getStatus() echo.HandlerFunc {
 
 func (s *Server) postUpdateProblems() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		s.updateProblems()
+		s.runUpdateProblems()
 		return nil
 	}
 }
@@ -215,26 +217,11 @@ func (s *Server) postJudge() echo.HandlerFunc {
 	}
 }
 
-func (s Server) Value() (string, error) {
+func (s Server) ToString() (string, error) {
 	val, err := json.Marshal(s)
 	return string(val), err
 }
 
-func (u *Server) Scan(value interface{}) error {
-	if value == nil {
-		return errors.New("can't scan server from nil")
-	}
-
-	var data []byte
-
-	switch value.(type) {
-	case []byte:
-		data = value.([]byte)
-	case string:
-		data = []byte(value.(string))
-	default:
-		return errors.New("can't scan server from this type")
-	}
-
-	return json.Unmarshal(data, u)
+func (s *Server) FromString(str string) error {
+	return json.Unmarshal([]byte(str), s)
 }

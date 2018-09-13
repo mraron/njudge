@@ -144,7 +144,7 @@ func (s *Server) runSyncJudges() {
 			}
 
 			j.Online = true
-			j.State, _ = st.Value()
+			j.State, _ = st.ToString()
 			j.Ping = 1
 
 			_, err = j.Update(s.db, boil.Infer())
@@ -221,7 +221,7 @@ func (s *Server) runJudger() {
 		for _, sub := range ss {
 			for _, j := range s.judges {
 				server := &judge.Server{}
-				server.Scan(j.State)
+				server.FromString(j.State)
 
 				if server.SupportsProblem(sub.Problem) {
 					err := server.Submit(judge.Submission{sub.Problem, sub.Language, sub.Source, "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(int(sub.ID))})

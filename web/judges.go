@@ -33,7 +33,7 @@ func NewJudgeFromModelsJudge(j *models.Judge) (res Judge) {
 	res.Online = j.Online
 
 	server := &judge.Server{}
-	err := server.Scan(j.State)
+	err := server.FromString(j.State)
 
 	if err != nil {
 		res.Name = server.Id
