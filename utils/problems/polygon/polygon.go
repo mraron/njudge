@@ -3,7 +3,6 @@ package polygon
 import (
 	"github.com/mraron/njudge/utils/language"
 	_ "github.com/mraron/njudge/utils/language/cpp11"
-
 	"github.com/mraron/njudge/utils/problems"
 
 	"os"
@@ -341,6 +340,8 @@ func (p Problem) Run(s language.Sandbox, lang language.Language, bin io.Reader, 
 
 					err = cmd.Run()
 
+					fmt.Println(err, checkerOutput.String(), "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
 					/*	if err != nil {
 						ans.Feedback = append(ans.Feedback, problems.Testcase{VerdictName: problems.VERDICT_XX, MemoryUsed: res.Memory, TimeSpent: res.Time})
 						return ans, err
@@ -403,6 +404,8 @@ func (p Problem) Run(s language.Sandbox, lang language.Language, bin io.Reader, 
 	return ans, nil
 }
 
+//@TODO actually respect problem.xml with statements
+
 func parser(path string) (problems.Problem, error) {
 	problemXML := filepath.Join(path, "problem.xml")
 
@@ -421,57 +424,55 @@ func parser(path string) (problems.Problem, error) {
 	p.Path = path
 
 	list, err := ioutil.ReadDir(filepath.Join(path, "statements"))
-	if err != nil {
-		return nil, err
-	}
+	if err == nil {
+		for _, dir := range list {
+			if !dir.IsDir() || strings.HasPrefix(dir.Name(), ".") {
+				continue
+			}
 
-	for _, dir := range list {
-		if !dir.IsDir() || strings.HasPrefix(dir.Name(), ".") {
-			continue
+			jsonstmt := JSONStatement{}
+
+			propertiesFile, err := os.Open(filepath.Join(path, "statements", dir.Name(), "problem-properties.json"))
+			if err != nil {
+				return nil, err
+			}
+
+			dec := json.NewDecoder(propertiesFile)
+			if err := dec.Decode(&jsonstmt); err != nil {
+				return nil, err
+			}
+
+			replace := func(str *string) {
+				*str = strings.Replace(*str, "\n\n", "<p></p><p></p>", -1)
+			}
+
+			replace(&jsonstmt.Legend)
+			replace(&jsonstmt.Input)
+			replace(&jsonstmt.Output)
+			replace(&jsonstmt.Notes)
+
+			jsonstmt.InputFile, jsonstmt.OutputFile = p.InputOutputFiles()
+			jsonstmt.TimeLimit = p.TimeLimit()
+			jsonstmt.MemoryLimit = p.MemoryLimit()
+
+			p.JSONStatementList = append(p.JSONStatementList, jsonstmt)
+
+			buf := bytes.Buffer{}
+			htmlTmpl.Execute(&buf, jsonstmt)
+
+			p.GeneratedStatementList = append(p.GeneratedStatementList, problems.Content{Locale: dir.Name(), Contents: buf.Bytes(), Type: "text/html"})
 		}
 
-		jsonstmt := JSONStatement{}
+		for _, stmt := range p.StatementList {
+			statementPath := filepath.Join(path, stmt.Path)
 
-		propertiesFile, err := os.Open(filepath.Join(path, "statements", dir.Name(), "problem-properties.json"))
-		if err != nil {
-			return nil, err
+			cont, err := ioutil.ReadFile(statementPath)
+			if err != nil {
+				return nil, err
+			}
+
+			p.GeneratedStatementList = append(p.GeneratedStatementList, problems.Content{Locale: stmt.Language, Contents: cont, Type: stmt.Type})
 		}
-
-		dec := json.NewDecoder(propertiesFile)
-		if err := dec.Decode(&jsonstmt); err != nil {
-			return nil, err
-		}
-
-		replace := func(str *string) {
-			*str = strings.Replace(*str, "\n\n", "<p></p><p></p>", -1)
-		}
-
-		replace(&jsonstmt.Legend)
-		replace(&jsonstmt.Input)
-		replace(&jsonstmt.Output)
-		replace(&jsonstmt.Notes)
-
-		jsonstmt.InputFile, jsonstmt.OutputFile = p.InputOutputFiles()
-		jsonstmt.TimeLimit = p.TimeLimit()
-		jsonstmt.MemoryLimit = p.MemoryLimit()
-
-		p.JSONStatementList = append(p.JSONStatementList, jsonstmt)
-
-		buf := bytes.Buffer{}
-		htmlTmpl.Execute(&buf, jsonstmt)
-
-		p.GeneratedStatementList = append(p.GeneratedStatementList, problems.Content{Locale: dir.Name(), Contents: buf.Bytes(), Type: "text/html"})
-	}
-
-	for _, stmt := range p.StatementList {
-		statementPath := filepath.Join(path, stmt.Path)
-
-		cont, err := ioutil.ReadFile(statementPath)
-		if err != nil {
-			return nil, err
-		}
-
-		p.GeneratedStatementList = append(p.GeneratedStatementList, problems.Content{Locale: stmt.Language, Contents: cont, Type: stmt.Type})
 	}
 
 	if _, err := os.Stat(filepath.Join(path, "check")); os.IsNotExist(err) {
@@ -486,7 +487,7 @@ func parser(path string) (problems.Problem, error) {
 						return nil, err
 					}
 
-					if err := os.Chmod(filepath.Join(path, "check"), 0777); err != nil {
+					if err := os.Chmod(filepath.Join(path, "check"), os.ModePerm); err != nil {
 						return nil, err
 					}
 				} else {
