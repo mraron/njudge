@@ -20,7 +20,7 @@ func getEnv(key, fallback string) string {
 	return fallback
 }
 
-var ISOLATE_ROOT = getEnv("ISOLATE_ROOT", "/tmp/box/")
+var ISOLATE_ROOT = getEnv("ISOLATE_ROOT", "/var/local/lib/isolate/")
 
 type Sandbox interface {
 	Init() error
@@ -95,9 +95,9 @@ func (s *IsolateSandbox) MakeExecutable(name string) error {
 
 func (s *IsolateSandbox) SetMaxProcesses(num int) Sandbox {
 	if num < 0 {
-		s.argv = append(s.argv, "-processes=max")
+		s.argv = append(s.argv, "--processes=100")
 	}else {
-		s.argv = append(s.argv, "-processes="+strconv.Itoa(num))
+		s.argv = append(s.argv, "--processes="+strconv.Itoa(num))
 	}
 
 	return s
@@ -160,7 +160,7 @@ func (s *IsolateSandbox) Run(prg string, needStatus bool) (error) {
 	s.argv = append(s.argv, "--run", "--")
 	s.argv = append(s.argv, splt...)
 
-	fmt.Println(s.argv)
+	fmt.Println(s.argv, "!!!!")
 
 	stderr := &bytes.Buffer{}
 

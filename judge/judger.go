@@ -94,6 +94,7 @@ func Judge(p problems.Problem, src string, lang language.Language, sandbox langu
 		st.CompilerOutput = stderr.String()
 
 		log.Print(err)
+		log.Print(st)
 		return c.Callback("", st, true)
 	}
 

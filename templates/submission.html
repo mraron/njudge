@@ -14,6 +14,11 @@
 {{end}}
 
 {{$status := parseStatus .Data.Status}}
+{{if not $status.Compiled}}
+Hibaüzenet:
+<pre><code>{{$status.CompilerOutput}}</code></pre>
+{{end}}
+
 {{if eq $status.FeedbackType 0}}
 {{range $testset := $status.Feedback}}
 {{range $i, $e := $testset.Testcases}}

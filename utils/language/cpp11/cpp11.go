@@ -1,11 +1,12 @@
 package cpp11
 
 import (
+	"bytes"
+	"fmt"
 	"github.com/mraron/njudge/utils/language"
 	"io"
 	"os/exec"
 	"time"
-	"bytes"
 )
 
 type cpp11 struct {}
@@ -32,8 +33,10 @@ func (cpp11) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) (
 
 func (c cpp11) Compile(s language.Sandbox, r io.Reader, w io.Writer, e io.Writer) error {
 	if err := s.Init(); err != nil {
+		fmt.Println("hmmm2")
 		return err
 	}
+	fmt.Println("hmmm")
 
 	defer s.Cleanup()
 
