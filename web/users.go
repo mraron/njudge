@@ -171,7 +171,7 @@ func (s *Server) postUserRegister(c echo.Context) error {
 
 		m := Mail{}
 		m.Recipients = []string{c.FormValue("email")}
-		m.Message = fmt.Sprintf(`Kedves %s!<br> Köszönjük a registrációt. Aktiváló link: <a href="http://localhost:8080/user/activate/%s/%s">http://localhost:8080/user/activate/%s/%s</a>`, c.FormValue("name"), c.FormValue("name"), key, c.FormValue("name"), key)
+		m.Message = fmt.Sprintf(`Kedves %s!<br> Köszönjük a registrációt. Aktiváló link: <a href="http://`+s.Hostname+`/user/activate/%s/%s">http://`+s.Hostname+`/user/activate/%s/%s</a>`, c.FormValue("name"), c.FormValue("name"), key, c.FormValue("name"), key)
 		m.Subject = "Regisztráció aktiválása"
 		mustPanic(s.SendMail(m))
 
