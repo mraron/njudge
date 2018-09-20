@@ -2,6 +2,7 @@ package web
 
 import (
 	"database/sql"
+	errors2 "errors"
 	"fmt"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/session"
@@ -151,7 +152,11 @@ func (s *Server) postUserRegister(c echo.Context) error {
 		defer func() {
 			if p := recover(); p != nil {
 				tx.Rollback()
-				err = p.(error)
+
+				var ok bool
+				if err, ok = p.(error); !ok {
+					err = errors2.New("hiba")
+				}
 			}
 		}()
 
