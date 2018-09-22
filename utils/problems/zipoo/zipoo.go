@@ -127,7 +127,7 @@ func (p Problem) Run(s language.Sandbox, lang language.Language, bin io.Reader, 
 	ans.Compiled = true
 
 	ans.Feedback = make([]problems.Testset, 1)
-	ans.Feedback[0] = problems.Testset{"main", problems.SCORING_SUM, make([]problems.Testcase, 0)}
+	ans.Feedback[0] = problems.Testset{"main", make([]problems.Group, 0), make([]problems.Testcase, 0)}
 
 	ans.FeedbackType = problems.FEEDBACK_IOI
 
@@ -147,6 +147,7 @@ func (p Problem) Run(s language.Sandbox, lang language.Language, bin io.Reader, 
 		return ans, err
 	}
 
+	ans.Feedback[0].Groups = append(ans.Feedback[0].Groups, problems.Group{"subtask1", problems.SCORING_SUM, make([]problems.Testcase, 0), make([]string, 0)})
 	for tc := 1; tc <= p.TestCount; tc++ {
 		inputName := fmt.Sprintf(filepath.Join(p.Path, p.InputPattern), tc)
 		outputName := fmt.Sprintf(p.OutputPattern, tc)
@@ -164,6 +165,8 @@ func (p Problem) Run(s language.Sandbox, lang language.Language, bin io.Reader, 
 				if err != nil {
 					currentCase.VerdictName = problems.VERDICT_XX
 					currentCase.CheckerOutput = err.Error()
+
+					ans.Feedback[0].Groups[0].Testcases = append(ans.Feedback[0].Groups[0].Testcases, *currentCase)
 					break
 				}
 
@@ -178,8 +181,10 @@ func (p Problem) Run(s language.Sandbox, lang language.Language, bin io.Reader, 
 
 				if err == nil {
 					currentCase.VerdictName = problems.VERDICT_AC
+					ans.Feedback[0].Groups[0].Testcases = append(ans.Feedback[0].Groups[0].Testcases, *currentCase)
 				}else {
 					currentCase.VerdictName = problems.VERDICT_WA
+					ans.Feedback[0].Groups[0].Testcases = append(ans.Feedback[0].Groups[0].Testcases, *currentCase)
 				}
 
 				break

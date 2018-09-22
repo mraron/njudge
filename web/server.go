@@ -10,8 +10,13 @@ import (
 	"github.com/labstack/gommon/log"
 	_ "github.com/lib/pq"
 	"github.com/mraron/njudge/judge"
+
 	"github.com/mraron/njudge/utils/problems"
 	_ "github.com/mraron/njudge/utils/problems/polygon"
+	_ "github.com/mraron/njudge/utils/problems/zipoo"
+
+	_ "github.com/mraron/njudge/utils/language/zip"
+
 	"github.com/mraron/njudge/web/models"
 	_ "github.com/mraron/njudge/web/models"
 	"github.com/mraron/njudge/web/roles"

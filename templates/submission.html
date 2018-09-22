@@ -10,13 +10,17 @@
 </div>
 
 {{if ne .Data.Language "zip"}}
-<pre><code class="{{.Data.Language}}">{{.Data.Source}}</code></pre>
+<pre><code class="{{.Data.Language}}">{{tostring .Data.Source}}</code></pre>
 {{end}}
 
 {{$status := parseStatus .Data.Status}}
 {{if not $status.Compiled}}
-Hibaüzenet:
-<pre><code>{{$status.CompilerOutput}}</code></pre>
+<div class="card">
+    <div class="card-header bg-warning"><i class="fas fa-exclamation-triangle"></i> Fordítási hiba</div>
+    <div class="card-body">
+        <code><pre>{{$status.CompilerOutput}}</pre></code>
+    </div>
+</div>
 {{end}}
 
 {{if eq $status.FeedbackType 0}}

@@ -660,7 +660,7 @@ func testSubmissionsSelect(t *testing.T) {
 }
 
 var (
-	submissionDBTypes = map[string]string{`ID`: `integer`, `Judged`: `timestamp with time zone`, `Language`: `text`, `Ontest`: `text`, `Private`: `boolean`, `Problem`: `text`, `Problemset`: `text`, `Source`: `text`, `Started`: `boolean`, `Status`: `text`, `Submitted`: `timestamp with time zone`, `UserID`: `integer`, `Verdict`: `integer`}
+	submissionDBTypes = map[string]string{`ID`: `integer`, `Judged`: `timestamp with time zone`, `Language`: `text`, `Ontest`: `text`, `Private`: `boolean`, `Problem`: `text`, `Problemset`: `text`, `Source`: `bytea`, `Started`: `boolean`, `Status`: `text`, `Submitted`: `timestamp with time zone`, `UserID`: `integer`, `Verdict`: `integer`}
 	_                 = bytes.MinRead
 )
 

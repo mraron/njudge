@@ -14,17 +14,20 @@
             <input type="file" name="source" id="fileInput">
             <br>
             <br>
-            <select name="language" class="form-control" id="languagesList">
+            <select name="language" class="custom-select form-control" id="languagesList">
                 {{range $l := .Data.Languages}}
                     <option value="{{$l.Id}}">{{$l.Name}}</option>
                 {{end}}
             </select>
-            <br>
+            <br><br>
             <input type="submit" class="btn btn-primary">
         </form>
     </div>
 </div>
+<br>
 
+<a href="/problemset/status?problem_set={{get .Context "problemset"}}&problem={{.Data.Name}}">Összes beküldés</a> <br>
+<a href="/problemset/status?problem_set={{get .Context "problemset"}}&problem={{.Data.Name}}&ac=1">Elfogadott beküldések</a>
 {{end}}
 
 {{template "footer" .}}

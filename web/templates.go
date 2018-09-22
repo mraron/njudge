@@ -49,6 +49,11 @@ func translateContent(locale string, cs []problems.Content) problems.Content {
 		return val
 	}
 
+
+	if(len(cs)==0) {
+		return problems.Content{"-", []byte("undefined"), "text"}
+	}
+
 	return cs[0]
 }
 
@@ -109,6 +114,12 @@ func (s *Server) templatefuncs() template.FuncMap {
 			}
 
 			return st
+		},
+		"divide": func(a, b int) int {
+			return a/b
+		},
+		"tostring": func(b []byte) string {
+			return string(b)
 		},
 	}
 }

@@ -31,7 +31,7 @@ type Submission struct {
 	Language   string      `boil:"language" json:"language" toml:"language" yaml:"language"`
 	Private    bool        `boil:"private" json:"private" toml:"private" yaml:"private"`
 	Verdict    int         `boil:"verdict" json:"verdict" toml:"verdict" yaml:"verdict"`
-	Source     string      `boil:"source" json:"source" toml:"source" yaml:"source"`
+	Source     []byte      `boil:"source" json:"source" toml:"source" yaml:"source"`
 	Started    bool        `boil:"started" json:"started" toml:"started" yaml:"started"`
 	Submitted  time.Time   `boil:"submitted" json:"submitted" toml:"submitted" yaml:"submitted"`
 	Judged     null.Time   `boil:"judged" json:"judged,omitempty" toml:"judged" yaml:"judged,omitempty"`

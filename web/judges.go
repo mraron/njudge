@@ -35,7 +35,7 @@ func NewJudgeFromModelsJudge(j *models.Judge) (res Judge) {
 	server := &judge.Server{}
 	err := server.FromString(j.State)
 
-	if err != nil {
+	if err == nil {
 		res.Name = server.Id
 		res.Load = server.Load
 		res.ProblemsDir = server.ProblemsDir
@@ -86,7 +86,7 @@ func (s *Server) postAPIJudges(c echo.Context) error {
 		return s.internalError(c, err, "error")
 	}
 
-	return c.String(http.StatusOK, "inserted")
+	return c.JSON(http.StatusOK, NewJudgeFromModelsJudge(j))
 }
 
 func (s *Server) getAPIJudge(c echo.Context) error {

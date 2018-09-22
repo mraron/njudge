@@ -110,7 +110,25 @@ func (s *Server) getProblemsetProblemAttachment(c echo.Context) error {
 }
 
 func (s *Server) getProblemsetStatus(c echo.Context) error {
-	sbs, err := models.Submissions(OrderBy("id DESC")).All(s.db)
+	var (
+		sbs []*models.Submission
+		err error
+	)
+
+	ac := c.QueryParam("ac")
+	problem_set := c.QueryParam("problem_set")
+	problem := c.QueryParam("problem")
+
+	if problem == "" {
+		sbs, err = models.Submissions(OrderBy("id DESC")).All(s.db)
+	}else {
+		if ac == "1" {
+			sbs, err = models.Submissions(OrderBy("id DESC"), Where("verdict = 0"), Where("problem = ?", problem), Where("problemset = ?", problem_set)).All(s.db)
+		}else {
+			sbs, err = models.Submissions(OrderBy("id DESC"), Where("problem = ?", problem), Where("problemset = ?", problem_set)).All(s.db)
+		}
+	}
+
 	if err != nil {
 		return s.internalError(c, err, "Belső hiba.")
 	}

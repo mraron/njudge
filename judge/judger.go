@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/gommon/log"
 	"github.com/mraron/njudge/utils/language"
 	"github.com/mraron/njudge/utils/problems"
-	"github.com/mraron/njudge/utils/problems/polygon"
+	_ "github.com/mraron/njudge/utils/problems/zipoo"
 	"github.com/satori/go.uuid"
 	"net/http"
 	"os"
@@ -57,8 +57,7 @@ func (h HTTPCallback) Callback(test string, status problems.Status, done bool) e
 	return nil
 }
 
-func Judge(p problems.Problem, src string, lang language.Language, sandbox language.Sandbox, c Callbacker) error {
-	log.Print(p.(polygon.Problem).Judging.TestSet[0])
+func Judge(p problems.Problem, src []byte, lang language.Language, sandbox language.Sandbox, c Callbacker) error {
 	id, err := uuid.NewV4()
 	if err != nil {
 		log.Print(err)

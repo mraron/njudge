@@ -24,7 +24,7 @@ import (
 type Submission struct {
 	Problem     string `json:"problem"`
 	Language    string `json:"language"`
-	Source      string `json:"source"`
+	Source      []byte `json:"source"`
 	CallbackUrl string `json:"callback_url"`
 }
 
