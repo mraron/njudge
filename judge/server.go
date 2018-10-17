@@ -8,7 +8,12 @@ import (
 	"time"
 
 	"github.com/mraron/njudge/utils/problems"
-	_ "github.com/mraron/njudge/utils/problems/polygon"
+	_ "github.com/mraron/njudge/utils/problems/config/polygon"
+	_ "github.com/mraron/njudge/utils/problems/config/problemjson"
+	_ "github.com/mraron/njudge/utils/problems/tasktype/batch"
+	_ "github.com/mraron/njudge/utils/problems/tasktype/outputonly"
+	_ "github.com/mraron/njudge/utils/problems/tasktype/stub"
+
 	"io/ioutil"
 	"path/filepath"
 
@@ -126,7 +131,6 @@ func (s *Server) Run() error {
 
 	return e.Start(":" + s.Port)
 }
-
 
 //@TODO make it a background process
 func (s *Server) runUpdateProblems() {

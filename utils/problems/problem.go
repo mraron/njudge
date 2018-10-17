@@ -43,22 +43,40 @@ type Attachment struct {
 	Contents []byte
 }
 
-type Problem interface {
-	Name() string
+type File struct {
+	Name string
+	Role string
+	Path string
+}
 
+//@TODO add problem config type name
+
+type Problem interface {
 	Titles() []Content
 	Statements() []Content
 	HTMLStatements() []Content
 	PDFStatements() []Content
 
-	MemoryLimit() int
-	TimeLimit() int
-	InputOutputFiles() (string, string)
-	Interactive() bool
-	Languages() []language.Language
 	Attachments() []Attachment
 	Tags() []string
 
-	Compile(language.Sandbox, language.Language, io.Reader, io.Writer) (io.Reader, error)
-	Run(language.Sandbox, language.Language, io.Reader, chan string, chan Status) (Status, error)
+	JudgingInformation
+}
+
+type JudgingInformation interface {
+	Name() string
+	MemoryLimit() int
+	TimeLimit() int
+	Check(string, string, string, io.Writer, io.Writer) error
+	InputOutputFiles() (string, string)
+	Languages() []language.Language
+	StatusSkeleton() Status
+	Files() []File
+	TaskTypeName() string
+}
+
+type TaskType interface {
+	Name() string
+	Compile(JudgingInformation, language.Sandbox, language.Language, io.Reader, io.Writer) (io.Reader, error)
+	Run(JudgingInformation, language.Sandbox, language.Language, io.Reader, chan string, chan Status) (Status, error)
 }

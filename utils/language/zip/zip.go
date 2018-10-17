@@ -1,12 +1,12 @@
 package zip
 
 import (
-	"io"
 	"github.com/mraron/njudge/utils/language"
+	"io"
 	"time"
 )
 
-type zip struct {}
+type zip struct{}
 
 func (zip) Id() string {
 	return "zip"
@@ -16,11 +16,11 @@ func (zip) Name() string {
 	return "ZIP archívum"
 }
 
-func (zip) InsecureCompile(s string, r io.Reader, w1 io.Writer, w2 io.Writer) (error) {
+func (zip) InsecureCompile(s string, r io.Reader, w1 io.Writer, w2 io.Writer) error {
 	return nil
 }
 
-func (zip) Compile(s language.Sandbox, src io.Reader, bin io.Writer, cerr io.Writer) (error) {
+func (zip) Compile(s language.Sandbox, src language.File, bin io.Writer, cerr io.Writer, extras []language.File) error {
 	return nil
 }
 

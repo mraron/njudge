@@ -1,16 +1,18 @@
 package language
 
 import (
-	"io"
-	"time"
-	"sync"
-	"os/exec"
-	"fmt"
-	"os"
-	"strings"
 	"bufio"
-	"strconv"
 	"bytes"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
 )
 
 func getEnv(key, fallback string) string {
@@ -25,7 +27,10 @@ var ISOLATE_ROOT = getEnv("ISOLATE_ROOT", "/var/local/lib/isolate/")
 type Sandbox interface {
 	Init() error
 
+	Pwd() string
+
 	CreateFile(string, io.Reader) error
+	GetFile(string) (io.Reader, error)
 	MakeExecutable(string) error
 
 	SetMaxProcesses(int) Sandbox
@@ -36,7 +41,7 @@ type Sandbox interface {
 	Stderr(io.Writer) Sandbox
 	Stdout(io.Writer) Sandbox
 	WorkingDirectory(string) Sandbox
-	Run(string, bool) (error)
+	Run(string, bool) error
 
 	Status() Status
 
@@ -44,13 +49,13 @@ type Sandbox interface {
 }
 
 type IsolateSandbox struct {
-	id int
+	id   int
 	argv []string
 
-	stdin io.Reader
+	stdin  io.Reader
 	stdout io.Writer
 	stderr io.Writer
-	wdir string
+	wdir   string
 
 	st Status
 
@@ -59,6 +64,19 @@ type IsolateSandbox struct {
 
 func NewIsolateSandbox(id int) Sandbox {
 	return &IsolateSandbox{id: id}
+}
+
+func (s *IsolateSandbox) Pwd() string {
+	return ISOLATE_ROOT + strconv.Itoa(s.id) + "/box/"
+}
+
+func (s *IsolateSandbox) GetFile(name string) (io.Reader, error) {
+	f, err := ioutil.ReadFile(filepath.Join(s.Pwd(), name))
+	if err != nil {
+		return nil, err
+	}
+
+	return bytes.NewBuffer(f), nil
 }
 
 func (s *IsolateSandbox) Init() error {
@@ -70,13 +88,13 @@ func (s *IsolateSandbox) Init() error {
 	s.wdir = ""
 	s.st = Status{}
 
-	err :=  exec.Command("isolate", "--cg", "-b", strconv.Itoa(s.id), "--init").Run()
+	err := exec.Command("isolate", "--cg", "-b", strconv.Itoa(s.id), "--init").Run()
 
 	return err
 }
 
 func (s *IsolateSandbox) CreateFile(name string, r io.Reader) error {
-	f, err := os.Create(ISOLATE_ROOT+strconv.Itoa(s.id)+"/box/" + name)
+	f, err := os.Create(ISOLATE_ROOT + strconv.Itoa(s.id) + "/box/" + name)
 	if err != nil {
 		return err
 	}
@@ -90,13 +108,13 @@ func (s *IsolateSandbox) CreateFile(name string, r io.Reader) error {
 }
 
 func (s *IsolateSandbox) MakeExecutable(name string) error {
-	return os.Chmod(ISOLATE_ROOT+strconv.Itoa(s.id)+"/box/" + name, 0777)
+	return os.Chmod(ISOLATE_ROOT+strconv.Itoa(s.id)+"/box/"+name, 0777)
 }
 
 func (s *IsolateSandbox) SetMaxProcesses(num int) Sandbox {
 	if num < 0 {
 		s.argv = append(s.argv, "--processes=100")
-	}else {
+	} else {
 		s.argv = append(s.argv, "--processes="+strconv.Itoa(num))
 	}
 
@@ -109,7 +127,7 @@ func (s *IsolateSandbox) Env() Sandbox {
 }
 
 func (s *IsolateSandbox) TimeLimit(tl time.Duration) Sandbox {
-	tl = tl/time.Millisecond
+	tl = tl / time.Millisecond
 	s.argv = append(s.argv, fmt.Sprintf("--time=%d.%d", tl/1000, tl%1000))
 
 	return s
@@ -145,18 +163,18 @@ func (s *IsolateSandbox) WorkingDirectory(wd string) Sandbox {
 	return s
 }
 
-func (s *IsolateSandbox) Run(prg string, needStatus bool) (error) {
+func (s *IsolateSandbox) Run(prg string, needStatus bool) error {
 	var (
 		err error
-		f *os.File
+		f   *os.File
 		cmd *exec.Cmd
 		str string
-		st int
+		st  int
 	)
 
 	splt := strings.Split(prg, " ")
 
-	s.argv = append([]string{"--cg", "--cg-timing",  "-b", strconv.Itoa(s.id), "-M", "/tmp/metafile"+strconv.Itoa(s.id)}, s.argv...)
+	s.argv = append([]string{"--cg", "--cg-timing", "-b", strconv.Itoa(s.id), "-M", "/tmp/metafile" + strconv.Itoa(s.id)}, s.argv...)
 	s.argv = append(s.argv, "--run", "--")
 	s.argv = append(s.argv, splt...)
 
@@ -164,7 +182,7 @@ func (s *IsolateSandbox) Run(prg string, needStatus bool) (error) {
 
 	stderr := &bytes.Buffer{}
 
-	cmd = exec.Command("isolate",  s.argv... )
+	cmd = exec.Command("isolate", s.argv...)
 
 	cmd.Stdin = s.stdin
 	cmd.Stdout = s.stdout
@@ -181,14 +199,15 @@ func (s *IsolateSandbox) Run(prg string, needStatus bool) (error) {
 		fmt.Sscanf(str, "Caught fatal signal %d", &st)
 
 		if st == -1 {
+			fmt.Println("caught shiet", stderr.String())
 			s.st.Verdict = VERDICT_XX
-		}else if st==2 || st==127 {
+		} else if st == 2 || st == 127 {
 			//fmt.Println(st)
 			s.st.Verdict = VERDICT_ML
-		}else { //signal 8 -> division by zero
+		} else { //signal 8 -> division by zero
 			s.st.Verdict = VERDICT_RE
 		}
-	}else {
+	} else {
 		s.st.Verdict = VERDICT_OK
 	}
 
@@ -198,11 +217,11 @@ func (s *IsolateSandbox) Run(prg string, needStatus bool) (error) {
 		return nil
 	}
 
-
 	memorySum := 0
 
-	if f, err = os.Open("/tmp/metafile"+strconv.Itoa(s.id)); err != nil {
+	if f, err = os.Open("/tmp/metafile" + strconv.Itoa(s.id)); err != nil {
 		s.st.Verdict = VERDICT_XX
+		fmt.Println("can't open shiet")
 		return err
 	}
 
@@ -210,13 +229,13 @@ func (s *IsolateSandbox) Run(prg string, needStatus bool) (error) {
 	for sc.Scan() {
 		lst := strings.Split(sc.Text(), ":")
 
-		if lst[0] == "max-rss" || lst[0]=="cg-mem" {
+		if lst[0] == "max-rss" || lst[0] == "cg-mem" {
 			s.st.Memory, _ = strconv.Atoi(lst[1])
 			memorySum += s.st.Memory
 		} else if lst[0] == "time" {
 			tmp, _ := strconv.ParseFloat(lst[1], 32)
 			s.st.Time = time.Duration(tmp*1000) * time.Millisecond
-		}else if lst[0]=="status"  {
+		} else if lst[0] == "status" {
 			switch lst[1] {
 			case "TO":
 				s.st.Verdict = VERDICT_TL

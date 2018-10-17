@@ -2,7 +2,7 @@ package web
 
 import (
 	"github.com/labstack/echo"
-	"github.com/mraron/njudge/utils/problems/polygon"
+	"github.com/mraron/njudge/utils/problems/config/polygon"
 	"github.com/mraron/njudge/web/models"
 	. "github.com/volatiletech/sqlboiler/queries/qm"
 	"io/ioutil"
@@ -121,10 +121,10 @@ func (s *Server) getProblemsetStatus(c echo.Context) error {
 
 	if problem == "" {
 		sbs, err = models.Submissions(OrderBy("id DESC")).All(s.db)
-	}else {
+	} else {
 		if ac == "1" {
 			sbs, err = models.Submissions(OrderBy("id DESC"), Where("verdict = 0"), Where("problem = ?", problem), Where("problemset = ?", problem_set)).All(s.db)
-		}else {
+		} else {
 			sbs, err = models.Submissions(OrderBy("id DESC"), Where("problem = ?", problem), Where("problemset = ?", problem_set)).All(s.db)
 		}
 	}

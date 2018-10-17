@@ -7,24 +7,24 @@ import (
 )
 
 var (
-	ERROR_NAME_USED = errors.New("Problem name already in use")
+	ERROR_NAME_USED           = errors.New("Problem name already in use")
 	ERROR_AMBIGUOUS_STRUCTURE = errors.New("Parser can't decide problem type, because of many candidates")
-	ERROR_NO_MATCH = errors.New("Parser can't decide problem type, no match")
+	ERROR_NO_MATCH            = errors.New("Parser can't decide problem type, no match")
 )
 
-type Identifier func(string) bool
+type ConfigIdentifier func(string) bool
 
-type Parser func(string) (Problem, error)
+type ConfigParser func(string) (Problem, error)
 
-type problemType struct {
-	name string
-	parser Parser
-	identifiers []Identifier
+type problemConfigType struct {
+	name        string
+	parser      ConfigParser
+	identifiers []ConfigIdentifier
 }
 
-var problemTypes []problemType
+var problemTypes []problemConfigType
 
-func CombineIdentifiers(identifiers ...Identifier) Identifier {
+func CombineConfigIdentifiers(identifiers ...ConfigIdentifier) ConfigIdentifier {
 	return func(s string) bool {
 		ok := true
 		for _, val := range identifiers {
@@ -37,15 +37,15 @@ func CombineIdentifiers(identifiers ...Identifier) Identifier {
 	}
 }
 
-func DefaultIdentifier(name string) Identifier {
+func DefaultConfigIdentifier(name string) ConfigIdentifier {
 	return func(s string) bool {
-		_, err := os.Stat(filepath.Join(s, name + ".problem"))
+		_, err := os.Stat(filepath.Join(s, name+".problem"))
 		return !os.IsNotExist(err)
 	}
 
 }
 
-func RegisterType(name string, parser Parser, identifiers ...Identifier) (error) {
+func RegisterConfigType(name string, parser ConfigParser, identifiers ...ConfigIdentifier) error {
 	for _, val := range problemTypes {
 		if val.name == name {
 			return ERROR_NAME_USED
@@ -53,10 +53,10 @@ func RegisterType(name string, parser Parser, identifiers ...Identifier) (error)
 	}
 
 	if len(identifiers) == 0 {
-		identifiers = append(identifiers, DefaultIdentifier(name))
+		identifiers = append(identifiers, DefaultConfigIdentifier(name))
 	}
 
-	problemTypes = append(problemTypes, problemType{name, parser, identifiers})
+	problemTypes = append(problemTypes, problemConfigType{name, parser, identifiers})
 	return nil
 }
 
@@ -71,7 +71,7 @@ func Parse(dir string) (Problem, error) {
 		}
 
 		if ok {
-			matches ++
+			matches++
 			if first_match == -1 {
 				first_match = ind
 			}
@@ -80,14 +80,13 @@ func Parse(dir string) (Problem, error) {
 
 	if matches > 1 {
 		return nil, ERROR_AMBIGUOUS_STRUCTURE
-	}else if matches == 0 {
+	} else if matches == 0 {
 		return nil, ERROR_NO_MATCH
 	}
 
 	return problemTypes[first_match].parser(dir)
 }
 
-
 func init() {
-	problemTypes = make([]problemType, 0)
+	problemTypes = make([]problemConfigType, 0)
 }

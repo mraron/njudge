@@ -4,10 +4,9 @@ import (
 	"github.com/mraron/njudge/utils/language"
 	_ "github.com/mraron/njudge/utils/language/cpp11"
 	"github.com/mraron/njudge/utils/problems"
-
-	"os"
 	"os/exec"
 
+	"os"
 	"path/filepath"
 
 	"encoding/xml"
@@ -19,7 +18,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -127,8 +125,15 @@ type Attachment struct {
 	Location string `xml:"location,attr"`
 }
 
+type Stub struct {
+	Name     string `xml:"name,attr"`
+	Path     string `xml:"path,attr"`
+	Language string `xml:"language,attr"`
+}
+
 type Assets struct {
 	Attachments []Attachment `xml:"attachments>attachment"`
+	Stubs       []Stub       `xml:"stubs>stub"`
 }
 
 type Problem struct {
@@ -137,6 +142,7 @@ type Problem struct {
 	AttachmentsList        []problems.Attachment
 	GeneratedStatementList []problems.Content
 
+	TaskType      string      `xml:"task_type,attr"`
 	FeedbackType  string      `xml:"feedback,attr"`
 	Revision      int         `xml:"revision,attr"`
 	ShortName     string      `xml:"short-name,attr"`
@@ -218,17 +224,6 @@ func (p Problem) Tags() (lst []string) {
 	return
 }
 
-func (p Problem) Compile(s language.Sandbox, lang language.Language, src io.Reader, e io.Writer) (io.Reader, error) {
-	buf := &bytes.Buffer{}
-
-	err := lang.Compile(s, src, buf, e)
-	if err != nil {
-		return nil, err
-	}
-
-	return buf, nil
-}
-
 func (Problem) Languages() []language.Language {
 	lst1 := language.List()
 
@@ -242,36 +237,10 @@ func (Problem) Languages() []language.Language {
 	return lst2
 }
 
-func truncate(s string) string {
-	if len(s) < 256 {
-		return s
-	}
+func (p Problem) StatusSkeleton() problems.Status {
+	ans := problems.Status{false, "status skeleton", problems.FeedbackFromString(p.FeedbackType), make([]problems.Testset, 0)}
 
-	return s[:255] + "..."
-}
-
-func (p Problem) Run(s language.Sandbox, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
-	var (
-		ans            problems.Status
-		err            error
-		binaryContents []byte
-	)
-
-	defer func() {
-		close(testNotifier)
-		close(statusNotifier)
-	}()
-
-	ans.Compiled = true
-	ans.Feedback = make([]problems.Testset, 0)
-	ans.FeedbackType = problems.FeedbackFromString(p.FeedbackType)
-	fmt.Println("itt1")
-	if binaryContents, err = ioutil.ReadAll(bin); err != nil {
-		return ans, err
-	}
-	fmt.Println("itt2")
 	for _, ts := range p.Judging.TestSet {
-		fmt.Println("ott")
 		ans.Feedback = append(ans.Feedback, problems.Testset{Name: ts.Name})
 		testset := &ans.Feedback[len(ans.Feedback)-1]
 
@@ -286,12 +255,13 @@ func (p Problem) Run(s language.Sandbox, lang language.Language, bin io.Reader, 
 
 			tcbygroup[tc.Group] = append(tcbygroup[tc.Group], tc)
 		}
-		fmt.Println(len(ts.Groups), "REVIVE")
+
 		if len(ts.Groups) == 0 {
 			fmt.Println(len(ts.Groups), "wuwtuaofjsdléfklék")
 			ts.Groups = append(ts.Groups, Group{"", "sum", -1.0})
 		}
 
+		idx := 1
 		for _, grp := range ts.Groups {
 			testset.Groups = append(testset.Groups, problems.Group{})
 			group := &testset.Groups[len(testset.Groups)-1]
@@ -300,108 +270,49 @@ func (p Problem) Run(s language.Sandbox, lang language.Language, bin io.Reader, 
 			group.Scoring = problems.ScoringFromString(grp.Scoring)
 
 			for _, tc := range tcbygroup[grp.Name] {
-				testNotifier <- strconv.Itoa(tc.Index)
-				statusNotifier <- ans
+				testcase := problems.Testcase{idx, tc.Input, tc.Answer, ts.Name, group.Name, problems.VERDICT_DR, float64(0.0), float64(tc.Score), "-", "-", "-", 0 * time.Millisecond, 0, time.Duration(p.TimeLimit()) * time.Millisecond, p.MemoryLimit()}
+				group.Testcases = append(group.Testcases, testcase)
+				testset.Testcases = append(testset.Testcases, testcase)
 
-				testLocation, answerLocation := tc.Input, tc.Answer
-
-				testcase, err := os.Open(testLocation)
-				if err != nil {
-					return ans, err
-				}
-
-				stdout := &bytes.Buffer{}
-
-				answerFile, err := os.Open(answerLocation)
-				if err != nil {
-					return ans, err
-				}
-
-				answerContents, err := ioutil.ReadAll(answerFile)
-				if err != nil {
-					return ans, err
-				}
-
-				res, err := lang.Run(s, bytes.NewReader(binaryContents), testcase, stdout, time.Duration(ts.TimeLimit)*time.Millisecond, ts.MemoryLimit)
-				if err != nil {
-					return ans, err
-				}
-
-				if res.Verdict == language.VERDICT_OK {
-					checkerOutput := &bytes.Buffer{}
-					programOutput := stdout.String()
-
-					expectedOutput := string(answerContents)
-
-					cmd := exec.Command(filepath.Join(p.Path, "check"), testLocation, "/dev/stdin", answerLocation)
-					cmd.Stdin = stdout
-					cmd.Stdout = checkerOutput
-					cmd.Stderr = checkerOutput
-
-					err = cmd.Run()
-
-					fmt.Println(err, checkerOutput.String(), "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-
-					/*	if err != nil {
-						ans.Feedback = append(ans.Feedback, problems.Testcase{VerdictName: problems.VERDICT_XX, MemoryUsed: res.Memory, TimeSpent: res.Time})
-						return ans, err
-					}*/
-
-					testset.Testcases = append(testset.Testcases, problems.Testcase{MaxScore: float64(tc.Score), Testset: ts.Name, MemoryUsed: res.Memory, TimeSpent: res.Time, Output: truncate(programOutput), ExpectedOutput: truncate(expectedOutput), CheckerOutput: truncate(checkerOutput.String()), Group: grp.Name})
-					group.Testcases = append(group.Testcases, problems.Testcase{MaxScore: float64(tc.Score), Testset: ts.Name, MemoryUsed: res.Memory, TimeSpent: res.Time, Output: truncate(programOutput), ExpectedOutput: truncate(expectedOutput), CheckerOutput: truncate(checkerOutput.String()), Group: grp.Name})
-
-					if err == nil && cmd.ProcessState.Success() {
-						testset.Testcases[len(testset.Testcases)-1].VerdictName = problems.VERDICT_AC
-						testset.Testcases[len(testset.Testcases)-1].Score = testset.Testcases[len(testset.Testcases)-1].MaxScore
-
-						group.Testcases[len(group.Testcases)-1].VerdictName = problems.VERDICT_AC
-						group.Testcases[len(group.Testcases)-1].Score = group.Testcases[len(group.Testcases)-1].MaxScore
-					} else {
-						testset.Testcases[len(testset.Testcases)-1].VerdictName = problems.VERDICT_WA
-						testset.Testcases[len(testset.Testcases)-1].Score = 0
-
-						group.Testcases[len(group.Testcases)-1].VerdictName = problems.VERDICT_WA
-						group.Testcases[len(group.Testcases)-1].Score = 0
-
-						if problems.FeedbackFromString(p.FeedbackType) != problems.FEEDBACK_IOI {
-							return ans, nil
-						}
-					}
-				} else {
-					curr := problems.Testcase{}
-					curr.Testset = ts.Name
-					switch res.Verdict {
-					case language.VERDICT_RE:
-						curr.VerdictName = problems.VERDICT_RE
-					case language.VERDICT_XX:
-						curr.VerdictName = problems.VERDICT_XX
-					case language.VERDICT_ML:
-						curr.VerdictName = problems.VERDICT_ML
-					case language.VERDICT_TL:
-						curr.VerdictName = problems.VERDICT_TL
-					}
-
-					curr.Group = grp.Name
-					curr.MemoryUsed = res.Memory
-					curr.TimeSpent = res.Time
-					curr.Score = 0
-					curr.MaxScore = float64(tc.Score)
-					curr.Output = truncate(stdout.String()) //now it's stderr
-					curr.ExpectedOutput = truncate(string(answerContents))
-
-					testset.Testcases = append(testset.Testcases, curr)
-					group.Testcases = append(group.Testcases, curr)
-
-					if problems.FeedbackFromString(p.FeedbackType) != problems.FEEDBACK_IOI {
-						return ans, nil
-					}
-				}
+				idx++
 			}
 		}
-
 	}
 
-	return ans, nil
+	return ans
+}
+
+func (p Problem) Check(inp, pout, jans string, stdout io.Writer, stderr io.Writer) error {
+	cmd := exec.Command(filepath.Join(p.Path, "check"), inp, pout, jans)
+	cmd.Stdout = stdout
+	cmd.Stderr = stderr
+
+	err := cmd.Run()
+
+	if err == nil && cmd.ProcessState.Success() {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	return errors.New("proccess state is not success")
+}
+
+func (p Problem) Files() []problems.File {
+	res := make([]problems.File, 0)
+	for _, stub := range p.Assets.Stubs {
+		res = append(res, problems.File{stub.Name, "stub_" + stub.Language, filepath.Join(p.Path, stub.Path)})
+	}
+
+	return res
+}
+
+func (p Problem) TaskTypeName() string {
+	if p.TaskType == "" {
+		return "batch"
+	}
+
+	return p.TaskType
 }
 
 //@TODO actually respect problem.xml with statements
@@ -520,7 +431,7 @@ func identifier(path string) bool {
 }
 
 func init() {
-	problems.RegisterType("polygon", parser, identifier)
+	problems.RegisterConfigType("polygon", parser, identifier)
 
 	if tmpl, err := template.New("polygonHtmlTemplate").Funcs(template.FuncMap{"div": func(a, b int) int { return a / b }}).Parse(htmlTemplate); err != nil {
 		panic(err)

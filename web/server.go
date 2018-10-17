@@ -12,8 +12,7 @@ import (
 	"github.com/mraron/njudge/judge"
 
 	"github.com/mraron/njudge/utils/problems"
-	_ "github.com/mraron/njudge/utils/problems/polygon"
-	_ "github.com/mraron/njudge/utils/problems/zipoo"
+	_ "github.com/mraron/njudge/utils/problems/config/polygon"
 
 	_ "github.com/mraron/njudge/utils/language/zip"
 

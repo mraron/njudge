@@ -8,7 +8,6 @@ import (
 	"github.com/labstack/gommon/log"
 	"github.com/mraron/njudge/utils/language"
 	"github.com/mraron/njudge/utils/problems"
-	_ "github.com/mraron/njudge/utils/problems/zipoo"
 	"github.com/satori/go.uuid"
 	"net/http"
 	"os"
@@ -84,8 +83,10 @@ func Judge(p problems.Problem, src []byte, lang language.Language, sandbox langu
 		return err
 	}
 
+	tt := problems.GetTaskType(p.TaskTypeName())
+
 	stderr := bytes.Buffer{}
-	bin, err := p.Compile(sandbox, lang, f, &stderr)
+	bin, err := tt.Compile(p, sandbox, lang, f, &stderr)
 
 	if err != nil {
 		st := problems.Status{}
@@ -105,7 +106,7 @@ func Judge(p problems.Problem, src []byte, lang language.Language, sandbox langu
 	)
 
 	go func() {
-		st, err = p.Run(sandbox, lang, bin, testNotifier, statusNotifier)
+		st, err = tt.Run(p, sandbox, lang, bin, testNotifier, statusNotifier)
 		ran <- true
 		close(ran)
 	}()

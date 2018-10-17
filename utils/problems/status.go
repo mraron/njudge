@@ -20,6 +20,7 @@ const (
 	VERDICT_TL
 	VERDICT_ML
 	VERDICT_XX
+	VERDICT_DR
 )
 
 func (v VerdictName) String() string {
@@ -36,6 +37,8 @@ func (v VerdictName) String() string {
 		return "Memória limit túllépés"
 	case VERDICT_XX:
 		return "Belső hiba"
+	case VERDICT_DR:
+		return "Nem fut"
 	}
 
 	return "..."
@@ -84,6 +87,9 @@ func ScoringFromString(str string) ScoringType {
 // Testcase represents a testcase in the status of a submission
 //
 type Testcase struct {
+	Index          int
+	InputPath      string
+	AnswerPath     string
 	Testset        string
 	Group          string
 	VerdictName    VerdictName
@@ -94,6 +100,8 @@ type Testcase struct {
 	CheckerOutput  string
 	TimeSpent      time.Duration
 	MemoryUsed     int
+	TimeLimit      time.Duration
+	MemoryLimit    int
 }
 
 //

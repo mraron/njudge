@@ -15,21 +15,25 @@ const (
 	VERDICT_XX
 )
 
+type File struct {
+	Name   string
+	Source io.Reader
+}
+
 type Status struct {
 	Verdict Verdict
-	Signal int
-	Memory int
-	Time time.Duration
+	Signal  int
+	Memory  int
+	Time    time.Duration
 }
 
 type Language interface {
 	Id() string
 	Name() string
-	InsecureCompile(string, io.Reader, io.Writer, io.Writer) (error)
-	Compile(Sandbox, io.Reader, io.Writer, io.Writer) (error)
+	InsecureCompile(string, io.Reader, io.Writer, io.Writer) error
+	Compile(Sandbox, File, io.Writer, io.Writer, []File) error
 	Run(Sandbox, io.Reader, io.Reader, io.Writer, time.Duration, int) (Status, error)
 }
-
 
 var langList map[string]Language
 
@@ -43,13 +47,13 @@ func List() []Language {
 	ind := 0
 	for _, val := range langList {
 		ans[ind] = val
-		ind ++
+		ind++
 	}
 
 	return ans
 }
 
-func Get(name string) (Language) {
+func Get(name string) Language {
 	if val, ok := langList[name]; ok {
 		return val
 	}
