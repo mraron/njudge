@@ -116,5 +116,7 @@ func (s *Server) putAPIProblemRel(c echo.Context) error {
 		return s.internalError(c, err, "error")
 	}
 
-	return c.String(http.StatusOK, "ok")
+	return c.JSON(http.StatusOK, struct {
+		Message string `json:"message"`
+	}{"updated"})
 }

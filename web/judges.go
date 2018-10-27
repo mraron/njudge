@@ -167,5 +167,7 @@ func (s *Server) putAPIJudge(c echo.Context) error {
 		return s.internalError(c, err, "error")
 	}
 
-	return c.String(http.StatusOK, "updated")
+	return c.JSON(http.StatusOK, struct {
+		Message string `json:"message"`
+	}{"updated"})
 }

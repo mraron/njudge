@@ -22,8 +22,8 @@
         ]).listActions(['edit']);
 
         problem_rel.creationView().fields([
-            nga.field('Problemset').validation({ required: true }),
-            nga.field('Problem').validation({ required: true })
+            nga.field('problemset').validation({ required: true }),
+            nga.field('problem').validation({ required: true })
         ]);
 
         problem_rel.editionView().fields(problem_rel.creationView().fields());
