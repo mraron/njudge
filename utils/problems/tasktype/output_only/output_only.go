@@ -1,4 +1,4 @@
-package outputonly
+package output_only
 
 import (
 	"archive/zip"
@@ -73,7 +73,6 @@ func (o OutputOnly) Run(jinfo problems.JudgingInformation, s language.Sandbox, l
 
 	ans.Feedback[0].Groups = append(ans.Feedback[0].Groups, problems.Group{"subtask1", problems.SCORING_SUM, make([]problems.Testcase, 0), make([]string, 0)})
 	for _, tc := range skeleton.Feedback[0].Testcases {
-		inputName := tc.InputPath
 		outputName := tc.AnswerPath
 
 		ans.Feedback[0].Testcases = append(ans.Feedback[0].Testcases, problems.Testcase{Testset: "main", VerdictName: problems.VERDICT_RE, Score: 0.0, MaxScore: 0.0})
@@ -134,7 +133,8 @@ func (o OutputOnly) Run(jinfo problems.JudgingInformation, s language.Sandbox, l
 
 				defer os.Remove(tmpfile.Name())
 
-				err = jinfo.Check(inputName, tmpfile.Name(), outputName, stdout, stderr)
+				currentCase.OutputPath = tmpfile.Name()
+				err = jinfo.Check(currentCase)
 				fmt.Println(err, "LALALAAL")
 				currentCase.CheckerOutput = stderr.String()
 				fmt.Sscanf(stdout.String(), "%f/%f", &currentCase.Score, &currentCase.MaxScore)

@@ -5,13 +5,13 @@ import (
 	_ "github.com/mraron/njudge/utils/language/cpp11"
 	"github.com/mraron/njudge/utils/problems"
 	"os/exec"
+	"syscall"
 
 	"os"
 	"path/filepath"
 
 	"encoding/xml"
 
-	"io"
 	"io/ioutil"
 
 	"bytes"
@@ -270,7 +270,7 @@ func (p Problem) StatusSkeleton() problems.Status {
 			group.Scoring = problems.ScoringFromString(grp.Scoring)
 
 			for _, tc := range tcbygroup[grp.Name] {
-				testcase := problems.Testcase{idx, tc.Input, tc.Answer, ts.Name, group.Name, problems.VERDICT_DR, float64(0.0), float64(tc.Score), "-", "-", "-", 0 * time.Millisecond, 0, time.Duration(p.TimeLimit()) * time.Millisecond, p.MemoryLimit()}
+				testcase := problems.Testcase{idx, tc.Input, "", tc.Answer, ts.Name, group.Name, problems.VERDICT_DR, float64(0.0), float64(tc.Score), "-", "-", "-", 0 * time.Millisecond, 0, time.Duration(p.TimeLimit()) * time.Millisecond, p.MemoryLimit()}
 				group.Testcases = append(group.Testcases, testcase)
 				testset.Testcases = append(testset.Testcases, testcase)
 
@@ -282,20 +282,45 @@ func (p Problem) StatusSkeleton() problems.Status {
 	return ans
 }
 
-func (p Problem) Check(inp, pout, jans string, stdout io.Writer, stderr io.Writer) error {
-	cmd := exec.Command(filepath.Join(p.Path, "check"), inp, pout, jans)
-	cmd.Stdout = stdout
-	cmd.Stderr = stderr
+func (p Problem) Check(tc *problems.Testcase) error {
+	output := &bytes.Buffer{}
+
+	cmd := exec.Command(filepath.Join(p.Path, "check"), tc.InputPath, tc.OutputPath, tc.AnswerPath)
+	cmd.Stdout = output
+	cmd.Stderr = output
 
 	err := cmd.Run()
 
-	if err == nil && cmd.ProcessState.Success() {
-		return nil
-	} else if err != nil {
-		return err
+	tc.CheckerOutput = problems.Truncate(output.String())
+	if err != nil {
+		if exit_err, ok := err.(*exec.ExitError); ok {
+			if status, ok := exit_err.Sys().(syscall.WaitStatus); ok {
+				if status.ExitStatus() == 1 {
+					tc.VerdictName = problems.VERDICT_WA
+				} else if status.ExitStatus() == 2 {
+					tc.VerdictName = problems.VERDICT_PE
+				} else if status.ExitStatus() == 7 {
+					tc.VerdictName = problems.VERDICT_PC
+
+					rel := 0
+					fmt.Sscanf(output.String(), "points %d", &rel)
+					rel -= 16
+
+					tc.Score = float64(rel) / (200.0 * tc.MaxScore)
+				} else { //3 -> fail
+					tc.VerdictName = problems.VERDICT_XX
+				}
+			}
+		} else {
+			tc.VerdictName = problems.VERDICT_XX
+			return err
+		}
+	} else {
+		tc.Score = tc.MaxScore
+		tc.VerdictName = problems.VERDICT_AC
 	}
 
-	return errors.New("proccess state is not success")
+	return nil
 }
 
 func (p Problem) Files() []problems.File {

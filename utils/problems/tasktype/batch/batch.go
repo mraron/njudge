@@ -89,22 +89,26 @@ func (b Batch) Run(jinfo problems.JudgingInformation, s language.Sandbox, lang l
 	for _, ts := range skeleton.Feedback {
 		ans.Feedback = append(ans.Feedback, problems.Testset{Name: ts.Name})
 		testset := &ans.Feedback[len(ans.Feedback)-1]
-
+		fmt.Println("!!")
 		for _, g := range ts.Groups {
+			fmt.Println("!")
 			testset.Groups = append(testset.Groups, problems.Group{Name: g.Name, Scoring: g.Scoring})
 			group := &testset.Groups[len(testset.Groups)-1]
 
 			ac := true
 
 			for _, tc := range g.Testcases {
+				fmt.Println("?")
 				testNotifier <- strconv.Itoa(tc.Index)
 				statusNotifier <- ans
 
 				if dependenciesOK(g.Dependencies) {
+					fmt.Println("?")
 					testLocation, answerLocation := tc.InputPath, tc.AnswerPath
 
 					testcase, err := os.Open(testLocation)
 					if err != nil {
+						tc.VerdictName = problems.VERDICT_XX
 						return ans, err
 					}
 
@@ -112,77 +116,72 @@ func (b Batch) Run(jinfo problems.JudgingInformation, s language.Sandbox, lang l
 
 					answerFile, err := os.Open(answerLocation)
 					if err != nil {
+						tc.VerdictName = problems.VERDICT_XX
 						return ans, err
 					}
 
 					answerContents, err := ioutil.ReadAll(answerFile)
 					if err != nil {
+						tc.VerdictName = problems.VERDICT_XX
 						return ans, err
 					}
 
 					res, err := lang.Run(s, bytes.NewReader(binaryContents), testcase, stdout, tc.TimeLimit, tc.MemoryLimit)
 					if err != nil {
+						tc.VerdictName = problems.VERDICT_XX
 						return ans, err
 					}
 
 					fmt.Println(res, res.Verdict, language.VERDICT_OK, "!!!!!!!!!!!!!!")
 
 					if res.Verdict == language.VERDICT_OK {
-						checkerOutput := &bytes.Buffer{}
 						programOutput := stdout.String()
 
 						expectedOutput := string(answerContents)
 
 						tmpfile, err := ioutil.TempFile("/tmp", "OutputOfProgram")
 						if err != nil {
+							tc.VerdictName = problems.VERDICT_XX
+							fmt.Println(err, "!!!!")
 							return ans, err
 						}
 
 						if _, err := tmpfile.Write([]byte(programOutput)); err != nil {
+							tc.VerdictName = problems.VERDICT_XX
+							fmt.Println(err, "!!!!")
 							return ans, err
 						}
 
 						if err := tmpfile.Close(); err != nil {
+							tc.VerdictName = problems.VERDICT_XX
+							fmt.Println(err, "!!!!")
 							return ans, err
 						}
 
 						defer os.Remove(tmpfile.Name())
 
-						err = jinfo.Check(testLocation, tmpfile.Name(), answerLocation, checkerOutput, checkerOutput)
+						tc.OutputPath = tmpfile.Name()
+
+						err = jinfo.Check(&tc)
+
+						tc.Output = truncate(stdout.String())
+						tc.ExpectedOutput = truncate(expectedOutput)
+						tc.MemoryUsed = res.Memory
+						tc.TimeSpent = res.Time
 
 						testset.Testcases = append(testset.Testcases, tc)
 						group.Testcases = append(group.Testcases, tc)
 
-						testset.Testcases[len(testset.Testcases)-1].CheckerOutput = truncate(checkerOutput.String())
-						testset.Testcases[len(testset.Testcases)-1].Output = truncate(stdout.String())
-						testset.Testcases[len(testset.Testcases)-1].ExpectedOutput = truncate(expectedOutput)
-						testset.Testcases[len(testset.Testcases)-1].MemoryUsed = res.Memory
-						testset.Testcases[len(testset.Testcases)-1].TimeSpent = res.Time
-
-						group.Testcases[len(group.Testcases)-1].CheckerOutput = truncate(checkerOutput.String())
-						group.Testcases[len(group.Testcases)-1].Output = truncate(stdout.String())
-						group.Testcases[len(group.Testcases)-1].ExpectedOutput = truncate(expectedOutput)
-						group.Testcases[len(group.Testcases)-1].MemoryUsed = res.Memory
-						group.Testcases[len(group.Testcases)-1].TimeSpent = res.Time
-
 						if err == nil {
-							testset.Testcases[len(testset.Testcases)-1].VerdictName = problems.VERDICT_AC
-							testset.Testcases[len(testset.Testcases)-1].Score = testset.Testcases[len(testset.Testcases)-1].MaxScore
-
-							group.Testcases[len(group.Testcases)-1].VerdictName = problems.VERDICT_AC
-							group.Testcases[len(group.Testcases)-1].Score = group.Testcases[len(group.Testcases)-1].MaxScore
-						} else {
-							ac = false
-
-							testset.Testcases[len(testset.Testcases)-1].VerdictName = problems.VERDICT_WA
-							testset.Testcases[len(testset.Testcases)-1].Score = 0
-
-							group.Testcases[len(group.Testcases)-1].VerdictName = problems.VERDICT_WA
-							group.Testcases[len(group.Testcases)-1].Score = 0
-
-							if skeleton.FeedbackType != problems.FEEDBACK_IOI {
-								return ans, nil
+							if tc.VerdictName == problems.VERDICT_WA || tc.VerdictName == problems.VERDICT_PE {
+								ac = false
+								if skeleton.FeedbackType != problems.FEEDBACK_IOI {
+									return ans, nil
+								}
 							}
+						} else {
+							fmt.Println(err, "!!!!")
+							return ans, err
 						}
 					} else {
 						ac = false

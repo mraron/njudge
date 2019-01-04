@@ -11,7 +11,6 @@
     var njudge = angular.module('njudge', ['ng-admin']);
     njudge.config(['NgAdminConfigurationProvider', function(NgAdminConfigurationProvider) {
         var nga = NgAdminConfigurationProvider;
-        // create an admin application
         var admin = nga.application('njudge admin').baseApiUrl("http://192.168.4.128:5555/api/v1/");
 
         var problem_rel = nga.entity('problem_rels').identifier(nga.field('id'));
@@ -67,7 +66,6 @@
         admin.menu(nga.menu()
                 .addChild(nga.menu(problem_rel).title('Problem relations').icon('<span class="glyphicon glyphicon-link"></span>'))
                 .addChild(nga.menu(judge).title('Judges').icon('<span class="glyphicon glyphicon-wrench"></span>'))
-
         );
 
         nga.configure(admin);

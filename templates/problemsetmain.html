@@ -4,8 +4,8 @@
         <thead><tr><td>Név</td><td>Cím</td><td>Címkék</td></tr></thead>
         <tbody>
         {{ range $j := .Data }}
-        {{$i := problem $j.Problem}}
-        <tr><td>{{$i.Name}}</td><td><a href="{{$i.Name}}/">{{(translateContent "hungarian" $i.Titles).String}}</a></td><td> {{range $tag := $i.Tags}}<span class="badge badge-secondary">{{$tag}}</span> {{end}}</td></tr>
+            {{$i := problem $j.Problem}}
+            <tr><td>{{$i.Name}}</td><td><a href="{{$i.Name}}/">{{(translateContent "hungarian" $i.Titles).String}}</a></td><td> {{range $tag := $i.Tags}}<span class="badge badge-secondary">{{$tag}}</span> {{end}}</td></tr>
         {{end}}
         </tbody>
     </table>

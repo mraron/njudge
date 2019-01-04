@@ -67,7 +67,7 @@ type JudgingInformation interface {
 	Name() string
 	MemoryLimit() int
 	TimeLimit() int
-	Check(string, string, string, io.Writer, io.Writer) error
+	Check(*Testcase) error
 	InputOutputFiles() (string, string)
 	Languages() []language.Language
 	StatusSkeleton() Status
@@ -79,4 +79,12 @@ type TaskType interface {
 	Name() string
 	Compile(JudgingInformation, language.Sandbox, language.Language, io.Reader, io.Writer) (io.Reader, error)
 	Run(JudgingInformation, language.Sandbox, language.Language, io.Reader, chan string, chan Status) (Status, error)
+}
+
+func Truncate(s string) string {
+	if len(s) < 256 {
+		return s
+	}
+
+	return s[:255] + "..."
 }

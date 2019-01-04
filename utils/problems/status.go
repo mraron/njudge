@@ -21,6 +21,8 @@ const (
 	VERDICT_ML
 	VERDICT_XX
 	VERDICT_DR
+	VERDICT_PC
+	VERDICT_PE
 )
 
 func (v VerdictName) String() string {
@@ -39,6 +41,10 @@ func (v VerdictName) String() string {
 		return "Belső hiba"
 	case VERDICT_DR:
 		return "Nem fut"
+	case VERDICT_PC:
+		return "Részben elfogadva"
+	case VERDICT_PE:
+		return "Prezentációs hiba"
 	}
 
 	return "..."
@@ -89,6 +95,7 @@ func ScoringFromString(str string) ScoringType {
 type Testcase struct {
 	Index          int
 	InputPath      string
+	OutputPath     string
 	AnswerPath     string
 	Testset        string
 	Group          string
