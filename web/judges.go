@@ -70,7 +70,7 @@ func (s *Server) getAPIJudges(c echo.Context) error {
 	return c.JSON(http.StatusOK, local)
 }
 
-func (s *Server) postAPIJudges(c echo.Context) error {
+func (s *Server) postAPIJudge(c echo.Context) error {
 	u := c.Get("user").(*models.User)
 	if !roles.Can(roles.Role(u.Role), roles.ActionCreate, "api/v1/judges") {
 		return s.unauthorizedError(c)

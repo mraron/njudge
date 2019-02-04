@@ -5,13 +5,14 @@ import (
 	"github.com/shirou/gopsutil/load"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/mraron/njudge/utils/problems"
 	_ "github.com/mraron/njudge/utils/problems/config/polygon"
-	_ "github.com/mraron/njudge/utils/problems/config/problemjson"
+	//_ "github.com/mraron/njudge/utils/problems/config/problem_json"
 	_ "github.com/mraron/njudge/utils/problems/tasktype/batch"
-	_ "github.com/mraron/njudge/utils/problems/tasktype/outputonly"
+	//_ "github.com/mraron/njudge/utils/problems/tasktype/output_only"
 	_ "github.com/mraron/njudge/utils/problems/tasktype/stub"
 
 	"io/ioutil"
@@ -24,9 +25,12 @@ import (
 	"github.com/labstack/echo/middleware"
 	"github.com/mraron/njudge/utils/language"
 	_ "github.com/mraron/njudge/utils/language/cpp11"
+	_ "github.com/mraron/njudge/utils/language/golang"
+	_ "github.com/mraron/njudge/utils/language/python3"
 )
 
 type Submission struct {
+	Id          int    `json:"id"`
 	Problem     string `json:"problem"`
 	Language    string `json:"language"`
 	Source      []byte `json:"source"`
@@ -39,6 +43,7 @@ type Server struct {
 	Port        string
 	Load        float64
 	ProblemsDir string
+	LogDir      string
 	ProblemList []string
 	Uptime      time.Duration
 
@@ -49,8 +54,8 @@ type Server struct {
 	queue     chan Submission
 }
 
-func New(id, host, port, problemsDir, secretKey string) *Server {
-	return &Server{Id: id, Host: host, Port: port, Load: 0.0, secretKey: secretKey, ProblemsDir: problemsDir, problems: make(map[string]problems.Problem), ProblemList: make([]string, 0), Uptime: 0 * time.Second, start: time.Now(), queue: make(chan Submission, 100)}
+func New(id, host, port, problemsDir, logDir, secretKey string) *Server {
+	return &Server{Id: id, Host: host, Port: port, Load: 0.0, secretKey: secretKey, LogDir: logDir, ProblemsDir: problemsDir, problems: make(map[string]problems.Problem), ProblemList: make([]string, 0), Uptime: 0 * time.Second, start: time.Now(), queue: make(chan Submission, 100)}
 }
 
 func NewFromUrl(url string) (*Server, error) {
@@ -73,7 +78,7 @@ func NewFromUrl(url string) (*Server, error) {
 }
 
 func NewFromCloning(s *Server) *Server {
-	return New(s.Id, s.Host, s.Port, s.ProblemsDir, s.secretKey)
+	return New(s.Id, s.Host, s.Port, s.ProblemsDir, s.LogDir, s.secretKey)
 }
 
 func (s *Server) SupportsProblem(name string) bool {
@@ -185,7 +190,15 @@ func (s *Server) runJudger() {
 			continue
 		}
 
-		err := Judge(s.problems[sub.Problem], sub.Source, language.Get(sub.Language), s.sandbox, NewHTTPCallback(sub.CallbackUrl))
+		f, err := os.Create(filepath.Join(s.LogDir, fmt.Sprintf("judger.%d", sub.Id)))
+		if err != nil {
+			log.Print("judger: can't create logfile", err)
+			continue
+		}
+
+		logger := log.New(f, "[judging]", log.Lshortfile)
+
+		err = Judge(logger, s.problems[sub.Problem], sub.Source, language.Get(sub.Language), s.sandbox, NewHTTPCallback(sub.CallbackUrl))
 		if err != nil {
 			log.Print("judger: error while running Judge", err)
 			continue

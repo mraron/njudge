@@ -11,7 +11,7 @@
     var njudge = angular.module('njudge', ['ng-admin']);
     njudge.config(['NgAdminConfigurationProvider', function(NgAdminConfigurationProvider) {
         var nga = NgAdminConfigurationProvider;
-        var admin = nga.application('njudge admin').baseApiUrl("http://192.168.4.128:5555/api/v1/");
+        var admin = nga.application('njudge admin').baseApiUrl("http://{{.Data.Host}}/api/v1/");
 
         var problem_rel = nga.entity('problem_rels').identifier(nga.field('id'));
         problem_rel.listView().fields([
@@ -60,12 +60,73 @@
             nga.field('online'),
         ]).actions(['list', 'delete', 'edit']);
 
-        admin.addEntity(problem_rel)
-        admin.addEntity(judge)
+        var user = nga.entity("users").identifier(nga.field('id'));
+        user.listView().fields([
+            nga.field('id'),
+            nga.field('name'),
+            nga.field('email'),
+            nga.field('role'),
+        ]).listActions(['edit','show']);
+
+        user.creationView().fields([
+            nga.field('name').validation({ required: true }),
+            nga.field('password').validation({ required: true }),
+            nga.field('email').validation({ required: true }),
+            nga.field('role').validation({requiered: true}),
+        ]);
+
+        user.editionView().fields(user.creationView().fields());
+
+        user.showView().fields([
+            nga.field('id'),
+            nga.field('name'),
+            nga.field('email'),
+            nga.field('activation_key'),
+            nga.field('role'),
+        ]).actions(['list', 'delete', 'edit']);
+
+
+        var submission = nga.entity("submissions").identifier(nga.field('id'));
+        submission.listView().fields([
+            nga.field('id'),
+            nga.field('user_id', 'reference').targetEntity(user).label('Felhasználó').targetField(nga.field('name')),
+            nga.field('problemset'),
+            nga.field('problem'),
+            nga.field('language'),
+            nga.field('ontest'),
+            nga.field('verdict'),
+        ]).listActions(['edit','show']);
+
+        submission.creationView().fields([
+            nga.field('name').validation({ required: true }),
+            nga.field('email').validation({ required: true }),
+            nga.field('role').validation({requiered: true}),
+        ]);
+
+        submission.editionView().fields(submission.creationView().fields());
+
+        submission.showView().fields([
+            nga.field('id'),
+            nga.field('user_id', 'reference').targetEntity(user).label('Felhasználó').targetField(nga.field('name')),
+            nga.field('problemset'),
+            nga.field('problem'),
+            nga.field('language'),
+            nga.field('ontest'),
+            nga.field('verdict'),
+            nga.field('status'),
+        ]).actions(['list', 'delete', 'edit']);
+
+
+        admin.addEntity(problem_rel);
+        admin.addEntity(judge);
+        admin.addEntity(user);
+        admin.addEntity(submission);
 
         admin.menu(nga.menu()
                 .addChild(nga.menu(problem_rel).title('Problem relations').icon('<span class="glyphicon glyphicon-link"></span>'))
                 .addChild(nga.menu(judge).title('Judges').icon('<span class="glyphicon glyphicon-wrench"></span>'))
+                .addChild(nga.menu(user).title('Users').icon('<span class="glyphicon glyphicon-user"></span>'))
+                .addChild(nga.menu(submission).title('Submissions').icon('<span class="glyphicon glyphicon-upload"></span>'))
         );
 
         nga.configure(admin);

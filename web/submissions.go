@@ -5,6 +5,8 @@ import (
 	"github.com/labstack/echo"
 	"github.com/mraron/njudge/utils/problems"
 	"github.com/mraron/njudge/web/models"
+	"github.com/mraron/njudge/web/roles"
+	"github.com/volatiletech/sqlboiler/boil"
 	. "github.com/volatiletech/sqlboiler/queries/qm"
 	"io/ioutil"
 	"net/http"
@@ -122,4 +124,121 @@ func (s *Server) getSubmission(c echo.Context) error {
 	}
 
 	return c.Render(http.StatusOK, "submission.html", sub)
+}
+
+func (s *Server) getAPISubmissions(c echo.Context) error {
+	u := c.Get("user").(*models.User)
+
+	if !roles.Can(roles.Role(u.Role), roles.ActionView, "api/v1/submissions") {
+		return s.unauthorizedError(c)
+	}
+
+	data, err := parsePaginationData(c)
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	lst, err := models.Submissions(OrderBy(data._sortField+" "+data._sortDir), Limit(data._perPage), Offset(data._perPage*(data._page-1))).All(s.db)
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+	//models.Submissions().Count(s.db)
+
+	//source code is quiet big to serve for lists
+	for i := 0; i < len(lst); i++ {
+		lst[i].Source = []byte("-")
+	}
+
+	return c.JSON(http.StatusOK, lst)
+}
+
+func (s *Server) postAPISubmission(c echo.Context) error {
+	u := c.Get("user").(*models.User)
+	if !roles.Can(roles.Role(u.Role), roles.ActionCreate, "api/v1/submissions") {
+		return s.unauthorizedError(c)
+	}
+
+	pr := new(models.Submission)
+	if err := c.Bind(pr); err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	return pr.Insert(s.db, boil.Infer())
+}
+
+func (s *Server) getAPISubmission(c echo.Context) error {
+	u := c.Get("user").(*models.User)
+	if !roles.Can(roles.Role(u.Role), roles.ActionView, "api/v1/submissions") {
+		return s.unauthorizedError(c)
+	}
+
+	idStr := c.Param("id")
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	pr, err := models.Submissions(Where("id=?", id)).One(s.db)
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	return c.JSON(http.StatusOK, pr)
+}
+
+func (s *Server) deleteAPISubmission(c echo.Context) error {
+	u := c.Get("user").(*models.User)
+	if !roles.Can(roles.Role(u.Role), roles.ActionDelete, "api/v1/submissions") {
+		return s.unauthorizedError(c)
+	}
+
+	id_ := c.Param("id")
+
+	id, err := strconv.Atoi(id_)
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	pr, err := models.Submissions(Where("id=?", id)).One(s.db)
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	_, err = pr.Delete(s.db)
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	return c.String(http.StatusOK, "ok")
+}
+
+func (s *Server) putAPISubmission(c echo.Context) error {
+	u := c.Get("user").(*models.User)
+	if !roles.Can(roles.Role(u.Role), roles.ActionEdit, "api/v1/submissions") {
+		return s.unauthorizedError(c)
+	}
+
+	id_ := c.Param("id")
+
+	id, err := strconv.Atoi(id_)
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	pr := new(models.Submission)
+	if err = c.Bind(pr); err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	pr.ID = id
+	_, err = pr.Update(s.db, boil.Infer())
+
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	return c.JSON(http.StatusOK, struct {
+		Message string `json:"message"`
+	}{"updated"})
 }

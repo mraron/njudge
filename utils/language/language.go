@@ -2,6 +2,7 @@ package language
 
 import (
 	"io"
+	"sort"
 	"time"
 )
 
@@ -49,6 +50,10 @@ func List() []Language {
 		ans[ind] = val
 		ind++
 	}
+
+	sort.Slice(ans, func(i, j int) bool {
+		return ans[i].Name() < ans[j].Name()
+	})
 
 	return ans
 }

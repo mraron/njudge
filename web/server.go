@@ -228,7 +228,7 @@ func (s *Server) runJudger() {
 				server.FromString(j.State)
 
 				if server.SupportsProblem(sub.Problem) {
-					err := server.Submit(judge.Submission{sub.Problem, sub.Language, sub.Source, "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(int(sub.ID))})
+					err := server.Submit(judge.Submission{sub.ID, sub.Problem, sub.Language, sub.Source, "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(int(sub.ID))})
 					if err != nil {
 						log.Print("Trying to submit to server", j.Host, j.Port, "Error", err)
 						continue
@@ -305,10 +305,22 @@ func (s *Server) Run() {
 	v1.DELETE("/problem_rels/:id", s.deleteAPIProblemRel)
 
 	v1.GET("/judges", s.getAPIJudges)
-	v1.POST("/judges", s.postAPIJudges)
+	v1.POST("/judges", s.postAPIJudge)
 	v1.GET("/judges/:id", s.getAPIJudge)
 	v1.PUT("/judges/:id", s.putAPIJudge)
 	v1.DELETE("/judges/:id", s.deleteAPIJudge)
+
+	v1.GET("/users", s.getAPIUsers)
+	v1.POST("/users", s.postAPIUser)
+	v1.GET("/users/:id", s.getAPIUser)
+	v1.PUT("/users/:id", s.putAPIUser)
+	v1.DELETE("/users/:id", s.deleteAPIUser)
+
+	v1.GET("/submissions", s.getAPISubmissions)
+	v1.POST("/submissions", s.postAPISubmission)
+	v1.GET("/submissions/:id", s.getAPISubmission)
+	v1.PUT("/submissions/:id", s.putAPISubmission)
+	v1.DELETE("/submissions/:id", s.deleteAPISubmission)
 
 	e.GET("/admin", s.getAdmin)
 
@@ -336,5 +348,7 @@ func (s *Server) getAdmin(c echo.Context) error {
 		return c.Render(http.StatusUnauthorized, "error.html", "Engedély megtagadva.")
 	}
 
-	return c.Render(http.StatusOK, "admin.html", nil)
+	return c.Render(http.StatusOK, "admin.html", struct {
+		Host string
+	}{s.Hostname + ":" + s.Port})
 }

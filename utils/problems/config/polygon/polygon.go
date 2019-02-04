@@ -23,6 +23,9 @@ import (
 	"time"
 )
 
+//@TODO add njudge prefix to non standard problem xml additions
+//@TODO validate group/test points and create a logs directory maybe for problem parsin logs
+
 const htmlTemplate = `<link href="problem-statement.css" rel="stylesheet" type="text/css"><div class="problem-statement">
 <div class="header">
 	<div class="title">{{.Name}}</div>

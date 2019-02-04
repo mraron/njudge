@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/labstack/gommon/log"
 	"github.com/mraron/njudge/utils/language"
 	"github.com/mraron/njudge/utils/problems"
 	"github.com/satori/go.uuid"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -56,32 +56,43 @@ func (h HTTPCallback) Callback(test string, status problems.Status, done bool) e
 	return nil
 }
 
-func Judge(p problems.Problem, src []byte, lang language.Language, sandbox language.Sandbox, c Callbacker) error {
+//@TODO add separated logger for problem
+
+func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Language, sandbox language.Sandbox, c Callbacker) error {
+	logger.Print("Started Judge")
+
 	id, err := uuid.NewV4()
 	if err != nil {
-		log.Print(err)
+		logger.Print("Error while generating uuid")
 		return err
 	}
-	log.Print("itt?")
-	f, err := os.Create("/tmp/judge_" + id.String())
+
+	filename := "/tmp/judge_" + id.String()
+	logger.Print("Creating tempfile", filename)
+
+	f, err := os.Create(filename)
 	if err != nil {
-		log.Print(err)
+		logger.Print("Error while creating:", err)
 		return err
 	}
 
 	_, err = f.Write([]byte(src))
 	if err != nil {
-		log.Print(err)
+		logger.Print("Error while writing data:", err)
 		return err
 	}
 
 	f.Close()
 
+	logger.Print("Opening tempfile")
 	f, err = os.Open("/tmp/judge_" + id.String())
 	if err != nil {
-		log.Print(err)
+		logger.Print("Error while opening:", err)
 		return err
 	}
+
+	sandbox.Init(logger)
+	defer sandbox.Cleanup()
 
 	tt := problems.GetTaskType(p.TaskTypeName())
 
@@ -92,9 +103,6 @@ func Judge(p problems.Problem, src []byte, lang language.Language, sandbox langu
 		st := problems.Status{}
 		st.Compiled = false
 		st.CompilerOutput = stderr.String()
-
-		log.Print(err)
-		log.Print(st)
 		return c.Callback("", st, true)
 	}
 
@@ -120,7 +128,7 @@ func Judge(p problems.Problem, src []byte, lang language.Language, sandbox langu
 			err = c.Callback(test, status, false)
 
 			if err != nil {
-				log.Print(err)
+				logger.Print("Error while calling callback", err)
 				return err
 			}
 		case <-ran:
@@ -129,6 +137,8 @@ func Judge(p problems.Problem, src []byte, lang language.Language, sandbox langu
 
 		}
 	}
+
+	logger.Print("Succesful judging! removing tempfile and calling back for the last time...")
 
 	os.Remove("/tmp/judge_" + id.String())
 

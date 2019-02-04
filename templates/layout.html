@@ -214,7 +214,7 @@
     {{if eq .Verdict 0}}
     <span class="text-success">Elfogadva<span>
     {{else}}
-    {{if eq .Verdict 6}}
+    {{if eq .Verdict 998}}
         Fordítási Hiba
     {{else}}
         <span class="text-info">{{$tc := $status.FirstNonAC}}
@@ -238,7 +238,7 @@
     <span class="text-success">Elfogadva {{$status.Score}}/{{$status.MaxScore}}<span>
     {{else}}
 
-    {{if eq .Verdict 6}}
+    {{if eq .Verdict 998}}
         Fordítási Hiba
     {{else}}
     <span class="text-info">{{($status.IndexTestcase $status.FirstNonAC).VerdictName}} {{$status.Score}}/{{$status.MaxScore}}<span>
@@ -257,7 +257,7 @@
     {{if $status.IsAC}}
     <span class="text-success">Elfogadva<span>
     {{else}}
-    {{if eq .Verdict 6}}
+    {{if eq .Verdict 998}}
         Fordítási Hiba
     {{else}}
     <span class="text-info">{{(index $status.Feedback (decr $status.FirstNonAC)).VerdictName}}<span>

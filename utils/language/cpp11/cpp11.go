@@ -2,7 +2,6 @@ package cpp11
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/mraron/njudge/utils/language"
 	"io"
 	"os/exec"
@@ -17,7 +16,7 @@ func (cpp11) Id() string {
 }
 
 func (cpp11) Name() string {
-	return "C++ 11"
+	return "C++11"
 }
 
 func (cpp11) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) error {
@@ -33,26 +32,16 @@ func (cpp11) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) e
 }
 
 func (c cpp11) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
-	if err := s.Init(); err != nil {
-		fmt.Println("hmmm2")
-		return err
-	}
-	fmt.Println("hmmm")
-
-	defer s.Cleanup()
-
 	err := s.CreateFile("main.cpp", r.Source)
 	if err != nil {
-		panic(err)
+		return err
 	}
-
-	fmt.Println(extras, "???")
 
 	params := "main.cpp"
 	for _, f := range extras {
 		err := s.CreateFile(f.Name, f.Source)
 		if err != nil {
-			panic(err)
+			return err
 		}
 
 		if !strings.HasSuffix(f.Name, ".h") {
@@ -62,7 +51,7 @@ func (c cpp11) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Wr
 	}
 
 	errorStream := &bytes.Buffer{}
-	if err := s.SetMaxProcesses(-1).Env().TimeLimit(10*time.Second).MemoryLimit(2560000).Stdout(errorStream).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/g++ -std=c++11 -static -DONLINE_JUDGE "+params, false); err != nil {
+	if _, err := s.SetMaxProcesses(-1).Env().TimeLimit(10*time.Second).MemoryLimit(2560000).Stdout(errorStream).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/g++ -std=c++11 -static -DONLINE_JUDGE "+params, false); err != nil {
 		e.Write(errorStream.Bytes())
 		return err
 	}
@@ -80,12 +69,6 @@ func (cpp11) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, 
 	stat := language.Status{}
 	stat.Verdict = language.VERDICT_XX
 
-	if err := s.Init(); err != nil {
-		return stat, err
-	}
-
-	defer s.Cleanup()
-
 	if err := s.CreateFile("a.out", binary); err != nil {
 		return stat, err
 	}
@@ -94,11 +77,7 @@ func (cpp11) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, 
 		return stat, err
 	}
 
-	err := s.Stdin(stdin).Stdout(stdout).TimeLimit(tl).MemoryLimit(ml/1024).Run("a.out", true)
-
-	stat = s.Status()
-
-	return stat, err
+	return s.Stdin(stdin).Stdout(stdout).TimeLimit(tl).MemoryLimit(ml/1024).Run("a.out", true)
 }
 
 func init() {

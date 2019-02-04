@@ -2,6 +2,8 @@ package web
 
 type Verdict int
 
+//@TODO EXTEND AND MAKE BETTER -> CE, RU, UP from 999
+
 const (
 	VERDICT_AC Verdict = iota
 	VERDICT_WA
@@ -9,7 +11,11 @@ const (
 	VERDICT_TL
 	VERDICT_ML
 	VERDICT_XX
-	VERDICT_CE
-	VERDICT_RU
-	VERDICT_UP
+	VERDICT_DR
+	VERDICT_PC
+	VERDICT_PE
+
+	VERDICT_CE = 998
+	VERDICT_RU = 999
+	VERDICT_UP = 1000
 )

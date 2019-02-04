@@ -8,10 +8,13 @@ import (
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/gommon/log"
 	"github.com/mraron/njudge/web/models"
+	"github.com/mraron/njudge/web/roles"
+	"github.com/volatiletech/sqlboiler/boil"
 	. "github.com/volatiletech/sqlboiler/queries/qm"
 	"golang.org/x/crypto/bcrypt"
 	"math/rand"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -245,4 +248,127 @@ func (s *Server) getActivateUser(c echo.Context) error {
 	}
 
 	return c.Render(http.StatusOK, "message.html", "Sikeres aktiválás, mostmár beléphetsz.")
+}
+
+//@TODO CENSOR PASSWORD AND ADDING USER!!!
+
+func CensorUserPassword(user *models.User) {
+	user.Password = "***CENSORED***"
+}
+
+func (s *Server) getAPIUsers(c echo.Context) error {
+	u := c.Get("user").(*models.User)
+
+	if !roles.Can(roles.Role(u.Role), roles.ActionView, "api/v1/users") {
+		return s.unauthorizedError(c)
+	}
+
+	data, err := parsePaginationData(c)
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	lst, err := models.Users(OrderBy(data._sortField+" "+data._sortDir), Limit(data._perPage), Offset(data._perPage*(data._page-1))).All(s.db)
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	for i := 0; i < len(lst); i++ {
+		CensorUserPassword(lst[i])
+	}
+
+	return c.JSON(http.StatusOK, lst)
+}
+
+func (s *Server) postAPIUser(c echo.Context) error {
+	u := c.Get("user").(*models.User)
+	if !roles.Can(roles.Role(u.Role), roles.ActionCreate, "api/v1/users") {
+		return s.unauthorizedError(c)
+	}
+
+	pr := new(models.User)
+	if err := c.Bind(pr); err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	return pr.Insert(s.db, boil.Infer())
+}
+
+func (s *Server) getAPIUser(c echo.Context) error {
+	u := c.Get("user").(*models.User)
+	if !roles.Can(roles.Role(u.Role), roles.ActionView, "api/v1/users") {
+		return s.unauthorizedError(c)
+	}
+
+	idStr := c.Param("id")
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	pr, err := models.Users(Where("id=?", id)).One(s.db)
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	CensorUserPassword(pr)
+
+	return c.JSON(http.StatusOK, pr)
+}
+
+func (s *Server) deleteAPIUser(c echo.Context) error {
+	u := c.Get("user").(*models.User)
+	if !roles.Can(roles.Role(u.Role), roles.ActionDelete, "api/v1/users") {
+		return s.unauthorizedError(c)
+	}
+
+	id_ := c.Param("id")
+
+	id, err := strconv.Atoi(id_)
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	pr, err := models.Users(Where("id=?", id)).One(s.db)
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	_, err = pr.Delete(s.db)
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	return c.String(http.StatusOK, "ok")
+}
+
+func (s *Server) putAPIUser(c echo.Context) error {
+	u := c.Get("user").(*models.User)
+	if !roles.Can(roles.Role(u.Role), roles.ActionEdit, "api/v1/users") {
+		return s.unauthorizedError(c)
+	}
+
+	id_ := c.Param("id")
+
+	id, err := strconv.Atoi(id_)
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	pr := new(models.User)
+	if err = c.Bind(pr); err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	pr.ID = id
+	_, err = pr.Update(s.db, boil.Infer())
+
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	return c.JSON(http.StatusOK, struct {
+		Message string `json:"message"`
+	}{"updated"})
 }

@@ -1,4 +1,4 @@
-package problemjson
+package problem_json
 
 import (
 	"encoding/json"
@@ -12,6 +12,8 @@ import (
 	"os/exec"
 	"path/filepath"
 )
+
+//@TODO Make this work!!! :(
 
 type Name struct {
 	Language string
@@ -117,8 +119,8 @@ func (p Problem) StatusSkeleton() problems.Status {
 	return ans
 }
 
-func (p Problem) Check(inp, pout, jans string, stdout io.Writer, stderr io.Writer) error {
-	cmd := exec.Command(filepath.Join(p.Path, "check"), inp, pout, jans)
+func (p Problem) Check(tc *problems.Testcase, stdout io.Writer, stderr io.Writer) error {
+	cmd := exec.Command(filepath.Join(p.Path, "check"), tc.InputPath, tc.OutputPath, tc.AnswerPath)
 	cmd.Stdout = stdout
 	cmd.Stderr = stderr
 
@@ -138,7 +140,7 @@ func (p Problem) Files() []problems.File {
 }
 
 func (p Problem) TaskTypeName() string {
-	return "outputonly"
+	return "output_only"
 }
 
 func parser(path string) (problems.Problem, error) {
@@ -182,6 +184,11 @@ func parser(path string) (problems.Problem, error) {
 	return p, nil
 }
 
+func identifier(path string) bool {
+	_, err := os.Stat(filepath.Join(path, "problem.json"))
+	return !os.IsNotExist(err)
+}
+
 func init() {
-	problems.RegisterConfigType("problemjson", parser)
+	problems.RegisterConfigType("problem_json", parser, identifier)
 }

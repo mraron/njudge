@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -22,10 +22,13 @@ func getEnv(key, fallback string) string {
 	return fallback
 }
 
+//@TODO reimplement this functionality with like logs and etc.
+
 var ISOLATE_ROOT = getEnv("ISOLATE_ROOT", "/var/local/lib/isolate/")
 
 type Sandbox interface {
-	Init() error
+	ClearArguments()
+	Init(*log.Logger) error
 
 	Pwd() string
 
@@ -41,9 +44,7 @@ type Sandbox interface {
 	Stderr(io.Writer) Sandbox
 	Stdout(io.Writer) Sandbox
 	WorkingDirectory(string) Sandbox
-	Run(string, bool) error
-
-	Status() Status
+	Run(string, bool) (Status, error)
 
 	Cleanup() error
 }
@@ -59,7 +60,7 @@ type IsolateSandbox struct {
 
 	st Status
 
-	sync.Mutex
+	logger *log.Logger
 }
 
 func NewIsolateSandbox(id int) Sandbox {
@@ -79,27 +80,38 @@ func (s *IsolateSandbox) GetFile(name string) (io.Reader, error) {
 	return bytes.NewBuffer(f), nil
 }
 
-func (s *IsolateSandbox) Init() error {
-	s.Lock()
-
+func (s *IsolateSandbox) ClearArguments() {
 	s.argv = make([]string, 0)
 	s.stdin = nil
 	s.stdout = nil
 	s.wdir = ""
 	s.st = Status{}
+}
 
-	err := exec.Command("isolate", "--cg", "-b", strconv.Itoa(s.id), "--init").Run()
+func (s *IsolateSandbox) Init(l *log.Logger) error {
+	s.ClearArguments()
+	s.logger = l
 
+	args := []string{"--cg", "-b", strconv.Itoa(s.id), "--init"}
+
+	s.logger.Print("Running init: isolate with args ", args)
+
+	err := exec.Command("isolate", args...).Run()
 	return err
 }
 
 func (s *IsolateSandbox) CreateFile(name string, r io.Reader) error {
-	f, err := os.Create(ISOLATE_ROOT + strconv.Itoa(s.id) + "/box/" + name)
+	filename := ISOLATE_ROOT + strconv.Itoa(s.id) + "/box/" + name
+	s.logger.Print("Creating file ", filename)
+
+	f, err := os.Create(filename)
 	if err != nil {
+		s.logger.Print("Error occured while creating file ", err)
 		return err
 	}
 
 	if _, err := io.Copy(f, r); err != nil {
+		s.logger.Print("Error occured while populating it with its content: ", err)
 		f.Close()
 		return err
 	}
@@ -108,7 +120,12 @@ func (s *IsolateSandbox) CreateFile(name string, r io.Reader) error {
 }
 
 func (s *IsolateSandbox) MakeExecutable(name string) error {
-	return os.Chmod(ISOLATE_ROOT+strconv.Itoa(s.id)+"/box/"+name, 0777)
+	filename := ISOLATE_ROOT + strconv.Itoa(s.id) + "/box/" + name
+
+	err := os.Chmod(filename, 0777)
+	s.logger.Print("Making executable: ", filename, " error: ", err)
+
+	return err
 }
 
 func (s *IsolateSandbox) SetMaxProcesses(num int) Sandbox {
@@ -163,24 +180,27 @@ func (s *IsolateSandbox) WorkingDirectory(wd string) Sandbox {
 	return s
 }
 
-func (s *IsolateSandbox) Run(prg string, needStatus bool) error {
+func (s *IsolateSandbox) Run(prg string, needStatus bool) (Status, error) {
 	var (
-		err error
-		f   *os.File
-		cmd *exec.Cmd
-		str string
-		st  int
+		err      error
+		f        *os.File
+		cmd      *exec.Cmd
+		str      string
+		st       int
+		metafile = "/tmp/metafile" + strconv.Itoa(s.id)
 	)
+
+	defer s.ClearArguments()
 
 	splt := strings.Split(prg, " ")
 
-	s.argv = append([]string{"--cg", "--cg-timing", "-b", strconv.Itoa(s.id), "-M", "/tmp/metafile" + strconv.Itoa(s.id)}, s.argv...)
+	s.argv = append([]string{"--cg", "--cg-timing", "-b", strconv.Itoa(s.id), "-M", metafile}, s.argv...)
 	s.argv = append(s.argv, "--run", "--")
 	s.argv = append(s.argv, splt...)
 
-	fmt.Println(s.argv, "!!!!")
-
 	stderr := &bytes.Buffer{}
+
+	s.logger.Print("Running isolate with args ", s.argv)
 
 	cmd = exec.Command("isolate", s.argv...)
 
@@ -190,9 +210,11 @@ func (s *IsolateSandbox) Run(prg string, needStatus bool) error {
 	cmd.Dir = s.wdir
 
 	if err = cmd.Run(); err != nil {
+		s.logger.Print("Command exited with non-zero exit code: ", err)
+
 		if !needStatus {
 			s.stderr.Write(stderr.Bytes())
-			return err
+			return s.st, err
 		}
 
 		str, st = stderr.String(), -1
@@ -202,31 +224,38 @@ func (s *IsolateSandbox) Run(prg string, needStatus bool) error {
 			fmt.Println("caught shiet", stderr.String())
 			s.st.Verdict = VERDICT_XX
 		} else if st == 2 || st == 127 {
-			//fmt.Println(st)
 			s.st.Verdict = VERDICT_ML
-		} else { //signal 8 -> division by zero
+		} else { //eg. signal 8 -> division by zero
 			s.st.Verdict = VERDICT_RE
 		}
 	} else {
+		s.logger.Print("Command exited successfully")
+		s.logger.Print("stderr of process: ", stderr.String())
+
 		s.st.Verdict = VERDICT_OK
 	}
 
 	s.stderr.Write([]byte(str))
 
 	if !needStatus {
-		return nil
+		return s.st, nil
 	}
 
 	memorySum := 0
 
-	if f, err = os.Open("/tmp/metafile" + strconv.Itoa(s.id)); err != nil {
+	if f, err = os.Open(metafile); err != nil {
 		s.st.Verdict = VERDICT_XX
-		fmt.Println("can't open shiet")
-		return err
+		s.logger.Print("Can't open metafile ", metafile, " error is: ", err)
+
+		return s.st, err
 	}
+
+	s.logger.Print("Ok now, getting status")
 
 	sc := bufio.NewScanner(f)
 	for sc.Scan() {
+		s.logger.Print(sc.Text())
+
 		lst := strings.Split(sc.Text(), ":")
 
 		if lst[0] == "max-rss" || lst[0] == "cg-mem" {
@@ -245,18 +274,17 @@ func (s *IsolateSandbox) Run(prg string, needStatus bool) error {
 		}
 	}
 
+	s.logger.Print("Calculated memory usage ", memorySum, "KiB")
+	s.logger.Print("===============")
 	s.st.Memory = memorySum
 
-	return nil
-}
-
-func (s *IsolateSandbox) Status() Status {
-	return s.st
+	return s.st, nil
 }
 
 func (s *IsolateSandbox) Cleanup() error {
-	err := exec.Command("isolate", "--cg", "-b", strconv.Itoa(s.id), "--cleanup").Run()
-	s.Unlock()
+	args := []string{"--cg", "-b", strconv.Itoa(s.id), "--cleanup"}
 
-	return err
+	s.logger.Print("Executing cleanup with args ", args)
+
+	return exec.Command("isolate", args...).Run()
 }
