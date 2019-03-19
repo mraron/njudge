@@ -10,9 +10,7 @@ import (
 
 	"github.com/mraron/njudge/utils/problems"
 	_ "github.com/mraron/njudge/utils/problems/config/polygon"
-	//_ "github.com/mraron/njudge/utils/problems/config/problem_json"
 	_ "github.com/mraron/njudge/utils/problems/tasktype/batch"
-	//_ "github.com/mraron/njudge/utils/problems/tasktype/output_only"
 	_ "github.com/mraron/njudge/utils/problems/tasktype/stub"
 
 	"io/ioutil"
@@ -25,7 +23,10 @@ import (
 	"github.com/labstack/echo/middleware"
 	"github.com/mraron/njudge/utils/language"
 	_ "github.com/mraron/njudge/utils/language/cpp11"
+	_ "github.com/mraron/njudge/utils/language/cpp14"
 	_ "github.com/mraron/njudge/utils/language/golang"
+	_ "github.com/mraron/njudge/utils/language/julia"
+	_ "github.com/mraron/njudge/utils/language/octave"
 	_ "github.com/mraron/njudge/utils/language/python3"
 )
 

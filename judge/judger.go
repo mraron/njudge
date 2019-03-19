@@ -94,15 +94,19 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 	sandbox.Init(logger)
 	defer sandbox.Cleanup()
 
+	logger.Print("Getting tasktype")
 	tt := problems.GetTaskType(p.TaskTypeName())
 
 	stderr := bytes.Buffer{}
+
+	logger.Print("Trying to compile")
 	bin, err := tt.Compile(p, sandbox, lang, f, &stderr)
 
 	if err != nil {
+		logger.Print("Compile got error: ", err)
 		st := problems.Status{}
 		st.Compiled = false
-		st.CompilerOutput = stderr.String()
+		st.CompilerOutput = err.Error() + stderr.String()
 		return c.Callback("", st, true)
 	}
 
@@ -125,10 +129,10 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 		case test := <-testNotifier:
 			status := <-statusNotifier
 
-			err = c.Callback(test, status, false)
+			err2 := c.Callback(test, status, false)
 
-			if err != nil {
-				logger.Print("Error while calling callback", err)
+			if err2 != nil {
+				logger.Print("Error while calling callback", err2)
 				return err
 			}
 		case <-ran:
@@ -138,7 +142,11 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 		}
 	}
 
-	logger.Print("Succesful judging! removing tempfile and calling back for the last time...")
+	if err == nil {
+		logger.Print("Succesful judging! removing tempfile and calling back for the last time...")
+	} else {
+		logger.Print("Got error! removing tempfile and calling back for the last time... error is", err)
+	}
 
 	os.Remove("/tmp/judge_" + id.String())
 

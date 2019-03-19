@@ -3,6 +3,7 @@ package polygon
 import (
 	"github.com/mraron/njudge/utils/language"
 	_ "github.com/mraron/njudge/utils/language/cpp11"
+	_ "github.com/mraron/njudge/utils/language/cpp14"
 	"github.com/mraron/njudge/utils/problems"
 	"os/exec"
 	"syscall"
@@ -37,6 +38,7 @@ const htmlTemplate = `<link href="problem-statement.css" rel="stylesheet" type="
 {{if .Legend}}<div class="legend">{{.Legend}}</div><p></p><p></p>{{end}}
 {{if .Input}}<div class="input-specification"><div class="section-title">Bemenet</div> {{.Input}}</div><p></p><p></p>{{end}}
 {{if .Output}}<div class="input-specification"><div class="section-title">Kimenet</div> {{.Output}}</div><p></p><p></p>{{end}}
+{{if .Scoring}}<div class="input-specification"><div class="section-title">Pontozás</div> {{.Scoring}}</div><p></p><p></p>{{end}}
 {{if .SampleTests}}
 <div class="sample-tests">
 	<div class="section-title">Példák</div>
@@ -71,6 +73,7 @@ type JSONStatement struct {
 	Legend      string
 	Input       string
 	Output      string
+	Scoring     string
 	SampleTests []SampleTest
 	Notes       string
 }
@@ -134,9 +137,17 @@ type Stub struct {
 	Language string `xml:"language,attr"`
 }
 
+type Checker struct {
+	Type   string `xml:"type,attr"`
+	Source struct {
+		Path string `xml:"path,attr"`
+	} `xml:"source"`
+}
+
 type Assets struct {
 	Attachments []Attachment `xml:"attachments>attachment"`
 	Stubs       []Stub       `xml:"stubs>stub"`
+	Checker     Checker      `xml:"checker"`
 }
 
 type Problem struct {
@@ -343,7 +354,7 @@ func (p Problem) TaskTypeName() string {
 	return p.TaskType
 }
 
-//@TODO actually respect problem.xml with statements
+//@TODO actually respect problem.xml with statements and checkers
 
 func parser(path string) (problems.Problem, error) {
 	problemXML := filepath.Join(path, "problem.xml")
@@ -418,10 +429,10 @@ func parser(path string) (problems.Problem, error) {
 		if checkerBinary, err := os.Create(filepath.Join(path, "check")); err == nil {
 			defer checkerBinary.Close()
 
-			if lang := language.Get("cpp11"); lang != nil {
-				if checkerFile, err := os.Open(filepath.Join(path, "files", "check.cpp")); err == nil {
+			if lang := language.Get("cpp14"); lang != nil {
+				if checkerFile, err := os.Open(filepath.Join(path, p.Assets.Checker.Source.Path)); err == nil {
 					defer checkerFile.Close()
-
+					fmt.Println(filepath.Join(path, p.Assets.Checker.Source.Path), "!!!")
 					if err := lang.InsecureCompile(filepath.Join(path, "files"), checkerFile, checkerBinary, os.Stderr); err != nil {
 						return nil, err
 					}

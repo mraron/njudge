@@ -44,6 +44,7 @@ type Sandbox interface {
 	Stderr(io.Writer) Sandbox
 	Stdout(io.Writer) Sandbox
 	WorkingDirectory(string) Sandbox
+	Verbose() Sandbox
 	Run(string, bool) (Status, error)
 
 	Cleanup() error
@@ -139,7 +140,7 @@ func (s *IsolateSandbox) SetMaxProcesses(num int) Sandbox {
 }
 
 func (s *IsolateSandbox) Env() Sandbox {
-	s.argv = append(s.argv, "-e")
+	s.argv = append(s.argv, "--full-env")
 	return s
 }
 

@@ -104,8 +104,9 @@ func (b Batch) Run(jinfo problems.JudgingInformation, s language.Sandbox, lang l
 
 				if dependenciesOK(g.Dependencies) {
 					fmt.Println("?")
+					inputFile, _ := jinfo.InputOutputFiles()
 					testLocation, answerLocation := tc.InputPath, tc.AnswerPath
-
+					fmt.Println(inputFile, testLocation, answerLocation)
 					testcase, err := os.Open(testLocation)
 					if err != nil {
 						tc.VerdictName = problems.VERDICT_XX
@@ -126,7 +127,16 @@ func (b Batch) Run(jinfo problems.JudgingInformation, s language.Sandbox, lang l
 						return ans, err
 					}
 
-					res, err := lang.Run(s, bytes.NewReader(binaryContents), testcase, stdout, tc.TimeLimit, tc.MemoryLimit)
+					var res language.Status
+					fmt.Println("?")
+
+					if inputFile != "" {
+						s.CreateFile(inputFile, testcase)
+						testcase = nil
+					}
+
+					res, err = lang.Run(s, bytes.NewReader(binaryContents), testcase, stdout, tc.TimeLimit, tc.MemoryLimit)
+
 					if err != nil {
 						tc.VerdictName = problems.VERDICT_XX
 						return ans, err

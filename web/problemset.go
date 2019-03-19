@@ -1,6 +1,7 @@
 package web
 
 import (
+	"fmt"
 	"github.com/labstack/echo"
 	"github.com/mraron/njudge/utils/problems/config/polygon"
 	"github.com/mraron/njudge/web/models"
@@ -15,6 +16,7 @@ func (s *Server) getProblemsetMain(c echo.Context) error {
 	name := c.Param("name")
 	lst, err := models.ProblemRels(Where("problemset=?", name)).All(s.db)
 	//lst, err := models.ProblemsFromProblemset(s.db, name)
+	fmt.Println(lst)
 	if err != nil {
 		return s.internalError(c, err, "Belső hiba.")
 	}

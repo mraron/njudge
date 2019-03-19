@@ -1,4 +1,4 @@
-package cpp11
+package cpp14
 
 import (
 	"github.com/mraron/njudge/utils/language"
@@ -6,5 +6,5 @@ import (
 )
 
 func init() {
-	language.Register("cpp11", cpp.New("cpp11", "C++ 11", "c++11"))
+	language.Register("cpp14", cpp.New("cpp14", "C++ 14", "c++14"))
 }
