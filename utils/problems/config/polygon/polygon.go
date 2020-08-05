@@ -93,7 +93,7 @@ type Test struct {
 	Method string `xml:"method,attr"`
 	Cmd    string `xml:"cmd,attr"`
 	Sample bool   `xml:"sample,attr"`
-	Score  int    `xml:"score,attr"`
+	Score  int    `xml:"points,attr"`
 	Group  string `xml:"group,attr"`
 
 	Input  string
