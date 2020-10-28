@@ -17,6 +17,10 @@ func (python3) Name() string {
 	return "Python 3"
 }
 
+func (python3) DefaultFileName() string {
+	return "main.py"
+}
+
 func (python3) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) error {
 	return nil
 }

@@ -17,6 +17,10 @@ func (octave) Name() string {
 	return "Octave"
 }
 
+func (octave) DefaultFileName() string {
+	return "main.m"
+}
+
 func (octave) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) error {
 	return nil
 }

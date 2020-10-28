@@ -16,7 +16,9 @@ func (julia) Id() string {
 func (julia) Name() string {
 	return "Julia"
 }
-
+func (julia) DefaultFileName() string {
+	return "main.jl"
+}
 func (julia) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) error {
 	return nil
 }

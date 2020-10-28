@@ -23,6 +23,10 @@ func (c cpp) Name() string {
 	return c.name
 }
 
+func (c cpp) DefaultFileName() string {
+	return "main.cpp"
+}
+
 func (c cpp) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) error {
 	cmd := exec.Command("g++", "-std="+c.ver, "-x", "c++", "-O2", "-o", "/proc/self/fd/1", "-")
 
@@ -55,7 +59,7 @@ func (c cpp) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Writ
 	}
 
 	errorStream := &bytes.Buffer{}
-	if _, err := s.SetMaxProcesses(200).Env().TimeLimit(10*time.Second).MemoryLimit(2560000).Stdout(errorStream).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/g++ -std=c++11 -O2 -static -DONLINE_JUDGE "+params, false); err != nil {
+	if _, err := s.SetMaxProcesses(200).Env().TimeLimit(10*time.Second).MemoryLimit(2560000).Stdout(errorStream).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/g++ -std="+c.ver+" -O2 -static -DONLINE_JUDGE "+params, false); err != nil {
 		e.Write(errorStream.Bytes())
 		return err
 	}
