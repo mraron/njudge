@@ -13,6 +13,7 @@ import (
 
 	"github.com/mraron/njudge/utils/problems"
 	_ "github.com/mraron/njudge/utils/problems/config/polygon"
+	_ "github.com/mraron/njudge/utils/problems/config/feladat_txt"
 
 	_ "github.com/mraron/njudge/utils/language/cpp11"
 	_ "github.com/mraron/njudge/utils/language/cpp14"

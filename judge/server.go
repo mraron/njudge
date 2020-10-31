@@ -10,6 +10,7 @@ import (
 
 	"github.com/mraron/njudge/utils/problems"
 	_ "github.com/mraron/njudge/utils/problems/config/polygon"
+	_ "github.com/mraron/njudge/utils/problems/config/feladat_txt"
 	_ "github.com/mraron/njudge/utils/problems/tasktype/batch"
 	_ "github.com/mraron/njudge/utils/problems/tasktype/stub"
 
