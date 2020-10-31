@@ -16,6 +16,10 @@ func (zip) Name() string {
 	return "ZIP archívum"
 }
 
+func (zip) DefaultFileName() string {
+	return "main.zip"
+}
+
 func (zip) InsecureCompile(s string, r io.Reader, w1 io.Writer, w2 io.Writer) error {
 	return nil
 }

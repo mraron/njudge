@@ -1,7 +1,6 @@
 package golang
 
 import (
-	"bytes"
 	"github.com/mraron/njudge/utils/language"
 	"io"
 	"os/exec"
@@ -18,6 +17,10 @@ func (golang) Name() string {
 	return "Go"
 }
 
+func (golang) DefaultFileName() string {
+	return "main.go"
+}
+
 func (golang) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) error {
 	cmd := exec.Command("gccgo", "-x", "go", "-o", "/dev/stdout", "-")
 
@@ -31,14 +34,21 @@ func (golang) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) 
 }
 
 func (golang) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
-	bin := &bytes.Buffer{}
-
-	if _, err := s.SetMaxProcesses(-1).Env().TimeLimit(10*time.Second).MemoryLimit(256000).Stdin(r.Source).Stdout(bin).Stderr(e).WorkingDirectory("/tmp").Run("/usr/bin/gccgo -static -DONLINE_JUDGE -x go -o /dev/stdout -", false); err != nil {
-		e.Write(bin.Bytes())
+	err := s.CreateFile("main.go", r.Source)
+	if err != nil {
 		return err
 	}
 
-	_, err := w.Write(bin.Bytes())
+	if _, err := s.SetMaxProcesses(-1).Env().TimeLimit(10*time.Second).MemoryLimit(256000).Stdout(e).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/gccgo main.go", false); err != nil {
+		return err
+	}
+
+	bin, err := s.GetFile("a.out")
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(w, bin)
 
 	return err
 }

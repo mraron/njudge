@@ -219,14 +219,19 @@ func (s *IsolateSandbox) Run(prg string, needStatus bool) (Status, error) {
 		}
 
 		str, st = stderr.String(), -1
-		fmt.Sscanf(str, "Caught fatal signal %d", &st)
+		if strings.Contains(str, "Caught fatal signal") {
+			fmt.Sscanf(str, "Caught fatal signal %d", &st)
+		}else if(strings.Contains(str, "Exited with error status")) {
+			fmt.Sscanf(str[strings.Index(str, "Exited with error status"):], "Exited with error status %d", &st)
+		}else {
+			s.logger.Print("unknown error status format: ", str)
+		}
 
 		if st == -1 {
-			fmt.Println("caught shiet", stderr.String())
 			s.st.Verdict = VERDICT_XX
-		} else if st == 2 || st == 127 {
+		} else if st == 127 {
 			s.st.Verdict = VERDICT_ML
-		} else { //eg. signal 8 -> division by zero
+		} else { //eg. signal 8/136?? -> division by zero
 			s.st.Verdict = VERDICT_RE
 		}
 	} else {
