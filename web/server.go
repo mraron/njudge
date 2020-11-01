@@ -42,6 +42,7 @@ type Server struct {
 	Hostname     string
 	Port         string
 	ProblemsDir  string
+	SubmissionsDir string
 	TemplatesDir string
 
 	MailAccount         string

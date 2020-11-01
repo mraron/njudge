@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 )
@@ -94,7 +95,7 @@ func (s *Server) postProblemsetSubmit(c echo.Context) error {
 		err = res.Close()
 		mustPanic(err)
 
-		fs, err := os.Create("submissions/" + strconv.Itoa(int(last)))
+		fs, err := os.Create(filepath.Join(s.SubmissionsDir,  strconv.Itoa(int(last))))
 		mustPanic(err)
 
 		_, err = fs.Write(contents)
