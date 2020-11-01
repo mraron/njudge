@@ -1,4 +1,5 @@
 njudge
 web.json
+judge.json
 web/_models/*
 web/sqlboiler-psql
