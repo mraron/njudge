@@ -3,6 +3,7 @@ package language
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -48,6 +49,26 @@ type Sandbox interface {
 	Run(string, bool) (Status, error)
 
 	Cleanup() error
+}
+
+type SandboxProvider struct {
+	sandboxes chan Sandbox
+}
+
+func NewSandboxProvider() *SandboxProvider {
+	return &SandboxProvider{make(chan Sandbox, 100)}
+}
+
+func (sp *SandboxProvider) Get() (Sandbox, error) {
+	if len(sp.sandboxes) == 0 {
+		return nil, errors.New("No sandbox available")
+	}
+
+	return <-sp.sandboxes, nil
+}
+
+func (sp *SandboxProvider) Put(s Sandbox) {
+	sp.sandboxes <- s
 }
 
 type IsolateSandbox struct {

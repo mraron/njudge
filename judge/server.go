@@ -49,7 +49,7 @@ type Server struct {
 	ProblemList []string
 	Uptime      time.Duration
 
-	sandbox   language.Sandbox
+	sandboxProvider   *language.SandboxProvider
 	secretKey string
 	problems  map[string]problems.Problem
 	start     time.Time
@@ -122,7 +122,10 @@ func (s *Server) Submit(sub Submission) error {
 }
 
 func (s *Server) Run() error {
-	s.sandbox = language.NewIsolateSandbox(0)
+	s.sandboxProvider = language.NewSandboxProvider()
+	s.sandboxProvider.Put(language.NewIsolateSandbox(0))
+	s.sandboxProvider.Put(language.NewIsolateSandbox(1))
+	s.sandboxProvider.Put(language.NewIsolateSandbox(2))
 
 	e := echo.New()
 	e.Use(middleware.Logger())
@@ -200,7 +203,7 @@ func (s *Server) runJudger() {
 
 		logger := log.New(f, "[judging]", log.Lshortfile)
 
-		err = Judge(logger, s.problems[sub.Problem], sub.Source, language.Get(sub.Language), s.sandbox, NewHTTPCallback(sub.CallbackUrl))
+		err = Judge(logger, s.problems[sub.Problem], sub.Source, language.Get(sub.Language), s.sandboxProvider, NewHTTPCallback(sub.CallbackUrl))
 		if err != nil {
 			log.Print("judger: error while running Judge", err)
 			continue

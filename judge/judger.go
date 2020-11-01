@@ -58,7 +58,7 @@ func (h HTTPCallback) Callback(test string, status problems.Status, done bool) e
 
 //@TODO add separated logger for problem
 
-func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Language, sandbox language.Sandbox, c Callbacker) error {
+func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Language, sandboxProvider *language.SandboxProvider, c Callbacker) error {
 	logger.Print("Started Judge")
 
 	id := uuid.NewV4()
@@ -84,6 +84,12 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 	f, err = os.Open("/tmp/judge_" + id.String())
 	if err != nil {
 		logger.Print("Error while opening:", err)
+		return err
+	}
+
+	sandbox, err := sandboxProvider.Get()
+	if err != nil {
+		logger.Print("Error while getting sandbox: ", err)
 		return err
 	}
 
