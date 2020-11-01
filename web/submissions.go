@@ -2,7 +2,7 @@ package web
 
 import (
 	"database/sql"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/utils/problems"
 	"github.com/mraron/njudge/web/models"
 	"github.com/mraron/njudge/web/roles"

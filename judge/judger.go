@@ -61,11 +61,7 @@ func (h HTTPCallback) Callback(test string, status problems.Status, done bool) e
 func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Language, sandbox language.Sandbox, c Callbacker) error {
 	logger.Print("Started Judge")
 
-	id, err := uuid.NewV4()
-	if err != nil {
-		logger.Print("Error while generating uuid")
-		return err
-	}
+	id := uuid.NewV4()
 
 	filename := "/tmp/judge_" + id.String()
 	logger.Print("Creating tempfile", filename)

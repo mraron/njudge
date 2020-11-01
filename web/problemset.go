@@ -2,7 +2,7 @@ package web
 
 import (
 	"fmt"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/utils/problems/config/polygon"
 	"github.com/mraron/njudge/web/models"
 	. "github.com/volatiletech/sqlboiler/queries/qm"

@@ -1,7 +1,7 @@
 package web
 
 import (
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/web/models"
 	"github.com/mraron/njudge/web/roles"
 	"github.com/volatiletech/sqlboiler/boil"
