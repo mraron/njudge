@@ -18,7 +18,6 @@ require (
 	github.com/labstack/gommon v0.3.0
 	github.com/lib/pq v1.8.0
 	github.com/pkg/errors v0.9.1
-	github.com/satori/go.uuid v1.2.0
 	github.com/shirou/gopsutil v3.20.10+incompatible
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/viper v1.7.1

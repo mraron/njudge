@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/mraron/njudge/utils/language"
 	"github.com/mraron/njudge/utils/problems"
-	"github.com/satori/go.uuid"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -61,29 +61,25 @@ func (h HTTPCallback) Callback(test string, status problems.Status, done bool) e
 func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Language, sandboxProvider *language.SandboxProvider, c Callbacker) error {
 	logger.Print("Started Judge")
 
-	id := uuid.NewV4()
-
-	filename := "/tmp/judge_" + id.String()
-	logger.Print("Creating tempfile", filename)
-
-	f, err := os.Create(filename)
+	f, err := ioutil.TempFile("/tmp", "judge_*")
 	if err != nil {
 		logger.Print("Error while creating:", err)
 		return err
 	}
 
-	_, err = f.Write([]byte(src))
+	_, err = f.Write(src)
 	if err != nil {
 		logger.Print("Error while writing data:", err)
 		return err
 	}
 
+	fname := f.Name()
+
 	f.Close()
 
-	logger.Print("Opening tempfile")
-	f, err = os.Open("/tmp/judge_" + id.String())
+	f, err = os.Open(fname)
 	if err != nil {
-		logger.Print("Error while opening:", err)
+		logger.Print("Error while reopening file:", err)
 		return err
 	}
 
@@ -150,7 +146,8 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 		logger.Print("Got error! removing tempfile and calling back for the last time... error is", err)
 	}
 
-	os.Remove("/tmp/judge_" + id.String())
+	os.Remove(fname)
+	f.Close()
 
 	return c.Callback("", st, true)
 }
