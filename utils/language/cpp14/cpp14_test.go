@@ -49,6 +49,16 @@ using namespace std;
 int main() {
 	cerr<<(10'0110'0)<<"\n";
 }`
+	CPP14_sleep = `#include<unistd.h>
+int main() {
+	sleep(20);
+}
+`
+	CPP14_smallsleep = `#include<unistd.h>
+int main() {
+	sleep(1);
+}
+`
 )
 
 func TestCompileAndRun(t *testing.T) {
@@ -59,7 +69,9 @@ func TestCompileAndRun(t *testing.T) {
 		{language.Get("cpp14"), CPP14_tl, language.VERDICT_TL, "", "", 100*time.Millisecond,  128*1024*1024},
 		{language.Get("cpp14"), CPP14_re, language.VERDICT_RE, "", "", 1000*time.Millisecond,  128*1024*1024},
 		{language.Get("cpp14"), CPP14_rediv0, language.VERDICT_RE, "", "", 1000*time.Millisecond,  128*1024*1024},
-		{language.Get("cpp14"), CPP14_newfromcpp11, language.VERDICT_OK, "", "", 100*time.Second, 128*1024*1024},
+		{language.Get("cpp14"), CPP14_newfromcpp11, language.VERDICT_OK, "", "", 100*time.Millisecond, 128*1024*1024},
+		{language.Get("cpp14"), CPP14_sleep, language.VERDICT_TL, "", "", 2*time.Second, 128*1024*1024},
+		{language.Get("cpp14"), CPP14_smallsleep, language.VERDICT_OK, "", "", 2*time.Second, 128*1024*1024},
 	} {
 		test.Run(t)
 	}

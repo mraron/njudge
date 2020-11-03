@@ -168,6 +168,7 @@ func (s *IsolateSandbox) Env() Sandbox {
 func (s *IsolateSandbox) TimeLimit(tl time.Duration) Sandbox {
 	tl = tl / time.Millisecond
 	s.argv = append(s.argv, fmt.Sprintf("--time=%d.%d", tl/1000, tl%1000))
+	s.argv = append(s.argv, fmt.Sprintf("--wall-time=%d.%d",(2*tl+1000)/1000, (2*tl+1000)%1000))
 
 	return s
 }
