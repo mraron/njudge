@@ -88,6 +88,7 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 		logger.Print("Error while getting sandbox: ", err)
 		return err
 	}
+	defer sandboxProvider.Put(sandbox)
 
 	sandbox.Init(logger)
 	defer sandbox.Cleanup()
