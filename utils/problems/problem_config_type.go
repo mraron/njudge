@@ -2,6 +2,7 @@ package problems
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -79,9 +80,9 @@ func Parse(dir string) (Problem, error) {
 	}
 
 	if matches > 1 {
-		return nil, ERROR_AMBIGUOUS_STRUCTURE
+		return nil, fmt.Errorf("%w: %s", ERROR_AMBIGUOUS_STRUCTURE, dir)
 	} else if matches == 0 {
-		return nil, ERROR_NO_MATCH
+		return nil, fmt.Errorf("%w: %s", ERROR_NO_MATCH, dir)
 	}
 
 	return problemTypes[first_match].parser(dir)

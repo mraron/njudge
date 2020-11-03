@@ -10,6 +10,7 @@ import (
 	"mime"
 	"net/http"
 	"path/filepath"
+	"strings"
 )
 
 func (s *Server) getProblemsetMain(c echo.Context) error {
@@ -83,7 +84,12 @@ func (s *Server) getProblemsetProblemFile(c echo.Context) error {
 			return c.String(http.StatusNotFound, "file not found")
 		}
 
-		fileLoc = filepath.Join(s.ProblemsDir, p.Name(), "statements", ".html", p.HTMLStatements()[0].Locale, c.Param("file"))
+		if strings.HasSuffix(c.Param("file"), ".css") {
+			fileLoc = filepath.Join(s.ProblemsDir, p.Name(), "statements", ".html", p.HTMLStatements()[0].Locale, c.Param("file"))
+		}else {
+			fileLoc = filepath.Join(s.ProblemsDir, p.Name(), "statements", p.HTMLStatements()[0].Locale, c.Param("file"))
+		}
+
 	default:
 		return c.String(http.StatusNotFound, "not found")
 	}

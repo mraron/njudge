@@ -93,7 +93,7 @@ type Test struct {
 	Method string  `xml:"method,attr"`
 	Cmd    string  `xml:"cmd,attr"`
 	Sample bool    `xml:"sample,attr"`
-	Score  float64 `xml:"points,attr"`
+	Points float64 `xml:"points,attr"`
 	Group  string  `xml:"group,attr"`
 
 	Input  string
@@ -101,10 +101,11 @@ type Test struct {
 	Index  int
 }
 
+//@TODO FeedbackPolicy
 type Group struct {
-	Name    string  `xml:"name,attr"`
-	Scoring string  `xml:"scoring,attr"`
-	Score   float64 `xml:"score,attr"`
+	Name         string  `xml:"name,attr"`
+	PointsPolicy string  `xml:"points-policy,attr"`
+	Points       float64 `xml:"points,attr"`
 }
 
 type Judging struct {
@@ -120,7 +121,6 @@ type Judging struct {
 		TestCount         int     `xml:"test-count"`
 		InputPathPattern  string  `xml:"input-path-pattern"`
 		AnswerPathPattern string  `xml:"answer-path-pattern"`
-		Scoring           string  `xml:"scoring,attr"`
 		Tests             []Test  `xml:"tests>test"`
 		Groups            []Group `xml:"groups>group"`
 	} `xml:"testset"`
@@ -156,8 +156,8 @@ type Problem struct {
 	AttachmentsList        []problems.Attachment
 	GeneratedStatementList []problems.Content
 
-	TaskType      string      `xml:"task_type,attr"`
-	FeedbackType  string      `xml:"feedback,attr"`
+	TaskType      string      `xml:"njudge-task-type,attr"`
+	FeedbackType  string      `xml:"njudge-feedback-type,attr"`
 	Revision      int         `xml:"revision,attr"`
 	ShortName     string      `xml:"short-name,attr"`
 	Url           string      `xml:"url,attr"`
@@ -281,10 +281,14 @@ func (p Problem) StatusSkeleton() problems.Status {
 			group := &testset.Groups[len(testset.Groups)-1]
 
 			group.Name = grp.Name
-			group.Scoring = problems.ScoringFromString(grp.Scoring)
+			if grp.PointsPolicy == "complete-group" {
+				group.Scoring = problems.SCORING_GROUP
+			}else {
+				group.Scoring = problems.SCORING_SUM
+			}
 
 			for _, tc := range tcbygroup[grp.Name] {
-				testcase := problems.Testcase{idx, tc.Input, "", tc.Answer, ts.Name, group.Name, problems.VERDICT_DR, float64(0.0), float64(tc.Score), "-", "-", "-", 0 * time.Millisecond, 0, time.Duration(p.TimeLimit()) * time.Millisecond, p.MemoryLimit()}
+				testcase := problems.Testcase{idx, tc.Input, "", tc.Answer, ts.Name, group.Name, problems.VERDICT_DR, float64(0.0), float64(tc.Points), "-", "-", "-", 0 * time.Millisecond, 0, time.Duration(p.TimeLimit()) * time.Millisecond, p.MemoryLimit()}
 				group.Testcases = append(group.Testcases, testcase)
 				testset.Testcases = append(testset.Testcases, testcase)
 
@@ -392,14 +396,32 @@ func parser(path string) (problems.Problem, error) {
 				return nil, err
 			}
 
-			replace := func(str *string) {
-				*str = strings.Replace(*str, "\n\n", "<p></p><p></p>", -1)
+			convert_pandoc := func(str *string) {
+				if err != nil {
+					return
+				}
+
+				buf := &bytes.Buffer{}
+
+				cmd := exec.Command("pandoc", "--mathjax", "-f", "latex", "-t", "html")
+				cmd.Stdin = strings.NewReader(*str)
+				cmd.Stdout = buf
+
+				err = cmd.Run()
+				if err == nil {
+					*str = buf.String()
+				}
 			}
 
-			replace(&jsonstmt.Legend)
-			replace(&jsonstmt.Input)
-			replace(&jsonstmt.Output)
-			replace(&jsonstmt.Notes)
+			convert_pandoc(&jsonstmt.Legend)
+			convert_pandoc(&jsonstmt.Input)
+			convert_pandoc(&jsonstmt.Output)
+			convert_pandoc(&jsonstmt.Notes)
+			convert_pandoc(&jsonstmt.Scoring)
+
+			if err != nil {
+				return nil, err
+			}
 
 			jsonstmt.InputFile, jsonstmt.OutputFile = p.InputOutputFiles()
 			jsonstmt.TimeLimit = p.TimeLimit()
