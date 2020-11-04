@@ -78,7 +78,7 @@ type JudgingInformation interface {
 type TaskType interface {
 	Name() string
 	Compile(JudgingInformation, language.Sandbox, language.Language, io.Reader, io.Writer) (io.Reader, error)
-	Run(JudgingInformation, language.Sandbox, language.Language, io.Reader, chan string, chan Status) (Status, error)
+	Run(JudgingInformation, *language.SandboxProvider, language.Language, io.Reader, chan string, chan Status) (Status, error)
 }
 
 func Truncate(s string) string {

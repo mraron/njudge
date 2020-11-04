@@ -83,15 +83,21 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 		return err
 	}
 
-	sandbox, err := sandboxProvider.Get()
-	if err != nil {
-		logger.Print("Error while getting sandbox: ", err)
-		return err
-	}
-	defer sandboxProvider.Put(sandbox)
+	//@TODO do smth better
+	sandboxes := language.NewSandboxProvider()
+	for i := 0; i < 2; i++ {
+		sandbox, err := sandboxProvider.Get()
+		if err != nil {
+			logger.Print("Error while getting sandbox: ", err)
+			return err
+		}
+		defer sandboxProvider.Put(sandbox)
 
-	sandbox.Init(logger)
-	defer sandbox.Cleanup()
+		sandbox.Init(logger)
+		sandboxes.Put(sandbox)
+
+		defer sandbox.Cleanup()
+	}
 
 	logger.Print("Getting tasktype")
 	tt := problems.GetTaskType(p.TaskTypeName())
@@ -99,7 +105,10 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 	stderr := bytes.Buffer{}
 
 	logger.Print("Trying to compile")
-	bin, err := tt.Compile(p, sandbox, lang, f, &stderr)
+
+	compileSandbox := sandboxes.MustGet()
+	bin, err := tt.Compile(p,compileSandbox , lang, f, &stderr)
+	sandboxes.Put(compileSandbox)
 
 	if err != nil {
 		logger.Print("Compile got error: ", err)
@@ -117,7 +126,7 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 	)
 
 	go func() {
-		st, err = tt.Run(p, sandbox, lang, bin, testNotifier, statusNotifier)
+		st, err = tt.Run(p, sandboxes, lang, bin, testNotifier, statusNotifier)
 		ran <- true
 		close(ran)
 	}()

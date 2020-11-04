@@ -60,9 +60,8 @@ func (s Stub) Compile(jinfo problems.JudgingInformation, sandbox language.Sandbo
 	return buf, nil
 }
 
-func (Stub) Run(jinfo problems.JudgingInformation, s language.Sandbox, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
-	b := batch.Batch{}
-	return b.Run(jinfo, s, lang, bin, testNotifier, statusNotifier)
+func (Stub) Run(jinfo problems.JudgingInformation, sp *language.SandboxProvider, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
+	return batch.Batch{}.Run(jinfo, sp, lang, bin, testNotifier, statusNotifier)
 }
 
 func init() {

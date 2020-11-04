@@ -1,46 +1,28 @@
-package batch
+package communication
 
 import (
 	"bytes"
-	"errors"
-	"fmt"
 	"github.com/mraron/njudge/utils/language"
 	"github.com/mraron/njudge/utils/problems"
+	"github.com/mraron/njudge/utils/problems/tasktype/stub"
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strconv"
+	"syscall"
 )
 
-type Batch struct {
+
+type Communication struct {
 }
 
-func (b Batch) Name() string {
-	return "batch"
+func (b Communication) Name() string {
+	return "communication"
 }
 
-func (b Batch) Compile(jinfo problems.JudgingInformation, sandbox language.Sandbox, lang language.Language, src io.Reader, dest io.Writer) (io.Reader, error) {
-	lst, found := jinfo.Languages(), false
-
-	for _, l := range lst {
-		if l.Name() == lang.Name() {
-			found = true
-		}
-	}
-
-	if !found {
-		return nil, errors.New(fmt.Sprintf("running problem %s on %s tasktype, language %s is not supported", jinfo.Name(), b.Name(), lang.Name()))
-	}
-
-	buf := &bytes.Buffer{}
-
-	err := lang.Compile(sandbox, language.File{"main", src}, buf, dest, nil)
-	fmt.Println(err)
-	if err != nil {
-		return nil, err
-	}
-
-	return buf, nil
+func (b Communication) Compile(jinfo problems.JudgingInformation, sandbox language.Sandbox, lang language.Language, src io.Reader, dest io.Writer) (io.Reader, error) {
+	return stub.Stub{}.Compile(jinfo, sandbox, lang, src, dest)
 }
 
 func truncate(s string) string {
@@ -51,16 +33,40 @@ func truncate(s string) string {
 	return s[:255] + "..."
 }
 
-func (b Batch) Run(jinfo problems.JudgingInformation, sp *language.SandboxProvider, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
+func (b Communication) Run(jinfo problems.JudgingInformation, sp *language.SandboxProvider, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
 	var (
 		ans            problems.Status
 		skeleton       = jinfo.StatusSkeleton()
 		binaryContents []byte
 		err            error
-		s language.Sandbox
 	)
 
-	s, err = sp.Get()
+	interactorSandbox, err := sp.Get()
+	if err != nil {
+		ans.Compiled = false
+		ans.CompilerOutput = err.Error()
+		return ans, err
+	}
+	defer sp.Put(interactorSandbox)
+
+	interactorPath := ""
+	for _, f := range jinfo.Files() {
+		if f.Role == "interactor" {
+			interactorPath = f.Path
+		}
+	}
+
+	f, err := os.Open(interactorPath)
+	if err != nil {
+		ans.Compiled = false
+		ans.CompilerOutput = "Can't find interactor"
+		return ans, err
+	}
+
+	interactorSandbox.CreateFile("interactor", f)
+	interactorSandbox.MakeExecutable("interactor")
+
+	s, err := sp.Get()
 	if err != nil {
 		ans.Compiled = false
 		ans.CompilerOutput = err.Error()
@@ -94,29 +100,30 @@ func (b Batch) Run(jinfo problems.JudgingInformation, sp *language.SandboxProvid
 		return true
 	}
 
-	fmt.Println(skeleton)
 	for _, ts := range skeleton.Feedback {
 		ans.Feedback = append(ans.Feedback, problems.Testset{Name: ts.Name})
 		testset := &ans.Feedback[len(ans.Feedback)-1]
-		fmt.Println("!!")
+
 		for _, g := range ts.Groups {
-			fmt.Println("!")
 			testset.Groups = append(testset.Groups, problems.Group{Name: g.Name, Scoring: g.Scoring})
 			group := &testset.Groups[len(testset.Groups)-1]
 
 			ac := true
 
 			for _, tc := range g.Testcases {
-				fmt.Println("?")
 				testNotifier <- strconv.Itoa(tc.Index)
 				statusNotifier <- ans
 
 				if dependenciesOK(g.Dependencies) {
-					fmt.Println("?")
-					inputFile, _ := jinfo.InputOutputFiles()
 					testLocation, answerLocation := tc.InputPath, tc.AnswerPath
-					fmt.Println(inputFile, testLocation, answerLocation)
-					testcase, err := os.Open(testLocation)
+
+					testFile, err := os.Open(testLocation)
+					if err != nil {
+						tc.VerdictName = problems.VERDICT_XX
+						return ans, err
+					}
+
+					err = interactorSandbox.CreateFile("inp", testFile)
 					if err != nil {
 						tc.VerdictName = problems.VERDICT_XX
 						return ans, err
@@ -137,49 +144,57 @@ func (b Batch) Run(jinfo problems.JudgingInformation, sp *language.SandboxProvid
 					}
 
 					var res language.Status
-					fmt.Println("?")
 
-					if inputFile != "" {
-						s.CreateFile(inputFile, testcase)
-						testcase = nil
+					os.Remove("/tmp/fifo1"+interactorSandbox.Id())
+					os.Remove("/tmp/fifo2"+interactorSandbox.Id())
+
+					err = syscall.Mkfifo(filepath.Join("/tmp", "fifo1"+interactorSandbox.Id()), 0766)
+					if err != nil {
+						tc.VerdictName = problems.VERDICT_XX
+						return ans, err
 					}
 
-					res, err = lang.Run(s, bytes.NewReader(binaryContents), testcase, stdout, tc.TimeLimit, tc.MemoryLimit)
+					err = syscall.Mkfifo(filepath.Join("/tmp", "fifo2"+interactorSandbox.Id()), 0766)
+					if err != nil {
+						tc.VerdictName = problems.VERDICT_XX
+						return ans, err
+					}
+
+					fifo1, err := os.OpenFile(filepath.Join("/tmp", "fifo1"+interactorSandbox.Id()), os.O_RDWR, 0766)
+					if err != nil {
+						tc.VerdictName = problems.VERDICT_XX
+						return ans, err
+					}
+					defer fifo1.Close()
+
+					fifo2, err := os.OpenFile(filepath.Join("/tmp", "fifo2"+interactorSandbox.Id()), os.O_RDWR, 0766)
+					if err != nil {
+						tc.VerdictName = problems.VERDICT_XX
+						return ans, err
+					}
+					defer fifo2.Close()
+
+					done := make(chan int, 1)
+
+					go func() {
+						// @TODO check res and err of interactor
+						interactorSandbox.Stdin(fifo1).Stdout(fifo2).Stderr(os.Stderr).TimeLimit(tc.TimeLimit).MemoryLimit(tc.MemoryLimit).Run("interactor inp out", true)
+
+						done<-1
+					}()
+
+					res, err = lang.Run(s, bytes.NewReader(binaryContents), fifo2, fifo1, tc.TimeLimit, tc.MemoryLimit)
+					<- done
 
 					if err != nil {
 						tc.VerdictName = problems.VERDICT_XX
 						return ans, err
 					}
 
-					fmt.Println(res, res.Verdict, language.VERDICT_OK, "!!!!!!!!!!!!!!")
-
 					if res.Verdict == language.VERDICT_OK {
-						programOutput := stdout.String()
-
 						expectedOutput := string(answerContents)
 
-						tmpfile, err := ioutil.TempFile("/tmp", "OutputOfProgram")
-						if err != nil {
-							tc.VerdictName = problems.VERDICT_XX
-							fmt.Println(err, "!!!!")
-							return ans, err
-						}
-
-						if _, err := tmpfile.Write([]byte(programOutput)); err != nil {
-							tc.VerdictName = problems.VERDICT_XX
-							fmt.Println(err, "!!!!")
-							return ans, err
-						}
-
-						if err := tmpfile.Close(); err != nil {
-							tc.VerdictName = problems.VERDICT_XX
-							fmt.Println(err, "!!!!")
-							return ans, err
-						}
-
-						defer os.Remove(tmpfile.Name())
-
-						tc.OutputPath = tmpfile.Name()
+						tc.OutputPath = filepath.Join(interactorSandbox.Pwd(), "out")
 
 						err = jinfo.Check(&tc)
 
@@ -199,7 +214,6 @@ func (b Batch) Run(jinfo problems.JudgingInformation, sp *language.SandboxProvid
 								}
 							}
 						} else {
-							fmt.Println(err, "!!!!")
 							return ans, err
 						}
 					} else {
@@ -246,6 +260,6 @@ func (b Batch) Run(jinfo problems.JudgingInformation, sp *language.SandboxProvid
 }
 
 func init() {
-	problems.RegisterTaskType(Batch{})
-
+	problems.RegisterTaskType(Communication{})
 }
+

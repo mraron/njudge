@@ -29,6 +29,7 @@ var ISOLATE_ROOT = getEnv("ISOLATE_ROOT", "/var/local/lib/isolate/")
 
 type Sandbox interface {
 	ClearArguments()
+	Id() string
 	Init(*log.Logger) error
 
 	Pwd() string
@@ -67,6 +68,14 @@ func (sp *SandboxProvider) Get() (Sandbox, error) {
 	return <-sp.sandboxes, nil
 }
 
+func (sp *SandboxProvider) MustGet() Sandbox {
+	if s, err := sp.Get(); err != nil {
+		panic(err)
+	}else {
+		return s
+	}
+}
+
 func (sp *SandboxProvider) Put(s Sandbox) {
 	sp.sandboxes <- s
 }
@@ -87,6 +96,10 @@ type IsolateSandbox struct {
 
 func NewIsolateSandbox(id int) Sandbox {
 	return &IsolateSandbox{id: id}
+}
+
+func (s* IsolateSandbox) Id() string {
+	return "isolate"+strconv.Itoa(s.id)
 }
 
 func (s *IsolateSandbox) Pwd() string {
@@ -113,6 +126,7 @@ func (s *IsolateSandbox) ClearArguments() {
 func (s *IsolateSandbox) Init(l *log.Logger) error {
 	s.ClearArguments()
 	s.logger = l
+	s.Cleanup()
 
 	args := []string{"--cg", "-b", strconv.Itoa(s.id), "--init"}
 

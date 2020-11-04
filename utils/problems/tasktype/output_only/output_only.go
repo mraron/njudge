@@ -37,7 +37,7 @@ func (o OutputOnly) Compile(jinfo problems.JudgingInformation, s language.Sandbo
 	return bytes.NewReader(zipContents), nil
 }
 
-func (o OutputOnly) Run(jinfo problems.JudgingInformation, s language.Sandbox, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
+func (o OutputOnly) Run(jinfo problems.JudgingInformation, sp *language.SandboxProvider, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
 	defer func() {
 		close(testNotifier)
 		close(statusNotifier)
