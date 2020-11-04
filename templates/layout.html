@@ -114,6 +114,8 @@
 
 {{if .HTMLStatements}}
     {{str2html (translateContent "hungarian" .HTMLStatements).String}}
+{{else if .PDFStatements}}
+    <embed src="pdf/{{(translateContent "hungarian" .PDFStatements).Locale}}/" width="100%" height="800px"></embed>
 {{end}}
 
 
@@ -176,7 +178,7 @@
             <dt class="col-sm-3">Tagek:</dt>
             <dd class="col-sm-9">
             {{range $i := .Tags}}
-                [{{$i}}]
+                <span class="badge badge-secondary">{{$i}}</span>
             {{end}}
             </dd>
 
