@@ -137,17 +137,25 @@ type Stub struct {
 	Language string `xml:"language,attr"`
 }
 
+type Source struct {
+	Path string `xml:"path,attr"`
+	Type string `xml:"type,attr"`
+}
+
 type Checker struct {
 	Type   string `xml:"type,attr"`
-	Source struct {
-		Path string `xml:"path,attr"`
-	} `xml:"source"`
+	Source Source `xml:"source"`
+}
+
+type Interactor struct {
+	Source Source `xml:"source"`
 }
 
 type Assets struct {
 	Attachments []Attachment `xml:"attachments>attachment"`
 	Stubs       []Stub       `xml:"stubs>stub"`
 	Checker     Checker      `xml:"checker"`
+	Interactor Interactor `xml:"interactor"`
 }
 
 type Problem struct {
@@ -345,6 +353,11 @@ func (p Problem) Files() []problems.File {
 	res := make([]problems.File, 0)
 	for _, stub := range p.Assets.Stubs {
 		res = append(res, problems.File{stub.Name, "stub_" + stub.Language, filepath.Join(p.Path, stub.Path)})
+	}
+
+	//@TODO compile if not compiled
+	if p.Assets.Interactor.Source.Path != "" {
+		res = append(res, problems.File{"interactor", "interactor", filepath.Join(p.Path, "files", "interactor")})
 	}
 
 	return res

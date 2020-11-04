@@ -51,13 +51,22 @@ func truncate(s string) string {
 	return s[:255] + "..."
 }
 
-func (b Batch) Run(jinfo problems.JudgingInformation, s language.Sandbox, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
+func (b Batch) Run(jinfo problems.JudgingInformation, sp *language.SandboxProvider, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
 	var (
 		ans            problems.Status
 		skeleton       = jinfo.StatusSkeleton()
 		binaryContents []byte
 		err            error
+		s language.Sandbox
 	)
+
+	s, err = sp.Get()
+	if err != nil {
+		ans.Compiled = false
+		ans.CompilerOutput = err.Error()
+		return ans, err
+	}
+	defer sp.Put(s)
 
 	binaryContents, err = ioutil.ReadAll(bin)
 	if err != nil {
