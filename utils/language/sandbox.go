@@ -277,7 +277,9 @@ func (s *IsolateSandbox) Run(prg string, needStatus bool) (Status, error) {
 		s.st.Verdict = VERDICT_OK
 	}
 
-	s.stderr.Write([]byte(str))
+	if s.stderr != nil {
+		s.stderr.Write([]byte(str))
+	}
 
 	if !needStatus {
 		return s.st, nil
