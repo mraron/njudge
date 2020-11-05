@@ -242,6 +242,11 @@ func AddProblemRelHook(hookPoint boil.HookPoint, problemRelHook ProblemRelHook) 
 	}
 }
 
+// OneG returns a single problemRel record from the query using the global executor.
+func (q problemRelQuery) OneG() (*ProblemRel, error) {
+	return q.One(boil.GetDB())
+}
+
 // One returns a single problemRel record from the query.
 func (q problemRelQuery) One(exec boil.Executor) (*ProblemRel, error) {
 	o := &ProblemRel{}
@@ -261,6 +266,11 @@ func (q problemRelQuery) One(exec boil.Executor) (*ProblemRel, error) {
 	}
 
 	return o, nil
+}
+
+// AllG returns all ProblemRel records from the query using the global executor.
+func (q problemRelQuery) AllG() (ProblemRelSlice, error) {
+	return q.All(boil.GetDB())
 }
 
 // All returns all ProblemRel records from the query.
@@ -283,6 +293,11 @@ func (q problemRelQuery) All(exec boil.Executor) (ProblemRelSlice, error) {
 	return o, nil
 }
 
+// CountG returns the count of all ProblemRel records in the query, and panics on error.
+func (q problemRelQuery) CountG() (int64, error) {
+	return q.Count(boil.GetDB())
+}
+
 // Count returns the count of all ProblemRel records in the query.
 func (q problemRelQuery) Count(exec boil.Executor) (int64, error) {
 	var count int64
@@ -296,6 +311,11 @@ func (q problemRelQuery) Count(exec boil.Executor) (int64, error) {
 	}
 
 	return count, nil
+}
+
+// ExistsG checks if the row exists in the table, and panics on error.
+func (q problemRelQuery) ExistsG() (bool, error) {
+	return q.Exists(boil.GetDB())
 }
 
 // Exists checks if the row exists in the table.
@@ -318,6 +338,11 @@ func (q problemRelQuery) Exists(exec boil.Executor) (bool, error) {
 func ProblemRels(mods ...qm.QueryMod) problemRelQuery {
 	mods = append(mods, qm.From("\"problem_rels\""))
 	return problemRelQuery{NewQuery(mods...)}
+}
+
+// FindProblemRelG retrieves a single record by ID.
+func FindProblemRelG(iD int, selectCols ...string) (*ProblemRel, error) {
+	return FindProblemRel(boil.GetDB(), iD, selectCols...)
 }
 
 // FindProblemRel retrieves a single record by ID with an executor.
@@ -344,6 +369,11 @@ func FindProblemRel(exec boil.Executor, iD int, selectCols ...string) (*ProblemR
 	}
 
 	return problemRelObj, nil
+}
+
+// InsertG a single record. See Insert for whitelist behavior description.
+func (o *ProblemRel) InsertG(columns boil.Columns) error {
+	return o.Insert(boil.GetDB(), columns)
 }
 
 // Insert a single record using an executor.
@@ -424,6 +454,12 @@ func (o *ProblemRel) Insert(exec boil.Executor, columns boil.Columns) error {
 	return o.doAfterInsertHooks(exec)
 }
 
+// UpdateG a single ProblemRel record using the global executor.
+// See Update for more documentation.
+func (o *ProblemRel) UpdateG(columns boil.Columns) (int64, error) {
+	return o.Update(boil.GetDB(), columns)
+}
+
 // Update uses an executor to update the ProblemRel.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
@@ -486,6 +522,11 @@ func (o *ProblemRel) Update(exec boil.Executor, columns boil.Columns) (int64, er
 	return rowsAff, o.doAfterUpdateHooks(exec)
 }
 
+// UpdateAllG updates all rows with the specified column values.
+func (q problemRelQuery) UpdateAllG(cols M) (int64, error) {
+	return q.UpdateAll(boil.GetDB(), cols)
+}
+
 // UpdateAll updates all rows with the specified column values.
 func (q problemRelQuery) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 	queries.SetUpdate(q.Query, cols)
@@ -501,6 +542,11 @@ func (q problemRelQuery) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 	}
 
 	return rowsAff, nil
+}
+
+// UpdateAllG updates all rows with the specified column values.
+func (o ProblemRelSlice) UpdateAllG(cols M) (int64, error) {
+	return o.UpdateAll(boil.GetDB(), cols)
 }
 
 // UpdateAll updates all rows with the specified column values, using an executor.
@@ -548,6 +594,11 @@ func (o ProblemRelSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 		return 0, errors.Wrap(err, "models: unable to retrieve rows affected all in update all problemRel")
 	}
 	return rowsAff, nil
+}
+
+// UpsertG attempts an insert, and does an update or ignore on conflict.
+func (o *ProblemRel) UpsertG(updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
+	return o.Upsert(boil.GetDB(), updateOnConflict, conflictColumns, updateColumns, insertColumns)
 }
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
@@ -664,6 +715,12 @@ func (o *ProblemRel) Upsert(exec boil.Executor, updateOnConflict bool, conflictC
 	return o.doAfterUpsertHooks(exec)
 }
 
+// DeleteG deletes a single ProblemRel record.
+// DeleteG will match against the primary key column to find the record to delete.
+func (o *ProblemRel) DeleteG() (int64, error) {
+	return o.Delete(boil.GetDB())
+}
+
 // Delete deletes a single ProblemRel record with an executor.
 // Delete will match against the primary key column to find the record to delete.
 func (o *ProblemRel) Delete(exec boil.Executor) (int64, error) {
@@ -699,6 +756,10 @@ func (o *ProblemRel) Delete(exec boil.Executor) (int64, error) {
 	return rowsAff, nil
 }
 
+func (q problemRelQuery) DeleteAllG() (int64, error) {
+	return q.DeleteAll(boil.GetDB())
+}
+
 // DeleteAll deletes all matching rows.
 func (q problemRelQuery) DeleteAll(exec boil.Executor) (int64, error) {
 	if q.Query == nil {
@@ -718,6 +779,11 @@ func (q problemRelQuery) DeleteAll(exec boil.Executor) (int64, error) {
 	}
 
 	return rowsAff, nil
+}
+
+// DeleteAllG deletes all rows in the slice.
+func (o ProblemRelSlice) DeleteAllG() (int64, error) {
+	return o.DeleteAll(boil.GetDB())
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
@@ -768,6 +834,15 @@ func (o ProblemRelSlice) DeleteAll(exec boil.Executor) (int64, error) {
 	return rowsAff, nil
 }
 
+// ReloadG refetches the object from the database using the primary keys.
+func (o *ProblemRel) ReloadG() error {
+	if o == nil {
+		return errors.New("models: no ProblemRel provided for reload")
+	}
+
+	return o.Reload(boil.GetDB())
+}
+
 // Reload refetches the object from the database
 // using the primary keys with an executor.
 func (o *ProblemRel) Reload(exec boil.Executor) error {
@@ -778,6 +853,16 @@ func (o *ProblemRel) Reload(exec boil.Executor) error {
 
 	*o = *ret
 	return nil
+}
+
+// ReloadAllG refetches every row with matching primary key column values
+// and overwrites the original object slice with the newly updated slice.
+func (o *ProblemRelSlice) ReloadAllG() error {
+	if o == nil {
+		return errors.New("models: empty ProblemRelSlice provided for reload all")
+	}
+
+	return o.ReloadAll(boil.GetDB())
 }
 
 // ReloadAll refetches every row with matching primary key column values
@@ -807,6 +892,11 @@ func (o *ProblemRelSlice) ReloadAll(exec boil.Executor) error {
 	*o = slice
 
 	return nil
+}
+
+// ProblemRelExistsG checks if the ProblemRel row exists.
+func ProblemRelExistsG(iD int) (bool, error) {
+	return ProblemRelExists(boil.GetDB(), iD)
 }
 
 // ProblemRelExists checks if the ProblemRel row exists.

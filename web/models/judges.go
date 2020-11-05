@@ -312,6 +312,11 @@ func AddJudgeHook(hookPoint boil.HookPoint, judgeHook JudgeHook) {
 	}
 }
 
+// OneG returns a single judge record from the query using the global executor.
+func (q judgeQuery) OneG() (*Judge, error) {
+	return q.One(boil.GetDB())
+}
+
 // One returns a single judge record from the query.
 func (q judgeQuery) One(exec boil.Executor) (*Judge, error) {
 	o := &Judge{}
@@ -331,6 +336,11 @@ func (q judgeQuery) One(exec boil.Executor) (*Judge, error) {
 	}
 
 	return o, nil
+}
+
+// AllG returns all Judge records from the query using the global executor.
+func (q judgeQuery) AllG() (JudgeSlice, error) {
+	return q.All(boil.GetDB())
 }
 
 // All returns all Judge records from the query.
@@ -353,6 +363,11 @@ func (q judgeQuery) All(exec boil.Executor) (JudgeSlice, error) {
 	return o, nil
 }
 
+// CountG returns the count of all Judge records in the query, and panics on error.
+func (q judgeQuery) CountG() (int64, error) {
+	return q.Count(boil.GetDB())
+}
+
 // Count returns the count of all Judge records in the query.
 func (q judgeQuery) Count(exec boil.Executor) (int64, error) {
 	var count int64
@@ -366,6 +381,11 @@ func (q judgeQuery) Count(exec boil.Executor) (int64, error) {
 	}
 
 	return count, nil
+}
+
+// ExistsG checks if the row exists in the table, and panics on error.
+func (q judgeQuery) ExistsG() (bool, error) {
+	return q.Exists(boil.GetDB())
 }
 
 // Exists checks if the row exists in the table.
@@ -388,6 +408,11 @@ func (q judgeQuery) Exists(exec boil.Executor) (bool, error) {
 func Judges(mods ...qm.QueryMod) judgeQuery {
 	mods = append(mods, qm.From("\"judges\""))
 	return judgeQuery{NewQuery(mods...)}
+}
+
+// FindJudgeG retrieves a single record by ID.
+func FindJudgeG(iD int, selectCols ...string) (*Judge, error) {
+	return FindJudge(boil.GetDB(), iD, selectCols...)
 }
 
 // FindJudge retrieves a single record by ID with an executor.
@@ -414,6 +439,11 @@ func FindJudge(exec boil.Executor, iD int, selectCols ...string) (*Judge, error)
 	}
 
 	return judgeObj, nil
+}
+
+// InsertG a single record. See Insert for whitelist behavior description.
+func (o *Judge) InsertG(columns boil.Columns) error {
+	return o.Insert(boil.GetDB(), columns)
 }
 
 // Insert a single record using an executor.
@@ -494,6 +524,12 @@ func (o *Judge) Insert(exec boil.Executor, columns boil.Columns) error {
 	return o.doAfterInsertHooks(exec)
 }
 
+// UpdateG a single Judge record using the global executor.
+// See Update for more documentation.
+func (o *Judge) UpdateG(columns boil.Columns) (int64, error) {
+	return o.Update(boil.GetDB(), columns)
+}
+
 // Update uses an executor to update the Judge.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
@@ -556,6 +592,11 @@ func (o *Judge) Update(exec boil.Executor, columns boil.Columns) (int64, error) 
 	return rowsAff, o.doAfterUpdateHooks(exec)
 }
 
+// UpdateAllG updates all rows with the specified column values.
+func (q judgeQuery) UpdateAllG(cols M) (int64, error) {
+	return q.UpdateAll(boil.GetDB(), cols)
+}
+
 // UpdateAll updates all rows with the specified column values.
 func (q judgeQuery) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 	queries.SetUpdate(q.Query, cols)
@@ -571,6 +612,11 @@ func (q judgeQuery) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 	}
 
 	return rowsAff, nil
+}
+
+// UpdateAllG updates all rows with the specified column values.
+func (o JudgeSlice) UpdateAllG(cols M) (int64, error) {
+	return o.UpdateAll(boil.GetDB(), cols)
 }
 
 // UpdateAll updates all rows with the specified column values, using an executor.
@@ -618,6 +664,11 @@ func (o JudgeSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 		return 0, errors.Wrap(err, "models: unable to retrieve rows affected all in update all judge")
 	}
 	return rowsAff, nil
+}
+
+// UpsertG attempts an insert, and does an update or ignore on conflict.
+func (o *Judge) UpsertG(updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
+	return o.Upsert(boil.GetDB(), updateOnConflict, conflictColumns, updateColumns, insertColumns)
 }
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
@@ -734,6 +785,12 @@ func (o *Judge) Upsert(exec boil.Executor, updateOnConflict bool, conflictColumn
 	return o.doAfterUpsertHooks(exec)
 }
 
+// DeleteG deletes a single Judge record.
+// DeleteG will match against the primary key column to find the record to delete.
+func (o *Judge) DeleteG() (int64, error) {
+	return o.Delete(boil.GetDB())
+}
+
 // Delete deletes a single Judge record with an executor.
 // Delete will match against the primary key column to find the record to delete.
 func (o *Judge) Delete(exec boil.Executor) (int64, error) {
@@ -769,6 +826,10 @@ func (o *Judge) Delete(exec boil.Executor) (int64, error) {
 	return rowsAff, nil
 }
 
+func (q judgeQuery) DeleteAllG() (int64, error) {
+	return q.DeleteAll(boil.GetDB())
+}
+
 // DeleteAll deletes all matching rows.
 func (q judgeQuery) DeleteAll(exec boil.Executor) (int64, error) {
 	if q.Query == nil {
@@ -788,6 +849,11 @@ func (q judgeQuery) DeleteAll(exec boil.Executor) (int64, error) {
 	}
 
 	return rowsAff, nil
+}
+
+// DeleteAllG deletes all rows in the slice.
+func (o JudgeSlice) DeleteAllG() (int64, error) {
+	return o.DeleteAll(boil.GetDB())
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
@@ -838,6 +904,15 @@ func (o JudgeSlice) DeleteAll(exec boil.Executor) (int64, error) {
 	return rowsAff, nil
 }
 
+// ReloadG refetches the object from the database using the primary keys.
+func (o *Judge) ReloadG() error {
+	if o == nil {
+		return errors.New("models: no Judge provided for reload")
+	}
+
+	return o.Reload(boil.GetDB())
+}
+
 // Reload refetches the object from the database
 // using the primary keys with an executor.
 func (o *Judge) Reload(exec boil.Executor) error {
@@ -848,6 +923,16 @@ func (o *Judge) Reload(exec boil.Executor) error {
 
 	*o = *ret
 	return nil
+}
+
+// ReloadAllG refetches every row with matching primary key column values
+// and overwrites the original object slice with the newly updated slice.
+func (o *JudgeSlice) ReloadAllG() error {
+	if o == nil {
+		return errors.New("models: empty JudgeSlice provided for reload all")
+	}
+
+	return o.ReloadAll(boil.GetDB())
 }
 
 // ReloadAll refetches every row with matching primary key column values
@@ -877,6 +962,11 @@ func (o *JudgeSlice) ReloadAll(exec boil.Executor) error {
 	*o = slice
 
 	return nil
+}
+
+// JudgeExistsG checks if the Judge row exists.
+func JudgeExistsG(iD int) (bool, error) {
+	return JudgeExists(boil.GetDB(), iD)
 }
 
 // JudgeExists checks if the Judge row exists.

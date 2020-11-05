@@ -373,6 +373,11 @@ func AddSubmissionHook(hookPoint boil.HookPoint, submissionHook SubmissionHook) 
 	}
 }
 
+// OneG returns a single submission record from the query using the global executor.
+func (q submissionQuery) OneG() (*Submission, error) {
+	return q.One(boil.GetDB())
+}
+
 // One returns a single submission record from the query.
 func (q submissionQuery) One(exec boil.Executor) (*Submission, error) {
 	o := &Submission{}
@@ -392,6 +397,11 @@ func (q submissionQuery) One(exec boil.Executor) (*Submission, error) {
 	}
 
 	return o, nil
+}
+
+// AllG returns all Submission records from the query using the global executor.
+func (q submissionQuery) AllG() (SubmissionSlice, error) {
+	return q.All(boil.GetDB())
 }
 
 // All returns all Submission records from the query.
@@ -414,6 +424,11 @@ func (q submissionQuery) All(exec boil.Executor) (SubmissionSlice, error) {
 	return o, nil
 }
 
+// CountG returns the count of all Submission records in the query, and panics on error.
+func (q submissionQuery) CountG() (int64, error) {
+	return q.Count(boil.GetDB())
+}
+
 // Count returns the count of all Submission records in the query.
 func (q submissionQuery) Count(exec boil.Executor) (int64, error) {
 	var count int64
@@ -427,6 +442,11 @@ func (q submissionQuery) Count(exec boil.Executor) (int64, error) {
 	}
 
 	return count, nil
+}
+
+// ExistsG checks if the row exists in the table, and panics on error.
+func (q submissionQuery) ExistsG() (bool, error) {
+	return q.Exists(boil.GetDB())
 }
 
 // Exists checks if the row exists in the table.
@@ -563,6 +583,14 @@ func (submissionL) LoadUser(e boil.Executor, singular bool, maybeSubmission inte
 	return nil
 }
 
+// SetUserG of the submission to the related item.
+// Sets o.R.User to related.
+// Adds o to related.R.Submissions.
+// Uses the global database handle.
+func (o *Submission) SetUserG(insert bool, related *User) error {
+	return o.SetUser(boil.GetDB(), insert, related)
+}
+
 // SetUser of the submission to the related item.
 // Sets o.R.User to related.
 // Adds o to related.R.Submissions.
@@ -615,6 +643,11 @@ func Submissions(mods ...qm.QueryMod) submissionQuery {
 	return submissionQuery{NewQuery(mods...)}
 }
 
+// FindSubmissionG retrieves a single record by ID.
+func FindSubmissionG(iD int, selectCols ...string) (*Submission, error) {
+	return FindSubmission(boil.GetDB(), iD, selectCols...)
+}
+
 // FindSubmission retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
 func FindSubmission(exec boil.Executor, iD int, selectCols ...string) (*Submission, error) {
@@ -639,6 +672,11 @@ func FindSubmission(exec boil.Executor, iD int, selectCols ...string) (*Submissi
 	}
 
 	return submissionObj, nil
+}
+
+// InsertG a single record. See Insert for whitelist behavior description.
+func (o *Submission) InsertG(columns boil.Columns) error {
+	return o.Insert(boil.GetDB(), columns)
 }
 
 // Insert a single record using an executor.
@@ -719,6 +757,12 @@ func (o *Submission) Insert(exec boil.Executor, columns boil.Columns) error {
 	return o.doAfterInsertHooks(exec)
 }
 
+// UpdateG a single Submission record using the global executor.
+// See Update for more documentation.
+func (o *Submission) UpdateG(columns boil.Columns) (int64, error) {
+	return o.Update(boil.GetDB(), columns)
+}
+
 // Update uses an executor to update the Submission.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
@@ -781,6 +825,11 @@ func (o *Submission) Update(exec boil.Executor, columns boil.Columns) (int64, er
 	return rowsAff, o.doAfterUpdateHooks(exec)
 }
 
+// UpdateAllG updates all rows with the specified column values.
+func (q submissionQuery) UpdateAllG(cols M) (int64, error) {
+	return q.UpdateAll(boil.GetDB(), cols)
+}
+
 // UpdateAll updates all rows with the specified column values.
 func (q submissionQuery) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 	queries.SetUpdate(q.Query, cols)
@@ -796,6 +845,11 @@ func (q submissionQuery) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 	}
 
 	return rowsAff, nil
+}
+
+// UpdateAllG updates all rows with the specified column values.
+func (o SubmissionSlice) UpdateAllG(cols M) (int64, error) {
+	return o.UpdateAll(boil.GetDB(), cols)
 }
 
 // UpdateAll updates all rows with the specified column values, using an executor.
@@ -843,6 +897,11 @@ func (o SubmissionSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 		return 0, errors.Wrap(err, "models: unable to retrieve rows affected all in update all submission")
 	}
 	return rowsAff, nil
+}
+
+// UpsertG attempts an insert, and does an update or ignore on conflict.
+func (o *Submission) UpsertG(updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
+	return o.Upsert(boil.GetDB(), updateOnConflict, conflictColumns, updateColumns, insertColumns)
 }
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
@@ -959,6 +1018,12 @@ func (o *Submission) Upsert(exec boil.Executor, updateOnConflict bool, conflictC
 	return o.doAfterUpsertHooks(exec)
 }
 
+// DeleteG deletes a single Submission record.
+// DeleteG will match against the primary key column to find the record to delete.
+func (o *Submission) DeleteG() (int64, error) {
+	return o.Delete(boil.GetDB())
+}
+
 // Delete deletes a single Submission record with an executor.
 // Delete will match against the primary key column to find the record to delete.
 func (o *Submission) Delete(exec boil.Executor) (int64, error) {
@@ -994,6 +1059,10 @@ func (o *Submission) Delete(exec boil.Executor) (int64, error) {
 	return rowsAff, nil
 }
 
+func (q submissionQuery) DeleteAllG() (int64, error) {
+	return q.DeleteAll(boil.GetDB())
+}
+
 // DeleteAll deletes all matching rows.
 func (q submissionQuery) DeleteAll(exec boil.Executor) (int64, error) {
 	if q.Query == nil {
@@ -1013,6 +1082,11 @@ func (q submissionQuery) DeleteAll(exec boil.Executor) (int64, error) {
 	}
 
 	return rowsAff, nil
+}
+
+// DeleteAllG deletes all rows in the slice.
+func (o SubmissionSlice) DeleteAllG() (int64, error) {
+	return o.DeleteAll(boil.GetDB())
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
@@ -1063,6 +1137,15 @@ func (o SubmissionSlice) DeleteAll(exec boil.Executor) (int64, error) {
 	return rowsAff, nil
 }
 
+// ReloadG refetches the object from the database using the primary keys.
+func (o *Submission) ReloadG() error {
+	if o == nil {
+		return errors.New("models: no Submission provided for reload")
+	}
+
+	return o.Reload(boil.GetDB())
+}
+
 // Reload refetches the object from the database
 // using the primary keys with an executor.
 func (o *Submission) Reload(exec boil.Executor) error {
@@ -1073,6 +1156,16 @@ func (o *Submission) Reload(exec boil.Executor) error {
 
 	*o = *ret
 	return nil
+}
+
+// ReloadAllG refetches every row with matching primary key column values
+// and overwrites the original object slice with the newly updated slice.
+func (o *SubmissionSlice) ReloadAllG() error {
+	if o == nil {
+		return errors.New("models: empty SubmissionSlice provided for reload all")
+	}
+
+	return o.ReloadAll(boil.GetDB())
 }
 
 // ReloadAll refetches every row with matching primary key column values
@@ -1102,6 +1195,11 @@ func (o *SubmissionSlice) ReloadAll(exec boil.Executor) error {
 	*o = slice
 
 	return nil
+}
+
+// SubmissionExistsG checks if the Submission row exists.
+func SubmissionExistsG(iD int) (bool, error) {
+	return SubmissionExists(boil.GetDB(), iD)
 }
 
 // SubmissionExists checks if the Submission row exists.
