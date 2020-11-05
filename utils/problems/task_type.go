@@ -2,7 +2,6 @@ package problems
 
 import (
 	"errors"
-	"github.com/labstack/gommon/log"
 )
 
 var taskTypes []TaskType
@@ -12,7 +11,6 @@ func init() {
 }
 
 func RegisterTaskType(taskType TaskType) {
-	log.Print("registered", taskType.Name())
 	taskTypes = append(taskTypes, taskType)
 }
 
