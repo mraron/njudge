@@ -117,7 +117,7 @@ func (s *Server) runUpdateProblems() {
 	}
 }
 
-func (s *Server) connectToDB() {
+func (s *Server) ConnectToDB() {
 	var err error
 	s.db, err = sqlx.Open("postgres", "postgres://"+s.DBAccount+":"+s.DBPassword+"@"+s.DBHost+"/"+s.DBName)
 
@@ -126,6 +126,10 @@ func (s *Server) connectToDB() {
 	}
 
 	boil.SetDB(s.db)
+}
+
+func (s *Server) GetDB() *sqlx.DB {
+	return s.db
 }
 
 func (s *Server) loadJudgesFromDB() {
@@ -332,7 +336,7 @@ func (s *Server) Run() {
 
 	e.GET("/admin", s.getAdmin)
 
-	s.connectToDB()
+	s.ConnectToDB()
 
 	go s.runUpdateProblems()
 	go s.runSyncJudges()

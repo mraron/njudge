@@ -8,6 +8,7 @@ require (
 	github.com/friendsofgo/errors v0.9.2
 	github.com/go-ole/go-ole v1.2.4 // indirect
 	github.com/gofrs/uuid v3.3.0+incompatible // indirect
+	github.com/golang-migrate/migrate/v4 v4.13.0
 	github.com/gorilla/sessions v1.2.1
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/kat-co/vala v0.0.0-20170210184112-42e1d8b61f12

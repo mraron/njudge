@@ -3,12 +3,26 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	_ "github.com/lib/pq"
 	"github.com/mraron/njudge/judge"
 	"github.com/mraron/njudge/web"
 	"github.com/urfave/cli"
 	"log"
 	"os"
+
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
+
+type migrateLogger struct {
+	*log.Logger
+	verbose bool
+}
+
+func (m migrateLogger) Verbose() bool {
+	return m.verbose
+}
 
 func main() {
 	app := cli.NewApp()
@@ -24,6 +38,7 @@ func main() {
 				cli.StringFlag{
 					Name:  "config, c",
 					Usage: "Load configuration from `FILE`",
+					Required: true,
 				},
 			},
 			Action: func(c *cli.Context) error {
@@ -56,6 +71,7 @@ func main() {
 				cli.StringFlag{
 					Name:  "config, c",
 					Usage: "Load configuration from `FILE`",
+					Required: true,
 				},
 			},
 			Action: func(c *cli.Context) error {
@@ -79,6 +95,77 @@ func main() {
 				}
 
 				server.Run()
+				return nil
+			},
+		},
+		{
+			Name:  "migrate",
+			Usage: "run migrations",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "config,c",
+					Usage: "Load the web's configuration from `FILE`",
+					Required: true,
+				},
+				cli.BoolFlag{
+					Name: "up",
+					Usage: "runs up migrations",
+				},
+				cli.BoolFlag{
+					Name: "down",
+					Usage: "runs down migrations",
+				},
+				cli.IntFlag{
+					Name: "steps",
+					Usage: "runs `x` up/down migrations depending on the positivity",
+				},
+			},
+			Action: func(c *cli.Context) error {
+				name := c.String("config")
+				if len(name) == 0 {
+					return errors.New("config file is required")
+				}
+
+				f, err := os.Open(name)
+				if err != nil {
+					return err
+				}
+
+				server := &web.Server{}
+
+				dec := json.NewDecoder(f)
+
+				err = dec.Decode(server)
+				if err != nil {
+					return err
+				}
+
+				server.ConnectToDB()
+				driver, err := postgres.WithInstance(server.GetDB().DB, &postgres.Config{})
+				m, err := migrate.NewWithDatabaseInstance("file://web/migrations", "postgres", driver)
+				if err != nil {
+					return err
+				}
+
+				m.Log = &migrateLogger{log.New(os.Stdout, "[migrate]", 0), false}
+
+				if c.Bool("up") {
+					err = m.Up()
+					if err != nil {
+						return err
+					}
+				}else if c.Bool("down") {
+					err = m.Down()
+					if err != nil {
+						return err
+					}
+				}else if c.Int("steps") != 0 {
+					err = m.Steps(c.Int("steps"))
+					if err != nil {
+						return err
+					}
+				}
+
 				return nil
 			},
 		},
