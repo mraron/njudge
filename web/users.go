@@ -3,9 +3,11 @@ package web
 import (
 	"database/sql"
 	errors2 "errors"
+	"fmt"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
+	"github.com/markbates/goth/gothic"
 	"github.com/mraron/njudge/web/models"
 	"github.com/mraron/njudge/web/roles"
 	"github.com/volatiletech/sqlboiler/v4/boil"
@@ -116,7 +118,7 @@ func (s *Server) postUserRegister(c echo.Context) error {
 
 	used := func(col, value, msg string) {
 		u := ""
-		if s.db.Get(&u, "SELECT name FROM users WHERE"+col+"=$1", value); u != "" {
+		if s.db.Get(&u, "SELECT name FROM users WHERE "+col+"=$1", value); u != "" {
 			errors = append(errors, msg)
 		}
 	}
@@ -170,11 +172,11 @@ func (s *Server) postUserRegister(c echo.Context) error {
 		_, err = tx.Exec("INSERT INTO users (name,password,email,activation_key,role) VALUES ($1,$2,$3,$4,$5)", c.FormValue("name"), hashed, c.FormValue("email"), key, "user")
 		mustPanic(err)
 
-		/*m := Mail{}
+		m := Mail{}
 		m.Recipients = []string{c.FormValue("email")}
-		m.Message = fmt.Sprintf(`Kedves %s!<br> Köszönjük a registrációt. Aktiváló link: <a href="http://`+s.Hostname+`/user/activate/%s/%s">http://`+s.Hostname+`/user/activate/%s/%s</a>`, c.FormValue("name"), c.FormValue("name"), key, c.FormValue("name"), key)
+		m.Message = fmt.Sprintf(`Kedves %s!<br> Köszönjük regisztrációd. Aktiváló link: <a href="http://`+s.Hostname+`/user/activate/%s/%s">http://`+s.Hostname+`/user/activate/%s/%s</a>`, c.FormValue("name"), c.FormValue("name"), key, c.FormValue("name"), key)
 		m.Subject = "Regisztráció aktiválása"
-		mustPanic(s.SendMail(m))*/
+		mustPanic(s.SendMail(m))
 
 		mustPanic(tx.Commit())
 	}
@@ -246,6 +248,46 @@ func (s *Server) getActivateUser(c echo.Context) error {
 	}
 
 	return c.Render(http.StatusOK, "message.html", "Sikeres aktiválás, mostmár beléphetsz.")
+}
+
+func (s *Server) getUserAuthCallback(c echo.Context) error {
+	if u := c.Get("user").(*models.User); u != nil {
+		return c.Render(http.StatusOK, "error.html", "Már be vagy lépve...")
+	}
+
+	user, err := gothic.CompleteUserAuth(c.Response(), c.Request())
+	if err != nil {
+		return c.Render(http.StatusOK, "login.html", []string{"Hiba: érvénytelen token."})
+	}
+
+	lst, err := models.Users(Where("email = ?", user.Email)).All(s.db)
+	if len(lst) == 0 {
+		return c.Render(http.StatusOK, "login.html", []string{"Hiba: a felhasználó nincs regisztrálva."})
+	}
+
+	if lst[0].ActivationKey.Valid {
+		return c.Render(http.StatusOK, "login.html", []string{"Hiba: az account nincs aktiválva."})
+	}
+
+	storage, _ := session.Get("user", c)
+	storage.Values["id"] = lst[0].ID
+
+	if err = storage.Save(c.Request(), c.Response()); err != nil {
+		return s.internalError(c, err, "Belső hiba #2")
+	}
+
+	c.Set("user", lst[0])
+
+	return c.Render(http.StatusOK, "message.html", "Sikeres belépés.")
+}
+
+func (s *Server) getUserAuth(c echo.Context) error {
+	if u := c.Get("user").(*models.User); u != nil {
+		return c.Render(http.StatusOK, "error.html", "Már be vagy lépve...")
+	}
+
+	gothic.BeginAuthHandler(c.Response(), c.Request())
+	return nil
 }
 
 //@TODO CENSOR PASSWORD AND ADDING USER!!!

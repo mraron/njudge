@@ -9,6 +9,8 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	_ "github.com/lib/pq"
+	"github.com/markbates/goth"
+	"github.com/markbates/goth/providers/google"
 	"github.com/mraron/njudge/judge"
 
 	"github.com/mraron/njudge/utils/problems"
@@ -44,6 +46,15 @@ type Server struct {
 	ProblemsDir    string
 	SubmissionsDir string
 	TemplatesDir   string
+
+	CookieSecret string
+
+	GoogleAuth struct {
+		Enabled bool
+		ClientKey string
+		Secret string
+		Callback string
+	}
 
 	MailAccount         string
 	MailServerHost      string
@@ -257,8 +268,11 @@ func (s *Server) runJudger() {
 
 func (s *Server) Run() {
 	e := echo.New()
+	store := sessions.NewCookieStore([]byte(s.CookieSecret))
+
 	e.Use(middleware.Logger())
-	e.Use(session.Middleware(sessions.NewCookieStore([]byte("titkosdolog"))))
+	e.Use(middleware.Recover())
+	e.Use(session.Middleware(store))
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			user, err := s.currentUser(c)
@@ -270,6 +284,12 @@ func (s *Server) Run() {
 			return next(c)
 		}
 	})
+
+	if s.GoogleAuth.Enabled {
+		goth.UseProviders(
+			google.New(s.GoogleAuth.ClientKey, s.GoogleAuth.Secret, s.GoogleAuth.Callback, "email", "profile"),
+		)
+	}
 
 	t := &Template{
 		templates: template.Must(template.New("templater").Funcs(s.templatefuncs()).ParseGlob(filepath.Join(s.TemplatesDir, "*.html"))),
@@ -299,6 +319,9 @@ func (s *Server) Run() {
 	ps.GET("/status", s.getProblemsetStatus)
 
 	u := e.Group("/user")
+
+	u.GET("/auth/callback", s.getUserAuthCallback)
+	u.GET("/auth", s.getUserAuth)
 
 	u.GET("/login", s.getUserLogin)
 	u.POST("/login", s.postUserLogin)

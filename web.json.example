@@ -12,5 +12,13 @@
   "DBName": "[SECRET]",
   "DBAccount": "[SECRET]",
   "DBPassword": "[SECRET]",
-  "DBHost": "[SECRET]"
+  "DBHost": "[SECRET]",
+  "cookieSecret": "[SECRET]",
+
+  "googleAuth": {
+      "enabled": true,
+      "clientKey": "[SECRET]",
+      "secret": "[SECRET]",
+      "callback": "[SECRET]"
+    }
 }

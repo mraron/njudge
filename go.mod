@@ -18,6 +18,7 @@ require (
 	github.com/labstack/echo/v4 v4.1.6
 	github.com/labstack/gommon v0.3.0
 	github.com/lib/pq v1.8.0
+	github.com/markbates/goth v1.66.1
 	github.com/shirou/gopsutil v3.20.10+incompatible
 	github.com/spf13/viper v1.7.1
 	github.com/urfave/cli v1.22.4
