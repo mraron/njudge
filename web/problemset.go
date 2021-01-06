@@ -167,7 +167,7 @@ func (s *Server) getTaskArchive(c echo.Context) error {
 		}
 
 		for _, problem := range problems {
-			tree.Children = append(tree.Children, &taskArchiveTreeNode{"problem", translateContent("hungarian", s.getProblem(problem.Problem).Titles()).String(), "", make([]*taskArchiveTreeNode, 0)})
+			tree.Children = append(tree.Children, &taskArchiveTreeNode{"problem", translateContent("hungarian", s.getProblem(problem.Problem).Titles()).String(), fmt.Sprintf("/problemset/%s/%s/", problem.Problemset, problem.Problem), make([]*taskArchiveTreeNode, 0)})
 		}
 
 		subcats, err := models.ProblemCategories(Where("parent_id = ?", root.ID)).All(s.db)
