@@ -1,0 +1,20 @@
+{{template "header" .}}
+{{define "ta_tree_view"}}
+
+    {{if eq .Type "problem"}}
+        <a href="{{.Link}}">
+    {{end}}
+    {{.Name}}
+    {{if eq .Type "problem"}}
+        </a>
+    {{end}}
+        <ul>
+    {{range $children := .Children}}
+        <li>{{template "ta_tree_view" $children}}</li>
+    {{end}}
+        </ul>
+{{end}}
+{{range $root := .Data}}
+    {{template "ta_tree_view" $root}}
+{{end}}
+{{template "footer" .}}

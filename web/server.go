@@ -39,11 +39,11 @@ import (
 )
 
 type Server struct {
-	Hostname     string
-	Port         string
-	ProblemsDir  string
+	Hostname       string
+	Port           string
+	ProblemsDir    string
 	SubmissionsDir string
-	TemplatesDir string
+	TemplatesDir   string
 
 	MailAccount         string
 	MailServerHost      string
@@ -265,7 +265,6 @@ func (s *Server) Run() {
 			if err != nil {
 				return s.internalError(c, err, "belső hiba")
 			}
-
 			c.Set("user", user)
 
 			return next(c)
@@ -282,6 +281,7 @@ func (s *Server) Run() {
 
 	e.Static("/static", "public")
 	e.GET("/submission/:id", s.getSubmission)
+	e.GET("/task_archive", s.getTaskArchive)
 
 	ps := e.Group("/problemset", func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {

@@ -86,7 +86,7 @@ func (s *Server) getProblemsetProblemFile(c echo.Context) error {
 
 		if strings.HasSuffix(c.Param("file"), ".css") {
 			fileLoc = filepath.Join(s.ProblemsDir, p.Name(), "statements", ".html", p.HTMLStatements()[0].Locale, c.Param("file"))
-		}else {
+		} else {
 			fileLoc = filepath.Join(s.ProblemsDir, p.Name(), "statements", p.HTMLStatements()[0].Locale, c.Param("file"))
 		}
 
@@ -142,4 +142,56 @@ func (s *Server) getProblemsetStatus(c echo.Context) error {
 	}
 
 	return c.Render(http.StatusOK, "status.html", sbs)
+}
+
+type taskArchiveTreeNode struct {
+	Type     string
+	Name     string
+	Link     string
+	Children []*taskArchiveTreeNode
+}
+
+func (s *Server) getTaskArchive(c echo.Context) error {
+	lst, err := models.ProblemCategories(Where("parent_id IS NULL")).All(s.db)
+	if err != nil {
+		return s.internalError(c, err, "Belső hiba.")
+	}
+
+	roots := make([]*taskArchiveTreeNode, 0)
+
+	var dfs func(category *models.ProblemCategory, node *taskArchiveTreeNode) error
+	dfs = func(root *models.ProblemCategory, tree *taskArchiveTreeNode) error {
+		problems, err := models.ProblemRels(Where("category_id = ?", root.ID)).All(s.db)
+		if err != nil {
+			return err
+		}
+
+		for _, problem := range problems {
+			tree.Children = append(tree.Children, &taskArchiveTreeNode{"problem", translateContent("hungarian", s.getProblem(problem.Problem).Titles()).String(), "", make([]*taskArchiveTreeNode, 0)})
+		}
+
+		subcats, err := models.ProblemCategories(Where("parent_id = ?", root.ID)).All(s.db)
+		if err != nil {
+			return err
+		}
+
+		for _, cat := range subcats {
+			akt := &taskArchiveTreeNode{"category", cat.Name, "", make([]*taskArchiveTreeNode, 0)}
+			tree.Children = append(tree.Children, akt)
+			if err := dfs(cat, akt); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
+
+	for _, start := range lst {
+		roots = append(roots, &taskArchiveTreeNode{"category", start.Name, "", make([]*taskArchiveTreeNode, 0)})
+		if dfs(start, roots[len(roots)-1]) != nil {
+			return s.internalError(c, err, "Belső hiba.")
+		}
+	}
+
+	return c.Render(http.StatusOK, "task_archive.html", roots)
 }

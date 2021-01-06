@@ -3,7 +3,6 @@ package web
 import (
 	"database/sql"
 	errors2 "errors"
-	"fmt"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
@@ -47,7 +46,6 @@ func (s *Server) currentUser(c echo.Context) (*models.User, error) {
 	if _, ok := storage.Values["id"]; !ok {
 		return nil, nil
 	}
-
 	u, err = models.Users(Where("id=?", storage.Values["id"])).One(s.db)
 	return u, err
 }
@@ -172,11 +170,11 @@ func (s *Server) postUserRegister(c echo.Context) error {
 		_, err = tx.Exec("INSERT INTO users (name,password,email,activation_key,role) VALUES ($1,$2,$3,$4,$5)", c.FormValue("name"), hashed, c.FormValue("email"), key, "user")
 		mustPanic(err)
 
-		m := Mail{}
+		/*m := Mail{}
 		m.Recipients = []string{c.FormValue("email")}
 		m.Message = fmt.Sprintf(`Kedves %s!<br> Köszönjük a registrációt. Aktiváló link: <a href="http://`+s.Hostname+`/user/activate/%s/%s">http://`+s.Hostname+`/user/activate/%s/%s</a>`, c.FormValue("name"), c.FormValue("name"), key, c.FormValue("name"), key)
 		m.Subject = "Regisztráció aktiválása"
-		mustPanic(s.SendMail(m))
+		mustPanic(s.SendMail(m))*/
 
 		mustPanic(tx.Commit())
 	}
