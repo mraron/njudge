@@ -22,6 +22,7 @@ import (
 	_ "github.com/mraron/njudge/utils/language/golang"
 	_ "github.com/mraron/njudge/utils/language/julia"
 	_ "github.com/mraron/njudge/utils/language/octave"
+	_ "github.com/mraron/njudge/utils/language/pascal"
 	_ "github.com/mraron/njudge/utils/language/python3"
 	_ "github.com/mraron/njudge/utils/language/zip"
 
@@ -50,10 +51,10 @@ type Server struct {
 	CookieSecret string
 
 	GoogleAuth struct {
-		Enabled bool
+		Enabled   bool
 		ClientKey string
-		Secret string
-		Callback string
+		Secret    string
+		Callback  string
 	}
 
 	MailAccount         string

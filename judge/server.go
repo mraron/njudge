@@ -29,6 +29,7 @@ import (
 	_ "github.com/mraron/njudge/utils/language/golang"
 	_ "github.com/mraron/njudge/utils/language/julia"
 	_ "github.com/mraron/njudge/utils/language/octave"
+	_ "github.com/mraron/njudge/utils/language/pascal"
 	_ "github.com/mraron/njudge/utils/language/python3"
 )
 
@@ -50,11 +51,11 @@ type Server struct {
 	ProblemList []string
 	Uptime      time.Duration
 
-	sandboxProvider   *language.SandboxProvider
-	secretKey string
-	problems  map[string]problems.Problem
-	start     time.Time
-	queue     chan Submission
+	sandboxProvider *language.SandboxProvider
+	secretKey       string
+	problems        map[string]problems.Problem
+	start           time.Time
+	queue           chan Submission
 }
 
 func New(id, host, port, problemsDir, logDir, secretKey string) *Server {

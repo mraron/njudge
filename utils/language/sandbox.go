@@ -45,6 +45,7 @@ type Sandbox interface {
 	Stdin(io.Reader) Sandbox
 	Stderr(io.Writer) Sandbox
 	Stdout(io.Writer) Sandbox
+	MapDir(string, string, []string, bool) Sandbox
 	WorkingDirectory(string) Sandbox
 	Verbose() Sandbox
 	Run(string, bool) (Status, error)
@@ -71,7 +72,7 @@ func (sp *SandboxProvider) Get() (Sandbox, error) {
 func (sp *SandboxProvider) MustGet() Sandbox {
 	if s, err := sp.Get(); err != nil {
 		panic(err)
-	}else {
+	} else {
 		return s
 	}
 }
@@ -98,8 +99,8 @@ func NewIsolateSandbox(id int) Sandbox {
 	return &IsolateSandbox{id: id}
 }
 
-func (s* IsolateSandbox) Id() string {
-	return "isolate"+strconv.Itoa(s.id)
+func (s *IsolateSandbox) Id() string {
+	return "isolate" + strconv.Itoa(s.id)
 }
 
 func (s *IsolateSandbox) Pwd() string {
@@ -129,6 +130,9 @@ func (s *IsolateSandbox) Init(l *log.Logger) error {
 	s.Cleanup()
 
 	args := []string{"--cg", "-b", strconv.Itoa(s.id), "--init"}
+	s.MapDir("/etc/alternatives", "/etc/alternatives", []string{}, true)
+	s.MapDir("/usr/share", "/usr/share", []string{}, true)
+	s.MapDir("/usr/lib", "/usr/lib", []string{}, true)
 
 	s.logger.Print("Running init: isolate with args ", args)
 
@@ -182,7 +186,7 @@ func (s *IsolateSandbox) Env() Sandbox {
 func (s *IsolateSandbox) TimeLimit(tl time.Duration) Sandbox {
 	tl = tl / time.Millisecond
 	s.argv = append(s.argv, fmt.Sprintf("--time=%d.%d", tl/1000, tl%1000))
-	s.argv = append(s.argv, fmt.Sprintf("--wall-time=%d.%d",(2*tl+1000)/1000, (2*tl+1000)%1000))
+	s.argv = append(s.argv, fmt.Sprintf("--wall-time=%d.%d", (2*tl+1000)/1000, (2*tl+1000)%1000))
 
 	return s
 }
@@ -212,6 +216,22 @@ func (s *IsolateSandbox) Stderr(writer io.Writer) Sandbox {
 	return s
 }
 
+func (s *IsolateSandbox) MapDir(src string, dest string, opts []string, checkExists bool) Sandbox {
+	if checkExists {
+		if _, err := os.Stat(src); os.IsNotExist(err) {
+			return s
+		}
+	}
+
+	format := fmt.Sprintf("--dir=%s=%s", src, dest)
+	for _, opt := range opts {
+		format += ":" + opt
+	}
+	s.argv = append(s.argv, format)
+
+	return s
+}
+
 func (s *IsolateSandbox) WorkingDirectory(wd string) Sandbox {
 	s.wdir = wd
 	return s
@@ -234,7 +254,6 @@ func (s *IsolateSandbox) Run(prg string, needStatus bool) (Status, error) {
 	s.argv = append([]string{"--cg", "--cg-timing", "-b", strconv.Itoa(s.id), "-M", metafile}, s.argv...)
 	s.argv = append(s.argv, "--run", "--")
 	s.argv = append(s.argv, splt...)
-
 	stderr := &bytes.Buffer{}
 
 	s.logger.Print("Running isolate with args ", s.argv)
@@ -257,9 +276,9 @@ func (s *IsolateSandbox) Run(prg string, needStatus bool) (Status, error) {
 		str, st = stderr.String(), -1
 		if strings.Contains(str, "Caught fatal signal") {
 			fmt.Sscanf(str, "Caught fatal signal %d", &st)
-		}else if(strings.Contains(str, "Exited with error status")) {
+		} else if strings.Contains(str, "Exited with error status") {
 			fmt.Sscanf(str[strings.Index(str, "Exited with error status"):], "Exited with error status %d", &st)
-		}else {
+		} else {
 			s.logger.Print("unknown error status format: ", str)
 		}
 
