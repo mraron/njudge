@@ -110,6 +110,7 @@ func (s *Server) Submit(sub Submission) error {
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -200,6 +201,7 @@ func (s *Server) runJudger() {
 		f, err := os.Create(filepath.Join(s.LogDir, fmt.Sprintf("judger.%d", sub.Id)))
 		if err != nil {
 			log.Print("judger: can't create logfile", err)
+			f.Close()
 			continue
 		}
 
@@ -208,8 +210,11 @@ func (s *Server) runJudger() {
 		err = Judge(logger, s.problems[sub.Problem], sub.Source, language.Get(sub.Language), s.sandboxProvider, NewHTTPCallback(sub.CallbackUrl))
 		if err != nil {
 			log.Print("judger: error while running Judge", err)
+			f.Close()
 			continue
 		}
+
+		f.Close()
 	}
 }
 

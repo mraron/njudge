@@ -57,7 +57,7 @@ func (b Batch) Run(jinfo problems.JudgingInformation, sp *language.SandboxProvid
 		skeleton       = jinfo.StatusSkeleton()
 		binaryContents []byte
 		err            error
-		s language.Sandbox
+		s              language.Sandbox
 	)
 
 	s, err = sp.Get()
@@ -121,6 +121,7 @@ func (b Batch) Run(jinfo problems.JudgingInformation, sp *language.SandboxProvid
 						tc.VerdictName = problems.VERDICT_XX
 						return ans, err
 					}
+					defer testcase.Close()
 
 					stdout := &bytes.Buffer{}
 
@@ -129,6 +130,7 @@ func (b Batch) Run(jinfo problems.JudgingInformation, sp *language.SandboxProvid
 						tc.VerdictName = problems.VERDICT_XX
 						return ans, err
 					}
+					defer answerFile.Close()
 
 					answerContents, err := ioutil.ReadAll(answerFile)
 					if err != nil {

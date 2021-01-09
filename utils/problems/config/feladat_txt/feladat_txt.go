@@ -17,21 +17,20 @@ import (
 )
 
 type Problem struct {
-	Path string
-	ShortName string
-	Title string
-	StatementList []problems.Content
+	Path           string
+	ShortName      string
+	Title          string
+	StatementList  []problems.Content
 	AttachmentList []problems.Attachment
-	TestCount int
-	MemoryLimitKB int
-	TimeLimitS float64
-	SubtaskCount int
-	Points []int
+	TestCount      int
+	MemoryLimitKB  int
+	TimeLimitS     float64
+	SubtaskCount   int
+	Points         []int
 
-	InputPathPattern string
+	InputPathPattern  string
 	AnswerPathPattern string
 }
-
 
 func (p Problem) Name() string {
 	return p.ShortName
@@ -54,11 +53,11 @@ func (p Problem) PDFStatements() []problems.Content {
 }
 
 func (p Problem) MemoryLimit() int {
-	return 1024*p.MemoryLimitKB
+	return 1024 * p.MemoryLimitKB
 }
 
 func (p Problem) TimeLimit() int {
-	return int(p.TimeLimitS*float64(1000))
+	return int(p.TimeLimitS * float64(1000))
 }
 
 func (p Problem) InputOutputFiles() (string, string) {
@@ -96,13 +95,13 @@ func (p Problem) StatusSkeleton() problems.Status {
 	testset := &ans.Feedback[len(ans.Feedback)-1]
 
 	tcbygroup := make(map[string][]problems.Testcase)
-	for ind := 0; ind < p.TestCount; ind ++ {
+	for ind := 0; ind < p.TestCount; ind++ {
 		tc := problems.Testcase{}
 		tc.InputPath, tc.AnswerPath = fmt.Sprintf(p.InputPathPattern, ind+1), fmt.Sprintf(p.AnswerPathPattern, ind+1)
 		tc.Index = ind + 1
 
 		points_sum := 0.0
-		for x := 0; x < p.SubtaskCount; x ++ {
+		for x := 0; x < p.SubtaskCount; x++ {
 			points_sum = points_sum + float64(p.Points[x*p.TestCount+ind])
 		}
 
@@ -124,7 +123,7 @@ func (p Problem) StatusSkeleton() problems.Status {
 	group.Scoring = problems.SCORING_SUM
 
 	for _, tc := range tcbygroup[""] {
-		testcase := problems.Testcase{idx, tc.InputPath, "",tc.AnswerPath, "tests", "base", problems.VERDICT_DR, float64(0.0), float64(tc.MaxScore), "-", "-", "-", 0 * time.Millisecond, 0, time.Duration(p.TimeLimit()) * time.Millisecond, p.MemoryLimit()}
+		testcase := problems.Testcase{idx, tc.InputPath, "", tc.AnswerPath, "tests", "base", problems.VERDICT_DR, float64(0.0), float64(tc.MaxScore), "-", "-", "-", 0 * time.Millisecond, 0, time.Duration(p.TimeLimit()) * time.Millisecond, p.MemoryLimit()}
 		group.Testcases = append(group.Testcases, testcase)
 		testset.Testcases = append(testset.Testcases, testcase)
 
@@ -133,7 +132,6 @@ func (p Problem) StatusSkeleton() problems.Status {
 
 	return ans
 }
-
 
 func (p Problem) Check(tc *problems.Testcase) error {
 	testind := strconv.Itoa(tc.Index)
@@ -160,14 +158,14 @@ func (p Problem) Check(tc *problems.Testcase) error {
 
 	tc.CheckerOutput = problems.Truncate(output.String())
 
-	if err == nil && cmd.ProcessState.Success() {
+	if err == nil || strings.HasPrefix(err.Error(), "exit status") {
 		spltd := strings.Split(output.String(), ":")
 
 		score := 0.0
-		for i := 0; i < p.SubtaskCount; i ++ {
+		for i := 0; i < p.SubtaskCount; i++ {
 			spltd[i] = strings.TrimSpace(spltd[i])
 			curr := strings.Split(spltd[i], ";")
-			fmt.Println(curr)
+
 			if strings.TrimSpace(curr[len(curr)-2]) == "1" {
 				score = score + float64(p.Points[i*p.TestCount+tc.Index-1])
 			}
@@ -176,9 +174,9 @@ func (p Problem) Check(tc *problems.Testcase) error {
 		tc.Score = score
 		if score == tc.MaxScore {
 			tc.VerdictName = problems.VERDICT_AC
-		}else if score != 0.0 {
+		} else if score != 0.0 {
 			tc.VerdictName = problems.VERDICT_PC
-		}else {
+		} else {
 			tc.VerdictName = problems.VERDICT_WA
 		}
 
@@ -205,6 +203,7 @@ func parser(path string) (problems.Problem, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
 
 	br := bufio.NewReader(f)
 
@@ -221,7 +220,7 @@ func parser(path string) (problems.Problem, error) {
 		if err == nil {
 			if s != "\n" {
 				str := strings.TrimSpace(s)
-				lst = append(lst,  str[:len(str)-1])
+				lst = append(lst, str[:len(str)-1])
 			}
 		}
 	}
@@ -263,9 +262,9 @@ func parser(path string) (problems.Problem, error) {
 	}
 	ind++
 
-	p.Points = make([]int, p.SubtaskCount * p.TestCount)
+	p.Points = make([]int, p.SubtaskCount*p.TestCount)
 
-	for i := 0; i < p.SubtaskCount * p.TestCount; i ++ {
+	for i := 0; i < p.SubtaskCount*p.TestCount; i++ {
 		p.Points[i], err = strconv.Atoi(lst[ind])
 		if err != nil {
 			return nil, err
@@ -277,6 +276,7 @@ func parser(path string) (problems.Problem, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer feladat_pdf.Close()
 
 	cont, err := ioutil.ReadAll(feladat_pdf)
 	if err != nil {

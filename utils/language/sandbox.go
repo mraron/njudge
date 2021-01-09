@@ -312,6 +312,7 @@ func (s *IsolateSandbox) Run(prg string, needStatus bool) (Status, error) {
 
 		return s.st, err
 	}
+	defer f.Close()
 
 	s.logger.Print("Ok now, getting status")
 

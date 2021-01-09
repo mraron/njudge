@@ -24,7 +24,6 @@ import (
 	"time"
 )
 
-//@TODO add njudge prefix to non standard problem xml additions
 //@TODO validate group/test points and create a logs directory maybe for problem parsin logs
 
 const htmlTemplate = `<link href="problem-statement.css" rel="stylesheet" type="text/css"><div class="problem-statement">
@@ -61,8 +60,6 @@ type SampleTest struct {
 	Input  string
 	Output string
 }
-
-// @TODO: add scoring, explore what is it like
 
 type JSONStatement struct {
 	Name        string
@@ -155,7 +152,7 @@ type Assets struct {
 	Attachments []Attachment `xml:"attachments>attachment"`
 	Stubs       []Stub       `xml:"stubs>stub"`
 	Checker     Checker      `xml:"checker"`
-	Interactor Interactor `xml:"interactor"`
+	Interactor  Interactor   `xml:"interactor"`
 }
 
 type Problem struct {
@@ -291,7 +288,7 @@ func (p Problem) StatusSkeleton() problems.Status {
 			group.Name = grp.Name
 			if grp.PointsPolicy == "complete-group" {
 				group.Scoring = problems.SCORING_GROUP
-			}else {
+			} else {
 				group.Scoring = problems.SCORING_SUM
 			}
 
@@ -380,6 +377,7 @@ func parser(path string) (problems.Problem, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
 
 	p := Problem{}
 
@@ -403,6 +401,7 @@ func parser(path string) (problems.Problem, error) {
 			if err != nil {
 				return nil, err
 			}
+			defer propertiesFile.Close()
 
 			dec := json.NewDecoder(propertiesFile)
 			if err := dec.Decode(&jsonstmt); err != nil {

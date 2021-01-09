@@ -25,6 +25,8 @@ type Callbacker interface {
 	Callback(string, problems.Status, bool) error
 }
 
+//@TODO Create cached http callback
+
 type HTTPCallback struct {
 	url string
 }
@@ -48,6 +50,7 @@ func (h HTTPCallback) Callback(test string, status problems.Status, done bool) e
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		return errors.New(fmt.Sprint("Callback error: ", resp.Status, resp.Body))
@@ -82,6 +85,7 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 		logger.Print("Error while reopening file:", err)
 		return err
 	}
+	defer f.Close()
 
 	//@TODO do smth better
 	sandboxes := language.NewSandboxProvider()
@@ -107,7 +111,7 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 	logger.Print("Trying to compile")
 
 	compileSandbox := sandboxes.MustGet()
-	bin, err := tt.Compile(p,compileSandbox , lang, f, &stderr)
+	bin, err := tt.Compile(p, compileSandbox, lang, f, &stderr)
 	sandboxes.Put(compileSandbox)
 
 	if err != nil {
@@ -157,7 +161,6 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 	}
 
 	os.Remove(fname)
-	f.Close()
 
 	return c.Callback("", st, true)
 }

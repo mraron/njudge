@@ -13,7 +13,6 @@ import (
 	"syscall"
 )
 
-
 type Communication struct {
 }
 
@@ -62,6 +61,7 @@ func (b Communication) Run(jinfo problems.JudgingInformation, sp *language.Sandb
 		ans.CompilerOutput = "Can't find interactor"
 		return ans, err
 	}
+	defer f.Close()
 
 	interactorSandbox.CreateFile("interactor", f)
 	interactorSandbox.MakeExecutable("interactor")
@@ -122,6 +122,7 @@ func (b Communication) Run(jinfo problems.JudgingInformation, sp *language.Sandb
 						tc.VerdictName = problems.VERDICT_XX
 						return ans, err
 					}
+					defer testFile.Close()
 
 					err = interactorSandbox.CreateFile("inp", testFile)
 					if err != nil {
@@ -136,6 +137,7 @@ func (b Communication) Run(jinfo problems.JudgingInformation, sp *language.Sandb
 						tc.VerdictName = problems.VERDICT_XX
 						return ans, err
 					}
+					defer answerFile.Close()
 
 					answerContents, err := ioutil.ReadAll(answerFile)
 					if err != nil {
@@ -145,8 +147,8 @@ func (b Communication) Run(jinfo problems.JudgingInformation, sp *language.Sandb
 
 					var res language.Status
 
-					os.Remove("/tmp/fifo1"+interactorSandbox.Id())
-					os.Remove("/tmp/fifo2"+interactorSandbox.Id())
+					os.Remove("/tmp/fifo1" + interactorSandbox.Id())
+					os.Remove("/tmp/fifo2" + interactorSandbox.Id())
 
 					err = syscall.Mkfifo(filepath.Join("/tmp", "fifo1"+interactorSandbox.Id()), 0766)
 					if err != nil {
@@ -180,11 +182,11 @@ func (b Communication) Run(jinfo problems.JudgingInformation, sp *language.Sandb
 						// @TODO check res and err of interactor
 						interactorSandbox.Stdin(fifo1).Stdout(fifo2).Stderr(os.Stderr).TimeLimit(tc.TimeLimit).MemoryLimit(tc.MemoryLimit).Run("interactor inp out", true)
 
-						done<-1
+						done <- 1
 					}()
 
 					res, err = lang.Run(s, bytes.NewReader(binaryContents), fifo2, fifo1, tc.TimeLimit, tc.MemoryLimit)
-					<- done
+					<-done
 
 					if err != nil {
 						tc.VerdictName = problems.VERDICT_XX
@@ -262,4 +264,3 @@ func (b Communication) Run(jinfo problems.JudgingInformation, sp *language.Sandb
 func init() {
 	problems.RegisterTaskType(Communication{})
 }
-
