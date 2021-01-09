@@ -151,6 +151,7 @@ type taskArchiveTreeNode struct {
 	Children []*taskArchiveTreeNode
 }
 
+//@TODO optimize this to use less queries
 func (s *Server) getTaskArchive(c echo.Context) error {
 	lst, err := models.ProblemCategories(Where("parent_id IS NULL")).All(s.db)
 	if err != nil {
@@ -161,7 +162,7 @@ func (s *Server) getTaskArchive(c echo.Context) error {
 
 	var dfs func(category *models.ProblemCategory, node *taskArchiveTreeNode) error
 	dfs = func(root *models.ProblemCategory, tree *taskArchiveTreeNode) error {
-		problems, err := models.ProblemRels(Where("category_id = ?", root.ID)).All(s.db)
+		problems, err := models.ProblemRels(Where("category_id = ?", root.ID), OrderBy("problem")).All(s.db)
 		if err != nil {
 			return err
 		}
@@ -170,7 +171,8 @@ func (s *Server) getTaskArchive(c echo.Context) error {
 			tree.Children = append(tree.Children, &taskArchiveTreeNode{"problem", translateContent("hungarian", s.getProblem(problem.Problem).Titles()).String(), fmt.Sprintf("/problemset/%s/%s/", problem.Problemset, problem.Problem), make([]*taskArchiveTreeNode, 0)})
 		}
 
-		subcats, err := models.ProblemCategories(Where("parent_id = ?", root.ID)).All(s.db)
+		//@TODO make a way to control sorting order from db (add migrations etc.)
+		subcats, err := models.ProblemCategories(Where("parent_id = ?", root.ID), OrderBy("name")).All(s.db)
 		if err != nil {
 			return err
 		}
