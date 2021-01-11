@@ -229,7 +229,7 @@
 {{define "submissionRow"}}
 <tr id="submission{{.ID}}">
     <td><a href="/submission/{{.ID}}">{{.ID}}</a></td>
-    <td>{{.Submitted.Year}}. {{fixedlen (month2int .Submitted.Month) 2}}. {{fixedlen .Submitted.Day 2}} {{fixedlen .Submitted.Hour 2}}:{{fixedlen .Submitted.Minute 2}}:{{fixedlen .Submitted.Second 2}}</td>
+    <td>{{.Submitted.Local.Year}}. {{fixedlen (month2int .Submitted.Local.Month) 2}}. {{fixedlen .Submitted.Local.Day 2}} {{fixedlen .Submitted.Local.Hour 2}}:{{fixedlen .Submitted.Local.Minute 2}}:{{fixedlen .Submitted.Local.Second 2}}</td>
     <td>{{.User.OneG.Name}}</td>
     <td><a href="/problemset/{{.Problemset}}/{{.Problem}}/">{{translateContent "hungarian" (problem .Problem).Titles}}</a></td>
     <td>{{.Language}}</td>

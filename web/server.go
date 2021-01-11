@@ -222,6 +222,7 @@ func (s *Server) runGlue() {
 				verdict = VERDICT_CE
 			}
 
+			//@TODO add score
 			if _, err := s.db.Exec("UPDATE submissions SET verdict=$1, status=$2, ontest=NULL, judged=$3 WHERE id=$4", verdict, st.Status, time.Now(), id); err != nil {
 				return s.internalError(c, err, "err")
 			}
@@ -273,6 +274,14 @@ func (s *Server) runJudger() {
 }
 
 func (s *Server) Run() {
+	//@TODO add a member to Server
+	loc, err := time.LoadLocation("Europe/Budapest")
+	if err != nil {
+		panic(err)
+	}
+	time.Local = loc
+	boil.SetLocation(loc)
+
 	e := echo.New()
 	store := sessions.NewCookieStore([]byte(s.CookieSecret))
 
