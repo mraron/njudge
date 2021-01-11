@@ -16,11 +16,66 @@ import (
 	"time"
 )
 
+func (s *Server) Submit(uid int, problemset, problem, language string, source []byte) (int, error) {
+	var (
+		tx  *sql.Tx
+		id  int
+		err error
+	)
+	mustPanic := func(err error) {
+		if err != nil {
+			panic(err)
+		}
+	}
+	ok := true
+
+	transaction := func() {
+		defer func() {
+			if p := recover(); p != nil {
+				tx.Rollback()
+				ok = false
+				err = p.(error)
+			}
+		}()
+
+		tx, err = s.db.Begin()
+		mustPanic(err)
+
+		id = 0
+		res, err := tx.Query("INSERT INTO submissions (status,\"user_id\",verdict,ontest,submitted,judged,problem,language,private,problemset,source,started) VALUES ($1,$2,$3,NULL,$4,NULL,$5,$6,false,$7, $8,false) RETURNING id", problems.Status{}, uid, VERDICT_UP, time.Now(), s.getProblem(problem).Name(), language, problemset, source)
+
+		mustPanic(err)
+
+		res.Next()
+
+		err = res.Scan(&id)
+		mustPanic(err)
+
+		err = res.Close()
+		mustPanic(err)
+
+		fs, err := os.Create(filepath.Join(s.SubmissionsDir, strconv.Itoa(int(id))))
+		mustPanic(err)
+
+		_, err = fs.Write([]byte(source))
+		mustPanic(err)
+
+		err = tx.Commit()
+		mustPanic(err)
+	}
+
+	if transaction(); err != nil {
+		return -1, err
+	}
+
+	return id, nil
+}
+
 func (s *Server) postProblemsetSubmit(c echo.Context) error {
 	var (
 		u   *models.User
 		err error
-		tx  *sql.Tx
+		id  int
 		p   problems.Problem
 		ok  bool
 	)
@@ -63,53 +118,11 @@ func (s *Server) postProblemsetSubmit(c echo.Context) error {
 		return s.internalError(c, err, "Belső hiba #2")
 	}
 
-	mustPanic := func(err error) {
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	ok = true
-
-	transaction := func() {
-		defer func() {
-			if p := recover(); p != nil {
-				tx.Rollback()
-				ok = false
-				err = p.(error)
-			}
-		}()
-
-		tx, err = s.db.Begin()
-		mustPanic(err)
-
-		last := 0
-		res, err := tx.Query("INSERT INTO submissions (status,\"user_id\",verdict,ontest,submitted,judged,problem,language,private,problemset,source,started) VALUES ($1,$2,$3,NULL,$4,NULL,$5,$6,false,$7, $8,false) RETURNING id", problems.Status{}, u.ID, VERDICT_UP, time.Now(), s.getProblem(c.FormValue("problem")).Name(), c.FormValue("language"), c.Get("problemset"), contents)
-		mustPanic(err)
-
-		res.Next()
-
-		err = res.Scan(&last)
-		mustPanic(err)
-
-		err = res.Close()
-		mustPanic(err)
-
-		fs, err := os.Create(filepath.Join(s.SubmissionsDir,  strconv.Itoa(int(last))))
-		mustPanic(err)
-
-		_, err = fs.Write(contents)
-		mustPanic(err)
-
-		err = tx.Commit()
-		mustPanic(err)
-	}
-
-	if transaction(); !ok {
+	if id, err = s.Submit(u.ID, c.Get("problemset").(string), s.getProblem(c.FormValue("problem")).Name(), languageName, contents); err != nil {
 		return s.internalError(c, err, "Belső hiba #4")
 	}
 
-	return c.Redirect(http.StatusFound, "/problemset/status")
+	return c.Redirect(http.StatusFound, "/problemset/status#submission"+strconv.Itoa(id))
 }
 
 func (s *Server) getSubmission(c echo.Context) error {

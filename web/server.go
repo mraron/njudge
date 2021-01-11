@@ -12,7 +12,6 @@ import (
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/providers/google"
 	"github.com/mraron/njudge/judge"
-
 	"github.com/mraron/njudge/utils/problems"
 	_ "github.com/mraron/njudge/utils/problems/config/feladat_txt"
 	_ "github.com/mraron/njudge/utils/problems/config/polygon"
@@ -96,6 +95,20 @@ func (s *Server) getProblemExists(name string) (problems.Problem, bool) {
 	return p, ok
 }
 
+func (s *Server) AddProblem(dir string) (problems.Problem, error) {
+	if s.problems == nil {
+		s.problems = make(map[string]problems.Problem)
+	}
+
+	path := filepath.Join(s.ProblemsDir, dir)
+	p, err := problems.Parse(path)
+	if err == nil {
+		s.problems[p.Name()] = p
+	}
+
+	return p, err
+}
+
 func (s *Server) runUpdateProblems() {
 	for {
 		s.problemsMutex.Lock()
@@ -107,17 +120,9 @@ func (s *Server) runUpdateProblems() {
 		if err != nil {
 			panic(err)
 		}
-
-		pList := make([]string, 0)
-
 		for _, f := range files {
 			if f.IsDir() {
-				path := filepath.Join(s.ProblemsDir, f.Name())
-				p, err := problems.Parse(path)
-				if err == nil {
-					s.problems[p.Name()] = p
-					pList = append(pList, p.Name())
-				} else {
+				if _, err := s.AddProblem(f.Name()); err != nil {
 					log.Print(err)
 				}
 			}

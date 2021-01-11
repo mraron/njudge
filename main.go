@@ -7,6 +7,7 @@ import (
 	"github.com/mraron/njudge/judge"
 	"github.com/mraron/njudge/web"
 	"github.com/urfave/cli"
+	"io/ioutil"
 	"log"
 	"os"
 
@@ -36,8 +37,8 @@ func main() {
 			Usage: "start a judging server",
 			Flags: []cli.Flag{
 				cli.StringFlag{
-					Name:  "config, c",
-					Usage: "Load configuration from `FILE`",
+					Name:     "config, c",
+					Usage:    "Load configuration from `FILE`",
 					Required: true,
 				},
 			},
@@ -69,8 +70,8 @@ func main() {
 			Usage: "start a web server",
 			Flags: []cli.Flag{
 				cli.StringFlag{
-					Name:  "config, c",
-					Usage: "Load configuration from `FILE`",
+					Name:     "config, c",
+					Usage:    "Load configuration from `FILE`",
 					Required: true,
 				},
 			},
@@ -103,20 +104,20 @@ func main() {
 			Usage: "run migrations",
 			Flags: []cli.Flag{
 				cli.StringFlag{
-					Name:  "config,c",
-					Usage: "Load the web's configuration from `FILE`",
+					Name:     "config,c",
+					Usage:    "Load the web's configuration from `FILE`",
 					Required: true,
 				},
 				cli.BoolFlag{
-					Name: "up",
+					Name:  "up",
 					Usage: "runs up migrations",
 				},
 				cli.BoolFlag{
-					Name: "down",
+					Name:  "down",
 					Usage: "runs down migrations",
 				},
 				cli.IntFlag{
-					Name: "steps",
+					Name:  "steps",
 					Usage: "runs `x` up/down migrations depending on the positivity",
 				},
 			},
@@ -154,18 +155,89 @@ func main() {
 					if err != nil {
 						return err
 					}
-				}else if c.Bool("down") {
+				} else if c.Bool("down") {
 					err = m.Down()
 					if err != nil {
 						return err
 					}
-				}else if c.Int("steps") != 0 {
+				} else if c.Int("steps") != 0 {
 					err = m.Steps(c.Int("steps"))
 					if err != nil {
 						return err
 					}
 				}
 
+				return nil
+			},
+		},
+		{
+			Name:  "submit",
+			Usage: "submit",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:     "config, c",
+					Usage:    "Load configuration from `FILE`",
+					Required: true,
+				},
+				cli.IntFlag{
+					Name:     "user, u",
+					Usage:    "ID of user on behalf we make the submission",
+					Required: true,
+				},
+				cli.StringFlag{
+					Name:     "problemset, ps",
+					Usage:    "Problemset of problem",
+					Required: true,
+				},
+				cli.StringFlag{
+					Name:     "problem, p",
+					Usage:    "Problem",
+					Required: true,
+				},
+				cli.StringFlag{
+					Name:     "language, l",
+					Usage:    "Language",
+					Required: true,
+				},
+				cli.StringFlag{
+					Name:     "file, f",
+					Usage:    "File to submit",
+					Required: true,
+				},
+			},
+			Action: func(c *cli.Context) error {
+				name := c.String("config")
+				if len(name) == 0 {
+					return errors.New("config file is required")
+				}
+
+				f, err := os.Open(name)
+				if err != nil {
+					return err
+				}
+
+				server := &web.Server{}
+
+				dec := json.NewDecoder(f)
+
+				err = dec.Decode(server)
+				if err != nil {
+					return err
+				}
+
+				src, err := ioutil.ReadFile(c.String("file"))
+				if err != nil {
+					return err
+				}
+
+				server.ConnectToDB()
+				server.AddProblem(c.String("problem"))
+				id, err := server.Submit(c.Int("user"), c.String("problemset"), c.String("problem"), c.String("language"), src)
+				if err != nil {
+					return err
+				}
+
+				log.Print("submission received with id ", id)
 				return nil
 			},
 		},

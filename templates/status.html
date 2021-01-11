@@ -11,4 +11,15 @@
         </tbody>
     </table>
 </div>
+<script type="application/javascript">
+    if(window.location.hash) {
+        var hash=window.location.hash.substring(1);
+        var row=document.getElementById(hash);
+        if(row!==null) {
+            row.classList.toggle("table-active");
+        }
+    }
+
+
+</script>
 {{template "footer" .}}
