@@ -94,4 +94,6 @@ func init() {
 	AddRule("api/v1/submissions", ActionDelete, Role("admin"))
 	AddRule("api/v1/submissions", ActionEdit, Role("admin"))
 
+	AddRule("submissions/rejudge", ActionView, Role("admin"))
+	AddRule("submissions/rejudge", ActionCreate, Role("admin"))
 }

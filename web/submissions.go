@@ -6,6 +6,7 @@ import (
 	"github.com/mraron/njudge/utils/problems"
 	"github.com/mraron/njudge/web/models"
 	"github.com/mraron/njudge/web/roles"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"io/ioutil"
@@ -255,4 +256,23 @@ func (s *Server) putAPISubmission(c echo.Context) error {
 	return c.JSON(http.StatusOK, struct {
 		Message string `json:"message"`
 	}{"updated"})
+}
+
+func (s *Server) getSubmissionRejudge(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return s.internalError(c, err, "can't parse id")
+	}
+
+	sub, err := models.Submissions(Where("id = ?", id)).One(s.db)
+	if err != nil {
+		return s.internalError(c, err, "can't find submission")
+	}
+
+	sub.ID = id
+	sub.Judged = null.Time{Valid: false}
+	sub.Started = false
+	sub.Update(s.db, boil.Infer())
+
+	return c.Redirect(http.StatusFound, "/submission/"+strconv.Itoa(id))
 }

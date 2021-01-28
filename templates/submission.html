@@ -1,5 +1,12 @@
 {{template "header" .}}
 
+{{if logged .Context}}
+{{if canView (user .Context).Role "submissions/rejudge"}}
+<a class="btn btn-secondary" href="/submission/rejudge/{{.Data.ID}}"><i class="fa fa-sync"></i> Rejudge</a>
+<br>
+<br>
+{{end}}
+{{end}}
 
 <div class="table-responsive">
     <table class="table table-bordered">

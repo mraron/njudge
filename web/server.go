@@ -316,6 +316,7 @@ func (s *Server) Run() {
 
 	e.Static("/static", "public")
 	e.GET("/submission/:id", s.getSubmission)
+	e.GET("/submission/rejudge/:id", s.getSubmissionRejudge)
 	e.GET("/task_archive", s.getTaskArchive)
 
 	ps := e.Group("/problemset", func(next echo.HandlerFunc) echo.HandlerFunc {
