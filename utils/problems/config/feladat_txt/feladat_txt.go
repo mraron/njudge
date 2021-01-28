@@ -162,7 +162,7 @@ func (p Problem) Check(tc *problems.Testcase) error {
 		spltd := strings.Split(output.String(), ":")
 
 		score := 0.0
-		for i := 0; i < p.SubtaskCount; i++ {
+		for i := 0; i < len(spltd); i++ {
 			spltd[i] = strings.TrimSpace(spltd[i])
 			curr := strings.Split(spltd[i], ";")
 
