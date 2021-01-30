@@ -10,7 +10,6 @@ import (
 	"mime"
 	"net/http"
 	"path/filepath"
-	"strconv"
 	"strings"
 )
 
@@ -24,10 +23,10 @@ func (s *Server) getProblemsetMain(c echo.Context) error {
 	}
 
 	if len(lst) == 0 {
-		return c.Render(http.StatusNotFound, "404.html", "Nem található.")
+		return c.Render(http.StatusNotFound, "404.gohtml", "Nem található.")
 	}
 
-	return c.Render(http.StatusOK, "problemsetmain.html", lst)
+	return c.Render(http.StatusOK, "problemset_list.gohtml", lst)
 }
 
 func (s *Server) getProblemsetProblem(c echo.Context) error {
@@ -53,7 +52,7 @@ func (s *Server) getProblemsetProblem(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, nil)
 	}
 
-	return c.Render(http.StatusOK, "problemsetproblem.html", s.getProblem(problem))
+	return c.Render(http.StatusOK, "problemset_problem.gohtml", s.getProblem(problem))
 }
 
 func (s *Server) getProblemsetProblemPDFLanguage(c echo.Context) error {
@@ -118,89 +117,6 @@ func (s *Server) getProblemsetProblemAttachment(c echo.Context) error {
 	return c.String(http.StatusNotFound, "no such attachment")
 }
 
-type statusPage struct {
-	Name string
-	Active bool
-	Disabled bool
-	Url string
-}
-func (s *Server) getProblemsetStatus(c echo.Context) error {
-	var (
-		sbs []*models.Submission
-		err error
-		cnt int64
-	)
-
-	ac := c.QueryParam("ac")
-	problem_set := c.QueryParam("problem_set")
-	problem := c.QueryParam("problem")
-	page, err := strconv.Atoi(c.QueryParam("page"))
-	if  err != nil || page<=0 {
-		page = 1
-	}
-
-	per_page := 20
-	pagination := []QueryMod{Limit(per_page), Offset((page-1)*per_page)}
-
-	query := []QueryMod{}
-	if problem == "" {
-		query = []QueryMod{OrderBy("id DESC")}
-	} else {
-		if ac == "1" {
-			query = []QueryMod{OrderBy("id DESC"), Where("verdict = 0"), Where("problem = ?", problem), Where("problemset = ?", problem_set)}
-		} else {
-			query = []QueryMod{OrderBy("id DESC"), Where("problem = ?", problem), Where("problemset = ?", problem_set)}
-		}
-	}
-
-	sbs, err = models.Submissions(append(pagination, query...)...).All(s.db)
-	if err != nil {
-		return s.internalError(c, err, "Belső hiba 1")
-	}
-
-	cnt, err = models.Submissions(query[1:]...).Count(s.db)
-	if err != nil {
-		return s.internalError(c, err, "Belső hiba 2")
-	}
-
-	qu := c.Request().URL.Query()
-
-
-	pageCnt := (int(cnt)+per_page-1)/per_page
-	pages := make([]statusPage, pageCnt+2)
-	pages[0] = statusPage{"Előző", false, true, "#"}
-	if page>1 {
-		qu.Set("page", strconv.Itoa(page-1))
-
-		pages[0].Disabled = false
-		pages[0].Url = "?"+qu.Encode()
-	}
-	for i := 1; i < len(pages)-1; i++ {
-		qu.Set("page", strconv.Itoa(i))
-		pages[i] = statusPage{strconv.Itoa(i), false, false, "?"+qu.Encode()}
-		if i==page {
-			pages[i].Active = true
-		}
-	}
-	pages[len(pages)-1] = statusPage{"Következő", false, true, "#"}
-	if page<pageCnt {
-		qu.Set("page", strconv.Itoa(page+1))
-
-		pages[len(pages)-1].Disabled = false
-		pages[len(pages)-1].Url = "?"+qu.Encode()
-	}
-
-	if page>len(pages) {
-		return s.internalError(c, err, "Nincs ilyen oldal")
-	}
-
-	return c.Render(http.StatusOK, "status.html", struct {
-		CurrentPage int
-		Pages []statusPage
-		Submissions []*models.Submission
-	}{page, pages, sbs})
-}
-
 type taskArchiveTreeNode struct {
 	Id       int
 	Type     string
@@ -255,5 +171,5 @@ func (s *Server) getTaskArchive(c echo.Context) error {
 		}
 	}
 
-	return c.Render(http.StatusOK, "task_archive.html", roots)
+	return c.Render(http.StatusOK, "task_archive.gohtml", roots)
 }

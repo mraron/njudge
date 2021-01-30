@@ -82,12 +82,12 @@ func (s *Server) postProblemsetSubmit(c echo.Context) error {
 	)
 
 	if u = c.Get("user").(*models.User); u == nil {
-		return c.Render(http.StatusForbidden, "error.html", "Előbb lépj be.")
+		return c.Render(http.StatusForbidden, "error.gohtml", "Előbb lépj be.")
 	}
 
 	problemName := c.FormValue("problem")
 	if p, ok = s.getProblemExists(problemName); !ok {
-		return c.Render(http.StatusOK, "error.html", "Hibás feladatazonosító.")
+		return c.Render(http.StatusOK, "error.gohtml", "Hibás feladatazonosító.")
 	}
 
 	languageName := c.FormValue("language")
@@ -101,7 +101,7 @@ func (s *Server) postProblemsetSubmit(c echo.Context) error {
 	}
 
 	if !found {
-		return c.Render(http.StatusOK, "error.html", "Hibás nyelvazonosító.")
+		return c.Render(http.StatusOK, "error.gohtml", "Hibás nyelvazonosító.")
 	}
 
 	fileHeader, err := c.FormFile("source")
@@ -138,7 +138,7 @@ func (s *Server) getSubmission(c echo.Context) error {
 		return s.internalError(c, err, "ajaj")
 	}
 
-	return c.Render(http.StatusOK, "submission.html", sub)
+	return c.Render(http.StatusOK, "submission.gohtml", sub)
 }
 
 func (s *Server) getAPISubmissions(c echo.Context) error {

@@ -1,6 +1,7 @@
 package web
 
 import (
+	"crypto/md5"
 	"encoding/json"
 	"fmt"
 	"github.com/labstack/echo/v4"
@@ -10,6 +11,7 @@ import (
 	"github.com/mraron/njudge/web/roles"
 	"html/template"
 	"io"
+	"strings"
 	"time"
 )
 
@@ -118,6 +120,9 @@ func (s *Server) templatefuncs() template.FuncMap {
 		},
 		"tostring": func(b []byte) string {
 			return string(b)
+		},
+		"gravatarHash": func(user *models.User) string {
+			return fmt.Sprintf("%x", md5.Sum([]byte(strings.ToLower(strings.TrimSpace(user.Email)))))
 		},
 	}
 }

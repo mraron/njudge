@@ -1,0 +1,112 @@
+{{template "header" .}}
+{{define "problem_menu"}}
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link{{if eq . "problem"}} active{{end}}" href="./problem">Leírás</a>
+    </li>
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle{{if eq . "status"}} active{{end}}" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Beküldések</a>
+        <div class="dropdown-menu">
+            <a class="dropdown-item" href="./status">Összes</a>
+            <a class="dropdown-item" href="./status?ac=1">Elfogadott</a>
+        </div>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link{{if eq . "ranklist"}} active{{end}} disabled" href="#">Eredmények</a>
+    </li>
+</ul>
+<br>
+{{end}}
+{{template "problem_menu" "problem"}}
+<!--<div class="container-fluid">-->
+    <div class="row">
+        <div class="col-12 col-lg-9">
+{{if .Data.HTMLStatements}}
+    {{str2html (translateContent "hungarian" .Data.HTMLStatements).String}}
+{{else if .Data.PDFStatements}}
+    <embed src="pdf/{{(translateContent "hungarian" .Data.PDFStatements).Locale}}/" width="100%" height="800px"></embed>
+{{end}}</div>
+
+<div class="col-12 col-lg-3">
+<div class="card">
+    <div class="card-header">
+        <i class="fa fa-info"></i> Információk
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-6">Azonosító:</div>
+            <div class="col-6">{{.Data.Name}}</div>
+            <div class="col-6">Cím:</div>
+            <div class="col-6">{{translateContent "hungarian" .Data.Titles}}</div>
+            <div class="col-6">Időlimit:</div>
+            <div class="col-6">{{.Data.TimeLimit}} ms</div>
+            <div class="col-6">Memórialimit:</div>
+            <div class="col-6">{{divide .Data.MemoryLimit 1048576}} MiB</div>
+            {{if .Data.Tags}}
+            <div class="col-6">Tagek:</div>
+            <div class="col-6">{{range $i := .Data.Tags}}<span class="badge badge-secondary">{{$i}}</span> {{end}}</div>
+            {{end}}
+            <div class="col-6">Típus:</div>
+            <div class="col-6">{{.Data.TaskTypeName}}</div>
+        </div>
+    </div>
+</div>
+
+
+
+<br>
+<div class="card">
+    <div class="card-header">
+        <i class="fa fa-paper-plane"></i> Megoldás beküldése
+    </div>
+    <div class="card-body">
+        {{if logged .Context}}
+            <form action="/problemset/{{get .Context "problemset"}}/submit" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="problem" value="{{.Data.Name}}">
+            <input type="file" name="source" id="fileInput">
+            <br>
+            <select name="language" class="custom-select form-control" id="languagesList">
+                {{range $l := .Data.Languages}}
+                    <option value="{{$l.Id}}">{{$l.Name}}</option>
+                {{end}}
+            </select>
+            <br><br>
+            <input type="submit" class="btn btn-primary">
+            </form>
+        {{else}}
+            Beküldéshez lépj be vagy regisztrálj!
+        {{end}}
+    </div>
+</div>
+    {{if or .Data.Attachments .Data.PDFStatements}}
+        <br>
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-paperclip"></i> Mellékletek
+            </div>
+            <div class="card-body">
+                {{range $a := .Data.Attachments}}
+                    <a href="attachment/{{$a.Name}}/"><i class="fa fa-file"></i> Fájl ({{$a.Name}})</a><br>
+                {{end}}
+                {{range $loc := locales .Data.PDFStatements}}
+                    <a href="pdf/{{$loc}}/"><i class="fa fa-file-pdf"></i> Leírás ({{$loc}})</a><br>
+                {{end}}
+
+            </div>
+        </div>
+    {{end}}
+    <!--<a href="/problemset/status?problem_set={{get .Context "problemset"}}&problem={{.Data.Name}}">Összes beküldés</a> <br>
+    <a href="/problemset/status?problem_set={{get .Context "problemset"}}&problem={{.Data.Name}}&ac=1">Elfogadott beküldések</a>
+    -->
+</div>
+
+    </div>
+<!--</div>-->
+<!--
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb" style="background-color: #f7f7f7;">
+        <li class="breadcrumb-item active" aria-current="page">Home</li>
+    </ol>
+</nav>
+-->
+{{template "footer" .}}

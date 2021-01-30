@@ -192,7 +192,7 @@ func (s *Server) runSyncJudges() {
 
 func (s *Server) internalError(c echo.Context, err error, msg string) error {
 	c.Logger().Print("internal error:", err)
-	return c.Render(http.StatusInternalServerError, "error.html", msg)
+	return c.Render(http.StatusInternalServerError, "error.gohtml", msg)
 }
 
 func (s *Server) unauthorizedError(c echo.Context) error {
@@ -307,7 +307,7 @@ func (s *Server) Run() {
 	}
 
 	t := &Template{
-		templates: template.Must(template.New("templater").Funcs(s.templatefuncs()).ParseGlob(filepath.Join(s.TemplatesDir, "*.html"))),
+		templates: template.Must(template.New("templater").Funcs(s.templatefuncs()).ParseGlob(filepath.Join(s.TemplatesDir, "*.gohtml"))),
 	}
 
 	e.Renderer = t
@@ -328,6 +328,8 @@ func (s *Server) Run() {
 
 	ps.GET("/:name/", s.getProblemsetMain)
 	ps.GET("/:name/:problem/", s.getProblemsetProblem)
+	ps.GET("/:name/:problem/problem", s.getProblemsetProblem)
+	ps.GET("/:name/:problem/status", s.getProblemsetProblemStatus)
 	ps.GET("/:name/:problem/pdf/:language/", s.getProblemsetProblemPDFLanguage)
 	ps.GET("/:name/:problem/attachment/:attachment/", s.getProblemsetProblemAttachment)
 	ps.GET("/:name/:problem/:file", s.getProblemsetProblemFile)
@@ -346,6 +348,8 @@ func (s *Server) Run() {
 	u.POST("/register", s.postUserRegister)
 	u.GET("/activate", s.getUserActivate)
 	u.GET("/activate/:name/:key", s.getActivateUser)
+
+	u.GET("/profile/:name", s.getUserProfile)
 
 	v1 := e.Group("/api/v1")
 
@@ -390,16 +394,16 @@ func (s *Server) Run() {
 }
 
 func (s *Server) getHome(c echo.Context) error {
-	return c.Render(http.StatusOK, "home.html", nil)
+	return c.Render(http.StatusOK, "home.gohtml", nil)
 }
 
 func (s *Server) getAdmin(c echo.Context) error {
 	u := c.Get("user").(*models.User)
 	if !roles.Can(roles.Role(u.Role), roles.ActionView, "admin_panel") {
-		return c.Render(http.StatusUnauthorized, "error.html", "Engedély megtagadva.")
+		return c.Render(http.StatusUnauthorized, "error.gohtml", "Engedély megtagadva.")
 	}
 
-	return c.Render(http.StatusOK, "admin.html", struct {
+	return c.Render(http.StatusOK, "admin.gohtml", struct {
 		Host string
 	}{s.Hostname + ":" + s.Port})
 }

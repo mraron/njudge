@@ -76,7 +76,7 @@
                 <a class="nav-link" href="/task_archive">Archívum</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/problemset/status">Státusz</a>
+                <a class="nav-link" href="/problemset/status">Beküldések</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/problemset/main/">Feladatok</a>
@@ -108,10 +108,15 @@
     </div>
 </nav>
 
-<div class="container"><br>
+<div class="container-fluid">
+    <div class="row justify-content-md-center">
+        <div class="col col-xl-9">
+            <br>
 {{end}}
 
 {{define "footer"}}
+        </div>
+    </div>
 </div>
 
 <br>
@@ -141,87 +146,6 @@
 </html>
 {{end}}
 
-{{define "problem"}}
-
-{{if .HTMLStatements}}
-    {{str2html (translateContent "hungarian" .HTMLStatements).String}}
-{{else if .PDFStatements}}
-    <embed src="pdf/{{(translateContent "hungarian" .PDFStatements).Locale}}/" width="100%" height="800px"></embed>
-{{end}}
-
-
-
-
-{{if .PDFStatements}}
-<br>
-<div class="card">
-    <div class="card-header">
-        PDF feladatleírás
-    </div>
-    <div class="card-body">
-        <ul>
-        {{$p := .}}
-        {{range $loc := locales .PDFStatements}}
-            <li><a href="pdf/{{$loc}}/">{{$loc}}</a></li>
-        {{end}}
-        </ul>
-    </div>
-</div>
-{{end}}
-<br>
-{{if .Attachments}}
-<div class="card">
-    <div class="card-header">
-        Mellékletek
-    </div>
-    <div class="card-body">
-        <ul>
-        {{$p := .}}
-        {{range $a := .Attachments}}
-            <li><a href="attachment/{{$a.Name}}/">{{$a.Name}}</a></li>
-        {{end}}
-        </ul>
-    </div>
-</div>
-
-<br>
-
-{{end}}
-
-<div class="card">
-    <div class="card-header">
-        Információk
-    </div>
-    <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-3">Feladatazonosító:</dt>
-            <dd class="col-sm-9">{{.Name}}</dd>
-
-            <dt class="col-sm-3">Feladatcím:</dt>
-            <dd class="col-sm-9">{{translateContent "hungarian" .Titles}} </dd>
-
-            <dt class="col-sm-3">Időlimit:</dt>
-            <dd class="col-sm-9">{{.TimeLimit}} ms</dd>
-
-            <dt class="col-sm-3">Memórialimit:</dt>
-            <dd class="col-sm-9">{{divide .MemoryLimit 1048576}} MB</dd>
-
-            <dt class="col-sm-3">Tagek:</dt>
-            <dd class="col-sm-9">
-            {{range $i := .Tags}}
-                <span class="badge badge-secondary">{{$i}}</span>
-            {{end}}
-            </dd>
-
-            <dt class="col-sm-3">Feladattípus:</dt>
-            <dd class="col-sm-9">
-            {{.TaskTypeName}}
-            </dd>
-        </dl>
-    </div>
-</div>
-
-{{end}}
 
 
 
@@ -230,7 +154,7 @@
 <tr id="submission{{.ID}}">
     <td><a href="/submission/{{.ID}}">{{.ID}}</a></td>
     <td>{{.Submitted.Local.Year}}. {{fixedlen (month2int .Submitted.Local.Month) 2}}. {{fixedlen .Submitted.Local.Day 2}} {{fixedlen .Submitted.Local.Hour 2}}:{{fixedlen .Submitted.Local.Minute 2}}:{{fixedlen .Submitted.Local.Second 2}}</td>
-    <td>{{.User.OneG.Name}}</td>
+    <td><a href="/user/profile/{{.User.OneG.Name}}">{{.User.OneG.Name}}</a></td>
     <td><a href="/problemset/{{.Problemset}}/{{.Problem}}/">{{translateContent "hungarian" (problem .Problem).Titles}}</a></td>
     <td>{{.Language}}</td>
     <td>

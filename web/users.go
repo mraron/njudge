@@ -54,10 +54,10 @@ func (s *Server) currentUser(c echo.Context) (*models.User, error) {
 
 func (s *Server) getUserLogin(c echo.Context) error {
 	if u := c.Get("user").(*models.User); u != nil {
-		return c.Render(http.StatusOK, "error.html", "Már be vagy lépve...")
+		return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
 	}
 
-	return c.Render(http.StatusOK, "login.html", nil)
+	return c.Render(http.StatusOK, "login.gohtml", nil)
 }
 
 func (s *Server) postUserLogin(c echo.Context) error {
@@ -67,21 +67,21 @@ func (s *Server) postUserLogin(c echo.Context) error {
 	)
 
 	if u := c.Get("user").(*models.User); u != nil {
-		return c.Render(http.StatusOK, "error.html", "Már be vagy lépve...")
+		return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
 	}
 
 	u, err = models.Users(Where("name=?", c.FormValue("name"))).One(s.db)
 	if err != nil {
 		log.Error("Possible just wrong credentials, but", err)
-		return c.Render(http.StatusOK, "login.html", []string{"Hibás felhasználónév és jelszó páros."})
+		return c.Render(http.StatusOK, "login.gohtml", []string{"Hibás felhasználónév és jelszó páros."})
 	}
 
 	if err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(c.FormValue("password"))); err != nil {
-		return c.Render(http.StatusOK, "login.html", []string{"Hibás felhasználónév és jelszó páros."})
+		return c.Render(http.StatusOK, "login.gohtml", []string{"Hibás felhasználónév és jelszó páros."})
 	}
 
 	if u.ActivationKey.Valid {
-		return c.Render(http.StatusOK, "login.html", []string{"Hiba: az account nincs aktiválva."})
+		return c.Render(http.StatusOK, "login.gohtml", []string{"Hiba: az account nincs aktiválva."})
 	}
 
 	storage, _ := session.Get("user", c)
@@ -93,15 +93,15 @@ func (s *Server) postUserLogin(c echo.Context) error {
 
 	c.Set("user", u)
 
-	return c.Render(http.StatusOK, "message.html", "Sikeres belépés.")
+	return c.Render(http.StatusOK, "message.gohtml", "Sikeres belépés.")
 }
 
 func (s *Server) getUserRegister(c echo.Context) error {
 	if u := c.Get("user").(*models.User); u != nil {
-		return c.Render(http.StatusOK, "error.html", "Már be vagy lépve...")
+		return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
 	}
 
-	return c.Render(http.StatusOK, "register.html", nil)
+	return c.Render(http.StatusOK, "register.gohtml", nil)
 }
 
 func (s *Server) postUserRegister(c echo.Context) error {
@@ -113,7 +113,7 @@ func (s *Server) postUserRegister(c echo.Context) error {
 	)
 
 	if u := c.Get("user").(*models.User); u != nil {
-		return c.Render(http.StatusOK, "error.html", "Már be vagy lépve...")
+		return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
 	}
 
 	used := func(col, value, msg string) {
@@ -142,7 +142,7 @@ func (s *Server) postUserRegister(c echo.Context) error {
 	}
 
 	if len(errors) > 0 {
-		return c.Render(http.StatusOK, "register.html", errors)
+		return c.Render(http.StatusOK, "register.gohtml", errors)
 	}
 
 	mustPanic := func(err error) {
@@ -190,7 +190,7 @@ func (s *Server) postUserRegister(c echo.Context) error {
 
 func (s *Server) getUserLogout(c echo.Context) error {
 	if u := c.Get("user").(*models.User); u == nil {
-		return c.Render(http.StatusOK, "error.html", "Ahhoz hogy kijelentkezz előbb be kell hogy jelentkezz...")
+		return c.Render(http.StatusOK, "error.gohtml", "Ahhoz hogy kijelentkezz előbb be kell hogy jelentkezz...")
 	}
 
 	storage, _ := session.Get("user", c)
@@ -206,10 +206,10 @@ func (s *Server) getUserLogout(c echo.Context) error {
 
 func (s *Server) getUserActivate(c echo.Context) error {
 	if u := c.Get("user").(*models.User); u != nil {
-		return c.Render(http.StatusOK, "error.html", "Már be vagy lépve...")
+		return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
 	}
 
-	return c.Render(http.StatusOK, "activate.html", nil)
+	return c.Render(http.StatusOK, "activate.gohtml", nil)
 }
 
 func (s *Server) getActivateUser(c echo.Context) error {
@@ -220,7 +220,7 @@ func (s *Server) getActivateUser(c echo.Context) error {
 	)
 
 	if u := c.Get("user").(*models.User); u != nil {
-		return c.Render(http.StatusOK, "error.html", "Már be vagy lépve...")
+		return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
 	}
 
 	if user, err = models.Users(Where("name=?", c.Param("name"))).One(s.db); err != nil {
@@ -228,11 +228,11 @@ func (s *Server) getActivateUser(c echo.Context) error {
 	}
 
 	if !user.ActivationKey.Valid {
-		return c.Render(http.StatusOK, "error.html", "Ez a regisztráció már aktív!")
+		return c.Render(http.StatusOK, "error.gohtml", "Ez a regisztráció már aktív!")
 	}
 
 	if user.ActivationKey.String != c.Param("key") {
-		return c.Render(http.StatusOK, "error.html", "Hibás aktiválási kulcs. Biztos jó linkre kattintottál?")
+		return c.Render(http.StatusOK, "error.gohtml", "Hibás aktiválási kulcs. Biztos jó linkre kattintottál?")
 	}
 
 	if tx, err = s.db.Begin(); err != nil {
@@ -247,26 +247,26 @@ func (s *Server) getActivateUser(c echo.Context) error {
 		return s.internalError(c, err, "Belső hiba #4")
 	}
 
-	return c.Render(http.StatusOK, "message.html", "Sikeres aktiválás, mostmár beléphetsz.")
+	return c.Render(http.StatusOK, "message.gohtml", "Sikeres aktiválás, mostmár beléphetsz.")
 }
 
 func (s *Server) getUserAuthCallback(c echo.Context) error {
 	if u := c.Get("user").(*models.User); u != nil {
-		return c.Render(http.StatusOK, "error.html", "Már be vagy lépve...")
+		return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
 	}
 
 	user, err := gothic.CompleteUserAuth(c.Response(), c.Request())
 	if err != nil {
-		return c.Render(http.StatusOK, "login.html", []string{"Hiba: érvénytelen token."})
+		return c.Render(http.StatusOK, "login.gohtml", []string{"Hiba: érvénytelen token."})
 	}
 
 	lst, err := models.Users(Where("email = ?", user.Email)).All(s.db)
 	if len(lst) == 0 {
-		return c.Render(http.StatusOK, "login.html", []string{"Hiba: a felhasználó nincs regisztrálva."})
+		return c.Render(http.StatusOK, "login.gohtml", []string{"Hiba: a felhasználó nincs regisztrálva."})
 	}
 
 	if lst[0].ActivationKey.Valid {
-		return c.Render(http.StatusOK, "login.html", []string{"Hiba: az account nincs aktiválva."})
+		return c.Render(http.StatusOK, "login.gohtml", []string{"Hiba: az account nincs aktiválva."})
 	}
 
 	storage, _ := session.Get("user", c)
@@ -278,12 +278,12 @@ func (s *Server) getUserAuthCallback(c echo.Context) error {
 
 	c.Set("user", lst[0])
 
-	return c.Render(http.StatusOK, "message.html", "Sikeres belépés.")
+	return c.Render(http.StatusOK, "message.gohtml", "Sikeres belépés.")
 }
 
 func (s *Server) getUserAuth(c echo.Context) error {
 	if u := c.Get("user").(*models.User); u != nil {
-		return c.Render(http.StatusOK, "error.html", "Már be vagy lépve...")
+		return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
 	}
 
 	gothic.BeginAuthHandler(c.Response(), c.Request())
@@ -411,4 +411,15 @@ func (s *Server) putAPIUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, struct {
 		Message string `json:"message"`
 	}{"updated"})
+}
+
+func (s *Server) getUserProfile(c echo.Context) error {
+	user, err := models.Users(Where("name = ?", c.Param("name"))).One(s.db)
+	if err != nil {
+		return s.internalError(c, err, "error")
+	}
+
+	return c.Render(http.StatusOK, "profile.gohtml", struct {
+		User *models.User
+	}{user})
 }
