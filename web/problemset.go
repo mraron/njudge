@@ -1,15 +1,17 @@
 package web
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/utils/problems/config/polygon"
 	"github.com/mraron/njudge/web/models"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"io/ioutil"
+	"io"
 	"mime"
 	"net/http"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -94,12 +96,7 @@ func (s *Server) getProblemsetProblemFile(c echo.Context) error {
 		return c.String(http.StatusNotFound, "not found")
 	}
 
-	f, err := ioutil.ReadFile(fileLoc)
-	if err != nil {
-		return c.String(http.StatusInternalServerError, "error serving file")
-	}
-
-	return c.Blob(http.StatusOK, mime.TypeByExtension(filepath.Ext(fileLoc)), f)
+	return c.Attachment(fileLoc, c.Param("file"))
 }
 
 func (s *Server) getProblemsetProblemAttachment(c echo.Context) error {
@@ -110,7 +107,13 @@ func (s *Server) getProblemsetProblemAttachment(c echo.Context) error {
 
 	for _, val := range p.Attachments() {
 		if val.Name == attachment {
-			return c.Blob(http.StatusOK, mime.TypeByExtension(filepath.Ext(val.Name)), val.Contents)
+			c.Response().Header().Set("Content-Disposition", "attachment; filename="+val.Name)
+			c.Response().Header().Set("Content-Type", mime.TypeByExtension(filepath.Ext(val.Name)))
+			c.Response().Header().Set("Content-Length", strconv.Itoa(len(val.Contents)))
+
+			io.Copy(c.Response(), bytes.NewReader(val.Contents))
+
+			return c.NoContent(http.StatusOK)
 		}
 	}
 
