@@ -31,6 +31,7 @@ import (
 	_ "github.com/mraron/njudge/utils/language/octave"
 	_ "github.com/mraron/njudge/utils/language/pascal"
 	_ "github.com/mraron/njudge/utils/language/python3"
+	_ "github.com/mraron/njudge/utils/language/nim"
 )
 
 type Submission struct {
