@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"github.com/mraron/njudge/utils/problems"
 	"github.com/mraron/njudge/utils/problems/config/polygon"
 	"github.com/mraron/njudge/web/models"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -54,7 +55,19 @@ func (s *Server) getProblemsetProblem(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, nil)
 	}
 
-	return c.Render(http.StatusOK, "problemset_problem.gohtml", s.getProblem(problem))
+	lastLanguage := ""
+	if u := c.Get("user").(*models.User); u != nil {
+		fmt.Println(u)
+		sub, err := models.Submissions(Select("language"), Where("user_id = ?", u.ID), OrderBy("id DESC"), Limit(1)).One(s.db)
+		if err == nil {
+			lastLanguage = sub.Language
+		}
+	}
+
+	return c.Render(http.StatusOK, "problemset_problem.gohtml",struct{
+		Problem problems.Problem
+		LastLanguage string
+	}{s.getProblem(problem), lastLanguage})
 }
 
 func (s *Server) getProblemsetProblemPDFLanguage(c echo.Context) error {

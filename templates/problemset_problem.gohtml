@@ -21,10 +21,10 @@
 <!--<div class="container-fluid">-->
     <div class="row">
         <div class="col-12 col-lg-9">
-{{if .Data.HTMLStatements}}
-    {{str2html (translateContent "hungarian" .Data.HTMLStatements).String}}
-{{else if .Data.PDFStatements}}
-    <embed src="pdf/{{(translateContent "hungarian" .Data.PDFStatements).Locale}}/" width="100%" height="800px"></embed>
+{{if .Data.Problem.HTMLStatements}}
+    {{str2html (translateContent "hungarian" .Data.Problem.HTMLStatements).String}}
+{{else if .Data.Problem.PDFStatements}}
+    <embed src="pdf/{{(translateContent "hungarian" .Data.Problem.PDFStatements).Locale}}/" width="100%" height="800px"></embed>
 {{end}}</div>
 
 <div class="col-12 col-lg-3">
@@ -35,19 +35,19 @@
     <div class="card-body">
         <div class="row">
             <div class="col-6">Azonosító:</div>
-            <div class="col-6">{{.Data.Name}}</div>
+            <div class="col-6">{{.Data.Problem.Name}}</div>
             <div class="col-6">Cím:</div>
-            <div class="col-6">{{translateContent "hungarian" .Data.Titles}}</div>
+            <div class="col-6">{{translateContent "hungarian" .Data.Problem.Titles}}</div>
             <div class="col-6">Időlimit:</div>
-            <div class="col-6">{{.Data.TimeLimit}} ms</div>
+            <div class="col-6">{{.Data.Problem.TimeLimit}} ms</div>
             <div class="col-6">Memórialimit:</div>
-            <div class="col-6">{{divide .Data.MemoryLimit 1048576}} MiB</div>
-            {{if .Data.Tags}}
+            <div class="col-6">{{divide .Data.Problem.MemoryLimit 1048576}} MiB</div>
+            {{if .Data.Problem.Tags}}
             <div class="col-6">Tagek:</div>
-            <div class="col-6">{{range $i := .Data.Tags}}<span class="badge badge-secondary">{{$i}}</span> {{end}}</div>
+            <div class="col-6">{{range $i := .Data.Problem.Tags}}<span class="badge badge-secondary">{{$i}}</span> {{end}}</div>
             {{end}}
             <div class="col-6">Típus:</div>
-            <div class="col-6">{{.Data.TaskTypeName}}</div>
+            <div class="col-6">{{.Data.Problem.TaskTypeName}}</div>
         </div>
     </div>
 </div>
@@ -62,12 +62,12 @@
     <div class="card-body">
         {{if logged .Context}}
             <form action="/problemset/{{get .Context "problemset"}}/submit" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="problem" value="{{.Data.Name}}">
+            <input type="hidden" name="problem" value="{{.Data.Problem.Name}}">
             <input type="file" name="source" id="fileInput">
-            <br>
+            <br>{{$lastLang := .Data.LastLanguage}}
             <select name="language" class="custom-select form-control" id="languagesList">
-                {{range $l := .Data.Languages}}
-                    <option value="{{$l.Id}}">{{$l.Name}}</option>
+                {{range $l := .Data.Problem.Languages}}
+                    <option value="{{$l.Id}}"{{if eq $lastLang $l.Id}} selected="selected"{{end}}>{{$l.Name}}</option>
                 {{end}}
             </select>
             <br><br>
@@ -78,25 +78,25 @@
         {{end}}
     </div>
 </div>
-    {{if or .Data.Attachments .Data.PDFStatements}}
+    {{if or .Data.Problem.Attachments .Data.Problem.PDFStatements}}
         <br>
         <div class="card">
             <div class="card-header">
                 <i class="fa fa-paperclip"></i> Mellékletek
             </div>
             <div class="card-body">
-                {{range $a := .Data.Attachments}}
+                {{range $a := .Data.Problem.Attachments}}
                     <a href="attachment/{{$a.Name}}/"><i class="fa fa-file"></i> Fájl ({{$a.Name}})</a><br>
                 {{end}}
-                {{range $loc := locales .Data.PDFStatements}}
+                {{range $loc := locales .Data.Problem.PDFStatements}}
                     <a href="pdf/{{$loc}}/"><i class="fa fa-file-pdf"></i> Leírás ({{$loc}})</a><br>
                 {{end}}
 
             </div>
         </div>
     {{end}}
-    <!--<a href="/problemset/status?problem_set={{get .Context "problemset"}}&problem={{.Data.Name}}">Összes beküldés</a> <br>
-    <a href="/problemset/status?problem_set={{get .Context "problemset"}}&problem={{.Data.Name}}&ac=1">Elfogadott beküldések</a>
+    <!--<a href="/problemset/status?problem_set={{get .Context "problemset"}}&problem={{.Data.Problem.Name}}">Összes beküldés</a> <br>
+    <a href="/problemset/status?problem_set={{get .Context "problemset"}}&problem={{.Data.Problem.Name}}&ac=1">Elfogadott beküldések</a>
     -->
 </div>
 
