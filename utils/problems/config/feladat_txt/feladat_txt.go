@@ -119,7 +119,7 @@ func (p Problem) StatusSkeleton() problems.Status {
 	testset.Groups = append(testset.Groups, problems.Group{})
 	group := &testset.Groups[len(testset.Groups)-1]
 
-	group.Name = ""
+	group.Name = "base"
 	group.Scoring = problems.SCORING_SUM
 
 	for _, tc := range tcbygroup[""] {
@@ -148,17 +148,18 @@ func (p Problem) Check(tc *problems.Testcase) error {
 		return err
 	}
 
-	output := &bytes.Buffer{}
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
 
-	cmd := exec.Command(filepath.Join(p.Path, "ellen"), p.Path, dir, testind)
-	cmd.Stdout = output
-	cmd.Stderr = output
+	cmd := exec.Command("/bin/sh", "-c", "ulimit -s unlimited && "+strings.Join([]string{filepath.Join(p.Path, "ellen"), p.Path, dir, testind}, " "))
+	cmd.Stdout = stdout
+	cmd.Stderr = stderr
 
 	err = cmd.Run()
 
-	tc.CheckerOutput = problems.Truncate(output.String())
+	tc.CheckerOutput = problems.Truncate(stdout.String())
 	if err == nil || strings.HasPrefix(err.Error(), "exit status") {
-		spltd := strings.Split(strings.TrimSpace(output.String()), "\n")
+		spltd := strings.Split(strings.TrimSpace(stdout.String()), "\n")
 
 		score := 0.0
 		for i := 0; i < len(spltd); i++ {

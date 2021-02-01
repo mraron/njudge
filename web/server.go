@@ -223,8 +223,7 @@ func (s *Server) runGlue() {
 				verdict = VERDICT_CE
 			}
 
-			//@TODO add score
-			if _, err := s.db.Exec("UPDATE submissions SET verdict=$1, status=$2, ontest=NULL, judged=$3 WHERE id=$4", verdict, st.Status, time.Now(), id); err != nil {
+			if _, err := s.db.Exec("UPDATE submissions SET verdict=$1, status=$2, ontest=NULL, judged=$3, score=$5 WHERE id=$4", verdict, st.Status, time.Now(), id, st.Status.Score()); err != nil {
 				return s.internalError(c, err, "err")
 			}
 		} else {

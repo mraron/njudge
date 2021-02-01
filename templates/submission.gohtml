@@ -59,7 +59,7 @@
         {{range $testset := $status.Feedback}}
         {{range $ind, $val := $testset.Testcases}}
         <tr>
-            <td>{{$testset.Name}}.{{$val.Group}}</td><td><span class="text-{{if eq $val.VerdictName 0}}success{{else}}info{{end}}">{{$val.VerdictName.String}}</span></td><td>{{$val.Score}}/{{$val.MaxScore}}</td><td>{{$val.TimeSpent}}</td><td>{{$val.MemoryUsed}}</td>
+            <td>{{$testset.Name}}.{{$val.Group}}.{{$val.Index}}</td><td><span class="text-{{if eq $val.VerdictName 0}}success{{else}}info{{end}}">{{$val.VerdictName.String}}</span></td><td>{{$val.Score}}/{{$val.MaxScore}}</td><td>{{$val.TimeSpent}}</td><td>{{$val.MemoryUsed}}</td>
         </tr>
         {{end}}
         {{end}}

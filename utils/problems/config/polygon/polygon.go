@@ -308,7 +308,7 @@ func (p Problem) StatusSkeleton() problems.Status {
 func (p Problem) Check(tc *problems.Testcase) error {
 	output := &bytes.Buffer{}
 
-	cmd := exec.Command(filepath.Join(p.Path, "check"), tc.InputPath, tc.OutputPath, tc.AnswerPath)
+	cmd := exec.Command("/bin/sh", "-c", "ulimit -s unlimited && "+strings.Join([]string{filepath.Join(p.Path, "check"), tc.InputPath, tc.OutputPath, tc.AnswerPath}, " "))
 	cmd.Stdout = output
 	cmd.Stderr = output
 
