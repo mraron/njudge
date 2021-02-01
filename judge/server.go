@@ -1,7 +1,7 @@
 package judge
 
 import (
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/shirou/gopsutil/load"
 	"log"
 	"net/http"
@@ -22,7 +22,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/kataras/go-errors"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/mraron/njudge/utils/language"
 	_ "github.com/mraron/njudge/utils/language/cpp11"
 	_ "github.com/mraron/njudge/utils/language/cpp14"
