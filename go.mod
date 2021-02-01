@@ -13,7 +13,6 @@ require (
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/kat-co/vala v0.0.0-20170210184112-42e1d8b61f12
 	github.com/kataras/go-errors v0.0.3
-	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo-contrib v0.9.0
 	github.com/labstack/echo/v4 v4.1.6
 	github.com/labstack/gommon v0.3.0
