@@ -23,19 +23,20 @@ import (
 
 // Submission is an object representing the database table.
 type Submission struct {
-	ID         int         `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Status     string      `boil:"status" json:"status" toml:"status" yaml:"status"`
-	Ontest     null.String `boil:"ontest" json:"ontest,omitempty" toml:"ontest" yaml:"ontest,omitempty"`
-	UserID     int         `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
-	Problemset string      `boil:"problemset" json:"problemset" toml:"problemset" yaml:"problemset"`
-	Problem    string      `boil:"problem" json:"problem" toml:"problem" yaml:"problem"`
-	Language   string      `boil:"language" json:"language" toml:"language" yaml:"language"`
-	Private    bool        `boil:"private" json:"private" toml:"private" yaml:"private"`
-	Verdict    int         `boil:"verdict" json:"verdict" toml:"verdict" yaml:"verdict"`
-	Source     []byte      `boil:"source" json:"source" toml:"source" yaml:"source"`
-	Started    bool        `boil:"started" json:"started" toml:"started" yaml:"started"`
-	Submitted  time.Time   `boil:"submitted" json:"submitted" toml:"submitted" yaml:"submitted"`
-	Judged     null.Time   `boil:"judged" json:"judged,omitempty" toml:"judged" yaml:"judged,omitempty"`
+	ID         int          `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Status     string       `boil:"status" json:"status" toml:"status" yaml:"status"`
+	Ontest     null.String  `boil:"ontest" json:"ontest,omitempty" toml:"ontest" yaml:"ontest,omitempty"`
+	UserID     int          `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	Problemset string       `boil:"problemset" json:"problemset" toml:"problemset" yaml:"problemset"`
+	Problem    string       `boil:"problem" json:"problem" toml:"problem" yaml:"problem"`
+	Language   string       `boil:"language" json:"language" toml:"language" yaml:"language"`
+	Private    bool         `boil:"private" json:"private" toml:"private" yaml:"private"`
+	Verdict    int          `boil:"verdict" json:"verdict" toml:"verdict" yaml:"verdict"`
+	Source     []byte       `boil:"source" json:"source" toml:"source" yaml:"source"`
+	Started    bool         `boil:"started" json:"started" toml:"started" yaml:"started"`
+	Submitted  time.Time    `boil:"submitted" json:"submitted" toml:"submitted" yaml:"submitted"`
+	Judged     null.Time    `boil:"judged" json:"judged,omitempty" toml:"judged" yaml:"judged,omitempty"`
+	Score      null.Float32 `boil:"score" json:"score,omitempty" toml:"score" yaml:"score,omitempty"`
 
 	R *submissionR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L submissionL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -55,6 +56,7 @@ var SubmissionColumns = struct {
 	Started    string
 	Submitted  string
 	Judged     string
+	Score      string
 }{
 	ID:         "id",
 	Status:     "status",
@@ -69,6 +71,7 @@ var SubmissionColumns = struct {
 	Started:    "started",
 	Submitted:  "submitted",
 	Judged:     "judged",
+	Score:      "score",
 }
 
 // Generated where
@@ -149,6 +152,29 @@ func (w whereHelpernull_Time) GTE(x null.Time) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
 }
 
+type whereHelpernull_Float32 struct{ field string }
+
+func (w whereHelpernull_Float32) EQ(x null.Float32) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_Float32) NEQ(x null.Float32) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_Float32) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Float32) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+func (w whereHelpernull_Float32) LT(x null.Float32) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_Float32) LTE(x null.Float32) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_Float32) GT(x null.Float32) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_Float32) GTE(x null.Float32) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
 var SubmissionWhere = struct {
 	ID         whereHelperint
 	Status     whereHelperstring
@@ -163,6 +189,7 @@ var SubmissionWhere = struct {
 	Started    whereHelperbool
 	Submitted  whereHelpertime_Time
 	Judged     whereHelpernull_Time
+	Score      whereHelpernull_Float32
 }{
 	ID:         whereHelperint{field: "\"submissions\".\"id\""},
 	Status:     whereHelperstring{field: "\"submissions\".\"status\""},
@@ -177,6 +204,7 @@ var SubmissionWhere = struct {
 	Started:    whereHelperbool{field: "\"submissions\".\"started\""},
 	Submitted:  whereHelpertime_Time{field: "\"submissions\".\"submitted\""},
 	Judged:     whereHelpernull_Time{field: "\"submissions\".\"judged\""},
+	Score:      whereHelpernull_Float32{field: "\"submissions\".\"score\""},
 }
 
 // SubmissionRels is where relationship names are stored.
@@ -200,8 +228,8 @@ func (*submissionR) NewStruct() *submissionR {
 type submissionL struct{}
 
 var (
-	submissionAllColumns            = []string{"id", "status", "ontest", "user_id", "problemset", "problem", "language", "private", "verdict", "source", "started", "submitted", "judged"}
-	submissionColumnsWithoutDefault = []string{"status", "ontest", "user_id", "problemset", "problem", "language", "private", "verdict", "source", "started", "submitted", "judged"}
+	submissionAllColumns            = []string{"id", "status", "ontest", "user_id", "problemset", "problem", "language", "private", "verdict", "source", "started", "submitted", "judged", "score"}
+	submissionColumnsWithoutDefault = []string{"status", "ontest", "user_id", "problemset", "problem", "language", "private", "verdict", "source", "started", "submitted", "judged", "score"}
 	submissionColumnsWithDefault    = []string{"id"}
 	submissionPrimaryKeyColumns     = []string{"id"}
 )
