@@ -25,7 +25,10 @@ func (s *Server) getProblemsetList(c echo.Context) error {
 	type problem struct{
 		problems.Problem
 		SolverCount int
+		SolvedStatus int
 	}
+
+	u := c.Get("user").(*models.User)
 
 	name := c.Param("name")
 	problemLst, err := models.ProblemRels(Where("problemset=?", name)).All(s.db)
@@ -50,7 +53,28 @@ func (s *Server) getProblemsetList(c echo.Context) error {
 			return s.internalError(c, err, "Belső hiba.")
 		}
 
-		lst[i] = problem{Problem: s.getProblem(problemLst[i].Problem), SolverCount: int(cnt.Count)}
+		solvedStatus := -1
+		if u != nil {
+			cnt, err := models.Submissions(Where("problemset = ?", name), Where("problem = ?", problemLst[i].Problem), Where("verdict = 0"), Where("user_id = ?", u.ID)).Count(s.db)
+			if err != nil && !errors.Is(err, sql.ErrNoRows) {
+				return s.internalError(c, err, "Belső hiba.")
+			}else {
+				if cnt > 0 {
+					solvedStatus = 0
+				} else {
+					cnt, err := models.Submissions(Where("problemset = ?", name), Where("problem = ?", problemLst[i].Problem), Where("user_id = ?", u.ID)).Count(s.db)
+					if err != nil && !errors.Is(err, sql.ErrNoRows) {
+						return s.internalError(c, err, "Belső hiba.")
+					} else {
+						if cnt>0 {
+							solvedStatus = 1
+						}
+					}
+				}
+			}
+		}
+		fmt.Println(solvedStatus)
+		lst[i] = problem{Problem: s.getProblem(problemLst[i].Problem), SolverCount: int(cnt.Count), SolvedStatus: solvedStatus}
 	}
 
 	return c.Render(http.StatusOK, "problemset_list.gohtml", struct {
