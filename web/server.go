@@ -274,6 +274,7 @@ func (s *Server) runJudger() {
 }
 
 func (s *Server) Run() {
+	boil.DebugMode=true
 	//@TODO add a member to Server
 	loc, err := time.LoadLocation("Europe/Budapest")
 	if err != nil {
@@ -326,10 +327,11 @@ func (s *Server) Run() {
 		}
 	})
 
-	ps.GET("/:name/", s.getProblemsetMain)
+	ps.GET("/:name/", s.getProblemsetList)
 	ps.GET("/:name/:problem/", s.getProblemsetProblem)
 	ps.GET("/:name/:problem/problem", s.getProblemsetProblem)
 	ps.GET("/:name/:problem/status", s.getProblemsetProblemStatus)
+	ps.GET("/:name/:problem/ranklist", s.getProblemsetProblemRanklist)
 	ps.GET("/:name/:problem/pdf/:language/", s.getProblemsetProblemPDFLanguage)
 	ps.GET("/:name/:problem/attachment/:attachment/", s.getProblemsetProblemAttachment)
 	ps.GET("/:name/:problem/:file", s.getProblemsetProblemFile)
@@ -349,7 +351,7 @@ func (s *Server) Run() {
 	u.GET("/activate", s.getUserActivate)
 	u.GET("/activate/:name/:key", s.getActivateUser)
 
-	u.GET("/profile/:name", s.getUserProfile)
+	u.GET("/profile/:name/", s.getUserProfile)
 
 	v1 := e.Group("/api/v1")
 

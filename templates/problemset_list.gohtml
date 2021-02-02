@@ -1,15 +1,10 @@
 {{template "header" .}}
 <div class="table-responsive">
     <table class="table table-bordered" >
-        <thead><tr><td>Név</td><td>Cím</td><td>Címkék</td></tr></thead>
+        <thead><tr><td>Id</td><td>Cím</td><td>Címkék</td><td>Megoldók</td></tr></thead>
         <tbody>
-        {{ range $j := .Data }}
-            {{$i := problem $j.Problem}}
-                {{if $i}}
-                    <tr><td>{{$i.Name}}</td><td><a href="{{$i.Name}}/">{{(translateContent "hungarian" $i.Titles).String}}</a></td><td> {{range $tag := $i.Tags}}<span class="badge badge-secondary">{{$tag}}</span> {{end}}</td></tr>
-                {{else}}
-                    {{$j.Problem}}
-                {{end}}
+        {{ range $i := .Data.Lst }}
+            <tr><td>{{$i.Name}}</td><td><a href="{{$i.Name}}/">{{(translateContent "hungarian" $i.Titles).String}}</a></td><td> {{range $tag := $i.Tags}}<span class="badge badge-secondary">{{$tag}}</span> {{end}}</td><td> <a href="{{$i.Name}}/status?ac=1"><i class="fa fa-user"></i> {{$i.SolverCount}}</a></td></tr>
         {{end}}
         </tbody>
     </table>

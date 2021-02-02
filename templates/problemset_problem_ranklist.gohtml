@@ -1,0 +1,17 @@
+{{template "header" .}}
+{{template "problem_menu" "ranklist"}}
+
+<table class="table table-sm table-bordered">
+<thead>
+<tr>
+    <th scope="col">Név</th>
+    <th scope="col">Pont</th>
+</tr>
+</thead>
+{{$mx := .Data.Problem.StatusSkeleton.MaxScore}}
+{{range $i := .Data.Submissions}}
+    <tr><td><a href="/user/profile/{{$i.User.OneG.Name}}/">{{$i.User.OneG.Name}}</a></td><td><a href="/submission/{{$i.ID}}">{{$i.Score.Value}}/{{$mx}}</a></td></tr>
+{{end}}
+</table>
+
+{{template "footer" .}}

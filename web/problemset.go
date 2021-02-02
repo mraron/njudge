@@ -2,34 +2,60 @@ package web
 
 import (
 	"bytes"
+	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/utils/problems"
 	"github.com/mraron/njudge/utils/problems/config/polygon"
 	"github.com/mraron/njudge/web/models"
+	"github.com/volatiletech/sqlboiler/v4/queries"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"io"
 	"mime"
 	"net/http"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 )
 
-func (s *Server) getProblemsetMain(c echo.Context) error {
+func (s *Server) getProblemsetList(c echo.Context) error {
+	type problem struct{
+		problems.Problem
+		SolverCount int
+	}
+
 	name := c.Param("name")
-	lst, err := models.ProblemRels(Where("problemset=?", name)).All(s.db)
-	//lst, err := models.ProblemsFromProblemset(s.db, name)
-	fmt.Println(lst)
+	problemLst, err := models.ProblemRels(Where("problemset=?", name)).All(s.db)
+
 	if err != nil {
 		return s.internalError(c, err, "Belső hiba.")
 	}
 
-	if len(lst) == 0 {
+	if len(problemLst) == 0 {
 		return c.Render(http.StatusNotFound, "404.gohtml", "Nem található.")
 	}
 
-	return c.Render(http.StatusOK, "problemset_list.gohtml", lst)
+	lst := make([]problem, len(problemLst))
+
+	for i := 0; i < len(problemLst); i ++ {
+		cnt := struct {
+			Count int64
+		}{0}
+
+		err := queries.Raw("SELECT COUNT(DISTINCT user_id) FROM submissions WHERE problemset=$1 and problem=$2 and verdict=0", name, problemLst[i].Problem).Bind(context.TODO(), s.db, &cnt)
+		if err != nil && !errors.Is(err, sql.ErrNoRows) {
+			return s.internalError(c, err, "Belső hiba.")
+		}
+
+		lst[i] = problem{Problem: s.getProblem(problemLst[i].Problem), SolverCount: int(cnt.Count)}
+	}
+
+	return c.Render(http.StatusOK, "problemset_list.gohtml", struct {
+		Lst []problem
+	}{lst})
 }
 
 func (s *Server) getProblemsetProblem(c echo.Context) error {
@@ -188,4 +214,27 @@ func (s *Server) getTaskArchive(c echo.Context) error {
 	}
 
 	return c.Render(http.StatusOK, "task_archive.gohtml", roots)
+}
+
+
+func (s *Server) getProblemsetProblemRanklist(c echo.Context) error {
+	problemSet := c.Param("name")
+	problem := c.Param("problem")
+	prob := s.getProblem(problem)
+
+	sbs := make([]*models.Submission, 0)
+
+	//@TODO
+	if err := queries.Raw("SELECT DISTINCT ON (s1.user_id) s1.* FROM (SELECT s1.user_id, MAX(s1.score) as score FROM submissions s1 WHERE problemset=$1 AND problem=$2 GROUP BY s1.user_id) s2 INNER JOIN submissions s1 ON s1.user_id=s2.user_id AND s1.score=s2.score AND s1.problemset=$1 AND s1.problem=$2", problemSet, problem).Bind(context.TODO(), s.db, &sbs); err != nil {
+		return s.internalError(c, err, "hiba")
+	}
+
+	sort.Slice(sbs, func(i, j int) bool {
+		return sbs[i].Score.Float32 > sbs[j].Score.Float32
+	})
+
+	return c.Render(http.StatusOK, "problemset_problem_ranklist.gohtml", struct {
+		Problem problems.Problem
+		Submissions []*models.Submission
+	}{prob, sbs})
 }
