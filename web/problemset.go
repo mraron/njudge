@@ -30,8 +30,8 @@ func (s *Server) getProblemsetList(c echo.Context) error {
 
 	u := c.Get("user").(*models.User)
 
-	name := c.Param("name")
-	problemLst, err := models.ProblemRels(Where("problemset=?", name)).All(s.db)
+	problemSet := c.Param("name")
+	problemLst, err := models.ProblemRels(Where("problemset=?", problemSet)).All(s.db)
 
 	if err != nil {
 		return s.internalError(c, err, "Belső hiba.")
@@ -48,32 +48,16 @@ func (s *Server) getProblemsetList(c echo.Context) error {
 			Count int64
 		}{0}
 
-		err := queries.Raw("SELECT COUNT(DISTINCT user_id) FROM submissions WHERE problemset=$1 and problem=$2 and verdict=0", name, problemLst[i].Problem).Bind(context.TODO(), s.db, &cnt)
+		err := queries.Raw("SELECT COUNT(DISTINCT user_id) FROM submissions WHERE problemset=$1 and problem=$2 and verdict=0", problemSet, problemLst[i].Problem).Bind(context.TODO(), s.db, &cnt)
 		if err != nil && !errors.Is(err, sql.ErrNoRows) {
 			return s.internalError(c, err, "Belső hiba.")
 		}
 
-		solvedStatus := -1
-		if u != nil {
-			cnt, err := models.Submissions(Where("problemset = ?", name), Where("problem = ?", problemLst[i].Problem), Where("verdict = 0"), Where("user_id = ?", u.ID)).Count(s.db)
-			if err != nil && !errors.Is(err, sql.ErrNoRows) {
-				return s.internalError(c, err, "Belső hiba.")
-			}else {
-				if cnt > 0 {
-					solvedStatus = 0
-				} else {
-					cnt, err := models.Submissions(Where("problemset = ?", name), Where("problem = ?", problemLst[i].Problem), Where("user_id = ?", u.ID)).Count(s.db)
-					if err != nil && !errors.Is(err, sql.ErrNoRows) {
-						return s.internalError(c, err, "Belső hiba.")
-					} else {
-						if cnt>0 {
-							solvedStatus = 1
-						}
-					}
-				}
-			}
+		solvedStatus, err := s.UserSolvedStatus(problemSet, problemLst[i].Problem, u)
+		if err != nil {
+			return s.internalError(c, err, "Belső hiba.")
 		}
-		fmt.Println(solvedStatus)
+
 		lst[i] = problem{Problem: s.getProblem(problemLst[i].Problem), SolverCount: int(cnt.Count), SolvedStatus: solvedStatus}
 	}
 
@@ -188,11 +172,14 @@ type taskArchiveTreeNode struct {
 	Type     string
 	Name     string
 	Link     string
+	SolvedStatus int
 	Children []*taskArchiveTreeNode
 }
 
-//@TODO optimize this to use less queries
+//@TODO optimize this to use less queries, most likely caching it
 func (s *Server) getTaskArchive(c echo.Context) error {
+	u := c.Get("user").(*models.User)
+
 	lst, err := models.ProblemCategories(Where("parent_id IS NULL")).All(s.db)
 	if err != nil {
 		return s.internalError(c, err, "Belső hiba.")
@@ -209,7 +196,16 @@ func (s *Server) getTaskArchive(c echo.Context) error {
 		}
 
 		for _, problem := range problems {
-			tree.Children = append(tree.Children, &taskArchiveTreeNode{id, "problem", translateContent("hungarian", s.getProblem(problem.Problem).Titles()).String(), fmt.Sprintf("/problemset/%s/%s/", problem.Problemset, problem.Problem), make([]*taskArchiveTreeNode, 0)})
+			elem := &taskArchiveTreeNode{Id:id, Type: "problem", Name: translateContent("hungarian", s.getProblem(problem.Problem).Titles()).String(), Link: fmt.Sprintf("/problemset/%s/%s/", problem.Problemset, problem.Problem), Children: make([]*taskArchiveTreeNode, 0), SolvedStatus: -1}
+			if u != nil {
+				elem.SolvedStatus, err = s.UserSolvedStatus(problem.Problemset, problem.Problem, u)
+				if err != nil {
+					return err
+				}
+			}
+
+			tree.Children = append(tree.Children, elem)
+
 			id++
 		}
 
@@ -220,7 +216,7 @@ func (s *Server) getTaskArchive(c echo.Context) error {
 		}
 
 		for _, cat := range subcats {
-			akt := &taskArchiveTreeNode{cat.ID, "category", cat.Name, "", make([]*taskArchiveTreeNode, 0)}
+			akt := &taskArchiveTreeNode{Id:cat.ID, Type:"category", Name:cat.Name, Link:"", Children: make([]*taskArchiveTreeNode, 0), SolvedStatus: -1}
 			tree.Children = append(tree.Children, akt)
 			if err := dfs(cat, akt); err != nil {
 				return err
@@ -231,7 +227,7 @@ func (s *Server) getTaskArchive(c echo.Context) error {
 	}
 
 	for _, start := range lst {
-		roots = append(roots, &taskArchiveTreeNode{start.ID, "category", start.Name, "", make([]*taskArchiveTreeNode, 0)})
+		roots = append(roots, &taskArchiveTreeNode{Id:start.ID, Type: "category", Name: start.Name, Link: "", Children: make([]*taskArchiveTreeNode, 0), SolvedStatus: -1})
 		if dfs(start, roots[len(roots)-1]) != nil {
 			return s.internalError(c, err, "Belső hiba.")
 		}
