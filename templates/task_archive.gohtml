@@ -7,7 +7,7 @@
 
     {{range $c := .Children}}
         {{if eq $c.Type "problem"}}
-            <a href="{{$c.Link}}">{{$c.Name}} {{if eq $c.SolvedStatus 0}}<i class="fa fa-check text-success"></i>{{end}}{{if eq $c.SolvedStatus 1}}<i class="fa fa-times text-danger"></i>{{end}}<br>
+            <a href="{{$c.Link}}">{{$c.Name}} {{if eq $c.SolvedStatus 0}}<i class="fa fa-check text-success"></i>{{end}}{{if eq $c.SolvedStatus 1}}<i class="fa fa-times text-danger"></i>{{end}}</a><br>
         {{else}}
             <div class="problemcategory-header">
                 <a class="collapse-toggle" data-toggle="collapse" href="#category{{$c.Id}}">{{$c.Name}}</a>
