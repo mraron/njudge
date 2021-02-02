@@ -42,6 +42,7 @@ import (
 )
 
 type Server struct {
+	Mode string
 	Hostname       string
 	Port           string
 	ProblemsDir    string
@@ -274,7 +275,10 @@ func (s *Server) runJudger() {
 }
 
 func (s *Server) Run() {
-	boil.DebugMode=true
+	if s.Mode == "development" {
+		boil.DebugMode = true
+	}
+
 	//@TODO add a member to Server
 	loc, err := time.LoadLocation("Europe/Budapest")
 	if err != nil {
