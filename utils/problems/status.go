@@ -121,6 +121,26 @@ type Testset struct {
 	Testcases []Testcase
 }
 
+func (ts *Testset) SetTimeLimit(tl time.Duration) {
+	for ind := range ts.Testcases {
+		ts.Testcases[ind].TimeLimit = tl
+	}
+
+	for ind := range ts.Groups {
+		ts.Groups[ind].SetTimeLimit(tl)
+	}
+}
+
+func (ts *Testset) SetMemoryLimit(ml int) {
+	for ind := range ts.Testcases {
+		ts.Testcases[ind].MemoryLimit = ml
+	}
+
+	for ind := range ts.Groups {
+		ts.Groups[ind].SetMemoryLimit(ml)
+	}
+}
+
 func (ts Testset) Score() (res float64) {
 	for _, g := range ts.Groups {
 		res += g.Score()
@@ -176,11 +196,23 @@ func (ts Testset) MaxTimeSpent() time.Duration {
 //
 // Represents a group of testcases inside a testset
 //
-type Group struct {
+type Group struct {	
 	Name         string
 	Scoring      ScoringType
 	Testcases    []Testcase
 	Dependencies []string //@TODO: actually support this
+}
+
+func (g *Group) SetTimeLimit(tl time.Duration) {
+	for ind := range g.Testcases {
+		g.Testcases[ind].TimeLimit = tl
+	}
+}
+
+func (g *Group) SetMemoryLimit(ml int) {
+	for ind := range g.Testcases {
+		g.Testcases[ind].MemoryLimit = ml
+	}
 }
 
 func (ts Group) Score() float64 {
