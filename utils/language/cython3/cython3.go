@@ -35,12 +35,12 @@ func (c cython3) Compile(s language.Sandbox, r language.File, w io.Writer, e io.
 	}
 
 	errorStream := &bytes.Buffer{}
-	if _, err := s.SetMaxProcesses(200).Env().TimeLimit(10*time.Second).MemoryLimit(2560000).Stdout(errorStream).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/cython3 -3 --embed -o main.c main.py ", false); err != nil {
+	if _, err := s.SetMaxProcesses(200).Env().TimeLimit(10*time.Second).MemoryLimit(2560000).Stdout(errorStream).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/cython3 -3 --embed -o main.c main.py", false); err != nil {
 		e.Write(errorStream.Bytes())
 		return err
 	}
 
-	if _, err := s.SetMaxProcesses(200).Env().TimeLimit(10*time.Second).MemoryLimit(2560000).Stdout(errorStream).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/gcc -O2 -I/usr/include/python3.9 -o main main.c -lpython3.9 -lpthread -lm -lutil -ldl ", false); err != nil {
+	if _, err := s.SetMaxProcesses(200).Env().TimeLimit(10*time.Second).MemoryLimit(2560000).Stdout(errorStream).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/gcc -O2 -I/usr/include/python3.9 -o main main.c -lpython3.9 -lpthread -lm -lutil -ldl", false); err != nil {
 		e.Write(errorStream.Bytes())
 		return err
 	}
