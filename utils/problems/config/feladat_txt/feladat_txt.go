@@ -159,7 +159,7 @@ func (p Problem) Check(tc *problems.Testcase) error {
 
 	tc.CheckerOutput = problems.Truncate(stdout.String())
 	if err == nil || strings.HasPrefix(err.Error(), "exit status") {
-		spltd := strings.Split(strings.TrimSpace(stdout.String()), "\n")
+		spltd := strings.Split(strings.TrimSpace(stdout.String()), ":")
 
 		score := 0.0
 		for i := 0; i < len(spltd); i++ {
