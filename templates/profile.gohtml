@@ -1,3 +1,5 @@
 {{template "header" .}}
-    <img src="https://www.gravatar.com/avatar/{{gravatarHash .Data.User}}?d=identicon">
+    <img src="https://www.gravatar.com/avatar/{{gravatarHash .Data.User}}?d=identicon&s=80" width="80px" height="80px"><br>
+    {{.Data.User.Name}}<br>
+    <a href="/problemset/status?user_id={{.Data.User.ID}}">Beküldések</a>
 {{template "footer" .}}
