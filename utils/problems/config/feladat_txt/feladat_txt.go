@@ -167,8 +167,6 @@ func (p Problem) Check(tc *problems.Testcase) error {
 			spltd = strings.Split(strings.TrimSpace(str), "\n")
 		}
 
-		fmt.Println(spltd, len(spltd), stderr.String(), str, "!!!!!!!")
-
 		score := 0.0
 		for i := 0; i < len(spltd); i++ {
 			spltd[i] = strings.TrimSpace(spltd[i])
