@@ -157,9 +157,17 @@ func (p Problem) Check(tc *problems.Testcase) error {
 
 	err = cmd.Run()
 
-	tc.CheckerOutput = problems.Truncate(stdout.String())
+	str := stdout.String()
+	tc.CheckerOutput = problems.Truncate(str)
 	if err == nil || strings.HasPrefix(err.Error(), "exit status") {
-		spltd := strings.Split(strings.TrimSpace(stdout.String()), "\n")
+		var spltd []string
+		if strings.Contains(str, ":") {
+			spltd = strings.Split(strings.TrimSpace(str), ":")
+		}else {
+			spltd = strings.Split(strings.TrimSpace(str), "\n")
+		}
+
+		fmt.Println(spltd, len(spltd), stderr.String(), str, "!!!!!!!")
 
 		score := 0.0
 		for i := 0; i < len(spltd); i++ {
