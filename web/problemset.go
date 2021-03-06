@@ -31,7 +31,7 @@ func (s *Server) getProblemsetList(c echo.Context) error {
 	u := c.Get("user").(*models.User)
 
 	problemSet := c.Param("name")
-	problemLst, err := models.ProblemRels(Where("problemset=?", problemSet)).All(s.db)
+	problemLst, err := models.ProblemRels(Where("problemset=?", problemSet), OrderBy("id DESC")).All(s.db)
 
 	if err != nil {
 		return s.internalError(c, err, "Belső hiba.")
