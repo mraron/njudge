@@ -168,17 +168,20 @@ func (p Problem) Check(tc *problems.Testcase) error {
 		}
 
 		score := 0.0
+		allOk := true
 		for i := 0; i < len(spltd); i++ {
 			spltd[i] = strings.TrimSpace(spltd[i])
 			curr := strings.Split(spltd[i], ";")
 
 			if strings.TrimSpace(curr[len(curr)-2]) == "1" {
 				score = score + float64(p.Points[i*p.TestCount+tc.Index-1])
+			}else {
+				allOk = false
 			}
 		}
 
 		tc.Score = score
-		if score == tc.MaxScore {
+		if score == tc.MaxScore && allOk {
 			tc.VerdictName = problems.VERDICT_AC
 		} else if score != 0.0 {
 			tc.VerdictName = problems.VERDICT_PC
