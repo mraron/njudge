@@ -92,6 +92,7 @@ func (s *Server) getProblemsetProblemStatus(c echo.Context) error {
 
 func (s *Server) getProblemsetStatus(c echo.Context) error {
 	ac := c.QueryParam("ac")
+	userID := c.QueryParam("user_id")
 	problemset := c.QueryParam("problem_set")
 	problem := c.QueryParam("problem")
 	page, err := strconv.Atoi(c.QueryParam("page"))
@@ -100,14 +101,14 @@ func (s *Server) getProblemsetStatus(c echo.Context) error {
 	}
 
 	query := []QueryMod{}
-	if problem == "" {
-		query = []QueryMod{}
-	} else {
-		if ac == "1" {
-			query = []QueryMod{Where("verdict = 0"), Where("problem = ?", problem), Where("problemset = ?", problemset)}
-		} else {
-			query = []QueryMod{Where("problem = ?", problem), Where("problemset = ?", problemset)}
-		}
+	if problem != "" {
+		query = append(query, Where("problem = ?", problem), Where("problemset = ?", problemset))
+	}
+	if ac == "1" {
+		query = append(query, Where("verdict = 0"))
+	}
+	if userID != "" {
+		query = append(query, Where("user_id = ?", userID))
 	}
 
 	statusPage, err := s.GetStatusPage(page, 20, OrderBy("id DESC"), query, c.Request().URL.Query())

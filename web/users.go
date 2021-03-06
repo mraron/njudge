@@ -16,6 +16,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"math/rand"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 )
@@ -415,7 +416,12 @@ func (s *Server) putAPIUser(c echo.Context) error {
 }
 
 func (s *Server) getUserProfile(c echo.Context) error {
-	user, err := models.Users(Where("name = ?", c.Param("name"))).One(s.db)
+	name, err := url.QueryUnescape(c.Param("name"))
+	if err != nil {
+		return s.internalError(c, err, "hiba")
+	}
+
+	user, err := models.Users(Where("name = ?", name)).One(s.db)
 	if err != nil {
 		return s.internalError(c, err, "error")
 	}
