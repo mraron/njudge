@@ -20,10 +20,10 @@ import (
 	_ "github.com/mraron/njudge/utils/language/cpp14"
 	_ "github.com/mraron/njudge/utils/language/golang"
 	_ "github.com/mraron/njudge/utils/language/julia"
+	_ "github.com/mraron/njudge/utils/language/nim"
 	_ "github.com/mraron/njudge/utils/language/octave"
 	_ "github.com/mraron/njudge/utils/language/pascal"
 	_ "github.com/mraron/njudge/utils/language/python3"
-	_ "github.com/mraron/njudge/utils/language/nim"
 	_ "github.com/mraron/njudge/utils/language/zip"
 
 	"github.com/mraron/njudge/web/models"
@@ -164,7 +164,7 @@ func (s *Server) runSyncJudges() {
 	for {
 		s.loadJudgesFromDB()
 		for _, j := range s.judges {
-			st, err := judge.NewFromUrl("http://" + j.Host + ":" + j.Port)
+			st, err := judge.NewFromUrl("http://" + j.Host + ":" + j.Port, "tok")
 
 			if err != nil {
 				log.Print("trying to access judge on ", j.Host, j.Port, " getting error ", err)
@@ -172,7 +172,7 @@ func (s *Server) runSyncJudges() {
 				j.Ping = -1
 				_, err = j.Update(s.db, boil.Infer())
 				if err != nil {
-					log.Print("also error occured while updating", err)
+					log.Print("also error occurred while updating", err)
 				}
 
 				continue
@@ -259,7 +259,7 @@ func (s *Server) runJudger() {
 				server.FromString(j.State)
 
 				if server.SupportsProblem(sub.Problem) {
-					err := server.Submit(judge.Submission{sub.ID, sub.Problem, sub.Language, sub.Source, "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(int(sub.ID))})
+					err := server.Submit(judge.Submission{sub.ID, sub.Problem, sub.Language, sub.Source, "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(int(sub.ID))}, "tok")
 					if err != nil {
 						log.Print("Trying to submit to server", j.Host, j.Port, "Error", err)
 						continue
