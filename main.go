@@ -62,7 +62,7 @@ func main() {
 					return err
 				}
 
-				return judge.NewFromCloning(server).Run()
+				return server.Run()
 			},
 		},
 		{
