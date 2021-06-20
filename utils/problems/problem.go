@@ -2,6 +2,7 @@ package problems
 
 import (
 	"github.com/mraron/njudge/utils/language"
+	"github.com/spf13/afero"
 	"io"
 )
 
@@ -27,10 +28,23 @@ func (s Content) String() string {
 	return string(s.Contents)
 }
 
-func FilterContentArray(arr []Content, mime string) (res []Content) {
-	res = make([]Content, 0)
-	for _, val := range arr {
+type Contents []Content
+
+func (cs Contents) FilterByType(mime string) Contents {
+	res := make(Contents, 0)
+	for _, val := range cs {
 		if mime == val.Type {
+			res = append(res, val)
+		}
+	}
+
+	return res
+}
+
+func (cs Contents) FilterByLocale(locale string) Contents {
+	res := make(Contents, 0)
+	for _, val := range cs {
+		if locale == val.Locale {
 			res = append(res, val)
 		}
 	}
@@ -52,19 +66,28 @@ type File struct {
 //@TODO add problem config type name
 
 type Problem interface {
-	Titles() []Content
-	Statements() []Content
-	HTMLStatements() []Content
-	PDFStatements() []Content
+	Name() string
+	Titles() Contents
+	Statements() Contents
+	HTMLStatements() Contents
+	PDFStatements() Contents
 
 	Attachments() []Attachment
 	Tags() []string
 
-	JudgingInformation
+	Judgeable
 }
 
-type JudgingInformation interface {
-	Name() string
+//@TODO redo problem
+
+type FullProblem interface {
+	Problem
+	Judgeable
+	Validatable
+	Exportable
+}
+
+type Judgeable interface {
 	MemoryLimit() int
 	TimeLimit() int
 	Check(*Testcase) error
@@ -75,10 +98,18 @@ type JudgingInformation interface {
 	TaskTypeName() string
 }
 
+type Validatable interface {
+	Validate(*Testcase) (bool, error)
+}
+
+type Exportable interface {
+	Export(afero.Fs, string) error
+}
+
 type TaskType interface {
 	Name() string
-	Compile(JudgingInformation, language.Sandbox, language.Language, io.Reader, io.Writer) (io.Reader, error)
-	Run(JudgingInformation, *language.SandboxProvider, language.Language, io.Reader, chan string, chan Status) (Status, error)
+	Compile(Judgeable, language.Sandbox, language.Language, io.Reader, io.Writer) (io.Reader, error)
+	Run(Judgeable, *language.SandboxProvider, language.Language, io.Reader, chan string, chan Status) (Status, error)
 }
 
 func Truncate(s string) string {

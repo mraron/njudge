@@ -19,7 +19,7 @@ func (o OutputOnly) Name() string {
 	return "outputonly"
 }
 
-func (o OutputOnly) Compile(jinfo problems.JudgingInformation, s language.Sandbox, l language.Language, src io.Reader, errw io.Writer) (io.Reader, error) {
+func (o OutputOnly) Compile(jinfo problems.Judgeable, s language.Sandbox, l language.Language, src io.Reader, errw io.Writer) (io.Reader, error) {
 	zipContents, err := ioutil.ReadAll(src)
 	if err != nil {
 		errw.Write([]byte(err.Error()))
@@ -37,7 +37,7 @@ func (o OutputOnly) Compile(jinfo problems.JudgingInformation, s language.Sandbo
 	return bytes.NewReader(zipContents), nil
 }
 
-func (o OutputOnly) Run(jinfo problems.JudgingInformation, sp *language.SandboxProvider, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
+func (o OutputOnly) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
 	defer func() {
 		close(testNotifier)
 		close(statusNotifier)

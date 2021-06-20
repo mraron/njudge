@@ -18,7 +18,7 @@ func (s Stub) Name() string {
 	return "stub"
 }
 
-func (s Stub) Compile(jinfo problems.JudgingInformation, sandbox language.Sandbox, lang language.Language, src io.Reader, dest io.Writer) (io.Reader, error) {
+func (s Stub) Compile(jinfo problems.Judgeable, sandbox language.Sandbox, lang language.Language, src io.Reader, dest io.Writer) (io.Reader, error) {
 	lst, found := jinfo.Languages(), false
 
 	for _, l := range lst {
@@ -28,7 +28,7 @@ func (s Stub) Compile(jinfo problems.JudgingInformation, sandbox language.Sandbo
 	}
 
 	if !found {
-		return nil, errors.New(fmt.Sprintf("running problem %s on %s tasktype, language %s is not supported", jinfo.Name(), s.Name(), lang.Name()))
+		return nil, errors.New(fmt.Sprintf("%s tasktype: language %s is not supported", s.Name(), lang.Name()))
 	}
 
 	files := jinfo.Files()
@@ -60,7 +60,7 @@ func (s Stub) Compile(jinfo problems.JudgingInformation, sandbox language.Sandbo
 	return buf, nil
 }
 
-func (Stub) Run(jinfo problems.JudgingInformation, sp *language.SandboxProvider, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
+func (Stub) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
 	return batch.Batch{}.Run(jinfo, sp, lang, bin, testNotifier, statusNotifier)
 }
 

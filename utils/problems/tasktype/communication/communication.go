@@ -20,7 +20,7 @@ func (b Communication) Name() string {
 	return "communication"
 }
 
-func (b Communication) Compile(jinfo problems.JudgingInformation, sandbox language.Sandbox, lang language.Language, src io.Reader, dest io.Writer) (io.Reader, error) {
+func (b Communication) Compile(jinfo problems.Judgeable, sandbox language.Sandbox, lang language.Language, src io.Reader, dest io.Writer) (io.Reader, error) {
 	return stub.Stub{}.Compile(jinfo, sandbox, lang, src, dest)
 }
 
@@ -32,7 +32,7 @@ func truncate(s string) string {
 	return s[:255] + "..."
 }
 
-func (b Communication) Run(jinfo problems.JudgingInformation, sp *language.SandboxProvider, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
+func (b Communication) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
 	var (
 		ans            problems.Status
 		skeleton       = jinfo.StatusSkeleton()

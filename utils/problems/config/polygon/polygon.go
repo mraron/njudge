@@ -5,6 +5,7 @@ import (
 	_ "github.com/mraron/njudge/utils/language/cpp11"
 	_ "github.com/mraron/njudge/utils/language/cpp14"
 	"github.com/mraron/njudge/utils/problems"
+	"github.com/spf13/afero"
 	"os/exec"
 	"syscall"
 
@@ -156,10 +157,12 @@ type Assets struct {
 }
 
 type Problem struct {
+	config *config
+
 	Path                   string
 	JSONStatementList      []JSONStatement
 	AttachmentsList        []problems.Attachment
-	GeneratedStatementList []problems.Content
+	GeneratedStatementList problems.Contents
 
 	TaskType      string      `xml:"njudge-task-type,attr"`
 	FeedbackType  string      `xml:"njudge-feedback-type,attr"`
@@ -179,8 +182,8 @@ func (p Problem) Name() string {
 	return p.ShortName
 }
 
-func (p Problem) Titles() []problems.Content {
-	ans := make([]problems.Content, len(p.Names))
+func (p Problem) Titles() problems.Contents {
+	ans := make(problems.Contents, len(p.Names))
 	for i := 0; i < len(p.Names); i++ {
 		ans[i] = problems.Content{p.Names[i].Language, []byte(p.Names[i].Value), "text"}
 	}
@@ -188,30 +191,16 @@ func (p Problem) Titles() []problems.Content {
 	return ans
 }
 
-func (p Problem) Statements() []problems.Content {
+func (p Problem) Statements() problems.Contents {
 	return p.GeneratedStatementList
 }
 
-func (p Problem) HTMLStatements() []problems.Content {
-	lst := make([]problems.Content, 0)
-	for _, val := range p.GeneratedStatementList {
-		if val.Type == "text/html" {
-			lst = append(lst, val)
-		}
-	}
-
-	return lst
+func (p Problem) HTMLStatements() problems.Contents {
+	return p.GeneratedStatementList.FilterByType("text/html")
 }
 
-func (p Problem) PDFStatements() []problems.Content {
-	lst := make([]problems.Content, 0)
-	for _, val := range p.GeneratedStatementList {
-		if val.Type == "application/pdf" {
-			lst = append(lst, val)
-		}
-	}
-
-	return lst
+func (p Problem) PDFStatements() problems.Contents {
+	return p.GeneratedStatementList.FilterByType("application/pdf")
 }
 
 func (p Problem) MemoryLimit() int {
@@ -227,7 +216,7 @@ func (p Problem) InputOutputFiles() (string, string) {
 }
 
 func (p Problem) Interactive() bool {
-	return false
+	return false //@BUG xd
 }
 
 func (p Problem) Attachments() []problems.Attachment {
@@ -368,142 +357,191 @@ func (p Problem) TaskTypeName() string {
 	return p.TaskType
 }
 
-//@TODO actually respect problem.xml with statements and checkers
-
-func parser(path string) (problems.Problem, error) {
-	problemXML := filepath.Join(path, "problem.xml")
-
-	f, err := os.Open(problemXML)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	p := Problem{}
-
-	dec := xml.NewDecoder(f)
-	if err := dec.Decode(&p); err != nil {
-		return nil, err
+func (p Problem) compileIfNotCompiled(src, dst string) error {
+	if src == "" {
+		return nil
 	}
 
-	p.Path = path
-
-	list, err := ioutil.ReadDir(filepath.Join(path, "statements"))
-	if err == nil {
-		for _, dir := range list {
-			if !dir.IsDir() || strings.HasPrefix(dir.Name(), ".") {
-				continue
-			}
-
-			jsonstmt := JSONStatement{}
-
-			propertiesFile, err := os.Open(filepath.Join(path, "statements", dir.Name(), "problem-properties.json"))
-			if err != nil {
-				return nil, err
-			}
-			defer propertiesFile.Close()
-
-			dec := json.NewDecoder(propertiesFile)
-			if err := dec.Decode(&jsonstmt); err != nil {
-				return nil, err
-			}
-
-			convert_pandoc := func(str *string) {
-				if err != nil {
-					return
-				}
-
-				buf := &bytes.Buffer{}
-
-				cmd := exec.Command("pandoc", "--mathjax", "-f", "latex", "-t", "html")
-				cmd.Stdin = strings.NewReader(*str)
-				cmd.Stdout = buf
-
-				err = cmd.Run()
-				if err == nil {
-					*str = buf.String()
-				}
-			}
-
-			convert_pandoc(&jsonstmt.Legend)
-			convert_pandoc(&jsonstmt.Input)
-			convert_pandoc(&jsonstmt.Output)
-			convert_pandoc(&jsonstmt.Notes)
-			convert_pandoc(&jsonstmt.Scoring)
-
-			if err != nil {
-				return nil, err
-			}
-
-			jsonstmt.InputFile, jsonstmt.OutputFile = p.InputOutputFiles()
-			jsonstmt.TimeLimit = p.TimeLimit()
-			jsonstmt.MemoryLimit = p.MemoryLimit()
-
-			p.JSONStatementList = append(p.JSONStatementList, jsonstmt)
-
-			buf := bytes.Buffer{}
-			htmlTmpl.Execute(&buf, jsonstmt)
-
-			p.GeneratedStatementList = append(p.GeneratedStatementList, problems.Content{Locale: dir.Name(), Contents: buf.Bytes(), Type: "text/html"})
-		}
-
-		for _, stmt := range p.StatementList {
-			statementPath := filepath.Join(path, stmt.Path)
-
-			cont, err := ioutil.ReadFile(statementPath)
-			if err != nil {
-				return nil, err
-			}
-
-			p.GeneratedStatementList = append(p.GeneratedStatementList, problems.Content{Locale: stmt.Language, Contents: cont, Type: stmt.Type})
-		}
-	}
-
-	if _, err := os.Stat(filepath.Join(path, "check")); os.IsNotExist(err) {
-		if checkerBinary, err := os.Create(filepath.Join(path, "check")); err == nil {
-			defer checkerBinary.Close()
+	if st, err := p.config.fs.Stat(filepath.Join(p.Path, dst)); os.IsNotExist(err) ||  st.Size() == 0 {
+		if binary, err := p.config.fs.Create(filepath.Join(p.Path, dst)); err == nil {
+			defer binary.Close()
 
 			if lang := language.Get("cpp14"); lang != nil {
-				if checkerFile, err := os.Open(filepath.Join(path, p.Assets.Checker.Source.Path)); err == nil {
-					defer checkerFile.Close()
-					fmt.Println(filepath.Join(path, p.Assets.Checker.Source.Path), "!!!")
-					if err := lang.InsecureCompile(filepath.Join(path, "files"), checkerFile, checkerBinary, os.Stderr); err != nil {
-						return nil, err
+				if file, err := p.config.fs.Open(filepath.Join(p.Path, src)); err == nil {
+					defer file.Close()
+					if err := lang.InsecureCompile(filepath.Join(p.Path, "files"), file, binary, os.Stderr); err != nil {
+						return err
 					}
 
-					if err := os.Chmod(filepath.Join(path, "check"), os.ModePerm); err != nil {
-						return nil, err
+					if err := p.config.fs.Chmod(filepath.Join(p.Path, dst), os.ModePerm); err != nil {
+						return err
 					}
 				} else {
-					return nil, err
+					return err
 				}
 			} else {
-				return nil, errors.New("error while parsing polygon problem can't compile polygon checker because there's no cpp11 compiler")
+				return errors.New("can't compile file, no cpp14 compiler")
 			}
 		} else {
-			return nil, err
+			return err
 		}
 	}
 
-	for _, val := range p.Assets.Attachments {
-		attachmentLocation := filepath.Join(path, val.Location)
-		contents, err := ioutil.ReadFile(attachmentLocation)
+	return nil
+}
+
+//@TODO actually respect problem.xml with statements and checkers
+
+type config struct {
+	fs afero.Fs
+	compileBinaries bool
+}
+
+func newConfig() *config {
+	return &config{fs: afero.NewOsFs(), compileBinaries: true}
+}
+
+type Option func(*config)
+
+func UseFS(fs afero.Fs) Option {
+	return func(c *config) {
+		c.fs = fs
+	}
+}
+
+func CompileBinaries(compile bool) Option {
+	return func(c *config) {
+		c.compileBinaries = compile
+	}
+}
+
+func ParserAndIdentifier(opts... Option) (problems.ConfigParser, problems.ConfigIdentifier) {
+	cfg := newConfig()
+	for _, opt := range opts {
+		opt(cfg)
+	}
+
+	parser := func(path string) (problems.Problem, error) {
+		problemXML := filepath.Join(path, "problem.xml")
+
+		f, err := cfg.fs.Open(problemXML)
 		if err != nil {
 			return nil, err
 		}
+		defer f.Close()
 
-		p.AttachmentsList = append(p.AttachmentsList, problems.Attachment{val.Name, contents})
+		p := Problem{config: cfg}
+
+		dec := xml.NewDecoder(f)
+		if err := dec.Decode(&p); err != nil {
+			return nil, err
+		}
+
+		p.Path = path
+
+		list, err := ioutil.ReadDir(filepath.Join(path, "statements"))
+		if err == nil {
+			for _, dir := range list {
+				if !dir.IsDir() || strings.HasPrefix(dir.Name(), ".") {
+					continue
+				}
+
+				jsonstmt := JSONStatement{}
+
+				propertiesFile, err := cfg.fs.Open(filepath.Join(path, "statements", dir.Name(), "problem-properties.json"))
+				if err != nil {
+					return nil, err
+				}
+				defer propertiesFile.Close()
+
+				dec := json.NewDecoder(propertiesFile)
+				if err := dec.Decode(&jsonstmt); err != nil {
+					return nil, err
+				}
+
+				convertPandoc := func(str *string) {
+					if err != nil {
+						return
+					}
+
+					buf := &bytes.Buffer{}
+
+					cmd := exec.Command("pandoc", "--mathjax", "-f", "latex", "-t", "html")
+					cmd.Stdin = strings.NewReader(*str)
+					cmd.Stdout = buf
+
+					err = cmd.Run()
+					if err == nil {
+						*str = buf.String()
+					}
+				}
+
+				convertPandoc(&jsonstmt.Legend)
+				convertPandoc(&jsonstmt.Input)
+				convertPandoc(&jsonstmt.Output)
+				convertPandoc(&jsonstmt.Notes)
+				convertPandoc(&jsonstmt.Scoring)
+
+				if err != nil {
+					return nil, err
+				}
+
+				jsonstmt.InputFile, jsonstmt.OutputFile = p.InputOutputFiles()
+				jsonstmt.TimeLimit = p.TimeLimit()
+				jsonstmt.MemoryLimit = p.MemoryLimit()
+
+				p.JSONStatementList = append(p.JSONStatementList, jsonstmt)
+
+				buf := bytes.Buffer{}
+				htmlTmpl.Execute(&buf, jsonstmt)
+
+				p.GeneratedStatementList = append(p.GeneratedStatementList, problems.Content{Locale: dir.Name(), Contents: buf.Bytes(), Type: "text/html"})
+			}
+
+			for _, stmt := range p.StatementList {
+				statementPath := filepath.Join(path, stmt.Path)
+
+				cont, err := ioutil.ReadFile(statementPath)
+				if err != nil {
+					return nil, err
+				}
+
+				p.GeneratedStatementList = append(p.GeneratedStatementList, problems.Content{Locale: stmt.Language, Contents: cont, Type: stmt.Type})
+			}
+		}
+
+		if cfg.compileBinaries {
+			if err := p.compileIfNotCompiled(p.Assets.Checker.Source.Path, "check"); err != nil {
+				return nil, err
+			}
+			if err := p.compileIfNotCompiled(p.Assets.Interactor.Source.Path, "files/interactor"); err != nil {
+				return nil, err
+			}
+		}
+
+		for _, val := range p.Assets.Attachments {
+			attachmentLocation := filepath.Join(path, val.Location)
+			contents, err := ioutil.ReadFile(attachmentLocation)
+			if err != nil {
+				return nil, err
+			}
+
+			p.AttachmentsList = append(p.AttachmentsList, problems.Attachment{Name:val.Name, Contents: contents})
+		}
+
+		return p, nil
 	}
 
-	return p, nil
-}
+	identifier := func(path string) bool {
+		_, err := cfg.fs.Stat(filepath.Join(path, "problem.xml"))
+		return !os.IsNotExist(err)
+	}
 
-func identifier(path string) bool {
-	_, err := os.Stat(filepath.Join(path, "problem.xml"))
-	return !os.IsNotExist(err)
+	return parser, identifier
 }
 
 func init() {
+	parser, identifier := ParserAndIdentifier(CompileBinaries(true))
 	problems.RegisterConfigType("polygon", parser, identifier)
 
 	if tmpl, err := template.New("polygonHtmlTemplate").Funcs(template.FuncMap{"div": func(a, b int) int { return a / b }}).Parse(htmlTemplate); err != nil {

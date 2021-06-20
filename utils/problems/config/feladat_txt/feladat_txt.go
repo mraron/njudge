@@ -20,7 +20,7 @@ type Problem struct {
 	Path           string
 	ShortName      string
 	Title          string
-	StatementList  []problems.Content
+	StatementList  problems.Contents
 	AttachmentList []problems.Attachment
 	TestCount      int
 	MemoryLimitKB  int
@@ -36,20 +36,20 @@ func (p Problem) Name() string {
 	return p.ShortName
 }
 
-func (p Problem) Titles() []problems.Content {
-	return []problems.Content{problems.Content{"hungarian", []byte(p.Title), "text"}}
+func (p Problem) Titles() problems.Contents {
+	return problems.Contents{problems.Content{"hungarian", []byte(p.Title), "text"}}
 }
 
-func (p Problem) Statements() []problems.Content {
+func (p Problem) Statements() problems.Contents {
 	return p.StatementList
 }
 
-func (p Problem) HTMLStatements() []problems.Content {
-	return problems.FilterContentArray(p.StatementList, "text/html")
+func (p Problem) HTMLStatements() problems.Contents {
+	return p.StatementList.FilterByType("text/html")
 }
 
-func (p Problem) PDFStatements() []problems.Content {
-	return problems.FilterContentArray(p.StatementList, "application/pdf")
+func (p Problem) PDFStatements() problems.Contents {
+	return p.StatementList.FilterByType("application/pdf")
 }
 
 func (p Problem) MemoryLimit() int {
@@ -292,7 +292,7 @@ func parser(path string) (problems.Problem, error) {
 		return nil, err
 	}
 
-	p.StatementList = make([]problems.Content, 0)
+	p.StatementList = make(problems.Contents, 0)
 	p.StatementList = append(p.StatementList, problems.Content{"hungarian", cont, "application/pdf"})
 
 	p.AttachmentList = make([]problems.Attachment, 0)
