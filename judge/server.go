@@ -109,6 +109,9 @@ func NewFromUrl(url, token string) (*Server, error) {
 	}
 
 	ans.url = url
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New("judger returned: "+resp.Status)
+	}
 
 	return &ans, nil
 }
@@ -197,16 +200,10 @@ func (s *Server) Run() error {
 			return fmt.Errorf("can't parse pem public key file: %s", s.PublicKeyLocation)
 		}
 
-		publicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
+		s.publicKey, err = x509.ParsePKCS1PublicKey(block.Bytes)
 		if err != nil {
 			return fmt.Errorf("can't decode publickey: %v", err)
 		}
-
-		if _, ok := publicKey.(*rsa.PublicKey); !ok {
-			return errors.New("bad key format")
-		}
-
-		s.publicKey = publicKey.(*rsa.PublicKey)
 	}
 
 	e := echo.New()
@@ -214,10 +211,10 @@ func (s *Server) Run() error {
 
 	if s.PublicKeyLocation != "" {
 		e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
-			TokenLookup: "query:token",
+			SigningMethod: "RS512",
 			ParseTokenFunc: func(auth string, c echo.Context) (interface{}, error) {
 				keyFunc := func(t *jwt.Token) (interface{}, error) {
-					if t.Method.Alg() != "RSA" {
+					if t.Method.Alg() != "RS512" {
 						return nil, fmt.Errorf("unexpected jwt signing method=%v", t.Header["alg"])
 					}
 					return s.publicKey, nil

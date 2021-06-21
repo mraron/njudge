@@ -1,6 +1,7 @@
 package web
 
 import (
+	"crypto/rsa"
 	"fmt"
 	"github.com/gorilla/sessions"
 	"github.com/jmoiron/sqlx"
@@ -69,6 +70,13 @@ type Server struct {
 	DBName     string
 
 	GluePort string
+
+	Keys struct {
+		PrivateKeyLocation string `json:"private_key"`
+		PublicKeyLocation string `json:"public_key"`
+		privateKey *rsa.PrivateKey
+		publicKey *rsa.PublicKey
+	}
 
 	judges        []*models.Judge
 	problems      map[string]problems.Problem
@@ -164,7 +172,13 @@ func (s *Server) runSyncJudges() {
 	for {
 		s.loadJudgesFromDB()
 		for _, j := range s.judges {
-			st, err := judge.NewFromUrl("http://" + j.Host + ":" + j.Port, "tok")
+			jwt, err := s.getJWT()
+			if err != nil {
+				log.Print(err)
+				continue
+			}
+
+			st, err := judge.NewFromUrl("http://" + j.Host + ":" + j.Port, jwt)
 
 			if err != nil {
 				log.Print("trying to access judge on ", j.Host, j.Port, " getting error ", err)
@@ -262,12 +276,17 @@ func (s *Server) runJudger() {
 				}
 
 				if server.SupportsProblem(sub.Problem) {
-					err := server.Submit(judge.Submission{sub.ID, sub.Problem, sub.Language, sub.Source, "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(int(sub.ID))}, "tok")
+					token, err := s.getJWT()
 					if err != nil {
+						log.Print("can't get jwt token", err)
+					}
+
+					if err = server.Submit(judge.Submission{sub.ID, sub.Problem, sub.Language, sub.Source, "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(int(sub.ID))}, token); err != nil {
 						log.Print("Trying to submit to server", j.Host, j.Port, "Error", err)
 						continue
 					}
-					if _, err := s.db.Exec("UPDATE submissions SET started=true WHERE id=$1", sub.ID); err != nil {
+
+					if _, err = s.db.Exec("UPDATE submissions SET started=true WHERE id=$1", sub.ID); err != nil {
 						log.Print("FATAL: ", err)
 					}
 					break
@@ -389,6 +408,7 @@ func (s *Server) Run() {
 	e.GET("/admin", s.getAdmin)
 
 	s.ConnectToDB()
+	s.parseKeys()
 
 	go s.runUpdateProblems()
 	go s.runSyncJudges()
