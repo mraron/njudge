@@ -68,8 +68,13 @@ type Server struct {
 	url string
 }
 
-func New(id, host, port, problemsDir, logDir, publicKeyLocation string) *Server {
-	return &Server{Id: id, Host: host, Port: port, Load: 0.0, PublicKeyLocation: publicKeyLocation, LogDir: logDir, ProblemsDir: problemsDir, problems: make(map[string]problems.Problem), ProblemList: make([]string, 0), Uptime: 0 * time.Second, start: time.Now(), queue: make(chan Submission, 100)}
+func New() *Server {
+	s := Server{}
+	s.problems = make(map[string]problems.Problem)
+	s.start = time.Now()
+	s.queue = make(chan Submission, 100)
+
+	return &s
 }
 
 func NewFromUrl(url, token string) (*Server, error) {
@@ -172,10 +177,16 @@ func (s *Server) Run() error {
 			return fmt.Errorf("can't parse pem public key file: %s", s.PublicKeyLocation)
 		}
 
-		s.publicKey, err = x509.ParsePKCS1PublicKey(block.Bytes)
+		publicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
 		if err != nil {
 			return fmt.Errorf("can't decode publickey: %v", err)
 		}
+
+		if _, ok := publicKey.(*rsa.PublicKey); !ok {
+			return errors.New("bad key format")
+		}
+
+		s.publicKey = publicKey.(*rsa.PublicKey)
 	}
 
 	e := echo.New()
