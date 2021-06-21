@@ -20,10 +20,10 @@ import (
 	_ "github.com/mraron/njudge/utils/language/cpp14"
 	_ "github.com/mraron/njudge/utils/language/golang"
 	_ "github.com/mraron/njudge/utils/language/julia"
+	_ "github.com/mraron/njudge/utils/language/nim"
 	_ "github.com/mraron/njudge/utils/language/octave"
 	_ "github.com/mraron/njudge/utils/language/pascal"
 	_ "github.com/mraron/njudge/utils/language/python3"
-	_ "github.com/mraron/njudge/utils/language/nim"
 	_ "github.com/mraron/njudge/utils/language/zip"
 
 	"github.com/mraron/njudge/web/models"
@@ -58,10 +58,20 @@ type Server struct {
 		Callback  string
 	}
 
-	MailAccount         string
-	MailServerHost      string
-	MailServerPort      string
-	MailAccountPassword string
+	Sendgrid struct {
+		Enabled bool
+		ApiKey string `json:"api_key"`
+		SenderName string `json:"sender_name"`
+		SenderAddress string `json:"sender_address"`
+	}
+
+	SMTP struct {
+		Enabled bool
+		MailAccount         string `json:"mail_account"`
+		MailServerHost      string `json:"mail_server"`
+		MailServerPort      string `json:"mail_port"`
+		MailAccountPassword string `json:"mail_password"`
+	} `json:"smtp"`
 
 	DBAccount  string
 	DBPassword string
