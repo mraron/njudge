@@ -27,6 +27,11 @@
     "sender_address": "[SECRET]"
   },
 
+  "keys": {
+    "private_key": "",
+    "public_key": ""
+  },
+
   "googleAuth": {
       "enabled": true,
       "clientKey": "[SECRET]",
