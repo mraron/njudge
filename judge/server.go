@@ -1,6 +1,10 @@
 package judge
 
 import (
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
+	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 	"github.com/shirou/gopsutil/load"
 	"log"
@@ -28,10 +32,10 @@ import (
 	_ "github.com/mraron/njudge/utils/language/cpp14"
 	_ "github.com/mraron/njudge/utils/language/golang"
 	_ "github.com/mraron/njudge/utils/language/julia"
+	_ "github.com/mraron/njudge/utils/language/nim"
 	_ "github.com/mraron/njudge/utils/language/octave"
 	_ "github.com/mraron/njudge/utils/language/pascal"
 	_ "github.com/mraron/njudge/utils/language/python3"
-	_ "github.com/mraron/njudge/utils/language/nim"
 )
 
 type Submission struct {
@@ -42,31 +46,56 @@ type Submission struct {
 	CallbackUrl string `json:"callback_url"`
 }
 
+//@TODO use contexts and afero => tests
+
 type Server struct {
 	Id          string
 	Host        string
 	Port        string
+	url string
+
+
+	ProblemsDir string `json:"problems_dir"`
+	LogDir      string `json:"log_dir"`
+	ProblemList []string `json:"problem_list"`
+	SandboxIds  []int `json:"sandbox_ids"`
+
 	Load        float64
-	ProblemsDir string
-	LogDir      string
-	ProblemList []string
 	Uptime      time.Duration
 
+	PublicKeyLocation       string `json:"public_key"`
+
 	sandboxProvider *language.SandboxProvider
-	secretKey       string
+	publicKey       *rsa.PublicKey
 	problems        map[string]problems.Problem
 	start           time.Time
 	queue           chan Submission
 }
 
-func New(id, host, port, problemsDir, logDir, secretKey string) *Server {
-	return &Server{Id: id, Host: host, Port: port, Load: 0.0, secretKey: secretKey, LogDir: logDir, ProblemsDir: problemsDir, problems: make(map[string]problems.Problem), ProblemList: make([]string, 0), Uptime: 0 * time.Second, start: time.Now(), queue: make(chan Submission, 100)}
+func New() *Server {
+	s := Server{}
+	s.problems = make(map[string]problems.Problem)
+	s.start = time.Now()
+	s.queue = make(chan Submission, 100)
+
+	return &s
 }
 
-func NewFromUrl(url string) (*Server, error) {
+func NewFromUrl(url, token string) (*Server, error) {
 	dst := url + "/status"
 
-	resp, err := http.Get(dst)
+	client := &http.Client{}
+
+	req, err := http.NewRequest("GET", dst, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if token != "" {
+		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
+	}
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -79,12 +108,27 @@ func NewFromUrl(url string) (*Server, error) {
 		return nil, err
 	}
 
+	ans.url = url
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New("judger returned: "+resp.Status)
+	}
+
 	return &ans, nil
 }
 
-func NewFromCloning(s *Server) *Server {
-	return New(s.Id, s.Host, s.Port, s.ProblemsDir, s.LogDir, s.secretKey)
+func NewFromString(str string) (*Server, error) {
+	s := New()
+	if err := json.Unmarshal([]byte(str), s); err != nil {
+		return nil, err
+	}
+
+	s.url = fmt.Sprintf("http://%s:%s", s.Host, s.Port)
+	return s, nil
 }
+
+//func NewFromCloning(s *Server) *Server {
+//	return New(s.Id, s.Host, s.Port, s.ProblemsDir, s.LogDir, s.PublicKeyLocation)
+//}
 
 func (s *Server) SupportsProblem(name string) bool {
 	for _, p := range s.ProblemList {
@@ -96,18 +140,30 @@ func (s *Server) SupportsProblem(name string) bool {
 	return true
 }
 
-func (s *Server) Submit(sub Submission) error {
-	dst := "http://" + s.Host + ":" + s.Port + "/judge"
+func (s *Server) Submit(sub Submission, token string) error {
+	dst := s.url + "/judge"
 
 	buf := bytes.Buffer{}
-	fmt.Println("postin ye", dst)
+
 	enc := json.NewEncoder(&buf)
 	err := enc.Encode(sub)
 	if err != nil {
 		return err
 	}
 
-	resp, err := http.Post(dst, "application/json", &buf)
+	client := &http.Client{}
+
+	req, err := http.NewRequest("POST", dst, &buf)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	if token != "" {
+		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
+	}
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return err
 	}
@@ -118,7 +174,8 @@ func (s *Server) Submit(sub Submission) error {
 		return err
 	}
 
-	if string(data) != "Queued" {
+	//@TODO ? maybe use json
+	if string(data) != "queued" {
 		return errors.New("Submit: server says: " + string(data))
 	}
 
@@ -126,13 +183,55 @@ func (s *Server) Submit(sub Submission) error {
 }
 
 func (s *Server) Run() error {
+	fmt.Println(s)
 	s.sandboxProvider = language.NewSandboxProvider()
-	s.sandboxProvider.Put(language.NewIsolateSandbox(0))
-	s.sandboxProvider.Put(language.NewIsolateSandbox(1))
-	s.sandboxProvider.Put(language.NewIsolateSandbox(2))
+	for _, id := range s.SandboxIds {
+		s.sandboxProvider.Put(language.NewIsolateSandbox(id))
+	}
+
+	if s.PublicKeyLocation != "" {
+		publicKeyContents, err := ioutil.ReadFile(s.PublicKeyLocation)
+		if err != nil {
+			return err
+		}
+
+		block, _ := pem.Decode(publicKeyContents)
+		if block == nil {
+			return fmt.Errorf("can't parse pem public key file: %s", s.PublicKeyLocation)
+		}
+
+		s.publicKey, err = x509.ParsePKCS1PublicKey(block.Bytes)
+		if err != nil {
+			return fmt.Errorf("can't decode publickey: %v", err)
+		}
+	}
 
 	e := echo.New()
 	e.Use(middleware.Logger())
+
+	if s.PublicKeyLocation != "" {
+		e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
+			SigningMethod: "RS512",
+			ParseTokenFunc: func(auth string, c echo.Context) (interface{}, error) {
+				keyFunc := func(t *jwt.Token) (interface{}, error) {
+					if t.Method.Alg() != "RS512" {
+						return nil, fmt.Errorf("unexpected jwt signing method=%v", t.Header["alg"])
+					}
+					return s.publicKey, nil
+				}
+
+				// claims are of type `jwt.MapClaims` when token is created with `jwt.Parse`
+				token, err := jwt.Parse(auth, keyFunc)
+				if err != nil {
+					return nil, err
+				}
+				if !token.Valid {
+					return nil, errors.New("invalid token")
+				}
+				return token, nil
+			},
+		}))
+	}
 
 	e.GET("/status", s.getStatus())
 	e.POST("/update", s.postUpdateProblems())
@@ -146,7 +245,6 @@ func (s *Server) Run() error {
 	return e.Start(":" + s.Port)
 }
 
-//@TODO make it a background process
 func (s *Server) runUpdateProblems() {
 	files, err := ioutil.ReadDir(s.ProblemsDir)
 	if err != nil {
@@ -243,7 +341,7 @@ func (s *Server) postJudge() echo.HandlerFunc {
 		s.queue <- sub
 		fmt.Println("queued")
 
-		return c.String(http.StatusOK, "Queued")
+		return c.String(http.StatusOK, "queued")
 	}
 }
 
@@ -252,6 +350,3 @@ func (s Server) ToString() (string, error) {
 	return string(val), err
 }
 
-func (s *Server) FromString(str string) error {
-	return json.Unmarshal([]byte(str), s)
-}
