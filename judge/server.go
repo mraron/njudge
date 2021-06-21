@@ -52,12 +52,17 @@ type Server struct {
 	Id          string
 	Host        string
 	Port        string
-	Load        float64
+	url string
+
+
 	ProblemsDir string `json:"problems_dir"`
 	LogDir      string `json:"log_dir"`
 	ProblemList []string `json:"problem_list"`
 	SandboxIds  []int `json:"sandbox_ids"`
+
+	Load        float64
 	Uptime      time.Duration
+
 	PublicKeyLocation       string `json:"public_key"`
 
 	sandboxProvider *language.SandboxProvider
@@ -65,7 +70,6 @@ type Server struct {
 	problems        map[string]problems.Problem
 	start           time.Time
 	queue           chan Submission
-	url string
 }
 
 func New() *Server {
@@ -87,7 +91,9 @@ func NewFromUrl(url, token string) (*Server, error) {
 		return nil, err
 	}
 
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
+	if token != "" {
+		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -105,6 +111,16 @@ func NewFromUrl(url, token string) (*Server, error) {
 	ans.url = url
 
 	return &ans, nil
+}
+
+func NewFromString(str string) (*Server, error) {
+	s := New()
+	if err := json.Unmarshal([]byte(str), s); err != nil {
+		return nil, err
+	}
+
+	s.url = fmt.Sprintf("http://%s:%s", s.Host, s.Port)
+	return s, nil
 }
 
 //func NewFromCloning(s *Server) *Server {
@@ -138,7 +154,11 @@ func (s *Server) Submit(sub Submission, token string) error {
 	if err != nil {
 		return err
 	}
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
+
+	req.Header.Add("Content-Type", "application/json")
+	if token != "" {
+		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -333,6 +353,3 @@ func (s Server) ToString() (string, error) {
 	return string(val), err
 }
 
-func (s *Server) FromString(str string) error {
-	return json.Unmarshal([]byte(str), s)
-}

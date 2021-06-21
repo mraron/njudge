@@ -32,10 +32,7 @@ func NewJudgeFromModelsJudge(j *models.Judge) (res Judge) {
 	res.Ping = j.Ping
 	res.Online = j.Online
 
-	server := &judge.Server{}
-	err := server.FromString(j.State)
-
-	if err == nil {
+	if server, err := judge.NewFromString(j.State); err == nil {
 		res.Name = server.Id
 		res.Load = server.Load
 		res.ProblemsDir = server.ProblemsDir

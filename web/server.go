@@ -255,8 +255,11 @@ func (s *Server) runJudger() {
 
 		for _, sub := range ss {
 			for _, j := range s.judges {
-				server := &judge.Server{}
-				server.FromString(j.State)
+				server, err := judge.NewFromString(j.State)
+				if err != nil {
+					log.Print("malformed judge: ", j.State, err)
+					continue
+				}
 
 				if server.SupportsProblem(sub.Problem) {
 					err := server.Submit(judge.Submission{sub.ID, sub.Problem, sub.Language, sub.Source, "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(int(sub.ID))}, "tok")
