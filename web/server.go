@@ -16,6 +16,7 @@ import (
 	"github.com/mraron/njudge/utils/problems"
 	_ "github.com/mraron/njudge/utils/problems/config/feladat_txt"
 	_ "github.com/mraron/njudge/utils/problems/config/polygon"
+	_ "github.com/mraron/njudge/utils/problems/config/task_yaml"
 
 	_ "github.com/mraron/njudge/utils/language/cpp11"
 	_ "github.com/mraron/njudge/utils/language/cpp14"
@@ -115,6 +116,7 @@ func (s *Server) getProblemExists(name string) (problems.Problem, bool) {
 	return p, ok
 }
 
+//@TODO refactor all of this in conjunction with the problems related stuff
 func (s *Server) AddProblem(dir string) (problems.Problem, error) {
 	if s.problems == nil {
 		s.problems = make(map[string]problems.Problem)
