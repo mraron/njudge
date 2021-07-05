@@ -96,14 +96,16 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 	run := true
 	for run {
 		select {
-		case test := <-testNotifier:
-			status := <-statusNotifier
+		case test, ok := <-testNotifier:
+			if ok {
+				status := <-statusNotifier
 
-			err2 := c.Callback(test, status, false)
+				err2 := c.Callback(test, status, false)
 
-			if err2 != nil {
-				logger.Print("Error while calling callback", err2)
-				return err
+				if err2 != nil {
+					logger.Print("Error while calling callback", err2)
+					return err
+				}
 			}
 		case <-ran:
 			run = false
