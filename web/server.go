@@ -293,7 +293,7 @@ func (s *Server) runJudger() {
 						log.Print("can't get jwt token", err)
 					}
 
-					if err = server.Submit(judge.Submission{sub.ID, sub.Problem, sub.Language, sub.Source, "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(int(sub.ID))}, token); err != nil {
+					if err = server.Submit(judge.Submission{Id:strconv.Itoa(sub.ID), Problem: sub.Problem, Language: sub.Language, Source: sub.Source, Stream: false, CallbackUrl: "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(sub.ID)}, token); err != nil {
 						log.Print("Trying to submit to server", j.Host, j.Port, "Error", err)
 						continue
 					}

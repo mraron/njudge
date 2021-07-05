@@ -7,6 +7,7 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 	"github.com/shirou/gopsutil/load"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -39,11 +40,15 @@ import (
 )
 
 type Submission struct {
-	Id          int    `json:"id"`
+	Id          string `json:"id"`
 	Problem     string `json:"problem"`
 	Language    string `json:"language"`
 	Source      []byte `json:"source"`
+	Stream      bool   `json:"stream"`
 	CallbackUrl string `json:"callback_url"`
+
+	w io.Writer
+	done chan bool
 }
 
 //@TODO use contexts and afero => tests
@@ -183,7 +188,6 @@ func (s *Server) Submit(sub Submission, token string) error {
 }
 
 func (s *Server) Run() error {
-	fmt.Println(s)
 	s.sandboxProvider = language.NewSandboxProvider()
 	for _, id := range s.SandboxIds {
 		s.sandboxProvider.Put(language.NewIsolateSandbox(id))
@@ -233,9 +237,9 @@ func (s *Server) Run() error {
 		}))
 	}
 
-	e.GET("/status", s.getStatus())
-	e.POST("/update", s.postUpdateProblems())
-	e.POST("/judge", s.postJudge())
+	e.GET("/status", s.getStatus)
+	e.POST("/update", s.postUpdateProblems)
+	e.POST("/judge", s.postJudge)
 
 	go s.runUpdateLoad()
 	go s.runUpdateUptime()
@@ -290,57 +294,72 @@ func (s *Server) runUpdateUptime() {
 
 func (s *Server) runJudger() {
 	for {
-		sub := <-s.queue
+		func() {
+			sub := <-s.queue
 
-		if _, ok := s.problems[sub.Problem]; !ok {
-			log.Print("judger: can't find problem", sub.Problem)
-			continue
-		}
+			defer func() {
+				sub.done <- true
+			}()
 
-		f, err := os.Create(filepath.Join(s.LogDir, fmt.Sprintf("judger.%d", sub.Id)))
-		if err != nil {
-			log.Print("judger: can't create logfile", err)
+			if _, ok := s.problems[sub.Problem]; !ok {
+				log.Print("judger: can't find problem", sub.Problem)
+				return
+			}
+
+			f, err := os.Create(filepath.Join(s.LogDir, fmt.Sprintf("judger.%d", sub.Id)))
+			if err != nil {
+				log.Print("judger: can't create logfile", err)
+				f.Close()
+				return
+			}
+
+			logger := log.New(f, "[judging]", log.Lshortfile)
+
+			callbacker := NewCombineCallback()
+			if sub.CallbackUrl != "" {
+				callbacker.Append(NewHTTPCallback(sub.CallbackUrl))
+			}
+
+			if sub.Stream {
+				callbacker.Append(NewWriterCallback(sub.w))
+			}
+
+			err = Judge(logger, s.problems[sub.Problem], sub.Source, language.Get(sub.Language), s.sandboxProvider, callbacker)
+			if err != nil {
+				log.Print("judger: error while running Judge", err)
+				f.Close()
+				return
+			}
+
 			f.Close()
-			continue
-		}
-
-		logger := log.New(f, "[judging]", log.Lshortfile)
-
-		err = Judge(logger, s.problems[sub.Problem], sub.Source, language.Get(sub.Language), s.sandboxProvider, NewHTTPCallback(sub.CallbackUrl))
-		if err != nil {
-			log.Print("judger: error while running Judge", err)
-			f.Close()
-			continue
-		}
-
-		f.Close()
+		}()
 	}
 }
 
-func (s *Server) getStatus() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		return c.JSON(http.StatusOK, s)
-	}
+func (s *Server) getStatus(c echo.Context) error {
+	return c.JSON(http.StatusOK, s)
 }
 
-func (s *Server) postUpdateProblems() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		s.runUpdateProblems()
-		return nil
-	}
+func (s *Server) postUpdateProblems(c echo.Context) error {
+	s.runUpdateProblems()
+	return nil
 }
 
-func (s *Server) postJudge() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		sub := Submission{}
-		if err := c.Bind(&sub); err != nil {
-			log.Print("getJudge error binding:", err)
-			return c.String(http.StatusBadRequest, "Parse error")
-		}
+func (s *Server) postJudge(c echo.Context) error {
+	sub := Submission{}
+	if err := c.Bind(&sub); err != nil {
+		log.Print("getJudge error binding:", err)
+		return c.String(http.StatusBadRequest, "Parse error")
+	}
 
+	sub.done = make(chan bool, 1)
+	if sub.Stream {
+		sub.w = c.Response()
 		s.queue <- sub
-		fmt.Println("queued")
-
+		<-sub.done
+		return c.String(http.StatusOK, "")
+	}else {
+		s.queue <- sub
 		return c.String(http.StatusOK, "queued")
 	}
 }

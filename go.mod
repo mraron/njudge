@@ -11,6 +11,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.1+incompatible
 	github.com/golang-migrate/migrate/v4 v4.13.0
 	github.com/gorilla/sessions v1.2.1
+	github.com/hashicorp/go-multierror v1.1.0
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/kat-co/vala v0.0.0-20170210184112-42e1d8b61f12
 	github.com/kataras/go-errors v0.0.3
