@@ -58,7 +58,7 @@ func (s *Server) getProblemsetList(c echo.Context) error {
 			return s.internalError(c, err, "Belső hiba.")
 		}
 
-		lst[i] = problem{Problem: s.getProblem(problemLst[i].Problem), SolverCount: int(cnt.Count), SolvedStatus: solvedStatus}
+		lst[i] = problem{Problem: s.GetProblem(problemLst[i].Problem), SolverCount: int(cnt.Count), SolvedStatus: solvedStatus}
 	}
 
 	return c.Render(http.StatusOK, "problemset_list.gohtml", struct {
@@ -101,11 +101,11 @@ func (s *Server) getProblemsetProblem(c echo.Context) error {
 	return c.Render(http.StatusOK, "problemset_problem.gohtml",struct{
 		Problem problems.Problem
 		LastLanguage string
-	}{s.getProblem(problem), lastLanguage})
+	}{s.GetProblem(problem), lastLanguage})
 }
 
 func (s *Server) getProblemsetProblemPDFLanguage(c echo.Context) error {
-	p, lang := s.getProblem(c.Param("problem")), c.Param("language")
+	p, lang := s.GetProblem(c.Param("problem")), c.Param("language")
 
 	if p == nil {
 		return c.String(http.StatusNotFound, "no such problem")
@@ -119,7 +119,7 @@ func (s *Server) getProblemsetProblemPDFLanguage(c echo.Context) error {
 }
 
 func (s *Server) getProblemsetProblemFile(c echo.Context) error {
-	p := s.getProblem(c.Param("problem"))
+	p := s.GetProblem(c.Param("problem"))
 
 	if p == nil {
 		return c.String(http.StatusNotFound, "not found")
@@ -147,7 +147,7 @@ func (s *Server) getProblemsetProblemFile(c echo.Context) error {
 }
 
 func (s *Server) getProblemsetProblemAttachment(c echo.Context) error {
-	p, attachment := s.getProblem(c.Param("problem")), c.Param("attachment")
+	p, attachment := s.GetProblem(c.Param("problem")), c.Param("attachment")
 	if p == nil {
 		return c.String(http.StatusNotFound, "no such problem")
 	}
@@ -196,7 +196,7 @@ func (s *Server) getTaskArchive(c echo.Context) error {
 		}
 
 		for _, problem := range problems {
-			elem := &taskArchiveTreeNode{Id:id, Type: "problem", Name: translateContent("hungarian", s.getProblem(problem.Problem).Titles()).String(), Link: fmt.Sprintf("/problemset/%s/%s/", problem.Problemset, problem.Problem), Children: make([]*taskArchiveTreeNode, 0), SolvedStatus: -1}
+			elem := &taskArchiveTreeNode{Id:id, Type: "problem", Name: translateContent("hungarian", s.GetProblem(problem.Problem).Titles()).String(), Link: fmt.Sprintf("/problemset/%s/%s/", problem.Problemset, problem.Problem), Children: make([]*taskArchiveTreeNode, 0), SolvedStatus: -1}
 			if u != nil {
 				elem.SolvedStatus, err = s.UserSolvedStatus(problem.Problemset, problem.Problem, u)
 				if err != nil {
@@ -240,7 +240,7 @@ func (s *Server) getTaskArchive(c echo.Context) error {
 func (s *Server) getProblemsetProblemRanklist(c echo.Context) error {
 	problemSet := c.Param("name")
 	problem := c.Param("problem")
-	prob := s.getProblem(problem)
+	prob := s.GetProblem(problem)
 
 	sbs := make([]*models.Submission, 0)
 

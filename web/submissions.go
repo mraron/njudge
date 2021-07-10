@@ -43,7 +43,7 @@ func (s *Server) Submit(uid int, problemset, problem, language string, source []
 		mustPanic(err)
 
 		id = 0
-		res, err := tx.Query("INSERT INTO submissions (status,\"user_id\",verdict,ontest,submitted,judged,problem,language,private,problemset,source,started) VALUES ($1,$2,$3,NULL,$4,NULL,$5,$6,false,$7, $8,false) RETURNING id", problems.Status{}, uid, VERDICT_UP, time.Now(), s.getProblem(problem).Name(), language, problemset, source)
+		res, err := tx.Query("INSERT INTO submissions (status,\"user_id\",verdict,ontest,submitted,judged,problem,language,private,problemset,source,started) VALUES ($1,$2,$3,NULL,$4,NULL,$5,$6,false,$7, $8,false) RETURNING id", problems.Status{}, uid, VERDICT_UP, time.Now(), s.GetProblem(problem).Name(), language, problemset, source)
 
 		mustPanic(err)
 
@@ -78,7 +78,6 @@ func (s *Server) postProblemsetSubmit(c echo.Context) error {
 		err error
 		id  int
 		p   problems.Problem
-		ok  bool
 	)
 
 	if u = c.Get("user").(*models.User); u == nil {
@@ -86,8 +85,10 @@ func (s *Server) postProblemsetSubmit(c echo.Context) error {
 	}
 
 	problemName := c.FormValue("problem")
-	if p, ok = s.getProblemExists(problemName); !ok {
+	if has, _ := s.ProblemStore.Has(problemName); !has {
 		return c.Render(http.StatusOK, "error.gohtml", "Hibás feladatazonosító.")
+	}else {
+		p, _ = s.ProblemStore.Get(problemName)
 	}
 
 	languageName := c.FormValue("language")
@@ -119,7 +120,7 @@ func (s *Server) postProblemsetSubmit(c echo.Context) error {
 		return s.internalError(c, err, "Belső hiba #2")
 	}
 
-	if id, err = s.Submit(u.ID, c.Get("problemset").(string), s.getProblem(c.FormValue("problem")).Name(), languageName, contents); err != nil {
+	if id, err = s.Submit(u.ID, c.Get("problemset").(string), s.GetProblem(c.FormValue("problem")).Name(), languageName, contents); err != nil {
 		return s.internalError(c, err, "Belső hiba #4")
 	}
 

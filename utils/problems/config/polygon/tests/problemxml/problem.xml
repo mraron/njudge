@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<problem revision="10" short-name="fancyfence" url="https://polygon.codeforces.com/p7sOD9i/noszaly.aron/fancyfence" njudge-task-type="batch" njudge-feedback-type="ioi">
+    <names>
+        <name language="english" value="Fancy Fence"/>
+    </names>
+    <statements>
+        <statement charset="UTF-8" language="english" mathjax="true" path="statements/english/problem.tex" type="application/x-tex"/>
+        <statement charset="UTF-8" language="english" mathjax="true" path="statements/.html/english/problem.html" type="text/html"/>
+        <statement language="english" path="statements/.pdf/english/problem.pdf" type="application/pdf"/>
+    </statements>
+    <tutorials>
+        <tutorial charset="UTF-8" language="english" mathjax="true" path="statements/english/tutorial.tex" type="application/x-tex"/>
+        <tutorial charset="UTF-8" language="english" mathjax="true" path="statements/.html/english/tutorial.html" type="text/html"/>
+        <tutorial language="english" path="statements/.pdf/english/tutorial.pdf" type="application/pdf"/>
+    </tutorials>
+    <judging cpu-name="Intel(R) Core(TM) i3-8100 CPU @ 3.60GHz" cpu-speed="3600" input-file="" output-file="">
+        <testset name="tests">
+            <time-limit>1000</time-limit>
+            <memory-limit>268435456</memory-limit>
+            <test-count>40</test-count>
+            <input-path-pattern>tests/%02d</input-path-pattern>
+            <answer-path-pattern>tests/%02d.a</answer-path-pattern>
+            <tests>
+                <test description="imported from github at 2020-08-16 14:47:57" group="subtask1" method="manual" points="0.0" sample="true"/>
+                <test description="imported from github at 2020-08-16 14:47:59" group="subtask1" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:48:01" group="subtask2" method="manual" points="12.0"/>
+                <test description="imported from github at 2020-08-16 14:48:02" group="subtask2" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:48:04" group="subtask2" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:48:06" group="subtask2" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:48:08" group="subtask2" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:48:09" group="subtask3" method="manual" points="13.0"/>
+                <test description="imported from github at 2020-08-16 14:48:11" group="subtask3" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:48:13" group="subtask3" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:48:16" group="subtask3" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:48:20" group="subtask3" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:48:23" group="subtask4" method="manual" points="15.0"/>
+                <test description="imported from github at 2020-08-16 14:48:25" group="subtask4" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:48:27" group="subtask4" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:48:30" group="subtask4" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:48:33" group="subtask4" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:48:36" group="subtask5" method="manual" points="15.0"/>
+                <test description="imported from github at 2020-08-16 14:48:39" group="subtask5" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:48:41" group="subtask5" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:48:43" group="subtask5" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:48:47" group="subtask5" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:48:50" group="subtask6" method="manual" points="18.0"/>
+                <test description="imported from github at 2020-08-16 14:48:52" group="subtask6" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:48:53" group="subtask6" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:48:55" group="subtask6" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:48:57" group="subtask6" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:49:01" group="subtask7" method="manual" points="27.0"/>
+                <test description="imported from github at 2020-08-16 14:49:03" group="subtask7" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:49:05" group="subtask7" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:49:08" group="subtask7" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:49:10" group="subtask7" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:49:15" group="subtask7" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:49:18" group="subtask7" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:49:21" group="subtask7" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:49:24" group="subtask7" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:49:26" group="subtask7" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:49:29" group="subtask7" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:49:33" group="subtask7" method="manual" points="0.0"/>
+                <test description="imported from github at 2020-08-16 14:49:36" group="subtask7" method="manual" points="0.0"/>
+            </tests>
+            <groups>
+                <group feedback-policy="complete" name="subtask1" points="0.0" points-policy="complete-group"/>
+                <group feedback-policy="complete" name="subtask2" points="12.0" points-policy="complete-group"/>
+                <group feedback-policy="complete" name="subtask3" points="13.0" points-policy="complete-group"/>
+                <group feedback-policy="complete" name="subtask4" points="15.0" points-policy="complete-group"/>
+                <group feedback-policy="complete" name="subtask5" points="15.0" points-policy="complete-group"/>
+                <group feedback-policy="complete" name="subtask6" points="18.0" points-policy="complete-group"/>
+                <group feedback-policy="complete" name="subtask7" points="27.0" points-policy="complete-group"/>
+            </groups>
+        </testset>
+    </judging>
+    <files>
+        <resources>
+            <file path="files/olymp.sty"/>
+            <file path="files/problem.tex"/>
+            <file path="files/statements.ftl"/>
+            <file path="files/testlib.h" type="h.g++"/>
+            <file path="files/tutorial.tex"/>
+        </resources>
+        <executables>
+            <executable>
+                <source path="files/validator.cpp" type="cpp.g++17"/>
+                <binary path="files/validator.exe" type="exe.win32"/>
+            </executable>
+        </executables>
+    </files>
+    <assets>
+        <checker name="std::wcmp.cpp" type="testlib">
+            <source path="files/check.cpp" type="cpp.g++17"/>
+            <binary path="check.exe" type="exe.win32"/>
+            <copy path="check.cpp"/>
+            <testset>
+                <test-count>0</test-count>
+                <input-path-pattern>files/tests/checker-tests/%02d</input-path-pattern>
+                <output-path-pattern>files/tests/checker-tests/%02d.o</output-path-pattern>
+                <answer-path-pattern>files/tests/checker-tests/%02d.a</answer-path-pattern>
+                <tests/>
+            </testset>
+        </checker>
+        <validators>
+            <validator>
+                <source path="files/validator.cpp" type="cpp.g++17"/>
+                <binary path="files/validator.exe" type="exe.win32"/>
+                <testset>
+                    <test-count>26</test-count>
+                    <input-path-pattern>files/tests/validator-tests/%02d</input-path-pattern>
+                    <tests>
+                        <test verdict="valid"/>
+                        <test verdict="valid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="valid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="valid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="valid"/>
+                        <test verdict="valid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="valid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="valid"/>
+                        <test verdict="valid"/>
+                        <test verdict="valid"/>
+                        <test verdict="valid"/>
+                        <test verdict="valid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="valid"/>
+                        <test verdict="valid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                    </tests>
+                </testset>
+            </validator>
+        </validators>
+        <solutions>
+            <solution tag="main">
+                <source path="solutions/solution.cpp" type="cpp.g++17"/>
+                <binary path="solutions/solution.exe" type="exe.win32"/>
+                <extra-tags>
+                    <extra-tag tag="accepted" testset="tests"/>
+                </extra-tags>
+            </solution>
+            <solution tag="accepted">
+                <source path="solutions/solution_linear.cpp" type="cpp.g++17"/>
+                <binary path="solutions/solution_linear.exe" type="exe.win32"/>
+                <extra-tags>
+                    <extra-tag tag="accepted" testset="tests"/>
+                </extra-tags>
+            </solution>
+            <solution tag="time-limit-exceeded-or-accepted">
+                <source path="solutions/solution_n2_opt.cpp" type="cpp.g++17"/>
+                <binary path="solutions/solution_n2_opt.exe" type="exe.win32"/>
+                <extra-tags>
+                    <extra-tag tag="time-limit-exceeded-or-accepted" testset="tests"/>
+                    <extra-tag group="subtask4" tag="accepted"/>
+                    <extra-tag group="subtask3" tag="accepted"/>
+                    <extra-tag group="subtask2" tag="accepted"/>
+                    <extra-tag group="subtask1" tag="accepted"/>
+                    <extra-tag group="subtask7" tag="time-limit-exceeded-or-accepted"/>
+                    <extra-tag group="subtask6" tag="accepted"/>
+                    <extra-tag group="subtask5" tag="accepted"/>
+                </extra-tags>
+            </solution>
+            <solution tag="rejected">
+                <source path="solutions/subtask2.cpp" type="cpp.g++17"/>
+                <binary path="solutions/subtask2.exe" type="exe.win32"/>
+                <extra-tags>
+                    <extra-tag group="subtask4" tag="rejected"/>
+                    <extra-tag group="subtask3" tag="rejected"/>
+                    <extra-tag group="subtask2" tag="accepted"/>
+                    <extra-tag group="subtask7" tag="rejected"/>
+                    <extra-tag group="subtask6" tag="rejected"/>
+                    <extra-tag group="subtask5" tag="rejected"/>
+                </extra-tags>
+            </solution>
+            <solution tag="rejected">
+                <source path="solutions/subtask3.cpp" type="cpp.g++17"/>
+                <binary path="solutions/subtask3.exe" type="exe.win32"/>
+                <extra-tags>
+                    <extra-tag group="subtask4" tag="rejected"/>
+                    <extra-tag group="subtask3" tag="accepted"/>
+                    <extra-tag group="subtask2" tag="rejected"/>
+                    <extra-tag group="subtask7" tag="rejected"/>
+                    <extra-tag group="subtask6" tag="rejected"/>
+                    <extra-tag group="subtask5" tag="rejected"/>
+                </extra-tags>
+            </solution>
+            <solution tag="rejected">
+                <source path="solutions/subtask4.cpp" type="cpp.g++17"/>
+                <binary path="solutions/subtask4.exe" type="exe.win32"/>
+                <extra-tags>
+                    <extra-tag group="subtask4" tag="accepted"/>
+                    <extra-tag group="subtask3" tag="rejected"/>
+                    <extra-tag group="subtask2" tag="rejected"/>
+                    <extra-tag group="subtask7" tag="rejected"/>
+                    <extra-tag group="subtask6" tag="rejected"/>
+                    <extra-tag group="subtask5" tag="rejected"/>
+                </extra-tags>
+            </solution>
+            <solution tag="rejected">
+                <source path="solutions/subtask5.cpp" type="cpp.g++17"/>
+                <binary path="solutions/subtask5.exe" type="exe.win32"/>
+                <extra-tags>
+                    <extra-tag group="subtask4" tag="accepted"/>
+                    <extra-tag group="subtask3" tag="rejected"/>
+                    <extra-tag group="subtask2" tag="rejected"/>
+                    <extra-tag group="subtask7" tag="rejected"/>
+                    <extra-tag group="subtask6" tag="rejected"/>
+                    <extra-tag group="subtask5" tag="accepted"/>
+                </extra-tags>
+            </solution>
+            <solution tag="rejected">
+                <source path="solutions/subtask6.cpp" type="cpp.g++17"/>
+                <binary path="solutions/subtask6.exe" type="exe.win32"/>
+                <extra-tags>
+                    <extra-tag group="subtask4" tag="rejected"/>
+                    <extra-tag group="subtask3" tag="rejected"/>
+                    <extra-tag group="subtask2" tag="accepted"/>
+                    <extra-tag group="subtask7" tag="rejected"/>
+                    <extra-tag group="subtask6" tag="accepted"/>
+                    <extra-tag group="subtask5" tag="rejected"/>
+                </extra-tags>
+            </solution>
+        </solutions>
+    </assets>
+    <properties>
+        <property name="tests-wellformed" value="true"/>
+    </properties>
+    <stresses>
+        <stress-count>0</stress-count>
+        <stress-path-pattern>stresses/%03d</stress-path-pattern>
+        <list/>
+    </stresses>
+    <tags>
+        <tag value="dsu"/>
+        <tag value="math"/>
+        <tag value="sortings"/>
+        <tag value="stack"/>
+    </tags>
+</problem>

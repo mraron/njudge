@@ -3,7 +3,6 @@ package web
 import (
 	"context"
 	"crypto/rsa"
-	"fmt"
 	"github.com/gorilla/sessions"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo-contrib/session"
@@ -35,12 +34,10 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"html/template"
-	"io/ioutil"
 	_ "mime"
 	"net/http"
 	"path/filepath"
 	"strconv"
-	"sync"
 	"time"
 )
 
@@ -90,68 +87,26 @@ type Server struct {
 		publicKey *rsa.PublicKey
 	}
 
+	ProblemStore problems.Store
+
 	judges        []*models.Judge
-	problems      map[string]problems.Problem
-	problemsMutex sync.Mutex
 	db            *sqlx.DB
 }
 
-/*
-func New(port string, problemsDir string, templatesDir string, mailServerAccount, mailServerHost, mailServerPort, mailAccountPassword string, glueport string) *Server {
-	return &Server{port, problemsDir, templatesDir, mailServerAccount, mailServerHost, mailServerPort, mailAccountPassword, glueport, make([]*models.Judge, 0), make(map[string]problems.Problem), nil}
-}*/
+func (s *Server) UpdateProblem(pr string) error {
+	return s.ProblemStore.UpdateProblem(pr)
+}
 
-func (s *Server) getProblem(name string) problems.Problem {
-	s.problemsMutex.Lock()
-	p := s.problems[name]
-	s.problemsMutex.Unlock()
-
+func (s *Server) GetProblem(pr string) problems.Problem {
+	p, _ := s.ProblemStore.Get(pr)
 	return p
-}
-
-func (s *Server) getProblemExists(name string) (problems.Problem, bool) {
-	s.problemsMutex.Lock()
-	p, ok := s.problems[name]
-	s.problemsMutex.Unlock()
-
-	return p, ok
-}
-
-//@TODO refactor all of this in conjunction with the problems related stuff
-func (s *Server) AddProblem(dir string) (problems.Problem, error) {
-	if s.problems == nil {
-		s.problems = make(map[string]problems.Problem)
-	}
-
-	path := filepath.Join(s.ProblemsDir, dir)
-	p, err := problems.Parse(path)
-	if err == nil {
-		s.problems[p.Name()] = p
-	}
-
-	return p, err
 }
 
 func (s *Server) runUpdateProblems() {
 	for {
-		s.problemsMutex.Lock()
-		if s.problems == nil {
-			s.problems = make(map[string]problems.Problem)
+		if err := s.ProblemStore.Update(); err != nil {
+			log.Print(err)
 		}
-
-		files, err := ioutil.ReadDir(s.ProblemsDir)
-		if err != nil {
-			panic(err)
-		}
-		for _, f := range files {
-			if f.IsDir() {
-				if _, err := s.AddProblem(f.Name()); err != nil {
-					log.Print(err)
-				}
-			}
-		}
-
-		s.problemsMutex.Unlock()
 
 		time.Sleep(20 * time.Second)
 	}
@@ -310,18 +265,40 @@ func (s *Server) runJudger() {
 	}
 }
 
-func (s *Server) Run() {
+func (s *Server) StartBackgroundProcesses() {
+	go s.runUpdateProblems()
+	go s.runSyncJudges()
+	go s.runGlue()
+	go s.runJudger()
+}
+
+func (s *Server) SetupEnvironment() {
 	if s.Mode == "development" {
 		boil.DebugMode = true
 	}
 
-	//@TODO add a member to Server
 	loc, err := time.LoadLocation("Europe/Budapest")
 	if err != nil {
 		panic(err)
 	}
 	time.Local = loc
 	boil.SetLocation(loc)
+
+	if s.GoogleAuth.Enabled {
+		goth.UseProviders(
+			google.New(s.GoogleAuth.ClientKey, s.GoogleAuth.Secret, s.GoogleAuth.Callback, "email", "profile"),
+		)
+	}
+
+	s.ConnectToDB()
+	s.parseKeys()
+
+	s.ProblemStore = problems.NewFsStore(s.ProblemsDir)
+}
+
+func (s *Server) Run() {
+	s.SetupEnvironment()
+	s.StartBackgroundProcesses()
 
 	e := echo.New()
 	store := sessions.NewCookieStore([]byte(s.CookieSecret))
@@ -340,12 +317,6 @@ func (s *Server) Run() {
 			return next(c)
 		}
 	})
-
-	if s.GoogleAuth.Enabled {
-		goth.UseProviders(
-			google.New(s.GoogleAuth.ClientKey, s.GoogleAuth.Secret, s.GoogleAuth.Callback, "email", "profile"),
-		)
-	}
 
 	t := &Template{
 		templates: template.Must(template.New("templater").Funcs(s.templatefuncs()).ParseGlob(filepath.Join(s.TemplatesDir, "*.gohtml"))),
@@ -420,18 +391,6 @@ func (s *Server) Run() {
 	v1.DELETE("/submissions/:id", s.deleteAPISubmission)
 
 	e.GET("/admin", s.getAdmin)
-
-	s.ConnectToDB()
-	s.parseKeys()
-
-	go s.runUpdateProblems()
-	go s.runSyncJudges()
-	go s.runGlue()
-	go s.runJudger()
-
-	for idx, judge := range s.judges {
-		fmt.Println(idx, judge)
-	}
 
 	panic(e.Start(":" + s.Port))
 }

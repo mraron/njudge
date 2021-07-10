@@ -230,8 +230,8 @@ func main() {
 					return err
 				}
 
-				server.ConnectToDB()
-				server.AddProblem(c.String("problem"))
+				server.SetupEnvironment()
+				server.UpdateProblem(c.String("problem"))
 				id, err := server.Submit(c.Int("user"), c.String("problemset"), c.String("problem"), c.String("language"), src)
 				if err != nil {
 					return err

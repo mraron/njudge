@@ -78,7 +78,7 @@ func (s *Server) templatefuncs() template.FuncMap {
 	return template.FuncMap{
 		"locales":          locales,
 		"translateContent": translateContent,
-		"problem":          s.getProblem,
+		"problem":          s.GetProblem,
 		"str2html": func(s string) template.HTML {
 			return template.HTML(s)
 		},
