@@ -40,14 +40,29 @@ func (c *CombineCallback) Append(callbacker Callbacker) {
 
 type WriterCallback struct {
 	enc *json.Encoder
+	err error
+	afterFunc func()
 }
 
-func NewWriterCallback(w io.Writer) WriterCallback {
-	return WriterCallback{json.NewEncoder(w)}
+func NewWriterCallback(w io.Writer, afterFunc func()) *WriterCallback {
+	return &WriterCallback{enc: json.NewEncoder(w), err: nil, afterFunc: afterFunc}
 }
 
-func (wc WriterCallback) Callback(test string, status problems.Status, done bool) error {
-	return wc.enc.Encode(Status{test, status, done, time.Now()})
+func (wc* WriterCallback) Callback(test string, status problems.Status, done bool) error {
+	if wc.err != nil {
+		return wc.err
+	}
+
+	wc.err = wc.enc.Encode(Status{test, status, done, time.Now()})
+	if wc.err == nil {
+		wc.afterFunc()
+	}
+
+	return wc.err
+}
+
+func (wc *WriterCallback) Error() error {
+	return wc.err
 }
 
 type HTTPCallback struct {

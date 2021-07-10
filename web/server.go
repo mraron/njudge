@@ -1,6 +1,7 @@
 package web
 
 import (
+	"context"
 	"crypto/rsa"
 	"fmt"
 	"github.com/gorilla/sessions"
@@ -190,8 +191,8 @@ func (s *Server) runSyncJudges() {
 				continue
 			}
 
-			st, err := judge.NewFromUrl("http://" + j.Host + ":" + j.Port, jwt)
-
+			c := judge.NewClient("http://" + j.Host + ":" + j.Port, jwt)
+			st, err := c.Status(context.TODO())
 			if err != nil {
 				log.Print("trying to access judge on ", j.Host, j.Port, " getting error ", err)
 				j.Online = false
@@ -205,7 +206,7 @@ func (s *Server) runSyncJudges() {
 			}
 
 			j.Online = true
-			j.State, _ = st.ToString()
+			j.State = st.String()
 			j.Ping = 1
 
 			_, err = j.Update(s.db, boil.Infer())
@@ -281,19 +282,20 @@ func (s *Server) runJudger() {
 
 		for _, sub := range ss {
 			for _, j := range s.judges {
-				server, err := judge.NewFromString(j.State)
+				st, err := judge.ParseServerStatus(j.State)
 				if err != nil {
 					log.Print("malformed judge: ", j.State, err)
 					continue
 				}
 
-				if server.SupportsProblem(sub.Problem) {
+				if st.SupportsProblem(sub.Problem) {
 					token, err := s.getJWT()
 					if err != nil {
 						log.Print("can't get jwt token", err)
 					}
 
-					if err = server.Submit(judge.Submission{Id:strconv.Itoa(sub.ID), Problem: sub.Problem, Language: sub.Language, Source: sub.Source, Stream: false, CallbackUrl: "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(sub.ID)}, token); err != nil {
+					client := judge.NewClient(st.Url, token)
+					if err = client.SubmitCallback(context.TODO(), judge.Submission{Id:strconv.Itoa(sub.ID), Problem: sub.Problem, Language: sub.Language, Source: sub.Source}, "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(sub.ID)); err != nil {
 						log.Print("Trying to submit to server", j.Host, j.Port, "Error", err)
 						continue
 					}

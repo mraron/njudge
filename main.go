@@ -53,7 +53,7 @@ func main() {
 					return err
 				}
 
-				server := judge.New()
+				server := judge.NewServer()
 
 				dec := json.NewDecoder(f)
 

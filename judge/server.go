@@ -7,7 +7,6 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 	"github.com/shirou/gopsutil/load"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -23,7 +22,6 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/kataras/go-errors"
@@ -39,34 +37,45 @@ import (
 	_ "github.com/mraron/njudge/utils/language/python3"
 )
 
-type Submission struct {
-	Id          string `json:"id"`
-	Problem     string `json:"problem"`
-	Language    string `json:"language"`
-	Source      []byte `json:"source"`
-	Stream      bool   `json:"stream"`
-	CallbackUrl string `json:"callback_url"`
-
-	w io.Writer
-	done chan bool
-}
 
 //@TODO use contexts and afero => tests
 
-type Server struct {
-	Id          string
-	Host        string
-	Port        string
-	url string
+type ServerStatus struct {
+	Id string `json:"id"`
+	Host string `json:"host"`
+	Port string `json:"port"`
+	Url string `json:"url"`
+	Load float64 `json:"load"`
+	Uptime      time.Duration `json:"uptime"`
+	ProblemList []string `json:"problem_list"`
+}
 
+func ParseServerStatus(s string) (res ServerStatus, err error) {
+	err = json.Unmarshal([]byte(s), &res)
+	return
+}
+
+func (s ServerStatus) SupportsProblem(want string) bool {
+	for _, key := range s.ProblemList {
+		if key == want {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (s ServerStatus) String() string {
+	res, _ := json.Marshal(s)
+	return string(res)
+}
+
+type Server struct {
+	ServerStatus
 
 	ProblemsDir string `json:"problems_dir"`
 	LogDir      string `json:"log_dir"`
-	ProblemList []string `json:"problem_list"`
 	SandboxIds  []int `json:"sandbox_ids"`
-
-	Load        float64
-	Uptime      time.Duration
 
 	PublicKeyLocation       string `json:"public_key"`
 
@@ -74,117 +83,16 @@ type Server struct {
 	publicKey       *rsa.PublicKey
 	problems        map[string]problems.Problem
 	start           time.Time
-	queue           chan Submission
+	queue           chan submission
 }
 
-func New() *Server {
+func NewServer() *Server {
 	s := Server{}
 	s.problems = make(map[string]problems.Problem)
 	s.start = time.Now()
-	s.queue = make(chan Submission, 100)
+	s.queue = make(chan submission, 100)
 
 	return &s
-}
-
-func NewFromUrl(url, token string) (*Server, error) {
-	dst := url + "/status"
-
-	client := &http.Client{}
-
-	req, err := http.NewRequest("GET", dst, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if token != "" {
-		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	ans := Server{}
-
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&ans)
-	if err != nil {
-		return nil, err
-	}
-
-	ans.url = url
-	if resp.StatusCode != http.StatusOK {
-		return nil, errors.New("judger returned: "+resp.Status)
-	}
-
-	return &ans, nil
-}
-
-func NewFromString(str string) (*Server, error) {
-	s := New()
-	if err := json.Unmarshal([]byte(str), s); err != nil {
-		return nil, err
-	}
-
-	s.url = fmt.Sprintf("http://%s:%s", s.Host, s.Port)
-	return s, nil
-}
-
-//func NewFromCloning(s *Server) *Server {
-//	return New(s.Id, s.Host, s.Port, s.ProblemsDir, s.LogDir, s.PublicKeyLocation)
-//}
-
-func (s *Server) SupportsProblem(name string) bool {
-	for _, p := range s.ProblemList {
-		if p == name {
-			return true
-		}
-	}
-
-	return true
-}
-
-func (s *Server) Submit(sub Submission, token string) error {
-	dst := s.url + "/judge"
-
-	buf := bytes.Buffer{}
-
-	enc := json.NewEncoder(&buf)
-	err := enc.Encode(sub)
-	if err != nil {
-		return err
-	}
-
-	client := &http.Client{}
-
-	req, err := http.NewRequest("POST", dst, &buf)
-	if err != nil {
-		return err
-	}
-
-	req.Header.Add("Content-Type", "application/json")
-	if token != "" {
-		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	//@TODO ? maybe use json
-	if string(data) != "queued" {
-		return errors.New("Submit: server says: " + string(data))
-	}
-
-	return nil
 }
 
 func (s *Server) Run() error {
@@ -209,6 +117,8 @@ func (s *Server) Run() error {
 			return fmt.Errorf("can't decode publickey: %v", err)
 		}
 	}
+
+	s.Url = "http://"+s.Host+":"+s.Port
 
 	e := echo.New()
 	e.Use(middleware.Logger())
@@ -306,7 +216,7 @@ func (s *Server) runJudger() {
 				return
 			}
 
-			f, err := os.Create(filepath.Join(s.LogDir, fmt.Sprintf("judger.%d", sub.Id)))
+			f, err := os.Create(filepath.Join(s.LogDir, fmt.Sprintf("judger.%s", sub.Id)))
 			if err != nil {
 				log.Print("judger: can't create logfile", err)
 				f.Close()
@@ -315,16 +225,7 @@ func (s *Server) runJudger() {
 
 			logger := log.New(f, "[judging]", log.Lshortfile)
 
-			callbacker := NewCombineCallback()
-			if sub.CallbackUrl != "" {
-				callbacker.Append(NewHTTPCallback(sub.CallbackUrl))
-			}
-
-			if sub.Stream {
-				callbacker.Append(NewWriterCallback(sub.w))
-			}
-
-			err = Judge(logger, s.problems[sub.Problem], sub.Source, language.Get(sub.Language), s.sandboxProvider, callbacker)
+			err = Judge(logger, s.problems[sub.Problem], sub.Source, language.Get(sub.Language), s.sandboxProvider, sub.c)
 			if err != nil {
 				log.Print("judger: error while running Judge", err)
 				f.Close()
@@ -337,7 +238,7 @@ func (s *Server) runJudger() {
 }
 
 func (s *Server) getStatus(c echo.Context) error {
-	return c.JSON(http.StatusOK, s)
+	return c.JSON(http.StatusOK, s.ServerStatus)
 }
 
 func (s *Server) postUpdateProblems(c echo.Context) error {
@@ -346,7 +247,7 @@ func (s *Server) postUpdateProblems(c echo.Context) error {
 }
 
 func (s *Server) postJudge(c echo.Context) error {
-	sub := Submission{}
+	sub := submission{}
 	if err := c.Bind(&sub); err != nil {
 		log.Print("getJudge error binding:", err)
 		return c.String(http.StatusBadRequest, "Parse error")
@@ -354,11 +255,18 @@ func (s *Server) postJudge(c echo.Context) error {
 
 	sub.done = make(chan bool, 1)
 	if sub.Stream {
-		sub.w = c.Response()
+		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		c.Response().WriteHeader(http.StatusOK)
+
+		sub.c = NewWriterCallback(c.Response(), func() {
+			c.Response().Flush()
+		})
+
 		s.queue <- sub
 		<-sub.done
-		return c.String(http.StatusOK, "")
+		return sub.c.(*WriterCallback).Error()
 	}else {
+		sub.c = NewHTTPCallback(sub.CallbackUrl)
 		s.queue <- sub
 		return c.String(http.StatusOK, "queued")
 	}
