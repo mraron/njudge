@@ -1,19 +1,17 @@
 package problem_json
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/mraron/njudge/utils/language"
 	"github.com/mraron/njudge/utils/problems"
-	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 )
-
-//@TODO Make this work!!! :(
 
 type Name struct {
 	Language string
@@ -33,7 +31,7 @@ type Attachment struct {
 
 type Problem struct {
 	Path                   string
-	GeneratedStatementList []problems.Content
+	GeneratedStatementList problems.Contents
 	AttachmentList         []problems.Attachment
 
 	ShortName      string `json:"shortname"`
@@ -50,25 +48,25 @@ func (p Problem) Name() string {
 	return p.ShortName
 }
 
-func (p Problem) Titles() []problems.Content {
-	ans := make([]problems.Content, len(p.Names))
+func (p Problem) Titles() problems.Contents {
+	ans := make(problems.Contents, len(p.Names))
 	for ind, val := range p.Names {
-		ans[ind] = problems.Content{val.Language, []byte(val.Value), "text"}
+		ans[ind] = problems.Content{Locale: val.Language, Contents: []byte(val.Value), Type: "text"}
 	}
 
 	return ans
 }
 
-func (p Problem) Statements() []problems.Content {
+func (p Problem) Statements() problems.Contents {
 	return p.GeneratedStatementList
 }
 
-func (p Problem) HTMLStatements() []problems.Content {
-	return problems.FilterContentArray(p.GeneratedStatementList, "text/html")
+func (p Problem) HTMLStatements() problems.Contents {
+	return p.GeneratedStatementList.FilterByType("text/html")
 }
 
-func (p Problem) PDFStatements() []problems.Content {
-	return problems.FilterContentArray(p.GeneratedStatementList, "application/pdf")
+func (p Problem) PDFStatements() problems.Contents {
+	return p.GeneratedStatementList.FilterByType("application/pdf")
 }
 
 func (p Problem) MemoryLimit() int {
@@ -119,12 +117,16 @@ func (p Problem) StatusSkeleton() problems.Status {
 	return ans
 }
 
-func (p Problem) Check(tc *problems.Testcase, stdout io.Writer, stderr io.Writer) error {
+func (p Problem) Check(tc *problems.Testcase) error {
+	output := bytes.Buffer{}
+
 	cmd := exec.Command(filepath.Join(p.Path, "check"), tc.InputPath, tc.OutputPath, tc.AnswerPath)
-	cmd.Stdout = stdout
-	cmd.Stderr = stderr
+	cmd.Stdout = &output
+	cmd.Stderr = &output
 
 	err := cmd.Run()
+
+	tc.CheckerOutput = output.String()
 
 	if err == nil && cmd.ProcessState.Success() {
 		return nil

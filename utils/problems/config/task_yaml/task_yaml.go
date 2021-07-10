@@ -37,7 +37,7 @@ type TaskYAML struct {
 type Problem struct {
 	TaskYAML
 
-	StatementList []problems.Content
+	StatementList problems.Contents
 	AttachmentList []problems.Attachment
 
 	InputPathPattern string
@@ -50,20 +50,20 @@ func (p Problem) Name() string {
 	return filepath.Base(p.Path)
 }
 
-func (p Problem) Titles() []problems.Content {
-	return []problems.Content{problems.Content{"hungarian", []byte(p.Title), "text"}}
+func (p Problem) Titles() problems.Contents {
+	return []problems.Content{{"hungarian", []byte(p.Title), "text"}}
 }
 
-func (p Problem) Statements() []problems.Content {
+func (p Problem) Statements() problems.Contents {
 	return p.StatementList
 }
 
-func (p Problem) HTMLStatements() []problems.Content {
-	return problems.FilterContentArray(p.StatementList, "text/html")
+func (p Problem) HTMLStatements() problems.Contents {
+	return p.StatementList.FilterByType("text/html")
 }
 
-func (p Problem) PDFStatements() []problems.Content {
-	return problems.FilterContentArray(p.StatementList, "application/pdf")
+func (p Problem) PDFStatements() problems.Contents {
+	return p.StatementList.FilterByType("application/pdf")
 }
 
 func (p Problem) MemoryLimit() int {

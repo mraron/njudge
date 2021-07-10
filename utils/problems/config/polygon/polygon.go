@@ -341,7 +341,6 @@ func (p Problem) Files() []problems.File {
 		res = append(res, problems.File{stub.Name, "stub_" + stub.Language, filepath.Join(p.Path, stub.Path)})
 	}
 
-	//@TODO compile if not compiled
 	if p.Assets.Interactor.Source.Path != "" {
 		res = append(res, problems.File{"interactor", "interactor", filepath.Join(p.Path, "files", "interactor")})
 	}
