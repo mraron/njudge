@@ -91,7 +91,7 @@ func (h HTTPCallback) Callback(test string, status problems.Status, done bool) e
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("Callback error: %d %s", resp.Status, resp.Body)
+		return fmt.Errorf("Callback error: %s %s", resp.Status, resp.Body)
 	}
 
 	return nil

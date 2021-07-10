@@ -79,16 +79,16 @@ type Server struct {
 
 	PublicKeyLocation       string `json:"public_key"`
 
+	ProblemStore problems.Store
+
 	sandboxProvider *language.SandboxProvider
 	publicKey       *rsa.PublicKey
-	problems        map[string]problems.Problem
 	start           time.Time
 	queue           chan submission
 }
 
 func NewServer() *Server {
 	s := Server{}
-	s.problems = make(map[string]problems.Problem)
 	s.start = time.Now()
 	s.queue = make(chan submission, 100)
 
@@ -96,6 +96,8 @@ func NewServer() *Server {
 }
 
 func (s *Server) Run() error {
+	s.ProblemStore = problems.NewFsStore(s.ProblemsDir)
+
 	s.sandboxProvider = language.NewSandboxProvider()
 	for _, id := range s.SandboxIds {
 		s.sandboxProvider.Put(language.NewIsolateSandbox(id))
@@ -160,25 +162,18 @@ func (s *Server) Run() error {
 }
 
 func (s *Server) runUpdateProblems() {
-	files, err := ioutil.ReadDir(s.ProblemsDir)
-	if err != nil {
-		panic(err)
-	}
-
-	pList := make([]string, 0)
-
-	for _, f := range files {
-		if f.IsDir() {
-			path := filepath.Join(s.ProblemsDir, f.Name())
-			p, err := problems.Parse(path)
-			if err == nil {
-				s.problems[p.Name()] = p
-				pList = append(pList, p.Name())
-			}
+	for {
+		var err error
+		if err = s.ProblemStore.Update(); err != nil {
+			log.Print(err)
 		}
-	}
 
-	s.ProblemList = pList
+		if s.ProblemList, err = s.ProblemStore.List(); err != nil {
+			log.Print(err)
+		}
+
+		time.Sleep(20 * time.Second)
+	}
 }
 
 func (s *Server) runUpdateLoad() {
@@ -211,8 +206,8 @@ func (s *Server) runJudger() {
 				sub.done <- true
 			}()
 
-			if _, ok := s.problems[sub.Problem]; !ok {
-				log.Print("judger: can't find problem", sub.Problem)
+			if ok, err := s.ProblemStore.Has(sub.Problem); !ok {
+				log.Print("judger: can't find problem", sub.Problem, "err: ", err)
 				return
 			}
 
@@ -225,7 +220,8 @@ func (s *Server) runJudger() {
 
 			logger := log.New(f, "[judging]", log.Lshortfile)
 
-			err = Judge(logger, s.problems[sub.Problem], sub.Source, language.Get(sub.Language), s.sandboxProvider, sub.c)
+			p, _ := s.ProblemStore.Get(sub.Problem)
+			err = Judge(logger, p, sub.Source, language.Get(sub.Language), s.sandboxProvider, sub.c)
 			if err != nil {
 				log.Print("judger: error while running Judge", err)
 				f.Close()
