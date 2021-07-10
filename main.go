@@ -53,7 +53,7 @@ func main() {
 					return err
 				}
 
-				server := &judge.Server{}
+				server := judge.NewServer()
 
 				dec := json.NewDecoder(f)
 
@@ -62,7 +62,7 @@ func main() {
 					return err
 				}
 
-				return judge.NewFromCloning(server).Run()
+				return server.Run()
 			},
 		},
 		{

@@ -9,20 +9,15 @@ import (
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 type Judge struct {
 	Id          int64         `json:"id"`
 	Name        string        `json:"name"`
-	Host        string        `json:"host"`
-	Port        string        `json:"port"`
-	Load        float64       `json:"load"`
-	ProblemsDir string        `json:"problems_dir"`
-	ProblemList []string      `json:"problems_list"`
-	Uptime      time.Duration `json:"uptime"`
 	Ping        int           `json:"ping"`
 	Online      bool          `json:"online"`
+
+	judge.ServerStatus
 }
 
 func NewJudgeFromModelsJudge(j *models.Judge) (res Judge) {
@@ -32,13 +27,9 @@ func NewJudgeFromModelsJudge(j *models.Judge) (res Judge) {
 	res.Ping = j.Ping
 	res.Online = j.Online
 
-	server := &judge.Server{}
-	err := server.FromString(j.State)
-
-	if err == nil {
+	if server, err := judge.ParseServerStatus(j.State); err == nil {
 		res.Name = server.Id
 		res.Load = server.Load
-		res.ProblemsDir = server.ProblemsDir
 		res.ProblemList = server.ProblemList
 		res.Uptime = server.Uptime
 	}

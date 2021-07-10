@@ -1,6 +1,8 @@
 package web
 
 import (
+	"context"
+	"crypto/rsa"
 	"fmt"
 	"github.com/gorilla/sessions"
 	"github.com/jmoiron/sqlx"
@@ -15,15 +17,16 @@ import (
 	"github.com/mraron/njudge/utils/problems"
 	_ "github.com/mraron/njudge/utils/problems/config/feladat_txt"
 	_ "github.com/mraron/njudge/utils/problems/config/polygon"
+	_ "github.com/mraron/njudge/utils/problems/config/task_yaml"
 
 	_ "github.com/mraron/njudge/utils/language/cpp11"
 	_ "github.com/mraron/njudge/utils/language/cpp14"
 	_ "github.com/mraron/njudge/utils/language/golang"
 	_ "github.com/mraron/njudge/utils/language/julia"
+	_ "github.com/mraron/njudge/utils/language/nim"
 	_ "github.com/mraron/njudge/utils/language/octave"
 	_ "github.com/mraron/njudge/utils/language/pascal"
 	_ "github.com/mraron/njudge/utils/language/python3"
-	_ "github.com/mraron/njudge/utils/language/nim"
 	_ "github.com/mraron/njudge/utils/language/zip"
 
 	"github.com/mraron/njudge/web/models"
@@ -58,10 +61,20 @@ type Server struct {
 		Callback  string
 	}
 
-	MailAccount         string
-	MailServerHost      string
-	MailServerPort      string
-	MailAccountPassword string
+	Sendgrid struct {
+		Enabled bool
+		ApiKey string `json:"api_key"`
+		SenderName string `json:"sender_name"`
+		SenderAddress string `json:"sender_address"`
+	}
+
+	SMTP struct {
+		Enabled bool
+		MailAccount         string `json:"mail_account"`
+		MailServerHost      string `json:"mail_server"`
+		MailServerPort      string `json:"mail_port"`
+		MailAccountPassword string `json:"mail_password"`
+	} `json:"smtp"`
 
 	DBAccount  string
 	DBPassword string
@@ -69,6 +82,13 @@ type Server struct {
 	DBName     string
 
 	GluePort string
+
+	Keys struct {
+		PrivateKeyLocation string `json:"private_key"`
+		PublicKeyLocation string `json:"public_key"`
+		privateKey *rsa.PrivateKey
+		publicKey *rsa.PublicKey
+	}
 
 	judges        []*models.Judge
 	problems      map[string]problems.Problem
@@ -97,6 +117,7 @@ func (s *Server) getProblemExists(name string) (problems.Problem, bool) {
 	return p, ok
 }
 
+//@TODO refactor all of this in conjunction with the problems related stuff
 func (s *Server) AddProblem(dir string) (problems.Problem, error) {
 	if s.problems == nil {
 		s.problems = make(map[string]problems.Problem)
@@ -164,22 +185,28 @@ func (s *Server) runSyncJudges() {
 	for {
 		s.loadJudgesFromDB()
 		for _, j := range s.judges {
-			st, err := judge.NewFromUrl("http://" + j.Host + ":" + j.Port)
+			jwt, err := s.getJWT()
+			if err != nil {
+				log.Print(err)
+				continue
+			}
 
+			c := judge.NewClient("http://" + j.Host + ":" + j.Port, jwt)
+			st, err := c.Status(context.TODO())
 			if err != nil {
 				log.Print("trying to access judge on ", j.Host, j.Port, " getting error ", err)
 				j.Online = false
 				j.Ping = -1
 				_, err = j.Update(s.db, boil.Infer())
 				if err != nil {
-					log.Print("also error occured while updating", err)
+					log.Print("also error occurred while updating", err)
 				}
 
 				continue
 			}
 
 			j.Online = true
-			j.State, _ = st.ToString()
+			j.State = st.String()
 			j.Ping = 1
 
 			_, err = j.Update(s.db, boil.Infer())
@@ -255,16 +282,25 @@ func (s *Server) runJudger() {
 
 		for _, sub := range ss {
 			for _, j := range s.judges {
-				server := &judge.Server{}
-				server.FromString(j.State)
+				st, err := judge.ParseServerStatus(j.State)
+				if err != nil {
+					log.Print("malformed judge: ", j.State, err)
+					continue
+				}
 
-				if server.SupportsProblem(sub.Problem) {
-					err := server.Submit(judge.Submission{sub.ID, sub.Problem, sub.Language, sub.Source, "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(int(sub.ID))})
+				if st.SupportsProblem(sub.Problem) {
+					token, err := s.getJWT()
 					if err != nil {
+						log.Print("can't get jwt token", err)
+					}
+
+					client := judge.NewClient(st.Url, token)
+					if err = client.SubmitCallback(context.TODO(), judge.Submission{Id:strconv.Itoa(sub.ID), Problem: sub.Problem, Language: sub.Language, Source: sub.Source}, "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(sub.ID)); err != nil {
 						log.Print("Trying to submit to server", j.Host, j.Port, "Error", err)
 						continue
 					}
-					if _, err := s.db.Exec("UPDATE submissions SET started=true WHERE id=$1", sub.ID); err != nil {
+
+					if _, err = s.db.Exec("UPDATE submissions SET started=true WHERE id=$1", sub.ID); err != nil {
 						log.Print("FATAL: ", err)
 					}
 					break
@@ -386,6 +422,7 @@ func (s *Server) Run() {
 	e.GET("/admin", s.getAdmin)
 
 	s.ConnectToDB()
+	s.parseKeys()
 
 	go s.runUpdateProblems()
 	go s.runSyncJudges()

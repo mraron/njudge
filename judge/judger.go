@@ -2,14 +2,10 @@ package judge
 
 import (
 	"bytes"
-	"encoding/json"
-	"errors"
-	"fmt"
 	"github.com/mraron/njudge/utils/language"
 	"github.com/mraron/njudge/utils/problems"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 	"time"
 )
@@ -19,44 +15,6 @@ type Status struct {
 	Status problems.Status
 	Done   bool
 	Time   time.Time
-}
-
-type Callbacker interface {
-	Callback(string, problems.Status, bool) error
-}
-
-//@TODO Create cached http callback
-
-type HTTPCallback struct {
-	url string
-}
-
-func NewHTTPCallback(url string) HTTPCallback {
-	return HTTPCallback{url}
-}
-
-func (h HTTPCallback) Callback(test string, status problems.Status, done bool) error {
-	raw := Status{test, status, done, time.Now()}
-
-	buf := &bytes.Buffer{}
-
-	data := json.NewEncoder(buf)
-	err := data.Encode(raw)
-	if err != nil {
-		return err
-	}
-
-	resp, err := http.Post(h.url, "application/json", buf)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return errors.New(fmt.Sprint("Callback error: ", resp.Status, resp.Body))
-	}
-
-	return nil
 }
 
 //@TODO add separated logger for problem
@@ -138,14 +96,16 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 	run := true
 	for run {
 		select {
-		case test := <-testNotifier:
-			status := <-statusNotifier
+		case test, ok := <-testNotifier:
+			if ok {
+				status := <-statusNotifier
 
-			err2 := c.Callback(test, status, false)
+				err2 := c.Callback(test, status, false)
 
-			if err2 != nil {
-				logger.Print("Error while calling callback", err2)
-				return err
+				if err2 != nil {
+					logger.Print("Error while calling callback", err2)
+					return err
+				}
 			}
 		case <-ran:
 			run = false
@@ -155,7 +115,7 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 	}
 
 	if err == nil {
-		logger.Print("Succesful judging! removing tempfile and calling back for the last time...")
+		logger.Print("Successful judging! removing tempfile and calling back for the last time...")
 	} else {
 		logger.Print("Got error! removing tempfile and calling back for the last time... error is", err)
 	}

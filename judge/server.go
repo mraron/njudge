@@ -1,6 +1,10 @@
 package judge
 
 import (
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
+	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 	"github.com/shirou/gopsutil/load"
 	"log"
@@ -18,7 +22,6 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/kataras/go-errors"
@@ -28,115 +31,125 @@ import (
 	_ "github.com/mraron/njudge/utils/language/cpp14"
 	_ "github.com/mraron/njudge/utils/language/golang"
 	_ "github.com/mraron/njudge/utils/language/julia"
+	_ "github.com/mraron/njudge/utils/language/nim"
 	_ "github.com/mraron/njudge/utils/language/octave"
 	_ "github.com/mraron/njudge/utils/language/pascal"
 	_ "github.com/mraron/njudge/utils/language/python3"
-	_ "github.com/mraron/njudge/utils/language/nim"
 )
 
-type Submission struct {
-	Id          int    `json:"id"`
-	Problem     string `json:"problem"`
-	Language    string `json:"language"`
-	Source      []byte `json:"source"`
-	CallbackUrl string `json:"callback_url"`
+
+//@TODO use contexts and afero => tests
+
+type ServerStatus struct {
+	Id string `json:"id"`
+	Host string `json:"host"`
+	Port string `json:"port"`
+	Url string `json:"url"`
+	Load float64 `json:"load"`
+	Uptime      time.Duration `json:"uptime"`
+	ProblemList []string `json:"problem_list"`
 }
 
-type Server struct {
-	Id          string
-	Host        string
-	Port        string
-	Load        float64
-	ProblemsDir string
-	LogDir      string
-	ProblemList []string
-	Uptime      time.Duration
-
-	sandboxProvider *language.SandboxProvider
-	secretKey       string
-	problems        map[string]problems.Problem
-	start           time.Time
-	queue           chan Submission
+func ParseServerStatus(s string) (res ServerStatus, err error) {
+	err = json.Unmarshal([]byte(s), &res)
+	return
 }
 
-func New(id, host, port, problemsDir, logDir, secretKey string) *Server {
-	return &Server{Id: id, Host: host, Port: port, Load: 0.0, secretKey: secretKey, LogDir: logDir, ProblemsDir: problemsDir, problems: make(map[string]problems.Problem), ProblemList: make([]string, 0), Uptime: 0 * time.Second, start: time.Now(), queue: make(chan Submission, 100)}
-}
-
-func NewFromUrl(url string) (*Server, error) {
-	dst := url + "/status"
-
-	resp, err := http.Get(dst)
-	if err != nil {
-		return nil, err
-	}
-
-	ans := Server{}
-
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&ans)
-	if err != nil {
-		return nil, err
-	}
-
-	return &ans, nil
-}
-
-func NewFromCloning(s *Server) *Server {
-	return New(s.Id, s.Host, s.Port, s.ProblemsDir, s.LogDir, s.secretKey)
-}
-
-func (s *Server) SupportsProblem(name string) bool {
-	for _, p := range s.ProblemList {
-		if p == name {
+func (s ServerStatus) SupportsProblem(want string) bool {
+	for _, key := range s.ProblemList {
+		if key == want {
 			return true
 		}
 	}
 
-	return true
+	return false
 }
 
-func (s *Server) Submit(sub Submission) error {
-	dst := "http://" + s.Host + ":" + s.Port + "/judge"
+func (s ServerStatus) String() string {
+	res, _ := json.Marshal(s)
+	return string(res)
+}
 
-	buf := bytes.Buffer{}
-	fmt.Println("postin ye", dst)
-	enc := json.NewEncoder(&buf)
-	err := enc.Encode(sub)
-	if err != nil {
-		return err
-	}
+type Server struct {
+	ServerStatus
 
-	resp, err := http.Post(dst, "application/json", &buf)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
+	ProblemsDir string `json:"problems_dir"`
+	LogDir      string `json:"log_dir"`
+	SandboxIds  []int `json:"sandbox_ids"`
 
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
+	PublicKeyLocation       string `json:"public_key"`
 
-	if string(data) != "Queued" {
-		return errors.New("Submit: server says: " + string(data))
-	}
+	sandboxProvider *language.SandboxProvider
+	publicKey       *rsa.PublicKey
+	problems        map[string]problems.Problem
+	start           time.Time
+	queue           chan submission
+}
 
-	return nil
+func NewServer() *Server {
+	s := Server{}
+	s.problems = make(map[string]problems.Problem)
+	s.start = time.Now()
+	s.queue = make(chan submission, 100)
+
+	return &s
 }
 
 func (s *Server) Run() error {
 	s.sandboxProvider = language.NewSandboxProvider()
-	s.sandboxProvider.Put(language.NewIsolateSandbox(0))
-	s.sandboxProvider.Put(language.NewIsolateSandbox(1))
-	s.sandboxProvider.Put(language.NewIsolateSandbox(2))
+	for _, id := range s.SandboxIds {
+		s.sandboxProvider.Put(language.NewIsolateSandbox(id))
+	}
+
+	if s.PublicKeyLocation != "" {
+		publicKeyContents, err := ioutil.ReadFile(s.PublicKeyLocation)
+		if err != nil {
+			return err
+		}
+
+		block, _ := pem.Decode(publicKeyContents)
+		if block == nil {
+			return fmt.Errorf("can't parse pem public key file: %s", s.PublicKeyLocation)
+		}
+
+		s.publicKey, err = x509.ParsePKCS1PublicKey(block.Bytes)
+		if err != nil {
+			return fmt.Errorf("can't decode publickey: %v", err)
+		}
+	}
+
+	s.Url = "http://"+s.Host+":"+s.Port
 
 	e := echo.New()
 	e.Use(middleware.Logger())
 
-	e.GET("/status", s.getStatus())
-	e.POST("/update", s.postUpdateProblems())
-	e.POST("/judge", s.postJudge())
+	if s.PublicKeyLocation != "" {
+		e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
+			SigningMethod: "RS512",
+			ParseTokenFunc: func(auth string, c echo.Context) (interface{}, error) {
+				keyFunc := func(t *jwt.Token) (interface{}, error) {
+					if t.Method.Alg() != "RS512" {
+						return nil, fmt.Errorf("unexpected jwt signing method=%v", t.Header["alg"])
+					}
+					return s.publicKey, nil
+				}
+
+				// claims are of type `jwt.MapClaims` when token is created with `jwt.Parse`
+				token, err := jwt.Parse(auth, keyFunc)
+				if err != nil {
+					return nil, err
+				}
+				if !token.Valid {
+					return nil, errors.New("invalid token")
+				}
+				return token, nil
+			},
+		}))
+	}
+
+	e.GET("/status", s.getStatus)
+	e.POST("/update", s.postUpdateProblems)
+	e.POST("/judge", s.postJudge)
 
 	go s.runUpdateLoad()
 	go s.runUpdateUptime()
@@ -146,7 +159,6 @@ func (s *Server) Run() error {
 	return e.Start(":" + s.Port)
 }
 
-//@TODO make it a background process
 func (s *Server) runUpdateProblems() {
 	files, err := ioutil.ReadDir(s.ProblemsDir)
 	if err != nil {
@@ -192,58 +204,71 @@ func (s *Server) runUpdateUptime() {
 
 func (s *Server) runJudger() {
 	for {
-		sub := <-s.queue
+		func() {
+			sub := <-s.queue
 
-		if _, ok := s.problems[sub.Problem]; !ok {
-			log.Print("judger: can't find problem", sub.Problem)
-			continue
-		}
+			defer func() {
+				sub.done <- true
+			}()
 
-		f, err := os.Create(filepath.Join(s.LogDir, fmt.Sprintf("judger.%d", sub.Id)))
-		if err != nil {
-			log.Print("judger: can't create logfile", err)
+			if _, ok := s.problems[sub.Problem]; !ok {
+				log.Print("judger: can't find problem", sub.Problem)
+				return
+			}
+
+			f, err := os.Create(filepath.Join(s.LogDir, fmt.Sprintf("judger.%s", sub.Id)))
+			if err != nil {
+				log.Print("judger: can't create logfile", err)
+				f.Close()
+				return
+			}
+
+			logger := log.New(f, "[judging]", log.Lshortfile)
+
+			err = Judge(logger, s.problems[sub.Problem], sub.Source, language.Get(sub.Language), s.sandboxProvider, sub.c)
+			if err != nil {
+				log.Print("judger: error while running Judge", err)
+				f.Close()
+				return
+			}
+
 			f.Close()
-			continue
-		}
-
-		logger := log.New(f, "[judging]", log.Lshortfile)
-
-		err = Judge(logger, s.problems[sub.Problem], sub.Source, language.Get(sub.Language), s.sandboxProvider, NewHTTPCallback(sub.CallbackUrl))
-		if err != nil {
-			log.Print("judger: error while running Judge", err)
-			f.Close()
-			continue
-		}
-
-		f.Close()
+		}()
 	}
 }
 
-func (s *Server) getStatus() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		return c.JSON(http.StatusOK, s)
-	}
+func (s *Server) getStatus(c echo.Context) error {
+	return c.JSON(http.StatusOK, s.ServerStatus)
 }
 
-func (s *Server) postUpdateProblems() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		s.runUpdateProblems()
-		return nil
-	}
+func (s *Server) postUpdateProblems(c echo.Context) error {
+	s.runUpdateProblems()
+	return nil
 }
 
-func (s *Server) postJudge() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		sub := Submission{}
-		if err := c.Bind(&sub); err != nil {
-			log.Print("getJudge error binding:", err)
-			return c.String(http.StatusBadRequest, "Parse error")
-		}
+func (s *Server) postJudge(c echo.Context) error {
+	sub := submission{}
+	if err := c.Bind(&sub); err != nil {
+		log.Print("getJudge error binding:", err)
+		return c.String(http.StatusBadRequest, "Parse error")
+	}
+
+	sub.done = make(chan bool, 1)
+	if sub.Stream {
+		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		c.Response().WriteHeader(http.StatusOK)
+
+		sub.c = NewWriterCallback(c.Response(), func() {
+			c.Response().Flush()
+		})
 
 		s.queue <- sub
-		fmt.Println("queued")
-
-		return c.String(http.StatusOK, "Queued")
+		<-sub.done
+		return sub.c.(*WriterCallback).Error()
+	}else {
+		sub.c = NewHTTPCallback(sub.CallbackUrl)
+		s.queue <- sub
+		return c.String(http.StatusOK, "queued")
 	}
 }
 
@@ -252,6 +277,3 @@ func (s Server) ToString() (string, error) {
 	return string(val), err
 }
 
-func (s *Server) FromString(str string) error {
-	return json.Unmarshal([]byte(str), s)
-}
