@@ -2,7 +2,6 @@ package web
 
 import (
 	"context"
-	"crypto/rsa"
 	"github.com/gorilla/sessions"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo-contrib/session"
@@ -17,6 +16,8 @@ import (
 	_ "github.com/mraron/njudge/utils/problems/config/feladat_txt"
 	_ "github.com/mraron/njudge/utils/problems/config/polygon"
 	_ "github.com/mraron/njudge/utils/problems/config/task_yaml"
+	"github.com/mraron/njudge/web/extmodels"
+	"github.com/mraron/njudge/web/helpers/config"
 	"github.com/mraron/njudge/web/helpers/roles"
 
 	_ "github.com/mraron/njudge/utils/language/cpp11"
@@ -42,50 +43,7 @@ import (
 )
 
 type Server struct {
-	Mode string
-	Hostname       string
-	Port           string
-	ProblemsDir    string
-	SubmissionsDir string
-	TemplatesDir   string
-
-	CookieSecret string
-
-	GoogleAuth struct {
-		Enabled   bool
-		ClientKey string
-		Secret    string
-		Callback  string
-	}
-
-	Sendgrid struct {
-		Enabled bool
-		ApiKey string `json:"api_key"`
-		SenderName string `json:"sender_name"`
-		SenderAddress string `json:"sender_address"`
-	}
-
-	SMTP struct {
-		Enabled bool
-		MailAccount         string `json:"mail_account"`
-		MailServerHost      string `json:"mail_server"`
-		MailServerPort      string `json:"mail_port"`
-		MailAccountPassword string `json:"mail_password"`
-	} `json:"smtp"`
-
-	DBAccount  string
-	DBPassword string
-	DBHost     string
-	DBName     string
-
-	GluePort string
-
-	Keys struct {
-		PrivateKeyLocation string `json:"private_key"`
-		PublicKeyLocation string `json:"public_key"`
-		privateKey *rsa.PrivateKey
-		publicKey *rsa.PublicKey
-	}
+	config.Server
 
 	ProblemStore problems.Store
 
@@ -201,16 +159,16 @@ func (s *Server) runGlue() {
 		}
 
 		if st.Done {
-			verdict := Verdict(st.Status.Verdict())
+			verdict := st.Status.Verdict()
 			if st.Status.Compiled == false {
-				verdict = VERDICT_CE
+				verdict = extmodels.VERDICT_CE
 			}
 
 			if _, err := s.db.Exec("UPDATE submissions SET verdict=$1, status=$2, ontest=NULL, judged=$3, score=$5 WHERE id=$4", verdict, st.Status, time.Now(), id, st.Status.Score()); err != nil {
 				return s.internalError(c, err, "err")
 			}
 		} else {
-			if _, err := s.db.Exec("UPDATE submissions SET ontest=$1, status=$2, verdict=$3 WHERE id=$4", st.Test, st.Status, VERDICT_RU, id); err != nil {
+			if _, err := s.db.Exec("UPDATE submissions SET ontest=$1, status=$2, verdict=$3 WHERE id=$4", st.Test, st.Status, extmodels.VERDICT_RU, id); err != nil {
 				log.Print("can't realtime update status", err)
 			}
 		}

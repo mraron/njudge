@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"github.com/markbates/goth/gothic"
+	"github.com/mraron/njudge/web/helpers/pagination"
 	"github.com/mraron/njudge/web/helpers/roles"
 	"github.com/mraron/njudge/web/models"
 	"github.com/volatiletech/sqlboiler/v4/boil"
@@ -304,12 +305,12 @@ func (s *Server) getAPIUsers(c echo.Context) error {
 		return s.unauthorizedError(c)
 	}
 
-	data, err := parsePaginationData(c)
+	data, err := pagination.Parse(c)
 	if err != nil {
 		return s.internalError(c, err, "error")
 	}
 
-	lst, err := models.Users(OrderBy(data._sortField+" "+data._sortDir), Limit(data._perPage), Offset(data._perPage*(data._page-1))).All(s.db)
+	lst, err := models.Users(OrderBy(data.SortField+" "+data.SortDir), Limit(data.PerPage), Offset(data.PerPage*(data.Page-1))).All(s.db)
 	if err != nil {
 		return s.internalError(c, err, "error")
 	}

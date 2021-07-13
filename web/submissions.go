@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/utils/problems"
+	"github.com/mraron/njudge/web/extmodels"
+	"github.com/mraron/njudge/web/helpers/pagination"
 	"github.com/mraron/njudge/web/helpers/roles"
 	"github.com/mraron/njudge/web/models"
 	"github.com/volatiletech/null/v8"
@@ -43,7 +45,7 @@ func (s *Server) Submit(uid int, problemset, problem, language string, source []
 		mustPanic(err)
 
 		id = 0
-		res, err := tx.Query("INSERT INTO submissions (status,\"user_id\",verdict,ontest,submitted,judged,problem,language,private,problemset,source,started) VALUES ($1,$2,$3,NULL,$4,NULL,$5,$6,false,$7, $8,false) RETURNING id", problems.Status{}, uid, VERDICT_UP, time.Now(), s.GetProblem(problem).Name(), language, problemset, source)
+		res, err := tx.Query("INSERT INTO submissions (status,\"user_id\",verdict,ontest,submitted,judged,problem,language,private,problemset,source,started) VALUES ($1,$2,$3,NULL,$4,NULL,$5,$6,false,$7, $8,false) RETURNING id", problems.Status{}, uid, extmodels.VERDICT_UP, time.Now(), s.GetProblem(problem).Name(), language, problemset, source)
 
 		mustPanic(err)
 
@@ -149,12 +151,12 @@ func (s *Server) getAPISubmissions(c echo.Context) error {
 		return s.unauthorizedError(c)
 	}
 
-	data, err := parsePaginationData(c)
+	data, err := pagination.Parse(c)
 	if err != nil {
 		return s.internalError(c, err, "error")
 	}
 
-	lst, err := models.Submissions(OrderBy(data._sortField+" "+data._sortDir), Limit(data._perPage), Offset(data._perPage*(data._page-1))).All(s.db)
+	lst, err := models.Submissions(OrderBy(data.SortField+" "+data.SortDir), Limit(data.PerPage), Offset(data.PerPage*(data.Page-1))).All(s.db)
 	if err != nil {
 		return s.internalError(c, err, "error")
 	}

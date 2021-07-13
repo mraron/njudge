@@ -18,7 +18,7 @@ func (s *Server) getJWT() (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS512, claims)
-	jwt, err := token.SignedString(s.Keys.privateKey)
+	jwt, err := token.SignedString(s.Keys.PrivateKey)
 	if err != nil {
 		return "", err
 	}
@@ -42,7 +42,7 @@ func (s *Server) parseKeys() {
 			panic(fmt.Sprintf("can't parse pem private key file: %s", s.Keys.PrivateKeyLocation))
 		}
 
-		if s.Keys.privateKey, err = x509.ParsePKCS1PrivateKey(block.Bytes); err != nil {
+		if s.Keys.PrivateKey, err = x509.ParsePKCS1PrivateKey(block.Bytes); err != nil {
 			panic(err)
 		}
 
@@ -56,7 +56,7 @@ func (s *Server) parseKeys() {
 			panic(fmt.Sprintf("can't parse pem public key file: %s", s.Keys.PrivateKeyLocation))
 		}
 
-		if s.Keys.publicKey, err = x509.ParsePKCS1PublicKey(block.Bytes); err != nil {
+		if s.Keys.PublicKey, err = x509.ParsePKCS1PublicKey(block.Bytes); err != nil {
 			panic(err)
 		}
 	}

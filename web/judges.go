@@ -2,7 +2,8 @@ package web
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/mraron/njudge/judge"
+	"github.com/mraron/njudge/web/extmodels"
+	"github.com/mraron/njudge/web/helpers/pagination"
 	"github.com/mraron/njudge/web/helpers/roles"
 	"github.com/mraron/njudge/web/models"
 	"github.com/volatiletech/sqlboiler/v4/boil"
@@ -11,51 +12,25 @@ import (
 	"strconv"
 )
 
-type Judge struct {
-	Id          int64         `json:"id"`
-	Name        string        `json:"name"`
-	Ping        int           `json:"ping"`
-	Online      bool          `json:"online"`
-
-	judge.ServerStatus
-}
-
-func NewJudgeFromModelsJudge(j *models.Judge) (res Judge) {
-	res.Id = int64(j.ID)
-	res.Host = j.Host
-	res.Port = j.Port
-	res.Ping = j.Ping
-	res.Online = j.Online
-
-	if server, err := judge.ParseServerStatus(j.State); err == nil {
-		res.Name = server.Id
-		res.Load = server.Load
-		res.ProblemList = server.ProblemList
-		res.Uptime = server.Uptime
-	}
-
-	return
-}
-
 func (s *Server) getAPIJudges(c echo.Context) error {
 	u := c.Get("user").(*models.User)
 	if !roles.Can(roles.Role(u.Role), roles.ActionView, "api/v1/judges") {
 		return s.unauthorizedError(c)
 	}
 
-	data, err := parsePaginationData(c)
+	data, err := pagination.Parse(c)
 	if err != nil {
 		return s.internalError(c, err, "error")
 	}
 
-	lst, err := models.Judges(OrderBy(data._sortField+" "+data._sortDir), Limit(data._perPage), Offset(data._perPage*(data._page-1))).All(s.db)
+	lst, err := models.Judges(OrderBy(data.SortField+" "+data.SortDir), Limit(data.PerPage), Offset(data.PerPage*(data.Page-1))).All(s.db)
 	if err != nil {
 		return s.internalError(c, err, "error")
 	}
 
-	local := make([]Judge, len(lst))
+	local := make([]extmodels.Judge, len(lst))
 	for ind, _ := range lst {
-		local[ind] = NewJudgeFromModelsJudge(lst[ind])
+		local[ind] = extmodels.NewJudgeFromModelsJudge(lst[ind])
 	}
 
 	return c.JSON(http.StatusOK, local)
@@ -77,7 +52,7 @@ func (s *Server) postAPIJudge(c echo.Context) error {
 		return s.internalError(c, err, "error")
 	}
 
-	return c.JSON(http.StatusOK, NewJudgeFromModelsJudge(j))
+	return c.JSON(http.StatusOK, extmodels.NewJudgeFromModelsJudge(j))
 }
 
 func (s *Server) getAPIJudge(c echo.Context) error {
@@ -98,7 +73,7 @@ func (s *Server) getAPIJudge(c echo.Context) error {
 		return s.internalError(c, err, "error")
 	}
 
-	return c.JSON(http.StatusOK, NewJudgeFromModelsJudge(j))
+	return c.JSON(http.StatusOK, extmodels.NewJudgeFromModelsJudge(j))
 }
 
 func (s *Server) deleteAPIJudge(c echo.Context) error {
@@ -140,7 +115,7 @@ func (s *Server) putAPIJudge(c echo.Context) error {
 		return s.internalError(c, err, "error")
 	}
 
-	j := new(Judge)
+	j := new(extmodels.Judge)
 	if err = c.Bind(j); err != nil {
 		return s.internalError(c, err, "error")
 	}
