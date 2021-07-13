@@ -46,7 +46,7 @@ func (s *Server) Submit(uid int, problemset, problem, language string, source []
 		mustPanic(err)
 
 		id = 0
-		res, err := tx.Query("INSERT INTO submissions (status,\"user_id\",verdict,ontest,submitted,judged,problem,language,private,problemset,source,started) VALUES ($1,$2,$3,NULL,$4,NULL,$5,$6,false,$7, $8,false) RETURNING id", problems.Status{}, uid, extmodels.VERDICT_UP, time.Now(), s.GetProblem(problem).Name(), language, problemset, source)
+		res, err := tx.Query("INSERT INTO submissions (status,\"user_id\",verdict,ontest,submitted,judged,problem,language,private,problemset,source,started) VALUES ($1,$2,$3,NULL,$4,NULL,$5,$6,false,$7, $8,false) RETURNING id", problems.Status{}, uid, extmodels.VERDICT_UP, time.Now(), s.ProblemStore.MustGet(problem).Name(), language, problemset, source)
 
 		mustPanic(err)
 
@@ -123,7 +123,7 @@ func (s *Server) postProblemsetSubmit(c echo.Context) error {
 		return helpers.InternalError(c, err, "Belső hiba #2")
 	}
 
-	if id, err = s.Submit(u.ID, c.Get("problemset").(string), s.GetProblem(c.FormValue("problem")).Name(), languageName, contents); err != nil {
+	if id, err = s.Submit(u.ID, c.Get("problemset").(string), s.ProblemStore.MustGet(c.FormValue("problem")).Name(), languageName, contents); err != nil {
 		return helpers.InternalError(c, err, "Belső hiba #4")
 	}
 

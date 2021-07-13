@@ -45,11 +45,6 @@ func (s *Server) UpdateProblem(pr string) error {
 	return s.ProblemStore.UpdateProblem(pr)
 }
 
-func (s *Server) GetProblem(pr string) problems.Problem {
-	p, _ := s.ProblemStore.Get(pr)
-	return p
-}
-
 func (s *Server) Run() {
 	s.SetupEnvironment()
 	s.StartBackgroundJobs()

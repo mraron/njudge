@@ -15,6 +15,7 @@ type Store interface {
 	List() ([]string, error)
 	Has(string) (bool, error)
 	Get(string) (Problem, error)
+	MustGet(string) Problem
 	Update() error
 	UpdateProblem(string) error
 }
@@ -77,6 +78,15 @@ func (s *FsStore) Get(p string) (Problem, error) {
 	return nil, ErrorProblemNotFound
 }
 
+func (s *FsStore) MustGet(p string) Problem {
+	res, err := s.Get(p)
+	if err != nil {
+		panic(err)
+	}
+
+	return res
+}
+
 func (s *FsStore) Update() error {
 	files, err := afero.ReadDir(s.fs, s.dir)
 	if err != nil {
@@ -122,8 +132,3 @@ func (s *FsStore) UpdateProblem(p string) error {
 	s.problems[p] = prob
 	return nil
 }
-
-
-
-
-
