@@ -391,28 +391,3 @@ func (s *Server) getUserProfile(c echo.Context) error {
 		User *models.User
 	}{user})
 }
-
-func (s *Server) UserSolvedStatus(problemSet, problem string, u *models.User) (int, error) {
-	solvedStatus := -1
-	if u != nil {
-		cnt, err := models.Submissions(Where("problemset = ?", problemSet), Where("problem = ?", problem), Where("verdict = 0"), Where("user_id = ?", u.ID)).Count(s.DB)
-		if err != nil && !errors.Is(err, sql.ErrNoRows) {
-			return -1, fmt.Errorf("can't get solvedstatus for %s %s%s: %w", u.Name, problemSet, problem, err)
-		}else {
-			if cnt > 0 {
-				solvedStatus = 0
-			} else {
-				cnt, err := models.Submissions(Where("problemset = ?", problemSet), Where("problem = ?", problem), Where("user_id = ?", u.ID)).Count(s.DB)
-				if err != nil && !errors.Is(err, sql.ErrNoRows) {
-					return -1, fmt.Errorf("can't get solvedstatus for %s %s%s: %w", u.Name, problemSet, problem, err)
-				} else {
-					if cnt>0 {
-						solvedStatus = 1
-					}
-				}
-			}
-		}
-	}
-
-	return solvedStatus, nil
-}

@@ -55,7 +55,7 @@ func (s *Server) getProblemsetList(c echo.Context) error {
 			return helpers.InternalError(c, err, "Belső hiba.")
 		}
 
-		solvedStatus, err := s.UserSolvedStatus(problemSet, problemLst[i].Problem, u)
+		solvedStatus, err := helpers.HasUserSolved(s.DB, u, problemSet, problemLst[i].Problem)
 		if err != nil {
 			return helpers.InternalError(c, err, "Belső hiba.")
 		}
@@ -200,7 +200,7 @@ func (s *Server) getTaskArchive(c echo.Context) error {
 		for _, problem := range problems {
 			elem := &taskArchiveTreeNode{Id:id, Type: "problem", Name: i18n.TranslateContent("hungarian", s.ProblemStore.MustGet(problem.Problem).Titles()).String(), Link: fmt.Sprintf("/problemset/%s/%s/", problem.Problemset, problem.Problem), Children: make([]*taskArchiveTreeNode, 0), SolvedStatus: -1}
 			if u != nil {
-				elem.SolvedStatus, err = s.UserSolvedStatus(problem.Problemset, problem.Problem, u)
+				elem.SolvedStatus, err = helpers.HasUserSolved(s.DB, u, problem.Problemset, problem.Problem)
 				if err != nil {
 					return err
 				}
