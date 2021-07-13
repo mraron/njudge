@@ -21,25 +21,6 @@ import (
 	"strconv"
 )
 
-
-func (s *Server) currentUser(c echo.Context) (*models.User, error) {
-	var (
-		u   *models.User = &models.User{}
-		err error
-	)
-
-	storage, err := session.Get("user", c)
-	if err != nil {
-		panic(err)
-	}
-
-	if _, ok := storage.Values["id"]; !ok {
-		return nil, nil
-	}
-	u, err = models.Users(Where("id=?", storage.Values["id"])).One(s.DB)
-	return u, err
-}
-
 func (s *Server) getUserLogin(c echo.Context) error {
 	if u := c.Get("user").(*models.User); u != nil {
 		return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")

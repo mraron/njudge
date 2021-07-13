@@ -28,6 +28,7 @@ import (
 
 	"github.com/mraron/njudge/web/models"
 	_ "github.com/mraron/njudge/web/models"
+	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	_ "mime"
 	"net/http"
 )
@@ -53,7 +54,25 @@ func (s *Server) Run() {
 	e.Use(session.Middleware(store))
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			user, err := s.currentUser(c)
+			currentUser := func(c echo.Context) (*models.User, error) {
+				var (
+					u   = &models.User{}
+					err error
+				)
+
+				storage, err := session.Get("user", c)
+				if err != nil {
+					panic(err)
+				}
+
+				if _, ok := storage.Values["id"]; !ok {
+					return nil, nil
+				}
+				u, err = models.Users(Where("id=?", storage.Values["id"])).One(s.DB)
+				return u, err
+			}
+
+			user, err := currentUser(c)
 			if err != nil {
 				return helpers.InternalError(c, err, "belső hiba")
 			}
