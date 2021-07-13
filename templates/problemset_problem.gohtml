@@ -88,7 +88,7 @@
                 {{range $a := .Data.Problem.Attachments}}
                     <a href="attachment/{{$a.Name}}/"><i class="fa fa-file"></i> Fájl ({{$a.Name}})</a><br>
                 {{end}}
-                {{range $loc := locales .Data.Problem.PDFStatements}}
+                {{range $loc := .Data.Problem.PDFStatements.Locales}}
                     <a href="pdf/{{$loc}}/"><i class="fa fa-file-pdf"></i> Leírás ({{$loc}})</a><br>
                 {{end}}
 

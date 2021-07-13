@@ -8,33 +8,18 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"github.com/markbates/goth/gothic"
+	"github.com/mraron/njudge/web/helpers"
 	"github.com/mraron/njudge/web/helpers/pagination"
 	"github.com/mraron/njudge/web/helpers/roles"
 	"github.com/mraron/njudge/web/models"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"golang.org/x/crypto/bcrypt"
-	"math/rand"
 	"net/http"
 	"net/url"
 	"strconv"
-	"time"
 )
 
-func GenerateActivationKey(length int) string {
-	var (
-		alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678901234567890123456789"
-		ans      = make([]byte, length)
-	)
-
-	src := rand.NewSource(time.Now().UnixNano())
-
-	for i := 0; i < length; i++ {
-		ans[i] = alphabet[(int(src.Int63()))%len(alphabet)]
-	}
-
-	return string(ans)
-}
 
 func (s *Server) currentUser(c echo.Context) (*models.User, error) {
 	var (
@@ -90,7 +75,7 @@ func (s *Server) postUserLogin(c echo.Context) error {
 	storage.Values["id"] = u.ID
 
 	if err = storage.Save(c.Request(), c.Response()); err != nil {
-		return s.internalError(c, err, "Belső hiba #2")
+		return helpers.InternalError(c, err, "Belső hiba #2")
 	}
 
 	c.Set("user", u)
@@ -109,7 +94,7 @@ func (s *Server) getUserRegister(c echo.Context) error {
 func (s *Server) postUserRegister(c echo.Context) error {
 	var (
 		errStrings = make([]string, 0)
-		key             = GenerateActivationKey(255)
+		key             = helpers.GenerateActivationKey(255)
 		err    error
 		tx     *sql.Tx
 	)
@@ -184,7 +169,7 @@ func (s *Server) postUserRegister(c echo.Context) error {
 	}
 
 	if transaction(); err != nil {
-		return s.internalError(c, err, "Belső hiba.")
+		return helpers.InternalError(c, err, "Belső hiba.")
 	}
 
 	return c.Redirect(http.StatusFound, "/user/activate")
@@ -200,7 +185,7 @@ func (s *Server) getUserLogout(c echo.Context) error {
 	storage.Values["id"] = -1
 
 	if err := storage.Save(c.Request(), c.Response()); err != nil {
-		return s.internalError(c, err, "Belső hiba")
+		return helpers.InternalError(c, err, "Belső hiba")
 	}
 
 	return c.Redirect(http.StatusFound, "/")
@@ -226,7 +211,7 @@ func (s *Server) getActivateUser(c echo.Context) error {
 	}
 
 	if user, err = models.Users(Where("name=?", c.Param("name"))).One(s.db); err != nil {
-		return s.internalError(c, err, "Belső hiba #1")
+		return helpers.InternalError(c, err, "Belső hiba #1")
 	}
 
 	if !user.ActivationKey.Valid {
@@ -238,15 +223,15 @@ func (s *Server) getActivateUser(c echo.Context) error {
 	}
 
 	if tx, err = s.db.Begin(); err != nil {
-		return s.internalError(c, err, "Belső hiba #2")
+		return helpers.InternalError(c, err, "Belső hiba #2")
 	}
 
 	if _, err = tx.Exec("UPDATE users SET activation_key=NULL WHERE name=$1", c.Param("name")); err != nil {
-		return s.internalError(c, err, "Belső hiba #3")
+		return helpers.InternalError(c, err, "Belső hiba #3")
 	}
 
 	if err = tx.Commit(); err != nil {
-		return s.internalError(c, err, "Belső hiba #4")
+		return helpers.InternalError(c, err, "Belső hiba #4")
 	}
 
 	return c.Render(http.StatusOK, "message.gohtml", "Sikeres aktiválás, mostmár beléphetsz.")
@@ -275,7 +260,7 @@ func (s *Server) getUserAuthCallback(c echo.Context) error {
 	storage.Values["id"] = lst[0].ID
 
 	if err = storage.Save(c.Request(), c.Response()); err != nil {
-		return s.internalError(c, err, "Belső hiba #2")
+		return helpers.InternalError(c, err, "Belső hiba #2")
 	}
 
 	c.Set("user", lst[0])
@@ -292,31 +277,25 @@ func (s *Server) getUserAuth(c echo.Context) error {
 	return nil
 }
 
-//@TODO CENSOR PASSWORD AND ADDING USER!!!
-
-func CensorUserPassword(user *models.User) {
-	user.Password = "***CENSORED***"
-}
-
 func (s *Server) getAPIUsers(c echo.Context) error {
 	u := c.Get("user").(*models.User)
 
 	if !roles.Can(roles.Role(u.Role), roles.ActionView, "api/v1/users") {
-		return s.unauthorizedError(c)
+		return helpers.UnauthorizedError(c)
 	}
 
 	data, err := pagination.Parse(c)
 	if err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
 	lst, err := models.Users(OrderBy(data.SortField+" "+data.SortDir), Limit(data.PerPage), Offset(data.PerPage*(data.Page-1))).All(s.db)
 	if err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
 	for i := 0; i < len(lst); i++ {
-		CensorUserPassword(lst[i])
+		helpers.CensorUserPassword(lst[i])
 	}
 
 	return c.JSON(http.StatusOK, lst)
@@ -325,12 +304,12 @@ func (s *Server) getAPIUsers(c echo.Context) error {
 func (s *Server) postAPIUser(c echo.Context) error {
 	u := c.Get("user").(*models.User)
 	if !roles.Can(roles.Role(u.Role), roles.ActionCreate, "api/v1/users") {
-		return s.unauthorizedError(c)
+		return helpers.UnauthorizedError(c)
 	}
 
 	pr := new(models.User)
 	if err := c.Bind(pr); err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
 	return pr.Insert(s.db, boil.Infer())
@@ -339,22 +318,22 @@ func (s *Server) postAPIUser(c echo.Context) error {
 func (s *Server) getAPIUser(c echo.Context) error {
 	u := c.Get("user").(*models.User)
 	if !roles.Can(roles.Role(u.Role), roles.ActionView, "api/v1/users") {
-		return s.unauthorizedError(c)
+		return helpers.UnauthorizedError(c)
 	}
 
 	idStr := c.Param("id")
 
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
 	pr, err := models.Users(Where("id=?", id)).One(s.db)
 	if err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
-	CensorUserPassword(pr)
+	helpers.CensorUserPassword(pr)
 
 	return c.JSON(http.StatusOK, pr)
 }
@@ -362,24 +341,24 @@ func (s *Server) getAPIUser(c echo.Context) error {
 func (s *Server) deleteAPIUser(c echo.Context) error {
 	u := c.Get("user").(*models.User)
 	if !roles.Can(roles.Role(u.Role), roles.ActionDelete, "api/v1/users") {
-		return s.unauthorizedError(c)
+		return helpers.UnauthorizedError(c)
 	}
 
 	id_ := c.Param("id")
 
 	id, err := strconv.Atoi(id_)
 	if err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
 	pr, err := models.Users(Where("id=?", id)).One(s.db)
 	if err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
 	_, err = pr.Delete(s.db)
 	if err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
 	return c.String(http.StatusOK, "ok")
@@ -388,26 +367,26 @@ func (s *Server) deleteAPIUser(c echo.Context) error {
 func (s *Server) putAPIUser(c echo.Context) error {
 	u := c.Get("user").(*models.User)
 	if !roles.Can(roles.Role(u.Role), roles.ActionEdit, "api/v1/users") {
-		return s.unauthorizedError(c)
+		return helpers.UnauthorizedError(c)
 	}
 
 	id_ := c.Param("id")
 
 	id, err := strconv.Atoi(id_)
 	if err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
 	pr := new(models.User)
 	if err = c.Bind(pr); err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
 	pr.ID = id
 	_, err = pr.Update(s.db, boil.Infer())
 
 	if err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
 	return c.JSON(http.StatusOK, struct {
@@ -418,12 +397,12 @@ func (s *Server) putAPIUser(c echo.Context) error {
 func (s *Server) getUserProfile(c echo.Context) error {
 	name, err := url.QueryUnescape(c.Param("name"))
 	if err != nil {
-		return s.internalError(c, err, "hiba")
+		return helpers.InternalError(c, err, "hiba")
 	}
 
 	user, err := models.Users(Where("name = ?", name)).One(s.db)
 	if err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
 	return c.Render(http.StatusOK, "profile.gohtml", struct {

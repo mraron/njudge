@@ -30,6 +30,23 @@ func (s Content) String() string {
 
 type Contents []Content
 
+func (cs Contents) Locales() []string {
+	lst := make(map[string]bool)
+	for _, val := range cs {
+		lst[val.Locale] = true
+	}
+
+	ans := make([]string, len(lst))
+
+	ind := 0
+	for key := range lst {
+		ans[ind] = key
+		ind++
+	}
+
+	return ans
+}
+
 func (cs Contents) FilterByType(mime string) Contents {
 	res := make(Contents, 0)
 	for _, val := range cs {

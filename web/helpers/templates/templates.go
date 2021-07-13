@@ -1,4 +1,4 @@
-package web
+package templates
 
 import (
 	"crypto/md5"
@@ -7,19 +7,25 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"github.com/mraron/njudge/utils/problems"
+	"github.com/mraron/njudge/web/helpers/i18n"
 	"github.com/mraron/njudge/web/helpers/roles"
 	"github.com/mraron/njudge/web/models"
 	"html/template"
 	"io"
+	"path/filepath"
 	"strings"
 	"time"
 )
 
-type Template struct {
+type Renderer struct {
 	templates *template.Template
 }
 
-func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+func New(templatesDir string, st problems.Store) *Renderer {
+	return &Renderer{template.Must(template.New("").Funcs(funcs(st)).ParseGlob(filepath.Join(templatesDir, "*.gohtml")))}
+}
+
+func (t *Renderer) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
 	err := t.templates.ExecuteTemplate(w, name, struct {
 		Data    interface{}
 		Context echo.Context
@@ -32,53 +38,10 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 	return nil
 }
 
-func translateContent(locale string, cs []problems.Content) problems.Content {
-	search := func(loc string) (problems.Content, bool) {
-		for _, c := range cs {
-			if locale == c.Locale {
-				return c, true
-			}
-		}
-
-		return problems.Content{}, false
-	}
-
-	if val, ok := search(locale); ok {
-		return val
-	}
-
-	if val, ok := search("hungarian"); ok {
-		return val
-	}
-
-	if len(cs) == 0 {
-		return problems.Content{"-", []byte("undefined"), "text"}
-	}
-	return cs[0]
-}
-
-func locales(cs []problems.Content) []string {
-	lst := make(map[string]bool)
-	for _, val := range cs {
-		lst[val.Locale] = true
-	}
-
-	ans := make([]string, len(lst))
-
-	ind := 0
-	for key := range lst {
-		ans[ind] = key
-		ind++
-	}
-
-	return ans
-}
-
-func (s *Server) templatefuncs() template.FuncMap {
+func funcs(store problems.Store) template.FuncMap {
 	return template.FuncMap{
-		"locales":          locales,
-		"translateContent": translateContent,
-		"problem":          s.GetProblem,
+		"translateContent": i18n.TranslateContent,
+		"problem":          store.Get,
 		"str2html": func(s string) template.HTML {
 			return template.HTML(s)
 		},

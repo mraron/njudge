@@ -5,6 +5,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/utils/problems"
 	"github.com/mraron/njudge/web/extmodels"
+	"github.com/mraron/njudge/web/helpers"
 	"github.com/mraron/njudge/web/helpers/pagination"
 	"github.com/mraron/njudge/web/helpers/roles"
 	"github.com/mraron/njudge/web/models"
@@ -109,21 +110,21 @@ func (s *Server) postProblemsetSubmit(c echo.Context) error {
 
 	fileHeader, err := c.FormFile("source")
 	if err != nil {
-		return s.internalError(c, err, "Belső hiba #0")
+		return helpers.InternalError(c, err, "Belső hiba #0")
 	}
 
 	f, err := fileHeader.Open()
 	if err != nil {
-		return s.internalError(c, err, "Belső hiba #1")
+		return helpers.InternalError(c, err, "Belső hiba #1")
 	}
 
 	contents, err := ioutil.ReadAll(f)
 	if err != nil {
-		return s.internalError(c, err, "Belső hiba #2")
+		return helpers.InternalError(c, err, "Belső hiba #2")
 	}
 
 	if id, err = s.Submit(u.ID, c.Get("problemset").(string), s.GetProblem(c.FormValue("problem")).Name(), languageName, contents); err != nil {
-		return s.internalError(c, err, "Belső hiba #4")
+		return helpers.InternalError(c, err, "Belső hiba #4")
 	}
 
 	return c.Redirect(http.StatusFound, "/problemset/status#submission"+strconv.Itoa(id))
@@ -132,13 +133,13 @@ func (s *Server) postProblemsetSubmit(c echo.Context) error {
 func (s *Server) getSubmission(c echo.Context) error {
 	val, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return s.internalError(c, err, "ajaj")
+		return helpers.InternalError(c, err, "ajaj")
 	}
 
 	sub, err := models.Submissions(Where("id=?", val)).One(s.db)
 	//sub, err := models.SubmissionFromId(s.db, int64(val))
 	if err != nil {
-		return s.internalError(c, err, "ajaj")
+		return helpers.InternalError(c, err, "ajaj")
 	}
 
 	return c.Render(http.StatusOK, "submission.gohtml", sub)
@@ -148,17 +149,17 @@ func (s *Server) getAPISubmissions(c echo.Context) error {
 	u := c.Get("user").(*models.User)
 
 	if !roles.Can(roles.Role(u.Role), roles.ActionView, "api/v1/submissions") {
-		return s.unauthorizedError(c)
+		return helpers.UnauthorizedError(c)
 	}
 
 	data, err := pagination.Parse(c)
 	if err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
 	lst, err := models.Submissions(OrderBy(data.SortField+" "+data.SortDir), Limit(data.PerPage), Offset(data.PerPage*(data.Page-1))).All(s.db)
 	if err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 	//models.Submissions().Count(s.db)
 
@@ -173,12 +174,12 @@ func (s *Server) getAPISubmissions(c echo.Context) error {
 func (s *Server) postAPISubmission(c echo.Context) error {
 	u := c.Get("user").(*models.User)
 	if !roles.Can(roles.Role(u.Role), roles.ActionCreate, "api/v1/submissions") {
-		return s.unauthorizedError(c)
+		return helpers.UnauthorizedError(c)
 	}
 
 	pr := new(models.Submission)
 	if err := c.Bind(pr); err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
 	return pr.Insert(s.db, boil.Infer())
@@ -187,19 +188,19 @@ func (s *Server) postAPISubmission(c echo.Context) error {
 func (s *Server) getAPISubmission(c echo.Context) error {
 	u := c.Get("user").(*models.User)
 	if !roles.Can(roles.Role(u.Role), roles.ActionView, "api/v1/submissions") {
-		return s.unauthorizedError(c)
+		return helpers.UnauthorizedError(c)
 	}
 
 	idStr := c.Param("id")
 
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
 	pr, err := models.Submissions(Where("id=?", id)).One(s.db)
 	if err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
 	return c.JSON(http.StatusOK, pr)
@@ -208,24 +209,24 @@ func (s *Server) getAPISubmission(c echo.Context) error {
 func (s *Server) deleteAPISubmission(c echo.Context) error {
 	u := c.Get("user").(*models.User)
 	if !roles.Can(roles.Role(u.Role), roles.ActionDelete, "api/v1/submissions") {
-		return s.unauthorizedError(c)
+		return helpers.UnauthorizedError(c)
 	}
 
 	id_ := c.Param("id")
 
 	id, err := strconv.Atoi(id_)
 	if err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
 	pr, err := models.Submissions(Where("id=?", id)).One(s.db)
 	if err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
 	_, err = pr.Delete(s.db)
 	if err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
 	return c.String(http.StatusOK, "ok")
@@ -234,26 +235,26 @@ func (s *Server) deleteAPISubmission(c echo.Context) error {
 func (s *Server) putAPISubmission(c echo.Context) error {
 	u := c.Get("user").(*models.User)
 	if !roles.Can(roles.Role(u.Role), roles.ActionEdit, "api/v1/submissions") {
-		return s.unauthorizedError(c)
+		return helpers.UnauthorizedError(c)
 	}
 
 	id_ := c.Param("id")
 
 	id, err := strconv.Atoi(id_)
 	if err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
 	pr := new(models.Submission)
 	if err = c.Bind(pr); err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
 	pr.ID = id
 	_, err = pr.Update(s.db, boil.Infer())
 
 	if err != nil {
-		return s.internalError(c, err, "error")
+		return helpers.InternalError(c, err, "error")
 	}
 
 	return c.JSON(http.StatusOK, struct {
@@ -264,12 +265,12 @@ func (s *Server) putAPISubmission(c echo.Context) error {
 func (s *Server) getSubmissionRejudge(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return s.internalError(c, err, "can't parse id")
+		return helpers.InternalError(c, err, "can't parse id")
 	}
 
 	sub, err := models.Submissions(Where("id = ?", id)).One(s.db)
 	if err != nil {
-		return s.internalError(c, err, "can't find submission")
+		return helpers.InternalError(c, err, "can't find submission")
 	}
 
 	sub.ID = id

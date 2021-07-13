@@ -17,8 +17,10 @@ import (
 	_ "github.com/mraron/njudge/utils/problems/config/polygon"
 	_ "github.com/mraron/njudge/utils/problems/config/task_yaml"
 	"github.com/mraron/njudge/web/extmodels"
+	"github.com/mraron/njudge/web/helpers"
 	"github.com/mraron/njudge/web/helpers/config"
 	"github.com/mraron/njudge/web/helpers/roles"
+	"github.com/mraron/njudge/web/helpers/templates"
 
 	_ "github.com/mraron/njudge/utils/language/cpp11"
 	_ "github.com/mraron/njudge/utils/language/cpp14"
@@ -34,10 +36,8 @@ import (
 	_ "github.com/mraron/njudge/web/models"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"html/template"
 	_ "mime"
 	"net/http"
-	"path/filepath"
 	"strconv"
 	"time"
 )
@@ -132,15 +132,6 @@ func (s *Server) runSyncJudges() {
 	}
 }
 
-func (s *Server) internalError(c echo.Context, err error, msg string) error {
-	c.Logger().Print("internal error:", err)
-	return c.Render(http.StatusInternalServerError, "error.gohtml", msg)
-}
-
-func (s *Server) unauthorizedError(c echo.Context) error {
-	return c.String(http.StatusUnauthorized, "unauthorized")
-}
-
 func (s *Server) runGlue() {
 	g := echo.New()
 	g.Use(middleware.Logger())
@@ -150,12 +141,12 @@ func (s *Server) runGlue() {
 
 		id, err := strconv.Atoi(id_)
 		if err != nil {
-			return s.internalError(c, err, "err")
+			return helpers.InternalError(c, err, "err")
 		}
 
 		st := judge.Status{}
 		if err = c.Bind(&st); err != nil {
-			return s.internalError(c, err, "err")
+			return helpers.InternalError(c, err, "err")
 		}
 
 		if st.Done {
@@ -165,7 +156,7 @@ func (s *Server) runGlue() {
 			}
 
 			if _, err := s.db.Exec("UPDATE submissions SET verdict=$1, status=$2, ontest=NULL, judged=$3, score=$5 WHERE id=$4", verdict, st.Status, time.Now(), id, st.Status.Score()); err != nil {
-				return s.internalError(c, err, "err")
+				return helpers.InternalError(c, err, "err")
 			}
 		} else {
 			if _, err := s.db.Exec("UPDATE submissions SET ontest=$1, status=$2, verdict=$3 WHERE id=$4", st.Test, st.Status, extmodels.VERDICT_RU, id); err != nil {
@@ -268,7 +259,7 @@ func (s *Server) Run() {
 		return func(c echo.Context) error {
 			user, err := s.currentUser(c)
 			if err != nil {
-				return s.internalError(c, err, "belső hiba")
+				return helpers.InternalError(c, err, "belső hiba")
 			}
 			c.Set("user", user)
 
@@ -276,11 +267,7 @@ func (s *Server) Run() {
 		}
 	})
 
-	t := &Template{
-		templates: template.Must(template.New("templater").Funcs(s.templatefuncs()).ParseGlob(filepath.Join(s.TemplatesDir, "*.gohtml"))),
-	}
-
-	e.Renderer = t
+	e.Renderer = templates.New(s.TemplatesDir, s.ProblemStore)
 
 	e.GET("/", s.getHome)
 

@@ -3,10 +3,11 @@ package web
 import (
 	"errors"
 	"github.com/labstack/echo/v4"
+	"github.com/mraron/njudge/web/helpers"
 	"github.com/mraron/njudge/web/models"
+	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"net/http"
 	"net/url"
-	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"strconv"
 )
 
@@ -84,7 +85,7 @@ func (s *Server) getProblemsetProblemStatus(c echo.Context) error {
 
 	statusPage, err := s.GetStatusPage(page, 20, OrderBy("id DESC"), query, c.Request().URL.Query())
 	if err != nil {
-		return s.internalError(c, err, "Belső hiba")
+		return helpers.InternalError(c, err, "Belső hiba")
 	}
 
 	return c.Render(http.StatusOK, "problemset_problem_status.gohtml", statusPage)
@@ -113,7 +114,7 @@ func (s *Server) getProblemsetStatus(c echo.Context) error {
 
 	statusPage, err := s.GetStatusPage(page, 20, OrderBy("id DESC"), query, c.Request().URL.Query())
 	if err != nil {
-		return s.internalError(c, err, "Belső hiba")
+		return helpers.InternalError(c, err, "Belső hiba")
 	}
 
 	return c.Render(http.StatusOK, "status.gohtml", statusPage)
