@@ -17,6 +17,7 @@ import (
 	_ "github.com/mraron/njudge/utils/problems/config/feladat_txt"
 	_ "github.com/mraron/njudge/utils/problems/config/polygon"
 	_ "github.com/mraron/njudge/utils/problems/config/task_yaml"
+	"github.com/mraron/njudge/web/helpers/roles"
 
 	_ "github.com/mraron/njudge/utils/language/cpp11"
 	_ "github.com/mraron/njudge/utils/language/cpp14"
@@ -30,7 +31,6 @@ import (
 
 	"github.com/mraron/njudge/web/models"
 	_ "github.com/mraron/njudge/web/models"
-	"github.com/mraron/njudge/web/roles"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"html/template"
@@ -327,6 +327,7 @@ func (s *Server) Run() {
 	e.GET("/", s.getHome)
 
 	e.Static("/static", "public")
+
 	e.GET("/submission/:id", s.getSubmission)
 	e.GET("/submission/rejudge/:id", s.getSubmissionRejudge)
 	e.GET("/task_archive", s.getTaskArchive)

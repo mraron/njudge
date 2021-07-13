@@ -2,8 +2,8 @@ package web
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/mraron/njudge/web/helpers/roles"
 	"github.com/mraron/njudge/web/models"
-	"github.com/mraron/njudge/web/roles"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"net/http"

@@ -2,15 +2,14 @@ package web
 
 import (
 	"database/sql"
-	errors2 "errors"
+	"errors"
 	"fmt"
-	"github.com/friendsofgo/errors"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"github.com/markbates/goth/gothic"
+	"github.com/mraron/njudge/web/helpers/roles"
 	"github.com/mraron/njudge/web/models"
-	"github.com/mraron/njudge/web/roles"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"golang.org/x/crypto/bcrypt"
@@ -108,7 +107,7 @@ func (s *Server) getUserRegister(c echo.Context) error {
 
 func (s *Server) postUserRegister(c echo.Context) error {
 	var (
-		errors []string = make([]string, 0)
+		errStrings = make([]string, 0)
 		key             = GenerateActivationKey(255)
 		err    error
 		tx     *sql.Tx
@@ -121,13 +120,13 @@ func (s *Server) postUserRegister(c echo.Context) error {
 	used := func(col, value, msg string) {
 		u := ""
 		if s.db.Get(&u, "SELECT name FROM users WHERE "+col+"=$1", value); u != "" {
-			errors = append(errors, msg)
+			errStrings = append(errStrings, msg)
 		}
 	}
 
 	required := func(value, msg string) {
 		if c.FormValue(value) == "" {
-			errors = append(errors, msg)
+			errStrings = append(errStrings, msg)
 		}
 	}
 
@@ -140,11 +139,11 @@ func (s *Server) postUserRegister(c echo.Context) error {
 	required("email", "Az email mező szükséges")
 
 	if c.FormValue("password") != c.FormValue("password2") {
-		errors = append(errors, "A két jelszó nem egyezik meg")
+		errStrings = append(errStrings, "A két jelszó nem egyezik meg")
 	}
 
-	if len(errors) > 0 {
-		return c.Render(http.StatusOK, "register.gohtml", errors)
+	if len(errStrings) > 0 {
+		return c.Render(http.StatusOK, "register.gohtml", errStrings)
 	}
 
 	mustPanic := func(err error) {
@@ -160,7 +159,7 @@ func (s *Server) postUserRegister(c echo.Context) error {
 
 				var ok bool
 				if err, ok = p.(error); !ok {
-					err = errors2.New("hiba")
+					err = errors.New("hiba")
 				}
 			}
 		}()
