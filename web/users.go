@@ -9,6 +9,7 @@ import (
 	"github.com/labstack/gommon/log"
 	"github.com/markbates/goth/gothic"
 	"github.com/mraron/njudge/web/helpers"
+	"github.com/mraron/njudge/web/helpers/mail"
 	"github.com/mraron/njudge/web/helpers/pagination"
 	"github.com/mraron/njudge/web/helpers/roles"
 	"github.com/mraron/njudge/web/models"
@@ -35,7 +36,7 @@ func (s *Server) currentUser(c echo.Context) (*models.User, error) {
 	if _, ok := storage.Values["id"]; !ok {
 		return nil, nil
 	}
-	u, err = models.Users(Where("id=?", storage.Values["id"])).One(s.db)
+	u, err = models.Users(Where("id=?", storage.Values["id"])).One(s.DB)
 	return u, err
 }
 
@@ -57,7 +58,7 @@ func (s *Server) postUserLogin(c echo.Context) error {
 		return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
 	}
 
-	u, err = models.Users(Where("name=?", c.FormValue("name"))).One(s.db)
+	u, err = models.Users(Where("name=?", c.FormValue("name"))).One(s.DB)
 	if err != nil {
 		log.Error("Possible just wrong credentials, but", err)
 		return c.Render(http.StatusOK, "login.gohtml", []string{"Hibás felhasználónév és jelszó páros."})
@@ -105,7 +106,7 @@ func (s *Server) postUserRegister(c echo.Context) error {
 
 	used := func(col, value, msg string) {
 		u := ""
-		if s.db.Get(&u, "SELECT name FROM users WHERE "+col+"=$1", value); u != "" {
+		if s.DB.Get(&u, "SELECT name FROM users WHERE "+col+"=$1", value); u != "" {
 			errStrings = append(errStrings, msg)
 		}
 	}
@@ -150,7 +151,7 @@ func (s *Server) postUserRegister(c echo.Context) error {
 			}
 		}()
 
-		tx, err := s.db.Begin()
+		tx, err := s.DB.Begin()
 		mustPanic(err)
 
 		hashed, err := bcrypt.GenerateFromPassword([]byte(c.FormValue("password")), bcrypt.DefaultCost)
@@ -159,11 +160,11 @@ func (s *Server) postUserRegister(c echo.Context) error {
 		_, err = tx.Exec("INSERT INTO users (name,password,email,activation_key,role) VALUES ($1,$2,$3,$4,$5)", c.FormValue("name"), hashed, c.FormValue("email"), key, "user")
 		mustPanic(err)
 
-		m := Mail{}
+		m := mail.Mail{}
 		m.Recipients = []string{c.FormValue("email")}
 		m.Message = fmt.Sprintf(`Kedves %s!<br> Köszönjük regisztrációd. Aktiváló link: <a href="http://`+s.Hostname+`/user/activate/%s/%s">http://`+s.Hostname+`/user/activate/%s/%s</a>`, c.FormValue("name"), c.FormValue("name"), key, c.FormValue("name"), key)
 		m.Subject = "Regisztráció aktiválása"
-		mustPanic(s.SendMail(m))
+		mustPanic(m.Send(s.Server))
 
 		mustPanic(tx.Commit())
 	}
@@ -210,7 +211,7 @@ func (s *Server) getActivateUser(c echo.Context) error {
 		return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
 	}
 
-	if user, err = models.Users(Where("name=?", c.Param("name"))).One(s.db); err != nil {
+	if user, err = models.Users(Where("name=?", c.Param("name"))).One(s.DB); err != nil {
 		return helpers.InternalError(c, err, "Belső hiba #1")
 	}
 
@@ -222,7 +223,7 @@ func (s *Server) getActivateUser(c echo.Context) error {
 		return c.Render(http.StatusOK, "error.gohtml", "Hibás aktiválási kulcs. Biztos jó linkre kattintottál?")
 	}
 
-	if tx, err = s.db.Begin(); err != nil {
+	if tx, err = s.DB.Begin(); err != nil {
 		return helpers.InternalError(c, err, "Belső hiba #2")
 	}
 
@@ -247,7 +248,7 @@ func (s *Server) getUserAuthCallback(c echo.Context) error {
 		return c.Render(http.StatusOK, "login.gohtml", []string{"Hiba: érvénytelen token."})
 	}
 
-	lst, err := models.Users(Where("email = ?", user.Email)).All(s.db)
+	lst, err := models.Users(Where("email = ?", user.Email)).All(s.DB)
 	if len(lst) == 0 {
 		return c.Render(http.StatusOK, "login.gohtml", []string{"Hiba: a felhasználó nincs regisztrálva."})
 	}
@@ -289,7 +290,7 @@ func (s *Server) getAPIUsers(c echo.Context) error {
 		return helpers.InternalError(c, err, "error")
 	}
 
-	lst, err := models.Users(OrderBy(data.SortField+" "+data.SortDir), Limit(data.PerPage), Offset(data.PerPage*(data.Page-1))).All(s.db)
+	lst, err := models.Users(OrderBy(data.SortField+" "+data.SortDir), Limit(data.PerPage), Offset(data.PerPage*(data.Page-1))).All(s.DB)
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
 	}
@@ -312,7 +313,7 @@ func (s *Server) postAPIUser(c echo.Context) error {
 		return helpers.InternalError(c, err, "error")
 	}
 
-	return pr.Insert(s.db, boil.Infer())
+	return pr.Insert(s.DB, boil.Infer())
 }
 
 func (s *Server) getAPIUser(c echo.Context) error {
@@ -328,7 +329,7 @@ func (s *Server) getAPIUser(c echo.Context) error {
 		return helpers.InternalError(c, err, "error")
 	}
 
-	pr, err := models.Users(Where("id=?", id)).One(s.db)
+	pr, err := models.Users(Where("id=?", id)).One(s.DB)
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
 	}
@@ -351,12 +352,12 @@ func (s *Server) deleteAPIUser(c echo.Context) error {
 		return helpers.InternalError(c, err, "error")
 	}
 
-	pr, err := models.Users(Where("id=?", id)).One(s.db)
+	pr, err := models.Users(Where("id=?", id)).One(s.DB)
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
 	}
 
-	_, err = pr.Delete(s.db)
+	_, err = pr.Delete(s.DB)
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
 	}
@@ -383,7 +384,7 @@ func (s *Server) putAPIUser(c echo.Context) error {
 	}
 
 	pr.ID = id
-	_, err = pr.Update(s.db, boil.Infer())
+	_, err = pr.Update(s.DB, boil.Infer())
 
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
@@ -400,7 +401,7 @@ func (s *Server) getUserProfile(c echo.Context) error {
 		return helpers.InternalError(c, err, "hiba")
 	}
 
-	user, err := models.Users(Where("name = ?", name)).One(s.db)
+	user, err := models.Users(Where("name = ?", name)).One(s.DB)
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
 	}
@@ -413,14 +414,14 @@ func (s *Server) getUserProfile(c echo.Context) error {
 func (s *Server) UserSolvedStatus(problemSet, problem string, u *models.User) (int, error) {
 	solvedStatus := -1
 	if u != nil {
-		cnt, err := models.Submissions(Where("problemset = ?", problemSet), Where("problem = ?", problem), Where("verdict = 0"), Where("user_id = ?", u.ID)).Count(s.db)
+		cnt, err := models.Submissions(Where("problemset = ?", problemSet), Where("problem = ?", problem), Where("verdict = 0"), Where("user_id = ?", u.ID)).Count(s.DB)
 		if err != nil && !errors.Is(err, sql.ErrNoRows) {
 			return -1, fmt.Errorf("can't get solvedstatus for %s %s%s: %w", u.Name, problemSet, problem, err)
 		}else {
 			if cnt > 0 {
 				solvedStatus = 0
 			} else {
-				cnt, err := models.Submissions(Where("problemset = ?", problemSet), Where("problem = ?", problem), Where("user_id = ?", u.ID)).Count(s.db)
+				cnt, err := models.Submissions(Where("problemset = ?", problemSet), Where("problem = ?", problem), Where("user_id = ?", u.ID)).Count(s.DB)
 				if err != nil && !errors.Is(err, sql.ErrNoRows) {
 					return -1, fmt.Errorf("can't get solvedstatus for %s %s%s: %w", u.Name, problemSet, problem, err)
 				} else {

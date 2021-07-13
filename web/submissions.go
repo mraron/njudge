@@ -42,7 +42,7 @@ func (s *Server) Submit(uid int, problemset, problem, language string, source []
 			}
 		}()
 
-		tx, err = s.db.Begin()
+		tx, err = s.DB.Begin()
 		mustPanic(err)
 
 		id = 0
@@ -136,8 +136,8 @@ func (s *Server) getSubmission(c echo.Context) error {
 		return helpers.InternalError(c, err, "ajaj")
 	}
 
-	sub, err := models.Submissions(Where("id=?", val)).One(s.db)
-	//sub, err := models.SubmissionFromId(s.db, int64(val))
+	sub, err := models.Submissions(Where("id=?", val)).One(s.DB)
+	//sub, err := models.SubmissionFromId(s.DB, int64(val))
 	if err != nil {
 		return helpers.InternalError(c, err, "ajaj")
 	}
@@ -157,11 +157,11 @@ func (s *Server) getAPISubmissions(c echo.Context) error {
 		return helpers.InternalError(c, err, "error")
 	}
 
-	lst, err := models.Submissions(OrderBy(data.SortField+" "+data.SortDir), Limit(data.PerPage), Offset(data.PerPage*(data.Page-1))).All(s.db)
+	lst, err := models.Submissions(OrderBy(data.SortField+" "+data.SortDir), Limit(data.PerPage), Offset(data.PerPage*(data.Page-1))).All(s.DB)
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
 	}
-	//models.Submissions().Count(s.db)
+	//models.Submissions().Count(s.DB)
 
 	//source code is quiet big to serve for lists
 	for i := 0; i < len(lst); i++ {
@@ -182,7 +182,7 @@ func (s *Server) postAPISubmission(c echo.Context) error {
 		return helpers.InternalError(c, err, "error")
 	}
 
-	return pr.Insert(s.db, boil.Infer())
+	return pr.Insert(s.DB, boil.Infer())
 }
 
 func (s *Server) getAPISubmission(c echo.Context) error {
@@ -198,7 +198,7 @@ func (s *Server) getAPISubmission(c echo.Context) error {
 		return helpers.InternalError(c, err, "error")
 	}
 
-	pr, err := models.Submissions(Where("id=?", id)).One(s.db)
+	pr, err := models.Submissions(Where("id=?", id)).One(s.DB)
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
 	}
@@ -219,12 +219,12 @@ func (s *Server) deleteAPISubmission(c echo.Context) error {
 		return helpers.InternalError(c, err, "error")
 	}
 
-	pr, err := models.Submissions(Where("id=?", id)).One(s.db)
+	pr, err := models.Submissions(Where("id=?", id)).One(s.DB)
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
 	}
 
-	_, err = pr.Delete(s.db)
+	_, err = pr.Delete(s.DB)
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
 	}
@@ -251,7 +251,7 @@ func (s *Server) putAPISubmission(c echo.Context) error {
 	}
 
 	pr.ID = id
-	_, err = pr.Update(s.db, boil.Infer())
+	_, err = pr.Update(s.DB, boil.Infer())
 
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
@@ -268,7 +268,7 @@ func (s *Server) getSubmissionRejudge(c echo.Context) error {
 		return helpers.InternalError(c, err, "can't parse id")
 	}
 
-	sub, err := models.Submissions(Where("id = ?", id)).One(s.db)
+	sub, err := models.Submissions(Where("id = ?", id)).One(s.DB)
 	if err != nil {
 		return helpers.InternalError(c, err, "can't find submission")
 	}
@@ -276,7 +276,7 @@ func (s *Server) getSubmissionRejudge(c echo.Context) error {
 	sub.ID = id
 	sub.Judged = null.Time{Valid: false}
 	sub.Started = false
-	sub.Update(s.db, boil.Infer())
+	sub.Update(s.DB, boil.Infer())
 
 	return c.Redirect(http.StatusFound, "/submission/"+strconv.Itoa(id))
 }

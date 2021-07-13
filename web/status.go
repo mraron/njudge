@@ -26,12 +26,12 @@ type StatusPage struct {
 
 func (s *Server) GetStatusPage(page, perPage int, order QueryMod, query []QueryMod, qu url.Values) (*StatusPage, error) {
 	pagination := []QueryMod{Limit(perPage), Offset((page-1)*perPage)}
-	sbs, err := models.Submissions(append(append(pagination, query...), order)...).All(s.db)
+	sbs, err := models.Submissions(append(append(pagination, query...), order)...).All(s.DB)
 	if err != nil {
 		return nil, err
 	}
 
-	cnt, err := models.Submissions(query...).Count(s.db)
+	cnt, err := models.Submissions(query...).Count(s.DB)
 	if err != nil {
 		return nil, err
 	}

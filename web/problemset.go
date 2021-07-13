@@ -33,7 +33,7 @@ func (s *Server) getProblemsetList(c echo.Context) error {
 	u := c.Get("user").(*models.User)
 
 	problemSet := c.Param("name")
-	problemLst, err := models.ProblemRels(Where("problemset=?", problemSet), OrderBy("id DESC")).All(s.db)
+	problemLst, err := models.ProblemRels(Where("problemset=?", problemSet), OrderBy("id DESC")).All(s.DB)
 
 	if err != nil {
 		return helpers.InternalError(c, err, "Belső hiba.")
@@ -50,7 +50,7 @@ func (s *Server) getProblemsetList(c echo.Context) error {
 			Count int64
 		}{0}
 
-		err := queries.Raw("SELECT COUNT(DISTINCT user_id) FROM submissions WHERE problemset=$1 and problem=$2 and verdict=0", problemSet, problemLst[i].Problem).Bind(context.TODO(), s.db, &cnt)
+		err := queries.Raw("SELECT COUNT(DISTINCT user_id) FROM submissions WHERE problemset=$1 and problem=$2 and verdict=0", problemSet, problemLst[i].Problem).Bind(context.TODO(), s.DB, &cnt)
 		if err != nil && !errors.Is(err, sql.ErrNoRows) {
 			return helpers.InternalError(c, err, "Belső hiba.")
 		}
@@ -71,7 +71,7 @@ func (s *Server) getProblemsetList(c echo.Context) error {
 func (s *Server) getProblemsetProblem(c echo.Context) error {
 	name, problem := c.Param("name"), c.Param("problem")
 
-	lst, err := models.ProblemRels(Where("problemset=?", name)).All(s.db)
+	lst, err := models.ProblemRels(Where("problemset=?", name)).All(s.DB)
 	if err != nil {
 		return helpers.InternalError(c, err, "Belső hiba.")
 	}
@@ -94,7 +94,7 @@ func (s *Server) getProblemsetProblem(c echo.Context) error {
 	lastLanguage := ""
 	if u := c.Get("user").(*models.User); u != nil {
 		fmt.Println(u)
-		sub, err := models.Submissions(Select("language"), Where("user_id = ?", u.ID), OrderBy("id DESC"), Limit(1)).One(s.db)
+		sub, err := models.Submissions(Select("language"), Where("user_id = ?", u.ID), OrderBy("id DESC"), Limit(1)).One(s.DB)
 		if err == nil {
 			lastLanguage = sub.Language
 		}
@@ -182,7 +182,7 @@ type taskArchiveTreeNode struct {
 func (s *Server) getTaskArchive(c echo.Context) error {
 	u := c.Get("user").(*models.User)
 
-	lst, err := models.ProblemCategories(Where("parent_id IS NULL")).All(s.db)
+	lst, err := models.ProblemCategories(Where("parent_id IS NULL")).All(s.DB)
 	if err != nil {
 		return helpers.InternalError(c, err, "Belső hiba.")
 	}
@@ -192,7 +192,7 @@ func (s *Server) getTaskArchive(c echo.Context) error {
 	var dfs func(category *models.ProblemCategory, node *taskArchiveTreeNode) error
 	id := 1000
 	dfs = func(root *models.ProblemCategory, tree *taskArchiveTreeNode) error {
-		problems, err := models.ProblemRels(Where("category_id = ?", root.ID), OrderBy("problem")).All(s.db)
+		problems, err := models.ProblemRels(Where("category_id = ?", root.ID), OrderBy("problem")).All(s.DB)
 		if err != nil {
 			return err
 		}
@@ -211,8 +211,8 @@ func (s *Server) getTaskArchive(c echo.Context) error {
 			id++
 		}
 
-		//@TODO make a way to control sorting order from db (add migrations etc.)
-		subcats, err := models.ProblemCategories(Where("parent_id = ?", root.ID), OrderBy("name")).All(s.db)
+		//@TODO make a way to control sorting order from DB (add migrations etc.)
+		subcats, err := models.ProblemCategories(Where("parent_id = ?", root.ID), OrderBy("name")).All(s.DB)
 		if err != nil {
 			return err
 		}
@@ -247,7 +247,7 @@ func (s *Server) getProblemsetProblemRanklist(c echo.Context) error {
 	sbs := make([]*models.Submission, 0)
 
 	//@TODO
-	if err := queries.Raw("SELECT DISTINCT ON (s1.user_id) s1.* FROM (SELECT s1.user_id, MAX(s1.score) as score FROM submissions s1 WHERE problemset=$1 AND problem=$2 GROUP BY s1.user_id) s2 INNER JOIN submissions s1 ON s1.user_id=s2.user_id AND s1.score=s2.score AND s1.problemset=$1 AND s1.problem=$2", problemSet, problem).Bind(context.TODO(), s.db, &sbs); err != nil {
+	if err := queries.Raw("SELECT DISTINCT ON (s1.user_id) s1.* FROM (SELECT s1.user_id, MAX(s1.score) as score FROM submissions s1 WHERE problemset=$1 AND problem=$2 GROUP BY s1.user_id) s2 INNER JOIN submissions s1 ON s1.user_id=s2.user_id AND s1.score=s2.score AND s1.problemset=$1 AND s1.problem=$2", problemSet, problem).Bind(context.TODO(), s.DB, &sbs); err != nil {
 		return helpers.InternalError(c, err, "hiba")
 	}
 

@@ -24,7 +24,7 @@ func (s *Server) getAPIProblemRels(c echo.Context) error {
 		return helpers.InternalError(c, err, "error")
 	}
 
-	lst, err := models.ProblemRels(OrderBy(data.SortField+" "+data.SortDir), Limit(data.PerPage), Offset(data.PerPage*(data.Page-1))).All(s.db)
+	lst, err := models.ProblemRels(OrderBy(data.SortField+" "+data.SortDir), Limit(data.PerPage), Offset(data.PerPage*(data.Page-1))).All(s.DB)
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
 	}
@@ -43,7 +43,7 @@ func (s *Server) postAPIProblemRel(c echo.Context) error {
 		return helpers.InternalError(c, err, "error")
 	}
 
-	return pr.Insert(s.db, boil.Infer())
+	return pr.Insert(s.DB, boil.Infer())
 }
 
 func (s *Server) getAPIProblemRel(c echo.Context) error {
@@ -59,7 +59,7 @@ func (s *Server) getAPIProblemRel(c echo.Context) error {
 		return helpers.InternalError(c, err, "error")
 	}
 
-	pr, err := models.ProblemRels(Where("id=?", id)).One(s.db)
+	pr, err := models.ProblemRels(Where("id=?", id)).One(s.DB)
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
 	}
@@ -80,12 +80,12 @@ func (s *Server) deleteAPIProblemRel(c echo.Context) error {
 		return helpers.InternalError(c, err, "error")
 	}
 
-	pr, err := models.ProblemRels(Where("id=?", id)).One(s.db)
+	pr, err := models.ProblemRels(Where("id=?", id)).One(s.DB)
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
 	}
 
-	_, err = pr.Delete(s.db)
+	_, err = pr.Delete(s.DB)
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
 	}
@@ -112,7 +112,7 @@ func (s *Server) putAPIProblemRel(c echo.Context) error {
 	}
 
 	pr.ID = id
-	_, err = pr.Update(s.db, boil.Infer())
+	_, err = pr.Update(s.DB, boil.Infer())
 
 	if err != nil {
 		return helpers.InternalError(c, err, "error")

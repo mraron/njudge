@@ -4,29 +4,40 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"github.com/golang-jwt/jwt"
+	"github.com/jmoiron/sqlx"
+	"github.com/markbates/goth"
+	"github.com/markbates/goth/providers/google"
+	"github.com/mraron/njudge/utils/problems"
+	"github.com/volatiletech/sqlboiler/v4/boil"
 	"io/ioutil"
 	"time"
 )
 
-func (s *Server) getJWT() (string, error) {
-	claims := &jwt.StandardClaims{
-		ExpiresAt: time.Now().Add(10 * time.Minute).Unix(),
-		NotBefore: time.Now().Unix(),
-		Issuer:    "njudge web",
-		IssuedAt:  time.Now().Unix(),
+func (s *Server) SetupEnvironment() {
+	if s.Mode == "development" {
+		boil.DebugMode = true
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodRS512, claims)
-	jwt, err := token.SignedString(s.Keys.PrivateKey)
+	loc, err := time.LoadLocation("Europe/Budapest")
 	if err != nil {
-		return "", err
+		panic(err)
+	}
+	time.Local = loc
+	boil.SetLocation(loc)
+
+	if s.GoogleAuth.Enabled {
+		goth.UseProviders(
+			google.New(s.GoogleAuth.ClientKey, s.GoogleAuth.Secret, s.GoogleAuth.Callback, "email", "profile"),
+		)
 	}
 
-	return jwt, nil
+	s.ConnectToDB()
+	s.ParseKeys()
+
+	s.ProblemStore = problems.NewFsStore(s.ProblemsDir)
 }
 
-func (s *Server) parseKeys() {
+func (s *Server) ParseKeys() {
 	if s.Keys.PrivateKeyLocation != "" {
 		if s.Keys.PublicKeyLocation == "" {
 			panic("private key filled, public not")
@@ -60,4 +71,15 @@ func (s *Server) parseKeys() {
 			panic(err)
 		}
 	}
+}
+
+func (s *Server) ConnectToDB() {
+	var err error
+	s.DB, err = sqlx.Open("postgres", "postgres://"+s.DBAccount+":"+s.DBPassword+"@"+s.DBHost+"/"+s.DBName)
+
+	if err != nil {
+		panic(err)
+	}
+
+	boil.SetDB(s.DB)
 }

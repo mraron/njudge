@@ -24,7 +24,7 @@ func (s *Server) getAPIJudges(c echo.Context) error {
 		return helpers.InternalError(c, err, "error")
 	}
 
-	lst, err := models.Judges(OrderBy(data.SortField+" "+data.SortDir), Limit(data.PerPage), Offset(data.PerPage*(data.Page-1))).All(s.db)
+	lst, err := models.Judges(OrderBy(data.SortField+" "+data.SortDir), Limit(data.PerPage), Offset(data.PerPage*(data.Page-1))).All(s.DB)
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
 	}
@@ -48,7 +48,7 @@ func (s *Server) postAPIJudge(c echo.Context) error {
 		return helpers.InternalError(c, err, "error")
 	}
 
-	err := j.Insert(s.db, boil.Infer())
+	err := j.Insert(s.DB, boil.Infer())
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
 	}
@@ -69,7 +69,7 @@ func (s *Server) getAPIJudge(c echo.Context) error {
 		return helpers.InternalError(c, err, "error")
 	}
 
-	j, err := models.Judges(Where("id=?", id)).One(s.db)
+	j, err := models.Judges(Where("id=?", id)).One(s.DB)
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
 	}
@@ -90,12 +90,12 @@ func (s *Server) deleteAPIJudge(c echo.Context) error {
 		return helpers.InternalError(c, err, "error")
 	}
 
-	j, err := models.Judges(Where("id=?", id)).One(s.db)
+	j, err := models.Judges(Where("id=?", id)).One(s.DB)
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
 	}
 
-	_, err = j.Delete(s.db)
+	_, err = j.Delete(s.DB)
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
 	}
@@ -121,7 +121,7 @@ func (s *Server) putAPIJudge(c echo.Context) error {
 		return helpers.InternalError(c, err, "error")
 	}
 
-	model, err := models.Judges(Where("id=?", id)).One(s.db)
+	model, err := models.Judges(Where("id=?", id)).One(s.DB)
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
 	}
@@ -129,7 +129,7 @@ func (s *Server) putAPIJudge(c echo.Context) error {
 	model.Host = j.Host
 	model.Port = j.Port
 
-	_, err = model.Update(s.db, boil.Infer())
+	_, err = model.Update(s.DB, boil.Infer())
 	if err != nil {
 		return helpers.InternalError(c, err, "error")
 	}

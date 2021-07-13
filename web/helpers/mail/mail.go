@@ -1,9 +1,10 @@
-package web
+package mail
 
 import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"github.com/mraron/njudge/web/helpers/config"
 	"io"
 	"net/smtp"
 	"strings"
@@ -22,7 +23,7 @@ func (m Mail) Body(Sender string) string {
 	return fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: %s\r\nContent-Type: text/html; charset=utf-8\r\n\r\n%s", Sender, strings.Join(m.Recipients, ";"), m.Subject, m.Message)
 }
 
-func (s *Server) SendMail(m Mail) error {
+func (m Mail) Send(s config.Server) error {
 	if s.SMTP.Enabled {
 		auth := smtp.PlainAuth("", s.SMTP.MailAccount, s.SMTP.MailAccountPassword, s.SMTP.MailServerHost)
 
@@ -73,9 +74,7 @@ func (s *Server) SendMail(m Mail) error {
 		}
 
 		return nil
-	}
-
-	if s.Sendgrid.Enabled {
+	}else if s.Sendgrid.Enabled {
 		from := mail.NewEmail(s.Sendgrid.SenderName, s.Sendgrid.SenderAddress)
 		to := mail.NewEmail("", m.Recipients[0]) // @TODO erroneous
 

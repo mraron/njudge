@@ -1,7 +1,9 @@
 package helpers
 
 import (
+	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
+	"github.com/mraron/njudge/web/helpers/config"
 	"github.com/mraron/njudge/web/models"
 	"math/rand"
 	"net/http"
@@ -34,5 +36,22 @@ func InternalError(c echo.Context, err error, msg string) error {
 
 func UnauthorizedError(c echo.Context) error {
 	return c.String(http.StatusUnauthorized, "unauthorized")
+}
+
+func GetJWT(cfg config.Keys) (string, error) {
+	claims := &jwt.StandardClaims{
+		ExpiresAt: time.Now().Add(10 * time.Minute).Unix(),
+		NotBefore: time.Now().Unix(),
+		Issuer:    "njudge web",
+		IssuedAt:  time.Now().Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodRS512, claims)
+	jwt, err := token.SignedString(cfg.PrivateKey)
+	if err != nil {
+		return "", err
+	}
+
+	return jwt, nil
 }
 

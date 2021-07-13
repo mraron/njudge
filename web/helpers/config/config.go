@@ -41,10 +41,12 @@ type Server struct {
 
 	GluePort string
 
-	Keys struct {
-		PrivateKeyLocation string `json:"private_key"`
-		PublicKeyLocation  string `json:"public_key"`
-		PrivateKey         *rsa.PrivateKey
-		PublicKey          *rsa.PublicKey
-	}
+	Keys Keys
+}
+
+type Keys struct {
+	PrivateKeyLocation string `json:"private_key"`
+	PublicKeyLocation  string `json:"public_key"`
+	PrivateKey         *rsa.PrivateKey
+	PublicKey          *rsa.PublicKey
 }
