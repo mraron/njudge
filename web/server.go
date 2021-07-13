@@ -41,10 +41,6 @@ type Server struct {
 	DB     *sqlx.DB
 }
 
-func (s *Server) UpdateProblem(pr string) error {
-	return s.ProblemStore.UpdateProblem(pr)
-}
-
 func (s *Server) Run() {
 	s.SetupEnvironment()
 	s.StartBackgroundJobs()
