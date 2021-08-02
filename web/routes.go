@@ -5,6 +5,7 @@ import (
 	"github.com/mraron/njudge/web/handlers/problemset"
 	"github.com/mraron/njudge/web/handlers/submission"
 	"github.com/mraron/njudge/web/handlers/taskarchive"
+	"github.com/mraron/njudge/web/handlers/user"
 )
 
 func (s *Server) prepareRoutes(e *echo.Echo) {
@@ -36,18 +37,18 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 
 	u := e.Group("/user")
 
-	u.GET("/auth/callback", s.getUserAuthCallback)
-	u.GET("/auth", s.getUserAuth)
+	u.GET("/auth/callback", user.AuthCallback(s.DB))
+	u.GET("/auth", user.Auth())
 
-	u.GET("/login", s.getUserLogin)
-	u.POST("/login", s.postUserLogin)
-	u.GET("/logout", s.getUserLogout)
-	u.GET("/register", s.getUserRegister)
-	u.POST("/register", s.postUserRegister)
-	u.GET("/activate", s.getUserActivate)
-	u.GET("/activate/:name/:key", s.getActivateUser)
+	u.GET("/login", user.GetLogin())
+	u.POST("/login", user.Login(s.DB))
+	u.GET("/logout", user.Logout())
+	u.GET("/register", user.GetRegister())
+	u.POST("/register", user.Register(s.Server, s.DB))
+	u.GET("/activate", user.GetActivateInfo())
+	u.GET("/activate/:name/:key", user.Activate(s.DB))
 
-	u.GET("/profile/:name/", s.getUserProfile)
+	u.GET("/profile/:name/", user.Profile(s.DB))
 
 	v1 := e.Group("/api/v1")
 
