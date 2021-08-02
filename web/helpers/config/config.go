@@ -1,6 +1,13 @@
 package config
 
-import "crypto/rsa"
+import (
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
+	"errors"
+	"fmt"
+	"io/ioutil"
+)
 
 type Server struct {
 	Mode string
@@ -49,4 +56,48 @@ type Keys struct {
 	PublicKeyLocation  string `json:"public_key"`
 	PrivateKey         *rsa.PrivateKey
 	PublicKey          *rsa.PublicKey
+}
+
+func (k *Keys) Parse() error {
+	if k.PrivateKeyLocation != "" {
+		if k.PublicKeyLocation == "" {
+			return errors.New("private key filled, public not")
+		}
+
+		privateKeyContents, err := ioutil.ReadFile(k.PrivateKeyLocation)
+		if err != nil {
+			return err
+		}
+
+		block, _ := pem.Decode(privateKeyContents)
+		if block == nil {
+			return fmt.Errorf("can't parse pem private key file: %s", k.PrivateKeyLocation)
+		}
+
+		if k.PrivateKey, err = x509.ParsePKCS1PrivateKey(block.Bytes); err != nil {
+			return err
+		}
+
+		publicKeyContents, err := ioutil.ReadFile(k.PublicKeyLocation)
+		if err != nil {
+			return err
+		}
+
+		block, _ = pem.Decode(publicKeyContents)
+		if block == nil {
+			return fmt.Errorf("can't parse pem public key file: %s", k.PrivateKeyLocation)
+		}
+
+		if k.PublicKey, err = x509.ParsePKCS1PublicKey(block.Bytes); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (k *Keys) MustParse() {
+	if err := k.Parse(); err != nil {
+		panic(err)
+	}
 }
