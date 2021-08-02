@@ -35,11 +35,10 @@ import (
 
 type Server struct {
 	config.Server
-
 	ProblemStore problems.Store
+	DB     *sqlx.DB
 
 	judges []*models.Judge
-	DB     *sqlx.DB
 }
 
 func (s *Server) Run() {

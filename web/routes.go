@@ -1,15 +1,20 @@
 package web
 
-import "github.com/labstack/echo/v4"
+import (
+	"github.com/labstack/echo/v4"
+	"github.com/mraron/njudge/web/handlers/problemset"
+	"github.com/mraron/njudge/web/handlers/submission"
+	"github.com/mraron/njudge/web/handlers/taskarchive"
+)
 
 func (s *Server) prepareRoutes(e *echo.Echo) {
 	e.GET("/", s.getHome)
 
 	e.Static("/static", "public")
 
-	e.GET("/submission/:id", s.getSubmission)
-	e.GET("/submission/rejudge/:id", s.getSubmissionRejudge)
-	e.GET("/task_archive", s.getTaskArchive)
+	e.GET("/submission/:id", submission.Get(s.DB))
+	e.GET("/submission/rejudge/:id", submission.Rejudge(s.DB))
+	e.GET("/task_archive", taskarchive.Get(s.DB, s.ProblemStore))
 
 	ps := e.Group("/problemset", func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -18,16 +23,16 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 		}
 	})
 
-	ps.GET("/:name/", s.getProblemsetList)
-	ps.GET("/:name/:problem/", s.getProblemsetProblem)
-	ps.GET("/:name/:problem/problem", s.getProblemsetProblem)
-	ps.GET("/:name/:problem/status", s.getProblemsetProblemStatus)
-	ps.GET("/:name/:problem/ranklist", s.getProblemsetProblemRanklist)
-	ps.GET("/:name/:problem/pdf/:language/", s.getProblemsetProblemPDFLanguage)
-	ps.GET("/:name/:problem/attachment/:attachment/", s.getProblemsetProblemAttachment)
-	ps.GET("/:name/:problem/:file", s.getProblemsetProblemFile)
-	ps.POST("/:name/submit", s.postProblemsetSubmit)
-	ps.GET("/status", s.getProblemsetStatus)
+	ps.GET("/:name/", problemset.GetList(s.DB, s.ProblemStore))
+	ps.GET("/:name/:problem/", problemset.GetProblem(s.DB, s.ProblemStore))
+	ps.GET("/:name/:problem/problem", problemset.GetProblem(s.DB, s.ProblemStore))
+	ps.GET("/:name/:problem/status", problemset.GetProblemStatus(s.DB))
+	ps.GET("/:name/:problem/ranklist", problemset.GetProblemRanklist(s.DB, s.ProblemStore))
+	ps.GET("/:name/:problem/pdf/:language/", problemset.GetProblemPDF(s.ProblemStore))
+	ps.GET("/:name/:problem/attachment/:attachment/", problemset.GetProblemAttachment(s.ProblemStore))
+	ps.GET("/:name/:problem/:file", problemset.GetProblemFile(s.Server, s.ProblemStore))
+	ps.POST("/:name/submit", problemset.PostSubmit(s.Server, s.DB, s.ProblemStore))
+	ps.GET("/status", problemset.GetStatus(s.DB))
 
 	u := e.Group("/user")
 
