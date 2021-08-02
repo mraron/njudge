@@ -7,35 +7,66 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"github.com/mraron/njudge/utils/problems"
+	"github.com/mraron/njudge/web/helpers/config"
 	"github.com/mraron/njudge/web/helpers/i18n"
 	"github.com/mraron/njudge/web/helpers/roles"
 	"github.com/mraron/njudge/web/models"
 	"html/template"
 	"io"
+	"io/fs"
 	"path/filepath"
 	"strings"
 	"time"
 )
 
 type Renderer struct {
-	templates *template.Template
+	templates map[string]*template.Template
 }
 
-func New(templatesDir string, st problems.Store) *Renderer {
-	return &Renderer{template.Must(template.New("").Funcs(funcs(st)).ParseGlob(filepath.Join(templatesDir, "*.gohtml")))}
-}
+func New(cfg config.Server, problemStore problems.Store) *Renderer {
+	renderer := &Renderer{make(map[string]*template.Template)}
 
-func (t *Renderer) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	err := t.templates.ExecuteTemplate(w, name, struct {
-		Data    interface{}
-		Context echo.Context
-	}{data, c})
+	layoutFiles := make([]string, 0)
+	err := filepath.Walk(cfg.TemplatesDir, func(path string, info fs.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !info.IsDir() {
+			if info.Name() == "_layout.gohtml" {
+				layoutFiles = append(layoutFiles, path)
+			}else {
+				name, err := filepath.Rel(cfg.TemplatesDir, path)
+				if err != nil {
+					panic(err)
+				}
+
+				renderer.templates[name] = template.Must(template.New(info.Name()).Funcs(funcs(problemStore)).ParseFiles(append(layoutFiles, path)...))
+			}
+		}
+		return nil
+	})
 
 	if err != nil {
 		panic(err)
 	}
 
-	return nil
+	return renderer
+}
+
+func (t *Renderer) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	if !strings.HasSuffix(name, ".gohtml") {
+		name += ".gohtml"
+	}
+
+	if _, ok := t.templates[name]; !ok {
+		return fmt.Errorf("can find template %q", name)
+	}
+
+	return t.templates[name].ExecuteTemplate(w, filepath.Base(name), struct {
+		Data    interface{}
+		Context echo.Context
+	}{data, c})
 }
 
 func funcs(store problems.Store) template.FuncMap {

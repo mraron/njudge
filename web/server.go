@@ -81,7 +81,7 @@ func (s *Server) Run() {
 		}
 	})
 
-	e.Renderer = templates.New(s.TemplatesDir, s.ProblemStore)
+	e.Renderer = templates.New(s.Server, s.ProblemStore)
 
 	s.prepareRoutes(e)
 

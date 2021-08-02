@@ -63,7 +63,7 @@ func GetProblem(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 			}
 		}
 
-		return c.Render(http.StatusOK, "problemset_problem.gohtml", Problem{Problem:problemStore.MustGet(problem), LastLanguage: lastLanguage})
+		return c.Render(http.StatusOK, "problemset/problem/problem", Problem{Problem:problemStore.MustGet(problem), LastLanguage: lastLanguage})
 	}
 }
 
@@ -153,7 +153,7 @@ func GetProblemRanklist(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFu
 			return sbs[i].Score.Float32 > sbs[j].Score.Float32
 		})
 
-		return c.Render(http.StatusOK, "problemset_problem_ranklist.gohtml", struct {
+		return c.Render(http.StatusOK, "problemset/problem/ranklist", struct {
 			Problem     problems.Problem
 			Submissions []*models.Submission
 		}{prob, sbs})
@@ -182,6 +182,6 @@ func GetProblemStatus(DB *sqlx.DB) echo.HandlerFunc {
 			return helpers.InternalError(c, err, "Belső hiba")
 		}
 
-		return c.Render(http.StatusOK, "problemset_problem_status.gohtml", statusPage)
+		return c.Render(http.StatusOK, "problemset/problem/status", statusPage)
 	}
 }

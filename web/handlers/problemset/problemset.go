@@ -52,7 +52,7 @@ func GetList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 			lst[i] = Problem{Problem: problemStore.MustGet(problemLst[i].Problem), SolverCount: int(cnt.Count), SolvedStatus: solvedStatus}
 		}
 
-		return c.Render(http.StatusOK, "problemset_list.gohtml", struct {
+		return c.Render(http.StatusOK, "problemset/list", struct {
 			Lst []Problem
 		}{lst})
 	}
