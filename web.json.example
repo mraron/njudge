@@ -2,7 +2,7 @@
   "mode": "development",
   "hostname": "192.168.4.128",
   "port": "5555",
-  "url": "192.168.4.128:5555",
+  "url": "http://192.168.4.128:5555",
   "problemsDir": "/home/aron/njudge_problems",
   "submissionsDir": "/home/aron/njudge_submissions",
   "templatesDir": "/home/aron/njudge/templates",

@@ -107,7 +107,7 @@ func Register(cfg config.Server, DB *sqlx.DB) echo.HandlerFunc {
 
 			m := mail.Mail{}
 			m.Recipients = []string{c.FormValue("email")}
-			m.Message = fmt.Sprintf(`Kedves %s!<br> Köszönjük regisztrációd. Aktiváló link: <a href="http://`+cfg.Url+`/user/activate/%s/%s">http://`+cfg.Url+`/user/activate/%s/%s</a>`, c.FormValue("name"), c.FormValue("name"), key, c.FormValue("name"), key)
+			m.Message = fmt.Sprintf(`Kedves %s!<br> Köszönjük regisztrációd. Aktiváló link: <a href="`+cfg.Url+`/user/activate/%s/%s">`+cfg.Url+`/user/activate/%s/%s</a>`, c.FormValue("name"), c.FormValue("name"), key, c.FormValue("name"), key)
 			m.Subject = "Regisztráció aktiválása"
 			mustPanic(m.Send(cfg))
 
