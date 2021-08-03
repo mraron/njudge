@@ -12,6 +12,7 @@ import (
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
+	"unicode"
 )
 
 func GetRegister() echo.HandlerFunc {
@@ -50,6 +51,15 @@ func Register(cfg config.Server, DB *sqlx.DB) echo.HandlerFunc {
 			}
 		}
 
+		alphaNumeric := func(value, msg string) {
+			for _, r := range value {
+				if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
+					errStrings = append(errStrings, msg)
+					return
+				}
+			}
+		}
+
 		used("name", c.FormValue("name"), "A név foglalt")
 		used("email", c.FormValue("email"), "Az email cím foglalt")
 
@@ -58,12 +68,14 @@ func Register(cfg config.Server, DB *sqlx.DB) echo.HandlerFunc {
 		required("password2", "A jelszó ellenörző mező szükséges")
 		required("email", "Az email mező szükséges")
 
+		alphaNumeric(c.FormValue("name"), "A név csak alfanumerikus karakterekből állhat")
+
 		if c.FormValue("password") != c.FormValue("password2") {
 			errStrings = append(errStrings, "A két jelszó nem egyezik meg")
 		}
 
 		if len(errStrings) > 0 {
-			return c.Render(http.StatusOK, "register.gohtml", errStrings)
+			return c.Render(http.StatusOK, "user/register", errStrings)
 		}
 
 		mustPanic := func(err error) {
