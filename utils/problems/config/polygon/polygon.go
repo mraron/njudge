@@ -6,6 +6,7 @@ import (
 	_ "github.com/mraron/njudge/utils/language/cpp14"
 	"github.com/mraron/njudge/utils/problems"
 	"github.com/spf13/afero"
+	"html"
 	"os/exec"
 	"syscall"
 
@@ -471,7 +472,7 @@ func ParserAndIdentifier(opts... Option) (problems.ConfigParser, problems.Config
 
 					err = cmd.Run()
 					if err == nil {
-						*str = buf.String()
+						*str = html.UnescapeString(buf.String())
 					}
 				}
 
