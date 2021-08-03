@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"errors"
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/web/helpers/config"
@@ -29,13 +30,8 @@ func CensorUserPassword(user *models.User) {
 	user.Password = "***CENSORED***"
 }
 
-func InternalError(c echo.Context, err error, msg string) error {
-	c.Logger().Print("internal error:", err)
-	return c.Render(http.StatusInternalServerError, "error.gohtml", msg)
-}
-
 func UnauthorizedError(c echo.Context) error {
-	return c.String(http.StatusUnauthorized, "unauthorized")
+	return echo.NewHTTPError(http.StatusUnauthorized, errors.New("unauthorized"))
 }
 
 func GetJWT(cfg config.Keys) (string, error) {

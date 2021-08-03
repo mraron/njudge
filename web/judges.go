@@ -21,12 +21,12 @@ func (s *Server) getAPIJudges(c echo.Context) error {
 
 	data, err := pagination.Parse(c)
 	if err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	lst, err := models.Judges(OrderBy(data.SortField+" "+data.SortDir), Limit(data.PerPage), Offset(data.PerPage*(data.Page-1))).All(s.DB)
 	if err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	local := make([]extmodels.Judge, len(lst))
@@ -45,12 +45,12 @@ func (s *Server) postAPIJudge(c echo.Context) error {
 
 	j := new(models.Judge)
 	if err := c.Bind(j); err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	err := j.Insert(s.DB, boil.Infer())
 	if err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	return c.JSON(http.StatusOK, extmodels.NewJudgeFromModelsJudge(j))
@@ -66,12 +66,12 @@ func (s *Server) getAPIJudge(c echo.Context) error {
 
 	id, err := strconv.Atoi(id_)
 	if err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	j, err := models.Judges(Where("id=?", id)).One(s.DB)
 	if err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	return c.JSON(http.StatusOK, extmodels.NewJudgeFromModelsJudge(j))
@@ -87,17 +87,17 @@ func (s *Server) deleteAPIJudge(c echo.Context) error {
 
 	id, err := strconv.Atoi(id_)
 	if err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	j, err := models.Judges(Where("id=?", id)).One(s.DB)
 	if err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	_, err = j.Delete(s.DB)
 	if err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	return c.String(http.StatusOK, "deleted")
@@ -113,17 +113,17 @@ func (s *Server) putAPIJudge(c echo.Context) error {
 
 	id, err := strconv.Atoi(id_)
 	if err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	j := new(extmodels.Judge)
 	if err = c.Bind(j); err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	model, err := models.Judges(Where("id=?", id)).One(s.DB)
 	if err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	model.Host = j.Host
@@ -131,7 +131,7 @@ func (s *Server) putAPIJudge(c echo.Context) error {
 
 	_, err = model.Update(s.DB, boil.Infer())
 	if err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	return c.JSON(http.StatusOK, struct {

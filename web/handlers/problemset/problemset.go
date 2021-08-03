@@ -25,11 +25,11 @@ func GetList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 		problemLst, err := models.ProblemRels(Where("problemset=?", problemSet), OrderBy("id DESC")).All(DB)
 
 		if err != nil {
-			return helpers.InternalError(c, err, "Belső hiba.")
+			return err
 		}
 
 		if len(problemLst) == 0 {
-			return c.Render(http.StatusNotFound, "404.gohtml", "Nem található.")
+			return echo.NewHTTPError(http.StatusNotFound, errors.New("problemset not found"))
 		}
 
 		lst := make([]Problem, len(problemLst))
@@ -41,12 +41,12 @@ func GetList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 
 			err := queries.Raw("SELECT COUNT(DISTINCT user_id) FROM submissions WHERE problemset=$1 and problem=$2 and verdict=0", problemSet, problemLst[i].Problem).Bind(context.TODO(), DB, &cnt)
 			if err != nil && !errors.Is(err, sql.ErrNoRows) {
-				return helpers.InternalError(c, err, "Belső hiba.")
+				return err
 			}
 
 			solvedStatus, err := helpers.HasUserSolved(DB, u, problemSet, problemLst[i].Problem)
 			if err != nil {
-				return helpers.InternalError(c, err, "Belső hiba.")
+				return err
 			}
 
 			lst[i] = Problem{Problem: problemStore.MustGet(problemLst[i].Problem), SolverCount: int(cnt.Count), SolvedStatus: solvedStatus}
@@ -82,7 +82,7 @@ func GetStatus(DB* sqlx.DB) echo.HandlerFunc {
 
 		statusPage, err := helpers.GetStatusPage(DB, page, 20, OrderBy("id DESC"), query, c.Request().URL.Query())
 		if err != nil {
-			return helpers.InternalError(c, err, "Belső hiba")
+			return err
 		}
 
 		return c.Render(http.StatusOK, "status.gohtml", statusPage)
@@ -99,14 +99,12 @@ func PostSubmit(cfg config.Server, DB* sqlx.DB, problemStore problems.Store) ech
 		)
 
 		if u = c.Get("user").(*models.User); u == nil {
-			return c.Render(http.StatusForbidden, "error.gohtml", "Előbb lépj be.")
+			return c.Render(http.StatusForbidden, "message.html", "Előbb lépj be.")
 		}
 
 		problemName := c.FormValue("problem")
-		if has, _ := problemStore.Has(problemName); !has {
-			return c.Render(http.StatusOK, "error.gohtml", "Hibás feladatazonosító.")
-		}else {
-			p, _ = problemStore.Get(problemName)
+		if p, err = problemStore.Get(problemName); err != nil {
+			return err
 		}
 
 		languageName := c.FormValue("language")
@@ -125,21 +123,21 @@ func PostSubmit(cfg config.Server, DB* sqlx.DB, problemStore problems.Store) ech
 
 		fileHeader, err := c.FormFile("source")
 		if err != nil {
-			return helpers.InternalError(c, err, "Belső hiba #0")
+			return err
 		}
 
 		f, err := fileHeader.Open()
 		if err != nil {
-			return helpers.InternalError(c, err, "Belső hiba #1")
+			return err
 		}
 
 		contents, err := ioutil.ReadAll(f)
 		if err != nil {
-			return helpers.InternalError(c, err, "Belső hiba #2")
+			return err
 		}
 
 		if id, err = helpers.Submit(cfg, DB, problemStore, u.ID, c.Get("problemset").(string), problemStore.MustGet(c.FormValue("problem")).Name(), languageName, contents); err != nil {
-			return helpers.InternalError(c, err, "Belső hiba #4")
+			return err
 		}
 
 		return c.Redirect(http.StatusFound, "/problemset/status#submission"+strconv.Itoa(id))

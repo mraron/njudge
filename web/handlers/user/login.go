@@ -4,7 +4,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
-	"github.com/mraron/njudge/web/helpers"
 	"github.com/mraron/njudge/web/models"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"golang.org/x/crypto/bcrypt"
@@ -49,7 +48,7 @@ func Login(DB *sqlx.DB) echo.HandlerFunc {
 		storage.Values["id"] = u.ID
 
 		if err = storage.Save(c.Request(), c.Response()); err != nil {
-			return helpers.InternalError(c, err, "Belső hiba #2")
+			return err
 		}
 
 		c.Set("user", u)
@@ -69,7 +68,7 @@ func Logout() echo.HandlerFunc {
 		storage.Values["id"] = -1
 
 		if err := storage.Save(c.Request(), c.Response()); err != nil {
-			return helpers.InternalError(c, err, "Belső hiba")
+			return err
 		}
 
 		return c.Redirect(http.StatusFound, "/")

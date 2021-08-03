@@ -90,12 +90,12 @@ func (s *Server) runGlue() {
 
 		id, err := strconv.Atoi(id_)
 		if err != nil {
-			return helpers.InternalError(c, err, "err")
+			return err
 		}
 
 		st := judge.Status{}
 		if err = c.Bind(&st); err != nil {
-			return helpers.InternalError(c, err, "err")
+			return err
 		}
 
 		if st.Done {
@@ -105,7 +105,7 @@ func (s *Server) runGlue() {
 			}
 
 			if _, err := s.DB.Exec("UPDATE submissions SET verdict=$1, status=$2, ontest=NULL, judged=$3, score=$5 WHERE id=$4", verdict, st.Status, time.Now(), id, st.Status.Score()); err != nil {
-				return helpers.InternalError(c, err, "err")
+				return err
 			}
 		} else {
 			if _, err := s.DB.Exec("UPDATE submissions SET ontest=$1, status=$2, verdict=$3 WHERE id=$4", st.Test, st.Status, extmodels.VERDICT_RU, id); err != nil {

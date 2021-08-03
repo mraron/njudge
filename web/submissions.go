@@ -25,12 +25,12 @@ func (s *Server) getAPISubmissions(c echo.Context) error {
 
 	data, err := pagination.Parse(c)
 	if err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	lst, err := models.Submissions(OrderBy(data.SortField+" "+data.SortDir), Limit(data.PerPage), Offset(data.PerPage*(data.Page-1))).All(s.DB)
 	if err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 	//models.Submissions().Count(s.DB)
 
@@ -50,7 +50,7 @@ func (s *Server) postAPISubmission(c echo.Context) error {
 
 	pr := new(models.Submission)
 	if err := c.Bind(pr); err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	return pr.Insert(s.DB, boil.Infer())
@@ -66,12 +66,12 @@ func (s *Server) getAPISubmission(c echo.Context) error {
 
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	pr, err := models.Submissions(Where("id=?", id)).One(s.DB)
 	if err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	return c.JSON(http.StatusOK, pr)
@@ -87,17 +87,17 @@ func (s *Server) deleteAPISubmission(c echo.Context) error {
 
 	id, err := strconv.Atoi(id_)
 	if err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	pr, err := models.Submissions(Where("id=?", id)).One(s.DB)
 	if err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	_, err = pr.Delete(s.DB)
 	if err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	return c.String(http.StatusOK, "ok")
@@ -113,19 +113,19 @@ func (s *Server) putAPISubmission(c echo.Context) error {
 
 	id, err := strconv.Atoi(id_)
 	if err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	pr := new(models.Submission)
 	if err = c.Bind(pr); err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	pr.ID = id
 	_, err = pr.Update(s.DB, boil.Infer())
 
 	if err != nil {
-		return helpers.InternalError(c, err, "error")
+		return err
 	}
 
 	return c.JSON(http.StatusOK, struct {

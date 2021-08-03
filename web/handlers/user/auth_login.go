@@ -5,7 +5,6 @@ import (
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/markbates/goth/gothic"
-	"github.com/mraron/njudge/web/helpers"
 	"github.com/mraron/njudge/web/models"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"net/http"
@@ -35,7 +34,7 @@ func AuthCallback(DB *sqlx.DB) echo.HandlerFunc {
 		storage.Values["id"] = lst[0].ID
 
 		if err = storage.Save(c.Request(), c.Response()); err != nil {
-			return helpers.InternalError(c, err, "Belső hiba #2")
+			return err
 		}
 
 		c.Set("user", lst[0])

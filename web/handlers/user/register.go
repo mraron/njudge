@@ -103,7 +103,7 @@ func Register(cfg config.Server, DB *sqlx.DB) echo.HandlerFunc {
 		}
 
 		if transaction(); err != nil {
-			return helpers.InternalError(c, err, "Belső hiba.")
+			return err
 		}
 
 		return c.Redirect(http.StatusFound, "/user/activate")
@@ -133,7 +133,7 @@ func Activate(DB *sqlx.DB) echo.HandlerFunc {
 		}
 
 		if user, err = models.Users(Where("name=?", c.Param("name"))).One(DB); err != nil {
-			return helpers.InternalError(c, err, "Belső hiba #1")
+			return err
 		}
 
 		if !user.ActivationKey.Valid {
@@ -145,15 +145,15 @@ func Activate(DB *sqlx.DB) echo.HandlerFunc {
 		}
 
 		if tx, err = DB.Begin(); err != nil {
-			return helpers.InternalError(c, err, "Belső hiba #2")
+			return err
 		}
 
 		if _, err = tx.Exec("UPDATE users SET activation_key=NULL WHERE name=$1", c.Param("name")); err != nil {
-			return helpers.InternalError(c, err, "Belső hiba #3")
+			return err
 		}
 
 		if err = tx.Commit(); err != nil {
-			return helpers.InternalError(c, err, "Belső hiba #4")
+			return err
 		}
 
 		return c.Render(http.StatusOK, "message.gohtml", "Sikeres aktiválás, mostmár beléphetsz.")

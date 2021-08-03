@@ -11,7 +11,6 @@ import (
 	_ "github.com/mraron/njudge/utils/problems/config/feladat_txt"
 	_ "github.com/mraron/njudge/utils/problems/config/polygon"
 	_ "github.com/mraron/njudge/utils/problems/config/task_yaml"
-	"github.com/mraron/njudge/web/helpers"
 	"github.com/mraron/njudge/web/helpers/config"
 	"github.com/mraron/njudge/web/helpers/roles"
 	"github.com/mraron/njudge/web/helpers/templates"
@@ -46,6 +45,23 @@ func (s *Server) Run() {
 	s.StartBackgroundJobs()
 
 	e := echo.New()
+	if s.Mode == "development" {
+		e.Debug = true
+	}else {
+		e.HTTPErrorHandler = func(err error, c echo.Context) {
+			code := http.StatusInternalServerError
+			if he, ok := err.(*echo.HTTPError); ok {
+				code = he.Code
+			}
+
+			if err := c.Render(code, "error.gohtml", "Hiba történt"); err != nil {
+				c.Logger().Error(err)
+			}
+
+			c.Logger().Error(err)
+		}
+	}
+
 	store := sessions.NewCookieStore([]byte(s.CookieSecret))
 
 	e.Use(middleware.Logger())
@@ -73,7 +89,7 @@ func (s *Server) Run() {
 
 			user, err := currentUser(c)
 			if err != nil {
-				return helpers.InternalError(c, err, "belső hiba")
+				return err
 			}
 			c.Set("user", user)
 

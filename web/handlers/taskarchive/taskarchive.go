@@ -28,7 +28,7 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 
 		lst, err := models.ProblemCategories(Where("parent_id IS NULL")).All(DB)
 		if err != nil {
-			return helpers.InternalError(c, err, "Belső hiba.")
+			return err
 		}
 
 		roots := make([]*TreeNode, 0)
@@ -75,7 +75,7 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 		for _, start := range lst {
 			roots = append(roots, &TreeNode{Id:start.ID, Type: "category", Name: start.Name, Link: "", Children: make([]*TreeNode, 0), SolvedStatus: -1})
 			if dfs(start, roots[len(roots)-1]) != nil {
-				return helpers.InternalError(c, err, "Belső hiba.")
+				return err
 			}
 		}
 
