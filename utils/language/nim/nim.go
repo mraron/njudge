@@ -33,7 +33,7 @@ func (nim) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Writer
 
 	s.MapDir("/etc", "/etc", []string{}, true)
 
-	if _, err := s.SetMaxProcesses(-1).Env().TimeLimit(10*time.Second).MemoryLimit(256000).Stdout(e).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/nim compile --nimcache=. main.nim", false); err != nil {
+	if _, err := s.SetMaxProcesses(-1).Env().TimeLimit(10*time.Second).MemoryLimit(256000).Stdout(e).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/nim compile -d:release --nimcache=. main.nim", false); err != nil {
 		return err
 	}
 
