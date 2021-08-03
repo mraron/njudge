@@ -41,6 +41,8 @@ type Server struct {
 		MailAccountPassword string `json:"mail_password"`
 	} `json:"smtp"`
 
+	CustomHead string
+
 	DBAccount  string
 	DBPassword string
 	DBHost     string

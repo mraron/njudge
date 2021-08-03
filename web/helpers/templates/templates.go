@@ -21,10 +21,11 @@ import (
 
 type Renderer struct {
 	templates map[string]*template.Template
+	cfg config.Server
 }
 
 func New(cfg config.Server, problemStore problems.Store) *Renderer {
-	renderer := &Renderer{make(map[string]*template.Template)}
+	renderer := &Renderer{make(map[string]*template.Template), cfg}
 
 	layoutFiles := make([]string, 0)
 	err := filepath.Walk(cfg.TemplatesDir, func(path string, info fs.FileInfo, err error) error {
@@ -66,7 +67,8 @@ func (t *Renderer) Render(w io.Writer, name string, data interface{}, c echo.Con
 	return t.templates[name].ExecuteTemplate(w, filepath.Base(name), struct {
 		Data    interface{}
 		Context echo.Context
-	}{data, c})
+		CustomHead string
+	}{data, c, t.cfg.CustomHead})
 }
 
 func funcs(store problems.Store) template.FuncMap {
