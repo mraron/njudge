@@ -1,0 +1,28 @@
+.problemcategory-header {
+    font-weight: bold;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+.problemcategory-header:first-child{
+    margin-top: 0;
+}
+
+.problemcategory-header .collapse-toggle:after {
+    font-family: 'Font Awesome 5 Free';
+    content: "\f0d7";
+    float: left;
+    color: grey;
+    font-size: small;
+    line-height: 2em;
+    vertical-align: middle;
+    padding-right: 0.5em;
+}
+
+.problemcategory-header .collapse-toggle.collapsed:after {
+    content: "\f0da";
+}
+
+.problemcategory-body {
+    padding-left: 1em;
+}

@@ -41,7 +41,7 @@
     <script>
         if(window.location.hash)
         {
-            var hash = window.location.hash.substring(1);
+            const hash = window.location.hash.substring(1);
             document.getElementById(hash).classList.toggle('show');
             document.getElementById(hash).scrollIntoView();
         }

@@ -3,6 +3,14 @@
   "version": "0.1.0",
   "author": "Áron Noszály",
   "dependencies": {
+    "bootstrap": "^4.6.0",
     "ng-admin": "*"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-clean-css": "^4.3.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-purgecss": "^4.0.3",
+    "purgecss": "^4.0.3"
   }
 }

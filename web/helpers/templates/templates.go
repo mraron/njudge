@@ -33,7 +33,7 @@ func New(cfg config.Server, problemStore problems.Store) *Renderer {
 		}
 
 		if !info.IsDir() {
-			if info.Name() == "_layout.gohtml" {
+			if strings.HasPrefix(info.Name(), "_") {
 				layoutFiles = append(layoutFiles, path)
 			}else {
 				name, err := filepath.Rel(cfg.TemplatesDir, path)

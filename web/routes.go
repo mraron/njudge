@@ -11,7 +11,7 @@ import (
 func (s *Server) prepareRoutes(e *echo.Echo) {
 	e.GET("/", s.getHome)
 
-	e.Static("/static", "public")
+	e.Static("/static", "static")
 
 	e.GET("/submission/:id", submission.Get(s.DB))
 	e.GET("/submission/rejudge/:id", submission.Rejudge(s.DB))
