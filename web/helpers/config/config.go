@@ -12,6 +12,7 @@ import (
 type Server struct {
 	Mode string
 	Hostname       string
+	Url string
 	Port           string
 	ProblemsDir    string
 	SubmissionsDir string

@@ -11,7 +11,7 @@
     var njudge = angular.module('njudge', ['ng-admin']);
     njudge.config(['NgAdminConfigurationProvider', function(NgAdminConfigurationProvider) {
         var nga = NgAdminConfigurationProvider;
-        var admin = nga.application('njudge admin').baseApiUrl("http://{{.Data.Host}}/api/v1/");
+        var admin = nga.application('njudge admin').baseApiUrl("http://{{.Data.Url}}/api/v1/");
 
         var problem_rel = nga.entity('problem_rels').identifier(nga.field('id'));
         problem_rel.listView().fields([

@@ -115,6 +115,6 @@ func (s *Server) getAdmin(c echo.Context) error {
 	}
 
 	return c.Render(http.StatusOK, "admin.gohtml", struct {
-		Host string
-	}{s.Hostname + ":" + s.Port})
+		Url string
+	}{s.Url})
 }
