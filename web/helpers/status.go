@@ -3,6 +3,7 @@ package helpers
 import (
 	"errors"
 	"github.com/jmoiron/sqlx"
+	"github.com/mraron/njudge/web/helpers/pagination"
 	"github.com/mraron/njudge/web/models"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"net/url"
@@ -10,10 +11,7 @@ import (
 )
 
 type StatusPageLink struct {
-	Name string
-	Active bool
-	Disabled bool
-	Url string
+	pagination.Link
 }
 
 type StatusPage struct {
@@ -23,8 +21,7 @@ type StatusPage struct {
 }
 
 func GetStatusPage(DB *sqlx.DB, page, perPage int, order QueryMod, query []QueryMod, qu url.Values) (*StatusPage, error) {
-	pagination := []QueryMod{Limit(perPage), Offset((page-1)*perPage)}
-	sbs, err := models.Submissions(append(append(pagination, query...), order)...).All(DB)
+	sbs, err := models.Submissions(append(append([]QueryMod{Limit(perPage), Offset((page-1)*perPage)}, query...), order)...).All(DB)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +33,7 @@ func GetStatusPage(DB *sqlx.DB, page, perPage int, order QueryMod, query []Query
 
 	pageCnt := (int(cnt)+perPage-1)/perPage
 	pages := make([]StatusPageLink, pageCnt+2)
-	pages[0] = StatusPageLink{"Előző", false, true, "#"}
+	pages[0] = StatusPageLink{pagination.Link{"&laquo;", false, true, "#"}}
 	if page>1 {
 		qu.Set("page", strconv.Itoa(page-1))
 
@@ -45,12 +42,12 @@ func GetStatusPage(DB *sqlx.DB, page, perPage int, order QueryMod, query []Query
 	}
 	for i := 1; i < len(pages)-1; i++ {
 		qu.Set("page", strconv.Itoa(i))
-		pages[i] = StatusPageLink{strconv.Itoa(i), false, false, "?"+qu.Encode()}
+		pages[i] = StatusPageLink{pagination.Link{strconv.Itoa(i), false, false, "?"+qu.Encode()}}
 		if i==page {
 			pages[i].Active = true
 		}
 	}
-	pages[len(pages)-1] = StatusPageLink{"Következő", false, true, "#"}
+	pages[len(pages)-1] = StatusPageLink{pagination.Link{"&raquo;", false, true, "#"}}
 	if page<pageCnt {
 		qu.Set("page", strconv.Itoa(page+1))
 

@@ -32,6 +32,8 @@ type Problem struct {
 	SolverCount int
 	SolvedStatus helpers.SolvedStatus
 	LastLanguage string
+	CategoryLink helpers.Link
+	CategoryId int
 }
 
 func GetProblem(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {

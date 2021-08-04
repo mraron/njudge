@@ -107,6 +107,15 @@ func (s *Server) runGlue() {
 			if _, err := s.DB.Exec("UPDATE submissions SET verdict=$1, status=$2, ontest=NULL, judged=$3, score=$5 WHERE id=$4", verdict, st.Status, time.Now(), id, st.Status.Score()); err != nil {
 				return err
 			}
+
+			sub, err := models.Submissions(Where("id=?", id)).One(s.DB)
+			if err != nil {
+				return err
+			}
+
+			if _, err = s.DB.Exec("UPDATE problem_rels SET solver_count = (SELECT COUNT(distinct user_id) from submissions where problemset = problem_rels.problemset and problem = problem_rels.problem and verdict = 0) WHERE problemset = $1 and problem = $2", sub.Problemset, sub.Problem); err != nil {
+				return err
+			}
 		} else {
 			if _, err := s.DB.Exec("UPDATE submissions SET ontest=$1, status=$2, verdict=$3 WHERE id=$4", st.Test, st.Status, extmodels.VERDICT_RU, id); err != nil {
 				log.Print("can't realtime update status", err)

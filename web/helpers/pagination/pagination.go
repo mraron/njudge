@@ -13,3 +13,10 @@ func Parse(c echo.Context) (*Data, error) {
 	data := &Data{}
 	return data, c.Bind(data)
 }
+
+type Link struct {
+	Name string
+	Active bool
+	Disabled bool
+	Url string
+}

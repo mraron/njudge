@@ -710,7 +710,7 @@ func testProblemRelsSelect(t *testing.T) {
 }
 
 var (
-	problemRelDBTypes = map[string]string{`Problemset`: `text`, `Problem`: `text`, `ID`: `integer`, `CategoryID`: `integer`}
+	problemRelDBTypes = map[string]string{`Problemset`: `text`, `Problem`: `text`, `ID`: `integer`, `CategoryID`: `integer`, `SolverCount`: `integer`}
 	_                 = bytes.MinRead
 )
 

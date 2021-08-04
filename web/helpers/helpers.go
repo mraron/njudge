@@ -11,6 +11,16 @@ import (
 	"time"
 )
 
+type SortColumn struct {
+	Order string
+	Href string
+}
+
+type Link struct {
+	Text string
+	Href string
+}
+
 func GenerateActivationKey(length int) string {
 	var (
 		alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678901234567890123456789"

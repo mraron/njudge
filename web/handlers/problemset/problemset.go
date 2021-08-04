@@ -1,60 +1,145 @@
 package problemset
 
 import (
-	"context"
-	"database/sql"
 	"errors"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/utils/problems"
 	"github.com/mraron/njudge/web/helpers"
 	"github.com/mraron/njudge/web/helpers/config"
+	"github.com/mraron/njudge/web/helpers/pagination"
 	"github.com/mraron/njudge/web/models"
-	"github.com/volatiletech/sqlboiler/v4/queries"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strconv"
 )
+
+type ProblemList struct {
+	Pages []pagination.Link
+	Problems []Problem
+	SolverSorter helpers.SortColumn
+}
+
+func GetProblemList(DB *sqlx.DB, problemStore problems.Store, u *models.User, page, perPage int, order QueryMod, query []QueryMod, qu url.Values) (*ProblemList, error) {
+	ps, err := models.ProblemRels(append(append([]QueryMod{Limit(perPage), Offset((page-1)*perPage)}, query...), order)...).All(DB)
+	if err != nil {
+		return nil, err
+	}
+
+	cnt, err := models.ProblemRels(query...).Count(DB)
+	if err != nil {
+		return nil, err
+	}
+
+	pageCnt := (int(cnt)+perPage-1)/perPage
+	pages := make([]pagination.Link, pageCnt+2)
+	pages[0] = pagination.Link{"&laquo;", false, true, "#"}
+	if page>1 {
+		qu.Set("page", strconv.Itoa(page-1))
+
+		pages[0].Disabled = false
+		pages[0].Url = "?"+qu.Encode()
+	}
+	for i := 1; i < len(pages)-1; i++ {
+		qu.Set("page", strconv.Itoa(i))
+		pages[i] = pagination.Link{strconv.Itoa(i), false, false, "?"+qu.Encode()}
+		if i==page {
+			pages[i].Active = true
+		}
+	}
+	pages[len(pages)-1] = pagination.Link{"&raquo;", false, true, "#"}
+	if page<pageCnt {
+		qu.Set("page", strconv.Itoa(page+1))
+
+		pages[len(pages)-1].Disabled = false
+		pages[len(pages)-1].Url = "?"+qu.Encode()
+	}
+
+	if page>len(pages) {
+		return nil, errors.New("no such page")
+	}
+
+	problems := make([]Problem, len(ps))
+	for i, p := range ps {
+		problems[i].Problem, err = problemStore.Get(p.Problem)
+		if err != nil {
+			return nil, err
+		}
+
+		if u != nil {
+			problems[i].SolvedStatus, err = helpers.HasUserSolved(DB, u, p.Problemset, p.Problem)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		problems[i].SolverCount = p.SolverCount
+		if p.CategoryID.Valid {
+			cat := p.CategoryID.Int
+			var category *models.ProblemCategory
+			for {
+				category, err = models.ProblemCategories(Where("id = ?", cat)).One(DB)
+				if err != nil {
+					return nil, err
+				}
+
+				if !category.ParentID.Valid {
+					break
+				}
+				cat = category.ParentID.Int
+			}
+
+			problems[i].CategoryLink = helpers.Link{
+				Text: category.Name,
+				Href: "/task_archive#category"+strconv.Itoa(p.CategoryID.Int),
+			}
+		}
+	}
+
+	sortOrder := ""
+	qu.Set("page", strconv.Itoa(page))
+	if qu.Get("by") == "solver_count" {
+		sortOrder = qu.Get("order")
+		if qu.Get("order") == "DESC" {
+			qu.Set("order", "ASC")
+		}else {
+			qu.Set("order", "")
+			qu.Set("by", "")
+		}
+	}else {
+		qu.Set("by", "solver_count")
+		qu.Set("order", "DESC")
+	}
+
+	return &ProblemList{Pages: pages, Problems: problems, SolverSorter: helpers.SortColumn{sortOrder, "?"+qu.Encode()}}, nil
+}
 
 func GetList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		u := c.Get("user").(*models.User)
 
 		problemSet := c.Param("name")
-		problemLst, err := models.ProblemRels(Where("problemset=?", problemSet), OrderBy("id DESC")).All(DB)
+		page, err := strconv.Atoi(c.QueryParam("page"))
+		if err != nil || page <= 0 {
+			page = 1
+		}
 
+		order, by := "DESC", "id"
+		if c.QueryParam("by") == "solver_count" {
+			by = "solver_count"
+		}
+		if c.QueryParam("order") == "ASC" {
+			order = "ASC"
+		}
+
+		problemList, err := GetProblemList(DB, problemStore, u, page, 20, OrderBy(by+" "+order), []QueryMod{Where("problemset=?", problemSet)}, c.Request().URL.Query())
 		if err != nil {
 			return err
 		}
 
-		if len(problemLst) == 0 {
-			return echo.NewHTTPError(http.StatusNotFound, errors.New("problemset not found"))
-		}
-
-		lst := make([]Problem, len(problemLst))
-
-		for i := 0; i < len(problemLst); i ++ {
-			cnt := struct {
-				Count int64
-			}{0}
-
-			err := queries.Raw("SELECT COUNT(DISTINCT user_id) FROM submissions WHERE problemset=$1 and problem=$2 and verdict=0", problemSet, problemLst[i].Problem).Bind(context.TODO(), DB, &cnt)
-			if err != nil && !errors.Is(err, sql.ErrNoRows) {
-				return err
-			}
-
-			solvedStatus, err := helpers.HasUserSolved(DB, u, problemSet, problemLst[i].Problem)
-			if err != nil {
-				return err
-			}
-
-			lst[i] = Problem{Problem: problemStore.MustGet(problemLst[i].Problem), SolverCount: int(cnt.Count), SolvedStatus: solvedStatus}
-		}
-
-		return c.Render(http.StatusOK, "problemset/list", struct {
-			Lst []Problem
-		}{lst})
+		return c.Render(http.StatusOK, "problemset/list", problemList)
 	}
 }
 

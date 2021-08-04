@@ -23,39 +23,44 @@ import (
 
 // ProblemRel is an object representing the database table.
 type ProblemRel struct {
-	Problemset string   `boil:"problemset" json:"problemset" toml:"problemset" yaml:"problemset"`
-	Problem    string   `boil:"problem" json:"problem" toml:"problem" yaml:"problem"`
-	ID         int      `boil:"id" json:"id" toml:"id" yaml:"id"`
-	CategoryID null.Int `boil:"category_id" json:"category_id,omitempty" toml:"category_id" yaml:"category_id,omitempty"`
+	Problemset  string   `boil:"problemset" json:"problemset" toml:"problemset" yaml:"problemset"`
+	Problem     string   `boil:"problem" json:"problem" toml:"problem" yaml:"problem"`
+	ID          int      `boil:"id" json:"id" toml:"id" yaml:"id"`
+	CategoryID  null.Int `boil:"category_id" json:"category_id,omitempty" toml:"category_id" yaml:"category_id,omitempty"`
+	SolverCount int      `boil:"solver_count" json:"solver_count" toml:"solver_count" yaml:"solver_count"`
 
 	R *problemRelR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L problemRelL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var ProblemRelColumns = struct {
-	Problemset string
-	Problem    string
-	ID         string
-	CategoryID string
+	Problemset  string
+	Problem     string
+	ID          string
+	CategoryID  string
+	SolverCount string
 }{
-	Problemset: "problemset",
-	Problem:    "problem",
-	ID:         "id",
-	CategoryID: "category_id",
+	Problemset:  "problemset",
+	Problem:     "problem",
+	ID:          "id",
+	CategoryID:  "category_id",
+	SolverCount: "solver_count",
 }
 
 // Generated where
 
 var ProblemRelWhere = struct {
-	Problemset whereHelperstring
-	Problem    whereHelperstring
-	ID         whereHelperint
-	CategoryID whereHelpernull_Int
+	Problemset  whereHelperstring
+	Problem     whereHelperstring
+	ID          whereHelperint
+	CategoryID  whereHelpernull_Int
+	SolverCount whereHelperint
 }{
-	Problemset: whereHelperstring{field: "\"problem_rels\".\"problemset\""},
-	Problem:    whereHelperstring{field: "\"problem_rels\".\"problem\""},
-	ID:         whereHelperint{field: "\"problem_rels\".\"id\""},
-	CategoryID: whereHelpernull_Int{field: "\"problem_rels\".\"category_id\""},
+	Problemset:  whereHelperstring{field: "\"problem_rels\".\"problemset\""},
+	Problem:     whereHelperstring{field: "\"problem_rels\".\"problem\""},
+	ID:          whereHelperint{field: "\"problem_rels\".\"id\""},
+	CategoryID:  whereHelpernull_Int{field: "\"problem_rels\".\"category_id\""},
+	SolverCount: whereHelperint{field: "\"problem_rels\".\"solver_count\""},
 }
 
 // ProblemRelRels is where relationship names are stored.
@@ -79,9 +84,9 @@ func (*problemRelR) NewStruct() *problemRelR {
 type problemRelL struct{}
 
 var (
-	problemRelAllColumns            = []string{"problemset", "problem", "id", "category_id"}
+	problemRelAllColumns            = []string{"problemset", "problem", "id", "category_id", "solver_count"}
 	problemRelColumnsWithoutDefault = []string{"problemset", "problem", "category_id"}
-	problemRelColumnsWithDefault    = []string{"id"}
+	problemRelColumnsWithDefault    = []string{"id", "solver_count"}
 	problemRelPrimaryKeyColumns     = []string{"id"}
 )
 

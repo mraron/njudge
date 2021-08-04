@@ -1,12 +1,45 @@
 {{template "header" .}}
+{{template "pagination" .Data.Pages}}
+
 <div class="table-responsive">
-    <table class="table table-bordered" >
-        <thead><tr><td></td><td>Id</td><td>Cím</td><td>Címkék</td><td>Megoldók</td></tr></thead>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col">Azonosító</th>
+                <th scope="col">Cím</th>
+                <th scope="col">Kategória</th>
+                <th scope="col"><a href="{{.Data.SolverSorter.Href}}">{{if eq .Data.SolverSorter.Order ""}}<i class="fa fa-sort"></i>{{else}}{{if eq .Data.SolverSorter.Order "ASC"}}<i class="fa fa-sort-down"></i>{{else}}<i class="fa fa-sort-up"></i>{{end}}{{end}} Megoldók</a></th>
+            </tr>
+        </thead>
         <tbody>
-        {{ range $i := .Data.Lst }}
-            <tr><td class="text-center">{{if eq $i.SolvedStatus 3}}<i class="fa fa-check text-success"></i>{{end}}{{if eq $i.SolvedStatus 1}}<i class="fa fa-times text-danger"></i>{{end}}</td><td>{{$i.Name}}</td><td><a href="{{$i.Name}}/">{{(translateContent "hungarian" $i.Titles).String}}</a></td><td> {{range $tag := $i.Tags}}<span class="badge badge-secondary">{{$tag}}</span> {{end}}</td><td><a href="{{$i.Name}}/status?ac=1"><i class="fa fa-user"></i> {{$i.SolverCount}}</a></td></tr>
+        {{ range $i := .Data.Problems }}
+            <tr>
+                <td class="text-center">{{if eq $i.SolvedStatus 3}}<i class="fa fa-check text-success"></i>{{end}}{{if eq $i.SolvedStatus 1}}<i class="fa fa-times text-danger"></i>{{end}}</td>
+                <td>{{$i.Name}}</td>
+                <td><a href="{{$i.Name}}/">{{(translateContent "hungarian" $i.Titles).String}}</a></td>
+                <td>{{if $i.CategoryLink.Text}}<a href="{{$i.CategoryLink.Href}}">{{$i.CategoryLink.Text}}</a>{{end}}</td>
+                <td><a href="{{$i.Name}}/status?ac=1"><i class="fa fa-user"></i> {{$i.SolverCount}}</a></td>
+            </tr>
         {{end}}
         </tbody>
     </table>
+</div>
+<div class="accordion" id="filterAccordion">
+    <div class="card">
+        <div class="card-header" id="filterHeading">
+            <h2 class="mb-0">
+                <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#filter" aria-expanded="true" aria-controls="filterAccordion">
+                    <i class="fa fa-filter"></i> Szűrés
+                </button>
+            </h2>
+        </div>
+
+        <div id="filter" class="collapse" aria-labelledby="filterHeading" data-parent="#filterAccordion">
+            <div class="card-body">
+                ...
+            </div>
+        </div>
+    </div>
 </div>
 {{template "footer" .}}

@@ -10,12 +10,6 @@
         {{end}}
         </tbody>
     </table>
-    <nav aria-label="...">
-        <ul class="pagination">
-            {{range $p := .Pages}}
-                <li class="page-item {{if $p.Disabled}}disabled{{end}} {{if $p.Active}}active{{end}}"><a class="page-link" href="{{$p.Url}}">{{$p.Name}}</a></li>
-            {{end}}
-        </ul>
-    </nav>
+    {{template "pagination" .Pages}}
 </div>
 {{end}}
