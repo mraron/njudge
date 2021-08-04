@@ -30,7 +30,7 @@ var (
 type Problem struct {
 	problems.Problem
 	SolverCount int
-	SolvedStatus int
+	SolvedStatus helpers.SolvedStatus
 	LastLanguage string
 }
 

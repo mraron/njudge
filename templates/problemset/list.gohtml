@@ -4,7 +4,7 @@
         <thead><tr><td></td><td>Id</td><td>Cím</td><td>Címkék</td><td>Megoldók</td></tr></thead>
         <tbody>
         {{ range $i := .Data.Lst }}
-            <tr><td class="text-center">{{if eq $i.SolvedStatus 0}}<i class="fa fa-check text-success"></i>{{end}}{{if eq $i.SolvedStatus 1}}<i class="fa fa-times text-danger"></i>{{end}}</td><td>{{$i.Name}}</td><td><a href="{{$i.Name}}/">{{(translateContent "hungarian" $i.Titles).String}}</a></td><td> {{range $tag := $i.Tags}}<span class="badge badge-secondary">{{$tag}}</span> {{end}}</td><td><a href="{{$i.Name}}/status?ac=1"><i class="fa fa-user"></i> {{$i.SolverCount}}</a></td></tr>
+            <tr><td class="text-center">{{if eq $i.SolvedStatus 3}}<i class="fa fa-check text-success"></i>{{end}}{{if eq $i.SolvedStatus 1}}<i class="fa fa-times text-danger"></i>{{end}}</td><td>{{$i.Name}}</td><td><a href="{{$i.Name}}/">{{(translateContent "hungarian" $i.Titles).String}}</a></td><td> {{range $tag := $i.Tags}}<span class="badge badge-secondary">{{$tag}}</span> {{end}}</td><td><a href="{{$i.Name}}/status?ac=1"><i class="fa fa-user"></i> {{$i.SolverCount}}</a></td></tr>
         {{end}}
         </tbody>
     </table>

@@ -17,7 +17,7 @@ type TreeNode struct {
 	Type     string
 	Name     string
 	Link     string
-	SolvedStatus int
+	SolvedStatus helpers.SolvedStatus
 	Children []*TreeNode
 }
 
