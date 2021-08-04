@@ -8,12 +8,12 @@
 <div ui-view="ng-admin"></div>
 <script src="/static/js/ng-admin.min.js"></script>
 <script type="text/javascript">
-    var njudge = angular.module('njudge', ['ng-admin']);
+    const njudge = angular.module('njudge', ['ng-admin']);
     njudge.config(['NgAdminConfigurationProvider', function(NgAdminConfigurationProvider) {
-        var nga = NgAdminConfigurationProvider;
-        var admin = nga.application('njudge admin').baseApiUrl("{{.Data.Url}}/api/v1/");
+        const nga = NgAdminConfigurationProvider;
+        const admin = nga.application('njudge admin').baseApiUrl("{{.Data.Url}}/api/v1/");
 
-        var problem_rel = nga.entity('problem_rels').identifier(nga.field('id'));
+        const problem_rel = nga.entity('problem_rels').identifier(nga.field('id'));
         problem_rel.listView().fields([
             nga.field('id'),
             nga.field('problemset'),
@@ -27,7 +27,7 @@
 
         problem_rel.editionView().fields(problem_rel.creationView().fields());
 
-        var judge = nga.entity("judges").identifier(nga.field('id'));
+        const judge = nga.entity("judges").identifier(nga.field('id'));
         judge.listView().fields([
             nga.field('id'),
             nga.field('name'),
@@ -60,7 +60,7 @@
             nga.field('online'),
         ]).actions(['list', 'delete', 'edit']);
 
-        var user = nga.entity("users").identifier(nga.field('id'));
+        const user = nga.entity("users").identifier(nga.field('id'));
         user.listView().fields([
             nga.field('id'),
             nga.field('name'),
@@ -86,7 +86,7 @@
         ]).actions(['list', 'delete', 'edit']);
 
 
-        var submission = nga.entity("submissions").identifier(nga.field('id'));
+        const submission = nga.entity("submissions").identifier(nga.field('id'));
         submission.listView().fields([
             nga.field('id'),
             nga.field('user_id', 'reference').targetEntity(user).label('Felhasználó').targetField(nga.field('name')),

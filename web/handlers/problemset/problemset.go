@@ -69,7 +69,7 @@ func GetStatus(DB* sqlx.DB) echo.HandlerFunc {
 			page = 1
 		}
 
-		query := []QueryMod{}
+		query := make([]QueryMod, 0)
 		if problem != "" {
 			query = append(query, Where("problem = ?", problem), Where("problemset = ?", problemset))
 		}
@@ -140,7 +140,7 @@ func PostSubmit(cfg config.Server, DB* sqlx.DB, problemStore problems.Store) ech
 			return err
 		}
 
-		return c.Redirect(http.StatusFound, "/problemset/status#submission"+strconv.Itoa(id))
+		return c.Redirect(http.StatusFound, "/problemset/status/#submission"+strconv.Itoa(id))
 	}
 }
 

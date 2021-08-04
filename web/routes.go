@@ -33,7 +33,7 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	ps.GET("/:name/:problem/attachment/:attachment/", problemset.GetProblemAttachment(s.ProblemStore))
 	ps.GET("/:name/:problem/:file", problemset.GetProblemFile(s.Server, s.ProblemStore))
 	ps.POST("/:name/submit", problemset.PostSubmit(s.Server, s.DB, s.ProblemStore))
-	ps.GET("/status", problemset.GetStatus(s.DB))
+	ps.GET("/status/", problemset.GetStatus(s.DB))
 
 	u := e.Group("/user")
 
@@ -48,7 +48,9 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	u.GET("/activate", user.GetActivateInfo())
 	u.GET("/activate/:name/:key", user.Activate(s.DB))
 
-	u.GET("/profile/:name/", user.Profile(s.DB))
+	profile := u.Group("/profile", user.ProfileMiddleware(s.DB))
+	profile.GET("/:name/", user.Profile(s.DB))
+	profile.GET("/:name/submissions/", user.Submissions(s.DB))
 
 	v1 := e.Group("/api/v1")
 
