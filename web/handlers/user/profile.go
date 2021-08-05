@@ -49,7 +49,7 @@ func Profile(DB *sqlx.DB) echo.HandlerFunc {
 			return err
 		}
 
-		attempted, err = models.Submissions(Select("max(submissions.id) as id, problemset, problem"), Where("user_id = ?", u.ID), Where("verdict <> ?", 0), Where("not exists(select id from submissions as other where other.user_id=2 and verdict = 0 and other.problem = submissions.problem and other.problemset=submissions.problemset)"), GroupBy("submissions.problemset, submissions.problem")).All(DB)
+		attempted, err = models.Submissions(Select("max(submissions.id) as id, problemset, problem"), Where("user_id = ?", u.ID), Where("verdict <> ?", 0), Where("not exists(select id from submissions as other where other.user_id = ? and verdict = 0 and other.problem = submissions.problem and other.problemset=submissions.problemset)", u.ID), GroupBy("submissions.problemset, submissions.problem")).All(DB)
 		if err != nil {
 			return err
 		}
