@@ -31,11 +31,34 @@ func ProfileMiddleware(DB *sqlx.DB) echo.MiddlewareFunc {
 	}
 }
 
+type problem struct {
+	Problemset string
+	Problem string
+}
+
 func Profile(DB *sqlx.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		u := c.Get("profile").(*models.User)
+		var (
+			solved, attempted models.SubmissionSlice
+			err error
+		)
+
+		solved, err = models.Submissions(Select("max(submissions.id) as id, problemset, problem"), Where("user_id = ?", u.ID), Where("verdict = ?", 0), GroupBy("submissions.problemset, submissions.problem")).All(DB)
+		if err != nil {
+			return err
+		}
+
+		attempted, err = models.Submissions(Select("max(submissions.id) as id, problemset, problem"), Where("user_id = ?", u.ID), Where("verdict <> ?", 0), Where("not exists(select id from submissions as other where other.user_id=2 and verdict = 0 and other.problem = submissions.problem and other.problemset=submissions.problemset)"), GroupBy("submissions.problemset, submissions.problem")).All(DB)
+		if err != nil {
+			return err
+		}
+
 		return c.Render(http.StatusOK, "user/profile/main", struct {
 			User *models.User
-		}{c.Get("profile").(*models.User)})
+			SolvedProblems models.SubmissionSlice
+			AttemptedNotSolvedProblems models.SubmissionSlice
+		}{u, solved, attempted})
 	}
 }
 
