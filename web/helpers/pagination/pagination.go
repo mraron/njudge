@@ -1,6 +1,11 @@
 package pagination
 
-import "github.com/labstack/echo/v4"
+import (
+	"errors"
+	"github.com/labstack/echo/v4"
+	"net/url"
+	"strconv"
+)
 
 type Data struct {
 	Page      int `query:"_page"`
@@ -19,4 +24,36 @@ type Link struct {
 	Active bool
 	Disabled bool
 	Url string
+}
+
+func Links(page, perPage int, cnt int64, qu url.Values) ([]Link, error){
+	pageCnt := (int(cnt)+perPage-1)/perPage
+	pages := make([]Link, pageCnt+2)
+	pages[0] = Link{"&laquo;", false, true, "#"}
+	if page>1 {
+		qu.Set("page", strconv.Itoa(page-1))
+
+		pages[0].Disabled = false
+		pages[0].Url = "?"+qu.Encode()
+	}
+	for i := 1; i < len(pages)-1; i++ {
+		qu.Set("page", strconv.Itoa(i))
+		pages[i] = Link{strconv.Itoa(i), false, false, "?"+qu.Encode()}
+		if i==page {
+			pages[i].Active = true
+		}
+	}
+	pages[len(pages)-1] = Link{"&raquo;", false, true, "#"}
+	if page<pageCnt {
+		qu.Set("page", strconv.Itoa(page+1))
+
+		pages[len(pages)-1].Disabled = false
+		pages[len(pages)-1].Url = "?"+qu.Encode()
+	}
+
+	if page>len(pages) {
+		return nil, errors.New("no such page")
+	}
+
+	return pages, nil
 }

@@ -1,7 +1,6 @@
 package problemset
 
 import (
-	"errors"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/utils/problems"
@@ -33,32 +32,9 @@ func GetProblemList(DB *sqlx.DB, problemStore problems.Store, u *models.User, pa
 		return nil, err
 	}
 
-	pageCnt := (int(cnt)+perPage-1)/perPage
-	pages := make([]pagination.Link, pageCnt+2)
-	pages[0] = pagination.Link{"&laquo;", false, true, "#"}
-	if page>1 {
-		qu.Set("page", strconv.Itoa(page-1))
-
-		pages[0].Disabled = false
-		pages[0].Url = "?"+qu.Encode()
-	}
-	for i := 1; i < len(pages)-1; i++ {
-		qu.Set("page", strconv.Itoa(i))
-		pages[i] = pagination.Link{strconv.Itoa(i), false, false, "?"+qu.Encode()}
-		if i==page {
-			pages[i].Active = true
-		}
-	}
-	pages[len(pages)-1] = pagination.Link{"&raquo;", false, true, "#"}
-	if page<pageCnt {
-		qu.Set("page", strconv.Itoa(page+1))
-
-		pages[len(pages)-1].Disabled = false
-		pages[len(pages)-1].Url = "?"+qu.Encode()
-	}
-
-	if page>len(pages) {
-		return nil, errors.New("no such page")
+	pages, err := pagination.Links(page, perPage, cnt, qu)
+	if err != nil {
+		return nil, err
 	}
 
 	problems := make([]Problem, len(ps))
