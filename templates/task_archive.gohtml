@@ -24,7 +24,7 @@
                 <div class="card-body" id="top_category{{$root.Id}}">
                     {{range $c := $root.Children}}
                         <div class="problemcategory-header">
-                            <a class="collapse-toggle collapsed" data-toggle="collapse" data-parent="#top_category{{$root.Id}}" href="#category{{$c.Id}}">{{$c.Name}}</a>
+                            <a class="collapse-toggle collapsed" data-toggle="collapse" href="#category{{$c.Id}}">{{$c.Name}}</a>
                         </div>
                         <div class="collapse problemcategory-body" id="category{{$c.Id}}">
                             {{template "ta_tree_view" $c}}
@@ -37,23 +37,27 @@
     <script>
         if(window.location.hash)
         {
+            // carets are kinda buggy :D
+
             const hash = window.location.hash.substring(1);
 
             const elem = document.getElementById(hash);
             let curr = elem;
 
-            while('parent' in curr.dataset) {
+            while(1) {
                 curr.classList.add('show');
-                curr = document.querySelector(curr.dataset['parent']);
 
-                // don't show siblings
+                // don't show non-important nodes
                 for(let child of document.querySelectorAll("div[data-parent='#"+curr.id+"']")) {
+                    console.log(child);
                     child.classList.remove('show');
                 }
-            }
-            curr.classList.add('show');
-            elem.classList.add('show');
 
+                if(!('parent' in curr.dataset)) break ;
+                curr = document.querySelector(curr.dataset['parent']);
+            }
+
+            elem.classList.add('show');
             elem.scrollIntoView();
         }
     </script>
