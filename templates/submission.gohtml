@@ -2,7 +2,7 @@
 
 {{if logged .Context}}
 {{if canView (user .Context).Role "submissions/rejudge"}}
-<a class="btn btn-secondary" href="/submission/rejudge/{{.Data.ID}}"><i class="fa fa-sync"></i> Rejudge</a>
+<a class="btn btn-secondary" href="/submission/rejudge/{{.Data.ID}}"><i class="fas fa-sync"></i> Rejudge</a>
 <br>
 <br>
 {{end}}
@@ -35,9 +35,9 @@
 {{range $i, $e := $testset.Testcases}}
 {{$ind := add $i 1}}
 <div class="card">
-    <div class="card-header {{if and (eq $e.VerdictName 0) ($status.Compiled)}}bg-success{{else}}bg-danger{{end}}"><span class="fa fa-{{if and (eq $e.VerdictName 0) ($status.Compiled)}}check{{else}}times{{end}}"></span> {{$ind}} - {{if $status.Compiled}}{{$e.VerdictName.String}}{{else}}Fordítási hiba{{end}}</div>
+    <div class="card-header {{if and (eq $e.VerdictName 0) ($status.Compiled)}}bg-success{{else}}bg-danger{{end}}"><span class="fas fa-{{if and (eq $e.VerdictName 0) ($status.Compiled)}}check{{else}}times{{end}}"></span> {{$ind}} - {{if $status.Compiled}}{{$e.VerdictName.String}}{{else}}Fordítási hiba{{end}}</div>
     <div class="card-body">
-        <span class="fa fa-hdd"></span> Memória: {{$e.MemoryUsed}}KB <br><span class="fa fa-clock"></span> Idő:{{$e.TimeSpent}}<br><br>
+        <span class="fas fa-hdd"></span> Memória: {{$e.MemoryUsed}}KB <br><span class="fas fa-clock"></span> Idő:{{$e.TimeSpent}}<br><br>
         Program kimenete:
         <code><pre>{{$e.Output}}</pre></code>
         Elvárt kimenete:

@@ -12,7 +12,7 @@
 <div class="col-12 col-lg-3">
 <div class="card">
     <div class="card-header">
-        <i class="fa fa-info"></i> Információk
+        <i class="s fa-info"></i> Információk
     </div>
     <div class="card-body">
         <div class="row">
@@ -39,7 +39,7 @@
 <br>
 <div class="card">
     <div class="card-header">
-        <i class="fa fa-paper-plane"></i> Megoldás beküldése
+        <i class="fas fa-paper-plane"></i> Megoldás beküldése
     </div>
     <div class="card-body">
         {{if logged .Context}}
@@ -64,14 +64,14 @@
         <br>
         <div class="card">
             <div class="card-header">
-                <i class="fa fa-paperclip"></i> Mellékletek
+                <i class="fas fa-paperclip"></i> Mellékletek
             </div>
             <div class="card-body">
                 {{range $a := .Data.Problem.Attachments}}
-                    <a href="attachment/{{$a.Name}}/"><i class="fa fa-file"></i> Fájl ({{$a.Name}})</a><br>
+                    <a href="attachment/{{$a.Name}}/"><i class="fas fa-file"></i> Fájl ({{$a.Name}})</a><br>
                 {{end}}
                 {{range $loc := .Data.Problem.PDFStatements.Locales}}
-                    <a href="pdf/{{$loc}}/"><i class="fa fa-file-pdf"></i> Leírás ({{$loc}})</a><br>
+                    <a href="pdf/{{$loc}}/"><i class="fas fa-file-pdf"></i> Leírás ({{$loc}})</a><br>
                 {{end}}
 
             </div>
