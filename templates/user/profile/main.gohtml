@@ -5,6 +5,7 @@
             <div class="col-md-auto col-12">
                 <img src="https://www.gravatar.com/avatar/{{gravatarHash .Data.User}}?d=identicon&s=128" width="96px" height="96px" alt=""><br>
                 <br>
+                <b>Pontok</b>: {{fixedlenFloat32 .Data.User.Points.Float32 2}}
             </div>
             <div class="col">
                 <div class="card">

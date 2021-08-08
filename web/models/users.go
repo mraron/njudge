@@ -23,12 +23,13 @@ import (
 
 // User is an object representing the database table.
 type User struct {
-	ID            int         `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Name          string      `boil:"name" json:"name" toml:"name" yaml:"name"`
-	Password      string      `boil:"password" json:"password" toml:"password" yaml:"password"`
-	Email         string      `boil:"email" json:"email" toml:"email" yaml:"email"`
-	ActivationKey null.String `boil:"activation_key" json:"activation_key,omitempty" toml:"activation_key" yaml:"activation_key,omitempty"`
-	Role          string      `boil:"role" json:"role" toml:"role" yaml:"role"`
+	ID            int          `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Name          string       `boil:"name" json:"name" toml:"name" yaml:"name"`
+	Password      string       `boil:"password" json:"password" toml:"password" yaml:"password"`
+	Email         string       `boil:"email" json:"email" toml:"email" yaml:"email"`
+	ActivationKey null.String  `boil:"activation_key" json:"activation_key,omitempty" toml:"activation_key" yaml:"activation_key,omitempty"`
+	Role          string       `boil:"role" json:"role" toml:"role" yaml:"role"`
+	Points        null.Float32 `boil:"points" json:"points,omitempty" toml:"points" yaml:"points,omitempty"`
 
 	R *userR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -41,6 +42,7 @@ var UserColumns = struct {
 	Email         string
 	ActivationKey string
 	Role          string
+	Points        string
 }{
 	ID:            "id",
 	Name:          "name",
@@ -48,6 +50,7 @@ var UserColumns = struct {
 	Email:         "email",
 	ActivationKey: "activation_key",
 	Role:          "role",
+	Points:        "points",
 }
 
 // Generated where
@@ -59,6 +62,7 @@ var UserWhere = struct {
 	Email         whereHelperstring
 	ActivationKey whereHelpernull_String
 	Role          whereHelperstring
+	Points        whereHelpernull_Float32
 }{
 	ID:            whereHelperint{field: "\"users\".\"id\""},
 	Name:          whereHelperstring{field: "\"users\".\"name\""},
@@ -66,6 +70,7 @@ var UserWhere = struct {
 	Email:         whereHelperstring{field: "\"users\".\"email\""},
 	ActivationKey: whereHelpernull_String{field: "\"users\".\"activation_key\""},
 	Role:          whereHelperstring{field: "\"users\".\"role\""},
+	Points:        whereHelpernull_Float32{field: "\"users\".\"points\""},
 }
 
 // UserRels is where relationship names are stored.
@@ -89,9 +94,9 @@ func (*userR) NewStruct() *userR {
 type userL struct{}
 
 var (
-	userAllColumns            = []string{"id", "name", "password", "email", "activation_key", "role"}
+	userAllColumns            = []string{"id", "name", "password", "email", "activation_key", "role", "points"}
 	userColumnsWithoutDefault = []string{"name", "password", "email", "activation_key", "role"}
-	userColumnsWithDefault    = []string{"id"}
+	userColumnsWithDefault    = []string{"id", "points"}
 	userPrimaryKeyColumns     = []string{"id"}
 )
 

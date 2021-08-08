@@ -94,6 +94,9 @@ func funcs(store problems.Store) template.FuncMap {
 		"fixedlen": func(a int, len int) string {
 			return fmt.Sprintf(fmt.Sprintf("%%0%dd", len), a)
 		},
+		"fixedlenFloat32": func(a float32, len int) string {
+			return fmt.Sprintf(fmt.Sprintf("%%.%df", len), a)
+		},
 		"month2int": func(month time.Month) int {
 			return int(month)
 		},

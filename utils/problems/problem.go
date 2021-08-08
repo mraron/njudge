@@ -80,8 +80,6 @@ type File struct {
 	Path string
 }
 
-//@TODO add problem config type name
-
 type Problem interface {
 	Name() string
 	Titles() Contents
@@ -93,15 +91,6 @@ type Problem interface {
 	Tags() []string
 
 	Judgeable
-}
-
-//@TODO redo problem
-
-type FullProblem interface {
-	Problem
-	Judgeable
-	Validatable
-	Exportable
 }
 
 type Judgeable interface {

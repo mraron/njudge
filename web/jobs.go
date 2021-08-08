@@ -8,9 +8,11 @@ import (
 	"github.com/mraron/njudge/web/extmodels"
 	"github.com/mraron/njudge/web/helpers"
 	"github.com/mraron/njudge/web/models"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"log"
+	"math"
 	"net/http"
 	"strconv"
 	"time"
@@ -21,6 +23,7 @@ func (s *Server) StartBackgroundJobs() {
 	go s.runSyncJudges()
 	go s.runGlue()
 	go s.runJudger()
+	go s.runStatisticsUpdate()
 }
 
 func (s *Server) runUpdateProblems() {
@@ -169,5 +172,41 @@ func (s *Server) runJudger() {
 				}
 			}
 		}
+	}
+}
+
+func (s *Server) runStatisticsUpdate() {
+	for {
+		probs, err := models.ProblemRels().All(s.DB)
+		if err != nil {
+			log.Print(err)
+			continue
+		}
+
+		userPoints := make(map[int]float64)
+		for _, p := range probs {
+			points := math.Sqrt(1.0/float64(p.SolverCount))
+			solvedBy, err := models.Submissions(Distinct("user_id"), Where("verdict = 0"), Where("problemset = ?", p.Problemset), Where("problem = ?", p.Problem)).All(s.DB)
+			if err != nil {
+				log.Print(err)
+				continue
+			}
+
+			for _, uid := range solvedBy {
+				userPoints[uid.UserID] += points
+			}
+		}
+
+		for uid, pts := range userPoints {
+			var user models.User
+			user.ID = uid
+			user.Points = null.Float32{Float32:float32(pts), Valid: true}
+			if _, err := user.Update(s.DB, boil.Whitelist("points")); err != nil {
+				log.Print(err)
+				continue
+			}
+		}
+
+		time.Sleep(5 * time.Minute)
 	}
 }

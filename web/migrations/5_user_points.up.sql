@@ -1,0 +1,1 @@
+alter table users add column points real default 0;
