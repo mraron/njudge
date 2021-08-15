@@ -1,0 +1,11 @@
+.source-block {
+    position: relative;
+}
+
+.source-actions {
+    position: absolute;
+    display: block;
+    right: 0;
+    top: 0;
+    padding-right: 6px;
+}

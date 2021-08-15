@@ -17,7 +17,13 @@
 </div>
 
 {{if ne .Data.Language "zip"}}
-    <pre><code class="{{.Data.Language}}">{{tostring .Data.Source}}</code></pre>
+    <div class="source-block">
+        <div class="source-actions">
+            <button id="source-expand" class="btn" data-target="source-code"><i class="fa fa-arrows-alt-v"></i></button>
+            <button id="source-copy" class="btn" data-target="source-code"><i class="fa fa-copy"></i></button>
+        </div>
+        <pre id="source-code" style="max-height: 400px;" data-expanded="false"><code class="{{.Data.Language}}">{{tostring .Data.Source}}</code></pre>
+    </div>
 {{end}}
 
 {{$status := parseStatus .Data.Status}}
@@ -98,7 +104,7 @@
         </table>
     </div>
 {{end}}
-
+<script src="/static/js/submission.js" defer></script>
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
