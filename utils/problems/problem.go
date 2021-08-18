@@ -99,7 +99,7 @@ type Judgeable interface {
 	Check(*Testcase) error
 	InputOutputFiles() (string, string)
 	Languages() []language.Language
-	StatusSkeleton() Status
+	StatusSkeleton(string) (*Status, error)
 	Files() []File
 	TaskTypeName() string
 }

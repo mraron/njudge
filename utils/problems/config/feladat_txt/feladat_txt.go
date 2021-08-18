@@ -89,7 +89,7 @@ func (p Problem) Tags() []string {
 	return make([]string, 0)
 }
 
-func (p Problem) StatusSkeleton() problems.Status {
+func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	ans := problems.Status{false, "status skeleton", problems.FEEDBACK_IOI, make([]problems.Testset, 0)}
 	ans.Feedback = append(ans.Feedback, problems.Testset{Name: "tests"})
 	testset := &ans.Feedback[len(ans.Feedback)-1]
@@ -130,7 +130,7 @@ func (p Problem) StatusSkeleton() problems.Status {
 		idx++
 	}
 
-	return ans
+	return &ans, nil
 }
 
 func (p Problem) Check(tc *problems.Testcase) error {

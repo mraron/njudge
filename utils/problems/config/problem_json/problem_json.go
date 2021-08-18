@@ -97,9 +97,9 @@ func (p Problem) Tags() []string {
 	return []string{}
 }
 
-func (p Problem) StatusSkeleton() problems.Status {
+func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	ans := problems.Status{false, "status skeleton", problems.FEEDBACK_IOI, make([]problems.Testset, 0)}
-	ans.Feedback = append(ans.Feedback, problems.Testset{Name: "main"})
+	ans.Feedback = append(ans.Feedback, problems.Testset{Name: "tests"})
 	ans.Feedback[0].Groups = make([]problems.Group, 1)
 	ans.Feedback[0].Groups[0].Name = "base"
 	ans.Feedback[0].Groups[0].Scoring = problems.SCORING_SUM
@@ -114,7 +114,7 @@ func (p Problem) StatusSkeleton() problems.Status {
 		ans.Feedback[0].Groups[0].Testcases = append(ans.Feedback[0].Groups[0].Testcases, tc)
 	}
 
-	return ans
+	return &ans, nil
 }
 
 func (p Problem) Check(tc *problems.Testcase) error {

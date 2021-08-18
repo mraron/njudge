@@ -43,17 +43,17 @@ func (o OutputOnly) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, 
 		close(statusNotifier)
 	}()
 
-	skeleton := jinfo.StatusSkeleton()
-
-	fmt.Println(skeleton)
 	ans := problems.Status{}
 
 	ans.Compiled = true
-
 	ans.Feedback = make([]problems.Testset, 1)
 	ans.Feedback[0] = problems.Testset{"main", make([]problems.Group, 0), make([]problems.Testcase, 0)}
-
 	ans.FeedbackType = problems.FEEDBACK_IOI
+
+	skeleton, err := jinfo.StatusSkeleton("")
+	if err != nil {
+		return ans, err
+	}
 
 	zipContents, err := ioutil.ReadAll(bin)
 	if err != nil {

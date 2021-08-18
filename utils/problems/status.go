@@ -8,9 +8,7 @@ import (
 	"time"
 )
 
-//
-// Represents a verdict of a testcase
-//
+// VerdictName represents the verdict of a testcase i.e the outcome which happened in result of running the testcase (or the lack of running it in the case of VERDICT_DR)
 type VerdictName int
 
 const (
@@ -50,9 +48,10 @@ func (v VerdictName) String() string {
 	return "..."
 }
 
-//
-// Represents a feedback type, it's mainly for the frontend eg. in FEEDBACK_CF we actually output the contestant's output and the jury's output too whereas in for example FEEDBACK_ACM we only use standard ACM feedback (just the verdict)
-//
+// FeedbackType is mainly for displaying to the end user.
+// In FEEDBACK_CF we actually output the contestant's output and the jury's output,
+// too whereas in for example FEEDBACK_ACM we only use standard ACM feedback (just the verdict),
+// in FEEDBACK_IOI we display all testcases along information about groups.
 type FeedbackType int
 
 const (
@@ -61,6 +60,7 @@ const (
 	FEEDBACK_ACM
 )
 
+// FeedbackFromString parses a string into FeedbackType, the default is FEEDBACK_CF, "ioi" is for FEEDBACK_IOI and "acm" is for FEEDBACK_ACM
 func FeedbackFromString(str string) FeedbackType {
 	if str == "ioi" {
 		return FEEDBACK_IOI
@@ -71,9 +71,9 @@ func FeedbackFromString(str string) FeedbackType {
 	return FEEDBACK_CF
 }
 
-//
-// Represents the scoring of a group of tests, SCORING_GROUP means that if there's a non accepted testcase in the group then the whole group scores 0 points, SCORING_SUM means that the score of the group is the sum of scores of individual scores.
-//
+// ScoringType represents the scoring of a group of tests,
+// * SCORING_GROUP means that if there's a non accepted testcase in the group then the whole group scores 0 points,
+// * SCORING_SUM means that the score of the group is the sum of scores of individual scores.
 type ScoringType int
 
 const (
@@ -89,9 +89,7 @@ func ScoringFromString(str string) ScoringType {
 	return SCORING_SUM
 }
 
-//
-// Testcase represents a testcase in the status of a submission
-//
+// Testcase represents a testcase in the status of a submission.
 type Testcase struct {
 	Index          int
 	InputPath      string
@@ -111,10 +109,8 @@ type Testcase struct {
 	MemoryLimit    int
 }
 
-//
-// Testset represents some set of tests, for example pretests and systests should be testsets.
-// It's important that a testset is not a group! Groups are inside a testset.
-//
+// Testset represents some set of tests, for example pretests and system tests should be testsets.
+// They are also used to seamlessly rejudge for contestants.
 type Testset struct {
 	Name      string
 	Groups    []Group
@@ -193,14 +189,12 @@ func (ts Testset) MaxTimeSpent() time.Duration {
 	return mx
 }
 
-//
-// Represents a group of testcases inside a testset
-//
+// A Group is named group of tests for which there is a scoring policy defined.
 type Group struct {	
 	Name         string
 	Scoring      ScoringType
 	Testcases    []Testcase
-	Dependencies []string //@TODO: actually support this
+	Dependencies []string //@TODO: actually support this while calculating score
 }
 
 func (g *Group) SetTimeLimit(tl time.Duration) {
@@ -215,19 +209,19 @@ func (g *Group) SetMemoryLimit(ml int) {
 	}
 }
 
-func (ts Group) Score() float64 {
-	switch ts.Scoring {
+func (g Group) Score() float64 {
+	switch g.Scoring {
 	case SCORING_GROUP:
-		for _, val := range ts.Testcases {
+		for _, val := range g.Testcases {
 			if val.VerdictName != VERDICT_AC {
 				return 0.0
 			}
 		}
 
-		return ts.MaxScore()
+		return g.MaxScore()
 	case SCORING_SUM:
 		sum := 0.0
-		for _, val := range ts.Testcases {
+		for _, val := range g.Testcases {
 			sum += val.Score
 		}
 
@@ -237,17 +231,17 @@ func (ts Group) Score() float64 {
 	return -1.0
 }
 
-func (ts Group) MaxScore() float64 {
+func (g Group) MaxScore() float64 {
 	sum := 0.0
-	for _, val := range ts.Testcases {
+	for _, val := range g.Testcases {
 		sum += val.MaxScore
 	}
 
 	return sum
 }
 
-func (ts Group) FirstNonAC() int {
-	for ind, val := range ts.Testcases {
+func (g Group) FirstNonAC() int {
+	for ind, val := range g.Testcases {
 		if val.VerdictName != VERDICT_AC {
 			return ind + 1
 		}
@@ -256,13 +250,13 @@ func (ts Group) FirstNonAC() int {
 	return -1
 }
 
-func (ts Group) IsAC() bool {
-	return ts.FirstNonAC() == -1
+func (g Group) IsAC() bool {
+	return g.FirstNonAC() == -1
 }
 
-func (ts Group) MaxMemoryUsage() int {
+func (g Group) MaxMemoryUsage() int {
 	mx := 0
-	for _, val := range ts.Testcases {
+	for _, val := range g.Testcases {
 		if mx < val.MemoryUsed {
 			mx = val.MemoryUsed
 		}
@@ -271,9 +265,9 @@ func (ts Group) MaxMemoryUsage() int {
 	return mx
 }
 
-func (ts Group) MaxTimeSpent() time.Duration {
+func (g Group) MaxTimeSpent() time.Duration {
 	mx := time.Duration(0)
-	for _, val := range ts.Testcases {
+	for _, val := range g.Testcases {
 		if mx < val.TimeSpent {
 			mx = val.TimeSpent
 		}
@@ -282,9 +276,9 @@ func (ts Group) MaxTimeSpent() time.Duration {
 	return mx
 }
 
-//
-// Represents the status of a submission after judging
-//
+// A Status represents the status of a submission after judging
+// It contains the information about compilation and the feedback
+// (Multiple testsets are currently outside of focus, but possible to implement)
 type Status struct {
 	Compiled       bool
 	CompilerOutput string

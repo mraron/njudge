@@ -35,10 +35,14 @@ func truncate(s string) string {
 func (b Communication) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
 	var (
 		ans            problems.Status
-		skeleton       = jinfo.StatusSkeleton()
+		skeleton       *problems.Status
 		binaryContents []byte
 		err            error
 	)
+
+	if skeleton, err = jinfo.StatusSkeleton(""); err != nil {
+		return ans, err
+	}
 
 	interactorSandbox, err := sp.Get()
 	if err != nil {
