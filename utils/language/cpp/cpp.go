@@ -3,7 +3,9 @@ package cpp
 import (
 	"bytes"
 	"github.com/mraron/njudge/utils/language"
+	"go.uber.org/multierr"
 	"io"
+	"io/ioutil"
 	"os/exec"
 	"strings"
 	"time"
@@ -28,15 +30,29 @@ func (c cpp) DefaultFileName() string {
 }
 
 func (c cpp) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) error {
+	temp, err := ioutil.TempFile("/tmp", "cpptempfile")
+	if err != nil {
+		return err
+	}
+
 	cmd := exec.Command("g++", "-std="+c.ver, "-x", "c++", "-O2", "-o", "/proc/self/fd/1", "-")
 
 	cmd.Stdin = r
-	cmd.Stdout = w
+	cmd.Stdout = temp
 	cmd.Stderr = e
 
 	cmd.Dir = wd
 
-	return cmd.Run()
+	copyTemp := func() error {
+		_, err := io.Copy(w, temp)
+		return err
+	}
+
+	return multierr.Combine(
+		cmd.Run(),
+		copyTemp(),
+		temp.Close(),
+	)
 }
 
 func (c cpp) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
