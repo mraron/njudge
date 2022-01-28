@@ -25,7 +25,7 @@ func GetStatusPage(DB *sqlx.DB, page, perPage int, order QueryMod, query []Query
 		return nil, err
 	}
 
-	pages, err := pagination.Links(page, perPage, cnt, qu)
+	pages, err := pagination.LinksWithCountLimit(page, perPage, cnt, qu, 6)
 	if err != nil {
 		return nil, err
 	}

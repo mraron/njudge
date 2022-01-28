@@ -41,6 +41,7 @@ func Links(page, perPage int, cnt int64, qu url.Values) ([]Link, error){
 		pages[i] = Link{strconv.Itoa(i), false, false, "?"+qu.Encode()}
 		if i==page {
 			pages[i].Active = true
+			pages[i].Disabled = true
 		}
 	}
 	pages[len(pages)-1] = Link{"&raquo;", false, true, "#"}
@@ -56,4 +57,52 @@ func Links(page, perPage int, cnt int64, qu url.Values) ([]Link, error){
 	}
 
 	return pages, nil
+}
+
+func abs(x int) int {
+	if x<0 {
+		return -x
+	}
+
+	return x
+}
+
+func LinksWithCountLimit(page, perPage int, cnt int64, qu url.Values, pageLimit int) ([]Link, error) {
+	links, err := Links(page, perPage, cnt, qu)
+	if err != nil {
+		return links, err
+	}
+
+	empty := Link{"...", false, true, "#"}
+
+	ans := make([]Link, 0)
+	ans = append(ans, links[0])
+
+	for i:=1;i<len(links)-1;i++ {
+		if i==1 {
+			ans = append(ans, links[i])
+			if abs(i-page)>pageLimit+1 {
+				ans = append(ans, empty)
+			}
+			continue
+		}
+
+		if i==len(links)-2 {
+			if abs(i-page)>pageLimit+1 {
+				ans = append(ans, empty)
+
+			}
+			ans = append(ans, links[i])
+			continue
+		}
+
+		if abs(i-page)>pageLimit {
+			continue
+		}
+
+		ans = append(ans, links[i])
+	}
+
+	ans = append(ans, links[len(links)-1])
+	return ans, nil
 }
