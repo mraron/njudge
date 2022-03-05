@@ -19,6 +19,14 @@ type Status struct {
 
 //@TODO add separated logger for problem
 
+func truncate(s string, to int) string {
+	if len(s) < to {
+		return s
+	}
+
+	return s[:to-1] + "..."
+}
+
 func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Language, sandboxProvider *language.SandboxProvider, c Callbacker) error {
 	logger.Print("Started Judge")
 
@@ -76,7 +84,7 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 		logger.Print("Compile got error: ", err)
 		st := problems.Status{}
 		st.Compiled = false
-		st.CompilerOutput = err.Error() + stderr.String()
+		st.CompilerOutput = err.Error() + "\n" + truncate(stderr.String(), 1024)
 		return c.Callback("", st, true)
 	}
 

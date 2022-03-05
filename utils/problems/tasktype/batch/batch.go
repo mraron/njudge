@@ -33,10 +33,7 @@ func (b Batch) Compile(jinfo problems.Judgeable, sandbox language.Sandbox, lang 
 	}
 
 	buf := &bytes.Buffer{}
-
-	err := lang.Compile(sandbox, language.File{"main", src}, buf, dest, nil)
-	fmt.Println(err)
-	if err != nil {
+	if err := lang.Compile(sandbox, language.File{"main", src}, buf, dest, nil); err != nil {
 		return nil, err
 	}
 
