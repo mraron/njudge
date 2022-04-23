@@ -21,14 +21,15 @@ func Execute() {
 	}
 }
 
-func initConfig() {
-	viper.SetEnvPrefix("njudge")
+func init() {
+	cobra.OnInitialize(initConfig)
+}
 
-	viper.SetConfigName("web")
-	viper.AddConfigPath(".")
-	viper.ReadInConfig()
+func initConfig() {
+	fmt.Println("??")
 
 	viper.SetConfigName("judge")
 	viper.AddConfigPath(".")
+	viper.AutomaticEnv()
 	viper.MergeInConfig()
 }

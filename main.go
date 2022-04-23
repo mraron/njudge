@@ -28,6 +28,7 @@ func (m migrateLogger) Verbose() bool {
 
 func main() {
 	cmd.Execute()
+
 	return
 
 	app := cli.NewApp()
