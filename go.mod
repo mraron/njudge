@@ -26,6 +26,7 @@ require (
 	github.com/sendgrid/sendgrid-go v3.11.0+incompatible
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/spf13/afero v1.8.1
+	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.9.0
 	github.com/urfave/cli v1.22.5
 	github.com/volatiletech/null/v8 v8.1.2

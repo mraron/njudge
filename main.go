@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	_ "github.com/lib/pq"
+	"github.com/mraron/njudge/cmd"
 	"github.com/mraron/njudge/judge"
 	"github.com/mraron/njudge/web"
 	"github.com/urfave/cli"
@@ -26,6 +27,9 @@ func (m migrateLogger) Verbose() bool {
 }
 
 func main() {
+	cmd.Execute()
+	return
+
 	app := cli.NewApp()
 	app.Name = "njudge"
 	app.Usage = "CLI utility for njudge"
