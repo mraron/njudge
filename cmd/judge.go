@@ -1,0 +1,33 @@
+package cmd
+
+import (
+	"github.com/mraron/njudge/judge"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+)
+
+var JudgeCmd = &cobra.Command{
+	Use:   "judge",
+	Short: "start judge server",
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		viper.SetEnvPrefix("njudge")
+
+		viper.SetConfigName("judge")
+		viper.AddConfigPath(".")
+		viper.AutomaticEnv()
+		return viper.MergeInConfig()
+	},
+
+	RunE: func(cmd *cobra.Command, args []string) error {
+		s := judge.Server{}
+		if err := viper.Unmarshal(&s); err != nil {
+			return err
+		}
+
+		return s.Run()
+	},
+}
+
+func init() {
+	RootCmd.AddCommand(JudgeCmd)
+}

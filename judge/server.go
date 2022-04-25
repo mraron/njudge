@@ -37,17 +37,16 @@ import (
 	_ "github.com/mraron/njudge/utils/language/python3"
 )
 
-
 //@TODO use contexts and afero => tests
 
 type ServerStatus struct {
-	Id string `json:"id"`
-	Host string `json:"host"`
-	Port string `json:"port"`
-	Url string `json:"url"`
-	Load float64 `json:"load"`
+	Id          string        `json:"id" mapstructure:"id"`
+	Host        string        `json:"host" mapstructure:"host"`
+	Port        string        `json:"port" mapstructure:"port"`
+	Url         string        `json:"url"`
+	Load        float64       `json:"load"`
 	Uptime      time.Duration `json:"uptime"`
-	ProblemList []string `json:"problem_list"`
+	ProblemList []string      `json:"problem_list"`
 }
 
 func ParseServerStatus(s string) (res ServerStatus, err error) {
@@ -71,13 +70,13 @@ func (s ServerStatus) String() string {
 }
 
 type Server struct {
-	ServerStatus
+	ServerStatus `mapstructure:",squash"`
 
-	ProblemsDir string `json:"problems_dir"`
-	LogDir      string `json:"log_dir"`
-	SandboxIds  []int `json:"sandbox_ids"`
+	ProblemsDir string `json:"problems_dir" mapstructure:"problems_dir"`
+	LogDir      string `json:"log_dir" mapstructure:"log_dir"`
+	SandboxIds  []int  `json:"sandbox_ids" mapstructure:"sandobx_ids"`
 
-	PublicKeyLocation       string `json:"public_key"`
+	PublicKeyLocation string `json:"public_key" mapstructure:"public_key"`
 
 	ProblemStore problems.Store
 
@@ -120,7 +119,7 @@ func (s *Server) Run() error {
 		}
 	}
 
-	s.Url = "http://"+s.Host+":"+s.Port
+	s.Url = "http://" + s.Host + ":" + s.Port
 
 	e := echo.New()
 	e.Use(middleware.Logger())
@@ -261,7 +260,7 @@ func (s *Server) postJudge(c echo.Context) error {
 		s.queue <- sub
 		<-sub.done
 		return sub.c.(*WriterCallback).Error()
-	}else {
+	} else {
 		sub.c = NewHTTPCallback(sub.CallbackUrl)
 		s.queue <- sub
 		return c.String(http.StatusOK, "queued")
@@ -272,4 +271,3 @@ func (s Server) ToString() (string, error) {
 	val, err := json.Marshal(s)
 	return string(val), err
 }
-

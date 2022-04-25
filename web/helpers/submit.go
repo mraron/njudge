@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func Submit(cfg config.Server, DB* sqlx.DB, problemStore problems.Store, uid int, problemset, problem, language string, source []byte) (int, error) {
+func Submit(cfg config.Server, DB *sqlx.DB, problemStore problems.Store, uid int, problemset, problem, language string, source []byte) (int, error) {
 	var (
 		tx  *sql.Tx
 		id  int
@@ -23,13 +23,11 @@ func Submit(cfg config.Server, DB* sqlx.DB, problemStore problems.Store, uid int
 			panic(err)
 		}
 	}
-	ok := true
 
 	transaction := func() {
 		defer func() {
 			if p := recover(); p != nil {
 				tx.Rollback()
-				ok = false
 				err = p.(error)
 			}
 		}()
