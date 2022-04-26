@@ -22,11 +22,11 @@ func (m migrateLogger) Verbose() bool {
 	return m.verbose
 }
 
-var (
+var MigrateCmdArgs struct {
 	Up    bool
 	Down  bool
 	Steps int
-)
+}
 
 var MigrateCmd = &cobra.Command{
 	Use: "migrate",
@@ -48,18 +48,18 @@ var MigrateCmd = &cobra.Command{
 
 		m.Log = &migrateLogger{log.New(os.Stdout, "[migrate]", 0), false}
 
-		if Up {
+		if MigrateCmdArgs.Up {
 			err = m.Up()
 			if err != nil {
 				return err
 			}
-		} else if Down {
+		} else if MigrateCmdArgs.Down {
 			err = m.Down()
 			if err != nil {
 				return err
 			}
-		} else if Steps != 0 {
-			err = m.Steps(Steps)
+		} else if MigrateCmdArgs.Steps != 0 {
+			err = m.Steps(MigrateCmdArgs.Steps)
 			if err != nil {
 				return err
 			}
@@ -70,9 +70,9 @@ var MigrateCmd = &cobra.Command{
 }
 
 func init() {
-	MigrateCmd.Flags().BoolVar(&Up, "up", false, "runs up migrations")
-	MigrateCmd.Flags().BoolVar(&Down, "down", false, "runs down migrations")
-	MigrateCmd.Flags().IntVar(&Steps, "steps", 0, "runs `x` up/down migrations depending on the positivity")
+	MigrateCmd.Flags().BoolVar(&MigrateCmdArgs.Up, "up", false, "runs up migrations")
+	MigrateCmd.Flags().BoolVar(&MigrateCmdArgs.Down, "down", false, "runs down migrations")
+	MigrateCmd.Flags().IntVar(&MigrateCmdArgs.Steps, "steps", 0, "runs `x` up/down migrations depending on the positivity")
 
 	WebCmd.AddCommand(MigrateCmd)
 }
