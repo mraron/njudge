@@ -1,0 +1,50 @@
+services:
+  base:
+    build: .
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    ports:
+      - 5600:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./web/migrations/1_init.up.sql:/docker-entrypoint-initdb.d/create_tables.sql
+  web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile
+    ports:
+      - 5555:5555
+    env_file:
+      - web.env
+    depends_on:
+      - base
+      - db
+    volumes:
+      - problems:/njudge_problems
+    links:
+      - db
+      - judge
+  judge:
+    build:
+      context: .
+      dockerfile: judge/Dockerfile
+    env_file:
+      - judge.env
+    depends_on:
+      - base
+    volumes:
+      - problems:/njudge_problems
+      - logs:/njudge_logs
+volumes:
+  db:
+    driver: local
+  problems:
+    driver: local
+  submissions:
+    driver: local
+  logs:
+    driver: local

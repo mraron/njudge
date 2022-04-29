@@ -1,0 +1,9 @@
+{
+  "id": "default",
+  "host": "localhost",
+  "port": "8888",
+  "problems_dir": "/njudge_problems",
+  "public_key": "./key.pub.pem",
+  "log_dir":"/njudge_logs",
+  "sandbox_ids": [0,1,2]
+}
