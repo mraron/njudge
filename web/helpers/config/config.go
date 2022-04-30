@@ -10,9 +10,9 @@ import (
 )
 
 type Server struct {
-	Mode string
+	Mode           string
 	Hostname       string
-	Url string
+	Url            string
 	Port           string
 	ProblemsDir    string
 	SubmissionsDir string
@@ -28,19 +28,19 @@ type Server struct {
 	}
 
 	Sendgrid struct {
-		Enabled bool
-		ApiKey string `json:"api_key"`
-		SenderName string `json:"sender_name"`
-		SenderAddress string `json:"sender_address"`
+		Enabled       bool
+		ApiKey        string `json:"api_key" mapstructure:"api_key"`
+		SenderName    string `json:"sender_name" mapstructure:"sender_name"`
+		SenderAddress string `json:"sender_address" mapstructure:"sender_address"`
 	}
 
 	SMTP struct {
-		Enabled bool
-		MailAccount         string `json:"mail_account"`
-		MailServerHost      string `json:"mail_server"`
-		MailServerPort      string `json:"mail_port"`
-		MailAccountPassword string `json:"mail_password"`
-	} `json:"smtp"`
+		Enabled             bool
+		MailAccount         string `json:"mail_account" mapstructure:"mail_account"`
+		MailServerHost      string `json:"mail_server" mapstructure:"mail_server"`
+		MailServerPort      string `json:"mail_port" mapstructure:"mail_port"`
+		MailAccountPassword string `json:"mail_password" mapstructure:"mail_port"`
+	} `json:"smtp" mapstructure:"smtp"`
 
 	CustomHead string
 
@@ -55,8 +55,8 @@ type Server struct {
 }
 
 type Keys struct {
-	PrivateKeyLocation string `json:"private_key"`
-	PublicKeyLocation  string `json:"public_key"`
+	PrivateKeyLocation string `json:"private_key" mapstructure:"private_key"`
+	PublicKeyLocation  string `json:"public_key" mapstructure:"public_key"`
 	PrivateKey         *rsa.PrivateKey
 	PublicKey          *rsa.PublicKey
 }
