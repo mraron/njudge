@@ -50,7 +50,7 @@ type Problem struct {
 }
 
 func (p Problem) Name() string {
-	return filepath.Base(p.Path)
+	return p.TaskYAML.Name
 }
 
 func (p Problem) Titles() problems.Contents {
