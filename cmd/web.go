@@ -61,7 +61,7 @@ var SubmitCmd = &cobra.Command{
 		}
 
 		s.SetupEnvironment()
-		if err := s.ProblemStore.UpdateProblem(SubmitCmdArgs.Problem); err != nil {
+		if err := s.ProblemStore.Update(); err != nil {
 			return err
 		}
 
