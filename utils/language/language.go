@@ -55,7 +55,6 @@ type Language interface {
 	Id() string
 	Name() string
 	DefaultFileName() string
-	InsecureCompile(string, io.Reader, io.Writer, io.Writer) error
 	Compile(Sandbox, File, io.Writer, io.Writer, []File) error
 	Run(Sandbox, io.Reader, io.Reader, io.Writer, time.Duration, int) (Status, error)
 }
@@ -83,19 +82,19 @@ func (test LanguageTest) Run(t *testing.T) {
 	stderr := &bytes.Buffer{}
 
 	err = test.Language.Compile(sandbox, File{test.Language.DefaultFileName(), src}, bin, stderr, []File{})
-	stderr_content := stderr.String()
+	stderrContent := stderr.String()
 
-	if (test.ExpectedVerdict&VERDICT_CE == 0 && err != nil) || (test.ExpectedVerdict&VERDICT_CE != 0 && err == nil && stderr_content == "") {
-		t.Errorf("error: %v stderr: %s", err, stderr_content)
+	if (test.ExpectedVerdict&VERDICT_CE == 0 && err != nil) || (test.ExpectedVerdict&VERDICT_CE != 0 && err == nil && stderrContent == "") {
+		t.Errorf("error: %v stderr: %s", err, stderrContent)
 	}
 
 	if test.ExpectedVerdict&VERDICT_CE == 0 {
 		output := &bytes.Buffer{}
 		status, err := test.Language.Run(sandbox, bin, bytes.NewBufferString(test.Input), output, test.TimeLimit, test.MemoryLimit)
 
-		output_content := output.String()
-		if status.Verdict&test.ExpectedVerdict == 0 || err != nil || output_content != test.ExpectedOutput {
-			t.Errorf("EXPECTED %s got %s, source %q\n error: %v status: %v output: %q", test.ExpectedVerdict, status.Verdict, test.Source, err, status, output_content)
+		outputContent := output.String()
+		if status.Verdict&test.ExpectedVerdict == 0 || err != nil || outputContent != test.ExpectedOutput {
+			t.Errorf("EXPECTED %s got %s, source %q\n error: %v status: %v output: %q", test.ExpectedVerdict, status.Verdict, test.Source, err, status, outputContent)
 		}
 	}
 

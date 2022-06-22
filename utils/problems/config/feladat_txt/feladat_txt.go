@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/mraron/njudge/utils/language"
+	"github.com/mraron/njudge/utils/language/cpp14"
 	"github.com/mraron/njudge/utils/problems"
 	"io/ioutil"
 	"os"
@@ -163,7 +164,7 @@ func (p Problem) Check(tc *problems.Testcase) error {
 		var spltd []string
 		if strings.Contains(str, ":") {
 			spltd = strings.Split(strings.TrimSpace(str), ":")
-		}else {
+		} else {
 			spltd = strings.Split(strings.TrimSpace(str), "\n")
 		}
 
@@ -175,7 +176,7 @@ func (p Problem) Check(tc *problems.Testcase) error {
 
 			if strings.TrimSpace(curr[len(curr)-2]) == "1" {
 				score = score + float64(p.Points[i*p.TestCount+tc.Index-1])
-			}else {
+			} else {
 				allOk = false
 			}
 		}
@@ -300,24 +301,20 @@ func parser(path string) (problems.Problem, error) {
 	if _, err := os.Stat(filepath.Join(path, "ellen")); os.IsNotExist(err) {
 		if checkerBinary, err := os.Create(filepath.Join(path, "ellen")); err == nil {
 			defer checkerBinary.Close()
+			if checkerFile, err := os.Open(filepath.Join(path, "ellen.cpp")); err == nil {
+				defer checkerFile.Close()
 
-			if lang := language.Get("cpp11"); lang != nil {
-				if checkerFile, err := os.Open(filepath.Join(path, "ellen.cpp")); err == nil {
-					defer checkerFile.Close()
+				if err := cpp14.Lang.InsecureCompile(path, checkerFile, checkerBinary, os.Stderr); err != nil {
+					return nil, err
+				}
 
-					if err := lang.InsecureCompile(path, checkerFile, checkerBinary, os.Stderr); err != nil {
-						return nil, err
-					}
-
-					if err := os.Chmod(filepath.Join(path, "ellen"), os.ModePerm); err != nil {
-						return nil, err
-					}
-				} else {
+				if err := os.Chmod(filepath.Join(path, "ellen"), os.ModePerm); err != nil {
 					return nil, err
 				}
 			} else {
-				return nil, errors.New("error while parsing feladat_txt problem can't compile feladat_txt checker because there's no cpp11 compiler")
+				return nil, err
 			}
+
 		} else {
 			return nil, err
 		}

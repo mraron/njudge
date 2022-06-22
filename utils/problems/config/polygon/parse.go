@@ -1,41 +1,38 @@
 package polygon
 
 import (
+	"bytes"
 	"encoding/xml"
 	"errors"
-	"github.com/mraron/njudge/utils/language"
+	"fmt"
+	"github.com/mraron/njudge/utils/language/cpp14"
 	"github.com/mraron/njudge/utils/problems"
 	"github.com/spf13/afero"
+	"go.uber.org/multierr"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-func compileIfNotCompiled(fs afero.Fs, path string, src, dst string) error {
+func compileIfNotCompiled(fs afero.Fs, wd, src, dst string) error {
 	if src == "" {
 		return nil
 	}
 
-	if st, err := fs.Stat(filepath.Join(path, dst)); os.IsNotExist(err) || st.Size() == 0 {
-		if binary, err := fs.Create(filepath.Join(path, dst)); err == nil {
-			defer binary.Close()
-
-			if lang := language.Get("cpp14"); lang != nil {
-				if file, err := fs.Open(filepath.Join(path, src)); err == nil {
-					defer file.Close()
-					if err := lang.InsecureCompile(filepath.Join(path, "files"), file, binary, os.Stderr); err != nil {
-						return err
-					}
-
-					if err := fs.Chmod(filepath.Join(path, dst), os.ModePerm); err != nil {
-						return err
-					}
-				} else {
-					return err
+	if st, err := fs.Stat(dst); os.IsNotExist(err) || st.Size() == 0 {
+		if binary, err := fs.Create(dst); err == nil {
+			if file, err := fs.Open(src); err == nil {
+				var buf bytes.Buffer
+				if err := cpp14.Lang.InsecureCompile(wd, file, binary, &buf); err != nil {
+					return multierr.Combine(err, binary.Close(), file.Close(), fmt.Errorf("compile error: %v", buf.String()))
+				}
+				if err := fs.Chmod(dst, os.ModePerm); err != nil {
+					return multierr.Combine(err, binary.Close(), file.Close())
 				}
 			} else {
-				return errors.New("can't compile file, no cpp14 compiler")
+				return multierr.Combine(err, binary.Close())
 			}
 		} else {
 			return err
@@ -60,7 +57,7 @@ func CompileBinaries(compile bool) Option {
 }
 
 type config struct {
-	fs afero.Fs
+	fs              afero.Fs
 	compileBinaries bool
 }
 
@@ -68,7 +65,7 @@ func newConfig() *config {
 	return &config{fs: afero.NewOsFs(), compileBinaries: true}
 }
 
-func ParserAndIdentifier(opts... Option) (problems.ConfigParser, problems.ConfigIdentifier) {
+func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.ConfigIdentifier) {
 	cfg := newConfig()
 	for _, opt := range opts {
 		opt(cfg)
@@ -132,11 +129,23 @@ func ParserAndIdentifier(opts... Option) (problems.ConfigParser, problems.Config
 		}
 
 		if cfg.compileBinaries {
-			if err := compileIfNotCompiled(cfg.fs, p.Path, p.Assets.Checker.Source.Path, "check"); err != nil {
+			workingDirectory := p.Path
+			if _, err := os.Stat(filepath.Join(p.Path, "files")); !errors.Is(err, fs.ErrNotExist) {
+				workingDirectory = filepath.Join(p.Path, "files")
+			}
+
+			checkerPath := p.Assets.Checker.Source.Path
+			if checkerPath == "" {
+				checkerPath = "check.cpp"
+			}
+			if err := compileIfNotCompiled(cfg.fs, workingDirectory, filepath.Join(p.Path, checkerPath), filepath.Join(p.Path, "check")); err != nil {
 				return nil, err
 			}
-			if err := compileIfNotCompiled(cfg.fs, p.Path, p.Assets.Interactor.Source.Path, "files/interactor"); err != nil {
-				return nil, err
+
+			if p.Assets.Interactor.Source.Path != "" {
+				if err := compileIfNotCompiled(cfg.fs, workingDirectory, filepath.Join(p.Path, p.Assets.Interactor.Source.Path), filepath.Join(p.Path, "files/interactor")); err != nil {
+					return nil, err
+				}
 			}
 		}
 
@@ -147,7 +156,7 @@ func ParserAndIdentifier(opts... Option) (problems.ConfigParser, problems.Config
 				return nil, err
 			}
 
-			p.AttachmentsList = append(p.AttachmentsList, problems.Attachment{Name:val.Name, Contents: contents})
+			p.AttachmentsList = append(p.AttachmentsList, problems.Attachment{Name: val.Name, Contents: contents})
 		}
 
 		return p, nil
