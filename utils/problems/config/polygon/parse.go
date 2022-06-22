@@ -28,6 +28,13 @@ func compileIfNotCompiled(fs afero.Fs, wd, src, dst string) error {
 				if err := cpp14.Lang.InsecureCompile(wd, file, binary, &buf); err != nil {
 					return multierr.Combine(err, binary.Close(), file.Close(), fmt.Errorf("compile error: %v", buf.String()))
 				}
+				st, err = fs.Stat("check")
+				if err == nil {
+					fmt.Println(st.Name(), st.Size())
+				} else {
+					return err
+				}
+
 				if err := fs.Chmod(dst, os.ModePerm); err != nil {
 					return multierr.Combine(err, binary.Close(), file.Close())
 				}
@@ -37,6 +44,8 @@ func compileIfNotCompiled(fs afero.Fs, wd, src, dst string) error {
 		} else {
 			return err
 		}
+	} else {
+		return err
 	}
 
 	return nil
