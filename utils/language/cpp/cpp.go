@@ -11,25 +11,25 @@ import (
 	"time"
 )
 
-type cpp struct {
+type Cpp struct {
 	id   string
 	name string
 	ver  string
 }
 
-func (c cpp) Id() string {
+func (c Cpp) Id() string {
 	return c.id
 }
 
-func (c cpp) Name() string {
+func (c Cpp) Name() string {
 	return c.name
 }
 
-func (c cpp) DefaultFileName() string {
+func (c Cpp) DefaultFileName() string {
 	return "main.cpp"
 }
 
-func (c cpp) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) error {
+func (c Cpp) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) error {
 	temp, err := ioutil.TempFile("/tmp", "cpptempfile")
 	if err != nil {
 		return err
@@ -55,7 +55,7 @@ func (c cpp) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) e
 	)
 }
 
-func (c cpp) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
+func (c Cpp) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
 	err := s.CreateFile("main.cpp", r.Source)
 	if err != nil {
 		return err
@@ -89,7 +89,7 @@ func (c cpp) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Writ
 	return err
 }
 
-func (cpp) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (language.Status, error) {
+func (Cpp) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (language.Status, error) {
 	stat := language.Status{}
 	stat.Verdict = language.VERDICT_XX
 
@@ -105,5 +105,5 @@ func (cpp) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, tl
 }
 
 func New(id, name, ver string) language.Language {
-	return cpp{id, name, ver}
+	return Cpp{id, name, ver}
 }

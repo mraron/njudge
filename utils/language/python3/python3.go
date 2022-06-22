@@ -3,7 +3,6 @@ package python3
 import (
 	"github.com/mraron/njudge/utils/language"
 	"io"
-	"os"
 	"time"
 )
 
@@ -38,7 +37,7 @@ func (python3) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer
 		return stat, err
 	}
 
-	if st, err := s.Env().TimeLimit(tl).MemoryLimit(ml/1024).Stdin(stdin).Stdout(stdout).Stderr(os.Stderr).WorkingDirectory(s.Pwd()).Run("/usr/bin/python3 a.out", true); err != nil {
+	if st, err := s.Env().TimeLimit(tl).MemoryLimit(ml/1024).Stdin(stdin).Stdout(stdout).WorkingDirectory(s.Pwd()).Run("/usr/bin/python3 a.out", true); err != nil {
 		return st, err
 	} else {
 		stat = st

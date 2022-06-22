@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/mraron/njudge/utils/language"
+	"github.com/mraron/njudge/utils/language/cpp14"
 	"github.com/mraron/njudge/utils/problems"
 	"gopkg.in/yaml.v2"
 	"io"
@@ -50,7 +51,7 @@ type Problem struct {
 }
 
 func (p Problem) Name() string {
-	return filepath.Base(p.Path)
+	return p.TaskYAML.Name
 }
 
 func (p Problem) Titles() problems.Contents {
@@ -306,18 +307,14 @@ func parser(path string) (problems.Problem, error) {
 		if checkerBinary, err := os.Create(checkerPath); err == nil {
 			defer checkerBinary.Close()
 
-			if lang := language.Get("cpp14"); lang != nil {
-				if checkerFile, err := os.Open(checkerPath + ".cpp"); err == nil {
-					defer checkerFile.Close()
+			if checkerFile, err := os.Open(checkerPath + ".cpp"); err == nil {
+				defer checkerFile.Close()
 
-					if err := lang.InsecureCompile(filepath.Join(path, "check"), checkerFile, checkerBinary, os.Stderr); err != nil {
-						return nil, err
-					}
+				if err := cpp14.Lang.InsecureCompile(filepath.Join(path, "check"), checkerFile, checkerBinary, os.Stderr); err != nil {
+					return nil, err
+				}
 
-					if err := os.Chmod(checkerPath, os.ModePerm); err != nil {
-						return nil, err
-					}
-				} else {
+				if err := os.Chmod(checkerPath, os.ModePerm); err != nil {
 					return nil, err
 				}
 			} else {

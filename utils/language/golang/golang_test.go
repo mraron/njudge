@@ -6,7 +6,6 @@ import (
 	"time"
 )
 
-
 const (
 	GOLANG_aplusb = `package main
 import (
@@ -62,13 +61,12 @@ func main() {
 
 func TestCompileAndRun(t *testing.T) {
 	for _, test := range []language.LanguageTest{
-		{language.Get("golang"), GOLANG_aplusb, language.VERDICT_OK, "1 2", "3\n", 1*time.Second,  1024*1024*1024},
-		{language.Get("golang"), GOLANG_ce, language.VERDICT_CE, "", "", 1*time.Second,  1024*1024*1024},
-		{language.Get("golang"), GOLANG_print, language.VERDICT_OK, "", "Hello world\n", 1*time.Second,  1024*1024*1024},
-		{language.Get("golang"), GOLANG_tl, language.VERDICT_TL, "", "", 100*time.Millisecond,  2048*1024*1024},
-		{language.Get("golang"), GOLANG_re, language.VERDICT_RE, "", "", 1000*time.Millisecond,  1024*1024*1024},
-		{language.Get("golang"), GOLANG_rediv0, language.VERDICT_RE, "", "", 1000*time.Millisecond,  1024*1024*1024},
-
+		{language.Get("golang"), GOLANG_aplusb, language.VERDICT_OK, "1 2", "3\n", 1 * time.Second, 2 * 512 * 1024 * 1024},
+		{language.Get("golang"), GOLANG_ce, language.VERDICT_CE, "", "", 1 * time.Second, 2 * 512 * 1024 * 1024},
+		{language.Get("golang"), GOLANG_print, language.VERDICT_OK, "", "Hello world\n", 1 * time.Second, 2 * 512 * 1024 * 1024},
+		{language.Get("golang"), GOLANG_tl, language.VERDICT_TL, "", "", 100 * time.Millisecond, 2 * 512 * 1024 * 1024},
+		{language.Get("golang"), GOLANG_re, language.VERDICT_RE | language.VERDICT_TL, "", "", 1000 * time.Millisecond, 2 * 512 * 1024 * 1024},
+		{language.Get("golang"), GOLANG_rediv0, language.VERDICT_RE, "", "", 1000 * time.Millisecond, 2 * 512 * 1024 * 1024},
 	} {
 		test.Run(t)
 	}
