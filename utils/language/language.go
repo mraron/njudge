@@ -5,7 +5,6 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"math/rand"
 	"sort"
 	"testing"
 	"time"
@@ -14,13 +13,31 @@ import (
 type Verdict int
 
 const (
-	VERDICT_OK Verdict = iota
+	VERDICT_OK Verdict = 1 << iota
 	VERDICT_TL
 	VERDICT_ML
 	VERDICT_RE
 	VERDICT_XX
 	VERDICT_CE
 )
+
+func (v Verdict) String() string {
+	switch v {
+	case VERDICT_OK:
+		return "OK"
+	case VERDICT_TL:
+		return "TL"
+	case VERDICT_ML:
+		return "ML"
+	case VERDICT_RE:
+		return "RE"
+	case VERDICT_XX:
+		return "XX"
+	case VERDICT_CE:
+		return "CE"
+	}
+	return "??"
+}
 
 type File struct {
 	Name   string
@@ -44,50 +61,50 @@ type Language interface {
 }
 
 type LanguageTest struct {
-	Language Language
-	Source string
+	Language        Language
+	Source          string
 	ExpectedVerdict Verdict
-	Input string
-	ExpectedOutput string
-	TimeLimit time.Duration
-	MemoryLimit int
+	Input           string
+	ExpectedOutput  string
+	TimeLimit       time.Duration
+	MemoryLimit     int
 }
 
 func (test LanguageTest) Run(t *testing.T) {
-	rand.Seed(time.Now().UnixNano())
-	sandbox := NewIsolateSandbox(500+rand.Intn(100))
+	sandbox := NewDummySandbox()
 
-	sandbox.Init(log.New(ioutil.Discard, "", 0))
+	err := sandbox.Init(log.New(ioutil.Discard, "", 0))
+	if err != nil {
+		t.Error(err)
+	}
 
 	src := bytes.NewBufferString(test.Source)
 	bin := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 
-	err := test.Language.Compile(sandbox, File{test.Language.DefaultFileName(), src}, bin, stderr, []File{})
-
+	err = test.Language.Compile(sandbox, File{test.Language.DefaultFileName(), src}, bin, stderr, []File{})
 	stderr_content := stderr.String()
 
-	if (test.ExpectedVerdict != VERDICT_CE && err != nil) || (test.ExpectedVerdict == VERDICT_CE && (err==nil || stderr_content=="")){
-		t.Fatalf("error: %s stderr: %s", err, stderr_content)
+	if (test.ExpectedVerdict&VERDICT_CE == 0 && err != nil) || (test.ExpectedVerdict&VERDICT_CE != 0 && err == nil && stderr_content == "") {
+		t.Errorf("error: %v stderr: %s", err, stderr_content)
 	}
 
-	if test.ExpectedVerdict != VERDICT_CE {
+	if test.ExpectedVerdict&VERDICT_CE == 0 {
 		output := &bytes.Buffer{}
 		status, err := test.Language.Run(sandbox, bin, bytes.NewBufferString(test.Input), output, test.TimeLimit, test.MemoryLimit)
 
 		output_content := output.String()
-		if status.Verdict != test.ExpectedVerdict || err != nil || output_content != test.ExpectedOutput {
-			t.Fatalf("source %s\n error: %s status: %v output: %q", test.Source, err, status, output_content)
+		if status.Verdict&test.ExpectedVerdict == 0 || err != nil || output_content != test.ExpectedOutput {
+			t.Errorf("EXPECTED %s got %s, source %q\n error: %v status: %v output: %q", test.ExpectedVerdict, status.Verdict, test.Source, err, status, output_content)
 		}
 	}
 
 	err = sandbox.Cleanup()
 	if err != nil {
-		t.Fatalf("cleanup err: %s", err.Error())
+		t.Errorf("cleanup err: %v", err.Error())
 	}
 
 }
-
 
 var langList map[string]Language
 
