@@ -17,7 +17,8 @@ jobs:
       uses: actions/setup-go@v3
       with:
         go-version: 1.18
-
+    - name: Install dependencies
+      run: sudo apt-get install -y cython3 pandoc gccgo pypy3
     - name: Build
       run: go build -v ./...
 
