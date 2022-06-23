@@ -10,13 +10,12 @@ import (
 )
 
 type Server struct {
-	Mode           string
-	Hostname       string
-	Url            string
-	Port           string
-	ProblemsDir    string
-	SubmissionsDir string
-	TemplatesDir   string
+	Mode         string
+	Hostname     string
+	Url          string
+	Port         string
+	ProblemsDir  string
+	TemplatesDir string
 
 	CookieSecret string
 

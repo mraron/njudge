@@ -5,7 +5,6 @@
   "url": "http://localhost:5555",
   "problemsDir": "/njudge_problems",
   "templatesDir": "./templates",
-  "submissionsDir": "/njudge_submissions",
   "gluePort": "3000",
   "DBName": "postgres",
   "DBAccount": "postgres",
