@@ -1,53 +1,57 @@
 package task_yaml
 
 import (
+	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
-	"github.com/friendsofgo/errors"
 	"github.com/mraron/njudge/utils/language"
+	"github.com/mraron/njudge/utils/language/cpp14"
 	"github.com/mraron/njudge/utils/problems"
 	"gopkg.in/yaml.v2"
+	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 )
 
 type TaskYAML struct {
-	Name string `yaml:"name"`
-	Title string
-	TimeLimit float64 `yaml:"time_limit"`
-	MemoryLimit int `yaml:"memory_limit"`
-	InputCount int `yaml:"n_input"`
-	Infile string
-	Outfile string
-	PrimaryLanguage string `yaml:"primary_language"`
-	TokenMode string `yaml:"token_mode"`
-	MaxSubmissionCount int `yaml:"max_submission_number"`
-	PublicTestcases string `yaml:"public_testcases"`
-	FeedbackLevel string `yaml:"feedback_level"`
-	ScoreType string `yaml:"score_type"`
+	Name                string `yaml:"name"`
+	Title               string
+	TimeLimit           float64 `yaml:"time_limit"`
+	MemoryLimit         int     `yaml:"memory_limit"`
+	InputCount          int     `yaml:"n_input"`
+	Infile              string
+	Outfile             string
+	PrimaryLanguage     string   `yaml:"primary_language"`
+	TokenMode           string   `yaml:"token_mode"`
+	MaxSubmissionCount  int      `yaml:"max_submission_number"`
+	PublicTestcases     string   `yaml:"public_testcases"`
+	FeedbackLevel       string   `yaml:"feedback_level"`
+	ScoreType           string   `yaml:"score_type"`
 	ScoreTypeParameters [][2]int `yaml:"score_type_parameters"`
-	ScoreMode string `yaml:"score_mode"`
-	TotalValue int `yaml:"total_value"`
+	ScoreMode           string   `yaml:"score_mode"`
+	TotalValue          int      `yaml:"total_value"`
 }
 
 type Problem struct {
 	TaskYAML
 
-	StatementList problems.Contents
+	StatementList  problems.Contents
 	AttachmentList []problems.Attachment
 
-	InputPathPattern string
+	InputPathPattern  string
 	AnswerPathPattern string
 
 	Path string
 }
 
 func (p Problem) Name() string {
-	return filepath.Base(p.Path)
+	return p.TaskYAML.Name
 }
 
 func (p Problem) Titles() problems.Contents {
@@ -131,7 +135,6 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 		subtasks[subtask] = "subtask" + strconv.Itoa(subtask+1)
 		tc.Group = "subtask" + strconv.Itoa(subtask+1)
 
-
 		if len(tcByGroup[tc.Group]) == 0 {
 			tcByGroup[tc.Group] = make([]problems.Testcase, 0)
 			tc.MaxScore = float64(p.ScoreTypeParameters[subtask][0])
@@ -153,11 +156,8 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 		}
 	}
 
-
-
 	return &ans, nil
 }
-
 
 func (p Problem) Check(tc *problems.Testcase) error {
 	checkerPath := filepath.Join(p.Path, "check", "checker")
@@ -169,16 +169,16 @@ func (p Problem) Check(tc *problems.Testcase) error {
 	cmd.Stderr = &stderr
 
 	if err := cmd.Run(); err != nil {
-		return errors.Wrap(err, "can't check task_yaml task")
+		return fmt.Errorf("can't check task_yaml task: %w", err)
 	}
 
 	fmt.Fscanf(&stdout, "%f", &tc.Score)
 
 	if tc.Score == 1.0 {
 		tc.VerdictName = problems.VERDICT_AC
-	}else if tc.Score > 0 {
+	} else if tc.Score > 0 {
 		tc.VerdictName = problems.VERDICT_PC
-	}else {
+	} else {
 		tc.VerdictName = problems.VERDICT_WA
 	}
 
@@ -194,6 +194,74 @@ func (p Problem) Files() []problems.File {
 
 func (p Problem) TaskTypeName() string {
 	return "batch"
+}
+
+func parseGen(r io.Reader) (int, [][2]int, error) {
+	var err error
+	subtasks, testcases, points := make([][2]int, 0), 0, -1
+	inputCount := 0
+
+	sc := bufio.NewScanner(r)
+	for sc.Scan() {
+		line := strings.TrimSpace(sc.Text())
+		splitted := strings.SplitN(line, "#", 2)
+
+		if len(splitted) == 1 {
+			if splitted[0] != "" {
+				testcases++
+				inputCount++
+			}
+		} else {
+			testcase, comment := splitted[0], splitted[1]
+			testcase, comment = strings.TrimSpace(testcase), strings.TrimSpace(comment)
+
+			testcaseDetected := len(testcase) > 0
+			copyTestcaseDetected := strings.HasPrefix(comment, "COPY:")
+			subtaskDetected := strings.HasPrefix(comment, "ST:")
+
+			cnt := 0
+			if testcaseDetected {
+				cnt++
+			}
+			if copyTestcaseDetected {
+				cnt++
+			}
+			if subtaskDetected {
+				cnt++
+			}
+
+			if cnt > 1 {
+				return -1, nil, errors.New("multiple commands on one line of GEN file")
+			}
+
+			if testcaseDetected || copyTestcaseDetected {
+				testcases++
+				inputCount++
+			}
+
+			if subtaskDetected {
+				if points == -1 {
+					if testcases > 0 {
+						return -1, nil, errors.New("trailing testcases")
+					}
+				} else {
+					subtasks = append(subtasks, [2]int{points, testcases})
+				}
+
+				testcases = 0
+				if points, err = strconv.Atoi(strings.TrimSpace(comment[3:])); err != nil {
+					return -1, nil, err
+				}
+			}
+		}
+	}
+
+	if err = sc.Err(); err != nil {
+		return -1, nil, err
+	}
+
+	subtasks = append(subtasks, [2]int{points, testcases})
+	return inputCount, subtasks, nil
 }
 
 func parser(path string) (problems.Problem, error) {
@@ -215,6 +283,22 @@ func parser(path string) (problems.Problem, error) {
 		return nil, err
 	}
 
+	genPath := filepath.Join(p.Path, "gen", "GEN")
+	if _, err = os.Stat(genPath); err == nil {
+		gen, err := os.Open(genPath)
+		if err != nil {
+			return nil, err
+		}
+
+		inputCount, subtasks, err := parseGen(gen)
+		if err != nil {
+			return nil, err
+		}
+
+		p.InputCount = inputCount
+		p.ScoreTypeParameters = subtasks
+	}
+
 	p.StatementList = make([]problems.Content, 0)
 	p.StatementList = append(p.StatementList, problems.Content{"hungarian", statementPDF, "application/pdf"})
 
@@ -223,18 +307,14 @@ func parser(path string) (problems.Problem, error) {
 		if checkerBinary, err := os.Create(checkerPath); err == nil {
 			defer checkerBinary.Close()
 
-			if lang := language.Get("cpp14"); lang != nil {
-				if checkerFile, err := os.Open(checkerPath+".cpp"); err == nil {
-					defer checkerFile.Close()
+			if checkerFile, err := os.Open(checkerPath + ".cpp"); err == nil {
+				defer checkerFile.Close()
 
-					if err := lang.InsecureCompile(filepath.Join(path, "check"), checkerFile, checkerBinary, os.Stderr); err != nil {
-						return nil, err
-					}
+				if err := cpp14.Lang.InsecureCompile(filepath.Join(path, "check"), checkerFile, checkerBinary, os.Stderr); err != nil {
+					return nil, err
+				}
 
-					if err := os.Chmod(checkerPath, os.ModePerm); err != nil {
-						return nil, err
-					}
-				} else {
+				if err := os.Chmod(checkerPath, os.ModePerm); err != nil {
 					return nil, err
 				}
 			} else {
@@ -257,7 +337,7 @@ func parser(path string) (problems.Problem, error) {
 				return nil, err
 			}
 
-			p.AttachmentList = append(p.AttachmentList, problems.Attachment{file.Name(),cont})
+			p.AttachmentList = append(p.AttachmentList, problems.Attachment{file.Name(), cont})
 		}
 	}
 

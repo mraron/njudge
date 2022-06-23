@@ -63,15 +63,15 @@ int main() {
 
 func TestCompileAndRun(t *testing.T) {
 	for _, test := range []language.LanguageTest{
-		{language.Get("cpp14"), CPP14_aplusb, language.VERDICT_OK, "1 2", "3\n", 1*time.Second,  128*1024*1024},
-		{language.Get("cpp14"), CPP14_ce, language.VERDICT_CE, "", "", 1*time.Second,  128*1024*1024},
-		{language.Get("cpp14"), CPP14_print, language.VERDICT_OK, "", "Hello world", 1*time.Second,  128*1024*1024},
-		{language.Get("cpp14"), CPP14_tl, language.VERDICT_TL, "", "", 100*time.Millisecond,  128*1024*1024},
-		{language.Get("cpp14"), CPP14_re, language.VERDICT_RE, "", "", 1000*time.Millisecond,  128*1024*1024},
-		{language.Get("cpp14"), CPP14_rediv0, language.VERDICT_RE, "", "", 1000*time.Millisecond,  128*1024*1024},
-		{language.Get("cpp14"), CPP14_newfromcpp11, language.VERDICT_OK, "", "", 100*time.Millisecond, 128*1024*1024},
-		{language.Get("cpp14"), CPP14_sleep, language.VERDICT_TL, "", "", 2*time.Second, 128*1024*1024},
-		{language.Get("cpp14"), CPP14_smallsleep, language.VERDICT_OK, "", "", 2*time.Second, 128*1024*1024},
+		{language.Get("cpp14"), CPP14_aplusb, language.VERDICT_OK, "1 2", "3\n", 1 * time.Second, 128 * 1024 * 1024},
+		{language.Get("cpp14"), CPP14_ce, language.VERDICT_CE, "", "", 1 * time.Second, 128 * 1024 * 1024},
+		{language.Get("cpp14"), CPP14_print, language.VERDICT_OK, "", "Hello world", 1 * time.Second, 128 * 1024 * 1024},
+		{language.Get("cpp14"), CPP14_tl, language.VERDICT_TL, "", "", 100 * time.Millisecond, 128 * 1024 * 1024},
+		{language.Get("cpp14"), CPP14_re, language.VERDICT_RE, "", "", 1000 * time.Millisecond, 128 * 1024 * 1024},
+		{language.Get("cpp14"), CPP14_rediv0, language.VERDICT_RE, "", "", 1000 * time.Millisecond, 128 * 1024 * 1024},
+		{language.Get("cpp14"), CPP14_newfromcpp11, language.VERDICT_OK, "", "", 100 * time.Millisecond, 128 * 1024 * 1024},
+		{language.Get("cpp14"), CPP14_sleep, language.VERDICT_TL, "", "", 2 * time.Second, 128 * 1024 * 1024},
+		{language.Get("cpp14"), CPP14_smallsleep, language.VERDICT_OK, "", "", 2 * time.Second, 128 * 1024 * 1024},
 	} {
 		test.Run(t)
 	}

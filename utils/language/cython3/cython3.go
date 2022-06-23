@@ -8,7 +8,6 @@ import (
 	"time"
 )
 
-
 type cython3 struct {
 }
 
@@ -40,7 +39,7 @@ func (c cython3) Compile(s language.Sandbox, r language.File, w io.Writer, e io.
 		return err
 	}
 
-	if _, err := s.SetMaxProcesses(200).Env().TimeLimit(10*time.Second).MemoryLimit(2560000).Stdout(errorStream).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/gcc -O2 -I/usr/include/python3.9 -o main main.c -lpython3.9 -lpthread -lm -lutil -ldl", false); err != nil {
+	if _, err := s.SetMaxProcesses(200).Env().TimeLimit(10*time.Second).MemoryLimit(2560000).Stdout(errorStream).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/gcc -O2 -I/usr/include/python3.8 -o main main.c -lpython3.8 -lpthread -lm -lutil -ldl", false); err != nil {
 		e.Write(errorStream.Bytes())
 		return err
 	}
