@@ -5,12 +5,14 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"github.com/mraron/njudge/utils/language"
 	"github.com/mraron/njudge/utils/language/cpp14"
 	"github.com/mraron/njudge/utils/problems"
 	"github.com/spf13/afero"
 	"go.uber.org/multierr"
 	"io/fs"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -25,7 +27,15 @@ func compileIfNotCompiled(fs afero.Fs, wd, src, dst string) error {
 		if binary, err := fs.Create(dst); err == nil {
 			if file, err := fs.Open(src); err == nil {
 				var buf bytes.Buffer
-				if err := cpp14.Lang.InsecureCompile(wd, file, binary, &buf); err != nil {
+				//if err := cpp14.Lang.InsecureCompile(wd, file, binary, &buf); err != nil {
+				s := language.NewDummySandbox()
+				if err := s.Init(log.New(ioutil.Discard, "", 0)); err != nil {
+					return multierr.Combine(err, binary.Close(), file.Close())
+				}
+				if err := cpp14.Lang.Compile(s, language.File{
+					Name:   filepath.Base(src),
+					Source: file,
+				}, binary, &buf, nil); err != nil {
 					return multierr.Combine(err, binary.Close(), file.Close(), fmt.Errorf("compile error: %v", buf.String()))
 				}
 
