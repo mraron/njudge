@@ -1,7 +1,6 @@
 package polygon
 
 import (
-	"fmt"
 	"github.com/mraron/njudge/utils/problems"
 	"github.com/spf13/afero"
 	"testing"
@@ -139,15 +138,10 @@ func TestCompileBinaries(t *testing.T) {
 		t.Error(err)
 	}
 
-	st, err := fs.Stat("check")
-	fmt.Println(st.Name(), st.Size())
-
 	if err := compileIfNotCompiled(fs, "", "check_syntaxerr.cpp", "check_syntaxerr"); err == nil {
 		t.Error("wanted error, but compiled fine")
 	}
 
-	st, err = fs.Stat("check")
-	fmt.Println(st.Name(), st.Size())
 	// check already exists because of the first compilation
 	if err := compileIfNotCompiled(fs, "", "check_syntaxerr.cpp", "check"); err != nil {
 		t.Error(err)

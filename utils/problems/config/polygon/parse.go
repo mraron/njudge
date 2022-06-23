@@ -27,7 +27,6 @@ func compileIfNotCompiled(fs afero.Fs, wd, src, dst string) error {
 		if binary, err := fs.Create(dst); err == nil {
 			if file, err := fs.Open(src); err == nil {
 				var buf bytes.Buffer
-				//if err := cpp14.Lang.InsecureCompile(wd, file, binary, &buf); err != nil {
 				s := language.NewDummySandbox()
 				if err := s.Init(log.New(ioutil.Discard, "", 0)); err != nil {
 					return multierr.Combine(err, binary.Close(), file.Close())
