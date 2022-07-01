@@ -19,6 +19,3 @@ COPY templates/ ./templates
 COPY main.go ./
 
 RUN go build
-
-RUN openssl genrsa -out key.pem 4096
-RUN openssl rsa -in key.pem -pubout -out key.pub.pem -RSAPublicKey_out

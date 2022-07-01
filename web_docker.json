@@ -22,8 +22,8 @@
   },
 
   "keys": {
-    "private_key": "./key.pem",
-    "public_key": "./key.pub.pem"
+    "private_key": "",
+    "public_key": ""
   },
 
   "googleAuth": {
