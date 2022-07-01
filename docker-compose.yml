@@ -29,6 +29,7 @@ services:
       - db
       - judge
   judge:
+    privileged: true
     build:
       context: .
       dockerfile: judge/Dockerfile
