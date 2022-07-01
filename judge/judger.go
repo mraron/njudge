@@ -4,9 +4,8 @@ import (
 	"bytes"
 	"github.com/mraron/njudge/utils/language"
 	"github.com/mraron/njudge/utils/problems"
-	"io/ioutil"
+	"go.uber.org/multierr"
 	"log"
-	"os"
 	"time"
 )
 
@@ -27,46 +26,29 @@ func truncate(s string, to int) string {
 	return s[:to-1] + "..."
 }
 
-func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Language, sandboxProvider *language.SandboxProvider, c Callbacker) error {
+func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Language, sandboxProvider *language.SandboxProvider, c Callbacker) (st problems.Status, err error) {
 	logger.Print("Started Judge")
-
-	f, err := ioutil.TempFile("/tmp", "judge_*")
-	if err != nil {
-		logger.Print("Error while creating:", err)
-		return err
-	}
-
-	_, err = f.Write(src)
-	if err != nil {
-		logger.Print("Error while writing data:", err)
-		return err
-	}
-
-	fname := f.Name()
-
-	f.Close()
-
-	f, err = os.Open(fname)
-	if err != nil {
-		logger.Print("Error while reopening file:", err)
-		return err
-	}
-	defer f.Close()
 
 	//@TODO do smth better
 	sandboxes := language.NewSandboxProvider()
 	for i := 0; i < 2; i++ {
-		sandbox, err := sandboxProvider.Get()
+		var sandbox language.Sandbox
+		sandbox, err = sandboxProvider.Get()
 		if err != nil {
 			logger.Print("Error while getting sandbox: ", err)
-			return err
+			return
 		}
 		defer sandboxProvider.Put(sandbox)
 
-		sandbox.Init(logger)
+		err = sandbox.Init(logger)
+		if err != nil {
+			return
+		}
 		sandboxes.Put(sandbox)
 
-		defer sandbox.Cleanup()
+		defer func(sandbox language.Sandbox) {
+			err = multierr.Append(err, sandbox.Cleanup())
+		}(sandbox)
 	}
 
 	logger.Print("Getting tasktype")
@@ -77,26 +59,27 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 	logger.Print("Trying to compile")
 
 	compileSandbox := sandboxes.MustGet()
-	bin, err := tt.Compile(p, compileSandbox, lang, f, &stderr)
+	bin, err := tt.Compile(p, compileSandbox, lang, bytes.NewReader(src), &stderr)
 	sandboxes.Put(compileSandbox)
 
 	if err != nil {
 		logger.Print("Compile got error: ", err)
-		st := problems.Status{}
 		st.Compiled = false
 		st.CompilerOutput = err.Error() + "\n" + truncate(stderr.String(), 1024)
-		return c.Callback("", st, true)
+		err = multierr.Append(err, c.Callback("", st, true))
+		return
 	}
+	st.Compiled = true
 
 	var (
 		testNotifier   = make(chan string)
 		statusNotifier = make(chan problems.Status)
 		ran            = make(chan bool)
-		st             problems.Status
+		errRun         error
 	)
 
 	go func() {
-		st, err = tt.Run(p, sandboxes, lang, bin, testNotifier, statusNotifier)
+		st, errRun = tt.Run(p, sandboxes, lang, bin, testNotifier, statusNotifier)
 		ran <- true
 		close(ran)
 	}()
@@ -108,11 +91,10 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 			if ok {
 				status := <-statusNotifier
 
-				err2 := c.Callback(test, status, false)
-
-				if err2 != nil {
-					logger.Print("Error while calling callback", err2)
-					return err
+				err = c.Callback(test, status, false)
+				if err != nil {
+					logger.Print("Error while calling callback", err)
+					return
 				}
 			}
 		case <-ran:
@@ -121,6 +103,7 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 
 		}
 	}
+	err = multierr.Combine(err, errRun)
 
 	if err == nil {
 		logger.Print("Successful judging! removing tempfile and calling back for the last time...")
@@ -128,7 +111,5 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 		logger.Print("Got error! removing tempfile and calling back for the last time... error is", err)
 	}
 
-	os.Remove(fname)
-
-	return c.Callback("", st, true)
+	return
 }

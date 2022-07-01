@@ -21,14 +21,14 @@ type Store interface {
 }
 
 type FsStore struct {
-	cs ConfigStore
-	fs afero.Fs
+	cs  ConfigStore
+	fs  afero.Fs
 	dir string
 
-	problems      map[string]Problem
+	problems     map[string]Problem
 	problemsList []string
 
-	sync.Mutex
+	sync.RWMutex
 }
 
 type FsStoreOptions func(*FsStore)
@@ -45,7 +45,7 @@ func FsStoreUseFs(afs afero.Fs) FsStoreOptions {
 	}
 }
 
-func NewFsStore(dir string, options... FsStoreOptions) *FsStore {
+func NewFsStore(dir string, options ...FsStoreOptions) *FsStore {
 	fs := &FsStore{cs: globalConfigStore, fs: afero.NewOsFs(), dir: dir, problems: make(map[string]Problem), problemsList: make([]string, 0)}
 	for _, opt := range options {
 		opt(fs)
@@ -55,10 +55,19 @@ func NewFsStore(dir string, options... FsStoreOptions) *FsStore {
 }
 
 func (s *FsStore) List() ([]string, error) {
-	return s.problemsList, nil
+	s.RLock()
+	defer s.RUnlock()
+
+	lst := make([]string, len(s.problemsList))
+	copy(lst, s.problemsList)
+
+	return lst, nil
 }
 
 func (s *FsStore) Has(p string) (bool, error) {
+	s.RLock()
+	defer s.RUnlock()
+
 	for _, key := range s.problemsList {
 		if key == p {
 			return true, nil
@@ -69,8 +78,8 @@ func (s *FsStore) Has(p string) (bool, error) {
 }
 
 func (s *FsStore) Get(p string) (Problem, error) {
-	s.Lock()
-	defer s.Unlock()
+	s.RLock()
+	defer s.RUnlock()
 
 	if res, ok := s.problems[p]; ok {
 		return res, nil
@@ -93,7 +102,7 @@ func (s *FsStore) Update() error {
 		return err
 	}
 
-	s.problemsList = s.problemsList[:0]
+	lst := make([]string, 0)
 
 	errs := make([]error, 0)
 	for _, file := range files {
@@ -103,9 +112,16 @@ func (s *FsStore) Update() error {
 				errs = append(errs, err)
 			}
 
-			s.problemsList = append(s.problemsList, name)
+			lst = append(lst, name)
 		}
 	}
+
+	s.Lock()
+	fmt.Println(lst, "STORE")
+	s.problemsList = make([]string, len(lst))
+	copy(s.problemsList, lst)
+	fmt.Println(s.problemsList, "STORE")
+	s.Unlock()
 
 	if len(errs) == 0 {
 		return nil
