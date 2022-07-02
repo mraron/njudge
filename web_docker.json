@@ -1,0 +1,35 @@
+{
+  "mode": "development",
+  "hostname": "localhost",
+  "port": "5555",
+  "url": "http://localhost:5555",
+  "problemsDir": "/njudge_problems",
+  "templatesDir": "./templates",
+  "gluePort": "3000",
+  "DBName": "postgres",
+  "DBAccount": "postgres",
+  "DBPassword": "postgres",
+  "DBHost": "db",
+  "cookieSecret": "secret_for_c00kies",
+  "customHead": "",
+
+  "smtp": {
+    "enabled": false
+  },
+
+  "sendgrid": {
+    "enabled": false
+  },
+
+  "keys": {
+    "private_key": "",
+    "public_key": ""
+  },
+
+  "googleAuth": {
+    "enabled": false,
+    "clientKey": "[SECRET]",
+    "secret": "[SECRET]",
+    "callback": "[SECRET]"
+  }
+}

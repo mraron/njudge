@@ -35,7 +35,8 @@ func (s *Server) SetupEnvironment() {
 
 func (s *Server) ConnectToDB() {
 	var err error
-	s.DB, err = sqlx.Open("postgres", "postgres://"+s.DBAccount+":"+s.DBPassword+"@"+s.DBHost+"/"+s.DBName)
+	//@TODO create a config entry for sslmode
+	s.DB, err = sqlx.Open("postgres", "postgres://"+s.DBAccount+":"+s.DBPassword+"@"+s.DBHost+"/"+s.DBName+"?sslmode=disable")
 
 	if err != nil {
 		panic(err)

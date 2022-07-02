@@ -10,13 +10,12 @@ import (
 )
 
 type Server struct {
-	Mode           string
-	Hostname       string
-	Url            string
-	Port           string
-	ProblemsDir    string
-	SubmissionsDir string
-	TemplatesDir   string
+	Mode         string
+	Hostname     string
+	Url          string
+	Port         string
+	ProblemsDir  string
+	TemplatesDir string
 
 	CookieSecret string
 
@@ -77,9 +76,11 @@ func (k *Keys) Parse() error {
 			return fmt.Errorf("can't parse pem private key file: %s", k.PrivateKeyLocation)
 		}
 
-		if k.PrivateKey, err = x509.ParsePKCS1PrivateKey(block.Bytes); err != nil {
+		var pKey any
+		if pKey, err = x509.ParsePKCS8PrivateKey(block.Bytes); err != nil {
 			return err
 		}
+		k.PrivateKey = pKey.(*rsa.PrivateKey)
 
 		publicKeyContents, err := ioutil.ReadFile(k.PublicKeyLocation)
 		if err != nil {

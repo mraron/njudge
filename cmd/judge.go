@@ -19,7 +19,7 @@ var JudgeCmd = &cobra.Command{
 	},
 
 	RunE: func(cmd *cobra.Command, args []string) error {
-		s := judge.Server{}
+		s := judge.NewServer()
 		if err := viper.Unmarshal(&s); err != nil {
 			return err
 		}

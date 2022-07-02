@@ -14,6 +14,7 @@ import (
 	"github.com/mraron/njudge/web/helpers/config"
 	"github.com/mraron/njudge/web/helpers/roles"
 	"github.com/mraron/njudge/web/helpers/templates"
+	"sync"
 
 	_ "github.com/mraron/njudge/utils/language/cpp11"
 	_ "github.com/mraron/njudge/utils/language/cpp14"
@@ -34,10 +35,12 @@ import (
 
 type Server struct {
 	config.Server
-	ProblemStore problems.Store
-	DB     *sqlx.DB
+	DB *sqlx.DB
 
-	judges []*models.Judge
+	ProblemStore problems.Store
+
+	judgesMutex sync.RWMutex
+	judges      []*models.Judge
 }
 
 func (s *Server) Run() {
@@ -47,7 +50,7 @@ func (s *Server) Run() {
 	e := echo.New()
 	if s.Mode == "development" {
 		e.Debug = true
-	}else {
+	} else {
 		e.HTTPErrorHandler = func(err error, c echo.Context) {
 			code := http.StatusInternalServerError
 			if he, ok := err.(*echo.HTTPError); ok {
