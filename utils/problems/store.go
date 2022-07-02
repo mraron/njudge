@@ -117,10 +117,8 @@ func (s *FsStore) Update() error {
 	}
 
 	s.Lock()
-	fmt.Println(lst, "STORE")
 	s.problemsList = make([]string, len(lst))
 	copy(s.problemsList, lst)
-	fmt.Println(s.problemsList, "STORE")
 	s.Unlock()
 
 	if len(errs) == 0 {
