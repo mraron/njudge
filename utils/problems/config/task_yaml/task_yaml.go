@@ -108,7 +108,7 @@ func (p Problem) Tags() []string {
 }
 
 func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
-	ans := problems.Status{false, "status skeleton", problems.FEEDBACK_IOI, make([]problems.Testset, 0)}
+	ans := problems.Status{false, "status skeleton", problems.FeedbackIOI, make([]problems.Testset, 0)}
 	ans.Feedback = append(ans.Feedback, problems.Testset{Name: "tests"})
 	testset := &ans.Feedback[len(ans.Feedback)-1]
 
@@ -121,7 +121,7 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 		tc.InputPath, tc.AnswerPath = fmt.Sprintf(p.InputPathPattern, ind), fmt.Sprintf(p.AnswerPathPattern, ind)
 		tc.Index = ind + 1
 		tc.MaxScore = 0
-		tc.VerdictName = problems.VERDICT_DR
+		tc.VerdictName = problems.VerdictDR
 		tc.MemoryLimit = p.MemoryLimit()
 		tc.TimeLimit = time.Duration(p.TimeLimit()) * time.Millisecond
 
@@ -149,10 +149,9 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 		group := &testset.Groups[len(testset.Groups)-1]
 
 		group.Name = subtask
-		group.Scoring = problems.SCORING_GROUP
+		group.Scoring = problems.ScoringGroup
 		for _, tc := range tcByGroup[subtask] {
 			group.Testcases = append(group.Testcases, tc)
-			testset.Testcases = append(testset.Testcases, tc)
 		}
 	}
 
@@ -175,11 +174,11 @@ func (p Problem) Check(tc *problems.Testcase) error {
 	fmt.Fscanf(&stdout, "%f", &tc.Score)
 
 	if tc.Score == 1.0 {
-		tc.VerdictName = problems.VERDICT_AC
+		tc.VerdictName = problems.VerdictAC
 	} else if tc.Score > 0 {
-		tc.VerdictName = problems.VERDICT_PC
+		tc.VerdictName = problems.VerdictPC
 	} else {
-		tc.VerdictName = problems.VERDICT_WA
+		tc.VerdictName = problems.VerdictWA
 	}
 
 	tc.Score *= tc.MaxScore

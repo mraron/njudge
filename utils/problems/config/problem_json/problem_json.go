@@ -98,11 +98,11 @@ func (p Problem) Tags() []string {
 }
 
 func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
-	ans := problems.Status{false, "status skeleton", problems.FEEDBACK_IOI, make([]problems.Testset, 0)}
+	ans := problems.Status{false, "status skeleton", problems.FeedbackIOI, make([]problems.Testset, 0)}
 	ans.Feedback = append(ans.Feedback, problems.Testset{Name: "tests"})
 	ans.Feedback[0].Groups = make([]problems.Group, 1)
 	ans.Feedback[0].Groups[0].Name = "base"
-	ans.Feedback[0].Groups[0].Scoring = problems.SCORING_SUM
+	ans.Feedback[0].Groups[0].Scoring = problems.ScoringSum
 
 	for i := 0; i < p.TestCount; i++ {
 		tc := problems.Testcase{}
@@ -110,7 +110,6 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 		tc.Index = i
 		tc.Group = "base"
 
-		ans.Feedback[0].Testcases = append(ans.Feedback[0].Testcases, tc)
 		ans.Feedback[0].Groups[0].Testcases = append(ans.Feedback[0].Groups[0].Testcases, tc)
 	}
 

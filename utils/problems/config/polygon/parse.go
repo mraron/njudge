@@ -31,10 +31,29 @@ func compileIfNotCompiled(fs afero.Fs, wd, src, dst string) error {
 				if err := s.Init(log.New(ioutil.Discard, "", 0)); err != nil {
 					return multierr.Combine(err, binary.Close(), file.Close())
 				}
+
+				//hacky solution
+				var headers []language.File
+				conts, err := os.ReadFile(src)
+				if err != nil {
+					return multierr.Combine(err, file.Close(), binary.Close())
+				}
+				if bytes.Contains(conts, []byte("testlib.h")) {
+					f, err := os.Open(filepath.Join(wd, "testlib.h"))
+					if err != nil {
+						return multierr.Combine(err, f.Close(), file.Close(), binary.Close())
+					}
+
+					headers = append(headers, language.File{
+						Name:   "testlib.h",
+						Source: f,
+					})
+				}
+
 				if err := cpp14.Lang.Compile(s, language.File{
 					Name:   filepath.Base(src),
 					Source: file,
-				}, binary, &buf, nil); err != nil {
+				}, binary, &buf, headers); err != nil {
 					return multierr.Combine(err, binary.Close(), file.Close(), fmt.Errorf("compile error: %v", buf.String()))
 				}
 

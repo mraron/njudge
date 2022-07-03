@@ -119,7 +119,7 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 					fmt.Println(inputFile, testLocation, answerLocation)
 					testcase, err := os.Open(testLocation)
 					if err != nil {
-						tc.VerdictName = problems.VERDICT_XX
+						tc.VerdictName = problems.VerdictXX
 						return ans, err
 					}
 					defer testcase.Close()
@@ -128,14 +128,14 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 
 					answerFile, err := os.Open(answerLocation)
 					if err != nil {
-						tc.VerdictName = problems.VERDICT_XX
+						tc.VerdictName = problems.VerdictXX
 						return ans, err
 					}
 					defer answerFile.Close()
 
 					answerContents, err := ioutil.ReadAll(answerFile)
 					if err != nil {
-						tc.VerdictName = problems.VERDICT_XX
+						tc.VerdictName = problems.VerdictXX
 						return ans, err
 					}
 
@@ -150,7 +150,7 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 					res, err = lang.Run(s, bytes.NewReader(binaryContents), testcase, stdout, tc.TimeLimit, tc.MemoryLimit)
 
 					if err != nil {
-						tc.VerdictName = problems.VERDICT_XX
+						tc.VerdictName = problems.VerdictXX
 						return ans, err
 					}
 
@@ -163,19 +163,19 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 
 						tmpfile, err := ioutil.TempFile("/tmp", "OutputOfProgram")
 						if err != nil {
-							tc.VerdictName = problems.VERDICT_XX
+							tc.VerdictName = problems.VerdictXX
 							fmt.Println(err, "!!!!")
 							return ans, err
 						}
 
 						if _, err := tmpfile.Write([]byte(programOutput)); err != nil {
-							tc.VerdictName = problems.VERDICT_XX
+							tc.VerdictName = problems.VerdictXX
 							fmt.Println(err, "!!!!")
 							return ans, err
 						}
 
 						if err := tmpfile.Close(); err != nil {
-							tc.VerdictName = problems.VERDICT_XX
+							tc.VerdictName = problems.VerdictXX
 							fmt.Println(err, "!!!!")
 							return ans, err
 						}
@@ -191,13 +191,12 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 						tc.MemoryUsed = res.Memory
 						tc.TimeSpent = res.Time
 
-						testset.Testcases = append(testset.Testcases, tc)
 						group.Testcases = append(group.Testcases, tc)
 
 						if err == nil {
-							if tc.VerdictName == problems.VERDICT_WA || tc.VerdictName == problems.VERDICT_PE {
+							if tc.VerdictName == problems.VerdictWA || tc.VerdictName == problems.VerdictPE {
 								ac = false
-								if skeleton.FeedbackType != problems.FEEDBACK_IOI {
+								if skeleton.FeedbackType != problems.FeedbackIOI {
 									return ans, nil
 								}
 							}
@@ -212,13 +211,13 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 						curr.Testset = ts.Name
 						switch res.Verdict {
 						case language.VERDICT_RE:
-							curr.VerdictName = problems.VERDICT_RE
+							curr.VerdictName = problems.VerdictRE
 						case language.VERDICT_XX:
-							curr.VerdictName = problems.VERDICT_XX
+							curr.VerdictName = problems.VerdictXX
 						case language.VERDICT_ML:
-							curr.VerdictName = problems.VERDICT_ML
+							curr.VerdictName = problems.VerdictML
 						case language.VERDICT_TL:
-							curr.VerdictName = problems.VERDICT_TL
+							curr.VerdictName = problems.VerdictTL
 						}
 
 						curr.Group = g.Name
@@ -228,16 +227,14 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 						curr.Output = truncate(stdout.String()) //now it's stderr
 						curr.ExpectedOutput = truncate(string(answerContents))
 
-						testset.Testcases = append(testset.Testcases, curr)
 						group.Testcases = append(group.Testcases, curr)
 
-						if skeleton.FeedbackType != problems.FEEDBACK_IOI {
+						if skeleton.FeedbackType != problems.FeedbackIOI {
 							return ans, nil
 						}
 					}
 				} else {
 					group.Testcases = append(group.Testcases, tc)
-					testset.Testcases = append(testset.Testcases, tc)
 				}
 			}
 
