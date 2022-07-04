@@ -56,7 +56,7 @@ type Problem struct {
 
 	Path                   string
 	JSONStatementList      []JSONStatement
-	AttachmentsList        []problems.Attachment
+	AttachmentsList        problems.Attachments
 	GeneratedStatementList problems.Contents
 
 	TaskType      string      `xml:"njudge-task-type,attr"`
@@ -80,7 +80,7 @@ func (p Problem) Name() string {
 func (p Problem) Titles() problems.Contents {
 	ans := make(problems.Contents, len(p.Names))
 	for i := 0; i < len(p.Names); i++ {
-		ans[i] = problems.Content{p.Names[i].Language, []byte(p.Names[i].Value), "text"}
+		ans[i] = problems.BytesData{Loc: p.Names[i].Language, Val: []byte(p.Names[i].Value), Typ: "text"}
 	}
 
 	return ans
@@ -110,7 +110,7 @@ func (p Problem) InputOutputFiles() (string, string) {
 	return p.Judging.InputFile, p.Judging.OutputFile
 }
 
-func (p Problem) Attachments() []problems.Attachment {
+func (p Problem) Attachments() problems.Attachments {
 	return p.AttachmentsList
 }
 

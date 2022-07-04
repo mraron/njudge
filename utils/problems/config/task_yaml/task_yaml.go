@@ -42,7 +42,7 @@ type Problem struct {
 	TaskYAML
 
 	StatementList  problems.Contents
-	AttachmentList []problems.Attachment
+	AttachmentList problems.Attachments
 
 	InputPathPattern  string
 	AnswerPathPattern string
@@ -55,7 +55,7 @@ func (p Problem) Name() string {
 }
 
 func (p Problem) Titles() problems.Contents {
-	return []problems.Content{{"hungarian", []byte(p.Title), "text"}}
+	return problems.Contents{problems.BytesData{Loc: "hungarian", Val: []byte(p.Title), Typ: "text"}}
 }
 
 func (p Problem) Statements() problems.Contents {
@@ -99,7 +99,7 @@ func (p Problem) Languages() []language.Language {
 	return lst2
 }
 
-func (p Problem) Attachments() []problems.Attachment {
+func (p Problem) Attachments() problems.Attachments {
 	return p.AttachmentList
 }
 
@@ -265,7 +265,7 @@ func parseGen(r io.Reader) (int, [][2]int, error) {
 
 func parser(path string) (problems.Problem, error) {
 	fmt.Println(path)
-	p := Problem{Path: path, InputPathPattern: filepath.Join(path, "input", "input%d.txt"), AnswerPathPattern: filepath.Join(path, "output", "output%d.txt"), AttachmentList: make([]problems.Attachment, 0)}
+	p := Problem{Path: path, InputPathPattern: filepath.Join(path, "input", "input%d.txt"), AnswerPathPattern: filepath.Join(path, "output", "output%d.txt"), AttachmentList: make(problems.Attachments, 0)}
 
 	YAMLFile, err := os.Open(filepath.Join(path, "task.yaml"))
 	if err != nil {
@@ -298,8 +298,8 @@ func parser(path string) (problems.Problem, error) {
 		p.ScoreTypeParameters = subtasks
 	}
 
-	p.StatementList = make([]problems.Content, 0)
-	p.StatementList = append(p.StatementList, problems.Content{"hungarian", statementPDF, "application/pdf"})
+	p.StatementList = make(problems.Contents, 0)
+	p.StatementList = append(p.StatementList, problems.BytesData{Loc: "hungarian", Val: statementPDF, Typ: "application/pdf"})
 
 	checkerPath := filepath.Join(p.Path, "check", "checker")
 	if _, err := os.Stat(checkerPath); os.IsNotExist(err) {
@@ -336,7 +336,7 @@ func parser(path string) (problems.Problem, error) {
 				return nil, err
 			}
 
-			p.AttachmentList = append(p.AttachmentList, problems.Attachment{file.Name(), cont})
+			p.AttachmentList = append(p.AttachmentList, problems.BytesData{Nam: file.Name(), Val: cont})
 		}
 	}
 

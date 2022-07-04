@@ -144,7 +144,7 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 					return nil, err
 				}
 
-				p.GeneratedStatementList = append(p.GeneratedStatementList, problems.Content{Locale: dir.Name(), Contents: contents, Type: "text/html"})
+				p.GeneratedStatementList = append(p.GeneratedStatementList, problems.BytesData{Loc: dir.Name(), Val: contents, Typ: "text/html"})
 			}
 
 			for _, stmt := range p.StatementList {
@@ -155,7 +155,7 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 					return nil, err
 				}
 
-				p.GeneratedStatementList = append(p.GeneratedStatementList, problems.Content{Locale: stmt.Language, Contents: cont, Type: stmt.Type})
+				p.GeneratedStatementList = append(p.GeneratedStatementList, problems.BytesData{Loc: stmt.Language, Val: cont, Typ: stmt.Type})
 			}
 		}
 
@@ -187,7 +187,7 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 				return nil, err
 			}
 
-			p.AttachmentsList = append(p.AttachmentsList, problems.Attachment{Name: val.Name, Contents: contents})
+			p.AttachmentsList = append(p.AttachmentsList, problems.BytesData{Nam: val.Name, Val: contents})
 		}
 
 		return p, nil

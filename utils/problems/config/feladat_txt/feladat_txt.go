@@ -22,7 +22,7 @@ type Problem struct {
 	ShortName      string
 	Title          string
 	StatementList  problems.Contents
-	AttachmentList []problems.Attachment
+	AttachmentList problems.Attachments
 	TestCount      int
 	MemoryLimitKB  int
 	TimeLimitS     float64
@@ -38,7 +38,7 @@ func (p Problem) Name() string {
 }
 
 func (p Problem) Titles() problems.Contents {
-	return problems.Contents{problems.Content{"hungarian", []byte(p.Title), "text"}}
+	return problems.Contents{problems.BytesData{Loc: "hungarian", Val: []byte(p.Title), Typ: "text"}}
 }
 
 func (p Problem) Statements() problems.Contents {
@@ -82,7 +82,7 @@ func (p Problem) Languages() []language.Language {
 	return lst2
 }
 
-func (p Problem) Attachments() []problems.Attachment {
+func (p Problem) Attachments() problems.Attachments {
 	return p.AttachmentList
 }
 
@@ -293,9 +293,9 @@ func parser(path string) (problems.Problem, error) {
 	}
 
 	p.StatementList = make(problems.Contents, 0)
-	p.StatementList = append(p.StatementList, problems.Content{"hungarian", cont, "application/pdf"})
+	p.StatementList = append(p.StatementList, problems.BytesData{Loc: "hungarian", Val: cont, Typ: "application/pdf"})
 
-	p.AttachmentList = make([]problems.Attachment, 0)
+	p.AttachmentList = make(problems.Attachments, 0)
 
 	if _, err := os.Stat(filepath.Join(path, "ellen")); os.IsNotExist(err) {
 		if checkerBinary, err := os.Create(filepath.Join(path, "ellen")); err == nil {
@@ -324,7 +324,7 @@ func parser(path string) (problems.Problem, error) {
 		if err != nil {
 			return nil, err
 		}
-		p.AttachmentList = append(p.AttachmentList, problems.Attachment{"minta.zip", cont})
+		p.AttachmentList = append(p.AttachmentList, problems.BytesData{Nam: "minta.zip", Val: cont})
 	}
 
 	p.InputPathPattern = filepath.Join(p.Path, "in.%d")
