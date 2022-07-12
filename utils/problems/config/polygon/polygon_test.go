@@ -41,7 +41,7 @@ func testProblemXML(t *testing.T, p Problem) {
 	}
 
 	assert("title", p.Titles()[0].String(), "Fancy Fence")
-	assert("title lang", p.Titles()[0].Locale, "english")
+	assert("title lang", p.Titles()[0].Locale(), "english")
 	assert("name", p.Name(), "fancyfence")
 	assert("path", p.Path, "problemxml/")
 	assert("tasktype", p.TaskType, "batch")

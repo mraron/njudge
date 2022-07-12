@@ -34,12 +34,12 @@ func compileIfNotCompiled(fs afero.Fs, wd, src, dst string) error {
 
 				//hacky solution
 				var headers []language.File
-				conts, err := os.ReadFile(src)
+				conts, err := afero.ReadFile(fs, src)
 				if err != nil {
 					return multierr.Combine(err, file.Close(), binary.Close())
 				}
 				if bytes.Contains(conts, []byte("testlib.h")) {
-					f, err := os.Open(filepath.Join(wd, "testlib.h"))
+					f, err := fs.Open(filepath.Join(wd, "testlib.h"))
 					if err != nil {
 						return multierr.Combine(err, f.Close(), file.Close(), binary.Close())
 					}
@@ -161,7 +161,7 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 
 		if cfg.compileBinaries {
 			workingDirectory := p.Path
-			if _, err := os.Stat(filepath.Join(p.Path, "files")); !errors.Is(err, fs.ErrNotExist) {
+			if _, err := cfg.fs.Stat(filepath.Join(p.Path, "files")); !errors.Is(err, fs.ErrNotExist) {
 				workingDirectory = filepath.Join(p.Path, "files")
 			}
 
