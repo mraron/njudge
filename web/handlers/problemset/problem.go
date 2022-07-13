@@ -29,11 +29,11 @@ var (
 
 type Problem struct {
 	problems.Problem
-	SolverCount int
+	SolverCount  int
 	SolvedStatus helpers.SolvedStatus
 	LastLanguage string
 	CategoryLink helpers.Link
-	CategoryId int
+	CategoryId   int
 }
 
 func GetProblem(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
@@ -89,7 +89,12 @@ func GetProblemPDF(problemStore problems.Store) echo.HandlerFunc {
 			return echo.NewHTTPError(http.StatusNotFound, ErrorFileNotFound)
 		}
 
-		return c.Blob(http.StatusOK, "application/pdf", i18n.TranslateContent(lang, p.PDFStatements()).Contents)
+		dat, err := i18n.TranslateContent(lang, p.PDFStatements()).Value()
+		if err != nil {
+			return err
+		}
+
+		return c.Blob(http.StatusOK, "application/pdf", dat)
 	}
 }
 
@@ -115,9 +120,9 @@ func GetProblemFile(cfg config.Server, problemStore problems.Store) echo.Handler
 
 			//@TODO what the fuck is this? how does polygon do it ATM
 			if strings.HasSuffix(c.Param("file"), ".css") {
-				fileLoc = filepath.Join(cfg.ProblemsDir, p.Name(), "statements", ".html", p.HTMLStatements()[0].Locale, c.Param("file"))
+				fileLoc = filepath.Join(cfg.ProblemsDir, p.Name(), "statements", ".html", p.HTMLStatements()[0].Locale(), c.Param("file"))
 			} else {
-				fileLoc = filepath.Join(cfg.ProblemsDir, p.Name(), "statements", p.HTMLStatements()[0].Locale, c.Param("file"))
+				fileLoc = filepath.Join(cfg.ProblemsDir, p.Name(), "statements", p.HTMLStatements()[0].Locale(), c.Param("file"))
 			}
 
 		default:
@@ -142,12 +147,17 @@ func GetProblemAttachment(problemStore problems.Store) echo.HandlerFunc {
 		}
 
 		for _, val := range p.Attachments() {
-			if val.Name == attachment {
-				c.Response().Header().Set("Content-Disposition", "attachment; filename="+val.Name)
-				c.Response().Header().Set("Content-Type", mime.TypeByExtension(filepath.Ext(val.Name)))
-				c.Response().Header().Set("Content-Length", strconv.Itoa(len(val.Contents)))
+			if val.Name() == attachment {
+				dat, err := val.Value()
+				if err != nil {
+					return err
+				}
 
-				if _, err := io.Copy(c.Response(), bytes.NewReader(val.Contents)); err != nil {
+				c.Response().Header().Set("Content-Disposition", "attachment; filename="+val.Name())
+				c.Response().Header().Set("Content-Type", mime.TypeByExtension(filepath.Ext(val.Name())))
+				c.Response().Header().Set("Content-Length", strconv.Itoa(len(dat)))
+
+				if _, err := io.Copy(c.Response(), bytes.NewReader(dat)); err != nil {
 					return err
 				}
 
@@ -196,7 +206,7 @@ func GetProblemStatus(DB *sqlx.DB) echo.HandlerFunc {
 		problemset := c.Param("name")
 		problem := c.Param("problem")
 		page, err := strconv.Atoi(c.QueryParam("page"))
-		if  err != nil || page<=0 {
+		if err != nil || page <= 0 {
 			page = 1
 		}
 

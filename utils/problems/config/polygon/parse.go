@@ -31,10 +31,29 @@ func compileIfNotCompiled(fs afero.Fs, wd, src, dst string) error {
 				if err := s.Init(log.New(ioutil.Discard, "", 0)); err != nil {
 					return multierr.Combine(err, binary.Close(), file.Close())
 				}
+
+				//hacky solution
+				var headers []language.File
+				conts, err := afero.ReadFile(fs, src)
+				if err != nil {
+					return multierr.Combine(err, file.Close(), binary.Close())
+				}
+				if bytes.Contains(conts, []byte("testlib.h")) {
+					f, err := fs.Open(filepath.Join(wd, "testlib.h"))
+					if err != nil {
+						return multierr.Combine(err, f.Close(), file.Close(), binary.Close())
+					}
+
+					headers = append(headers, language.File{
+						Name:   "testlib.h",
+						Source: f,
+					})
+				}
+
 				if err := cpp14.Lang.Compile(s, language.File{
 					Name:   filepath.Base(src),
 					Source: file,
-				}, binary, &buf, nil); err != nil {
+				}, binary, &buf, headers); err != nil {
 					return multierr.Combine(err, binary.Close(), file.Close(), fmt.Errorf("compile error: %v", buf.String()))
 				}
 
@@ -125,7 +144,7 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 					return nil, err
 				}
 
-				p.GeneratedStatementList = append(p.GeneratedStatementList, problems.Content{Locale: dir.Name(), Contents: contents, Type: "text/html"})
+				p.GeneratedStatementList = append(p.GeneratedStatementList, problems.BytesData{Loc: dir.Name(), Val: contents, Typ: "text/html"})
 			}
 
 			for _, stmt := range p.StatementList {
@@ -136,13 +155,13 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 					return nil, err
 				}
 
-				p.GeneratedStatementList = append(p.GeneratedStatementList, problems.Content{Locale: stmt.Language, Contents: cont, Type: stmt.Type})
+				p.GeneratedStatementList = append(p.GeneratedStatementList, problems.BytesData{Loc: stmt.Language, Val: cont, Typ: stmt.Type})
 			}
 		}
 
 		if cfg.compileBinaries {
 			workingDirectory := p.Path
-			if _, err := os.Stat(filepath.Join(p.Path, "files")); !errors.Is(err, fs.ErrNotExist) {
+			if _, err := cfg.fs.Stat(filepath.Join(p.Path, "files")); !errors.Is(err, fs.ErrNotExist) {
 				workingDirectory = filepath.Join(p.Path, "files")
 			}
 
@@ -168,7 +187,7 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 				return nil, err
 			}
 
-			p.AttachmentsList = append(p.AttachmentsList, problems.Attachment{Name: val.Name, Contents: contents})
+			p.AttachmentsList = append(p.AttachmentsList, problems.BytesData{Nam: val.Name, Val: contents})
 		}
 
 		return p, nil

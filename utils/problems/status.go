@@ -8,40 +8,40 @@ import (
 	"time"
 )
 
-// VerdictName represents the verdict of a testcase i.e the outcome which happened in result of running the testcase (or the lack of running it in the case of VERDICT_DR)
+// VerdictName represents the verdict of a testcase i.e the outcome which happened in result of running the testcase (or the lack of running it in the case of VerdictDR)
 type VerdictName int
 
 const (
-	VERDICT_AC VerdictName = iota
-	VERDICT_WA
-	VERDICT_RE
-	VERDICT_TL
-	VERDICT_ML
-	VERDICT_XX
-	VERDICT_DR
-	VERDICT_PC
-	VERDICT_PE
+	VerdictAC VerdictName = iota
+	VerdictWA
+	VerdictRE
+	VerdictTL
+	VerdictML
+	VerdictXX
+	VerdictDR
+	VerdictPC
+	VerdictPE
 )
 
 func (v VerdictName) String() string {
 	switch v {
-	case VERDICT_AC:
+	case VerdictAC:
 		return "Elfogadva"
-	case VERDICT_WA:
+	case VerdictWA:
 		return "Rossz válasz"
-	case VERDICT_RE:
+	case VerdictRE:
 		return "Futási hiba"
-	case VERDICT_TL:
+	case VerdictTL:
 		return "Időlimit túllépés"
-	case VERDICT_ML:
+	case VerdictML:
 		return "Memória limit túllépés"
-	case VERDICT_XX:
+	case VerdictXX:
 		return "Belső hiba"
-	case VERDICT_DR:
+	case VerdictDR:
 		return "Nem fut"
-	case VERDICT_PC:
+	case VerdictPC:
 		return "Részben elfogadva"
-	case VERDICT_PE:
+	case VerdictPE:
 		return "Prezentációs hiba"
 	}
 
@@ -49,44 +49,46 @@ func (v VerdictName) String() string {
 }
 
 // FeedbackType is mainly for displaying to the end user.
-// In FEEDBACK_CF we actually output the contestant's output and the jury's output,
-// too whereas in for example FEEDBACK_ACM we only use standard ACM feedback (just the verdict),
-// in FEEDBACK_IOI we display all testcases along information about groups.
+// In FeedbackCF we actually output the contestant's output and the jury's output,
+// too whereas in for example FeedbackACM we only use standard ACM feedback (just the verdict),
+// in FeedbackIOI we display all testcases along information about groups.
 type FeedbackType int
 
 const (
-	FEEDBACK_CF FeedbackType = iota
-	FEEDBACK_IOI
-	FEEDBACK_ACM
+	FeedbackCF FeedbackType = iota
+	FeedbackIOI
+	FeedbackACM
 )
 
-// FeedbackFromString parses a string into FeedbackType, the default is FEEDBACK_CF, "ioi" is for FEEDBACK_IOI and "acm" is for FEEDBACK_ACM
+// FeedbackFromString parses a string into FeedbackType, the default is FEEDBACK_CF, "ioi" is for FeedbackIOI and "acm" is for FeedbackACM
 func FeedbackFromString(str string) FeedbackType {
 	if str == "ioi" {
-		return FEEDBACK_IOI
+		return FeedbackIOI
 	} else if str == "acm" {
-		return FEEDBACK_ACM
+		return FeedbackACM
 	}
 
-	return FEEDBACK_CF
+	return FeedbackCF
 }
 
 // ScoringType represents the scoring of a group of tests,
-// * SCORING_GROUP means that if there's a non accepted testcase in the group then the whole group scores 0 points,
-// * SCORING_SUM means that the score of the group is the sum of scores of individual scores.
+//
+// * ScoringGroup means that if there's a non-accepted (or partially accepted) testcase in the group then the whole group scores 0 points,
+//
+// * ScoringSum means that the score of the group is the sum of scores of individual scores.
 type ScoringType int
 
 const (
-	SCORING_GROUP ScoringType = iota
-	SCORING_SUM
+	ScoringGroup ScoringType = iota
+	ScoringSum
 )
 
 func ScoringFromString(str string) ScoringType {
 	if str == "group" {
-		return SCORING_GROUP
+		return ScoringGroup
 	}
 
-	return SCORING_SUM
+	return ScoringSum
 }
 
 // Testcase represents a testcase in the status of a submission.
@@ -110,16 +112,31 @@ type Testcase struct {
 }
 
 // Testset represents some set of tests, for example pretests and system tests should be testsets.
-// They are also used to seamlessly rejudge for contestants.
+// They can also be used to seamlessly rejudge for contestants.
 type Testset struct {
-	Name      string
-	Groups    []Group
-	Testcases []Testcase
+	Name   string
+	Groups []Group
+}
+
+func (ts Testset) Testcases() (testcases []*Testcase) {
+	testcaseCount := 0
+	for i := range ts.Groups {
+		testcaseCount += len(ts.Groups[i].Testcases)
+	}
+
+	testcases = make([]*Testcase, 0, testcaseCount)
+	for i := range ts.Groups {
+		for j := range ts.Groups[i].Testcases {
+			testcases = append(testcases, &ts.Groups[i].Testcases[j])
+		}
+	}
+
+	return
 }
 
 func (ts *Testset) SetTimeLimit(tl time.Duration) {
-	for ind := range ts.Testcases {
-		ts.Testcases[ind].TimeLimit = tl
+	for _, tc := range ts.Testcases() {
+		tc.TimeLimit = tl
 	}
 
 	for ind := range ts.Groups {
@@ -128,8 +145,8 @@ func (ts *Testset) SetTimeLimit(tl time.Duration) {
 }
 
 func (ts *Testset) SetMemoryLimit(ml int) {
-	for ind := range ts.Testcases {
-		ts.Testcases[ind].MemoryLimit = ml
+	for _, tc := range ts.Testcases() {
+		tc.MemoryLimit = ml
 	}
 
 	for ind := range ts.Groups {
@@ -190,11 +207,16 @@ func (ts Testset) MaxTimeSpent() time.Duration {
 }
 
 // A Group is named group of tests for which there is a scoring policy defined.
-type Group struct {	
+type Group struct {
 	Name         string
 	Scoring      ScoringType
 	Testcases    []Testcase
-	Dependencies []string //@TODO: actually support this while calculating score
+	Dependencies []string
+}
+
+func (g *Group) AddTestcase(testcase Testcase) {
+	testcase.Index = len(g.Testcases) + 1
+	g.Testcases = append(g.Testcases, testcase)
 }
 
 func (g *Group) SetTimeLimit(tl time.Duration) {
@@ -210,21 +232,21 @@ func (g *Group) SetMemoryLimit(ml int) {
 }
 
 func (g Group) Score() float64 {
+	sum := 0.0
+	for _, val := range g.Testcases {
+		sum += val.Score
+	}
+
 	switch g.Scoring {
-	case SCORING_GROUP:
+	case ScoringGroup:
 		for _, val := range g.Testcases {
-			if val.VerdictName != VERDICT_AC {
+			if val.VerdictName != VerdictAC && val.VerdictName != VerdictPC {
 				return 0.0
 			}
 		}
 
-		return g.MaxScore()
-	case SCORING_SUM:
-		sum := 0.0
-		for _, val := range g.Testcases {
-			sum += val.Score
-		}
-
+		return sum
+	case ScoringSum:
 		return sum
 	}
 
@@ -242,7 +264,7 @@ func (g Group) MaxScore() float64 {
 
 func (g Group) FirstNonAC() int {
 	for ind, val := range g.Testcases {
-		if val.VerdictName != VERDICT_AC {
+		if val.VerdictName != VerdictAC {
 			return ind + 1
 		}
 	}
@@ -345,7 +367,7 @@ func (v *Status) Scan(value interface{}) error {
 
 func (v Status) Verdict() VerdictName {
 	if v.FirstNonAC() == -1 {
-		return VERDICT_AC
+		return VerdictAC
 	}
 
 	return v.IndexTestcase(v.FirstNonAC()).VerdictName
@@ -386,8 +408,8 @@ func (v Status) MaxTimeSpent() time.Duration {
 func (v Status) FirstNonAC() int {
 	ind := 1
 	for _, val := range v.Feedback {
-		for _, val2 := range val.Testcases {
-			if val2.VerdictName != VERDICT_AC {
+		for _, val2 := range val.Testcases() {
+			if val2.VerdictName != VerdictAC {
 				return ind
 			}
 
@@ -401,9 +423,9 @@ func (v Status) FirstNonAC() int {
 func (v Status) IndexTestcase(ind int) Testcase {
 	curr := 1
 	for _, val := range v.Feedback {
-		for _, val2 := range val.Testcases {
+		for _, val2 := range val.Testcases() {
 			if curr == ind {
-				return val2
+				return *val2
 			}
 
 			curr++

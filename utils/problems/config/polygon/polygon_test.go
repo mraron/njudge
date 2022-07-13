@@ -41,7 +41,7 @@ func testProblemXML(t *testing.T, p Problem) {
 	}
 
 	assert("title", p.Titles()[0].String(), "Fancy Fence")
-	assert("title lang", p.Titles()[0].Locale, "english")
+	assert("title lang", p.Titles()[0].Locale(), "english")
 	assert("name", p.Name(), "fancyfence")
 	assert("path", p.Path, "problemxml/")
 	assert("tasktype", p.TaskType, "batch")
@@ -88,7 +88,7 @@ func testProblemXML(t *testing.T, p Problem) {
 
 		skeleton, err := p.StatusSkeleton("tests")
 		if err == nil {
-			assert("sk_feedbacktype", skeleton.FeedbackType, problems.FEEDBACK_IOI)
+			assert("sk_feedbacktype", skeleton.FeedbackType, problems.FeedbackIOI)
 			assert("sk_maxscore", skeleton.Feedback[0].MaxScore(), float64(100))
 			assert("sk_testsetname", skeleton.Feedback[0].Name, "tests")
 		} else {

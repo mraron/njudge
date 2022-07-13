@@ -25,10 +25,10 @@ type Test struct {
 
 func (tc Test) Testcase() problems.Testcase {
 	return problems.Testcase{
-		InputPath: tc.Input,
-		AnswerPath: tc.Answer,
-		VerdictName: problems.VERDICT_DR,
-		MaxScore: tc.Points,
+		InputPath:   tc.Input,
+		AnswerPath:  tc.Answer,
+		VerdictName: problems.VerdictDR,
+		MaxScore:    tc.Points,
 	}
 }
 
@@ -75,9 +75,9 @@ func (ts Testset) Testset(path string) problems.Testset {
 
 		group.Name = grp.Name
 		if grp.PointsPolicy == "complete-group" {
-			group.Scoring = problems.SCORING_GROUP
+			group.Scoring = problems.ScoringGroup
 		} else {
-			group.Scoring = problems.SCORING_SUM
+			group.Scoring = problems.ScoringSum
 		}
 
 		for _, tc := range testcases[grp.Name] {
@@ -90,7 +90,6 @@ func (ts Testset) Testset(path string) problems.Testset {
 			testcase.MemoryLimit = ts.MemoryLimit
 
 			group.Testcases = append(group.Testcases, testcase)
-			testset.Testcases = append(testset.Testcases, testcase)
 
 			idx++
 		}
@@ -139,10 +138,10 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	}
 
 	return &problems.Status{
-		Compiled: false,
+		Compiled:       false,
 		CompilerOutput: "status skeleton",
-		FeedbackType: problems.FeedbackFromString(p.FeedbackType),
-		Feedback: []problems.Testset{testset.Testset(p.Path)},
+		FeedbackType:   problems.FeedbackFromString(p.FeedbackType),
+		Feedback:       []problems.Testset{testset.Testset(p.Path)},
 	}, nil
 }
 
@@ -160,11 +159,11 @@ func (p Problem) Check(tc *problems.Testcase) error {
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			if status, ok := exitErr.Sys().(syscall.WaitStatus); ok {
 				if status.ExitStatus() == 1 {
-					tc.VerdictName = problems.VERDICT_WA
+					tc.VerdictName = problems.VerdictWA
 				} else if status.ExitStatus() == 2 {
-					tc.VerdictName = problems.VERDICT_PE
+					tc.VerdictName = problems.VerdictPE
 				} else if status.ExitStatus() == 7 {
-					tc.VerdictName = problems.VERDICT_PC
+					tc.VerdictName = problems.VerdictPC
 
 					rel := 0
 					fmt.Sscanf(output.String(), "points %d", &rel)
@@ -172,16 +171,16 @@ func (p Problem) Check(tc *problems.Testcase) error {
 
 					tc.Score = float64(rel) / (200.0 * tc.MaxScore)
 				} else { //3 -> fail
-					tc.VerdictName = problems.VERDICT_XX
+					tc.VerdictName = problems.VerdictXX
 				}
 			}
 		} else {
-			tc.VerdictName = problems.VERDICT_XX
+			tc.VerdictName = problems.VerdictXX
 			return err
 		}
 	} else {
 		tc.Score = tc.MaxScore
-		tc.VerdictName = problems.VERDICT_AC
+		tc.VerdictName = problems.VerdictAC
 	}
 
 	return nil

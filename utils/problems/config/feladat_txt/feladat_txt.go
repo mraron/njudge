@@ -22,7 +22,7 @@ type Problem struct {
 	ShortName      string
 	Title          string
 	StatementList  problems.Contents
-	AttachmentList []problems.Attachment
+	AttachmentList problems.Attachments
 	TestCount      int
 	MemoryLimitKB  int
 	TimeLimitS     float64
@@ -38,7 +38,7 @@ func (p Problem) Name() string {
 }
 
 func (p Problem) Titles() problems.Contents {
-	return problems.Contents{problems.Content{"hungarian", []byte(p.Title), "text"}}
+	return problems.Contents{problems.BytesData{Loc: "hungarian", Val: []byte(p.Title), Typ: "text"}}
 }
 
 func (p Problem) Statements() problems.Contents {
@@ -82,7 +82,7 @@ func (p Problem) Languages() []language.Language {
 	return lst2
 }
 
-func (p Problem) Attachments() []problems.Attachment {
+func (p Problem) Attachments() problems.Attachments {
 	return p.AttachmentList
 }
 
@@ -91,7 +91,7 @@ func (p Problem) Tags() []string {
 }
 
 func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
-	ans := problems.Status{false, "status skeleton", problems.FEEDBACK_IOI, make([]problems.Testset, 0)}
+	ans := problems.Status{false, "status skeleton", problems.FeedbackIOI, make([]problems.Testset, 0)}
 	ans.Feedback = append(ans.Feedback, problems.Testset{Name: "tests"})
 	testset := &ans.Feedback[len(ans.Feedback)-1]
 
@@ -121,12 +121,11 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	group := &testset.Groups[len(testset.Groups)-1]
 
 	group.Name = "base"
-	group.Scoring = problems.SCORING_SUM
+	group.Scoring = problems.ScoringSum
 
 	for _, tc := range tcbygroup[""] {
-		testcase := problems.Testcase{idx, tc.InputPath, "", tc.AnswerPath, "tests", "base", problems.VERDICT_DR, float64(0.0), float64(tc.MaxScore), "-", "-", "-", 0 * time.Millisecond, 0, time.Duration(p.TimeLimit()) * time.Millisecond, p.MemoryLimit()}
+		testcase := problems.Testcase{idx, tc.InputPath, "", tc.AnswerPath, "tests", "base", problems.VerdictDR, float64(0.0), float64(tc.MaxScore), "-", "-", "-", 0 * time.Millisecond, 0, time.Duration(p.TimeLimit()) * time.Millisecond, p.MemoryLimit()}
 		group.Testcases = append(group.Testcases, testcase)
-		testset.Testcases = append(testset.Testcases, testcase)
 
 		idx++
 	}
@@ -183,20 +182,20 @@ func (p Problem) Check(tc *problems.Testcase) error {
 
 		tc.Score = score
 		if score == tc.MaxScore && allOk {
-			tc.VerdictName = problems.VERDICT_AC
+			tc.VerdictName = problems.VerdictAC
 		} else if score != 0.0 {
-			tc.VerdictName = problems.VERDICT_PC
+			tc.VerdictName = problems.VerdictPC
 		} else {
-			tc.VerdictName = problems.VERDICT_WA
+			tc.VerdictName = problems.VerdictWA
 		}
 
 		return nil
 	} else if err != nil {
-		tc.VerdictName = problems.VERDICT_XX
+		tc.VerdictName = problems.VerdictXX
 		return err
 	}
 
-	tc.VerdictName = problems.VERDICT_XX
+	tc.VerdictName = problems.VerdictXX
 	return errors.New("proccess state is not success")
 }
 
@@ -294,9 +293,9 @@ func parser(path string) (problems.Problem, error) {
 	}
 
 	p.StatementList = make(problems.Contents, 0)
-	p.StatementList = append(p.StatementList, problems.Content{"hungarian", cont, "application/pdf"})
+	p.StatementList = append(p.StatementList, problems.BytesData{Loc: "hungarian", Val: cont, Typ: "application/pdf"})
 
-	p.AttachmentList = make([]problems.Attachment, 0)
+	p.AttachmentList = make(problems.Attachments, 0)
 
 	if _, err := os.Stat(filepath.Join(path, "ellen")); os.IsNotExist(err) {
 		if checkerBinary, err := os.Create(filepath.Join(path, "ellen")); err == nil {
@@ -325,7 +324,7 @@ func parser(path string) (problems.Problem, error) {
 		if err != nil {
 			return nil, err
 		}
-		p.AttachmentList = append(p.AttachmentList, problems.Attachment{"minta.zip", cont})
+		p.AttachmentList = append(p.AttachmentList, problems.BytesData{Nam: "minta.zip", Val: cont})
 	}
 
 	p.InputPathPattern = filepath.Join(p.Path, "in.%d")
