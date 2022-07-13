@@ -1,7 +1,7 @@
 package problems
 
 import (
-	"errors"
+	"fmt"
 	"io"
 
 	"github.com/mraron/njudge/utils/language"
@@ -23,14 +23,12 @@ func RegisterTaskType(taskType TaskType) {
 	taskTypes = append(taskTypes, taskType)
 }
 
-func GetTaskType(name string) TaskType {
+func GetTaskType(name string) (TaskType, error) {
 	for _, tt := range taskTypes {
 		if tt.Name() == name {
-			return tt
+			return tt, nil
 		}
 	}
 
-	panic(errors.New("no such task type: " + name))
-
-	return nil
+	return nil, fmt.Errorf("no such task type: %q", name)
 }

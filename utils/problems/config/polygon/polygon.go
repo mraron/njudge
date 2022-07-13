@@ -152,8 +152,13 @@ func (p Problem) Files() []problems.File {
 
 func (p Problem) GetTaskType() problems.TaskType {
 	if p.TaskType == "" {
-		return problems.GetTaskType("batch")
+		p.TaskType = "batch"
 	}
 
-	return problems.GetTaskType(p.TaskType)
+	tt, err := problems.GetTaskType(p.TaskType)
+	if err != nil {
+		panic(err)
+	}
+
+	return tt
 }

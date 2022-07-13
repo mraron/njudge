@@ -142,7 +142,12 @@ func (p Problem) Files() []problems.File {
 }
 
 func (p Problem) GetTaskType() problems.TaskType {
-	return problems.GetTaskType("output_only")
+	tt, err := problems.GetTaskType("output_only")
+	if err != nil {
+		panic(err)
+	}
+
+	return tt
 }
 
 func parser(path string) (problems.Problem, error) {

@@ -205,7 +205,12 @@ func (p Problem) Files() []problems.File {
 }
 
 func (p Problem) GetTaskType() problems.TaskType {
-	return problems.GetTaskType("batch")
+	tt, err := problems.GetTaskType("batch")
+	if err != nil {
+		panic(err)
+	}
+
+	return tt
 }
 
 func parser(path string) (problems.Problem, error) {
