@@ -1,6 +1,8 @@
 package web
 
 import (
+	"sync"
+
 	"github.com/gorilla/sessions"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo-contrib/session"
@@ -14,7 +16,6 @@ import (
 	"github.com/mraron/njudge/web/helpers/config"
 	"github.com/mraron/njudge/web/helpers/roles"
 	"github.com/mraron/njudge/web/helpers/templates"
-	"sync"
 
 	_ "github.com/mraron/njudge/utils/language/cpp11"
 	_ "github.com/mraron/njudge/utils/language/cpp14"
@@ -26,11 +27,12 @@ import (
 	_ "github.com/mraron/njudge/utils/language/python3"
 	_ "github.com/mraron/njudge/utils/language/zip"
 
+	_ "mime"
+	"net/http"
+
 	"github.com/mraron/njudge/web/models"
 	_ "github.com/mraron/njudge/web/models"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
-	_ "mime"
-	"net/http"
 )
 
 type Server struct {
@@ -74,7 +76,7 @@ func (s *Server) Run() {
 		return func(c echo.Context) error {
 			currentUser := func(c echo.Context) (*models.User, error) {
 				var (
-					u   = &models.User{}
+					u   *models.User
 					err error
 				)
 

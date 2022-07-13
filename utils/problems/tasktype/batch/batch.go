@@ -3,12 +3,13 @@ package batch
 import (
 	"bytes"
 	"fmt"
-	"github.com/mraron/njudge/utils/language"
-	"github.com/mraron/njudge/utils/problems"
 	"io"
 	"io/ioutil"
 	"os"
 	"strconv"
+
+	"github.com/mraron/njudge/utils/language"
+	"github.com/mraron/njudge/utils/problems"
 )
 
 type Batch struct {
@@ -151,7 +152,7 @@ func CheckOK(ctx RunContext, res language.Status, group *problems.Group, testcas
 	testcase.ExpectedOutput = truncate(string(answerContents))
 	testcase.MemoryUsed = res.Memory
 	testcase.TimeSpent = res.Time
-	return nil
+	return err
 }
 
 func CheckFail(ctx RunContext, res language.Status, group *problems.Group, testcase *problems.Testcase) error {

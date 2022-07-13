@@ -1,9 +1,10 @@
 package polygon
 
 import (
+	"testing"
+
 	"github.com/mraron/njudge/utils/problems"
 	"github.com/spf13/afero"
-	"testing"
 )
 
 func TestDummyParsing(t *testing.T) {
@@ -95,7 +96,7 @@ func testProblemXML(t *testing.T, p Problem) {
 			t.Error(err)
 		}
 	} else {
-		t.Error("\"tests\" testset not found")
+		t.Error("\"tests\" testset not found", err)
 	}
 }
 

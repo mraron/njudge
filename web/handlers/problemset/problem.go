@@ -4,6 +4,14 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"io"
+	"mime"
+	"net/http"
+	"path/filepath"
+	"sort"
+	"strconv"
+	"strings"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/utils/problems"
@@ -14,13 +22,6 @@ import (
 	"github.com/mraron/njudge/web/models"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"io"
-	"mime"
-	"net/http"
-	"path/filepath"
-	"sort"
-	"strconv"
-	"strings"
 )
 
 var (
@@ -210,7 +211,7 @@ func GetProblemStatus(DB *sqlx.DB) echo.HandlerFunc {
 			page = 1
 		}
 
-		query := []QueryMod{}
+		var query []QueryMod
 		if ac == "1" {
 			query = []QueryMod{Where("verdict = 0"), Where("problem = ?", problem), Where("problemset = ?", problemset)}
 		} else {
