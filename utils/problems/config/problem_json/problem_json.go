@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/mraron/njudge/utils/language"
-	"github.com/mraron/njudge/utils/problems"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/mraron/njudge/utils/language"
+	"github.com/mraron/njudge/utils/problems"
 )
 
 type Name struct {
@@ -140,8 +141,13 @@ func (p Problem) Files() []problems.File {
 	return make([]problems.File, 0)
 }
 
-func (p Problem) TaskTypeName() string {
-	return "output_only"
+func (p Problem) GetTaskType() problems.TaskType {
+	tt, err := problems.GetTaskType("output_only")
+	if err != nil {
+		panic(err)
+	}
+
+	return tt
 }
 
 func parser(path string) (problems.Problem, error) {

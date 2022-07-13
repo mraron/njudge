@@ -2,11 +2,12 @@ package judge
 
 import (
 	"bytes"
+	"log"
+	"time"
+
 	"github.com/mraron/njudge/utils/language"
 	"github.com/mraron/njudge/utils/problems"
 	"go.uber.org/multierr"
-	"log"
-	"time"
 )
 
 type Status struct {
@@ -52,7 +53,7 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 	}
 
 	logger.Print("Getting tasktype")
-	tt := problems.GetTaskType(p.TaskTypeName())
+	tt := p.GetTaskType()
 
 	stderr := bytes.Buffer{}
 

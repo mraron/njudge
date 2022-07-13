@@ -1,11 +1,12 @@
 package polygon
 
 import (
+	"path/filepath"
+
 	"github.com/mraron/njudge/utils/language"
 	_ "github.com/mraron/njudge/utils/language/cpp11"
 	_ "github.com/mraron/njudge/utils/language/cpp14"
 	"github.com/mraron/njudge/utils/problems"
-	"path/filepath"
 )
 
 type Name struct {
@@ -149,10 +150,15 @@ func (p Problem) Files() []problems.File {
 	return res
 }
 
-func (p Problem) TaskTypeName() string {
+func (p Problem) GetTaskType() problems.TaskType {
 	if p.TaskType == "" {
-		return "batch"
+		p.TaskType = "batch"
 	}
 
-	return p.TaskType
+	tt, err := problems.GetTaskType(p.TaskType)
+	if err != nil {
+		panic(err)
+	}
+
+	return tt
 }
