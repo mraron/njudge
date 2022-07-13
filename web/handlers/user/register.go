@@ -29,9 +29,9 @@ func Register(cfg config.Server, DB *sqlx.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
 			errStrings = make([]string, 0)
-			key             = helpers.GenerateActivationKey(255)
-			err    error
-			tx     *sql.Tx
+			key        = helpers.GenerateActivationKey(255)
+			err        error
+			tx         *sql.Tx
 		)
 
 		if u := c.Get("user").(*models.User); u != nil {

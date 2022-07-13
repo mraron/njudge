@@ -17,7 +17,7 @@ func TestLinks(t *testing.T) {
 	}
 
 	var tests = []struct {
-		got []Link
+		got      []Link
 		expected []Link
 	}{
 		{
@@ -92,9 +92,8 @@ func TestLinks(t *testing.T) {
 
 		for i := 0; i < len(test.got); i++ {
 			if test.got[i] != test.expected[i] {
-				t.Error(idx, "(",i,")", ":", test.got[i], "!=", test.expected[i])
+				t.Error(idx, "(", i, ")", ":", test.got[i], "!=", test.expected[i])
 			}
 		}
 	}
 }
-

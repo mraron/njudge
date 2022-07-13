@@ -74,7 +74,7 @@ func (m Mail) Send(s config.Server) error {
 		}
 
 		return nil
-	}else if s.Sendgrid.Enabled {
+	} else if s.Sendgrid.Enabled {
 		from := mail.NewEmail(s.Sendgrid.SenderName, s.Sendgrid.SenderAddress)
 		to := mail.NewEmail("", m.Recipients[0]) // @TODO erroneous
 

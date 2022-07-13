@@ -22,7 +22,7 @@ import (
 
 type Renderer struct {
 	templates map[string]*template.Template
-	cfg config.Server
+	cfg       config.Server
 }
 
 func New(cfg config.Server, problemStore problems.Store) *Renderer {
@@ -37,7 +37,7 @@ func New(cfg config.Server, problemStore problems.Store) *Renderer {
 		if !info.IsDir() {
 			if strings.HasPrefix(info.Name(), "_") {
 				layoutFiles = append(layoutFiles, path)
-			}else {
+			} else {
 				name, err := filepath.Rel(cfg.TemplatesDir, path)
 				if err != nil {
 					panic(err)
@@ -66,8 +66,8 @@ func (t *Renderer) Render(w io.Writer, name string, data interface{}, c echo.Con
 	}
 
 	return t.templates[name].ExecuteTemplate(w, filepath.Base(name), struct {
-		Data    interface{}
-		Context echo.Context
+		Data       interface{}
+		Context    echo.Context
 		CustomHead string
 	}{data, c, t.cfg.CustomHead})
 }

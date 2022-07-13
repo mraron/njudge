@@ -128,4 +128,3 @@ func (s *Server) putAPIUser(c echo.Context) error {
 		Message string `json:"message"`
 	}{"updated"})
 }
-

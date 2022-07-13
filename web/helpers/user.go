@@ -25,7 +25,7 @@ func HasUserSolved(DB *sqlx.DB, u *models.User, problemSet, problem string) (Sol
 		cnt, err := models.Submissions(Where("problemset = ?", problemSet), Where("problem = ?", problem), Where("verdict = 0"), Where("user_id = ?", u.ID)).Count(DB)
 		if err != nil && !errors.Is(err, sql.ErrNoRows) {
 			return Unknown, fmt.Errorf("can't get solvedstatus for %s %s%s: %w", u.Name, problemSet, problem, err)
-		}else {
+		} else {
 			if cnt > 0 {
 				solvedStatus = Solved
 			} else {
@@ -33,7 +33,7 @@ func HasUserSolved(DB *sqlx.DB, u *models.User, problemSet, problem string) (Sol
 				if err != nil && !errors.Is(err, sql.ErrNoRows) {
 					return Unknown, fmt.Errorf("can't get solvedstatus for %s %s %s: %w", u.Name, problemSet, problem, err)
 				} else {
-					if cnt>0 {
+					if cnt > 0 {
 						solvedStatus = Attempted
 					}
 				}

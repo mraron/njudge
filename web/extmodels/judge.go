@@ -6,10 +6,10 @@ import (
 )
 
 type Judge struct {
-	Id          int64         `json:"id"`
-	Name        string        `json:"name"`
-	Ping        int           `json:"ping"`
-	Online      bool          `json:"online"`
+	Id     int64  `json:"id"`
+	Name   string `json:"name"`
+	Ping   int    `json:"ping"`
+	Online bool   `json:"online"`
 
 	judge.ServerStatus
 }

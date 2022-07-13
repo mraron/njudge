@@ -17,16 +17,15 @@ type submission struct {
 	Stream      bool   `json:"stream"`
 	CallbackUrl string `json:"callback_url"`
 
-	c Callbacker
+	c    Callbacker
 	done chan bool
 }
 
-
 type Submission struct {
-	Id          string `json:"id"`
-	Problem     string `json:"problem"`
-	Language    string `json:"language"`
-	Source      []byte `json:"source"`
+	Id       string `json:"id"`
+	Problem  string `json:"problem"`
+	Language string `json:"language"`
+	Source   []byte `json:"source"`
 }
 
 type Client interface {
@@ -38,12 +37,12 @@ type Client interface {
 type defaultClient struct {
 	client *http.Client
 
-	url string
+	url   string
 	token string
 }
 
 func NewClient(url, token string) Client {
-	return &defaultClient{url:url, token:token, client: &http.Client{}}
+	return &defaultClient{url: url, token: token, client: &http.Client{}}
 }
 
 func (dc defaultClient) submit(ctx context.Context, sub submission) (*http.Response, error) {
@@ -132,7 +131,7 @@ func (dc defaultClient) SubmitStream(ctx context.Context, sub Submission, res ch
 func (dc defaultClient) Status(ctx context.Context) (ServerStatus, error) {
 	dst := dc.url + "/status"
 
-	req, err := http.NewRequestWithContext(ctx,"GET", dst, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", dst, nil)
 	if err != nil {
 		return ServerStatus{}, err
 	}
@@ -155,7 +154,7 @@ func (dc defaultClient) Status(ctx context.Context) (ServerStatus, error) {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return ServerStatus{}, errors.New("judger returned: "+resp.Status)
+		return ServerStatus{}, errors.New("judger returned: " + resp.Status)
 	}
 
 	return ans, nil
