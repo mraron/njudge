@@ -134,7 +134,7 @@ func (p Problem) Check(tc *problems.Testcase) error {
 		return err
 	}
 
-	return errors.New("proccess state is not success")
+	return errors.New("process state is not success")
 }
 
 func (p Problem) Files() []problems.File {

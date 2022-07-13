@@ -2,6 +2,12 @@ package web
 
 import (
 	"context"
+	"log"
+	"math"
+	"net/http"
+	"strconv"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/mraron/njudge/judge"
@@ -11,11 +17,6 @@ import (
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"log"
-	"math"
-	"net/http"
-	"strconv"
-	"time"
 )
 
 func (s *Server) StartBackgroundJobs() {
@@ -80,7 +81,7 @@ func (s *Server) runSyncJudges() {
 
 			_, err = j.Update(s.DB, boil.Infer())
 			if err != nil {
-				log.Print("trying to access judge on", j.Host, j.Port, " unsuccesful update in database", err)
+				log.Print("trying to access judge on", j.Host, j.Port, " unsuccessful update in database", err)
 				continue
 			}
 		}
