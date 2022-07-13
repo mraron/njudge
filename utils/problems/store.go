@@ -25,6 +25,21 @@ func (perr problemNotFoundError) Is(target error) bool {
 	return target == ErrorProblemNotFound
 }
 
+var ErrorProblemParse = errors.New("can't parse problems")
+
+type ProblemParseError struct {
+	Errors   []error
+	Problems []string
+}
+
+func (perr ProblemParseError) Error() string {
+	return fmt.Sprintf("can't parse problems: %v", perr.Problems)
+}
+
+func (perr ProblemParseError) Is(target error) bool {
+	return target == ErrorProblemParse
+}
+
 //Store is an interface which is used to access a bunch of problems for example from the filesystem
 type Store interface {
 	List() ([]string, error)
@@ -112,7 +127,7 @@ func (s *FsStore) MustGet(p string) Problem {
 }
 
 func (s *FsStore) Update() error {
-	errs := make([]error, 0)
+	errs := ProblemParseError{Errors: make([]error, 0), Problems: make([]string, 0)}
 	lst := make([]string, 0)
 
 	if err := afero.Walk(s.fs, s.dir, func(path string, info fs.FileInfo, err error) error {
@@ -123,12 +138,23 @@ func (s *FsStore) Update() error {
 		if strings.HasPrefix(info.Name(), ".") {
 			return filepath.SkipDir
 		}
+
+		if s.dir == path {
+			return nil
+		}
+
 		if err := s.UpdateProblem(info.Name(), path); err != nil {
-			errs = append(errs, fmt.Errorf("%s: %q", info.Name(), err))
-			if err == ErrorNoMatch {
-				return nil
+			if !errors.Is(err, ErrorNoMatch) {
+				errs.Errors = append(errs.Errors, fmt.Errorf("%s: %w", info.Name(), err))
+				errs.Problems = append(errs.Problems, info.Name())
+
+				if err == ErrorNoMatch {
+					return nil
+				} else {
+					return filepath.SkipDir
+				}
 			} else {
-				return filepath.SkipDir
+				return nil
 			}
 		} else {
 			lst = append(lst, info.Name())
@@ -143,16 +169,10 @@ func (s *FsStore) Update() error {
 	copy(s.problemsList, lst)
 	s.Unlock()
 
-	if len(errs) == 0 {
+	if len(errs.Errors) == 0 {
 		return nil
 	}
-
-	err := errs[0]
-	for i := 1; i < len(errs); i++ {
-		err = fmt.Errorf("%v\n%v", err, errs[i])
-	}
-
-	return err
+	return errs
 }
 
 func (s *FsStore) UpdateProblem(p string, path string) error {
