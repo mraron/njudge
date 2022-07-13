@@ -5,10 +5,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/mraron/njudge/utils/language"
-	"github.com/mraron/njudge/utils/language/cpp14"
-	"github.com/mraron/njudge/utils/problems"
-	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
 	"os"
@@ -17,6 +13,11 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/mraron/njudge/utils/language"
+	"github.com/mraron/njudge/utils/language/cpp14"
+	"github.com/mraron/njudge/utils/problems"
+	"gopkg.in/yaml.v2"
 )
 
 type TaskYAML struct {
@@ -191,8 +192,8 @@ func (p Problem) Files() []problems.File {
 	return make([]problems.File, 0)
 }
 
-func (p Problem) TaskTypeName() string {
-	return "batch"
+func (p Problem) GetTaskType() problems.TaskType {
+	return problems.GetTaskType("batch")
 }
 
 func parseGen(r io.Reader) (int, [][2]int, error) {

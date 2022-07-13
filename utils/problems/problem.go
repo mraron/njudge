@@ -2,7 +2,6 @@ package problems
 
 import (
 	"github.com/mraron/njudge/utils/language"
-	"io"
 )
 
 type File struct {
@@ -32,13 +31,7 @@ type Judgeable interface {
 	Languages() []language.Language
 	StatusSkeleton(testset string) (*Status, error)
 	Files() []File
-	TaskTypeName() string
-}
-
-type TaskType interface {
-	Name() string
-	Compile(Judgeable, language.Sandbox, language.Language, io.Reader, io.Writer) (io.Reader, error)
-	Run(Judgeable, *language.SandboxProvider, language.Language, io.Reader, chan string, chan Status) (Status, error)
+	GetTaskType() TaskType
 }
 
 func Truncate(s string) string {

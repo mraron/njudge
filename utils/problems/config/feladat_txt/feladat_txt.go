@@ -5,9 +5,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/mraron/njudge/utils/language"
-	"github.com/mraron/njudge/utils/language/cpp14"
-	"github.com/mraron/njudge/utils/problems"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -15,6 +12,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/mraron/njudge/utils/language"
+	"github.com/mraron/njudge/utils/language/cpp14"
+	"github.com/mraron/njudge/utils/problems"
 )
 
 type Problem struct {
@@ -203,8 +204,8 @@ func (p Problem) Files() []problems.File {
 	return make([]problems.File, 0)
 }
 
-func (p Problem) TaskTypeName() string {
-	return "batch"
+func (p Problem) GetTaskType() problems.TaskType {
+	return problems.GetTaskType("batch")
 }
 
 func parser(path string) (problems.Problem, error) {

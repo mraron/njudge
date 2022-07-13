@@ -2,7 +2,16 @@ package problems
 
 import (
 	"errors"
+	"io"
+
+	"github.com/mraron/njudge/utils/language"
 )
+
+type TaskType interface {
+	Name() string
+	Compile(Judgeable, language.Sandbox, language.Language, io.Reader, io.Writer) (io.Reader, error)
+	Run(Judgeable, *language.SandboxProvider, language.Language, io.Reader, chan string, chan Status) (Status, error)
+}
 
 var taskTypes []TaskType
 
