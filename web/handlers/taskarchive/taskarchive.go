@@ -13,12 +13,12 @@ import (
 )
 
 type TreeNode struct {
-	Id       int
-	Type     string
-	Name     string
-	Link     string
+	Id           int
+	Type         string
+	Name         string
+	Link         string
 	SolvedStatus helpers.SolvedStatus
-	Children []*TreeNode
+	Children     []*TreeNode
 }
 
 //@TODO optimize this to use less queries, most likely caching it
@@ -42,7 +42,7 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 			}
 
 			for _, problem := range problems {
-				elem := &TreeNode{Id:id, Type: "problem", Name: i18n.TranslateContent("hungarian", problemStore.MustGet(problem.Problem).Titles()).String(), Link: fmt.Sprintf("/problemset/%s/%s/", problem.Problemset, problem.Problem), Children: make([]*TreeNode, 0), SolvedStatus: -1}
+				elem := &TreeNode{Id: id, Type: "problem", Name: i18n.TranslateContent("hungarian", problemStore.MustGet(problem.Problem).Titles()).String(), Link: fmt.Sprintf("/problemset/%s/%s/", problem.Problemset, problem.Problem), Children: make([]*TreeNode, 0), SolvedStatus: -1}
 				if u != nil {
 					elem.SolvedStatus, err = helpers.HasUserSolved(DB, u, problem.Problemset, problem.Problem)
 					if err != nil {
@@ -62,7 +62,7 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 			}
 
 			for _, cat := range subcats {
-				akt := &TreeNode{Id:cat.ID, Type:"category", Name:cat.Name, Link:"", Children: make([]*TreeNode, 0), SolvedStatus: -1}
+				akt := &TreeNode{Id: cat.ID, Type: "category", Name: cat.Name, Link: "", Children: make([]*TreeNode, 0), SolvedStatus: -1}
 				tree.Children = append(tree.Children, akt)
 				if err := dfs(cat, akt); err != nil {
 					return err
@@ -73,7 +73,7 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 		}
 
 		for _, start := range lst {
-			roots = append(roots, &TreeNode{Id:start.ID, Type: "category", Name: start.Name, Link: "", Children: make([]*TreeNode, 0), SolvedStatus: -1})
+			roots = append(roots, &TreeNode{Id: start.ID, Type: "category", Name: start.Name, Link: "", Children: make([]*TreeNode, 0), SolvedStatus: -1})
 			if dfs(start, roots[len(roots)-1]) != nil {
 				return err
 			}

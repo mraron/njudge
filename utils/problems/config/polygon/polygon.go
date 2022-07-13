@@ -1,11 +1,12 @@
 package polygon
 
 import (
+	"path/filepath"
+
 	"github.com/mraron/njudge/utils/language"
 	_ "github.com/mraron/njudge/utils/language/cpp11"
 	_ "github.com/mraron/njudge/utils/language/cpp14"
 	"github.com/mraron/njudge/utils/problems"
-	"path/filepath"
 )
 
 type Name struct {
@@ -56,7 +57,7 @@ type Problem struct {
 
 	Path                   string
 	JSONStatementList      []JSONStatement
-	AttachmentsList        []problems.Attachment
+	AttachmentsList        problems.Attachments
 	GeneratedStatementList problems.Contents
 
 	TaskType      string      `xml:"njudge-task-type,attr"`
@@ -80,7 +81,7 @@ func (p Problem) Name() string {
 func (p Problem) Titles() problems.Contents {
 	ans := make(problems.Contents, len(p.Names))
 	for i := 0; i < len(p.Names); i++ {
-		ans[i] = problems.Content{p.Names[i].Language, []byte(p.Names[i].Value), "text"}
+		ans[i] = problems.BytesData{Loc: p.Names[i].Language, Val: []byte(p.Names[i].Value), Typ: "text"}
 	}
 
 	return ans
@@ -110,7 +111,7 @@ func (p Problem) InputOutputFiles() (string, string) {
 	return p.Judging.InputFile, p.Judging.OutputFile
 }
 
-func (p Problem) Attachments() []problems.Attachment {
+func (p Problem) Attachments() problems.Attachments {
 	return p.AttachmentsList
 }
 
@@ -149,10 +150,15 @@ func (p Problem) Files() []problems.File {
 	return res
 }
 
-func (p Problem) TaskTypeName() string {
+func (p Problem) GetTaskType() problems.TaskType {
 	if p.TaskType == "" {
-		return "batch"
+		p.TaskType = "batch"
 	}
 
-	return p.TaskType
+	tt, err := problems.GetTaskType(p.TaskType)
+	if err != nil {
+		panic(err)
+	}
+
+	return tt
 }

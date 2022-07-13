@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"log"
+	"os"
+
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -9,8 +12,6 @@ import (
 	"github.com/mraron/njudge/web/helpers/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"log"
-	"os"
 )
 
 type migrateLogger struct {
@@ -41,6 +42,10 @@ var MigrateCmd = &cobra.Command{
 		server := web.Server{Server: cfg}
 		server.ConnectToDB()
 		driver, err := postgres.WithInstance(server.DB.DB, &postgres.Config{})
+		if err != nil {
+			return err
+		}
+
 		m, err := migrate.NewWithDatabaseInstance("file://web/migrations", "postgres", driver)
 		if err != nil {
 			return err

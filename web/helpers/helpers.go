@@ -13,7 +13,7 @@ import (
 
 type SortColumn struct {
 	Order string
-	Href string
+	Href  string
 }
 
 type Link struct {
@@ -45,6 +45,10 @@ func UnauthorizedError(c echo.Context) error {
 }
 
 func GetJWT(cfg config.Keys) (string, error) {
+	if cfg.PrivateKey == nil {
+		return "", nil
+	}
+
 	claims := &jwt.StandardClaims{
 		ExpiresAt: time.Now().Add(10 * time.Minute).Unix(),
 		NotBefore: time.Now().Unix(),
@@ -60,4 +64,3 @@ func GetJWT(cfg config.Keys) (string, error) {
 
 	return jwt, nil
 }
-

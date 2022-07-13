@@ -33,7 +33,7 @@ func ProfileMiddleware(DB *sqlx.DB) echo.MiddlewareFunc {
 
 type problem struct {
 	Problemset string
-	Problem string
+	Problem    string
 }
 
 func Profile(DB *sqlx.DB) echo.HandlerFunc {
@@ -41,7 +41,7 @@ func Profile(DB *sqlx.DB) echo.HandlerFunc {
 		u := c.Get("profile").(*models.User)
 		var (
 			solved, attempted models.SubmissionSlice
-			err error
+			err               error
 		)
 
 		solved, err = models.Submissions(Select("max(submissions.id) as id, problemset, problem"), Where("user_id = ?", u.ID), Where("verdict = ?", 0), GroupBy("submissions.problemset, submissions.problem")).All(DB)
@@ -55,8 +55,8 @@ func Profile(DB *sqlx.DB) echo.HandlerFunc {
 		}
 
 		return c.Render(http.StatusOK, "user/profile/main", struct {
-			User *models.User
-			SolvedProblems models.SubmissionSlice
+			User                       *models.User
+			SolvedProblems             models.SubmissionSlice
 			AttemptedNotSolvedProblems models.SubmissionSlice
 		}{u, solved, attempted})
 	}
@@ -77,7 +77,7 @@ func Submissions(DB *sqlx.DB) echo.HandlerFunc {
 		}
 
 		return c.Render(http.StatusOK, "user/profile/submissions", struct {
-			User *models.User
+			User       *models.User
 			StatusPage *helpers.StatusPage
 		}{u, statusPage})
 	}

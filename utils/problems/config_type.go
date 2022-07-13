@@ -6,8 +6,8 @@ import (
 )
 
 var (
-	ErrorNameUsed           = errors.New("config type name already in use")
-	ErrorNoMatch            = errors.New("parser can't decide config type, no match")
+	ErrorNameUsed = errors.New("config type name already in use")
+	ErrorNoMatch  = errors.New("parser can't decide config type, no match")
 )
 
 // ConfigIdentifier is a function for some config type which takes a path and returns true if it thinks that its respective parser can parse it

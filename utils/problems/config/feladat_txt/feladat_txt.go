@@ -5,8 +5,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/mraron/njudge/utils/language"
-	"github.com/mraron/njudge/utils/problems"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -14,6 +12,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/mraron/njudge/utils/language"
+	"github.com/mraron/njudge/utils/language/cpp14"
+	"github.com/mraron/njudge/utils/problems"
 )
 
 type Problem struct {
@@ -21,7 +23,7 @@ type Problem struct {
 	ShortName      string
 	Title          string
 	StatementList  problems.Contents
-	AttachmentList []problems.Attachment
+	AttachmentList problems.Attachments
 	TestCount      int
 	MemoryLimitKB  int
 	TimeLimitS     float64
@@ -37,7 +39,7 @@ func (p Problem) Name() string {
 }
 
 func (p Problem) Titles() problems.Contents {
-	return problems.Contents{problems.Content{"hungarian", []byte(p.Title), "text"}}
+	return problems.Contents{problems.BytesData{Loc: "hungarian", Val: []byte(p.Title), Typ: "text"}}
 }
 
 func (p Problem) Statements() problems.Contents {
@@ -81,7 +83,7 @@ func (p Problem) Languages() []language.Language {
 	return lst2
 }
 
-func (p Problem) Attachments() []problems.Attachment {
+func (p Problem) Attachments() problems.Attachments {
 	return p.AttachmentList
 }
 
@@ -90,7 +92,7 @@ func (p Problem) Tags() []string {
 }
 
 func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
-	ans := problems.Status{false, "status skeleton", problems.FEEDBACK_IOI, make([]problems.Testset, 0)}
+	ans := problems.Status{false, "status skeleton", problems.FeedbackIOI, make([]problems.Testset, 0)}
 	ans.Feedback = append(ans.Feedback, problems.Testset{Name: "tests"})
 	testset := &ans.Feedback[len(ans.Feedback)-1]
 
@@ -120,12 +122,11 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	group := &testset.Groups[len(testset.Groups)-1]
 
 	group.Name = "base"
-	group.Scoring = problems.SCORING_SUM
+	group.Scoring = problems.ScoringSum
 
 	for _, tc := range tcbygroup[""] {
-		testcase := problems.Testcase{idx, tc.InputPath, "", tc.AnswerPath, "tests", "base", problems.VERDICT_DR, float64(0.0), float64(tc.MaxScore), "-", "-", "-", 0 * time.Millisecond, 0, time.Duration(p.TimeLimit()) * time.Millisecond, p.MemoryLimit()}
+		testcase := problems.Testcase{idx, tc.InputPath, "", tc.AnswerPath, "tests", "base", problems.VerdictDR, float64(0.0), float64(tc.MaxScore), "-", "-", "-", 0 * time.Millisecond, 0, time.Duration(p.TimeLimit()) * time.Millisecond, p.MemoryLimit()}
 		group.Testcases = append(group.Testcases, testcase)
-		testset.Testcases = append(testset.Testcases, testcase)
 
 		idx++
 	}
@@ -163,7 +164,7 @@ func (p Problem) Check(tc *problems.Testcase) error {
 		var spltd []string
 		if strings.Contains(str, ":") {
 			spltd = strings.Split(strings.TrimSpace(str), ":")
-		}else {
+		} else {
 			spltd = strings.Split(strings.TrimSpace(str), "\n")
 		}
 
@@ -175,36 +176,41 @@ func (p Problem) Check(tc *problems.Testcase) error {
 
 			if strings.TrimSpace(curr[len(curr)-2]) == "1" {
 				score = score + float64(p.Points[i*p.TestCount+tc.Index-1])
-			}else {
+			} else {
 				allOk = false
 			}
 		}
 
 		tc.Score = score
 		if score == tc.MaxScore && allOk {
-			tc.VerdictName = problems.VERDICT_AC
+			tc.VerdictName = problems.VerdictAC
 		} else if score != 0.0 {
-			tc.VerdictName = problems.VERDICT_PC
+			tc.VerdictName = problems.VerdictPC
 		} else {
-			tc.VerdictName = problems.VERDICT_WA
+			tc.VerdictName = problems.VerdictWA
 		}
 
 		return nil
 	} else if err != nil {
-		tc.VerdictName = problems.VERDICT_XX
+		tc.VerdictName = problems.VerdictXX
 		return err
 	}
 
-	tc.VerdictName = problems.VERDICT_XX
-	return errors.New("proccess state is not success")
+	tc.VerdictName = problems.VerdictXX
+	return errors.New("process state is not success")
 }
 
 func (p Problem) Files() []problems.File {
 	return make([]problems.File, 0)
 }
 
-func (p Problem) TaskTypeName() string {
-	return "batch"
+func (p Problem) GetTaskType() problems.TaskType {
+	tt, err := problems.GetTaskType("batch")
+	if err != nil {
+		panic(err)
+	}
+
+	return tt
 }
 
 func parser(path string) (problems.Problem, error) {
@@ -293,31 +299,27 @@ func parser(path string) (problems.Problem, error) {
 	}
 
 	p.StatementList = make(problems.Contents, 0)
-	p.StatementList = append(p.StatementList, problems.Content{"hungarian", cont, "application/pdf"})
+	p.StatementList = append(p.StatementList, problems.BytesData{Loc: "hungarian", Val: cont, Typ: "application/pdf"})
 
-	p.AttachmentList = make([]problems.Attachment, 0)
+	p.AttachmentList = make(problems.Attachments, 0)
 
 	if _, err := os.Stat(filepath.Join(path, "ellen")); os.IsNotExist(err) {
 		if checkerBinary, err := os.Create(filepath.Join(path, "ellen")); err == nil {
 			defer checkerBinary.Close()
+			if checkerFile, err := os.Open(filepath.Join(path, "ellen.cpp")); err == nil {
+				defer checkerFile.Close()
 
-			if lang := language.Get("cpp11"); lang != nil {
-				if checkerFile, err := os.Open(filepath.Join(path, "ellen.cpp")); err == nil {
-					defer checkerFile.Close()
+				if err := cpp14.Lang.InsecureCompile(path, checkerFile, checkerBinary, os.Stderr); err != nil {
+					return nil, err
+				}
 
-					if err := lang.InsecureCompile(path, checkerFile, checkerBinary, os.Stderr); err != nil {
-						return nil, err
-					}
-
-					if err := os.Chmod(filepath.Join(path, "ellen"), os.ModePerm); err != nil {
-						return nil, err
-					}
-				} else {
+				if err := os.Chmod(filepath.Join(path, "ellen"), os.ModePerm); err != nil {
 					return nil, err
 				}
 			} else {
-				return nil, errors.New("error while parsing feladat_txt problem can't compile feladat_txt checker because there's no cpp11 compiler")
+				return nil, err
 			}
+
 		} else {
 			return nil, err
 		}
@@ -328,7 +330,7 @@ func parser(path string) (problems.Problem, error) {
 		if err != nil {
 			return nil, err
 		}
-		p.AttachmentList = append(p.AttachmentList, problems.Attachment{"minta.zip", cont})
+		p.AttachmentList = append(p.AttachmentList, problems.BytesData{Nam: "minta.zip", Val: cont})
 	}
 
 	p.InputPathPattern = filepath.Join(p.Path, "in.%d")

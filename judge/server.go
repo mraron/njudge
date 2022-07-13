@@ -7,9 +7,11 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 	"github.com/shirou/gopsutil/load"
+	"go.uber.org/multierr"
 	"log"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/mraron/njudge/utils/problems"
@@ -70,11 +72,12 @@ func (s ServerStatus) String() string {
 }
 
 type Server struct {
-	ServerStatus `mapstructure:",squash"`
+	serverStatusMutex sync.RWMutex
+	ServerStatus      `mapstructure:",squash"`
 
 	ProblemsDir string `json:"problems_dir" mapstructure:"problems_dir"`
 	LogDir      string `json:"log_dir" mapstructure:"log_dir"`
-	SandboxIds  []int  `json:"sandbox_ids" mapstructure:"sandobx_ids"`
+	SandboxIds  []int  `json:"sandbox_ids" mapstructure:"sandbox_ids"`
 
 	PublicKeyLocation string `json:"public_key" mapstructure:"public_key"`
 
@@ -96,6 +99,7 @@ func NewServer() *Server {
 
 func (s *Server) Run() error {
 	s.ProblemStore = problems.NewFsStore(s.ProblemsDir)
+	s.updateProblems()
 
 	s.sandboxProvider = language.NewSandboxProvider()
 	for _, id := range s.SandboxIds {
@@ -160,17 +164,23 @@ func (s *Server) Run() error {
 	return e.Start(":" + s.Port)
 }
 
+func (s *Server) updateProblems() error {
+	var (
+		err  error
+		err2 error
+	)
+
+	err = s.ProblemStore.Update()
+	s.ProblemList, err2 = s.ProblemStore.List()
+
+	return multierr.Append(err, err2)
+}
+
 func (s *Server) runUpdateProblems() {
 	for {
-		var err error
-		if err = s.ProblemStore.Update(); err != nil {
+		if err := s.updateProblems(); err != nil {
 			log.Print(err)
 		}
-
-		if s.ProblemList, err = s.ProblemStore.List(); err != nil {
-			log.Print(err)
-		}
-
 		time.Sleep(20 * time.Second)
 	}
 }
@@ -182,7 +192,9 @@ func (s *Server) runUpdateLoad() {
 		if err != nil {
 			log.Print("Error while getting load: ", err)
 		} else {
-			s.Load = l.Load1
+			s.serverStatusMutex.Lock()
+			s.ServerStatus.Load = l.Load1
+			s.serverStatusMutex.Unlock()
 		}
 
 		time.Sleep(60 * time.Second)
@@ -191,54 +203,58 @@ func (s *Server) runUpdateLoad() {
 
 func (s *Server) runUpdateUptime() {
 	for {
-		s.Uptime = time.Since(s.start)
+		s.serverStatusMutex.Lock()
+		s.ServerStatus.Uptime = time.Since(s.start)
+		s.serverStatusMutex.Unlock()
 		time.Sleep(1 * time.Second)
 	}
 }
 
 func (s *Server) runJudger() {
-	for {
-		func() {
-			sub := <-s.queue
+	judge := func() error {
+		sub := <-s.queue
 
-			defer func() {
-				sub.done <- true
-			}()
-
-			if ok, err := s.ProblemStore.Has(sub.Problem); !ok {
-				log.Print("judger: can't find problem", sub.Problem, "err: ", err)
-				return
-			}
-
-			f, err := os.Create(filepath.Join(s.LogDir, fmt.Sprintf("judger.%s", sub.Id)))
-			if err != nil {
-				log.Print("judger: can't create logfile", err)
-				f.Close()
-				return
-			}
-
-			logger := log.New(f, "[judging]", log.Lshortfile)
-
-			p, _ := s.ProblemStore.Get(sub.Problem)
-			err = Judge(logger, p, sub.Source, language.Get(sub.Language), s.sandboxProvider, sub.c)
-			if err != nil {
-				log.Print("judger: error while running Judge", err)
-				f.Close()
-				return
-			}
-
-			f.Close()
+		defer func() {
+			sub.done <- true
 		}()
+
+		if ok, err := s.ProblemStore.Has(sub.Problem); !ok {
+			return err
+		}
+
+		f, err := os.Create(filepath.Join(s.LogDir, fmt.Sprintf("judger.%s", sub.Id)))
+		if err != nil {
+			return multierr.Append(err, f.Close())
+		}
+
+		logger := log.New(f, "[judging]", log.Lshortfile)
+
+		p, _ := s.ProblemStore.Get(sub.Problem)
+		st, err := Judge(logger, p, sub.Source, language.Get(sub.Language), s.sandboxProvider, sub.c)
+		if err != nil {
+			st.Compiled = false
+			st.CompilerOutput = "internal error"
+			return multierr.Combine(sub.c.Callback("", st, true), err, f.Close())
+		} else {
+			return multierr.Append(sub.c.Callback("", st, true), f.Close())
+		}
+	}
+
+	for {
+		if err := judge(); err != nil {
+			log.Print("judger: ", err)
+		}
 	}
 }
 
 func (s *Server) getStatus(c echo.Context) error {
+	s.serverStatusMutex.RLock()
+	defer s.serverStatusMutex.RUnlock()
 	return c.JSON(http.StatusOK, s.ServerStatus)
 }
 
 func (s *Server) postUpdateProblems(c echo.Context) error {
-	s.runUpdateProblems()
-	return nil
+	return s.updateProblems()
 }
 
 func (s *Server) postJudge(c echo.Context) error {
@@ -267,7 +283,7 @@ func (s *Server) postJudge(c echo.Context) error {
 	}
 }
 
-func (s Server) ToString() (string, error) {
+func (s *Server) ToString() (string, error) {
 	val, err := json.Marshal(s)
 	return string(val), err
 }

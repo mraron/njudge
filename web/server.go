@@ -1,6 +1,8 @@
 package web
 
 import (
+	"sync"
+
 	"github.com/gorilla/sessions"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo-contrib/session"
@@ -25,19 +27,22 @@ import (
 	_ "github.com/mraron/njudge/utils/language/python3"
 	_ "github.com/mraron/njudge/utils/language/zip"
 
+	_ "mime"
+	"net/http"
+
 	"github.com/mraron/njudge/web/models"
 	_ "github.com/mraron/njudge/web/models"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
-	_ "mime"
-	"net/http"
 )
 
 type Server struct {
 	config.Server
-	ProblemStore problems.Store
-	DB     *sqlx.DB
+	DB *sqlx.DB
 
-	judges []*models.Judge
+	ProblemStore problems.Store
+
+	judgesMutex sync.RWMutex
+	judges      []*models.Judge
 }
 
 func (s *Server) Run() {
@@ -47,7 +52,7 @@ func (s *Server) Run() {
 	e := echo.New()
 	if s.Mode == "development" {
 		e.Debug = true
-	}else {
+	} else {
 		e.HTTPErrorHandler = func(err error, c echo.Context) {
 			code := http.StatusInternalServerError
 			if he, ok := err.(*echo.HTTPError); ok {
@@ -71,7 +76,7 @@ func (s *Server) Run() {
 		return func(c echo.Context) error {
 			currentUser := func(c echo.Context) (*models.User, error) {
 				var (
-					u   = &models.User{}
+					u   *models.User
 					err error
 				)
 

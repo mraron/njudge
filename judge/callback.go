@@ -12,7 +12,7 @@ import (
 )
 
 type Callbacker interface {
-	Callback(string, problems.Status, bool) error
+	Callback(test string, status problems.Status, done bool) error
 }
 
 //@TODO Create cached callback
@@ -28,7 +28,7 @@ func NewCombineCallback(lst ...Callbacker) CombineCallback {
 func (c CombineCallback) Callback(test string, status problems.Status, done bool) error {
 	var err error
 	for _, cb := range c.lst {
-		multierror.Append(err, cb.Callback(test, status, done))
+		err = multierror.Append(err, cb.Callback(test, status, done))
 	}
 
 	return err
@@ -39,8 +39,8 @@ func (c *CombineCallback) Append(callbacker Callbacker) {
 }
 
 type WriterCallback struct {
-	enc *json.Encoder
-	err error
+	enc       *json.Encoder
+	err       error
 	afterFunc func()
 }
 
@@ -48,7 +48,7 @@ func NewWriterCallback(w io.Writer, afterFunc func()) *WriterCallback {
 	return &WriterCallback{enc: json.NewEncoder(w), err: nil, afterFunc: afterFunc}
 }
 
-func (wc* WriterCallback) Callback(test string, status problems.Status, done bool) error {
+func (wc *WriterCallback) Callback(test string, status problems.Status, done bool) error {
 	if wc.err != nil {
 		return wc.err
 	}

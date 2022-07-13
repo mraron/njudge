@@ -39,7 +39,7 @@ func (golang) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Wri
 		return err
 	}
 
-	if _, err := s.SetMaxProcesses(-1).Env().TimeLimit(10*time.Second).MemoryLimit(256000).Stdout(e).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/gccgo main.go", false); err != nil {
+	if _, err := s.AddArg("--open-files=2048").SetMaxProcesses(-1).Env().SetEnv("GOCACHE=/tmp").TimeLimit(10*time.Second).MemoryLimit(4*256000).Stdout(e).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/gccgo main.go", false); err != nil {
 		return err
 	}
 

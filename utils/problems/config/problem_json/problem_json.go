@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/mraron/njudge/utils/language"
-	"github.com/mraron/njudge/utils/problems"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/mraron/njudge/utils/language"
+	"github.com/mraron/njudge/utils/problems"
 )
 
 type Name struct {
@@ -32,7 +33,7 @@ type Attachment struct {
 type Problem struct {
 	Path                   string
 	GeneratedStatementList problems.Contents
-	AttachmentList         []problems.Attachment
+	AttachmentList         problems.Attachments
 
 	ShortName      string `json:"shortname"`
 	Names          []Name
@@ -51,7 +52,7 @@ func (p Problem) Name() string {
 func (p Problem) Titles() problems.Contents {
 	ans := make(problems.Contents, len(p.Names))
 	for ind, val := range p.Names {
-		ans[ind] = problems.Content{Locale: val.Language, Contents: []byte(val.Value), Type: "text"}
+		ans[ind] = problems.BytesData{Loc: val.Language, Val: []byte(val.Value), Typ: "text"}
 	}
 
 	return ans
@@ -89,7 +90,7 @@ func (p Problem) Languages() []language.Language {
 	return []language.Language{language.Get("zip")}
 }
 
-func (p Problem) Attachments() []problems.Attachment {
+func (p Problem) Attachments() problems.Attachments {
 	return p.AttachmentList
 }
 
@@ -98,11 +99,11 @@ func (p Problem) Tags() []string {
 }
 
 func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
-	ans := problems.Status{false, "status skeleton", problems.FEEDBACK_IOI, make([]problems.Testset, 0)}
+	ans := problems.Status{false, "status skeleton", problems.FeedbackIOI, make([]problems.Testset, 0)}
 	ans.Feedback = append(ans.Feedback, problems.Testset{Name: "tests"})
 	ans.Feedback[0].Groups = make([]problems.Group, 1)
 	ans.Feedback[0].Groups[0].Name = "base"
-	ans.Feedback[0].Groups[0].Scoring = problems.SCORING_SUM
+	ans.Feedback[0].Groups[0].Scoring = problems.ScoringSum
 
 	for i := 0; i < p.TestCount; i++ {
 		tc := problems.Testcase{}
@@ -110,7 +111,6 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 		tc.Index = i
 		tc.Group = "base"
 
-		ans.Feedback[0].Testcases = append(ans.Feedback[0].Testcases, tc)
 		ans.Feedback[0].Groups[0].Testcases = append(ans.Feedback[0].Groups[0].Testcases, tc)
 	}
 
@@ -134,15 +134,20 @@ func (p Problem) Check(tc *problems.Testcase) error {
 		return err
 	}
 
-	return errors.New("proccess state is not success")
+	return errors.New("process state is not success")
 }
 
 func (p Problem) Files() []problems.File {
 	return make([]problems.File, 0)
 }
 
-func (p Problem) TaskTypeName() string {
-	return "output_only"
+func (p Problem) GetTaskType() problems.TaskType {
+	tt, err := problems.GetTaskType("output_only")
+	if err != nil {
+		panic(err)
+	}
+
+	return tt
 }
 
 func parser(path string) (problems.Problem, error) {
@@ -161,7 +166,7 @@ func parser(path string) (problems.Problem, error) {
 
 	p.Path = path
 
-	p.AttachmentList = make([]problems.Attachment, len(p.AttachmentInfo))
+	p.AttachmentList = make(problems.Attachments, len(p.AttachmentInfo))
 	for ind, val := range p.AttachmentInfo {
 		contents, err := ioutil.ReadFile(filepath.Join(path, val.Path))
 
@@ -169,10 +174,10 @@ func parser(path string) (problems.Problem, error) {
 			return nil, err
 		}
 
-		p.AttachmentList[ind] = problems.Attachment{val.Name, contents}
+		p.AttachmentList[ind] = problems.BytesData{Nam: val.Name, Val: contents}
 	}
 
-	p.GeneratedStatementList = make([]problems.Content, len(p.StatementList))
+	p.GeneratedStatementList = make(problems.Contents, len(p.StatementList))
 	for ind, val := range p.StatementList {
 		contents, err := ioutil.ReadFile(filepath.Join(path, val.Path))
 
@@ -180,7 +185,7 @@ func parser(path string) (problems.Problem, error) {
 			return nil, err
 		}
 
-		p.GeneratedStatementList[ind] = problems.Content{Locale: val.Language, Contents: contents, Type: val.Type}
+		p.GeneratedStatementList[ind] = problems.BytesData{Loc: val.Language, Val: contents, Typ: val.Type}
 	}
 
 	return p, nil

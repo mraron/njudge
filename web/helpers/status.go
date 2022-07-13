@@ -10,12 +10,12 @@ import (
 
 type StatusPage struct {
 	CurrentPage int
-	Pages []pagination.Link
+	Pages       []pagination.Link
 	Submissions []*models.Submission
 }
 
 func GetStatusPage(DB *sqlx.DB, page, perPage int, order QueryMod, query []QueryMod, qu url.Values) (*StatusPage, error) {
-	sbs, err := models.Submissions(append(append([]QueryMod{Limit(perPage), Offset((page-1)*perPage)}, query...), order)...).All(DB)
+	sbs, err := models.Submissions(append(append([]QueryMod{Limit(perPage), Offset((page - 1) * perPage)}, query...), order)...).All(DB)
 	if err != nil {
 		return nil, err
 	}

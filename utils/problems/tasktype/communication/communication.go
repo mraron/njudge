@@ -123,14 +123,14 @@ func (b Communication) Run(jinfo problems.Judgeable, sp *language.SandboxProvide
 
 					testFile, err := os.Open(testLocation)
 					if err != nil {
-						tc.VerdictName = problems.VERDICT_XX
+						tc.VerdictName = problems.VerdictXX
 						return ans, err
 					}
 					defer testFile.Close()
 
 					err = interactorSandbox.CreateFile("inp", testFile)
 					if err != nil {
-						tc.VerdictName = problems.VERDICT_XX
+						tc.VerdictName = problems.VerdictXX
 						return ans, err
 					}
 
@@ -138,14 +138,14 @@ func (b Communication) Run(jinfo problems.Judgeable, sp *language.SandboxProvide
 
 					answerFile, err := os.Open(answerLocation)
 					if err != nil {
-						tc.VerdictName = problems.VERDICT_XX
+						tc.VerdictName = problems.VerdictXX
 						return ans, err
 					}
 					defer answerFile.Close()
 
 					answerContents, err := ioutil.ReadAll(answerFile)
 					if err != nil {
-						tc.VerdictName = problems.VERDICT_XX
+						tc.VerdictName = problems.VerdictXX
 						return ans, err
 					}
 
@@ -156,26 +156,26 @@ func (b Communication) Run(jinfo problems.Judgeable, sp *language.SandboxProvide
 
 					err = syscall.Mkfifo(filepath.Join("/tmp", "fifo1"+interactorSandbox.Id()), 0766)
 					if err != nil {
-						tc.VerdictName = problems.VERDICT_XX
+						tc.VerdictName = problems.VerdictXX
 						return ans, err
 					}
 
 					err = syscall.Mkfifo(filepath.Join("/tmp", "fifo2"+interactorSandbox.Id()), 0766)
 					if err != nil {
-						tc.VerdictName = problems.VERDICT_XX
+						tc.VerdictName = problems.VerdictXX
 						return ans, err
 					}
 
 					fifo1, err := os.OpenFile(filepath.Join("/tmp", "fifo1"+interactorSandbox.Id()), os.O_RDWR, 0766)
 					if err != nil {
-						tc.VerdictName = problems.VERDICT_XX
+						tc.VerdictName = problems.VerdictXX
 						return ans, err
 					}
 					defer fifo1.Close()
 
 					fifo2, err := os.OpenFile(filepath.Join("/tmp", "fifo2"+interactorSandbox.Id()), os.O_RDWR, 0766)
 					if err != nil {
-						tc.VerdictName = problems.VERDICT_XX
+						tc.VerdictName = problems.VerdictXX
 						return ans, err
 					}
 					defer fifo2.Close()
@@ -193,7 +193,7 @@ func (b Communication) Run(jinfo problems.Judgeable, sp *language.SandboxProvide
 					<-done
 
 					if err != nil {
-						tc.VerdictName = problems.VERDICT_XX
+						tc.VerdictName = problems.VerdictXX
 						return ans, err
 					}
 
@@ -209,13 +209,12 @@ func (b Communication) Run(jinfo problems.Judgeable, sp *language.SandboxProvide
 						tc.MemoryUsed = res.Memory
 						tc.TimeSpent = res.Time
 
-						testset.Testcases = append(testset.Testcases, tc)
 						group.Testcases = append(group.Testcases, tc)
 
 						if err == nil {
-							if tc.VerdictName == problems.VERDICT_WA || tc.VerdictName == problems.VERDICT_PE {
+							if tc.VerdictName == problems.VerdictWA || tc.VerdictName == problems.VerdictPE {
 								ac = false
-								if skeleton.FeedbackType != problems.FEEDBACK_IOI {
+								if skeleton.FeedbackType != problems.FeedbackIOI {
 									return ans, nil
 								}
 							}
@@ -229,13 +228,13 @@ func (b Communication) Run(jinfo problems.Judgeable, sp *language.SandboxProvide
 						curr.Testset = ts.Name
 						switch res.Verdict {
 						case language.VERDICT_RE:
-							curr.VerdictName = problems.VERDICT_RE
+							curr.VerdictName = problems.VerdictRE
 						case language.VERDICT_XX:
-							curr.VerdictName = problems.VERDICT_XX
+							curr.VerdictName = problems.VerdictXX
 						case language.VERDICT_ML:
-							curr.VerdictName = problems.VERDICT_ML
+							curr.VerdictName = problems.VerdictML
 						case language.VERDICT_TL:
-							curr.VerdictName = problems.VERDICT_TL
+							curr.VerdictName = problems.VerdictTL
 						}
 
 						curr.Group = g.Name
@@ -245,16 +244,14 @@ func (b Communication) Run(jinfo problems.Judgeable, sp *language.SandboxProvide
 						curr.Output = truncate(stdout.String()) //now it's stderr
 						curr.ExpectedOutput = truncate(string(answerContents))
 
-						testset.Testcases = append(testset.Testcases, curr)
 						group.Testcases = append(group.Testcases, curr)
 
-						if skeleton.FeedbackType != problems.FEEDBACK_IOI {
+						if skeleton.FeedbackType != problems.FeedbackIOI {
 							return ans, nil
 						}
 					}
 				} else {
 					group.Testcases = append(group.Testcases, tc)
-					testset.Testcases = append(testset.Testcases, tc)
 				}
 			}
 

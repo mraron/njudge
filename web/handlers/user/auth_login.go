@@ -1,13 +1,14 @@
 package user
 
 import (
+	"net/http"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/markbates/goth/gothic"
 	"github.com/mraron/njudge/web/models"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"net/http"
 )
 
 func AuthCallback(DB *sqlx.DB) echo.HandlerFunc {

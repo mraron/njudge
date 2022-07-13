@@ -2,15 +2,15 @@ package i18n
 
 import "github.com/mraron/njudge/utils/problems"
 
-func TranslateContent(locale string, cs problems.Contents) problems.Content {
-	search := func(loc string) (problems.Content, bool) {
+func TranslateContent(locale string, cs problems.Contents) problems.LocalizedData {
+	search := func(loc string) (problems.LocalizedData, bool) {
 		for _, c := range cs {
-			if locale == c.Locale {
+			if locale == c.Locale() {
 				return c, true
 			}
 		}
 
-		return problems.Content{}, false
+		return problems.BytesData{}, false
 	}
 
 	if val, ok := search(locale); ok {
@@ -22,7 +22,7 @@ func TranslateContent(locale string, cs problems.Contents) problems.Content {
 	}
 
 	if len(cs) == 0 {
-		return problems.Content{"-", []byte("undefined"), "text"}
+		return problems.BytesData{Loc: "-", Val: []byte("undefined"), Typ: "text"}
 	}
 	return cs[0]
 }

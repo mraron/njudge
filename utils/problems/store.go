@@ -3,11 +3,12 @@ package problems
 import (
 	"errors"
 	"fmt"
-	"github.com/spf13/afero"
 	"io/fs"
 	"path/filepath"
 	"strings"
 	"sync"
+
+	"github.com/spf13/afero"
 )
 
 var ErrorProblemNotFound = errors.New("problem not found")
@@ -42,7 +43,7 @@ type FsStore struct {
 	problems     map[string]Problem
 	problemsList []string
 
-	sync.Mutex
+	sync.RWMutex
 }
 
 type FsStoreOptions func(*FsStore)
@@ -69,10 +70,19 @@ func NewFsStore(dir string, options ...FsStoreOptions) *FsStore {
 }
 
 func (s *FsStore) List() ([]string, error) {
-	return s.problemsList, nil
+	s.RLock()
+	defer s.RUnlock()
+
+	lst := make([]string, len(s.problemsList))
+	copy(lst, s.problemsList)
+
+	return lst, nil
 }
 
 func (s *FsStore) Has(p string) (bool, error) {
+	s.RLock()
+	defer s.RUnlock()
+
 	for _, key := range s.problemsList {
 		if key == p {
 			return true, nil
@@ -83,8 +93,8 @@ func (s *FsStore) Has(p string) (bool, error) {
 }
 
 func (s *FsStore) Get(p string) (Problem, error) {
-	s.Lock()
-	defer s.Unlock()
+	s.RLock()
+	defer s.RUnlock()
 
 	if res, ok := s.problems[p]; ok {
 		return res, nil
@@ -103,7 +113,7 @@ func (s *FsStore) MustGet(p string) Problem {
 
 func (s *FsStore) Update() error {
 	errs := make([]error, 0)
-	s.problemsList = s.problemsList[:0]
+	lst := make([]string, 0)
 
 	if err := afero.Walk(s.fs, s.dir, func(path string, info fs.FileInfo, err error) error {
 		if err != nil || !info.IsDir() {
@@ -121,12 +131,17 @@ func (s *FsStore) Update() error {
 				return filepath.SkipDir
 			}
 		} else {
-			s.problemsList = append(s.problemsList, info.Name())
+			lst = append(lst, info.Name())
 			return filepath.SkipDir
 		}
 	}); err != nil {
 		return err
 	}
+
+	s.Lock()
+	s.problemsList = make([]string, len(lst))
+	copy(s.problemsList, lst)
+	s.Unlock()
 
 	if len(errs) == 0 {
 		return nil
@@ -134,7 +149,7 @@ func (s *FsStore) Update() error {
 
 	err := errs[0]
 	for i := 1; i < len(errs); i++ {
-		err = fmt.Errorf("%v; %v", err, errs[i])
+		err = fmt.Errorf("%v\n%v", err, errs[i])
 	}
 
 	return err

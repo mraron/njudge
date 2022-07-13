@@ -16,13 +16,13 @@ import (
 )
 
 type ProblemList struct {
-	Pages []pagination.Link
-	Problems []Problem
+	Pages        []pagination.Link
+	Problems     []Problem
 	SolverSorter helpers.SortColumn
 }
 
 func GetProblemList(DB *sqlx.DB, problemStore problems.Store, u *models.User, page, perPage int, order QueryMod, query []QueryMod, qu url.Values) (*ProblemList, error) {
-	ps, err := models.ProblemRels(append(append([]QueryMod{Limit(perPage), Offset((page-1)*perPage)}, query...), order)...).All(DB)
+	ps, err := models.ProblemRels(append(append([]QueryMod{Limit(perPage), Offset((page - 1) * perPage)}, query...), order)...).All(DB)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func GetProblemList(DB *sqlx.DB, problemStore problems.Store, u *models.User, pa
 
 			problems[i].CategoryLink = helpers.Link{
 				Text: category.Name,
-				Href: "/task_archive#category"+strconv.Itoa(p.CategoryID.Int),
+				Href: "/task_archive#category" + strconv.Itoa(p.CategoryID.Int),
 			}
 		}
 	}
@@ -80,16 +80,16 @@ func GetProblemList(DB *sqlx.DB, problemStore problems.Store, u *models.User, pa
 		sortOrder = qu.Get("order")
 		if qu.Get("order") == "DESC" {
 			qu.Set("order", "ASC")
-		}else {
+		} else {
 			qu.Set("order", "")
 			qu.Set("by", "")
 		}
-	}else {
+	} else {
 		qu.Set("by", "solver_count")
 		qu.Set("order", "DESC")
 	}
 
-	return &ProblemList{Pages: pages, Problems: problems, SolverSorter: helpers.SortColumn{sortOrder, "?"+qu.Encode()}}, nil
+	return &ProblemList{Pages: pages, Problems: problems, SolverSorter: helpers.SortColumn{sortOrder, "?" + qu.Encode()}}, nil
 }
 
 func GetList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
@@ -119,7 +119,7 @@ func GetList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	}
 }
 
-func GetStatus(DB* sqlx.DB) echo.HandlerFunc {
+func GetStatus(DB *sqlx.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ac := c.QueryParam("ac")
 		userID := c.QueryParam("user_id")
@@ -150,7 +150,7 @@ func GetStatus(DB* sqlx.DB) echo.HandlerFunc {
 	}
 }
 
-func PostSubmit(cfg config.Server, DB* sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
+func PostSubmit(cfg config.Server, DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
 			u   *models.User
@@ -204,4 +204,3 @@ func PostSubmit(cfg config.Server, DB* sqlx.DB, problemStore problems.Store) ech
 		return c.Redirect(http.StatusFound, "/problemset/status/#submission"+strconv.Itoa(id))
 	}
 }
-

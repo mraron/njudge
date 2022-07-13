@@ -6,9 +6,6 @@ import (
 	"github.com/mraron/njudge/utils/problems"
 	"github.com/mraron/njudge/web/extmodels"
 	"github.com/mraron/njudge/web/helpers/config"
-	"os"
-	"path/filepath"
-	"strconv"
 	"time"
 )
 
@@ -46,12 +43,6 @@ func Submit(cfg config.Server, DB *sqlx.DB, problemStore problems.Store, uid int
 		mustPanic(err)
 
 		err = res.Close()
-		mustPanic(err)
-
-		fs, err := os.Create(filepath.Join(cfg.SubmissionsDir, strconv.Itoa(int(id))))
-		mustPanic(err)
-
-		_, err = fs.Write([]byte(source))
 		mustPanic(err)
 
 		err = tx.Commit()

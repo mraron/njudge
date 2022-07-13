@@ -41,7 +41,7 @@ const htmlTemplate = `<link href="problem-statement.css" rel="stylesheet" type="
 
 var htmlTmpl *template.Template
 
-func convertPandoc(str* string) (err error) {
+func convertPandoc(str *string) (err error) {
 	buf := &bytes.Buffer{}
 
 	cmd := exec.Command("pandoc", "--mathjax", "-f", "latex", "-t", "html")
@@ -79,7 +79,7 @@ type JSONStatement struct {
 func ParseJSONStatement(fs afero.Fs, path string) (*JSONStatement, error) {
 	var (
 		stmt JSONStatement
-		err error
+		err  error
 	)
 
 	propsFile, err := fs.Open(filepath.Join(path, "problem-properties.json"))

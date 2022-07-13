@@ -2,6 +2,12 @@ package web
 
 import (
 	"context"
+	"log"
+	"math"
+	"net/http"
+	"strconv"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/mraron/njudge/judge"
@@ -11,11 +17,6 @@ import (
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"log"
-	"math"
-	"net/http"
-	"strconv"
-	"time"
 )
 
 func (s *Server) StartBackgroundJobs() {
@@ -38,6 +39,9 @@ func (s *Server) runUpdateProblems() {
 
 func (s *Server) runSyncJudges() {
 	loadJudgesFromDB := func() {
+		s.judgesMutex.Lock()
+		defer s.judgesMutex.Unlock()
+
 		var err error
 		s.judges, err = models.Judges().All(s.DB)
 
@@ -46,8 +50,9 @@ func (s *Server) runSyncJudges() {
 		}
 	}
 
-	for {
-		loadJudgesFromDB()
+	updateJudges := func() {
+		s.judgesMutex.RLock()
+		defer s.judgesMutex.RUnlock()
 
 		for _, j := range s.judges {
 			jwt, err := helpers.GetJWT(s.Keys)
@@ -56,7 +61,7 @@ func (s *Server) runSyncJudges() {
 				continue
 			}
 
-			c := judge.NewClient("http://" + j.Host + ":" + j.Port, jwt)
+			c := judge.NewClient("http://"+j.Host+":"+j.Port, jwt)
 			st, err := c.Status(context.TODO())
 			if err != nil {
 				log.Print("trying to access judge on ", j.Host, j.Port, " getting error ", err)
@@ -76,10 +81,16 @@ func (s *Server) runSyncJudges() {
 
 			_, err = j.Update(s.DB, boil.Infer())
 			if err != nil {
-				log.Print("trying to access judge on", j.Host, j.Port, " unsuccesful update in database", err)
+				log.Print("trying to access judge on", j.Host, j.Port, " unsuccessful update in database", err)
 				continue
 			}
 		}
+	}
+
+	for {
+		loadJudgesFromDB()
+		updateJudges()
+
 		time.Sleep(10 * time.Second)
 	}
 }
@@ -132,6 +143,41 @@ func (s *Server) runGlue() {
 }
 
 func (s *Server) runJudger() {
+	findJudger := func(sub *models.Submission) {
+		s.judgesMutex.RLock()
+		defer s.judgesMutex.RUnlock()
+
+		for _, j := range s.judges {
+			st, err := judge.ParseServerStatus(j.State)
+			if err != nil {
+				log.Print("malformed judge: ", j.State, err)
+				continue
+			}
+
+			if j.Online && st.SupportsProblem(sub.Problem) {
+				token, err := helpers.GetJWT(s.Keys)
+				if err != nil {
+					log.Print("can't get jwt token", err)
+					continue
+				}
+
+				client := judge.NewClient(st.Url, token)
+
+				//@TODO web is a placeholder until migrating to streaming response
+				if err = client.SubmitCallback(context.TODO(), judge.Submission{Id: strconv.Itoa(sub.ID), Problem: sub.Problem, Language: sub.Language, Source: sub.Source}, "http://web:"+s.GluePort+"/callback/"+strconv.Itoa(sub.ID)); err != nil {
+					log.Print("Trying to submit to server", j.Host, j.Port, "Error", err)
+					continue
+				}
+
+				if _, err = s.DB.Exec("UPDATE submissions SET started=true WHERE id=$1", sub.ID); err != nil {
+					log.Print("FATAL: ", err)
+				}
+
+				break
+			}
+		}
+	}
+
 	for {
 		time.Sleep(1 * time.Second)
 
@@ -146,31 +192,7 @@ func (s *Server) runJudger() {
 		}
 
 		for _, sub := range ss {
-			for _, j := range s.judges {
-				st, err := judge.ParseServerStatus(j.State)
-				if err != nil {
-					log.Print("malformed judge: ", j.State, err)
-					continue
-				}
-
-				if st.SupportsProblem(sub.Problem) {
-					token, err := helpers.GetJWT(s.Keys)
-					if err != nil {
-						log.Print("can't get jwt token", err)
-					}
-
-					client := judge.NewClient(st.Url, token)
-					if err = client.SubmitCallback(context.TODO(), judge.Submission{Id:strconv.Itoa(sub.ID), Problem: sub.Problem, Language: sub.Language, Source: sub.Source}, "http://" + s.Hostname + ":" + s.GluePort + "/callback/" + strconv.Itoa(sub.ID)); err != nil {
-						log.Print("Trying to submit to server", j.Host, j.Port, "Error", err)
-						continue
-					}
-
-					if _, err = s.DB.Exec("UPDATE submissions SET started=true WHERE id=$1", sub.ID); err != nil {
-						log.Print("FATAL: ", err)
-					}
-					break
-				}
-			}
+			findJudger(sub)
 		}
 	}
 }
@@ -185,7 +207,7 @@ func (s *Server) runStatisticsUpdate() {
 
 		userPoints := make(map[int]float64)
 		for _, p := range probs {
-			points := math.Sqrt(1.0/float64(p.SolverCount))
+			points := math.Sqrt(1.0 / float64(p.SolverCount))
 			solvedBy, err := models.Submissions(Distinct("user_id"), Where("verdict = 0"), Where("problemset = ?", p.Problemset), Where("problem = ?", p.Problem)).All(s.DB)
 			if err != nil {
 				log.Print(err)
@@ -200,7 +222,7 @@ func (s *Server) runStatisticsUpdate() {
 		for uid, pts := range userPoints {
 			var user models.User
 			user.ID = uid
-			user.Points = null.Float32{Float32:float32(pts), Valid: true}
+			user.Points = null.Float32{Float32: float32(pts), Valid: true}
 			if _, err := user.Update(s.DB, boil.Whitelist("points")); err != nil {
 				log.Print(err)
 				continue

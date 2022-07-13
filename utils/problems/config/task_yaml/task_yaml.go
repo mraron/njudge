@@ -5,9 +5,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/mraron/njudge/utils/language"
-	"github.com/mraron/njudge/utils/problems"
-	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
 	"os"
@@ -16,6 +13,11 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/mraron/njudge/utils/language"
+	"github.com/mraron/njudge/utils/language/cpp14"
+	"github.com/mraron/njudge/utils/problems"
+	"gopkg.in/yaml.v2"
 )
 
 type TaskYAML struct {
@@ -41,7 +43,7 @@ type Problem struct {
 	TaskYAML
 
 	StatementList  problems.Contents
-	AttachmentList []problems.Attachment
+	AttachmentList problems.Attachments
 
 	InputPathPattern  string
 	AnswerPathPattern string
@@ -50,11 +52,11 @@ type Problem struct {
 }
 
 func (p Problem) Name() string {
-	return filepath.Base(p.Path)
+	return p.TaskYAML.Name
 }
 
 func (p Problem) Titles() problems.Contents {
-	return []problems.Content{{"hungarian", []byte(p.Title), "text"}}
+	return problems.Contents{problems.BytesData{Loc: "hungarian", Val: []byte(p.Title), Typ: "text"}}
 }
 
 func (p Problem) Statements() problems.Contents {
@@ -98,7 +100,7 @@ func (p Problem) Languages() []language.Language {
 	return lst2
 }
 
-func (p Problem) Attachments() []problems.Attachment {
+func (p Problem) Attachments() problems.Attachments {
 	return p.AttachmentList
 }
 
@@ -107,7 +109,7 @@ func (p Problem) Tags() []string {
 }
 
 func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
-	ans := problems.Status{false, "status skeleton", problems.FEEDBACK_IOI, make([]problems.Testset, 0)}
+	ans := problems.Status{false, "status skeleton", problems.FeedbackIOI, make([]problems.Testset, 0)}
 	ans.Feedback = append(ans.Feedback, problems.Testset{Name: "tests"})
 	testset := &ans.Feedback[len(ans.Feedback)-1]
 
@@ -120,7 +122,7 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 		tc.InputPath, tc.AnswerPath = fmt.Sprintf(p.InputPathPattern, ind), fmt.Sprintf(p.AnswerPathPattern, ind)
 		tc.Index = ind + 1
 		tc.MaxScore = 0
-		tc.VerdictName = problems.VERDICT_DR
+		tc.VerdictName = problems.VerdictDR
 		tc.MemoryLimit = p.MemoryLimit()
 		tc.TimeLimit = time.Duration(p.TimeLimit()) * time.Millisecond
 
@@ -148,10 +150,9 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 		group := &testset.Groups[len(testset.Groups)-1]
 
 		group.Name = subtask
-		group.Scoring = problems.SCORING_GROUP
+		group.Scoring = problems.ScoringGroup
 		for _, tc := range tcByGroup[subtask] {
 			group.Testcases = append(group.Testcases, tc)
-			testset.Testcases = append(testset.Testcases, tc)
 		}
 	}
 
@@ -174,11 +175,11 @@ func (p Problem) Check(tc *problems.Testcase) error {
 	fmt.Fscanf(&stdout, "%f", &tc.Score)
 
 	if tc.Score == 1.0 {
-		tc.VerdictName = problems.VERDICT_AC
+		tc.VerdictName = problems.VerdictAC
 	} else if tc.Score > 0 {
-		tc.VerdictName = problems.VERDICT_PC
+		tc.VerdictName = problems.VerdictPC
 	} else {
-		tc.VerdictName = problems.VERDICT_WA
+		tc.VerdictName = problems.VerdictWA
 	}
 
 	tc.Score *= tc.MaxScore
@@ -191,8 +192,13 @@ func (p Problem) Files() []problems.File {
 	return make([]problems.File, 0)
 }
 
-func (p Problem) TaskTypeName() string {
-	return "batch"
+func (p Problem) GetTaskType() problems.TaskType {
+	tt, err := problems.GetTaskType("batch")
+	if err != nil {
+		panic(err)
+	}
+
+	return tt
 }
 
 func parseGen(r io.Reader) (int, [][2]int, error) {
@@ -265,7 +271,7 @@ func parseGen(r io.Reader) (int, [][2]int, error) {
 
 func parser(path string) (problems.Problem, error) {
 	fmt.Println(path)
-	p := Problem{Path: path, InputPathPattern: filepath.Join(path, "input", "input%d.txt"), AnswerPathPattern: filepath.Join(path, "output", "output%d.txt"), AttachmentList: make([]problems.Attachment, 0)}
+	p := Problem{Path: path, InputPathPattern: filepath.Join(path, "input", "input%d.txt"), AnswerPathPattern: filepath.Join(path, "output", "output%d.txt"), AttachmentList: make(problems.Attachments, 0)}
 
 	YAMLFile, err := os.Open(filepath.Join(path, "task.yaml"))
 	if err != nil {
@@ -298,26 +304,22 @@ func parser(path string) (problems.Problem, error) {
 		p.ScoreTypeParameters = subtasks
 	}
 
-	p.StatementList = make([]problems.Content, 0)
-	p.StatementList = append(p.StatementList, problems.Content{"hungarian", statementPDF, "application/pdf"})
+	p.StatementList = make(problems.Contents, 0)
+	p.StatementList = append(p.StatementList, problems.BytesData{Loc: "hungarian", Val: statementPDF, Typ: "application/pdf"})
 
 	checkerPath := filepath.Join(p.Path, "check", "checker")
 	if _, err := os.Stat(checkerPath); os.IsNotExist(err) {
 		if checkerBinary, err := os.Create(checkerPath); err == nil {
 			defer checkerBinary.Close()
 
-			if lang := language.Get("cpp14"); lang != nil {
-				if checkerFile, err := os.Open(checkerPath + ".cpp"); err == nil {
-					defer checkerFile.Close()
+			if checkerFile, err := os.Open(checkerPath + ".cpp"); err == nil {
+				defer checkerFile.Close()
 
-					if err := lang.InsecureCompile(filepath.Join(path, "check"), checkerFile, checkerBinary, os.Stderr); err != nil {
-						return nil, err
-					}
+				if err := cpp14.Lang.InsecureCompile(filepath.Join(path, "check"), checkerFile, checkerBinary, os.Stderr); err != nil {
+					return nil, err
+				}
 
-					if err := os.Chmod(checkerPath, os.ModePerm); err != nil {
-						return nil, err
-					}
-				} else {
+				if err := os.Chmod(checkerPath, os.ModePerm); err != nil {
 					return nil, err
 				}
 			} else {
@@ -340,7 +342,7 @@ func parser(path string) (problems.Problem, error) {
 				return nil, err
 			}
 
-			p.AttachmentList = append(p.AttachmentList, problems.Attachment{file.Name(), cont})
+			p.AttachmentList = append(p.AttachmentList, problems.BytesData{Nam: file.Name(), Val: cont})
 		}
 	}
 
