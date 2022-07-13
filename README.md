@@ -1,38 +1,26 @@
 # njudge
 
+[![Tests](https://github.com/mraron/njudge/actions/workflows/tests.yml/badge.svg)](https://github.com/mraron/njudge/actions/workflows/tests.yml) [![Go Report Card](https://goreportcard.com/badge/github.com/mraron/njudge)](https://goreportcard.com/report/github.com/mraron/njudge)
+
 Online Judge system written in golang.
 
 ## Installation
 
-### 1. Install the dependencies
+Build and start the containers:
 
-For example on Ubuntu 20.10:
+```
+docker-compose build
+docker-compose up
+```
 
-`$ sudo apt install pandoc g++ fpc golang julia octave python3`
+Run migrations:
+```
+docker exec -it judge_web_1 ./njudge web migrate --up
+```
 
-Install [isolate](https://github.com/ioi/isolate) on the system.
+Modify the environemnt files `web.env` and `judge.env` (restart the containers for the changes to take effect).
 
-Install postgresql on the system and create a database for njudge.
-
-### 2. Clone the repository and create config files
-
-`$ git clone github.com/mraron/njudge.git`
-
-Create `judge.json` and and `web.json` from the appropriate `.example` files, modifying them in respect to your system.
-
-### 3. Migrate database
-
-Run njudge by executing `go build` in the root of the repository and then executing 
-`$ ./njudge migrate --up -c web.json`
-to migrate the database to the latest version.  
-
-### 4. Run
-
-Run your judger via the command `./njudge judge -c judge.json`
-Run the web frontend via the command `./njudge web -c web.json`
-
-In the database or on the admin panel add the judger to the list.
-
+Add problems to the problems volume, both the web and judge will detect them. 
 
 ## Modules
 * njudge/web: web frontend [![](https://godoc.org/github.com/mraron/njudge/web?status.svg)](http://godoc.org/github.com/mraron/njudge/web)
