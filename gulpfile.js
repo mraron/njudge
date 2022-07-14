@@ -12,17 +12,17 @@ function adminJS() {
 }
 
 function mainCSS() {
-    return src("src/css/*.css").pipe(src('node_modules/bootstrap/dist/css/bootstrap.min.css')).pipe(purgeCSS({
+    return src("static_src/css/*.css").pipe(src('node_modules/bootstrap/dist/css/bootstrap.min.css')).pipe(purgeCSS({
         content: ['templates/*.gohtml', 'templates/**/*.gohtml']
     })).pipe(cleanCSS({compatibility: 'ie8'})).pipe(concat('main.min.css')).pipe(dest("static/css"))
 }
 
 function mainJS() {
-    return src("src/js/*.js").pipe(dest("static/js"))
+    return src("static_src/js/*.js").pipe(dest("static/js"))
 }
 
 function mainFavicon() {
-    return src("src/favicon.ico").pipe(dest("static"))
+    return src("static_src/favicon.ico").pipe(dest("static"))
 }
 
 const admin = parallel(adminCSS, adminJS)

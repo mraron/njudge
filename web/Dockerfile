@@ -1,5 +1,5 @@
 FROM njudge_base
 
-COPY web_docker.json ./web.json
+COPY configs/web_docker.json ./web.json
 
 CMD ["./njudge", "web"]

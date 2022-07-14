@@ -7,6 +7,6 @@ RUN make isolate
 RUN make install
 WORKDIR /app
 
-COPY judge_docker.json ./judge.json
+COPY configs/judge_docker.json ./judge.json
 
 CMD ["./njudge", "judge"]
