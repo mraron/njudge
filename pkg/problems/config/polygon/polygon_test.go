@@ -101,7 +101,7 @@ func testProblemXML(t *testing.T, p Problem) {
 }
 
 func TestFSParsing(t *testing.T) {
-	fs := afero.NewBasePathFs(afero.NewOsFs(), "./tests/")
+	fs := afero.NewBasePathFs(afero.NewOsFs(), "./testdata/")
 	cs := problems.NewConfigStore()
 	parser, identifier := ParserAndIdentifier(CompileBinaries(false), UseFS(fs))
 
@@ -119,7 +119,7 @@ func TestFSParsing(t *testing.T) {
 }
 
 func TestJSONStatement(t *testing.T) {
-	fs := afero.NewBasePathFs(afero.NewOsFs(), "./tests/")
+	fs := afero.NewBasePathFs(afero.NewOsFs(), "./testdata/")
 
 	_, err := ParseJSONStatement(fs, "hablaty/")
 	if err == nil {
@@ -133,7 +133,7 @@ func TestJSONStatement(t *testing.T) {
 }
 
 func TestCompileBinaries(t *testing.T) {
-	fs := afero.NewCopyOnWriteFs(afero.NewBasePathFs(afero.NewOsFs(), "./tests/"), afero.NewMemMapFs())
+	fs := afero.NewCopyOnWriteFs(afero.NewBasePathFs(afero.NewOsFs(), "./testdata/"), afero.NewMemMapFs())
 
 	if err := compileIfNotCompiled(fs, "", "check.cpp", "check"); err != nil {
 		t.Error(err)

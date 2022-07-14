@@ -18,7 +18,7 @@ Run migrations:
 docker exec -it judge_web_1 ./njudge web migrate --up
 ```
 
-Modify the environemnt files `web.env` and `judge.env` (restart the containers for the changes to take effect).
+Modify the environment files `web.env` and `judge.env` (restart the containers for the changes to take effect).
 
 Add problems to the problems volume, both the web and judge will detect them. 
 
