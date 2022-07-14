@@ -1,6 +1,6 @@
 package i18n
 
-import "github.com/mraron/njudge/utils/problems"
+import "github.com/mraron/njudge/pkg/problems"
 
 func TranslateContent(locale string, cs problems.Contents) problems.LocalizedData {
 	search := func(loc string) (problems.LocalizedData, bool) {

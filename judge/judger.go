@@ -5,8 +5,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/mraron/njudge/utils/language"
-	"github.com/mraron/njudge/utils/problems"
+	"github.com/mraron/njudge/pkg/language"
+	"github.com/mraron/njudge/pkg/problems"
 	"go.uber.org/multierr"
 )
 

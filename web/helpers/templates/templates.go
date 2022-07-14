@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
-	"github.com/mraron/njudge/utils/problems"
+	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/web/helpers/config"
 	"github.com/mraron/njudge/web/helpers/i18n"
 	"github.com/mraron/njudge/web/helpers/roles"
