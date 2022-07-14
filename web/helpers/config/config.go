@@ -47,6 +47,8 @@ type Server struct {
 	DBPassword string
 	DBHost     string
 	DBName     string
+	DBPort     int
+	DBSSLMode  bool
 
 	GluePort string
 
