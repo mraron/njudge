@@ -2,12 +2,12 @@ package mail
 
 import (
 	"crypto/tls"
-	"errors"
 	"fmt"
-	"github.com/mraron/njudge/web/helpers/config"
 	"io"
 	"net/smtp"
 	"strings"
+
+	"github.com/mraron/njudge/web/helpers/config"
 
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
@@ -90,5 +90,6 @@ func (m Mail) Send(s config.Server) error {
 		return nil
 	}
 
-	return errors.New("can't send activation email")
+	//@TODO log this
+	return nil
 }

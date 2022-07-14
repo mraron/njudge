@@ -1,13 +1,14 @@
 package user
 
 import (
+	"net/http"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/web/models"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"golang.org/x/crypto/bcrypt"
-	"net/http"
 )
 
 func GetLogin() echo.HandlerFunc {
@@ -33,15 +34,15 @@ func Login(DB *sqlx.DB) echo.HandlerFunc {
 
 		u, err = models.Users(Where("name=?", c.FormValue("name"))).One(DB)
 		if err != nil {
-			return c.Render(http.StatusOK, "login.gohtml", []string{"Hibás felhasználónév és jelszó páros."})
+			return c.Render(http.StatusOK, "user/login", []string{"Hibás felhasználónév és jelszó páros."})
 		}
 
 		if err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(c.FormValue("password"))); err != nil {
-			return c.Render(http.StatusOK, "login.gohtml", []string{"Hibás felhasználónév és jelszó páros."})
+			return c.Render(http.StatusOK, "user/login", []string{"Hibás felhasználónév és jelszó páros."})
 		}
 
 		if u.ActivationKey.Valid {
-			return c.Render(http.StatusOK, "login.gohtml", []string{"Hiba: az account nincs aktiválva."})
+			return c.Render(http.StatusOK, "user/login", []string{"Hiba: az account nincs aktiválva."})
 		}
 
 		storage, _ := session.Get("user", c)
