@@ -13,7 +13,7 @@ RUN go mod download
 COPY static/ ./static
 COPY cmd/ ./cmd
 COPY judge/ ./judge
-COPY utils/ ./utils
+COPY pkg/ ./pkg
 COPY web/ ./web
 COPY templates/ ./templates
 COPY main.go ./

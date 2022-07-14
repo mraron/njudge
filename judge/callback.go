@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/hashicorp/go-multierror"
-	"github.com/mraron/njudge/utils/problems"
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/hashicorp/go-multierror"
+	"github.com/mraron/njudge/pkg/problems"
 )
 
 type Callbacker interface {

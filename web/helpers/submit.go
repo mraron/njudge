@@ -3,7 +3,7 @@ package helpers
 import (
 	"database/sql"
 	"github.com/jmoiron/sqlx"
-	"github.com/mraron/njudge/utils/problems"
+	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/web/extmodels"
 	"github.com/mraron/njudge/web/helpers/config"
 	"time"

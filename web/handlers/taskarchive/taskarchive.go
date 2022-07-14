@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
-	"github.com/mraron/njudge/utils/problems"
+	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/web/helpers"
 	"github.com/mraron/njudge/web/helpers/i18n"
 	"github.com/mraron/njudge/web/models"

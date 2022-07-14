@@ -4,7 +4,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/providers/google"
-	"github.com/mraron/njudge/utils/problems"
+	"github.com/mraron/njudge/pkg/problems"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"time"
 )

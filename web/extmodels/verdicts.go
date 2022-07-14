@@ -1,6 +1,6 @@
 package extmodels
 
-import "github.com/mraron/njudge/utils/problems"
+import "github.com/mraron/njudge/pkg/problems"
 
 const (
 	VERDICT_CE problems.VerdictName = 998
