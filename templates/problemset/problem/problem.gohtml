@@ -29,7 +29,7 @@
             <div class="col-6">{{range $i := .Data.Problem.Tags}}<span class="badge badge-secondary">{{$i}}</span> {{end}}</div>
             {{end}}
             <div class="col-6">Típus:</div>
-            <div class="col-6">{{.Data.Problem.TaskTypeName}}</div>
+            <div class="col-6">{{.Data.Problem.GetTaskType.Name}}</div>
         </div>
     </div>
 </div>
