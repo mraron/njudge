@@ -186,7 +186,7 @@ func Cleanup(ctx RunContext) error {
 }
 
 func (b Batch) Name() string {
-	return "Batch"
+	return "batch"
 }
 
 func (b Batch) Compile(jinfo problems.Judgeable, sandbox language.Sandbox, lang language.Language, src io.Reader, dest io.Writer) (io.Reader, error) {
