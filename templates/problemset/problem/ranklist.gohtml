@@ -8,7 +8,7 @@
     <th scope="col">Pont</th>
 </tr>
 </thead>
-{{$mx := .Data.Problem.StatusSkeleton.MaxScore}}
+{{$mx := (.Data.Problem.StatusSkeleton "").MaxScore}}
 {{range $i := .Data.Submissions}}
     <tr><td><a href="/user/profile/{{$i.User.OneG.Name}}/">{{$i.User.OneG.Name}}</a></td><td><a href="/submission/{{$i.ID}}">{{$i.Score.Value}}/{{$mx}}</a></td></tr>
 {{end}}
