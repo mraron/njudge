@@ -113,24 +113,23 @@ func GetProblemFile(cfg config.Server, problemStore problems.Store) echo.Handler
 
 		fileLoc := ""
 
-		switch p.(type) {
+		switch p := p.(type) {
 		case polygon.Problem:
 			if len(p.HTMLStatements()) == 0 {
 				return echo.NewHTTPError(http.StatusNotFound, ErrorFileNotFound)
 			}
 
-			//@TODO what the fuck is this? how does polygon do it ATM
 			if strings.HasSuffix(c.Param("file"), ".css") {
-				fileLoc = filepath.Join(cfg.ProblemsDir, p.Name(), "statements", ".html", p.HTMLStatements()[0].Locale(), c.Param("file"))
+				fileLoc = filepath.Join(p.Path, "statements", ".html", p.HTMLStatements()[0].Locale(), c.Param("file"))
 			} else {
-				fileLoc = filepath.Join(cfg.ProblemsDir, p.Name(), "statements", p.HTMLStatements()[0].Locale(), c.Param("file"))
+				fileLoc = filepath.Join(p.Path, "statements", p.HTMLStatements()[0].Locale(), c.Param("file"))
 			}
 
 		default:
 			return echo.NewHTTPError(http.StatusNotFound, ErrorFileNotFound)
 		}
 
-		return c.Attachment(fileLoc, c.Param("file"))
+		return c.File(fileLoc)
 	}
 }
 
