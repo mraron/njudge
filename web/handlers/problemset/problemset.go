@@ -1,6 +1,11 @@
 package problemset
 
 import (
+	"io/ioutil"
+	"net/http"
+	"net/url"
+	"strconv"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/pkg/problems"
@@ -9,10 +14,6 @@ import (
 	"github.com/mraron/njudge/web/helpers/pagination"
 	"github.com/mraron/njudge/web/models"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"io/ioutil"
-	"net/http"
-	"net/url"
-	"strconv"
 )
 
 type ProblemList struct {

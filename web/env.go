@@ -1,12 +1,14 @@
 package web
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/providers/google"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/volatiletech/sqlboiler/v4/boil"
-	"time"
 )
 
 func (s *Server) SetupEnvironment() {
@@ -35,9 +37,18 @@ func (s *Server) SetupEnvironment() {
 
 func (s *Server) ConnectToDB() {
 	var err error
-	//@TODO create a config entry for sslmode
-	s.DB, err = sqlx.Open("postgres", "postgres://"+s.DBAccount+":"+s.DBPassword+"@"+s.DBHost+"/"+s.DBName+"?sslmode=disable")
 
+	sslmode := "require"
+	if !s.DBSSLMode {
+		sslmode = "disable"
+	}
+
+	if s.DBPort == 0 {
+		s.DBPort = 5432
+	}
+
+	connStr := fmt.Sprintf("user=%s password=%s host=%s dbname=%s port=%d sslmode=%s", s.DBAccount, s.DBPassword, s.DBHost, s.DBName, s.DBPort, sslmode)
+	s.DB, err = sqlx.Open("postgres", connStr)
 	if err != nil {
 		panic(err)
 	}

@@ -15,7 +15,7 @@ require (
 	github.com/kat-co/vala v0.0.0-20170210184112-42e1d8b61f12
 	github.com/kataras/go-errors v0.0.3
 	github.com/labstack/echo-contrib v0.12.0
-	github.com/labstack/echo/v4 v4.7.0
+	github.com/labstack/echo/v4 v4.7.2
 	github.com/labstack/gommon v0.3.1
 	github.com/lib/pq v1.10.4
 	github.com/markbates/goth v1.69.0

@@ -270,7 +270,6 @@ func parseGen(r io.Reader) (int, [][2]int, error) {
 }
 
 func parser(path string) (problems.Problem, error) {
-	fmt.Println(path)
 	p := Problem{Path: path, InputPathPattern: filepath.Join(path, "input", "input%d.txt"), AnswerPathPattern: filepath.Join(path, "output", "output%d.txt"), AttachmentList: make(problems.Attachments, 0)}
 
 	YAMLFile, err := os.Open(filepath.Join(path, "task.yaml"))

@@ -5,6 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html/template"
+	"io"
+	"io/fs"
+	"path/filepath"
+	"strings"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"github.com/mraron/njudge/pkg/problems"
@@ -12,12 +19,6 @@ import (
 	"github.com/mraron/njudge/web/helpers/i18n"
 	"github.com/mraron/njudge/web/helpers/roles"
 	"github.com/mraron/njudge/web/models"
-	"html/template"
-	"io"
-	"io/fs"
-	"path/filepath"
-	"strings"
-	"time"
 )
 
 type Renderer struct {

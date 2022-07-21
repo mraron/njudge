@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -140,6 +141,15 @@ func (s *FsStore) Update() error {
 		}
 
 		if s.dir == path {
+			return nil
+		}
+
+		//skip directories recursively with the .njudge_ignore file
+		if _, err := os.Stat(filepath.Join(path, ".njudge_ignore")); err != nil {
+			if !errors.Is(err, os.ErrNotExist) {
+				return err
+			}
+		} else {
 			return nil
 		}
 
