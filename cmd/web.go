@@ -1,12 +1,15 @@
 package cmd
 
 import (
-	"github.com/mraron/njudge/web"
-	"github.com/mraron/njudge/web/helpers/config"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"io/ioutil"
 	"log"
+
+	"github.com/mraron/njudge/web"
+	"github.com/mraron/njudge/web/helpers/config"
+	"github.com/mraron/njudge/web/models"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 var WebCmd = &cobra.Command{
@@ -75,6 +78,30 @@ var SubmitCmd = &cobra.Command{
 	},
 }
 
+var ActivateCmdArgs struct {
+	Name string
+}
+
+var ActivateCmd = &cobra.Command{
+	Use: "activate",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		cfg := config.Server{}
+
+		err := viper.Unmarshal(&cfg)
+		if err != nil {
+			return err
+		}
+
+		s := web.Server{Server: cfg}
+
+		s.SetupEnvironment()
+		s.ConnectToDB()
+		_, err = models.Users(qm.Where("name = ?", ActivateCmdArgs.Name)).UpdateAll(s.DB, models.M{"activation_key": nil})
+
+		return err
+	},
+}
+
 func init() {
 	RootCmd.AddCommand(WebCmd)
 
@@ -89,4 +116,9 @@ func init() {
 	SubmitCmd.MarkFlagRequired("file")
 
 	WebCmd.AddCommand(SubmitCmd)
+
+	ActivateCmd.Flags().StringVar(&ActivateCmdArgs.Name, "name", "", "name os the user to activate")
+	ActivateCmd.MarkFlagRequired("name")
+
+	WebCmd.AddCommand(ActivateCmd)
 }
