@@ -17,6 +17,7 @@ import (
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/language/cpp14"
 	"github.com/mraron/njudge/pkg/problems"
+	"go.uber.org/multierr"
 	"gopkg.in/yaml.v2"
 )
 
@@ -49,6 +50,8 @@ type Problem struct {
 	AnswerPathPattern string
 
 	Path string
+
+	whiteDiffChecker bool
 }
 
 func (p Problem) Name() string {
@@ -160,6 +163,31 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 }
 
 func (p Problem) Check(tc *problems.Testcase) error {
+	if p.whiteDiffChecker {
+		ans, err := os.Open(tc.AnswerPath)
+		if err != nil {
+			return multierr.Combine(err, ans.Close())
+		}
+		defer ans.Close()
+
+		out, err := os.Open(tc.OutputPath)
+		if err != nil {
+			return multierr.Combine(err, out.Close())
+		}
+		defer out.Close()
+
+		outcome, err := Whitediff(ans, out)
+		tc.Score = outcome * tc.MaxScore
+
+		if outcome == 1.0 {
+			tc.VerdictName = problems.VerdictAC
+		} else {
+			tc.VerdictName = problems.VerdictWA
+		}
+
+		return err
+	}
+
 	checkerPath := filepath.Join(p.Path, "check", "checker")
 
 	stdout, stderr := bytes.Buffer{}, bytes.Buffer{}
@@ -306,26 +334,31 @@ func parser(path string) (problems.Problem, error) {
 	p.StatementList = make(problems.Contents, 0)
 	p.StatementList = append(p.StatementList, problems.BytesData{Loc: "hungarian", Val: statementPDF, Typ: "application/pdf"})
 
-	checkerPath := filepath.Join(p.Path, "check", "checker")
-	if _, err := os.Stat(checkerPath); os.IsNotExist(err) {
-		if checkerBinary, err := os.Create(checkerPath); err == nil {
-			defer checkerBinary.Close()
+	checkPath := filepath.Join(p.Path, "check")
+	if _, err := os.Stat(checkPath); os.IsNotExist(err) {
+		p.whiteDiffChecker = true
+	} else {
+		checkerPath := filepath.Join(checkPath, "checker")
+		if _, err := os.Stat(checkerPath); os.IsNotExist(err) {
+			if checkerBinary, err := os.Create(checkerPath); err == nil {
+				defer checkerBinary.Close()
 
-			if checkerFile, err := os.Open(checkerPath + ".cpp"); err == nil {
-				defer checkerFile.Close()
+				if checkerFile, err := os.Open(checkerPath + ".cpp"); err == nil {
+					defer checkerFile.Close()
 
-				if err := cpp14.Lang.InsecureCompile(filepath.Join(path, "check"), checkerFile, checkerBinary, os.Stderr); err != nil {
-					return nil, err
-				}
+					if err := cpp14.Lang.InsecureCompile(filepath.Join(path, "check"), checkerFile, checkerBinary, os.Stderr); err != nil {
+						return nil, err
+					}
 
-				if err := os.Chmod(checkerPath, os.ModePerm); err != nil {
-					return nil, err
+					if err := os.Chmod(checkerPath, os.ModePerm); err != nil {
+						return nil, err
+					}
+				} else {
+					return nil, errors.New("error while parsing task_yaml problem can't compile task_yaml checker because there's no cpp14 compiler")
 				}
 			} else {
-				return nil, errors.New("error while parsing task_yaml problem can't compile task_yaml checker because there's no cpp14 compiler")
+				return nil, err
 			}
-		} else {
-			return nil, err
 		}
 	}
 
