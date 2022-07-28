@@ -36,8 +36,10 @@ type TaskYAML struct {
 	FeedbackLevel       string   `yaml:"feedback_level"`
 	ScoreType           string   `yaml:"score_type"`
 	ScoreTypeParameters [][2]int `yaml:"score_type_parameters"`
+	ScorePrecision      int      `yaml:"score_precision"`
 	ScoreMode           string   `yaml:"score_mode"`
 	TotalValue          int      `yaml:"total_value"`
+	OutputOnly          bool     `yaml:"output_only"`
 }
 
 type Problem struct {
@@ -91,6 +93,10 @@ func (p Problem) Interactive() bool {
 }
 
 func (p Problem) Languages() []language.Language {
+	if p.OutputOnly {
+		return []language.Language{language.Get("zip")}
+	}
+
 	lst1 := language.List()
 
 	lst2 := make([]language.Language, 0, len(lst1))
@@ -112,7 +118,7 @@ func (p Problem) Tags() []string {
 }
 
 func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
-	ans := problems.Status{false, "status skeleton", problems.FeedbackIOI, make([]problems.Testset, 0)}
+	ans := problems.Status{Compiled: false, CompilerOutput: "status skeleton", FeedbackType: problems.FeedbackIOI, Feedback: make([]problems.Testset, 0)}
 	ans.Feedback = append(ans.Feedback, problems.Testset{Name: "tests"})
 	testset := &ans.Feedback[len(ans.Feedback)-1]
 
@@ -123,6 +129,11 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	for ind := 0; ind < p.InputCount; ind++ {
 		tc := problems.Testcase{}
 		tc.InputPath, tc.AnswerPath = fmt.Sprintf(p.InputPathPattern, ind), fmt.Sprintf(p.AnswerPathPattern, ind)
+		if p.OutputOnly {
+			//A bit hacky
+			tc.OutputPath = fmt.Sprintf("output_%03d.txt", ind)
+		}
+
 		tc.Index = ind + 1
 		tc.MaxScore = 0
 		tc.VerdictName = problems.VerdictDR
@@ -192,6 +203,7 @@ func (p Problem) Check(tc *problems.Testcase) error {
 
 	stdout, stderr := bytes.Buffer{}, bytes.Buffer{}
 
+	fmt.Println(checkerPath, tc.InputPath, tc.AnswerPath, tc.OutputPath)
 	cmd := exec.Command(checkerPath, tc.InputPath, tc.AnswerPath, tc.OutputPath)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
@@ -199,7 +211,8 @@ func (p Problem) Check(tc *problems.Testcase) error {
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("can't check task_yaml task: %w", err)
 	}
-
+	lol, _ := ioutil.ReadFile(tc.OutputPath)
+	fmt.Println(stdout.String(), stderr.String(), "-->", string(lol))
 	fmt.Fscanf(&stdout, "%f", &tc.Score)
 
 	if tc.Score == 1.0 {
@@ -221,7 +234,17 @@ func (p Problem) Files() []problems.File {
 }
 
 func (p Problem) GetTaskType() problems.TaskType {
-	tt, err := problems.GetTaskType("batch")
+	var (
+		tt  problems.TaskType
+		err error
+	)
+
+	if p.OutputOnly {
+		tt, err = problems.GetTaskType("outputonly")
+	} else {
+		tt, err = problems.GetTaskType("batch")
+	}
+
 	if err != nil {
 		panic(err)
 	}

@@ -13,13 +13,13 @@ import (
 )
 
 type Batch struct {
-	PrepareFilesF func(CompileContext) (language.File, []language.File, error)
+	PrepareFilesF func(*CompileContext) (language.File, []language.File, error)
 
-	InitF      func(RunContext) error
-	RunF       func(RunContext, *problems.Group, *problems.Testcase) (language.Status, error)
-	CheckOKF   func(RunContext, language.Status, *problems.Group, *problems.Testcase) error
-	CheckFailF func(RunContext, language.Status, *problems.Group, *problems.Testcase) error
-	CleanupF   func(RunContext) error
+	InitF      func(*RunContext) error
+	RunF       func(*RunContext, *problems.Group, *problems.Testcase) (language.Status, error)
+	CheckOKF   func(*RunContext, language.Status, *problems.Group, *problems.Testcase) error
+	CheckFailF func(*RunContext, language.Status, *problems.Group, *problems.Testcase) error
+	CleanupF   func(*RunContext) error
 }
 
 func New() Batch {
@@ -62,7 +62,7 @@ type CompileContext struct {
 	Binary  io.Writer
 }
 
-func PrepareFiles(ctx CompileContext) (language.File, []language.File, error) {
+func PrepareFiles(ctx *CompileContext) (language.File, []language.File, error) {
 	lst, found := ctx.Problem.Languages(), false
 
 	for _, l := range lst {
@@ -78,11 +78,11 @@ func PrepareFiles(ctx CompileContext) (language.File, []language.File, error) {
 	return language.File{Name: "main.cpp", Source: ctx.Source}, nil, nil
 }
 
-func Init(RunContext) error {
+func Init(*RunContext) error {
 	return nil
 }
 
-func Run(ctx RunContext, group *problems.Group, testcase *problems.Testcase) (language.Status, error) {
+func Run(ctx *RunContext, group *problems.Group, testcase *problems.Testcase) (language.Status, error) {
 	inputFile, _ := ctx.Problem.InputOutputFiles()
 	testLocation, answerLocation := testcase.InputPath, testcase.AnswerPath
 	input, err := os.Open(testLocation)
@@ -117,9 +117,8 @@ func Run(ctx RunContext, group *problems.Group, testcase *problems.Testcase) (la
 	return res, nil
 }
 
-func CheckOK(ctx RunContext, res language.Status, group *problems.Group, testcase *problems.Testcase) error {
+func CheckOK(ctx *RunContext, res language.Status, group *problems.Group, testcase *problems.Testcase) error {
 	programOutput := ctx.Stdout.String()
-
 	answerContents, err := ioutil.ReadFile(testcase.AnswerPath)
 	if err != nil {
 		testcase.VerdictName = problems.VerdictXX
@@ -155,7 +154,7 @@ func CheckOK(ctx RunContext, res language.Status, group *problems.Group, testcas
 	return err
 }
 
-func CheckFail(ctx RunContext, res language.Status, group *problems.Group, testcase *problems.Testcase) error {
+func CheckFail(ctx *RunContext, res language.Status, group *problems.Group, testcase *problems.Testcase) error {
 	answerContents, err := ioutil.ReadFile(testcase.AnswerPath)
 	if err != nil {
 		testcase.VerdictName = problems.VerdictXX
@@ -181,7 +180,7 @@ func CheckFail(ctx RunContext, res language.Status, group *problems.Group, testc
 	return nil
 }
 
-func Cleanup(ctx RunContext) error {
+func Cleanup(ctx *RunContext) error {
 	return nil
 }
 
@@ -190,7 +189,7 @@ func (b Batch) Name() string {
 }
 
 func (b Batch) Compile(jinfo problems.Judgeable, sandbox language.Sandbox, lang language.Language, src io.Reader, dest io.Writer) (io.Reader, error) {
-	file, extras, err := b.PrepareFilesF(CompileContext{
+	file, extras, err := b.PrepareFilesF(&CompileContext{
 		Problem: jinfo,
 		Sandbox: sandbox,
 		Lang:    lang,
@@ -267,7 +266,7 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 		Store: map[string]interface{}{},
 	}
 
-	if err := b.InitF(ctx); err != nil {
+	if err := b.InitF(&ctx); err != nil {
 		return ans, err
 	}
 
@@ -290,13 +289,13 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 
 				if dependenciesOK(g.Dependencies) {
 					ctx.Stdout = &bytes.Buffer{}
-					res, err := b.RunF(ctx, group, tc)
+					res, err := b.RunF(&ctx, group, tc)
 
 					if err != nil {
 						tc.VerdictName = problems.VerdictXX
 						return ans, err
 					} else if res.Verdict == language.VERDICT_OK {
-						if err := b.CheckOKF(ctx, res, group, tc); err != nil {
+						if err := b.CheckOKF(&ctx, res, group, tc); err != nil {
 							tc.VerdictName = problems.VerdictXX
 							return ans, err
 						} else {
@@ -308,7 +307,7 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 							}
 						}
 					} else {
-						if err := b.CheckFailF(ctx, res, group, tc); err != nil {
+						if err := b.CheckFailF(&ctx, res, group, tc); err != nil {
 							tc.VerdictName = problems.VerdictXX
 							return ans, err
 						}
@@ -325,7 +324,7 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 		}
 	}
 
-	return ans, Cleanup(ctx)
+	return ans, Cleanup(&ctx)
 }
 
 func init() {
