@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
-	"github.com/mraron/njudge/pkg/language/cpp14"
+	"github.com/mraron/njudge/pkg/language/cpp"
 	"github.com/mraron/njudge/pkg/problems"
 )
 
@@ -309,7 +309,7 @@ func parser(path string) (problems.Problem, error) {
 			if checkerFile, err := os.Open(filepath.Join(path, "ellen.cpp")); err == nil {
 				defer checkerFile.Close()
 
-				if err := cpp14.Lang.InsecureCompile(path, checkerFile, checkerBinary, os.Stderr); err != nil {
+				if err := cpp.Std14.InsecureCompile(path, checkerFile, checkerBinary, os.Stderr); err != nil {
 					return nil, err
 				}
 

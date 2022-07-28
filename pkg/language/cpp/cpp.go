@@ -2,13 +2,14 @@ package cpp
 
 import (
 	"bytes"
-	"github.com/mraron/njudge/pkg/language"
-	"go.uber.org/multierr"
 	"io"
 	"io/ioutil"
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/mraron/njudge/pkg/language"
+	"go.uber.org/multierr"
 )
 
 type Cpp struct {
@@ -106,4 +107,14 @@ func (Cpp) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, tl
 
 func New(id, name, ver string) language.Language {
 	return Cpp{id, name, ver}
+}
+
+var Std11 = New("cpp11", "C++ 11", "c++11").(Cpp)
+var Std14 = New("cpp14", "C++ 14", "c++14").(Cpp)
+var Std17 = New("cpp17", "C++ 17", "c++17").(Cpp)
+
+var latest = Std17
+
+func init() {
+	language.Register("cpp", latest)
 }
