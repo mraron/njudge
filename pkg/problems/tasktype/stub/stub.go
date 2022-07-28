@@ -2,16 +2,21 @@ package stub
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
+	"io"
+	"io/ioutil"
+
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/tasktype/batch"
-	"io"
-	"io/ioutil"
 )
 
 type Stub struct {
+	batch.Batch
+}
+
+func New() Stub {
+	return Stub{batch.New()}
 }
 
 func (s Stub) Name() string {
@@ -28,7 +33,7 @@ func (s Stub) Compile(jinfo problems.Judgeable, sandbox language.Sandbox, lang l
 	}
 
 	if !found {
-		return nil, errors.New(fmt.Sprintf("%s tasktype: language %s is not supported", s.Name(), lang.Name()))
+		return nil, fmt.Errorf("%s tasktype: language %s is not supported", s.Name(), lang.Name())
 	}
 
 	files := jinfo.Files()
@@ -60,10 +65,6 @@ func (s Stub) Compile(jinfo problems.Judgeable, sandbox language.Sandbox, lang l
 	return buf, nil
 }
 
-func (Stub) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
-	return batch.Batch{}.Run(jinfo, sp, lang, bin, testNotifier, statusNotifier)
-}
-
 func init() {
-	problems.RegisterTaskType(Stub{})
+	problems.RegisterTaskType(New())
 }
