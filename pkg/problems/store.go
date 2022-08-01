@@ -34,7 +34,7 @@ type ProblemParseError struct {
 }
 
 func (perr ProblemParseError) Error() string {
-	return fmt.Sprintf("can't parse problems: %v", perr.Problems)
+	return fmt.Sprintf("can't parse problems: %v", perr.Errors)
 }
 
 func (perr ProblemParseError) Is(target error) bool {
