@@ -114,6 +114,9 @@ func Run(ctx *RunContext, group *problems.Group, testcase *problems.Testcase) (l
 		return res, err
 	}
 
+	testcase.MemoryUsed = res.Memory
+	testcase.TimeSpent = res.Time
+
 	return res, nil
 }
 
@@ -149,8 +152,7 @@ func CheckOK(ctx *RunContext, res language.Status, group *problems.Group, testca
 
 	testcase.Output = truncate(programOutput)
 	testcase.ExpectedOutput = truncate(string(answerContents))
-	testcase.MemoryUsed = res.Memory
-	testcase.TimeSpent = res.Time
+
 	return err
 }
 
@@ -174,8 +176,7 @@ func CheckFail(ctx *RunContext, res language.Status, group *problems.Group, test
 
 	testcase.Output = truncate(ctx.Stdout.String())
 	testcase.ExpectedOutput = truncate(string(answerContents))
-	testcase.MemoryUsed = res.Memory
-	testcase.TimeSpent = res.Time
+
 	testcase.Score = 0
 	return nil
 }

@@ -25,7 +25,7 @@ func New() *Communication {
 	c := &Communication{
 		stub.New(),
 		func(rc *batch.RunContext, utoi, itou *os.File, g *problems.Group, tc *problems.Testcase) (language.Status, error) {
-			return rc.Store["interactorSandbox"].(language.Sandbox).Stdin(utoi).Stdout(itou).TimeLimit(2*tc.TimeLimit).MemoryLimit(1024*1024*1024).Run("interactor inp out", true)
+			return rc.Store["interactorSandbox"].(language.Sandbox).Stdin(utoi).Stdout(itou).TimeLimit(2*tc.TimeLimit).MemoryLimit(1024*1024).Run("interactor inp out", true)
 		},
 		func(rc *batch.RunContext, utoi, itou *os.File, g *problems.Group, tc *problems.Testcase) (language.Status, error) {
 			return rc.Lang.Run(rc.Sandbox, bytes.NewReader(rc.Binary), itou, utoi, tc.TimeLimit, tc.MemoryLimit)
@@ -82,29 +82,49 @@ func New() *Communication {
 		}
 		defer answerFile.Close()
 
-		os.Remove("/tmp/fifo1" + interactorSandbox.Id())
-		os.Remove("/tmp/fifo2" + interactorSandbox.Id())
+		dir, err := os.MkdirTemp("/tmp", "commtask")
+		if err != nil {
+			return language.Status{}, err
+		}
+		err = os.Chmod(dir, 0755)
+		if err != nil {
+			return language.Status{}, err
+		}
 
-		err = syscall.Mkfifo(filepath.Join("/tmp", "fifo1"+interactorSandbox.Id()), 0766)
+		dir = filepath.Base(dir)
+
+		rc.Store["tempdir"] = dir
+
+		err = syscall.Mkfifo(filepath.Join("/tmp", dir, "fifo1"), 0666)
 		if err != nil {
 			tc.VerdictName = problems.VerdictXX
 			return language.Status{}, err
 		}
 
-		err = syscall.Mkfifo(filepath.Join("/tmp", "fifo2"+interactorSandbox.Id()), 0766)
+		err = os.Chmod(filepath.Join("/tmp", dir, "fifo1"), 0666)
+		if err != nil {
+			return language.Status{}, err
+		}
+
+		err = syscall.Mkfifo(filepath.Join("/tmp", dir, "fifo2"), 0666)
 		if err != nil {
 			tc.VerdictName = problems.VerdictXX
 			return language.Status{}, err
 		}
 
-		fifo1, err := os.OpenFile(filepath.Join("/tmp", "fifo1"+interactorSandbox.Id()), os.O_RDWR, 0766)
+		err = os.Chmod(filepath.Join("/tmp", dir, "fifo2"), 0666)
+		if err != nil {
+			return language.Status{}, err
+		}
+
+		fifo1, err := os.OpenFile(filepath.Join("/tmp", dir, "fifo1"), os.O_RDWR, 0666)
 		if err != nil {
 			tc.VerdictName = problems.VerdictXX
 			return language.Status{}, err
 		}
 		defer fifo1.Close()
 
-		fifo2, err := os.OpenFile(filepath.Join("/tmp", "fifo2"+interactorSandbox.Id()), os.O_RDWR, 0766)
+		fifo2, err := os.OpenFile(filepath.Join("/tmp", dir, "fifo2"), os.O_RDWR, 0666)
 		if err != nil {
 			tc.VerdictName = problems.VerdictXX
 			return language.Status{}, err
@@ -121,6 +141,10 @@ func New() *Communication {
 
 		res, err := c.RunUserF(rc, fifo1, fifo2, g, tc)
 		<-done
+		tc.MemoryUsed = res.Memory
+		tc.TimeSpent = res.Time
+
+		//err = multierr.Combine(err, os.Remove(filepath.Join("/tmp", dir, "fifo1")), os.Remove(filepath.Join("/tmp", dir, "fifo2")))
 
 		if err != nil {
 			return language.Status{}, err
