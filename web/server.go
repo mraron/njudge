@@ -21,8 +21,7 @@ import (
 	"github.com/mraron/njudge/web/helpers/roles"
 	"github.com/mraron/njudge/web/helpers/templates"
 
-	_ "github.com/mraron/njudge/pkg/language/cpp11"
-	_ "github.com/mraron/njudge/pkg/language/cpp14"
+	_ "github.com/mraron/njudge/pkg/language/cpp"
 	_ "github.com/mraron/njudge/pkg/language/golang"
 	_ "github.com/mraron/njudge/pkg/language/julia"
 	_ "github.com/mraron/njudge/pkg/language/nim"

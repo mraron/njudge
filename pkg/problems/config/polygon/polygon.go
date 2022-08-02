@@ -4,8 +4,6 @@ import (
 	"path/filepath"
 
 	"github.com/mraron/njudge/pkg/language"
-	_ "github.com/mraron/njudge/pkg/language/cpp11"
-	_ "github.com/mraron/njudge/pkg/language/cpp14"
 	"github.com/mraron/njudge/pkg/problems"
 )
 

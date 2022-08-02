@@ -5,17 +5,18 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/mraron/njudge/pkg/language"
-	"github.com/mraron/njudge/pkg/language/cpp14"
-	"github.com/mraron/njudge/pkg/problems"
-	"github.com/spf13/afero"
-	"go.uber.org/multierr"
 	"io/fs"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/mraron/njudge/pkg/language"
+	"github.com/mraron/njudge/pkg/language/cpp"
+	"github.com/mraron/njudge/pkg/problems"
+	"github.com/spf13/afero"
+	"go.uber.org/multierr"
 )
 
 func compileIfNotCompiled(fs afero.Fs, wd, src, dst string) error {
@@ -50,7 +51,7 @@ func compileIfNotCompiled(fs afero.Fs, wd, src, dst string) error {
 					})
 				}
 
-				if err := cpp14.Lang.Compile(s, language.File{
+				if err := cpp.Std14.Compile(s, language.File{
 					Name:   filepath.Base(src),
 					Source: file,
 				}, binary, &buf, headers); err != nil {

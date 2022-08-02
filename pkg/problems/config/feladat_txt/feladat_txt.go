@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
-	"github.com/mraron/njudge/pkg/language/cpp14"
+	"github.com/mraron/njudge/pkg/language/cpp"
 	"github.com/mraron/njudge/pkg/problems"
 )
 
@@ -92,7 +92,7 @@ func (p Problem) Tags() []string {
 }
 
 func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
-	ans := problems.Status{false, "status skeleton", problems.FeedbackIOI, make([]problems.Testset, 0)}
+	ans := problems.Status{Compiled: false, CompilerOutput: "status skeleton", FeedbackType: problems.FeedbackIOI, Feedback: make([]problems.Testset, 0)}
 	ans.Feedback = append(ans.Feedback, problems.Testset{Name: "tests"})
 	testset := &ans.Feedback[len(ans.Feedback)-1]
 
@@ -309,7 +309,7 @@ func parser(path string) (problems.Problem, error) {
 			if checkerFile, err := os.Open(filepath.Join(path, "ellen.cpp")); err == nil {
 				defer checkerFile.Close()
 
-				if err := cpp14.Lang.InsecureCompile(path, checkerFile, checkerBinary, os.Stderr); err != nil {
+				if err := cpp.Std14.InsecureCompile(path, checkerFile, checkerBinary, os.Stderr); err != nil {
 					return nil, err
 				}
 

@@ -2,7 +2,6 @@ package stub
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -14,6 +13,11 @@ import (
 )
 
 type Stub struct {
+	batch.Batch
+}
+
+func New() Stub {
+	return Stub{batch.New()}
 }
 
 func (s Stub) Name() string {
@@ -30,7 +34,7 @@ func (s Stub) Compile(jinfo problems.Judgeable, sandbox language.Sandbox, lang l
 	}
 
 	if !found {
-		return nil, errors.New(fmt.Sprintf("%s tasktype: language %s is not supported", s.Name(), lang.Name()))
+		return nil, fmt.Errorf("%s tasktype: language %s is not supported", s.Name(), lang.Name())
 	}
 
 	files := jinfo.Files()
@@ -48,13 +52,12 @@ func (s Stub) Compile(jinfo problems.Judgeable, sandbox language.Sandbox, lang l
 			return nil, err
 		}
 
-		language_files = append(language_files, language.File{n.Name, bytes.NewBuffer(conts)})
+		language_files = append(language_files, language.File{Name: n.Name, Source: bytes.NewBuffer(conts)})
 	}
 
 	buf := &bytes.Buffer{}
 
-	err := lang.Compile(sandbox, language.File{"main", src}, buf, dest, language_files)
-	fmt.Println(err)
+	err := lang.Compile(sandbox, language.File{Name: "main", Source: src}, buf, dest, language_files)
 	if err != nil {
 		return nil, err
 	}
@@ -62,10 +65,6 @@ func (s Stub) Compile(jinfo problems.Judgeable, sandbox language.Sandbox, lang l
 	return buf, nil
 }
 
-func (Stub) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
-	return batch.Batch{}.Run(jinfo, sp, lang, bin, testNotifier, statusNotifier)
-}
-
 func init() {
-	problems.RegisterTaskType(Stub{})
+	problems.RegisterTaskType(New())
 }
