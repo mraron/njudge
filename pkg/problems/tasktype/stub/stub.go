@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"strings"
+
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/tasktype/batch"
-	"io"
-	"io/ioutil"
 )
 
 type Stub struct {
@@ -34,7 +36,7 @@ func (s Stub) Compile(jinfo problems.Judgeable, sandbox language.Sandbox, lang l
 	files := jinfo.Files()
 	needed := make([]problems.File, 0)
 	for _, f := range files {
-		if f.Role == "stub_"+lang.Id() {
+		if f.Role == "stub_"+lang.Id() || (strings.HasPrefix(lang.Id(), "cpp") && f.Role == "stub_cpp") {
 			needed = append(needed, f)
 		}
 	}
