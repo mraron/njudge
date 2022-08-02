@@ -96,16 +96,11 @@ func (s *FsStore) List() ([]string, error) {
 }
 
 func (s *FsStore) Has(p string) (bool, error) {
-	s.RLock()
-	defer s.RUnlock()
-
-	for _, key := range s.problemsList {
-		if key == p {
-			return true, nil
-		}
+	if _, err := s.Get(p); err != nil {
+		return false, nil
 	}
 
-	return false, nil
+	return true, nil
 }
 
 func (s *FsStore) Get(p string) (Problem, error) {
@@ -115,6 +110,13 @@ func (s *FsStore) Get(p string) (Problem, error) {
 	if res, ok := s.problems[p]; ok {
 		return res, nil
 	}
+
+	for _, prob := range s.problems {
+		if prob.Name() == p {
+			return prob, nil
+		}
+	}
+
 	return nil, problemNotFoundError{p}
 }
 
@@ -185,6 +187,16 @@ func (s *FsStore) Update() error {
 	return errs
 }
 
+type problemWrapper struct {
+	Problem
+
+	nameOverride string
+}
+
+func (pw problemWrapper) Name() string {
+	return pw.nameOverride
+}
+
 func (s *FsStore) UpdateProblem(p string, path string) error {
 	s.Lock()
 	defer s.Unlock()
@@ -194,6 +206,6 @@ func (s *FsStore) UpdateProblem(p string, path string) error {
 		return err
 	}
 
-	s.problems[p] = prob
+	s.problems[filepath.Base(path)] = problemWrapper{prob, filepath.Base(path)}
 	return nil
 }
