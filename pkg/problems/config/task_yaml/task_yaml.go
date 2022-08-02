@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -15,8 +16,10 @@ import (
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
-	"github.com/mraron/njudge/pkg/language/cpp14"
+	"github.com/mraron/njudge/pkg/language/cpp"
 	"github.com/mraron/njudge/pkg/problems"
+	"github.com/mraron/njudge/pkg/problems/tasktype/batch"
+	"github.com/mraron/njudge/pkg/problems/tasktype/communication"
 	"go.uber.org/multierr"
 	"gopkg.in/yaml.v2"
 )
@@ -36,8 +39,11 @@ type TaskYAML struct {
 	FeedbackLevel       string   `yaml:"feedback_level"`
 	ScoreType           string   `yaml:"score_type"`
 	ScoreTypeParameters [][2]int `yaml:"score_type_parameters"`
+	ScorePrecision      int      `yaml:"score_precision"`
 	ScoreMode           string   `yaml:"score_mode"`
 	TotalValue          int      `yaml:"total_value"`
+	OutputOnly          bool     `yaml:"output_only"`
+	TaskTypeParameters  []string `yaml:"task_type_parameters"`
 }
 
 type Problem struct {
@@ -51,6 +57,8 @@ type Problem struct {
 
 	Path string
 
+	files            []problems.File
+	tasktype         string
 	whiteDiffChecker bool
 }
 
@@ -91,6 +99,10 @@ func (p Problem) Interactive() bool {
 }
 
 func (p Problem) Languages() []language.Language {
+	if p.OutputOnly {
+		return []language.Language{language.Get("zip")}
+	}
+
 	lst1 := language.List()
 
 	lst2 := make([]language.Language, 0, len(lst1))
@@ -112,7 +124,7 @@ func (p Problem) Tags() []string {
 }
 
 func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
-	ans := problems.Status{false, "status skeleton", problems.FeedbackIOI, make([]problems.Testset, 0)}
+	ans := problems.Status{Compiled: false, CompilerOutput: "status skeleton", FeedbackType: problems.FeedbackIOI, Feedback: make([]problems.Testset, 0)}
 	ans.Feedback = append(ans.Feedback, problems.Testset{Name: "tests"})
 	testset := &ans.Feedback[len(ans.Feedback)-1]
 
@@ -123,6 +135,11 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	for ind := 0; ind < p.InputCount; ind++ {
 		tc := problems.Testcase{}
 		tc.InputPath, tc.AnswerPath = fmt.Sprintf(p.InputPathPattern, ind), fmt.Sprintf(p.AnswerPathPattern, ind)
+		if p.OutputOnly {
+			// default cms loader behaviour
+			tc.OutputPath = fmt.Sprintf("output_%03d.txt", ind)
+		}
+
 		tc.Index = ind + 1
 		tc.MaxScore = 0
 		tc.VerdictName = problems.VerdictDR
@@ -163,6 +180,10 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 }
 
 func (p Problem) Check(tc *problems.Testcase) error {
+	if p.tasktype == "communication" { // manager already printed the result
+		return nil
+	}
+
 	if p.whiteDiffChecker {
 		ans, err := os.Open(tc.AnswerPath)
 		if err != nil {
@@ -192,6 +213,7 @@ func (p Problem) Check(tc *problems.Testcase) error {
 
 	stdout, stderr := bytes.Buffer{}, bytes.Buffer{}
 
+	fmt.Println(checkerPath, tc.InputPath, tc.AnswerPath, tc.OutputPath)
 	cmd := exec.Command(checkerPath, tc.InputPath, tc.AnswerPath, tc.OutputPath)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
@@ -199,7 +221,6 @@ func (p Problem) Check(tc *problems.Testcase) error {
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("can't check task_yaml task: %w", err)
 	}
-
 	fmt.Fscanf(&stdout, "%f", &tc.Score)
 
 	if tc.Score == 1.0 {
@@ -217,11 +238,59 @@ func (p Problem) Check(tc *problems.Testcase) error {
 }
 
 func (p Problem) Files() []problems.File {
-	return make([]problems.File, 0)
+	return p.files
 }
 
 func (p Problem) GetTaskType() problems.TaskType {
-	tt, err := problems.GetTaskType("batch")
+	var (
+		tt  problems.TaskType
+		err error
+	)
+
+	if p.tasktype == "outputonly" {
+		tt, err = problems.GetTaskType("outputonly")
+	} else if p.tasktype == "batch" {
+		tt, err = problems.GetTaskType("batch")
+	} else if p.tasktype == "communication" {
+		res := communication.New()
+		res.RunInteractorF = func(rc *batch.RunContext, utoi, itou *os.File, g *problems.Group, tc *problems.Testcase) (language.Status, error) {
+			input, err := os.Open(tc.InputPath)
+			if err != nil {
+				return language.Status{}, multierr.Combine(err, input.Close())
+			}
+			defer input.Close()
+
+			sbox := rc.Store["interactorSandbox"].(language.Sandbox).Stdin(input).Stdout(rc.Stdout).TimeLimit(2 * tc.TimeLimit).MemoryLimit(1024 * 1024)
+			sbox.MapDir("/fifo", filepath.Dir(itou.Name()), []string{"rw"}, false)
+
+			st, err := sbox.Run(fmt.Sprintf("interactor %s %s", filepath.Join("/fifo", filepath.Base(utoi.Name())), filepath.Join("/fifo", filepath.Base(itou.Name()))), true)
+			if err != nil {
+				return st, err
+			}
+
+			fmt.Fscanf(rc.Stdout, "%f", &tc.Score)
+			if tc.Score == 0 {
+				tc.VerdictName = problems.VerdictWA
+			} else if tc.Score < 1.0 {
+				tc.VerdictName = problems.VerdictPC
+			} else {
+				tc.VerdictName = problems.VerdictAC
+			}
+
+			tc.Score *= tc.MaxScore
+
+			// For compatibility create a file named out
+			return st, multierr.Combine(err, rc.Store["interactorSandbox"].(language.Sandbox).CreateFile("out", bytes.NewBuffer([]byte{})))
+		}
+
+		res.RunUserF = func(rc *batch.RunContext, utoi, itou *os.File, g *problems.Group, tc *problems.Testcase) (language.Status, error) {
+			time.Sleep(25 * time.Millisecond) // TODO very hacky
+			return rc.Lang.Run(rc.Sandbox, bytes.NewReader(rc.Binary), itou, utoi, tc.TimeLimit, tc.MemoryLimit)
+		}
+
+		tt = res
+	}
+
 	if err != nil {
 		panic(err)
 	}
@@ -298,7 +367,13 @@ func parseGen(r io.Reader) (int, [][2]int, error) {
 }
 
 func parser(path string) (problems.Problem, error) {
-	p := Problem{Path: path, InputPathPattern: filepath.Join(path, "input", "input%d.txt"), AnswerPathPattern: filepath.Join(path, "output", "output%d.txt"), AttachmentList: make(problems.Attachments, 0)}
+	p := Problem{
+		Path:              path,
+		InputPathPattern:  filepath.Join(path, "input", "input%d.txt"),
+		AnswerPathPattern: filepath.Join(path, "output", "output%d.txt"),
+		AttachmentList:    make(problems.Attachments, 0),
+		files:             make([]problems.File, 0),
+	}
 
 	YAMLFile, err := os.Open(filepath.Join(path, "task.yaml"))
 	if err != nil {
@@ -334,47 +409,112 @@ func parser(path string) (problems.Problem, error) {
 	p.StatementList = make(problems.Contents, 0)
 	p.StatementList = append(p.StatementList, problems.BytesData{Loc: "hungarian", Val: statementPDF, Typ: "application/pdf"})
 
+	exists := func(path string) bool {
+		if _, err := os.Stat(path); errors.Is(err, fs.ErrNotExist) {
+			return false
+		} else if err == nil {
+			return true
+		} else { // could be both
+			return false
+		}
+	}
+
+	compile := func(src string, to string) error {
+		if bin, err := os.Create(to); err == nil {
+			defer bin.Close()
+
+			if file, err := os.Open(src); err == nil {
+				defer file.Close()
+
+				if err := cpp.Std14.InsecureCompile(filepath.Dir(src), file, bin, os.Stderr); err != nil {
+					return err
+				}
+
+				if err := os.Chmod(to, os.ModePerm); err != nil {
+					return err
+				}
+			}
+
+			return nil
+		} else {
+			return err
+		}
+	}
+
 	checkPath := filepath.Join(p.Path, "check")
-	if _, err := os.Stat(checkPath); os.IsNotExist(err) {
+	solPath := filepath.Join(p.Path, "sol")
+
+	if !exists(checkPath) {
 		p.whiteDiffChecker = true
 	} else {
 		checkerPath := filepath.Join(checkPath, "checker")
-		if _, err := os.Stat(checkerPath); os.IsNotExist(err) {
-			if checkerBinary, err := os.Create(checkerPath); err == nil {
-				defer checkerBinary.Close()
+		checkerCppPath := filepath.Join(checkPath, "checker.cpp")
 
-				if checkerFile, err := os.Open(checkerPath + ".cpp"); err == nil {
-					defer checkerFile.Close()
+		managerCppPath := filepath.Join(checkPath, "manager.cpp")
+		managerPath := filepath.Join(checkPath, "manager")
 
-					if err := cpp14.Lang.InsecureCompile(filepath.Join(path, "check"), checkerFile, checkerBinary, os.Stderr); err != nil {
-						return nil, err
-					}
-
-					if err := os.Chmod(checkerPath, os.ModePerm); err != nil {
-						return nil, err
-					}
-				} else {
-					return nil, errors.New("error while parsing task_yaml problem can't compile task_yaml checker because there's no cpp14 compiler")
+		if exists(checkerCppPath) {
+			if !exists(checkerPath) {
+				if err := compile(checkerCppPath, checkerPath); err != nil {
+					return nil, err
 				}
-			} else {
+			}
+		} else if exists(managerCppPath) {
+			p.tasktype = "communication"
+			if err := compile(managerCppPath, managerPath); err != nil {
 				return nil, err
+			}
+			p.files = append(p.files, problems.File{Name: "manager.cpp", Role: "interactor", Path: managerPath})
+		}
+
+		if _, err := os.Stat(filepath.Join(solPath, "grader.cpp")); err == nil {
+			p.tasktype = "batch"
+			p.files = append(p.files, problems.File{Name: "grader.cpp", Role: "stub_cpp", Path: filepath.Join(solPath, "grader.cpp")})
+		}
+	}
+
+	if exists(solPath) {
+		if exists(filepath.Join(solPath, "grader.cpp")) {
+			p.tasktype = "batch"
+			p.files = append(p.files, problems.File{Name: "grader.cpp", Role: "stub_cpp", Path: filepath.Join(solPath, "grader.cpp")})
+		} else if exists(filepath.Join(solPath, "stub.cpp")) {
+			p.tasktype = "communication"
+			p.files = append(p.files, problems.File{Name: "stub.cpp", Role: "stub_cpp", Path: filepath.Join(solPath, "stub.cpp")})
+		}
+
+		var files []os.FileInfo
+		files, err = ioutil.ReadDir(solPath)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, file := range files {
+			if !file.IsDir() && filepath.Ext(file.Name()) == ".h" {
+				p.files = append(p.files, problems.File{Name: filepath.Base(file.Name()), Role: "stub_cpp", Path: file.Name()})
 			}
 		}
 	}
 
-	files, err := ioutil.ReadDir(filepath.Join(path, "att"))
-	if err != nil {
-		return nil, err
+	if p.tasktype == "" {
+		p.tasktype = "batch"
 	}
 
-	for _, file := range files {
-		if !file.IsDir() {
-			cont, err := ioutil.ReadFile(filepath.Join(path, "att", file.Name()))
-			if err != nil {
-				return nil, err
-			}
+	attPath := filepath.Join(path, "att")
+	if exists(attPath) {
+		files, err := ioutil.ReadDir(filepath.Join(path, "att"))
+		if err != nil {
+			return nil, err
+		}
 
-			p.AttachmentList = append(p.AttachmentList, problems.BytesData{Nam: file.Name(), Val: cont})
+		for _, file := range files {
+			if !file.IsDir() {
+				cont, err := ioutil.ReadFile(filepath.Join(path, "att", file.Name()))
+				if err != nil {
+					return nil, err
+				}
+
+				p.AttachmentList = append(p.AttachmentList, problems.BytesData{Nam: file.Name(), Val: cont})
+			}
 		}
 	}
 
