@@ -3,6 +3,9 @@ package user
 import (
 	"database/sql"
 	"fmt"
+	"net/http"
+	"unicode"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/web/helpers"
@@ -11,8 +14,6 @@ import (
 	"github.com/mraron/njudge/web/models"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"golang.org/x/crypto/bcrypt"
-	"net/http"
-	"unicode"
 )
 
 func GetRegister() echo.HandlerFunc {
@@ -128,7 +129,7 @@ func GetActivateInfo() echo.HandlerFunc {
 			return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
 		}
 
-		return c.Render(http.StatusOK, "activate.gohtml", nil)
+		return c.Render(http.StatusOK, "user/activate.gohtml", nil)
 	}
 }
 
