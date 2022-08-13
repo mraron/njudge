@@ -16,7 +16,7 @@
             "showLog": true,
              "substitutePath": [
                 { "from": "${workspaceFolder}", "to": "/app/" },
-                {"to": "/root/go/pkg/", "from": "/home/aron/go/pkg/"}
+                { "to": "/root/go/pkg/", "from": "${env:HOME}/go/pkg/"}
             ]
         },
 
@@ -31,6 +31,7 @@
             "showLog": true,
             "substitutePath": [
                 { "from": "${workspaceFolder}", "to": "/app/" },
+                { "to": "/root/go/pkg/", "from": "${env:HOME}/go/pkg/"}
             ]
         }
     ]
