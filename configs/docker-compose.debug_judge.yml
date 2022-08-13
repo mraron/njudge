@@ -1,0 +1,4 @@
+services:
+  judge:
+    ports: [40001:40001]
+    command: bash -c "/root/go/bin/dlv debug . --listen=:40001 --headless --api-version=2 -- judge"

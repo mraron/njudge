@@ -1,0 +1,4 @@
+services:
+  web:
+    ports: [40000:40000]
+    command: bash -c "/root/go/bin/dlv debug . --listen=:40000 --headless --api-version=2 -- web"
