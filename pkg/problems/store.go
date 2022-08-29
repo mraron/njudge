@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -48,13 +49,16 @@ type Store interface {
 	Get(string) (Problem, error)
 	MustGet(string) Problem
 	Update() error
-	UpdateProblem(string, string) error
+	UpdateProblem(path string, id string) error
 }
 
 type FsStore struct {
-	cs  ConfigStore
-	fs  afero.Fs
-	dir string
+	cs           ConfigStore
+	fs           afero.Fs
+	dir          string
+	ignorePrefix bool
+
+	ByPath map[string]string
 
 	problems     map[string]Problem
 	problemsList []string
@@ -76,8 +80,21 @@ func FsStoreUseFs(afs afero.Fs) FsStoreOptions {
 	}
 }
 
+func FsStoreIgnorePreifx() FsStoreOptions {
+	return func(fs *FsStore) {
+		fs.ignorePrefix = true
+	}
+}
+
 func NewFsStore(dir string, options ...FsStoreOptions) *FsStore {
-	fsStore := &FsStore{cs: globalConfigStore, fs: afero.NewOsFs(), dir: dir, problems: make(map[string]Problem), problemsList: make([]string, 0)}
+	fsStore := &FsStore{
+		cs:           globalConfigStore,
+		fs:           afero.NewOsFs(),
+		dir:          dir,
+		problems:     make(map[string]Problem),
+		problemsList: make([]string, 0),
+		ByPath:       make(map[string]string),
+	}
 	for _, opt := range options {
 		opt(fsStore)
 	}
@@ -133,6 +150,20 @@ func (s *FsStore) Update() error {
 	errs := ProblemParseError{Errors: make([]error, 0), Problems: make([]string, 0)}
 	lst := make([]string, 0)
 
+	prefix, atPath := "", ""
+	getId := func(path string) string {
+		rel, err := filepath.Rel(atPath, path)
+		if err != nil || prefix == "" {
+			return filepath.Base(path)
+		}
+
+		if len(rel) == 1 || rel[0] != '.' {
+			return prefix + "_" + filepath.Base(path)
+		}
+
+		return filepath.Base(path)
+	}
+
 	if err := afero.Walk(s.fs, s.dir, func(path string, info fs.FileInfo, err error) error {
 		if err != nil || !info.IsDir() {
 			return err
@@ -155,7 +186,24 @@ func (s *FsStore) Update() error {
 			return nil
 		}
 
-		if err := s.UpdateProblem(info.Name(), path); err != nil {
+		if !s.ignorePrefix {
+			prefixFile := filepath.Join(path, ".njudge_prefix")
+			if _, err := os.Stat(prefixFile); err != nil {
+				if !errors.Is(err, os.ErrNotExist) {
+					return err
+				}
+			} else {
+				prefixBytes, err := ioutil.ReadFile(prefixFile)
+				if err != nil {
+					return err
+				}
+
+				prefix = strings.TrimSpace(string(prefixBytes))
+				atPath = path
+			}
+		}
+
+		if err := s.UpdateProblem(path, getId(path)); err != nil {
 			if !errors.Is(err, ErrorNoMatch) {
 				errs.Errors = append(errs.Errors, fmt.Errorf("%s: %w", info.Name(), err))
 				errs.Problems = append(errs.Problems, info.Name())
@@ -197,7 +245,7 @@ func (pw problemWrapper) Name() string {
 	return pw.nameOverride
 }
 
-func (s *FsStore) UpdateProblem(p string, path string) error {
+func (s *FsStore) UpdateProblem(path string, id string) error {
 	s.Lock()
 	defer s.Unlock()
 
@@ -206,6 +254,7 @@ func (s *FsStore) UpdateProblem(p string, path string) error {
 		return err
 	}
 
-	s.problems[filepath.Base(path)] = problemWrapper{prob, filepath.Base(path)}
+	s.ByPath[path] = id
+	s.problems[id] = problemWrapper{prob, id}
 	return nil
 }

@@ -1,9 +1,12 @@
 package cmd
 
 import (
+	"database/sql"
+	"fmt"
 	"io/ioutil"
 	"log"
 
+	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/web"
 	"github.com/mraron/njudge/web/helpers/config"
 	"github.com/mraron/njudge/web/models"
@@ -103,6 +106,78 @@ var ActivateCmd = &cobra.Command{
 	},
 }
 
+func RenameInDB(from, to string, tx *sql.Tx) error {
+	log.Print("Renaming ", from, " to ", to)
+
+	n, err := models.ProblemRels(qm.Where("problem = ?", from)).UpdateAll(tx, models.M{"problem": to})
+	fmt.Println(n, err)
+	if err != nil {
+		return err
+	}
+
+	n, err = models.Submissions(qm.Where("problem = ?", from)).UpdateAll(tx, models.M{"problem": to})
+	fmt.Println(n, err)
+	return err
+}
+
+var PrefixCmdArgs struct {
+	DryRun bool
+	Reset  bool
+}
+
+var PrefixCmd = &cobra.Command{
+	Use: "prefix_problems",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		cfg := config.Server{}
+
+		err := viper.Unmarshal(&cfg)
+		if err != nil {
+			return err
+		}
+		server := web.Server{Server: cfg}
+		server.ConnectToDB()
+
+		withoutPrefixes := problems.NewFsStore(cfg.ProblemsDir, problems.FsStoreIgnorePreifx())
+		err = withoutPrefixes.Update()
+		if err != nil {
+			return nil
+		}
+
+		withPrefixes := problems.NewFsStore(cfg.ProblemsDir)
+		err = withPrefixes.Update()
+		if err != nil {
+			return nil
+		}
+
+		if PrefixCmdArgs.Reset {
+			withPrefixes, withoutPrefixes = withoutPrefixes, withPrefixes
+		}
+
+		tx, err := server.DB.Begin()
+		if err != nil {
+			return err
+		}
+
+		for path, id := range withPrefixes.ByPath {
+			if withoutPrefixes.ByPath[path] != id {
+				if err := RenameInDB(withoutPrefixes.ByPath[path], id, tx); err != nil {
+					return err
+				}
+			}
+		}
+
+		if PrefixCmdArgs.DryRun {
+			return tx.Rollback()
+		}
+
+		return tx.Commit()
+	},
+}
+
+var PrefixRunCmd = &cobra.Command{
+	Use: "run",
+}
+
 func init() {
 	RootCmd.AddCommand(WebCmd)
 
@@ -122,4 +197,8 @@ func init() {
 	ActivateCmd.MarkFlagRequired("name")
 
 	WebCmd.AddCommand(ActivateCmd)
+
+	PrefixCmd.Flags().BoolVar(&PrefixCmdArgs.DryRun, "dry-run", false, "dry run")
+	PrefixCmd.Flags().BoolVar(&PrefixCmdArgs.Reset, "reset", false, "reset prefixes")
+	WebCmd.AddCommand(PrefixCmd)
 }
