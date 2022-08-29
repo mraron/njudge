@@ -1,14 +1,16 @@
 package user
 
 import (
+	"fmt"
+	"net/http"
+	"net/url"
+	"strconv"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/web/helpers"
 	"github.com/mraron/njudge/web/models"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"net/http"
-	"net/url"
-	"strconv"
 )
 
 func ProfileMiddleware(DB *sqlx.DB) echo.MiddlewareFunc {
@@ -54,6 +56,7 @@ func Profile(DB *sqlx.DB) echo.HandlerFunc {
 			return err
 		}
 
+		c.Set("title", fmt.Sprintf("%s", u.Name))
 		return c.Render(http.StatusOK, "user/profile/main", struct {
 			User                       *models.User
 			SolvedProblems             models.SubmissionSlice
@@ -76,6 +79,7 @@ func Submissions(DB *sqlx.DB) echo.HandlerFunc {
 			return err
 		}
 
+		c.Set("title", fmt.Sprintf("%s beküldései", u.Name))
 		return c.Render(http.StatusOK, "user/profile/submissions", struct {
 			User       *models.User
 			StatusPage *helpers.StatusPage

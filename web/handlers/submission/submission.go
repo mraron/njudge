@@ -1,14 +1,16 @@
 package submission
 
 import (
+	"fmt"
+	"net/http"
+	"strconv"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/web/models"
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"net/http"
-	"strconv"
 )
 
 func Get(DB *sqlx.DB) echo.HandlerFunc {
@@ -23,6 +25,7 @@ func Get(DB *sqlx.DB) echo.HandlerFunc {
 			return err
 		}
 
+		c.Set("title", fmt.Sprintf("Beküldés #%d", val))
 		return c.Render(http.StatusOK, "submission.gohtml", sub)
 	}
 }

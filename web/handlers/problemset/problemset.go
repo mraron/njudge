@@ -116,6 +116,7 @@ func GetList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 			return err
 		}
 
+		c.Set("title", "Feladatok")
 		return c.Render(http.StatusOK, "problemset/list", problemList)
 	}
 }
@@ -147,6 +148,7 @@ func GetStatus(DB *sqlx.DB) echo.HandlerFunc {
 			return err
 		}
 
+		c.Set("title", "Beküldések")
 		return c.Render(http.StatusOK, "status.gohtml", statusPage)
 	}
 }
