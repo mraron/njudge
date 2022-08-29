@@ -83,13 +83,15 @@ func (m Mail) Send(s config.Server) error {
 		message := mail.NewSingleEmail(from, m.Subject, to, plainTextContent, htmlContent)
 
 		client := sendgrid.NewSendClient(s.Sendgrid.ApiKey)
-		if _, err := client.Send(message); err != nil {
+		resp, err := client.Send(message)
+		if err != nil {
 			return err
 		}
+
+		fmt.Println(resp)
 
 		return nil
 	}
 
-	//@TODO log this
-	return nil
+	return fmt.Errorf("can't send mail")
 }
