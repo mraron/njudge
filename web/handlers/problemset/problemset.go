@@ -183,22 +183,27 @@ func PostSubmit(cfg config.Server, DB *sqlx.DB, problemStore problems.Store) ech
 			return c.Render(http.StatusOK, "error.gohtml", "Hibás nyelvazonosító.")
 		}
 
-		fileHeader, err := c.FormFile("source")
-		if err != nil {
-			return err
+		code := []byte(c.FormValue("submissionCode"))
+		if string(code) == "" {
+			fileHeader, err := c.FormFile("source")
+			if err != nil {
+				return err
+			}
+
+			f, err := fileHeader.Open()
+			if err != nil {
+				return err
+			}
+
+			contents, err := ioutil.ReadAll(f)
+			if err != nil {
+				return err
+			}
+
+			code = contents
 		}
 
-		f, err := fileHeader.Open()
-		if err != nil {
-			return err
-		}
-
-		contents, err := ioutil.ReadAll(f)
-		if err != nil {
-			return err
-		}
-
-		if id, err = helpers.Submit(cfg, DB, problemStore, u.ID, c.Get("problemset").(string), problemStore.MustGet(c.FormValue("problem")).Name(), languageName, contents); err != nil {
+		if id, err = helpers.Submit(cfg, DB, problemStore, u.ID, c.Get("problemset").(string), problemStore.MustGet(c.FormValue("problem")).Name(), languageName, code); err != nil {
 			return err
 		}
 

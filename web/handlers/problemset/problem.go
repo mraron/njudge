@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"mime"
 	"net/http"
@@ -37,6 +38,18 @@ type Problem struct {
 	CategoryId   int
 }
 
+func lastLanguage(c echo.Context, DB *sqlx.DB) string {
+	res := ""
+	if u := c.Get("user").(*models.User); u != nil {
+		sub, err := models.Submissions(Select("language"), Where("user_id = ?", u.ID), OrderBy("id DESC"), Limit(1)).One(DB)
+		if err == nil {
+			res = sub.Language
+		}
+	}
+
+	return res
+}
+
 func GetProblem(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		name, problem := c.Param("name"), c.Param("problem")
@@ -61,15 +74,13 @@ func GetProblem(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 			return echo.NewHTTPError(http.StatusNotFound, errors.New("no such problem in problemset"))
 		}
 
-		lastLanguage := ""
-		if u := c.Get("user").(*models.User); u != nil {
-			sub, err := models.Submissions(Select("language"), Where("user_id = ?", u.ID), OrderBy("id DESC"), Limit(1)).One(DB)
-			if err == nil {
-				lastLanguage = sub.Language
-			}
-		}
+		prob := problemStore.MustGet(problem)
 
-		return c.Render(http.StatusOK, "problemset/problem/problem", Problem{Problem: problemStore.MustGet(problem), LastLanguage: lastLanguage})
+		c.Set("title", fmt.Sprintf("Leírás - %s (%s)", i18n.TranslateContent("hungarian", prob.Titles()).String(), prob.Name()))
+		return c.Render(http.StatusOK, "problemset/problem/problem", Problem{
+			Problem:      prob,
+			LastLanguage: lastLanguage(c, DB),
+		})
 	}
 }
 
@@ -113,10 +124,8 @@ func GetProblemFile(cfg config.Server, problemStore problems.Store) echo.Handler
 
 		fileLoc := ""
 
-		switch p := p.(type) {
 		switch p := p.(problems.ProblemWrapper).Problem.(type) {
 		case polygon.Problem:
-			if len(p.HTMLStatements()) == 0 {
 			if len(p.HTMLStatements()) == 0 || strings.HasSuffix(c.Param("file"), ".tex") || strings.HasSuffix(c.Param("file"), ".json") {
 				return echo.NewHTTPError(http.StatusNotFound, ErrorFileNotFound)
 			}
@@ -195,6 +204,7 @@ func GetProblemRanklist(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFu
 			return sbs[i].Score.Float32 > sbs[j].Score.Float32
 		})
 
+		c.Set("title", fmt.Sprintf("Eredmények - %s (%s)", i18n.TranslateContent("hungarian", prob.Titles()).String(), prob.Name()))
 		return c.Render(http.StatusOK, "problemset/problem/ranklist", struct {
 			Problem     problems.Problem
 			Submissions []*models.Submission
@@ -202,11 +212,40 @@ func GetProblemRanklist(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFu
 	}
 }
 
-func GetProblemStatus(DB *sqlx.DB) echo.HandlerFunc {
+func GetProblemSubmit(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		problem := c.Param("problem")
+		prob, err := problemStore.Get(problem)
+		if err != nil {
+			if errors.Is(err, problems.ErrorProblemNotFound) {
+				return echo.NewHTTPError(http.StatusNotFound, err)
+			}
+
+			return err
+		}
+
+		c.Set("title", fmt.Sprintf("Beküldés - %s (%s)", i18n.TranslateContent("hungarian", prob.Titles()).String(), prob.Name()))
+		return c.Render(http.StatusOK, "problemset/problem/submit", Problem{
+			Problem:      prob,
+			LastLanguage: lastLanguage(c, DB),
+		})
+	}
+}
+
+func GetProblemStatus(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ac := c.QueryParam("ac")
 		problemset := c.Param("name")
 		problem := c.Param("problem")
+		prob, err := problemStore.Get(problem)
+		if err != nil {
+			if errors.Is(err, problems.ErrorProblemNotFound) {
+				return echo.NewHTTPError(http.StatusNotFound, err)
+			}
+
+			return err
+		}
+
 		page, err := strconv.Atoi(c.QueryParam("page"))
 		if err != nil || page <= 0 {
 			page = 1
@@ -224,6 +263,7 @@ func GetProblemStatus(DB *sqlx.DB) echo.HandlerFunc {
 			return err
 		}
 
+		c.Set("title", fmt.Sprintf("Beküldések - %s (%s)", i18n.TranslateContent("hungarian", prob.Titles()).String(), prob.Name()))
 		return c.Render(http.StatusOK, "problemset/problem/status", statusPage)
 	}
 }
