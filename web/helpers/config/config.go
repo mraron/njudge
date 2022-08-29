@@ -20,25 +20,25 @@ type Server struct {
 	CookieSecret string
 
 	GoogleAuth struct {
-		Enabled   bool
-		ClientKey string
-		Secret    string
-		Callback  string
-	}
+		Enabled   bool   `json:"enabled" mapstructure:"enabled"`
+		ClientKey string `json:"client_key" mapstructure:"clientkey"`
+		Secret    string `json:"secret" mapstructure:"secret"`
+		Callback  string `json:"callback" mapstructure:"callback"`
+	} `json:"googleAuth" mapstructure:"googleAuth"`
 
 	Sendgrid struct {
-		Enabled       bool
-		ApiKey        string `json:"api_key" mapstructure:"api_key"`
-		SenderName    string `json:"sender_name" mapstructure:"sender_name"`
-		SenderAddress string `json:"sender_address" mapstructure:"sender_address"`
-	}
+		Enabled       bool   `json:"enabled" mapstructure:"enabled"`
+		ApiKey        string `json:"api_key" mapstructure:"apikey"`
+		SenderName    string `json:"sender_name" mapstructure:"sendername"`
+		SenderAddress string `json:"sender_address" mapstructure:"senderaddress"`
+	} `json:"sendgrid" mapstructure:"sendgrid"`
 
 	SMTP struct {
 		Enabled             bool
-		MailAccount         string `json:"mail_account" mapstructure:"mail_account"`
-		MailServerHost      string `json:"mail_server" mapstructure:"mail_server"`
-		MailServerPort      string `json:"mail_port" mapstructure:"mail_port"`
-		MailAccountPassword string `json:"mail_password" mapstructure:"mail_port"`
+		MailAccount         string `json:"mail_account" mapstructure:"mailaccount"`
+		MailServerHost      string `json:"mail_server" mapstructure:"mailserver"`
+		MailServerPort      string `json:"mail_port" mapstructure:"mailport"`
+		MailAccountPassword string `json:"mail_password" mapstructure:"mailpassword"`
 	} `json:"smtp" mapstructure:"smtp"`
 
 	CustomHead string
@@ -56,8 +56,8 @@ type Server struct {
 }
 
 type Keys struct {
-	PrivateKeyLocation string `json:"private_key" mapstructure:"private_key"`
-	PublicKeyLocation  string `json:"public_key" mapstructure:"public_key"`
+	PrivateKeyLocation string `json:"private_key" mapstructure:"privatekey"`
+	PublicKeyLocation  string `json:"public_key" mapstructure:"publickey"`
 	PrivateKey         *rsa.PrivateKey
 	PublicKey          *rsa.PublicKey
 }
