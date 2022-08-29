@@ -16,6 +16,7 @@ var WebCmd = &cobra.Command{
 	Use:   "web",
 	Short: "manage web related parts, for example start webserver, run migrations etc.",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		BindEnvs(config.Server{})
 		viper.SetEnvPrefix("njudge")
 
 		viper.SetConfigName("web")

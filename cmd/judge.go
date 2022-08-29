@@ -10,6 +10,7 @@ var JudgeCmd = &cobra.Command{
 	Use:   "judge",
 	Short: "start judge server",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		BindEnvs(judge.Server{})
 		viper.SetEnvPrefix("njudge")
 
 		viper.SetConfigName("judge")
