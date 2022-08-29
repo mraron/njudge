@@ -187,14 +187,14 @@ func (s *FsStore) Update() error {
 	return errs
 }
 
-type problemWrapper struct {
+type ProblemWrapper struct {
 	Problem
 
-	nameOverride string
+	NameOverride string
 }
 
-func (pw problemWrapper) Name() string {
-	return pw.nameOverride
+func (pw ProblemWrapper) Name() string {
+	return pw.NameOverride
 }
 
 func (s *FsStore) UpdateProblem(p string, path string) error {
@@ -206,6 +206,6 @@ func (s *FsStore) UpdateProblem(p string, path string) error {
 		return err
 	}
 
-	s.problems[filepath.Base(path)] = problemWrapper{prob, filepath.Base(path)}
+	s.problems[filepath.Base(path)] = ProblemWrapper{prob, filepath.Base(path)}
 	return nil
 }

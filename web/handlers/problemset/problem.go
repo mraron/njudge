@@ -114,8 +114,10 @@ func GetProblemFile(cfg config.Server, problemStore problems.Store) echo.Handler
 		fileLoc := ""
 
 		switch p := p.(type) {
+		switch p := p.(problems.ProblemWrapper).Problem.(type) {
 		case polygon.Problem:
 			if len(p.HTMLStatements()) == 0 {
+			if len(p.HTMLStatements()) == 0 || strings.HasSuffix(c.Param("file"), ".tex") || strings.HasSuffix(c.Param("file"), ".json") {
 				return echo.NewHTTPError(http.StatusNotFound, ErrorFileNotFound)
 			}
 

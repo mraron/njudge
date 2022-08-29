@@ -3,3 +3,4 @@ web.json
 judge.json
 sqlboiler.toml
 web_prod.json
+node_modules
