@@ -1,0 +1,29 @@
+{{template "header" .}}
+{{template "problem_menu" "submit"}}
+{{if (logged .Context)}}
+<form action="/problemset/{{get .Context "problemset"}}/submit" method="post" >
+<div class="form-group">
+    <label for="problem" class="font-weight-bold">Feladat</label>
+    <input type="hidden" name="problem" value="{{.Data.Problem.Name}}">
+    <div id="problem">{{(translateContent "hungarian" .Data.Problem.Titles).String}}</div>
+</div>
+<div class="form-group">
+    <label for="submissionCode" class="font-weight-bolder">Kód</label>
+    <textarea class="form-control" id="submissionCode" rows="30" style="height: 100%;" name="submissionCode"></textarea>
+</div>
+<div class="form-group">
+    <label for="languageList" class="font-weight-bolder">Nyelv</label>
+    {{$lastLang := .Data.LastLanguage}}
+    <select name="language" class="custom-select form-control" id="languagesList">
+        {{range $l := .Data.Problem.Languages}}
+            <option value="{{$l.Id}}"{{if eq $lastLang $l.Id}} selected="selected"{{end}}>{{$l.Name}}</option>
+        {{end}}
+    </select>
+</div>
+<button type="submit" class="btn btn-primary">Beküld</button>
+</form>
+{{else}}
+Beküldéshez lépj be vagy regisztrálj!
+{{end}}
+
+{{template "footer" .}}

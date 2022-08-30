@@ -4,22 +4,39 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"sort"
 	"strconv"
+	"strings"
+	"unicode"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/web/helpers"
 	"github.com/mraron/njudge/web/helpers/config"
+	"github.com/mraron/njudge/web/helpers/i18n"
 	"github.com/mraron/njudge/web/helpers/pagination"
 	"github.com/mraron/njudge/web/models"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
+	"golang.org/x/text/runes"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 )
+
+type CategoryFilter struct {
+	Name     string
+	Value    string
+	Selected bool
+}
 
 type ProblemList struct {
 	Pages        []pagination.Link
 	Problems     []Problem
 	SolverSorter helpers.SortColumn
+
+	Filtered        bool
+	TitleFilter     string
+	CategoryFilters []CategoryFilter
 }
 
 func GetProblemList(DB *sqlx.DB, problemStore problems.Store, u *models.User, page, perPage int, order QueryMod, query []QueryMod, qu url.Values) (*ProblemList, error) {
@@ -111,11 +128,125 @@ func GetList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 			order = "ASC"
 		}
 
-		problemList, err := GetProblemList(DB, problemStore, u, page, 20, OrderBy(by+" "+order), []QueryMod{Where("problemset=?", problemSet)}, c.Request().URL.Query())
+		qmods := []QueryMod{Where("problemset=?", problemSet)}
+		filtered := false
+
+		if c.QueryParam("title") != "" {
+			filtered = true
+
+			rels, err := models.ProblemRels().All(DB)
+			if err != nil {
+				return err
+			}
+
+			lst := make([]interface{}, 0, len(rels))
+			for _, rel := range rels {
+				p, err := problemStore.Get(rel.Problem)
+				if err != nil {
+					return err
+				}
+
+				curr := strings.ToLower(i18n.TranslateContent("hungarian", p.Titles()).String())
+				want := strings.ToLower(c.QueryParam("title"))
+
+				t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
+				a, _, _ := transform.String(t, curr)
+				b, _, _ := transform.String(t, want)
+
+				if strings.Contains(a, b) {
+					lst = append(lst, rel.Problem)
+				}
+			}
+
+			qmods = append(qmods, WhereIn("problem in ?", lst...))
+		}
+
+		cats, err := models.ProblemCategories().All(DB)
+		if err != nil {
+			return err
+		}
+		par := make(map[int]int)
+		for _, cat := range cats {
+			if cat.ParentID.Valid {
+				par[cat.ID] = cat.ParentID.Int
+			}
+		}
+
+		if c.QueryParam("category") != "" {
+			filtered = true
+
+			cid, err := strconv.Atoi(c.QueryParam("category"))
+			if err != nil {
+				return err
+			}
+
+			pars := []interface{}{}
+			for _, cat := range cats {
+				curr := cat.ID
+				ok := false
+				for {
+					if curr == cid {
+						ok = true
+						break
+					}
+
+					if _, ok := par[curr]; ok {
+						curr = par[curr]
+					} else {
+						break
+					}
+				}
+
+				if ok {
+					pars = append(pars, cat.ID)
+				}
+			}
+
+			qmods = append(qmods, WhereIn("category_id in ?", pars...))
+		}
+
+		problemList, err := GetProblemList(DB, problemStore, u, page, 20, OrderBy(by+" "+order), qmods, c.Request().URL.Query())
 		if err != nil {
 			return err
 		}
 
+		problemList.Filtered = filtered
+		problemList.TitleFilter = c.QueryParam("title")
+
+		problemList.CategoryFilters = []CategoryFilter{{"-", "", false}}
+		nameById := make(map[int]string)
+		for _, cat := range cats {
+			nameById[cat.ID] = cat.Name
+		}
+
+		var getName func(int) string
+		getName = func(id int) string {
+			if _, ok := par[id]; !ok {
+				return nameById[id]
+			} else {
+				return getName(par[id]) + " -- " + nameById[id]
+			}
+		}
+
+		for _, cat := range cats {
+			curr := CategoryFilter{
+				Name:     getName(cat.ID),
+				Value:    strconv.Itoa(cat.ID),
+				Selected: false,
+			}
+
+			if strconv.Itoa(cat.ID) == c.QueryParam("category") {
+				curr.Selected = true
+			}
+
+			problemList.CategoryFilters = append(problemList.CategoryFilters, curr)
+		}
+
+		sort.Slice(problemList.CategoryFilters, func(i, j int) bool {
+			return problemList.CategoryFilters[i].Name < problemList.CategoryFilters[j].Name
+		})
+
+		c.Set("title", "Feladatok")
 		return c.Render(http.StatusOK, "problemset/list", problemList)
 	}
 }
@@ -147,6 +278,7 @@ func GetStatus(DB *sqlx.DB) echo.HandlerFunc {
 			return err
 		}
 
+		c.Set("title", "Beküldések")
 		return c.Render(http.StatusOK, "status.gohtml", statusPage)
 	}
 }
@@ -183,22 +315,27 @@ func PostSubmit(cfg config.Server, DB *sqlx.DB, problemStore problems.Store) ech
 			return c.Render(http.StatusOK, "error.gohtml", "Hibás nyelvazonosító.")
 		}
 
-		fileHeader, err := c.FormFile("source")
-		if err != nil {
-			return err
+		code := []byte(c.FormValue("submissionCode"))
+		if string(code) == "" {
+			fileHeader, err := c.FormFile("source")
+			if err != nil {
+				return err
+			}
+
+			f, err := fileHeader.Open()
+			if err != nil {
+				return err
+			}
+
+			contents, err := ioutil.ReadAll(f)
+			if err != nil {
+				return err
+			}
+
+			code = contents
 		}
 
-		f, err := fileHeader.Open()
-		if err != nil {
-			return err
-		}
-
-		contents, err := ioutil.ReadAll(f)
-		if err != nil {
-			return err
-		}
-
-		if id, err = helpers.Submit(cfg, DB, problemStore, u.ID, c.Get("problemset").(string), problemStore.MustGet(c.FormValue("problem")).Name(), languageName, contents); err != nil {
+		if id, err = helpers.Submit(cfg, DB, problemStore, u.ID, c.Get("problemset").(string), problemStore.MustGet(c.FormValue("problem")).Name(), languageName, code); err != nil {
 			return err
 		}
 

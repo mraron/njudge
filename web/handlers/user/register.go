@@ -32,7 +32,6 @@ func Register(cfg config.Server, DB *sqlx.DB) echo.HandlerFunc {
 			errStrings = make([]string, 0)
 			key        = helpers.GenerateActivationKey(255)
 			err        error
-			tx         *sql.Tx
 		)
 
 		if u := c.Get("user").(*models.User); u != nil {
@@ -86,6 +85,7 @@ func Register(cfg config.Server, DB *sqlx.DB) echo.HandlerFunc {
 		}
 
 		transaction := func() {
+			tx, err := DB.Begin()
 			defer func() {
 				if p := recover(); p != nil {
 					tx.Rollback()
@@ -97,7 +97,6 @@ func Register(cfg config.Server, DB *sqlx.DB) echo.HandlerFunc {
 				}
 			}()
 
-			tx, err := DB.Begin()
 			mustPanic(err)
 
 			hashed, err := bcrypt.GenerateFromPassword([]byte(c.FormValue("password")), bcrypt.DefaultCost)

@@ -2,6 +2,8 @@ package taskarchive
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/pkg/problems"
@@ -9,7 +11,6 @@ import (
 	"github.com/mraron/njudge/web/helpers/i18n"
 	"github.com/mraron/njudge/web/models"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"net/http"
 )
 
 type TreeNode struct {
@@ -79,6 +80,7 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 			}
 		}
 
+		c.Set("title", "Archívum")
 		return c.Render(http.StatusOK, "task_archive.gohtml", roots)
 	}
 }
