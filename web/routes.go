@@ -25,7 +25,7 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	})
 
 	ps.GET("/:name/", problemset.GetList(s.DB, s.ProblemStore))
-	ps.GET("/:name/:problem/", problemset.GetProblem(s.DB, s.ProblemStore))
+	ps.GET("/:name/:problem/", problemset.GetProblem(s.DB, s.ProblemStore), problemset.RenameMiddleware(s.ProblemStore))
 	ps.GET("/:name/:problem/problem", problemset.GetProblem(s.DB, s.ProblemStore))
 	ps.GET("/:name/:problem/status", problemset.GetProblemStatus(s.DB, s.ProblemStore))
 	ps.GET("/:name/:problem/submit", problemset.GetProblemSubmit(s.DB, s.ProblemStore))
