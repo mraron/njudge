@@ -217,7 +217,7 @@ func (s *FsStore) Update() error {
 				return nil
 			}
 		} else {
-			lst = append(lst, info.Name())
+			lst = append(lst, getId(path))
 			return filepath.SkipDir
 		}
 	}); err != nil {
