@@ -35,9 +35,24 @@
             </h2>
         </div>
 
-        <div id="filter" class="collapse" aria-labelledby="filterHeading" data-parent="#filterAccordion">
+        <div id="filter" class="collapse{{if .Data.Filtered}} show{{end}}" aria-labelledby="filterHeading" data-parent="#filterAccordion">
             <div class="card-body">
-                ...
+            <form action="" method="get">
+                <div class="form-group">
+                    <label for="titleFilter">Cím</label>
+                    <input name="title" value="{{.Data.TitleFilter}}" class="form-control" id="titleFilter">
+                </div>
+                <div class="form-group">
+                    <label for="categoryFilter">Kategória</label>
+                    <select name="category" class="custom-select" id="categoryFilter">
+                    {{range $i := .Data.CategoryFilters}}
+                    <option value="{{$i.Value}}"{{if $i.Selected}} selected{{end}}>{{$i.Name}}</option>
+                    {{end}}
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Szűr</button>
+            </form>
             </div>
         </div>
     </div>
