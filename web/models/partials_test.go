@@ -20,24 +20,24 @@ var (
 	_ = queries.Equal
 )
 
-func testJudges(t *testing.T) {
+func testPartials(t *testing.T) {
 	t.Parallel()
 
-	query := Judges()
+	query := Partials()
 
 	if query.Query == nil {
 		t.Error("expected a query, got nothing")
 	}
 }
 
-func testJudgesDelete(t *testing.T) {
+func testPartialsDelete(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Judge{}
-	if err = randomize.Struct(seed, o, judgeDBTypes, true, judgeColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	o := &Partial{}
+	if err = randomize.Struct(seed, o, partialDBTypes, true, partialColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -52,7 +52,7 @@ func testJudgesDelete(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := Judges().Count(tx)
+	count, err := Partials().Count(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -62,14 +62,14 @@ func testJudgesDelete(t *testing.T) {
 	}
 }
 
-func testJudgesQueryDeleteAll(t *testing.T) {
+func testPartialsQueryDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Judge{}
-	if err = randomize.Struct(seed, o, judgeDBTypes, true, judgeColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	o := &Partial{}
+	if err = randomize.Struct(seed, o, partialDBTypes, true, partialColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -78,13 +78,13 @@ func testJudgesQueryDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	if rowsAff, err := Judges().DeleteAll(tx); err != nil {
+	if rowsAff, err := Partials().DeleteAll(tx); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := Judges().Count(tx)
+	count, err := Partials().Count(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -94,14 +94,14 @@ func testJudgesQueryDeleteAll(t *testing.T) {
 	}
 }
 
-func testJudgesSliceDeleteAll(t *testing.T) {
+func testPartialsSliceDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Judge{}
-	if err = randomize.Struct(seed, o, judgeDBTypes, true, judgeColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	o := &Partial{}
+	if err = randomize.Struct(seed, o, partialDBTypes, true, partialColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -110,7 +110,7 @@ func testJudgesSliceDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := JudgeSlice{o}
+	slice := PartialSlice{o}
 
 	if rowsAff, err := slice.DeleteAll(tx); err != nil {
 		t.Error(err)
@@ -118,7 +118,7 @@ func testJudgesSliceDeleteAll(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := Judges().Count(tx)
+	count, err := Partials().Count(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -128,14 +128,14 @@ func testJudgesSliceDeleteAll(t *testing.T) {
 	}
 }
 
-func testJudgesExists(t *testing.T) {
+func testPartialsExists(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Judge{}
-	if err = randomize.Struct(seed, o, judgeDBTypes, true, judgeColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	o := &Partial{}
+	if err = randomize.Struct(seed, o, partialDBTypes, true, partialColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -144,23 +144,23 @@ func testJudgesExists(t *testing.T) {
 		t.Error(err)
 	}
 
-	e, err := JudgeExists(tx, o.ID)
+	e, err := PartialExists(tx, o.Name)
 	if err != nil {
-		t.Errorf("Unable to check if Judge exists: %s", err)
+		t.Errorf("Unable to check if Partial exists: %s", err)
 	}
 	if !e {
-		t.Errorf("Expected JudgeExists to return true, but got false.")
+		t.Errorf("Expected PartialExists to return true, but got false.")
 	}
 }
 
-func testJudgesFind(t *testing.T) {
+func testPartialsFind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Judge{}
-	if err = randomize.Struct(seed, o, judgeDBTypes, true, judgeColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	o := &Partial{}
+	if err = randomize.Struct(seed, o, partialDBTypes, true, partialColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -169,24 +169,24 @@ func testJudgesFind(t *testing.T) {
 		t.Error(err)
 	}
 
-	judgeFound, err := FindJudge(tx, o.ID)
+	partialFound, err := FindPartial(tx, o.Name)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if judgeFound == nil {
+	if partialFound == nil {
 		t.Error("want a record, got nil")
 	}
 }
 
-func testJudgesBind(t *testing.T) {
+func testPartialsBind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Judge{}
-	if err = randomize.Struct(seed, o, judgeDBTypes, true, judgeColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	o := &Partial{}
+	if err = randomize.Struct(seed, o, partialDBTypes, true, partialColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -195,19 +195,19 @@ func testJudgesBind(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err = Judges().Bind(nil, tx, o); err != nil {
+	if err = Partials().Bind(nil, tx, o); err != nil {
 		t.Error(err)
 	}
 }
 
-func testJudgesOne(t *testing.T) {
+func testPartialsOne(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Judge{}
-	if err = randomize.Struct(seed, o, judgeDBTypes, true, judgeColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	o := &Partial{}
+	if err = randomize.Struct(seed, o, partialDBTypes, true, partialColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -216,37 +216,37 @@ func testJudgesOne(t *testing.T) {
 		t.Error(err)
 	}
 
-	if x, err := Judges().One(tx); err != nil {
+	if x, err := Partials().One(tx); err != nil {
 		t.Error(err)
 	} else if x == nil {
 		t.Error("expected to get a non nil record")
 	}
 }
 
-func testJudgesAll(t *testing.T) {
+func testPartialsAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	judgeOne := &Judge{}
-	judgeTwo := &Judge{}
-	if err = randomize.Struct(seed, judgeOne, judgeDBTypes, false, judgeColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	partialOne := &Partial{}
+	partialTwo := &Partial{}
+	if err = randomize.Struct(seed, partialOne, partialDBTypes, false, partialColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
-	if err = randomize.Struct(seed, judgeTwo, judgeDBTypes, false, judgeColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	if err = randomize.Struct(seed, partialTwo, partialDBTypes, false, partialColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
 	defer func() { _ = tx.Rollback() }()
-	if err = judgeOne.Insert(tx, boil.Infer()); err != nil {
+	if err = partialOne.Insert(tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = judgeTwo.Insert(tx, boil.Infer()); err != nil {
+	if err = partialTwo.Insert(tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	slice, err := Judges().All(tx)
+	slice, err := Partials().All(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -256,30 +256,30 @@ func testJudgesAll(t *testing.T) {
 	}
 }
 
-func testJudgesCount(t *testing.T) {
+func testPartialsCount(t *testing.T) {
 	t.Parallel()
 
 	var err error
 	seed := randomize.NewSeed()
-	judgeOne := &Judge{}
-	judgeTwo := &Judge{}
-	if err = randomize.Struct(seed, judgeOne, judgeDBTypes, false, judgeColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	partialOne := &Partial{}
+	partialTwo := &Partial{}
+	if err = randomize.Struct(seed, partialOne, partialDBTypes, false, partialColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
-	if err = randomize.Struct(seed, judgeTwo, judgeDBTypes, false, judgeColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	if err = randomize.Struct(seed, partialTwo, partialDBTypes, false, partialColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
 	defer func() { _ = tx.Rollback() }()
-	if err = judgeOne.Insert(tx, boil.Infer()); err != nil {
+	if err = partialOne.Insert(tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = judgeTwo.Insert(tx, boil.Infer()); err != nil {
+	if err = partialTwo.Insert(tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	count, err := Judges().Count(tx)
+	count, err := Partials().Count(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -289,154 +289,154 @@ func testJudgesCount(t *testing.T) {
 	}
 }
 
-func judgeBeforeInsertHook(e boil.Executor, o *Judge) error {
-	*o = Judge{}
+func partialBeforeInsertHook(e boil.Executor, o *Partial) error {
+	*o = Partial{}
 	return nil
 }
 
-func judgeAfterInsertHook(e boil.Executor, o *Judge) error {
-	*o = Judge{}
+func partialAfterInsertHook(e boil.Executor, o *Partial) error {
+	*o = Partial{}
 	return nil
 }
 
-func judgeAfterSelectHook(e boil.Executor, o *Judge) error {
-	*o = Judge{}
+func partialAfterSelectHook(e boil.Executor, o *Partial) error {
+	*o = Partial{}
 	return nil
 }
 
-func judgeBeforeUpdateHook(e boil.Executor, o *Judge) error {
-	*o = Judge{}
+func partialBeforeUpdateHook(e boil.Executor, o *Partial) error {
+	*o = Partial{}
 	return nil
 }
 
-func judgeAfterUpdateHook(e boil.Executor, o *Judge) error {
-	*o = Judge{}
+func partialAfterUpdateHook(e boil.Executor, o *Partial) error {
+	*o = Partial{}
 	return nil
 }
 
-func judgeBeforeDeleteHook(e boil.Executor, o *Judge) error {
-	*o = Judge{}
+func partialBeforeDeleteHook(e boil.Executor, o *Partial) error {
+	*o = Partial{}
 	return nil
 }
 
-func judgeAfterDeleteHook(e boil.Executor, o *Judge) error {
-	*o = Judge{}
+func partialAfterDeleteHook(e boil.Executor, o *Partial) error {
+	*o = Partial{}
 	return nil
 }
 
-func judgeBeforeUpsertHook(e boil.Executor, o *Judge) error {
-	*o = Judge{}
+func partialBeforeUpsertHook(e boil.Executor, o *Partial) error {
+	*o = Partial{}
 	return nil
 }
 
-func judgeAfterUpsertHook(e boil.Executor, o *Judge) error {
-	*o = Judge{}
+func partialAfterUpsertHook(e boil.Executor, o *Partial) error {
+	*o = Partial{}
 	return nil
 }
 
-func testJudgesHooks(t *testing.T) {
+func testPartialsHooks(t *testing.T) {
 	t.Parallel()
 
 	var err error
 
-	empty := &Judge{}
-	o := &Judge{}
+	empty := &Partial{}
+	o := &Partial{}
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, o, judgeDBTypes, false); err != nil {
-		t.Errorf("Unable to randomize Judge object: %s", err)
+	if err = randomize.Struct(seed, o, partialDBTypes, false); err != nil {
+		t.Errorf("Unable to randomize Partial object: %s", err)
 	}
 
-	AddJudgeHook(boil.BeforeInsertHook, judgeBeforeInsertHook)
+	AddPartialHook(boil.BeforeInsertHook, partialBeforeInsertHook)
 	if err = o.doBeforeInsertHooks(nil); err != nil {
 		t.Errorf("Unable to execute doBeforeInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeInsertHook function to empty object, but got: %#v", o)
 	}
-	judgeBeforeInsertHooks = []JudgeHook{}
+	partialBeforeInsertHooks = []PartialHook{}
 
-	AddJudgeHook(boil.AfterInsertHook, judgeAfterInsertHook)
+	AddPartialHook(boil.AfterInsertHook, partialAfterInsertHook)
 	if err = o.doAfterInsertHooks(nil); err != nil {
 		t.Errorf("Unable to execute doAfterInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterInsertHook function to empty object, but got: %#v", o)
 	}
-	judgeAfterInsertHooks = []JudgeHook{}
+	partialAfterInsertHooks = []PartialHook{}
 
-	AddJudgeHook(boil.AfterSelectHook, judgeAfterSelectHook)
+	AddPartialHook(boil.AfterSelectHook, partialAfterSelectHook)
 	if err = o.doAfterSelectHooks(nil); err != nil {
 		t.Errorf("Unable to execute doAfterSelectHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterSelectHook function to empty object, but got: %#v", o)
 	}
-	judgeAfterSelectHooks = []JudgeHook{}
+	partialAfterSelectHooks = []PartialHook{}
 
-	AddJudgeHook(boil.BeforeUpdateHook, judgeBeforeUpdateHook)
+	AddPartialHook(boil.BeforeUpdateHook, partialBeforeUpdateHook)
 	if err = o.doBeforeUpdateHooks(nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpdateHook function to empty object, but got: %#v", o)
 	}
-	judgeBeforeUpdateHooks = []JudgeHook{}
+	partialBeforeUpdateHooks = []PartialHook{}
 
-	AddJudgeHook(boil.AfterUpdateHook, judgeAfterUpdateHook)
+	AddPartialHook(boil.AfterUpdateHook, partialAfterUpdateHook)
 	if err = o.doAfterUpdateHooks(nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpdateHook function to empty object, but got: %#v", o)
 	}
-	judgeAfterUpdateHooks = []JudgeHook{}
+	partialAfterUpdateHooks = []PartialHook{}
 
-	AddJudgeHook(boil.BeforeDeleteHook, judgeBeforeDeleteHook)
+	AddPartialHook(boil.BeforeDeleteHook, partialBeforeDeleteHook)
 	if err = o.doBeforeDeleteHooks(nil); err != nil {
 		t.Errorf("Unable to execute doBeforeDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeDeleteHook function to empty object, but got: %#v", o)
 	}
-	judgeBeforeDeleteHooks = []JudgeHook{}
+	partialBeforeDeleteHooks = []PartialHook{}
 
-	AddJudgeHook(boil.AfterDeleteHook, judgeAfterDeleteHook)
+	AddPartialHook(boil.AfterDeleteHook, partialAfterDeleteHook)
 	if err = o.doAfterDeleteHooks(nil); err != nil {
 		t.Errorf("Unable to execute doAfterDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterDeleteHook function to empty object, but got: %#v", o)
 	}
-	judgeAfterDeleteHooks = []JudgeHook{}
+	partialAfterDeleteHooks = []PartialHook{}
 
-	AddJudgeHook(boil.BeforeUpsertHook, judgeBeforeUpsertHook)
+	AddPartialHook(boil.BeforeUpsertHook, partialBeforeUpsertHook)
 	if err = o.doBeforeUpsertHooks(nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpsertHook function to empty object, but got: %#v", o)
 	}
-	judgeBeforeUpsertHooks = []JudgeHook{}
+	partialBeforeUpsertHooks = []PartialHook{}
 
-	AddJudgeHook(boil.AfterUpsertHook, judgeAfterUpsertHook)
+	AddPartialHook(boil.AfterUpsertHook, partialAfterUpsertHook)
 	if err = o.doAfterUpsertHooks(nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpsertHook function to empty object, but got: %#v", o)
 	}
-	judgeAfterUpsertHooks = []JudgeHook{}
+	partialAfterUpsertHooks = []PartialHook{}
 }
 
-func testJudgesInsert(t *testing.T) {
+func testPartialsInsert(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Judge{}
-	if err = randomize.Struct(seed, o, judgeDBTypes, true, judgeColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	o := &Partial{}
+	if err = randomize.Struct(seed, o, partialDBTypes, true, partialColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -445,7 +445,7 @@ func testJudgesInsert(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := Judges().Count(tx)
+	count, err := Partials().Count(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -455,23 +455,23 @@ func testJudgesInsert(t *testing.T) {
 	}
 }
 
-func testJudgesInsertWhitelist(t *testing.T) {
+func testPartialsInsertWhitelist(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Judge{}
-	if err = randomize.Struct(seed, o, judgeDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	o := &Partial{}
+	if err = randomize.Struct(seed, o, partialDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
 	defer func() { _ = tx.Rollback() }()
-	if err = o.Insert(tx, boil.Whitelist(judgeColumnsWithoutDefault...)); err != nil {
+	if err = o.Insert(tx, boil.Whitelist(partialColumnsWithoutDefault...)); err != nil {
 		t.Error(err)
 	}
 
-	count, err := Judges().Count(tx)
+	count, err := Partials().Count(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -481,14 +481,14 @@ func testJudgesInsertWhitelist(t *testing.T) {
 	}
 }
 
-func testJudgesReload(t *testing.T) {
+func testPartialsReload(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Judge{}
-	if err = randomize.Struct(seed, o, judgeDBTypes, true, judgeColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	o := &Partial{}
+	if err = randomize.Struct(seed, o, partialDBTypes, true, partialColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -502,14 +502,14 @@ func testJudgesReload(t *testing.T) {
 	}
 }
 
-func testJudgesReloadAll(t *testing.T) {
+func testPartialsReloadAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Judge{}
-	if err = randomize.Struct(seed, o, judgeDBTypes, true, judgeColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	o := &Partial{}
+	if err = randomize.Struct(seed, o, partialDBTypes, true, partialColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -518,21 +518,21 @@ func testJudgesReloadAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := JudgeSlice{o}
+	slice := PartialSlice{o}
 
 	if err = slice.ReloadAll(tx); err != nil {
 		t.Error(err)
 	}
 }
 
-func testJudgesSelect(t *testing.T) {
+func testPartialsSelect(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Judge{}
-	if err = randomize.Struct(seed, o, judgeDBTypes, true, judgeColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	o := &Partial{}
+	if err = randomize.Struct(seed, o, partialDBTypes, true, partialColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -541,7 +541,7 @@ func testJudgesSelect(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice, err := Judges().All(tx)
+	slice, err := Partials().All(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -552,25 +552,25 @@ func testJudgesSelect(t *testing.T) {
 }
 
 var (
-	judgeDBTypes = map[string]string{`ID`: `integer`, `State`: `text`, `Host`: `text`, `Port`: `text`, `Ping`: `integer`, `Online`: `boolean`}
-	_            = bytes.MinRead
+	partialDBTypes = map[string]string{`Name`: `text`, `HTML`: `text`}
+	_              = bytes.MinRead
 )
 
-func testJudgesUpdate(t *testing.T) {
+func testPartialsUpdate(t *testing.T) {
 	t.Parallel()
 
-	if 0 == len(judgePrimaryKeyColumns) {
+	if 0 == len(partialPrimaryKeyColumns) {
 		t.Skip("Skipping table with no primary key columns")
 	}
-	if len(judgeAllColumns) == len(judgePrimaryKeyColumns) {
+	if len(partialAllColumns) == len(partialPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Judge{}
-	if err = randomize.Struct(seed, o, judgeDBTypes, true, judgeColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	o := &Partial{}
+	if err = randomize.Struct(seed, o, partialDBTypes, true, partialColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -579,7 +579,7 @@ func testJudgesUpdate(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := Judges().Count(tx)
+	count, err := Partials().Count(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -588,8 +588,8 @@ func testJudgesUpdate(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, judgeDBTypes, true, judgePrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	if err = randomize.Struct(seed, o, partialDBTypes, true, partialPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
 
 	if rowsAff, err := o.Update(tx, boil.Infer()); err != nil {
@@ -599,18 +599,18 @@ func testJudgesUpdate(t *testing.T) {
 	}
 }
 
-func testJudgesSliceUpdateAll(t *testing.T) {
+func testPartialsSliceUpdateAll(t *testing.T) {
 	t.Parallel()
 
-	if len(judgeAllColumns) == len(judgePrimaryKeyColumns) {
+	if len(partialAllColumns) == len(partialPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Judge{}
-	if err = randomize.Struct(seed, o, judgeDBTypes, true, judgeColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	o := &Partial{}
+	if err = randomize.Struct(seed, o, partialDBTypes, true, partialColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -619,7 +619,7 @@ func testJudgesSliceUpdateAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := Judges().Count(tx)
+	count, err := Partials().Count(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -628,18 +628,18 @@ func testJudgesSliceUpdateAll(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, judgeDBTypes, true, judgePrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	if err = randomize.Struct(seed, o, partialDBTypes, true, partialPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
 
 	// Remove Primary keys and unique columns from what we plan to update
 	var fields []string
-	if strmangle.StringSliceMatch(judgeAllColumns, judgePrimaryKeyColumns) {
-		fields = judgeAllColumns
+	if strmangle.StringSliceMatch(partialAllColumns, partialPrimaryKeyColumns) {
+		fields = partialAllColumns
 	} else {
 		fields = strmangle.SetComplement(
-			judgeAllColumns,
-			judgePrimaryKeyColumns,
+			partialAllColumns,
+			partialPrimaryKeyColumns,
 		)
 	}
 
@@ -657,7 +657,7 @@ func testJudgesSliceUpdateAll(t *testing.T) {
 		}
 	}
 
-	slice := JudgeSlice{o}
+	slice := PartialSlice{o}
 	if rowsAff, err := slice.UpdateAll(tx, updateMap); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
@@ -665,28 +665,28 @@ func testJudgesSliceUpdateAll(t *testing.T) {
 	}
 }
 
-func testJudgesUpsert(t *testing.T) {
+func testPartialsUpsert(t *testing.T) {
 	t.Parallel()
 
-	if len(judgeAllColumns) == len(judgePrimaryKeyColumns) {
+	if len(partialAllColumns) == len(partialPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
 	// Attempt the INSERT side of an UPSERT
-	o := Judge{}
-	if err = randomize.Struct(seed, &o, judgeDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	o := Partial{}
+	if err = randomize.Struct(seed, &o, partialDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
 	defer func() { _ = tx.Rollback() }()
 	if err = o.Upsert(tx, false, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert Judge: %s", err)
+		t.Errorf("Unable to upsert Partial: %s", err)
 	}
 
-	count, err := Judges().Count(tx)
+	count, err := Partials().Count(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -695,15 +695,15 @@ func testJudgesUpsert(t *testing.T) {
 	}
 
 	// Attempt the UPDATE side of an UPSERT
-	if err = randomize.Struct(seed, &o, judgeDBTypes, false, judgePrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize Judge struct: %s", err)
+	if err = randomize.Struct(seed, &o, partialDBTypes, false, partialPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize Partial struct: %s", err)
 	}
 
 	if err = o.Upsert(tx, true, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert Judge: %s", err)
+		t.Errorf("Unable to upsert Partial: %s", err)
 	}
 
-	count, err = Judges().Count(tx)
+	count, err = Partials().Count(tx)
 	if err != nil {
 		t.Error(err)
 	}
