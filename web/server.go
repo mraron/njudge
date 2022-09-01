@@ -17,6 +17,7 @@ import (
 	_ "github.com/mraron/njudge/pkg/problems/tasktype/communication"
 	_ "github.com/mraron/njudge/pkg/problems/tasktype/output_only"
 	_ "github.com/mraron/njudge/pkg/problems/tasktype/stub"
+	"github.com/mraron/njudge/web/helpers"
 	"github.com/mraron/njudge/web/helpers/config"
 	"github.com/mraron/njudge/web/helpers/roles"
 	"github.com/mraron/njudge/web/helpers/templates"
@@ -125,4 +126,8 @@ func (s *Server) getAdmin(c echo.Context) error {
 	return c.Render(http.StatusOK, "admin.gohtml", struct {
 		Url string
 	}{s.Url})
+}
+
+func (s *Server) Submit(uid int, problemset, problem, language string, source []byte) (int, error) {
+	return helpers.Submit(s.Server, s.DB, s.ProblemStore, uid, problemset, problem, language, source)
 }

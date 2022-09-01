@@ -27,6 +27,24 @@
 
         problem_rel.editionView().fields(problem_rel.creationView().fields());
 
+        const partial = nga.entity('partials').identifier(nga.field('name'));
+        partial.listView().fields([
+            nga.field('name'),
+            nga.field('html', 'wysiwyg'),
+        ]).listActions(['show', 'edit']).sortField('name');
+
+        partial.creationView().fields([
+            nga.field('name').validation({ required: true }),
+            nga.field('html', 'wysiwyg').validation({ required: true })
+        ]);
+
+        partial.editionView().fields([
+            nga.field('html', 'wysiwyg').validation({ required: true })
+        ]);
+
+        partial.showView().fields(partial.listView().fields());
+
+
         const judge = nga.entity("judges").identifier(nga.field('id'));
         judge.listView().fields([
             nga.field('id'),
@@ -54,7 +72,7 @@
             nga.field('port'),
             nga.field('load'),
             nga.field('problems_dir'),
-            nga.field('problems_list','json'),
+            nga.field('problem_list', 'json'),
             nga.field('uptime'),
             nga.field('ping'),
             nga.field('online'),
@@ -95,15 +113,7 @@
             nga.field('language'),
             nga.field('ontest'),
             nga.field('verdict'),
-        ]).listActions(['edit','show']);
-
-        submission.creationView().fields([
-            nga.field('name').validation({ required: true }),
-            nga.field('email').validation({ required: true }),
-            nga.field('role').validation({requiered: true}),
-        ]);
-
-        submission.editionView().fields(submission.creationView().fields());
+        ]).listActions(['show']);
 
         submission.showView().fields([
             nga.field('id'),
@@ -114,10 +124,10 @@
             nga.field('ontest'),
             nga.field('verdict'),
             nga.field('status'),
-        ]).actions(['list', 'delete', 'edit']);
-
+        ]).actions(['list']);
 
         admin.addEntity(problem_rel);
+        admin.addEntity(partial);
         admin.addEntity(judge);
         admin.addEntity(user);
         admin.addEntity(submission);
@@ -127,6 +137,7 @@
                 .addChild(nga.menu(judge).title('Judges').icon('<span class="glyphicon glyphicon-wrench"></span>'))
                 .addChild(nga.menu(user).title('Users').icon('<span class="glyphicon glyphicon-user"></span>'))
                 .addChild(nga.menu(submission).title('Submissions').icon('<span class="glyphicon glyphicon-upload"></span>'))
+                .addChild(nga.menu(partial).title('Partials').icon('<span class="glyphicon glyphicon-folder-open"></span>'))
         );
 
         nga.configure(admin);
