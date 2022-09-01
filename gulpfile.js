@@ -4,11 +4,11 @@ const cleanCSS = require('gulp-clean-css');
 const concat = require('gulp-concat');
 
 function adminCSS() {
-    return src('node_modules/ng-admin/build/ng-admin.min.css', 'node_modules/ng-admin/build/ng-admin.min.css.map').pipe(dest("static/css"))
+    return src('node_modules/ng-admin/build/ng-admin.min.css', { sourcemaps: true }).pipe(dest("static/css", { sourcemaps: '.' }))
 }
 
 function adminJS() {
-    return src('node_modules/ng-admin/build/ng-admin.min.js', 'node_modules/ng-admin/build/ng-admin.min.js.map').pipe(dest("static/js"))
+    return src('node_modules/ng-admin/build/ng-admin.min.js', { sourcemaps: true }).pipe(dest("static/js", { sourcemaps: '.' }))
 }
 
 function mainCSS() {
