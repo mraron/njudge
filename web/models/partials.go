@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
-	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -23,8 +22,8 @@ import (
 
 // Partial is an object representing the database table.
 type Partial struct {
-	Name string      `boil:"name" json:"name" toml:"name" yaml:"name"`
-	HTML null.String `boil:"html" json:"html,omitempty" toml:"html" yaml:"html,omitempty"`
+	Name string `boil:"name" json:"name" toml:"name" yaml:"name"`
+	HTML string `boil:"html" json:"html" toml:"html" yaml:"html"`
 
 	R *partialR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L partialL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -48,50 +47,12 @@ var PartialTableColumns = struct {
 
 // Generated where
 
-type whereHelpernull_String struct{ field string }
-
-func (w whereHelpernull_String) EQ(x null.String) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
-}
-func (w whereHelpernull_String) NEQ(x null.String) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
-}
-func (w whereHelpernull_String) LT(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpernull_String) LTE(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpernull_String) GT(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpernull_String) GTE(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-func (w whereHelpernull_String) IN(slice []string) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
-}
-func (w whereHelpernull_String) NIN(slice []string) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
-}
-
-func (w whereHelpernull_String) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_String) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
-
 var PartialWhere = struct {
 	Name whereHelperstring
-	HTML whereHelpernull_String
+	HTML whereHelperstring
 }{
 	Name: whereHelperstring{field: "\"partials\".\"name\""},
-	HTML: whereHelpernull_String{field: "\"partials\".\"html\""},
+	HTML: whereHelperstring{field: "\"partials\".\"html\""},
 }
 
 // PartialRels is where relationship names are stored.
@@ -112,8 +73,8 @@ type partialL struct{}
 
 var (
 	partialAllColumns            = []string{"name", "html"}
-	partialColumnsWithoutDefault = []string{"name"}
-	partialColumnsWithDefault    = []string{"html"}
+	partialColumnsWithoutDefault = []string{"name", "html"}
+	partialColumnsWithDefault    = []string{}
 	partialPrimaryKeyColumns     = []string{"name"}
 	partialGeneratedColumns      = []string{}
 )
