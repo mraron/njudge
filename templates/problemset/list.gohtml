@@ -52,6 +52,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary">Szűr</button>
+                {{if .Data.Filtered}}<a class="btn btn-danger" href=".">Töröl</a>{{end}}
             </form>
             </div>
         </div>

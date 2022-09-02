@@ -2,10 +2,13 @@ package web
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/mraron/njudge/web/extmodels"
+	"github.com/mraron/njudge/web/handlers/api"
 	"github.com/mraron/njudge/web/handlers/problemset"
 	"github.com/mraron/njudge/web/handlers/submission"
 	"github.com/mraron/njudge/web/handlers/taskarchive"
 	"github.com/mraron/njudge/web/handlers/user"
+	"github.com/mraron/njudge/web/models"
 )
 
 func (s *Server) prepareRoutes(e *echo.Echo) {
@@ -55,29 +58,40 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 
 	v1 := e.Group("/api/v1")
 
-	v1.GET("/problem_rels", s.getAPIProblemRels)
-	v1.POST("/problem_rels", s.postAPIProblemRel)
-	v1.GET("/problem_rels/:id", s.getAPIProblemRel)
-	v1.PUT("/problem_rels/:id", s.putAPIProblemRel)
-	v1.DELETE("/problem_rels/:id", s.deleteAPIProblemRel)
+	problemRelDataProvider := api.ProblemRelDataProvider{DB: s.DB.DB}
+	v1.GET("/problem_rels", api.GetList[models.ProblemRel](problemRelDataProvider))
+	v1.POST("/problem_rels", api.Post[models.ProblemRel](problemRelDataProvider))
+	v1.GET("/problem_rels/:id", api.Get[models.ProblemRel](problemRelDataProvider))
+	v1.PUT("/problem_rels/:id", api.Put[models.ProblemRel](problemRelDataProvider))
+	v1.DELETE("/problem_rels/:id", api.Delete[models.ProblemRel](problemRelDataProvider))
 
-	v1.GET("/judges", s.getAPIJudges)
-	v1.POST("/judges", s.postAPIJudge)
-	v1.GET("/judges/:id", s.getAPIJudge)
-	v1.PUT("/judges/:id", s.putAPIJudge)
-	v1.DELETE("/judges/:id", s.deleteAPIJudge)
+	partialDataProvider := api.PartialDataProvider{DB: s.DB.DB}
+	v1.GET("/partials", api.GetList[models.Partial](partialDataProvider))
+	v1.POST("/partials", api.Post[models.Partial](partialDataProvider))
+	v1.GET("/partials/:name", api.Get[models.Partial](partialDataProvider))
+	v1.PUT("/partials/:name", api.Put[models.Partial](partialDataProvider))
+	v1.DELETE("/partials/:name", api.Delete[models.Partial](partialDataProvider))
 
-	v1.GET("/users", s.getAPIUsers)
-	v1.POST("/users", s.postAPIUser)
-	v1.GET("/users/:id", s.getAPIUser)
-	v1.PUT("/users/:id", s.putAPIUser)
-	v1.DELETE("/users/:id", s.deleteAPIUser)
+	judgeDataProvider := api.JudgeDataProvider{DB: s.DB.DB}
+	v1.GET("/judges", api.GetList[extmodels.Judge](judgeDataProvider))
+	v1.POST("/judges", api.Post[extmodels.Judge](judgeDataProvider))
+	v1.GET("/judges/:id", api.Get[extmodels.Judge](judgeDataProvider))
+	v1.PUT("/judges/:id", api.Put[extmodels.Judge](judgeDataProvider))
+	v1.DELETE("/judges/:id", api.Delete[extmodels.Judge](judgeDataProvider))
 
-	v1.GET("/submissions", s.getAPISubmissions)
-	v1.POST("/submissions", s.postAPISubmission)
-	v1.GET("/submissions/:id", s.getAPISubmission)
-	v1.PUT("/submissions/:id", s.putAPISubmission)
-	v1.DELETE("/submissions/:id", s.deleteAPISubmission)
+	userDataProvider := api.UserDataProvider{DB: s.DB.DB}
+	v1.GET("/users", api.GetList[models.User](userDataProvider))
+	v1.POST("/users", api.Post[models.User](userDataProvider))
+	v1.GET("/users/:id", api.Get[models.User](userDataProvider))
+	v1.PUT("/users/:id", api.Put[models.User](userDataProvider))
+	v1.DELETE("/users/:id", api.Delete[models.User](userDataProvider))
+
+	submissionDataProvider := api.SubmissionDataProvider{DB: s.DB.DB}
+	v1.GET("/submissions", api.GetList[models.Submission](submissionDataProvider))
+	v1.POST("/submissions", api.Post[models.Submission](submissionDataProvider))
+	v1.GET("/submissions/:id", api.Get[models.Submission](submissionDataProvider))
+	v1.PUT("/submissions/:id", api.Put[models.Submission](submissionDataProvider))
+	v1.DELETE("/submissions/:id", api.Delete[models.Submission](submissionDataProvider))
 
 	e.GET("/admin", s.getAdmin)
 }

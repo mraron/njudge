@@ -114,7 +114,7 @@ func (s *Server) runGlue() {
 
 		if st.Done {
 			verdict := st.Status.Verdict()
-			if st.Status.Compiled == false {
+			if !st.Status.Compiled {
 				verdict = extmodels.VERDICT_CE
 			}
 

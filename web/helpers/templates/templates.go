@@ -2,6 +2,7 @@ package templates
 
 import (
 	"crypto/md5"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -26,7 +27,7 @@ type Renderer struct {
 	cfg       config.Server
 }
 
-func New(cfg config.Server, problemStore problems.Store) *Renderer {
+func New(cfg config.Server, problemStore problems.Store, db *sql.DB) *Renderer {
 	renderer := &Renderer{make(map[string]*template.Template), cfg}
 
 	layoutFiles := make([]string, 0)
@@ -44,7 +45,7 @@ func New(cfg config.Server, problemStore problems.Store) *Renderer {
 					panic(err)
 				}
 
-				renderer.templates[name] = template.Must(template.New(info.Name()).Funcs(funcs(problemStore)).ParseFiles(append(layoutFiles, path)...))
+				renderer.templates[name] = template.Must(template.New(info.Name()).Funcs(funcs(problemStore, db)).ParseFiles(append(layoutFiles, path)...))
 			}
 		}
 		return nil
@@ -73,7 +74,7 @@ func (t *Renderer) Render(w io.Writer, name string, data interface{}, c echo.Con
 	}{data, c, t.cfg.CustomHead})
 }
 
-func funcs(store problems.Store) template.FuncMap {
+func funcs(store problems.Store, db *sql.DB) template.FuncMap {
 	return template.FuncMap{
 		"translateContent": i18n.TranslateContent,
 		"problem":          store.Get,
@@ -139,5 +140,6 @@ func funcs(store problems.Store) template.FuncMap {
 			}
 			return dict, nil
 		},
+		"partial": NewPartialCache(db, 30*time.Second).Get,
 	}
 }
