@@ -9,6 +9,7 @@ import (
 	"html/template"
 	"io"
 	"io/fs"
+	"math"
 	"path/filepath"
 	"strings"
 	"time"
@@ -141,5 +142,8 @@ func funcs(store problems.Store, db *sql.DB) template.FuncMap {
 			return dict, nil
 		},
 		"partial": NewPartialCache(db, 30*time.Second).Get,
+		"roundto": func(num float64, digs int) float64 {
+			return math.Round(num*100) / 100
+		},
 	}
 }

@@ -85,7 +85,7 @@
                             {{$g.Name}}
                         </td>
                         <td class="align-middle text-center" rowspan="{{add (len $g.Testcases) 1}}">
-                            {{$g.Score}}/{{$g.MaxScore}}
+                            {{roundto $g.Score 2}}/{{$g.MaxScore}}
                         </td>
                     </tr>
                     {{range $t := $g.Testcases}}
@@ -93,7 +93,7 @@
                             <td>{{$t.Index}}</td>
                             <td {{if ne $g.Scoring 1}}colspan="2"{{end}}><span class="{{if eq $t.VerdictName 0}}text-success{{else}}text-info{{end}}">{{$t.VerdictName.String}}</span></td>
                             {{if eq $g.Scoring 1}}
-                                <td>{{$t.Score}}/{{$t.MaxScore}}</td>
+                                <td>{{roundto $t.Score 2}}/{{$t.MaxScore}}</td>
                             {{end}}
                             <td>{{$t.TimeSpent}}</td>
                             <td>{{$t.MemoryUsed}} KiB</td>

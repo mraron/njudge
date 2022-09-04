@@ -32,12 +32,12 @@
             {{if eq $status.FeedbackType 1}}
                 {{if .Judged.Valid}}
                     {{if $status.IsAC}}
-                        <span class="text-success">Elfogadva {{$status.Score}}/{{$status.MaxScore}}</span>
+                        <span class="text-success">Elfogadva {{roundto $status.Score 2}}/{{$status.MaxScore}}</span>
                     {{else}}
                         {{if eq .Verdict 998}}
                             Fordítási Hiba
                         {{else}}
-                            <span class="text-info">{{($status.IndexTestcase $status.FirstNonAC).VerdictName}} {{$status.Score}}/{{$status.MaxScore}}</span>
+                            <span class="text-info">{{($status.IndexTestcase $status.FirstNonAC).VerdictName}} {{roundto $status.Score 2}}/{{$status.MaxScore}}</span>
                         {{end}}
                     {{end}}
                 {{else}}
