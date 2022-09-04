@@ -441,6 +441,14 @@ func parser(path string) (problems.Problem, error) {
 		}
 	}
 
+	chmodX := func(path string) error {
+		if stat, _ := os.Stat(path); stat.Mode().Perm()&fs.ModePerm != fs.ModePerm {
+			return os.Chmod(path, os.ModePerm)
+		}
+
+		return nil
+	}
+
 	checkPath := filepath.Join(p.Path, "check")
 	solPath := filepath.Join(p.Path, "sol")
 
@@ -459,12 +467,16 @@ func parser(path string) (problems.Problem, error) {
 					return nil, err
 				}
 			}
+
+			chmodX(checkerPath)
 		} else if exists(managerCppPath) {
 			p.tasktype = "communication"
 			if err := compile(managerCppPath, managerPath); err != nil {
 				return nil, err
 			}
 			p.files = append(p.files, problems.File{Name: "manager.cpp", Role: "interactor", Path: managerPath})
+
+			chmodX(managerPath)
 		}
 
 		if _, err := os.Stat(filepath.Join(solPath, "grader.cpp")); err == nil {
@@ -497,6 +509,10 @@ func parser(path string) (problems.Problem, error) {
 
 	if p.tasktype == "" {
 		p.tasktype = "batch"
+	}
+
+	if p.OutputOnly {
+		p.tasktype = "outputonly"
 	}
 
 	attPath := filepath.Join(path, "att")
