@@ -148,7 +148,7 @@ func CheckOK(ctx *RunContext, res language.Status, group *problems.Group, testca
 
 	testcase.OutputPath = tmpfile.Name()
 
-	err = ctx.Problem.Check(testcase)
+	err = ctx.Problem.Checker().Check(testcase)
 
 	testcase.Output = truncate(programOutput)
 	testcase.ExpectedOutput = truncate(string(answerContents))

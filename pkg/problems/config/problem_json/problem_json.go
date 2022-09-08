@@ -117,24 +117,8 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	return &ans, nil
 }
 
-func (p Problem) Check(tc *problems.Testcase) error {
-	output := bytes.Buffer{}
-
-	cmd := exec.Command(filepath.Join(p.Path, "check"), tc.InputPath, tc.OutputPath, tc.AnswerPath)
-	cmd.Stdout = &output
-	cmd.Stderr = &output
-
-	err := cmd.Run()
-
-	tc.CheckerOutput = output.String()
-
-	if err == nil && cmd.ProcessState.Success() {
-		return nil
-	} else if err != nil {
-		return err
-	}
-
-	return errors.New("process state is not success")
+func (p Problem) Checker() problems.Checker {
+	return checker.Noop{}
 }
 
 func (p Problem) Files() []problems.File {

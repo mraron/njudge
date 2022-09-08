@@ -9,7 +9,6 @@ import (
 	"io/fs"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -18,6 +17,7 @@ import (
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/language/cpp"
 	"github.com/mraron/njudge/pkg/problems"
+	"github.com/mraron/njudge/pkg/problems/checker"
 	"github.com/mraron/njudge/pkg/problems/tasktype/batch"
 	"github.com/mraron/njudge/pkg/problems/tasktype/communication"
 	"go.uber.org/multierr"
@@ -179,62 +179,16 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	return &ans, nil
 }
 
-func (p Problem) Check(tc *problems.Testcase) error {
+func (p Problem) Checker() problems.Checker {
 	if p.tasktype == "communication" { // manager already printed the result
-		return nil
+		return checker.Noop{}
 	}
 
 	if p.whiteDiffChecker {
-		ans, err := os.Open(tc.AnswerPath)
-		if err != nil {
-			return multierr.Combine(err, ans.Close())
-		}
-		defer ans.Close()
-
-		out, err := os.Open(tc.OutputPath)
-		if err != nil {
-			return multierr.Combine(err, out.Close())
-		}
-		defer out.Close()
-
-		outcome, err := Whitediff(ans, out)
-		tc.Score = outcome * tc.MaxScore
-
-		if outcome == 1.0 {
-			tc.VerdictName = problems.VerdictAC
-		} else {
-			tc.VerdictName = problems.VerdictWA
-		}
-
-		return err
+		return checker.Whitediff{}
 	}
 
-	checkerPath := filepath.Join(p.Path, "check", "checker")
-
-	stdout, stderr := bytes.Buffer{}, bytes.Buffer{}
-
-	fmt.Println(checkerPath, tc.InputPath, tc.AnswerPath, tc.OutputPath)
-	cmd := exec.Command(checkerPath, tc.InputPath, tc.AnswerPath, tc.OutputPath)
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("can't check task_yaml task: %w", err)
-	}
-	fmt.Fscanf(&stdout, "%f", &tc.Score)
-
-	if tc.Score == 1.0 {
-		tc.VerdictName = problems.VerdictAC
-	} else if tc.Score > 0 {
-		tc.VerdictName = problems.VerdictPC
-	} else {
-		tc.VerdictName = problems.VerdictWA
-	}
-
-	tc.Score *= tc.MaxScore
-
-	tc.CheckerOutput = stderr.String()
-	return nil
+	return checker.NewTaskYAML(filepath.Join(p.Path, "check", "checker"))
 }
 
 func (p Problem) Files() []problems.File {
