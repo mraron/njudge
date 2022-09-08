@@ -5,6 +5,8 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"github.com/mraron/njudge/pkg/language/langs/cpp"
+	"github.com/mraron/njudge/pkg/language/sandbox"
 	"io/fs"
 	"io/ioutil"
 	"log"
@@ -13,7 +15,6 @@ import (
 	"strings"
 
 	"github.com/mraron/njudge/pkg/language"
-	"github.com/mraron/njudge/pkg/language/cpp"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/spf13/afero"
 	"go.uber.org/multierr"
@@ -28,7 +29,7 @@ func compileIfNotCompiled(fs afero.Fs, wd, src, dst string) error {
 		if binary, err := fs.Create(dst); err == nil {
 			if file, err := fs.Open(src); err == nil {
 				var buf bytes.Buffer
-				s := language.NewDummySandbox()
+				s := sandbox.NewDummy()
 				if err := s.Init(log.New(ioutil.Discard, "", 0)); err != nil {
 					return multierr.Combine(err, binary.Close(), file.Close())
 				}
