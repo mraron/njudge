@@ -4,6 +4,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+	"github.com/mraron/njudge/pkg/language/sandbox"
 	"log"
 	"net/http"
 	"os"
@@ -31,13 +32,13 @@ import (
 	"github.com/kataras/go-errors"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/mraron/njudge/pkg/language"
-	_ "github.com/mraron/njudge/pkg/language/cpp"
-	_ "github.com/mraron/njudge/pkg/language/golang"
-	_ "github.com/mraron/njudge/pkg/language/julia"
-	_ "github.com/mraron/njudge/pkg/language/nim"
-	_ "github.com/mraron/njudge/pkg/language/octave"
-	_ "github.com/mraron/njudge/pkg/language/pascal"
-	_ "github.com/mraron/njudge/pkg/language/python3"
+	_ "github.com/mraron/njudge/pkg/language/langs/cpp"
+	_ "github.com/mraron/njudge/pkg/language/langs/golang"
+	_ "github.com/mraron/njudge/pkg/language/langs/julia"
+	_ "github.com/mraron/njudge/pkg/language/langs/nim"
+	_ "github.com/mraron/njudge/pkg/language/langs/octave"
+	_ "github.com/mraron/njudge/pkg/language/langs/pascal"
+	_ "github.com/mraron/njudge/pkg/language/langs/python3"
 )
 
 //@TODO use contexts and afero => tests
@@ -104,7 +105,7 @@ func (s *Server) Run() error {
 
 	s.sandboxProvider = language.NewSandboxProvider()
 	for _, id := range s.SandboxIds {
-		s.sandboxProvider.Put(language.NewIsolateSandbox(id))
+		s.sandboxProvider.Put(sandbox.NewIsolate(id))
 	}
 
 	if s.PublicKeyLocation != "" {

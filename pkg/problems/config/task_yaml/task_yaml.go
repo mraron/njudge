@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/mraron/njudge/pkg/language/langs/cpp"
 	"io"
 	"io/fs"
 	"io/ioutil"
@@ -15,7 +16,6 @@ import (
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
-	"github.com/mraron/njudge/pkg/language/cpp"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/checker"
 	"github.com/mraron/njudge/pkg/problems/tasktype/batch"

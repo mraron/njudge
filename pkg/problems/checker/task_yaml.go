@@ -3,36 +3,39 @@ package checker
 import (
 	"bytes"
 	"fmt"
-	"os/exec"
-
+	"github.com/mraron/njudge/pkg/language/runner"
 	"github.com/mraron/njudge/pkg/problems"
 )
 
 type TaskYAML struct {
 	path string
+
+	executable runner.Executable
 }
 
-func NewTaskYAML(path string) TaskYAML {
-	return TaskYAML{path: path}
+func NewTaskYAML(path string) *TaskYAML {
+	return &TaskYAML{
+		path:       path,
+		executable: runner.NewStdlib(path),
+	}
 }
 
-func (TaskYAML) Name() string {
+func (t *TaskYAML) Name() string {
 	return "taskyaml"
 }
 
-func (t TaskYAML) Check(tc *problems.Testcase) error {
-	checkerPath := t.path
-
+func (t *TaskYAML) Check(tc *problems.Testcase) error {
 	stdout, stderr := bytes.Buffer{}, bytes.Buffer{}
 
-	cmd := exec.Command(checkerPath, tc.InputPath, tc.AnswerPath, tc.OutputPath)
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
+	t.executable.Stdout(&stdout)
+	t.executable.Stderr(&stderr)
 
-	if err := cmd.Run(); err != nil {
+	if err := t.executable.Run([]string{tc.InputPath, tc.AnswerPath, tc.OutputPath}); err != nil {
 		return fmt.Errorf("can't check task_yaml task: %w", err)
 	}
-	fmt.Fscanf(&stdout, "%f", &tc.Score)
+	if _, err := fmt.Fscanf(&stdout, "%f", &tc.Score); err != nil {
+		return err
+	}
 
 	if tc.Score == 1.0 {
 		tc.VerdictName = problems.VerdictAC
