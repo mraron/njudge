@@ -1,22 +1,20 @@
 package problem_json
 
 import (
-	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
+	"github.com/mraron/njudge/pkg/problems/checker"
 )
 
-type Name struct {
+type Title struct {
 	Language string
-	Value    string
+	Title    string
 }
 
 type Statement struct {
@@ -30,19 +28,38 @@ type Attachment struct {
 	Path string
 }
 
-type Problem struct {
-	Path                   string
-	GeneratedStatementList problems.Contents
-	AttachmentList         problems.Attachments
+type Subtask struct {
+	TestCount  int      `json:"test_count"`
+	InputList  []string `json:"input_list"`
+	OutputList []string `json:"output_list"`
+	Scoring    string   `json:"scoring"`
+	MaxScore   float64  `json:"max_score"`
+}
 
-	ShortName      string `json:"shortname"`
-	Names          []Name
+type Problem struct {
+	Path                   string               `json:"-"`
+	GeneratedStatementList problems.Contents    `json:"-"`
+	AttachmentList         problems.Attachments `json:"-"`
+
+	ShortName      string       `json:"shortname"`
+	TitleList      []Title      `json:"titles"`
 	StatementList  []Statement  `json:"statements"`
 	AttachmentInfo []Attachment `json:"attachments"`
 
-	TestCount     int    `json:"testcount"`
-	InputPattern  string `json:"inputpattern"`
-	OutputPattern string `json:"outputpattern"`
+	Tests struct {
+		InputFile     string   `json:"input_file"`
+		OutputFile    string   `json:"output_file"`
+		MemoryLimit   int      `json:"memory_limit"`
+		TimeLimit     float64  `json:"time_limit"`
+		TestCount     int      `json:"test_count"`
+		InputPattern  string   `json:"input_pattern"`
+		OutputPattern string   `json:"output_pattern"`
+		InputList     []string `json:"input_list"`
+		OutputList    []string `json:"output_list"`
+
+		FeedbackType string    `json:"feedback_type"`
+		Subtasks     []Subtask `json:"subtasks"`
+	} `json:"tests"`
 }
 
 func (p Problem) Name() string {
@@ -50,9 +67,9 @@ func (p Problem) Name() string {
 }
 
 func (p Problem) Titles() problems.Contents {
-	ans := make(problems.Contents, len(p.Names))
-	for ind, val := range p.Names {
-		ans[ind] = problems.BytesData{Loc: val.Language, Val: []byte(val.Value), Typ: "text"}
+	ans := make(problems.Contents, len(p.TitleList))
+	for ind, val := range p.TitleList {
+		ans[ind] = problems.BytesData{Loc: val.Language, Val: []byte(val.Title), Typ: "text"}
 	}
 
 	return ans
@@ -71,19 +88,15 @@ func (p Problem) PDFStatements() problems.Contents {
 }
 
 func (p Problem) MemoryLimit() int {
-	return 0
+	return p.Tests.MemoryLimit * 1024 * 1024
 }
 
 func (p Problem) TimeLimit() int {
-	return 0
+	return int(1000 * p.Tests.TimeLimit)
 }
 
 func (p Problem) InputOutputFiles() (string, string) {
 	return "", ""
-}
-
-func (p Problem) Interactive() bool {
-	return false
 }
 
 func (p Problem) Languages() []language.Language {
@@ -105,9 +118,9 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	ans.Feedback[0].Groups[0].Name = "base"
 	ans.Feedback[0].Groups[0].Scoring = problems.ScoringSum
 
-	for i := 0; i < p.TestCount; i++ {
+	for i := 0; i < p.Tests.TestCount; i++ {
 		tc := problems.Testcase{}
-		tc.InputPath, tc.AnswerPath = fmt.Sprintf(filepath.Join(p.Path, p.InputPattern), i+1), fmt.Sprintf(filepath.Join(p.Path, p.OutputPattern), i+1)
+		tc.InputPath, tc.AnswerPath = fmt.Sprintf(filepath.Join(p.Path, p.Tests.InputPattern), i+1), fmt.Sprintf(filepath.Join(p.Path, p.Tests.OutputPattern), i+1)
 		tc.Index = i
 		tc.Group = "base"
 
@@ -126,7 +139,7 @@ func (p Problem) Files() []problems.File {
 }
 
 func (p Problem) GetTaskType() problems.TaskType {
-	tt, err := problems.GetTaskType("output_only")
+	tt, err := problems.GetTaskType("outputonly")
 	if err != nil {
 		panic(err)
 	}
