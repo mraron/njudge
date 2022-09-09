@@ -10,6 +10,9 @@ import (
 	"go.uber.org/multierr"
 )
 
+// Whitediff is the [default checker] built into CMS
+//
+// [default checker]: https://cms.readthedocs.io/en/v1.4/Task%20types.html#tasktypes-white-diff
 type Whitediff struct{}
 
 func (Whitediff) Name() string {
@@ -58,6 +61,15 @@ func canonicalize(str string) string {
 	return strings.Join(arr, " ")
 }
 
+// DoWhitediff performs a [whitediff] comparision on the two input readers.
+// It returns:
+//
+//   - "1.0" if the streams match,
+//   - "0.0" if not,
+//
+// and any errors encountered while trying to exhaust the readers.
+//
+// [whitediff]: https://cms.readthedocs.io/en/v1.4/Task%20types.html#tasktypes-white-diff
 func DoWhitediff(a io.Reader, b io.Reader) (float64, error) {
 	x, y := bufio.NewScanner(a), bufio.NewScanner(b)
 	eq := true

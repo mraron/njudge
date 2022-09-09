@@ -1,3 +1,4 @@
+// Package problems contains utilities useful for parsing, displaying, judging (submission for) problems
 package problems
 
 import (

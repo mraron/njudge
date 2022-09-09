@@ -10,6 +10,9 @@ import (
 	"github.com/mraron/njudge/pkg/problems"
 )
 
+// Testlib is [polygon]'s default checker format
+//
+// [polygon]: https://polygon.codeforces.com
 type Testlib struct {
 	path string
 }

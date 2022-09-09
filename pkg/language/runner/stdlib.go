@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"strings"
 	"syscall"
 )
 
@@ -34,7 +35,7 @@ func (s *Stdlib) Stderr(w io.Writer) {
 }
 
 func (s *Stdlib) Run(args []string) error {
-	s.cmd = exec.Command(s.path, args...)
+	s.cmd = exec.Command("/bin/sh", "-c", "ulimit -s unlimited && "+strings.Join(append([]string{s.path}, args...), " "))
 	s.cmd.Stdin = s.stdin
 	s.cmd.Stdout = s.stdout
 	s.cmd.Stderr = s.stderr

@@ -7,6 +7,11 @@ import (
 	"github.com/mraron/njudge/pkg/problems"
 )
 
+// TaskYAML checker format is used by CMS as described in
+// the CMS documentation's [Checker] and [Standard manager output] sections.
+//
+// [Checker]: https://cms.readthedocs.io/en/v1.4/Task%20types.html#checker
+// [Standard manager output]: https://cms.readthedocs.io/en/v1.4/Task%20types.html#standard-manager-output
 type TaskYAML struct {
 	path string
 

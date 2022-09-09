@@ -134,7 +134,7 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 }
 
 func (p Problem) Checker() problems.Checker {
-	return checker.NewFeladatTXT(filepath.Join(p.Path, "ellen"), p.Path, p.TestCount, p.Points)
+	return checker.NewEllen(filepath.Join(p.Path, "ellen"), p.Path, p.TestCount, p.Points)
 }
 
 func (p Problem) Files() []problems.File {

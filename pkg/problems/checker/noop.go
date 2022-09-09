@@ -2,6 +2,7 @@ package checker
 
 import "github.com/mraron/njudge/pkg/problems"
 
+// Noop doesn't perform any checking
 type Noop struct{}
 
 func (Noop) Name() string {

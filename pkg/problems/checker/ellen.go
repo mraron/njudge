@@ -13,15 +13,37 @@ import (
 	"github.com/mraron/njudge/pkg/problems"
 )
 
-type FeladatTXT struct {
+// Ellen (an abbreviation of checker in hungarian) checker is used by [mester], [bíró] systems.
+//
+// Arguments of the checker are:
+//
+//  1. Absolute path to testdata
+//  2. Absolute path to output data
+//  3. Index of testcase to check
+//
+// Testcases are named in.{x} and out.{x} where x is an 1 indexed integer.
+//
+// It produces its output to stdout in the following format:
+//
+// {test_index};{subtest_number};{point_multiplier};{verdict_message}
+//   - test_index: the index received via the argument
+//   - subtest_number: refer to the [github.com/mraron/njudge/pkg/problems/config/feladat_txt] config's docs
+//   - point_multiplier: 0 or 1, depending on the correctness
+//   - verdict_message: A message displayed to the user (it must not contain ";" or ":" characters)
+//
+// If there are multiple subtests the same format should be used delimited by a single ":"
+//
+// [mester]: https://mester.inf.elte.hu
+// [bíró]: https://biro.inf.elte.hu
+type Ellen struct {
 	testcaseDir string
 	ellenPath   string
 	testCount   int
 	points      []int
 }
 
-func NewFeladatTXT(ellenPath, testcaseDir string, testCount int, points []int) FeladatTXT {
-	return FeladatTXT{
+func NewEllen(ellenPath, testcaseDir string, testCount int, points []int) Ellen {
+	return Ellen{
 		testcaseDir: testcaseDir,
 		ellenPath:   ellenPath,
 		testCount:   testCount,
@@ -29,11 +51,11 @@ func NewFeladatTXT(ellenPath, testcaseDir string, testCount int, points []int) F
 	}
 }
 
-func (FeladatTXT) Name() string {
+func (Ellen) Name() string {
 	return "feladattxt"
 }
 
-func (f FeladatTXT) Check(tc *problems.Testcase) error {
+func (f Ellen) Check(tc *problems.Testcase) error {
 	testind := strconv.Itoa(tc.Index)
 
 	dir, err := ioutil.TempDir("/tmp", "feladat_txt_checker")
