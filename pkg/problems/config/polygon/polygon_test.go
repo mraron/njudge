@@ -121,12 +121,12 @@ func TestFSParsing(t *testing.T) {
 func TestJSONStatement(t *testing.T) {
 	fs := afero.NewBasePathFs(afero.NewOsFs(), "./testdata/")
 
-	_, err := ParseJSONStatement(fs, "hablaty/")
-	if err == nil {
+	stmt, _ := ParseJSONStatement(fs, "hablaty/")
+	if stmt != nil {
 		t.Error("found problem-properties.json")
 	}
 
-	_, err = ParseJSONStatement(fs, "json_statement/")
+	_, err := ParseJSONStatement(fs, "json_statement/")
 	if err != nil {
 		t.Error(err)
 	}
