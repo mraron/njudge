@@ -41,7 +41,7 @@ type Subtask struct {
 
 type Checker struct {
 	Type string `json:"type"`
-	Path string `json:"location"`
+	Path string `json:"path"`
 }
 
 type Problem struct {
