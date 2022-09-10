@@ -5,14 +5,15 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/mraron/njudge/pkg/language/langs/cpp"
-	"github.com/mraron/njudge/pkg/language/sandbox"
 	"io/fs"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/mraron/njudge/pkg/language/langs/cpp"
+	"github.com/mraron/njudge/pkg/language/sandbox"
 
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
@@ -132,6 +133,10 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 				jsonStmt, err := ParseJSONStatement(cfg.fs, filepath.Join(path, "statements", dir.Name()))
 				if err != nil {
 					return nil, err
+				}
+
+				if jsonStmt == nil {
+					continue
 				}
 
 				// problem-properties.json might be outdated. problem.xml should take priority
