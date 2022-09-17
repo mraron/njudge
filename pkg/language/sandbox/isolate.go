@@ -1,9 +1,10 @@
-package language
+package sandbox
 
 import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"github.com/mraron/njudge/pkg/language"
 	"io"
 	"io/ioutil"
 	"log"
@@ -24,7 +25,7 @@ func getEnv(key, fallback string) string {
 
 var ISOLATE_ROOT = getEnv("ISOLATE_ROOT", "/var/local/lib/isolate/")
 
-type IsolateSandbox struct {
+type Isolate struct {
 	id   int
 	argv []string
 
@@ -33,24 +34,24 @@ type IsolateSandbox struct {
 	stderr io.Writer
 	wdir   string
 
-	st Status
+	st language.Status
 
 	logger *log.Logger
 }
 
-func NewIsolateSandbox(id int) Sandbox {
-	return &IsolateSandbox{id: id}
+func NewIsolate(id int) language.Sandbox {
+	return &Isolate{id: id}
 }
 
-func (s *IsolateSandbox) Id() string {
+func (s *Isolate) Id() string {
 	return "isolate" + strconv.Itoa(s.id)
 }
 
-func (s IsolateSandbox) Pwd() string {
+func (s Isolate) Pwd() string {
 	return filepath.Join(ISOLATE_ROOT, strconv.Itoa(s.id), "box")
 }
 
-func (s *IsolateSandbox) GetFile(name string) (io.Reader, error) {
+func (s *Isolate) GetFile(name string) (io.Reader, error) {
 	f, err := ioutil.ReadFile(filepath.Join(s.Pwd(), name))
 	if err != nil {
 		return nil, err
@@ -59,15 +60,15 @@ func (s *IsolateSandbox) GetFile(name string) (io.Reader, error) {
 	return bytes.NewBuffer(f), nil
 }
 
-func (s *IsolateSandbox) ClearArguments() {
+func (s *Isolate) ClearArguments() {
 	s.argv = make([]string, 0)
 	s.stdin = nil
 	s.stdout = nil
 	s.wdir = ""
-	s.st = Status{}
+	s.st = language.Status{}
 }
 
-func (s *IsolateSandbox) Init(l *log.Logger) error {
+func (s *Isolate) Init(l *log.Logger) error {
 	s.ClearArguments()
 	s.logger = l
 	if err := s.Cleanup(); err != nil { //cleanup because the previous invocation might not have cleaned up
@@ -85,11 +86,11 @@ func (s *IsolateSandbox) Init(l *log.Logger) error {
 	return err
 }
 
-func (s IsolateSandbox) getPathToFile(name string) string {
+func (s Isolate) getPathToFile(name string) string {
 	return filepath.Join(s.Pwd(), name)
 }
 
-func (s *IsolateSandbox) CreateFile(name string, r io.Reader) error {
+func (s *Isolate) CreateFile(name string, r io.Reader) error {
 	filename := s.getPathToFile(name)
 	s.logger.Print("Creating file ", filename)
 
@@ -108,7 +109,7 @@ func (s *IsolateSandbox) CreateFile(name string, r io.Reader) error {
 	return f.Close()
 }
 
-func (s *IsolateSandbox) MakeExecutable(name string) error {
+func (s *Isolate) MakeExecutable(name string) error {
 	filename := s.getPathToFile(name)
 
 	err := os.Chmod(filename, 0777)
@@ -117,7 +118,7 @@ func (s *IsolateSandbox) MakeExecutable(name string) error {
 	return err
 }
 
-func (s *IsolateSandbox) SetMaxProcesses(num int) Sandbox {
+func (s *Isolate) SetMaxProcesses(num int) language.Sandbox {
 	if num < 0 {
 		s.argv = append(s.argv, "--processes=100")
 	} else {
@@ -127,22 +128,22 @@ func (s *IsolateSandbox) SetMaxProcesses(num int) Sandbox {
 	return s
 }
 
-func (s *IsolateSandbox) Env() Sandbox {
+func (s *Isolate) Env() language.Sandbox {
 	s.argv = append(s.argv, "--full-env")
 	return s
 }
 
-func (s *IsolateSandbox) SetEnv(e string) Sandbox {
+func (s *Isolate) SetEnv(e string) language.Sandbox {
 	s.argv = append(s.argv, fmt.Sprintf("--env=%s", e))
 	return s
 }
 
-func (s *IsolateSandbox) AddArg(a string) Sandbox {
+func (s *Isolate) AddArg(a string) language.Sandbox {
 	s.argv = append(s.argv, a)
 	return s
 }
 
-func (s *IsolateSandbox) TimeLimit(tl time.Duration) Sandbox {
+func (s *Isolate) TimeLimit(tl time.Duration) language.Sandbox {
 	tl = tl / time.Millisecond
 	s.argv = append(s.argv, fmt.Sprintf("--time=%d.%d", tl/1000, tl%1000))
 	s.argv = append(s.argv, fmt.Sprintf("--wall-time=%d.%d", (2*tl+1000)/1000, (2*tl+1000)%1000))
@@ -150,32 +151,32 @@ func (s *IsolateSandbox) TimeLimit(tl time.Duration) Sandbox {
 	return s
 }
 
-func (s *IsolateSandbox) MemoryLimit(ml int) Sandbox {
+func (s *Isolate) MemoryLimit(ml int) language.Sandbox {
 	s.argv = append(s.argv, "--cg-mem="+strconv.Itoa(ml), "--mem="+strconv.Itoa(ml))
 	return s
 }
 
-func (s *IsolateSandbox) Verbose() Sandbox {
+func (s *Isolate) Verbose() language.Sandbox {
 	s.argv = append(s.argv, "-v")
 	return s
 }
 
-func (s *IsolateSandbox) Stdin(reader io.Reader) Sandbox {
+func (s *Isolate) Stdin(reader io.Reader) language.Sandbox {
 	s.stdin = reader
 	return s
 }
 
-func (s *IsolateSandbox) Stdout(writer io.Writer) Sandbox {
+func (s *Isolate) Stdout(writer io.Writer) language.Sandbox {
 	s.stdout = writer
 	return s
 }
 
-func (s *IsolateSandbox) Stderr(writer io.Writer) Sandbox {
+func (s *Isolate) Stderr(writer io.Writer) language.Sandbox {
 	s.stderr = writer
 	return s
 }
 
-func (s *IsolateSandbox) MapDir(src string, dest string, opts []string, checkExists bool) Sandbox {
+func (s *Isolate) MapDir(src string, dest string, opts []string, checkExists bool) language.Sandbox {
 	if checkExists {
 		if _, err := os.Stat(src); os.IsNotExist(err) {
 			return s
@@ -191,12 +192,12 @@ func (s *IsolateSandbox) MapDir(src string, dest string, opts []string, checkExi
 	return s
 }
 
-func (s *IsolateSandbox) WorkingDirectory(wd string) Sandbox {
+func (s *Isolate) WorkingDirectory(wd string) language.Sandbox {
 	s.wdir = wd
 	return s
 }
 
-func (s *IsolateSandbox) Run(prg string, needStatus bool) (Status, error) {
+func (s *Isolate) Run(prg string, needStatus bool) (language.Status, error) {
 	var (
 		err      error
 		f        *os.File
@@ -242,17 +243,17 @@ func (s *IsolateSandbox) Run(prg string, needStatus bool) (Status, error) {
 		}
 
 		if st == -1 {
-			s.st.Verdict = VERDICT_XX
+			s.st.Verdict = language.VERDICT_XX
 		} else if st == 127 {
-			s.st.Verdict = VERDICT_ML
+			s.st.Verdict = language.VERDICT_ML
 		} else { //eg. signal 8/136?? -> division by zero
-			s.st.Verdict = VERDICT_RE
+			s.st.Verdict = language.VERDICT_RE
 		}
 	} else {
 		s.logger.Print("Command exited successfully")
 		s.logger.Print("stderr of process: ", stderr.String())
 
-		s.st.Verdict = VERDICT_OK
+		s.st.Verdict = language.VERDICT_OK
 	}
 
 	if s.stderr != nil {
@@ -266,7 +267,7 @@ func (s *IsolateSandbox) Run(prg string, needStatus bool) (Status, error) {
 	memorySum := 0
 
 	if f, err = os.Open(metafile); err != nil {
-		s.st.Verdict = VERDICT_XX
+		s.st.Verdict = language.VERDICT_XX
 		s.logger.Print("Can't open metafile ", metafile, " error is: ", err)
 
 		return s.st, err
@@ -290,9 +291,9 @@ func (s *IsolateSandbox) Run(prg string, needStatus bool) (Status, error) {
 		} else if lst[0] == "status" {
 			switch lst[1] {
 			case "TO":
-				s.st.Verdict = VERDICT_TL
+				s.st.Verdict = language.VERDICT_TL
 			case "SG":
-				s.st.Verdict = VERDICT_RE
+				s.st.Verdict = language.VERDICT_RE
 			}
 		}
 	}
@@ -304,7 +305,7 @@ func (s *IsolateSandbox) Run(prg string, needStatus bool) (Status, error) {
 	return s.st, nil
 }
 
-func (s *IsolateSandbox) Cleanup() error {
+func (s *Isolate) Cleanup() error {
 	args := []string{"--cg", "-b", strconv.Itoa(s.id), "--cleanup"}
 
 	s.logger.Print("Executing cleanup with args ", args)

@@ -9,15 +9,16 @@ import (
 	"io/fs"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/mraron/njudge/pkg/language/langs/cpp"
+
 	"github.com/mraron/njudge/pkg/language"
-	"github.com/mraron/njudge/pkg/language/cpp"
 	"github.com/mraron/njudge/pkg/problems"
+	"github.com/mraron/njudge/pkg/problems/checker"
 	"github.com/mraron/njudge/pkg/problems/tasktype/batch"
 	"github.com/mraron/njudge/pkg/problems/tasktype/communication"
 	"go.uber.org/multierr"
@@ -107,8 +108,22 @@ func (p Problem) Languages() []language.Language {
 
 	lst2 := make([]language.Language, 0, len(lst1))
 	for _, val := range lst1 {
-		if val.Id() != "zip" {
-			lst2 = append(lst2, val)
+		if p.tasktype == "stub" {
+			hasStub := false
+			for _, f := range p.files {
+				if f.Role == "stub_"+val.Id() || (f.Role == "stub_cpp" && strings.HasPrefix(val.Id(), "cpp")) {
+					hasStub = true
+					break
+				}
+			}
+
+			if hasStub {
+				lst2 = append(lst2, val)
+			}
+		} else {
+			if val.Id() != "zip" {
+				lst2 = append(lst2, val)
+			}
 		}
 	}
 
@@ -179,62 +194,16 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	return &ans, nil
 }
 
-func (p Problem) Check(tc *problems.Testcase) error {
+func (p Problem) Checker() problems.Checker {
 	if p.tasktype == "communication" { // manager already printed the result
-		return nil
+		return checker.Noop{}
 	}
 
 	if p.whiteDiffChecker {
-		ans, err := os.Open(tc.AnswerPath)
-		if err != nil {
-			return multierr.Combine(err, ans.Close())
-		}
-		defer ans.Close()
-
-		out, err := os.Open(tc.OutputPath)
-		if err != nil {
-			return multierr.Combine(err, out.Close())
-		}
-		defer out.Close()
-
-		outcome, err := Whitediff(ans, out)
-		tc.Score = outcome * tc.MaxScore
-
-		if outcome == 1.0 {
-			tc.VerdictName = problems.VerdictAC
-		} else {
-			tc.VerdictName = problems.VerdictWA
-		}
-
-		return err
+		return checker.Whitediff{}
 	}
 
-	checkerPath := filepath.Join(p.Path, "check", "checker")
-
-	stdout, stderr := bytes.Buffer{}, bytes.Buffer{}
-
-	fmt.Println(checkerPath, tc.InputPath, tc.AnswerPath, tc.OutputPath)
-	cmd := exec.Command(checkerPath, tc.InputPath, tc.AnswerPath, tc.OutputPath)
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("can't check task_yaml task: %w", err)
-	}
-	fmt.Fscanf(&stdout, "%f", &tc.Score)
-
-	if tc.Score == 1.0 {
-		tc.VerdictName = problems.VerdictAC
-	} else if tc.Score > 0 {
-		tc.VerdictName = problems.VerdictPC
-	} else {
-		tc.VerdictName = problems.VerdictWA
-	}
-
-	tc.Score *= tc.MaxScore
-
-	tc.CheckerOutput = stderr.String()
-	return nil
+	return checker.NewTaskYAML(filepath.Join(p.Path, "check", "checker"))
 }
 
 func (p Problem) Files() []problems.File {
@@ -251,6 +220,8 @@ func (p Problem) GetTaskType() problems.TaskType {
 		tt, err = problems.GetTaskType("outputonly")
 	} else if p.tasktype == "batch" {
 		tt, err = problems.GetTaskType("batch")
+	} else if p.tasktype == "stub" {
+		tt, err = problems.GetTaskType("stub")
 	} else if p.tasktype == "communication" {
 		res := communication.New()
 		res.RunInteractorF = func(rc *batch.RunContext, utoi, itou *os.File, g *problems.Group, tc *problems.Testcase) (language.Status, error) {
@@ -478,11 +449,6 @@ func parser(path string) (problems.Problem, error) {
 
 			chmodX(managerPath)
 		}
-
-		if _, err := os.Stat(filepath.Join(solPath, "grader.cpp")); err == nil {
-			p.tasktype = "batch"
-			p.files = append(p.files, problems.File{Name: "grader.cpp", Role: "stub_cpp", Path: filepath.Join(solPath, "grader.cpp")})
-		}
 	}
 
 	if exists(solPath) {
@@ -501,10 +467,21 @@ func parser(path string) (problems.Problem, error) {
 		}
 
 		for _, file := range files {
-			if !file.IsDir() && filepath.Ext(file.Name()) == ".h" {
-				p.files = append(p.files, problems.File{Name: filepath.Base(file.Name()), Role: "stub_cpp", Path: file.Name()})
+			if !file.IsDir() && filepath.Ext(file.Name()) == ".h" && file.Name() != "testlib.h" {
+				p.files = append(p.files, problems.File{Name: file.Name(), Role: "stub_cpp", Path: filepath.Join(solPath, file.Name())})
 			}
 		}
+	}
+
+	hasStub := false
+	for _, f := range p.files {
+		if strings.Contains(f.Role, "stub") {
+			hasStub = true
+		}
+	}
+
+	if hasStub {
+		p.tasktype = "stub"
 	}
 
 	if p.tasktype == "" {

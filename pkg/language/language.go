@@ -60,6 +60,7 @@ type Language interface {
 }
 
 type LanguageTest struct {
+	Sandbox         Sandbox
 	Language        Language
 	Source          string
 	ExpectedVerdict Verdict
@@ -70,9 +71,7 @@ type LanguageTest struct {
 }
 
 func (test LanguageTest) Run(t *testing.T) {
-	sandbox := NewDummySandbox()
-
-	err := sandbox.Init(log.New(ioutil.Discard, "", 0))
+	err := test.Sandbox.Init(log.New(ioutil.Discard, "", 0))
 	if err != nil {
 		t.Error(err)
 	}
@@ -81,7 +80,7 @@ func (test LanguageTest) Run(t *testing.T) {
 	bin := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 
-	err = test.Language.Compile(sandbox, File{test.Language.DefaultFileName(), src}, bin, stderr, []File{})
+	err = test.Language.Compile(test.Sandbox, File{test.Language.DefaultFileName(), src}, bin, stderr, []File{})
 	stderrContent := stderr.String()
 
 	if (test.ExpectedVerdict&VERDICT_CE == 0 && err != nil) || (test.ExpectedVerdict&VERDICT_CE != 0 && err == nil && stderrContent == "") {
@@ -90,7 +89,7 @@ func (test LanguageTest) Run(t *testing.T) {
 
 	if test.ExpectedVerdict&VERDICT_CE == 0 {
 		output := &bytes.Buffer{}
-		status, err := test.Language.Run(sandbox, bin, bytes.NewBufferString(test.Input), output, test.TimeLimit, test.MemoryLimit)
+		status, err := test.Language.Run(test.Sandbox, bin, bytes.NewBufferString(test.Input), output, test.TimeLimit, test.MemoryLimit)
 
 		outputContent := output.String()
 		if status.Verdict&test.ExpectedVerdict == 0 || err != nil || outputContent != test.ExpectedOutput {
@@ -98,7 +97,7 @@ func (test LanguageTest) Run(t *testing.T) {
 		}
 	}
 
-	err = sandbox.Cleanup()
+	err = test.Sandbox.Cleanup()
 	if err != nil {
 		t.Errorf("cleanup err: %v", err.Error())
 	}

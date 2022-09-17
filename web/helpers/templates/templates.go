@@ -145,5 +145,8 @@ func funcs(store problems.Store, db *sql.DB) template.FuncMap {
 		"roundto": func(num float64, digs int) float64 {
 			return math.Round(num*100) / 100
 		},
+		"tags": func() (models.TagSlice, error) {
+			return models.Tags().All(db)
+		},
 	}
 }

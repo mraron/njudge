@@ -3,12 +3,13 @@ package polygon
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/spf13/afero"
 	"html"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"text/template"
+
+	"github.com/spf13/afero"
 )
 
 const htmlTemplate = `<link href="problem-statement.css" rel="stylesheet" type="text/css"><div class="problem-statement">
@@ -82,7 +83,12 @@ func ParseJSONStatement(fs afero.Fs, path string) (*JSONStatement, error) {
 		err  error
 	)
 
-	propsFile, err := fs.Open(filepath.Join(path, "problem-properties.json"))
+	problemProps := filepath.Join(path, "problem-properties.json")
+	if exists, err := afero.Exists(fs, problemProps); !exists || err != nil {
+		return nil, err
+	}
+
+	propsFile, err := fs.Open(problemProps)
 	if err != nil {
 		return nil, err
 	}

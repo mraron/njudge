@@ -1,10 +1,11 @@
 package julia
 
 import (
-	"github.com/mraron/njudge/pkg/language"
 	"io"
 	"os"
 	"time"
+
+	"github.com/mraron/njudge/pkg/language"
 )
 
 type julia struct{}

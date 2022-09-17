@@ -73,9 +73,8 @@ func FeedbackFromString(str string) FeedbackType {
 
 // ScoringType represents the scoring of a group of tests,
 //
-// * ScoringGroup means that if there's a non-accepted (or partially accepted) testcase in the group then the whole group scores 0 points,
-//
-// * ScoringSum means that the score of the group is the sum of scores of individual scores.
+//   - ScoringGroup means that if there's a non-accepted (or partially accepted) testcase in the group then the whole group scores 0 points,
+//   - ScoringSum means that the score of the group is the sum of scores of individual scores.
 type ScoringType int
 
 const (

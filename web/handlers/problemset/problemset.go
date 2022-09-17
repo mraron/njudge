@@ -36,10 +36,11 @@ type ProblemList struct {
 
 	Filtered        bool
 	TitleFilter     string
+	TagsFilter      string
 	CategoryFilters []CategoryFilter
 }
 
-func GetProblemList(DB *sqlx.DB, problemStore problems.Store, u *models.User, page, perPage int, order QueryMod, query []QueryMod, qu url.Values) (*ProblemList, error) {
+func GetProblemList(c echo.Context, DB *sqlx.DB, problemStore problems.Store, u *models.User, page, perPage int, order QueryMod, query []QueryMod, qu url.Values) (*ProblemList, error) {
 	ps, err := models.ProblemRels(append(append([]QueryMod{Limit(perPage), Offset((page - 1) * perPage)}, query...), order)...).All(DB)
 	if err != nil {
 		return nil, err
@@ -62,33 +63,8 @@ func GetProblemList(DB *sqlx.DB, problemStore problems.Store, u *models.User, pa
 			return nil, err
 		}
 
-		if u != nil {
-			problems[i].SolvedStatus, err = helpers.HasUserSolved(DB, u, p.Problemset, p.Problem)
-			if err != nil {
-				return nil, err
-			}
-		}
-
-		problems[i].SolverCount = p.SolverCount
-		if p.CategoryID.Valid {
-			cat := p.CategoryID.Int
-			var category *models.ProblemCategory
-			for {
-				category, err = models.ProblemCategories(Where("id = ?", cat)).One(DB)
-				if err != nil {
-					return nil, err
-				}
-
-				if !category.ParentID.Valid {
-					break
-				}
-				cat = category.ParentID.Int
-			}
-
-			problems[i].CategoryLink = helpers.Link{
-				Text: category.Name,
-				Href: "/task_archive#category" + strconv.Itoa(p.CategoryID.Int),
-			}
+		if err := problems[i].FillFields(c, DB, p); err != nil {
+			return nil, err
 		}
 	}
 
@@ -205,13 +181,37 @@ func GetList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 			qmods = append(qmods, WhereIn("category_id in ?", pars...))
 		}
 
-		problemList, err := GetProblemList(DB, problemStore, u, page, 20, OrderBy(by+" "+order), qmods, c.Request().URL.Query())
+		if c.QueryParam("tags") != "" {
+			filtered = true
+
+			tagNames := strings.Split(c.QueryParam("tags"), ",")
+			lst := make([]interface{}, len(tagNames))
+			for ind, val := range tagNames {
+				lst[ind] = val
+			}
+
+			rels, err := models.ProblemRels(InnerJoin("problem_tags pt on pt.problem_id = problem_rels.id"),
+				InnerJoin("tags t on pt.tag_id = t.id"), WhereIn("t.name in ?", lst...), GroupBy("problem_rels.id"), Having("COUNT(DISTINCT t.name) = ?", len(lst))).All(DB)
+			if err != nil {
+				return nil
+			}
+
+			lst = make([]interface{}, len(rels))
+			for ind, val := range rels {
+				lst[ind] = val.ID
+			}
+
+			qmods = append(qmods, WhereIn("id IN ?", lst...))
+		}
+
+		problemList, err := GetProblemList(c, DB, problemStore, u, page, 20, OrderBy(by+" "+order), qmods, c.Request().URL.Query())
 		if err != nil {
 			return err
 		}
 
 		problemList.Filtered = filtered
 		problemList.TitleFilter = c.QueryParam("title")
+		problemList.TagsFilter = c.QueryParam("tags")
 
 		problemList.CategoryFilters = []CategoryFilter{{"-", "", false}}
 		nameById := make(map[int]string)
@@ -293,7 +293,7 @@ func PostSubmit(cfg config.Server, DB *sqlx.DB, problemStore problems.Store) ech
 		)
 
 		if u = c.Get("user").(*models.User); u == nil {
-			return c.Render(http.StatusForbidden, "message.html", "Előbb lépj be.")
+			return c.Render(http.StatusForbidden, "message", "Előbb lépj be.")
 		}
 
 		problemName := c.FormValue("problem")

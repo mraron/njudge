@@ -1,13 +1,39 @@
 {{template "header" .}}
 {{template "problem_menu" "problem"}}
-<!--<div class="container-fluid">-->
-    <div class="row">
-        <div class="col-12 col-lg-9">
+<div class="modal fade" id="tagModal" tabindex="-1" aria-labelledby="tagModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="tagModalLabel">Tag hozzáadása a "{{translateContent "hungarian" .Data.Problem.Titles}}" feladathoz</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="tags" method="post" id="addTag">
+        <select class="form-control" name="tagID">
+            {{range $tag := tags}}
+            <option value="{{$tag.ID}}">{{$tag.Name}}</option>
+            {{end}}
+        </select>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Mégse</button>
+        <button type="submit" class="btn btn-primary" form="addTag">Tag hozzáadása</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+<div class="col-12 col-lg-9">
 {{if .Data.Problem.HTMLStatements}}
     {{str2html (translateContent "hungarian" .Data.Problem.HTMLStatements).String}}
 {{else if .Data.Problem.PDFStatements}}
     <embed src="pdf/{{(translateContent "hungarian" .Data.Problem.PDFStatements).Locale}}/" width="100%" height="800px"></embed>
-{{end}}</div>
+{{end}}
+</div>
 
 <div class="col-12 col-lg-3">
 <div class="card">
@@ -20,13 +46,21 @@
             <div class="col-6">{{.Data.Problem.Name}}</div>
             <div class="col-6">Cím:</div>
             <div class="col-6">{{translateContent "hungarian" .Data.Problem.Titles}}</div>
+            {{if ne .Data.Problem.GetTaskType.Name "outputonly" }}
             <div class="col-6">Időlimit:</div>
             <div class="col-6">{{.Data.Problem.TimeLimit}} ms</div>
             <div class="col-6">Memórialimit:</div>
             <div class="col-6">{{divide .Data.Problem.MemoryLimit 1048576}} MiB</div>
-            {{if .Data.Problem.Tags}}
+            {{end}}
+            {{$solvedStatus := .Data.SolvedStatus}}
+            {{if or .Data.Tags (eq $solvedStatus 3)}}
             <div class="col-6">Tagek:</div>
-            <div class="col-6">{{range $i := .Data.Problem.Tags}}<span class="badge badge-secondary">{{$i}}</span> {{end}}</div>
+            <div class="col-6">
+            {{range $i := .Data.Tags}}<span class="badge badge-secondary">{{$i.Name}}{{if (eq $solvedStatus 3)}} <a href="delete_tag/{{$i.ID}}" style="color:#fff;">&times;</a>{{end}}</span> {{end}}
+            {{if (eq $solvedStatus 3)}}
+            <span class="badge badge-secondary"><a href="#" class="text-reset text-decoration-none" data-toggle="modal" data-target="#tagModal">+</a></span>
+            {{end}}
+            </div>
             {{end}}
             <div class="col-6">Típus:</div>
             <div class="col-6">{{.Data.Problem.GetTaskType.Name}}</div>
@@ -53,42 +87,49 @@
                 {{end}}
             </select>
             <br><br>
-            <input type="submit" class="btn btn-primary">
+            <input type="submit" class="btn btn-primary" value="Beküld">
             </form>
         {{else}}
             Beküldéshez lépj be vagy regisztrálj!
         {{end}}
     </div>
 </div>
-    {{if or .Data.Problem.Attachments .Data.Problem.PDFStatements}}
-        <br>
-        <div class="card">
-            <div class="card-header">
-                <i class="fas fa-paperclip"></i> Mellékletek
-            </div>
-            <div class="card-body">
-                {{range $a := .Data.Problem.Attachments}}
-                    <a href="attachment/{{$a.Name}}/"><i class="fas fa-file"></i> Fájl ({{$a.Name}})</a><br>
-                {{end}}
-                {{range $loc := .Data.Problem.PDFStatements.Locales}}
-                    <a href="pdf/{{$loc}}/"><i class="fas fa-file-pdf"></i> Leírás ({{$loc}})</a><br>
-                {{end}}
-
-            </div>
-        </div>
-    {{end}}
-    <!--<a href="/problemset/status?problem_set={{get .Context "problemset"}}&problem={{.Data.Problem.Name}}">Összes beküldés</a> <br>
-    <a href="/problemset/status?problem_set={{get .Context "problemset"}}&problem={{.Data.Problem.Name}}&ac=1">Elfogadott beküldések</a>
-    -->
+{{if .Data.Submissions}}
+<br>
+<div class="card table-responsive">
+    <div class="card-header" style="border-bottom: 0px;">
+        <i class="fas fa-history"></i> Beküldések
+    </div>
+    <table class="card-body table" style="margin: 0px;">
+        {{range $s := .Data.Submissions}}
+            <tr>
+                <td><a href="/submission/{{$s.ID}}">{{$s.ID}}</a></td>
+                <td>{{.Submitted.Local.Year}}. {{fixedlen (month2int .Submitted.Local.Month) 2}}. {{fixedlen .Submitted.Local.Day 2}} {{fixedlen .Submitted.Local.Hour 2}}:{{fixedlen .Submitted.Local.Minute 2}}:{{fixedlen .Submitted.Local.Second 2}}</td>
+                <td>{{template "submissionStatus" $s}}</td>
+            </tr>
+        {{end}}
+    </table>
 </div>
 
+{{end}}
+{{if or .Data.Problem.Attachments .Data.Problem.PDFStatements}}
+<br>
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-paperclip"></i> Mellékletek
     </div>
-<!--</div>-->
-<!--
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb" style="background-color: #f7f7f7;">
-        <li class="breadcrumb-item active" aria-current="page">Home</li>
-    </ol>
-</nav>
--->
+    <div class="card-body">
+        {{range $a := .Data.Problem.Attachments}}
+            <a href="attachment/{{$a.Name}}/"><i class="fas fa-file"></i> Fájl ({{$a.Name}})</a><br>
+        {{end}}
+        {{range $loc := .Data.Problem.PDFStatements.Locales}}
+            <a href="pdf/{{$loc}}/"><i class="fas fa-file-pdf"></i> Leírás ({{$loc}})</a><br>
+        {{end}}
+
+    </div>
+</div>
+{{end}}
+</div>
+
+</div>
 {{template "footer" .}}

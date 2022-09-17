@@ -1,30 +1,8 @@
 {{template "header" .}}
-{{template "pagination" .Data.Pages}}
 
-<div class="table-responsive">
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col"></th>
-                <th scope="col">Azonosító</th>
-                <th scope="col">Cím</th>
-                <th scope="col">Kategória</th>
-                <th scope="col"><a href="{{.Data.SolverSorter.Href}}">{{if eq .Data.SolverSorter.Order ""}}<i class="fas fa-sort"></i>{{else}}{{if eq .Data.SolverSorter.Order "ASC"}}<i class="fas fa-sort-down"></i>{{else}}<i class="fas fa-sort-up"></i>{{end}}{{end}} Megoldók</a></th>
-            </tr>
-        </thead>
-        <tbody>
-        {{ range $i := .Data.Problems }}
-            <tr>
-                <td class="text-center">{{if eq $i.SolvedStatus 3}}<i class="fas fa-check text-success"></i>{{end}}{{if eq $i.SolvedStatus 1}}<i class="fas fa-times text-danger"></i>{{end}}</td>
-                <td>{{$i.Name}}</td>
-                <td><a href="{{$i.Name}}/">{{(translateContent "hungarian" $i.Titles).String}}</a></td>
-                <td>{{if $i.CategoryLink.Text}}<a href="{{$i.CategoryLink.Href}}">{{$i.CategoryLink.Text}}</a>{{end}}</td>
-                <td><a href="{{$i.Name}}/status?ac=1"><i class="fas fa-user"></i> {{$i.SolverCount}}</a></td>
-            </tr>
-        {{end}}
-        </tbody>
-    </table>
-</div>
+<script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+<link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
+
 <div class="accordion" id="filterAccordion">
     <div class="card">
         <div class="card-header" id="filterHeading">
@@ -50,7 +28,10 @@
                     {{end}}
                     </select>
                 </div>
-
+                <div class="form-group">
+                    <label for="tagsFilter">Tagek</label>
+                    <input name="tags" value="{{.Data.TagsFilter}}" class="form-control" id="tagsFilter">
+                </div>
                 <button type="submit" class="btn btn-primary">Szűr</button>
                 {{if .Data.Filtered}}<a class="btn btn-danger" href=".">Töröl</a>{{end}}
             </form>
@@ -58,4 +39,53 @@
         </div>
     </div>
 </div>
+
+<script>
+var input = document.querySelector("input[name=tags]");
+var tagify = new Tagify(input, {
+    whitelist: [{{range $tag := tags}}'{{$tag.Name}}',{{end}}],
+    originalInputValueFormat: valuesArr => valuesArr.map(item => item.value).join(','),
+    enforceWhitelist: true,
+    dropdown: {
+        maxItems: 20,
+        enabled : 0,
+    },
+    editTags: false,
+});
+</script>
+
+<br>
+{{template "pagination" .Data.Pages}}
+
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col">Azonosító</th>
+                <th scope="col">Cím</th>
+                <th scope="col">Kategória</th>
+                <th scope="col">Tagek</th>
+                <th scope="col"><a href="{{.Data.SolverSorter.Href}}">{{if eq .Data.SolverSorter.Order ""}}<i class="fas fa-sort"></i>{{else}}{{if eq .Data.SolverSorter.Order "ASC"}}<i class="fas fa-sort-down"></i>{{else}}<i class="fas fa-sort-up"></i>{{end}}{{end}} Megoldók</a></th>
+            </tr>
+        </thead>
+        <tbody>
+        {{ range $i := .Data.Problems }}
+            <tr>
+                <td class="text-center">{{if eq $i.SolvedStatus 3}}<i class="fas fa-check text-success"></i>{{end}}{{if eq $i.SolvedStatus 1}}<i class="fas fa-times text-danger"></i>{{end}}</td>
+                <td>{{$i.Name}}</td>
+                <td><a href="{{$i.Name}}/">{{(translateContent "hungarian" $i.Titles).String}}</a></td>
+                <td>{{if $i.CategoryLink.Text}}<a href="{{$i.CategoryLink.Href}}">{{$i.CategoryLink.Text}}</a>{{end}}</td>
+                <td>
+                {{range $tag := $i.Tags}}
+                <span class="badge badge-secondary">{{$tag.Name}}</span>
+                {{end}}
+                </td>
+                <td><a href="{{$i.Name}}/status?ac=1"><i class="fas fa-user"></i> {{$i.SolverCount}}</a></td>
+            </tr>
+        {{end}}
+        </tbody>
+    </table>
+</div>
+
 {{template "footer" .}}

@@ -1,3 +1,4 @@
+// Package problems contains utilities useful for parsing, displaying, judging (submission for) problems
 package problems
 
 import (
@@ -26,12 +27,17 @@ type Problem interface {
 type Judgeable interface {
 	MemoryLimit() int
 	TimeLimit() int
-	Check(testcase *Testcase) error
+	Checker() Checker
 	InputOutputFiles() (string, string)
 	Languages() []language.Language
 	StatusSkeleton(testset string) (*Status, error)
 	Files() []File
 	GetTaskType() TaskType
+}
+
+type Checker interface {
+	Name() string
+	Check(testcase *Testcase) error
 }
 
 func Truncate(s string) string {

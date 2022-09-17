@@ -10,7 +10,7 @@
                 <div class="problemcategory-header">
                     <a class="collapse-toggle" data-toggle="collapse" href="#category{{$c.Id}}">{{$c.Name}}</a>
                 </div>
-                <div class="collapse show problemcategory-body" id="category{{$c.Id}}" data-parent="#category{{$id}}">
+                <div class="collapse show problemcategory-body" id="category{{$c.Id}}" data-nparent="#category{{$id}}">
                     {{template "ta_tree_view" $c}}
                 </div>
             {{end}}
@@ -48,7 +48,7 @@
                 curr.classList.add('show');
 
                 // don't show non-important nodes
-                for(let child of document.querySelectorAll("div[data-parent='#"+curr.id+"']")) {
+                for(let child of document.querySelectorAll("div[data-nparent='#"+curr.id+"']")) {
                     console.log(child);
                     child.classList.remove('show');
                 }

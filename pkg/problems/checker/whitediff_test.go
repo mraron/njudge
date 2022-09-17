@@ -1,4 +1,4 @@
-package task_yaml
+package checker
 
 import (
 	"io"
@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestWhitediff(t *testing.T) {
+func TestDoWhitediff(t *testing.T) {
 	type args struct {
 		a io.Reader
 		b io.Reader
@@ -48,13 +48,13 @@ func TestWhitediff(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Whitediff(tt.args.a, tt.args.b)
+			got, err := DoWhitediff(tt.args.a, tt.args.b)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Whitediff() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("DoWhitediff() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Whitediff() = %v, want %v", got, tt.want)
+				t.Errorf("DoWhitediff() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -13,7 +13,10 @@ function adminJS() {
 
 function mainCSS() {
     return src("static_src/css/*.css").pipe(src('node_modules/bootstrap/dist/css/bootstrap.min.css')).pipe(purgeCSS({
-        content: ['templates/*.gohtml', 'templates/**/*.gohtml']
+        content: ['templates/*.gohtml', 'templates/**/*.gohtml'],
+        safelist: {
+            deep: [/^modal/]
+        }
     })).pipe(cleanCSS({compatibility: 'ie8'})).pipe(concat('main.min.css')).pipe(dest("static/css"))
 }
 

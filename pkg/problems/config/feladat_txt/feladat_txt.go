@@ -2,20 +2,19 @@ package feladat_txt
 
 import (
 	"bufio"
-	"bytes"
 	"errors"
 	"fmt"
+	"github.com/mraron/njudge/pkg/language/langs/cpp"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
-	"github.com/mraron/njudge/pkg/language/cpp"
 	"github.com/mraron/njudge/pkg/problems"
+	"github.com/mraron/njudge/pkg/problems/checker"
 )
 
 type Problem struct {
@@ -134,70 +133,8 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	return &ans, nil
 }
 
-func (p Problem) Check(tc *problems.Testcase) error {
-	testind := strconv.Itoa(tc.Index)
-
-	dir, err := ioutil.TempDir("/tmp", "feladat_txt_checker")
-	if err != nil {
-		return err
-	}
-
-	pout_tmp := filepath.Join(dir, filepath.Base(tc.AnswerPath))
-
-	err = os.Symlink(tc.OutputPath, pout_tmp)
-	if err != nil {
-		return err
-	}
-
-	stdout := &bytes.Buffer{}
-	stderr := &bytes.Buffer{}
-
-	cmd := exec.Command("/bin/sh", "-c", "ulimit -s unlimited && "+strings.Join([]string{filepath.Join(p.Path, "ellen"), p.Path, dir, testind}, " "))
-	cmd.Stdout = stdout
-	cmd.Stderr = stderr
-
-	err = cmd.Run()
-
-	str := stdout.String()
-	tc.CheckerOutput = problems.Truncate(str)
-	if err == nil || strings.HasPrefix(err.Error(), "exit status") {
-		var spltd []string
-		if strings.Contains(str, ":") {
-			spltd = strings.Split(strings.TrimSpace(str), ":")
-		} else {
-			spltd = strings.Split(strings.TrimSpace(str), "\n")
-		}
-
-		score := 0.0
-		allOk := true
-		for i := 0; i < len(spltd); i++ {
-			spltd[i] = strings.TrimSpace(spltd[i])
-			curr := strings.Split(spltd[i], ";")
-
-			if strings.TrimSpace(curr[len(curr)-2]) == "1" {
-				score = score + float64(p.Points[i*p.TestCount+tc.Index-1])
-			} else {
-				allOk = false
-			}
-		}
-
-		tc.Score = score
-		if score == tc.MaxScore && allOk {
-			tc.VerdictName = problems.VerdictAC
-		} else if score != 0.0 {
-			tc.VerdictName = problems.VerdictPC
-		} else {
-			tc.VerdictName = problems.VerdictWA
-		}
-
-		return nil
-	} else if err != nil {
-		tc.VerdictName = problems.VerdictXX
-		return err
-	}
-
-	tc.VerdictName = problems.VerdictXX
-	return errors.New("process state is not success")
+func (p Problem) Checker() problems.Checker {
+	return checker.NewEllen(filepath.Join(p.Path, "ellen"), p.Path, p.TestCount, p.Points)
 }
 
 func (p Problem) Files() []problems.File {

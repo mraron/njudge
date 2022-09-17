@@ -1,14 +1,12 @@
 package polygon
 
 import (
-	"bytes"
 	"fmt"
-	"github.com/mraron/njudge/pkg/problems"
-	"os/exec"
 	"path/filepath"
-	"strings"
-	"syscall"
 	"time"
+
+	"github.com/mraron/njudge/pkg/problems"
+	"github.com/mraron/njudge/pkg/problems/checker"
 )
 
 type Test struct {
@@ -145,43 +143,6 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	}, nil
 }
 
-func (p Problem) Check(tc *problems.Testcase) error {
-	output := &bytes.Buffer{}
-
-	cmd := exec.Command("/bin/sh", "-c", "ulimit -s unlimited && "+strings.Join([]string{filepath.Join(p.Path, "check"), tc.InputPath, tc.OutputPath, tc.AnswerPath}, " "))
-	cmd.Stdout = output
-	cmd.Stderr = output
-
-	err := cmd.Run()
-
-	tc.CheckerOutput = problems.Truncate(output.String())
-	if err != nil {
-		if exitErr, ok := err.(*exec.ExitError); ok {
-			if status, ok := exitErr.Sys().(syscall.WaitStatus); ok {
-				if status.ExitStatus() == 1 {
-					tc.VerdictName = problems.VerdictWA
-				} else if status.ExitStatus() == 2 {
-					tc.VerdictName = problems.VerdictPE
-				} else if status.ExitStatus() == 7 {
-					tc.VerdictName = problems.VerdictPC
-
-					rel := 0
-					fmt.Sscanf(output.String(), "points %d", &rel)
-					rel -= 16
-
-					tc.Score = float64(rel) / (200.0 * tc.MaxScore)
-				} else { //3 -> fail
-					tc.VerdictName = problems.VerdictXX
-				}
-			}
-		} else {
-			tc.VerdictName = problems.VerdictXX
-			return err
-		}
-	} else {
-		tc.Score = tc.MaxScore
-		tc.VerdictName = problems.VerdictAC
-	}
-
-	return nil
+func (p Problem) Checker() problems.Checker {
+	return checker.NewTestlib(filepath.Join(p.Path, "check"))
 }
