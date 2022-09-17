@@ -58,7 +58,7 @@
             <div class="col-6">
             {{range $i := .Data.Tags}}<span class="badge badge-secondary">{{$i.Name}}{{if (eq $solvedStatus 3)}} <a href="delete_tag/{{$i.ID}}" style="color:#fff;">&times;</a>{{end}}</span> {{end}}
             {{if (eq $solvedStatus 3)}}
-            <a href="#" class="badge badge-secondary text-reset" data-toggle="modal" data-target="#tagModal">+</a>
+            <span class="badge badge-secondary"><a href="#" class="text-reset text-decoration-none" data-toggle="modal" data-target="#tagModal">+</a></span>
             {{end}}
             </div>
             {{end}}
