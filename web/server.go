@@ -12,6 +12,7 @@ import (
 	"github.com/mraron/njudge/pkg/problems"
 	_ "github.com/mraron/njudge/pkg/problems/config/feladat_txt"
 	_ "github.com/mraron/njudge/pkg/problems/config/polygon"
+	_ "github.com/mraron/njudge/pkg/problems/config/problem_json"
 	_ "github.com/mraron/njudge/pkg/problems/config/task_yaml"
 	_ "github.com/mraron/njudge/pkg/problems/tasktype/batch"
 	_ "github.com/mraron/njudge/pkg/problems/tasktype/communication"
@@ -24,7 +25,6 @@ import (
 
 	_ "github.com/mraron/njudge/pkg/language/langs/cpp"
 	_ "github.com/mraron/njudge/pkg/language/langs/golang"
-	_ "github.com/mraron/njudge/pkg/language/langs/julia"
 	_ "github.com/mraron/njudge/pkg/language/langs/nim"
 	_ "github.com/mraron/njudge/pkg/language/langs/octave"
 	_ "github.com/mraron/njudge/pkg/language/langs/pascal"

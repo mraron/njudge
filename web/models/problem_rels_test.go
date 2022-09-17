@@ -481,6 +481,158 @@ func testProblemRelsInsertWhitelist(t *testing.T) {
 	}
 }
 
+func testProblemRelToManyProblemProblemTags(t *testing.T) {
+	var err error
+
+	tx := MustTx(boil.Begin())
+	defer func() { _ = tx.Rollback() }()
+
+	var a ProblemRel
+	var b, c ProblemTag
+
+	seed := randomize.NewSeed()
+	if err = randomize.Struct(seed, &a, problemRelDBTypes, true, problemRelColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize ProblemRel struct: %s", err)
+	}
+
+	if err := a.Insert(tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	if err = randomize.Struct(seed, &b, problemTagDBTypes, false, problemTagColumnsWithDefault...); err != nil {
+		t.Fatal(err)
+	}
+	if err = randomize.Struct(seed, &c, problemTagDBTypes, false, problemTagColumnsWithDefault...); err != nil {
+		t.Fatal(err)
+	}
+
+	b.ProblemID = a.ID
+	c.ProblemID = a.ID
+
+	if err = b.Insert(tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+	if err = c.Insert(tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	check, err := a.ProblemProblemTags().All(tx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	bFound, cFound := false, false
+	for _, v := range check {
+		if v.ProblemID == b.ProblemID {
+			bFound = true
+		}
+		if v.ProblemID == c.ProblemID {
+			cFound = true
+		}
+	}
+
+	if !bFound {
+		t.Error("expected to find b")
+	}
+	if !cFound {
+		t.Error("expected to find c")
+	}
+
+	slice := ProblemRelSlice{&a}
+	if err = a.L.LoadProblemProblemTags(tx, false, (*[]*ProblemRel)(&slice), nil); err != nil {
+		t.Fatal(err)
+	}
+	if got := len(a.R.ProblemProblemTags); got != 2 {
+		t.Error("number of eager loaded records wrong, got:", got)
+	}
+
+	a.R.ProblemProblemTags = nil
+	if err = a.L.LoadProblemProblemTags(tx, true, &a, nil); err != nil {
+		t.Fatal(err)
+	}
+	if got := len(a.R.ProblemProblemTags); got != 2 {
+		t.Error("number of eager loaded records wrong, got:", got)
+	}
+
+	if t.Failed() {
+		t.Logf("%#v", check)
+	}
+}
+
+func testProblemRelToManyAddOpProblemProblemTags(t *testing.T) {
+	var err error
+
+	tx := MustTx(boil.Begin())
+	defer func() { _ = tx.Rollback() }()
+
+	var a ProblemRel
+	var b, c, d, e ProblemTag
+
+	seed := randomize.NewSeed()
+	if err = randomize.Struct(seed, &a, problemRelDBTypes, false, strmangle.SetComplement(problemRelPrimaryKeyColumns, problemRelColumnsWithoutDefault)...); err != nil {
+		t.Fatal(err)
+	}
+	foreigners := []*ProblemTag{&b, &c, &d, &e}
+	for _, x := range foreigners {
+		if err = randomize.Struct(seed, x, problemTagDBTypes, false, strmangle.SetComplement(problemTagPrimaryKeyColumns, problemTagColumnsWithoutDefault)...); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	if err := a.Insert(tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+	if err = b.Insert(tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+	if err = c.Insert(tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	foreignersSplitByInsertion := [][]*ProblemTag{
+		{&b, &c},
+		{&d, &e},
+	}
+
+	for i, x := range foreignersSplitByInsertion {
+		err = a.AddProblemProblemTags(tx, i != 0, x...)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		first := x[0]
+		second := x[1]
+
+		if a.ID != first.ProblemID {
+			t.Error("foreign key was wrong value", a.ID, first.ProblemID)
+		}
+		if a.ID != second.ProblemID {
+			t.Error("foreign key was wrong value", a.ID, second.ProblemID)
+		}
+
+		if first.R.Problem != &a {
+			t.Error("relationship was not added properly to the foreign slice")
+		}
+		if second.R.Problem != &a {
+			t.Error("relationship was not added properly to the foreign slice")
+		}
+
+		if a.R.ProblemProblemTags[i*2] != first {
+			t.Error("relationship struct slice not set to correct value")
+		}
+		if a.R.ProblemProblemTags[i*2+1] != second {
+			t.Error("relationship struct slice not set to correct value")
+		}
+
+		count, err := a.ProblemProblemTags().Count(tx)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if want := int64((i + 1) * 2); count != want {
+			t.Error("want", want, "got", count)
+		}
+	}
+}
 func testProblemRelToOneProblemCategoryUsingCategory(t *testing.T) {
 
 	tx := MustTx(boil.Begin())

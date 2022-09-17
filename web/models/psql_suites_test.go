@@ -14,7 +14,11 @@ func TestUpsert(t *testing.T) {
 
 	t.Run("ProblemRels", testProblemRelsUpsert)
 
+	t.Run("ProblemTags", testProblemTagsUpsert)
+
 	t.Run("Submissions", testSubmissionsUpsert)
+
+	t.Run("Tags", testTagsUpsert)
 
 	t.Run("Users", testUsersUpsert)
 }

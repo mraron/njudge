@@ -20,24 +20,24 @@ var (
 	_ = queries.Equal
 )
 
-func testUsers(t *testing.T) {
+func testTags(t *testing.T) {
 	t.Parallel()
 
-	query := Users()
+	query := Tags()
 
 	if query.Query == nil {
 		t.Error("expected a query, got nothing")
 	}
 }
 
-func testUsersDelete(t *testing.T) {
+func testTagsDelete(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &User{}
-	if err = randomize.Struct(seed, o, userDBTypes, true, userColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -52,7 +52,7 @@ func testUsersDelete(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := Users().Count(tx)
+	count, err := Tags().Count(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -62,14 +62,14 @@ func testUsersDelete(t *testing.T) {
 	}
 }
 
-func testUsersQueryDeleteAll(t *testing.T) {
+func testTagsQueryDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &User{}
-	if err = randomize.Struct(seed, o, userDBTypes, true, userColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -78,13 +78,13 @@ func testUsersQueryDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	if rowsAff, err := Users().DeleteAll(tx); err != nil {
+	if rowsAff, err := Tags().DeleteAll(tx); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := Users().Count(tx)
+	count, err := Tags().Count(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -94,14 +94,14 @@ func testUsersQueryDeleteAll(t *testing.T) {
 	}
 }
 
-func testUsersSliceDeleteAll(t *testing.T) {
+func testTagsSliceDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &User{}
-	if err = randomize.Struct(seed, o, userDBTypes, true, userColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -110,7 +110,7 @@ func testUsersSliceDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := UserSlice{o}
+	slice := TagSlice{o}
 
 	if rowsAff, err := slice.DeleteAll(tx); err != nil {
 		t.Error(err)
@@ -118,7 +118,7 @@ func testUsersSliceDeleteAll(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := Users().Count(tx)
+	count, err := Tags().Count(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -128,14 +128,14 @@ func testUsersSliceDeleteAll(t *testing.T) {
 	}
 }
 
-func testUsersExists(t *testing.T) {
+func testTagsExists(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &User{}
-	if err = randomize.Struct(seed, o, userDBTypes, true, userColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -144,23 +144,23 @@ func testUsersExists(t *testing.T) {
 		t.Error(err)
 	}
 
-	e, err := UserExists(tx, o.ID)
+	e, err := TagExists(tx, o.ID)
 	if err != nil {
-		t.Errorf("Unable to check if User exists: %s", err)
+		t.Errorf("Unable to check if Tag exists: %s", err)
 	}
 	if !e {
-		t.Errorf("Expected UserExists to return true, but got false.")
+		t.Errorf("Expected TagExists to return true, but got false.")
 	}
 }
 
-func testUsersFind(t *testing.T) {
+func testTagsFind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &User{}
-	if err = randomize.Struct(seed, o, userDBTypes, true, userColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -169,24 +169,24 @@ func testUsersFind(t *testing.T) {
 		t.Error(err)
 	}
 
-	userFound, err := FindUser(tx, o.ID)
+	tagFound, err := FindTag(tx, o.ID)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if userFound == nil {
+	if tagFound == nil {
 		t.Error("want a record, got nil")
 	}
 }
 
-func testUsersBind(t *testing.T) {
+func testTagsBind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &User{}
-	if err = randomize.Struct(seed, o, userDBTypes, true, userColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -195,19 +195,19 @@ func testUsersBind(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err = Users().Bind(nil, tx, o); err != nil {
+	if err = Tags().Bind(nil, tx, o); err != nil {
 		t.Error(err)
 	}
 }
 
-func testUsersOne(t *testing.T) {
+func testTagsOne(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &User{}
-	if err = randomize.Struct(seed, o, userDBTypes, true, userColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -216,37 +216,37 @@ func testUsersOne(t *testing.T) {
 		t.Error(err)
 	}
 
-	if x, err := Users().One(tx); err != nil {
+	if x, err := Tags().One(tx); err != nil {
 		t.Error(err)
 	} else if x == nil {
 		t.Error("expected to get a non nil record")
 	}
 }
 
-func testUsersAll(t *testing.T) {
+func testTagsAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	userOne := &User{}
-	userTwo := &User{}
-	if err = randomize.Struct(seed, userOne, userDBTypes, false, userColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	tagOne := &Tag{}
+	tagTwo := &Tag{}
+	if err = randomize.Struct(seed, tagOne, tagDBTypes, false, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
-	if err = randomize.Struct(seed, userTwo, userDBTypes, false, userColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	if err = randomize.Struct(seed, tagTwo, tagDBTypes, false, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
 	defer func() { _ = tx.Rollback() }()
-	if err = userOne.Insert(tx, boil.Infer()); err != nil {
+	if err = tagOne.Insert(tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = userTwo.Insert(tx, boil.Infer()); err != nil {
+	if err = tagTwo.Insert(tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	slice, err := Users().All(tx)
+	slice, err := Tags().All(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -256,30 +256,30 @@ func testUsersAll(t *testing.T) {
 	}
 }
 
-func testUsersCount(t *testing.T) {
+func testTagsCount(t *testing.T) {
 	t.Parallel()
 
 	var err error
 	seed := randomize.NewSeed()
-	userOne := &User{}
-	userTwo := &User{}
-	if err = randomize.Struct(seed, userOne, userDBTypes, false, userColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	tagOne := &Tag{}
+	tagTwo := &Tag{}
+	if err = randomize.Struct(seed, tagOne, tagDBTypes, false, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
-	if err = randomize.Struct(seed, userTwo, userDBTypes, false, userColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	if err = randomize.Struct(seed, tagTwo, tagDBTypes, false, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
 	defer func() { _ = tx.Rollback() }()
-	if err = userOne.Insert(tx, boil.Infer()); err != nil {
+	if err = tagOne.Insert(tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = userTwo.Insert(tx, boil.Infer()); err != nil {
+	if err = tagTwo.Insert(tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	count, err := Users().Count(tx)
+	count, err := Tags().Count(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -289,154 +289,154 @@ func testUsersCount(t *testing.T) {
 	}
 }
 
-func userBeforeInsertHook(e boil.Executor, o *User) error {
-	*o = User{}
+func tagBeforeInsertHook(e boil.Executor, o *Tag) error {
+	*o = Tag{}
 	return nil
 }
 
-func userAfterInsertHook(e boil.Executor, o *User) error {
-	*o = User{}
+func tagAfterInsertHook(e boil.Executor, o *Tag) error {
+	*o = Tag{}
 	return nil
 }
 
-func userAfterSelectHook(e boil.Executor, o *User) error {
-	*o = User{}
+func tagAfterSelectHook(e boil.Executor, o *Tag) error {
+	*o = Tag{}
 	return nil
 }
 
-func userBeforeUpdateHook(e boil.Executor, o *User) error {
-	*o = User{}
+func tagBeforeUpdateHook(e boil.Executor, o *Tag) error {
+	*o = Tag{}
 	return nil
 }
 
-func userAfterUpdateHook(e boil.Executor, o *User) error {
-	*o = User{}
+func tagAfterUpdateHook(e boil.Executor, o *Tag) error {
+	*o = Tag{}
 	return nil
 }
 
-func userBeforeDeleteHook(e boil.Executor, o *User) error {
-	*o = User{}
+func tagBeforeDeleteHook(e boil.Executor, o *Tag) error {
+	*o = Tag{}
 	return nil
 }
 
-func userAfterDeleteHook(e boil.Executor, o *User) error {
-	*o = User{}
+func tagAfterDeleteHook(e boil.Executor, o *Tag) error {
+	*o = Tag{}
 	return nil
 }
 
-func userBeforeUpsertHook(e boil.Executor, o *User) error {
-	*o = User{}
+func tagBeforeUpsertHook(e boil.Executor, o *Tag) error {
+	*o = Tag{}
 	return nil
 }
 
-func userAfterUpsertHook(e boil.Executor, o *User) error {
-	*o = User{}
+func tagAfterUpsertHook(e boil.Executor, o *Tag) error {
+	*o = Tag{}
 	return nil
 }
 
-func testUsersHooks(t *testing.T) {
+func testTagsHooks(t *testing.T) {
 	t.Parallel()
 
 	var err error
 
-	empty := &User{}
-	o := &User{}
+	empty := &Tag{}
+	o := &Tag{}
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, o, userDBTypes, false); err != nil {
-		t.Errorf("Unable to randomize User object: %s", err)
+	if err = randomize.Struct(seed, o, tagDBTypes, false); err != nil {
+		t.Errorf("Unable to randomize Tag object: %s", err)
 	}
 
-	AddUserHook(boil.BeforeInsertHook, userBeforeInsertHook)
+	AddTagHook(boil.BeforeInsertHook, tagBeforeInsertHook)
 	if err = o.doBeforeInsertHooks(nil); err != nil {
 		t.Errorf("Unable to execute doBeforeInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeInsertHook function to empty object, but got: %#v", o)
 	}
-	userBeforeInsertHooks = []UserHook{}
+	tagBeforeInsertHooks = []TagHook{}
 
-	AddUserHook(boil.AfterInsertHook, userAfterInsertHook)
+	AddTagHook(boil.AfterInsertHook, tagAfterInsertHook)
 	if err = o.doAfterInsertHooks(nil); err != nil {
 		t.Errorf("Unable to execute doAfterInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterInsertHook function to empty object, but got: %#v", o)
 	}
-	userAfterInsertHooks = []UserHook{}
+	tagAfterInsertHooks = []TagHook{}
 
-	AddUserHook(boil.AfterSelectHook, userAfterSelectHook)
+	AddTagHook(boil.AfterSelectHook, tagAfterSelectHook)
 	if err = o.doAfterSelectHooks(nil); err != nil {
 		t.Errorf("Unable to execute doAfterSelectHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterSelectHook function to empty object, but got: %#v", o)
 	}
-	userAfterSelectHooks = []UserHook{}
+	tagAfterSelectHooks = []TagHook{}
 
-	AddUserHook(boil.BeforeUpdateHook, userBeforeUpdateHook)
+	AddTagHook(boil.BeforeUpdateHook, tagBeforeUpdateHook)
 	if err = o.doBeforeUpdateHooks(nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpdateHook function to empty object, but got: %#v", o)
 	}
-	userBeforeUpdateHooks = []UserHook{}
+	tagBeforeUpdateHooks = []TagHook{}
 
-	AddUserHook(boil.AfterUpdateHook, userAfterUpdateHook)
+	AddTagHook(boil.AfterUpdateHook, tagAfterUpdateHook)
 	if err = o.doAfterUpdateHooks(nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpdateHook function to empty object, but got: %#v", o)
 	}
-	userAfterUpdateHooks = []UserHook{}
+	tagAfterUpdateHooks = []TagHook{}
 
-	AddUserHook(boil.BeforeDeleteHook, userBeforeDeleteHook)
+	AddTagHook(boil.BeforeDeleteHook, tagBeforeDeleteHook)
 	if err = o.doBeforeDeleteHooks(nil); err != nil {
 		t.Errorf("Unable to execute doBeforeDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeDeleteHook function to empty object, but got: %#v", o)
 	}
-	userBeforeDeleteHooks = []UserHook{}
+	tagBeforeDeleteHooks = []TagHook{}
 
-	AddUserHook(boil.AfterDeleteHook, userAfterDeleteHook)
+	AddTagHook(boil.AfterDeleteHook, tagAfterDeleteHook)
 	if err = o.doAfterDeleteHooks(nil); err != nil {
 		t.Errorf("Unable to execute doAfterDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterDeleteHook function to empty object, but got: %#v", o)
 	}
-	userAfterDeleteHooks = []UserHook{}
+	tagAfterDeleteHooks = []TagHook{}
 
-	AddUserHook(boil.BeforeUpsertHook, userBeforeUpsertHook)
+	AddTagHook(boil.BeforeUpsertHook, tagBeforeUpsertHook)
 	if err = o.doBeforeUpsertHooks(nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpsertHook function to empty object, but got: %#v", o)
 	}
-	userBeforeUpsertHooks = []UserHook{}
+	tagBeforeUpsertHooks = []TagHook{}
 
-	AddUserHook(boil.AfterUpsertHook, userAfterUpsertHook)
+	AddTagHook(boil.AfterUpsertHook, tagAfterUpsertHook)
 	if err = o.doAfterUpsertHooks(nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpsertHook function to empty object, but got: %#v", o)
 	}
-	userAfterUpsertHooks = []UserHook{}
+	tagAfterUpsertHooks = []TagHook{}
 }
 
-func testUsersInsert(t *testing.T) {
+func testTagsInsert(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &User{}
-	if err = randomize.Struct(seed, o, userDBTypes, true, userColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -445,7 +445,7 @@ func testUsersInsert(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := Users().Count(tx)
+	count, err := Tags().Count(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -455,23 +455,23 @@ func testUsersInsert(t *testing.T) {
 	}
 }
 
-func testUsersInsertWhitelist(t *testing.T) {
+func testTagsInsertWhitelist(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &User{}
-	if err = randomize.Struct(seed, o, userDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
 	defer func() { _ = tx.Rollback() }()
-	if err = o.Insert(tx, boil.Whitelist(userColumnsWithoutDefault...)); err != nil {
+	if err = o.Insert(tx, boil.Whitelist(tagColumnsWithoutDefault...)); err != nil {
 		t.Error(err)
 	}
 
-	count, err := Users().Count(tx)
+	count, err := Tags().Count(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -481,18 +481,18 @@ func testUsersInsertWhitelist(t *testing.T) {
 	}
 }
 
-func testUserToManyProblemTags(t *testing.T) {
+func testTagToManyProblemTags(t *testing.T) {
 	var err error
 
 	tx := MustTx(boil.Begin())
 	defer func() { _ = tx.Rollback() }()
 
-	var a User
+	var a Tag
 	var b, c ProblemTag
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, userDBTypes, true, userColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	if err = randomize.Struct(seed, &a, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	if err := a.Insert(tx, boil.Infer()); err != nil {
@@ -506,8 +506,8 @@ func testUserToManyProblemTags(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	b.UserID = a.ID
-	c.UserID = a.ID
+	b.TagID = a.ID
+	c.TagID = a.ID
 
 	if err = b.Insert(tx, boil.Infer()); err != nil {
 		t.Fatal(err)
@@ -523,10 +523,10 @@ func testUserToManyProblemTags(t *testing.T) {
 
 	bFound, cFound := false, false
 	for _, v := range check {
-		if v.UserID == b.UserID {
+		if v.TagID == b.TagID {
 			bFound = true
 		}
-		if v.UserID == c.UserID {
+		if v.TagID == c.TagID {
 			cFound = true
 		}
 	}
@@ -538,8 +538,8 @@ func testUserToManyProblemTags(t *testing.T) {
 		t.Error("expected to find c")
 	}
 
-	slice := UserSlice{&a}
-	if err = a.L.LoadProblemTags(tx, false, (*[]*User)(&slice), nil); err != nil {
+	slice := TagSlice{&a}
+	if err = a.L.LoadProblemTags(tx, false, (*[]*Tag)(&slice), nil); err != nil {
 		t.Fatal(err)
 	}
 	if got := len(a.R.ProblemTags); got != 2 {
@@ -559,95 +559,17 @@ func testUserToManyProblemTags(t *testing.T) {
 	}
 }
 
-func testUserToManySubmissions(t *testing.T) {
+func testTagToManyAddOpProblemTags(t *testing.T) {
 	var err error
 
 	tx := MustTx(boil.Begin())
 	defer func() { _ = tx.Rollback() }()
 
-	var a User
-	var b, c Submission
-
-	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, userDBTypes, true, userColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
-	}
-
-	if err := a.Insert(tx, boil.Infer()); err != nil {
-		t.Fatal(err)
-	}
-
-	if err = randomize.Struct(seed, &b, submissionDBTypes, false, submissionColumnsWithDefault...); err != nil {
-		t.Fatal(err)
-	}
-	if err = randomize.Struct(seed, &c, submissionDBTypes, false, submissionColumnsWithDefault...); err != nil {
-		t.Fatal(err)
-	}
-
-	b.UserID = a.ID
-	c.UserID = a.ID
-
-	if err = b.Insert(tx, boil.Infer()); err != nil {
-		t.Fatal(err)
-	}
-	if err = c.Insert(tx, boil.Infer()); err != nil {
-		t.Fatal(err)
-	}
-
-	check, err := a.Submissions().All(tx)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	bFound, cFound := false, false
-	for _, v := range check {
-		if v.UserID == b.UserID {
-			bFound = true
-		}
-		if v.UserID == c.UserID {
-			cFound = true
-		}
-	}
-
-	if !bFound {
-		t.Error("expected to find b")
-	}
-	if !cFound {
-		t.Error("expected to find c")
-	}
-
-	slice := UserSlice{&a}
-	if err = a.L.LoadSubmissions(tx, false, (*[]*User)(&slice), nil); err != nil {
-		t.Fatal(err)
-	}
-	if got := len(a.R.Submissions); got != 2 {
-		t.Error("number of eager loaded records wrong, got:", got)
-	}
-
-	a.R.Submissions = nil
-	if err = a.L.LoadSubmissions(tx, true, &a, nil); err != nil {
-		t.Fatal(err)
-	}
-	if got := len(a.R.Submissions); got != 2 {
-		t.Error("number of eager loaded records wrong, got:", got)
-	}
-
-	if t.Failed() {
-		t.Logf("%#v", check)
-	}
-}
-
-func testUserToManyAddOpProblemTags(t *testing.T) {
-	var err error
-
-	tx := MustTx(boil.Begin())
-	defer func() { _ = tx.Rollback() }()
-
-	var a User
+	var a Tag
 	var b, c, d, e ProblemTag
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, userDBTypes, false, strmangle.SetComplement(userPrimaryKeyColumns, userColumnsWithoutDefault)...); err != nil {
+	if err = randomize.Struct(seed, &a, tagDBTypes, false, strmangle.SetComplement(tagPrimaryKeyColumns, tagColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
 	foreigners := []*ProblemTag{&b, &c, &d, &e}
@@ -681,17 +603,17 @@ func testUserToManyAddOpProblemTags(t *testing.T) {
 		first := x[0]
 		second := x[1]
 
-		if a.ID != first.UserID {
-			t.Error("foreign key was wrong value", a.ID, first.UserID)
+		if a.ID != first.TagID {
+			t.Error("foreign key was wrong value", a.ID, first.TagID)
 		}
-		if a.ID != second.UserID {
-			t.Error("foreign key was wrong value", a.ID, second.UserID)
+		if a.ID != second.TagID {
+			t.Error("foreign key was wrong value", a.ID, second.TagID)
 		}
 
-		if first.R.User != &a {
+		if first.R.Tag != &a {
 			t.Error("relationship was not added properly to the foreign slice")
 		}
-		if second.R.User != &a {
+		if second.R.Tag != &a {
 			t.Error("relationship was not added properly to the foreign slice")
 		}
 
@@ -711,89 +633,15 @@ func testUserToManyAddOpProblemTags(t *testing.T) {
 		}
 	}
 }
-func testUserToManyAddOpSubmissions(t *testing.T) {
-	var err error
 
-	tx := MustTx(boil.Begin())
-	defer func() { _ = tx.Rollback() }()
-
-	var a User
-	var b, c, d, e Submission
-
-	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, userDBTypes, false, strmangle.SetComplement(userPrimaryKeyColumns, userColumnsWithoutDefault)...); err != nil {
-		t.Fatal(err)
-	}
-	foreigners := []*Submission{&b, &c, &d, &e}
-	for _, x := range foreigners {
-		if err = randomize.Struct(seed, x, submissionDBTypes, false, strmangle.SetComplement(submissionPrimaryKeyColumns, submissionColumnsWithoutDefault)...); err != nil {
-			t.Fatal(err)
-		}
-	}
-
-	if err := a.Insert(tx, boil.Infer()); err != nil {
-		t.Fatal(err)
-	}
-	if err = b.Insert(tx, boil.Infer()); err != nil {
-		t.Fatal(err)
-	}
-	if err = c.Insert(tx, boil.Infer()); err != nil {
-		t.Fatal(err)
-	}
-
-	foreignersSplitByInsertion := [][]*Submission{
-		{&b, &c},
-		{&d, &e},
-	}
-
-	for i, x := range foreignersSplitByInsertion {
-		err = a.AddSubmissions(tx, i != 0, x...)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		first := x[0]
-		second := x[1]
-
-		if a.ID != first.UserID {
-			t.Error("foreign key was wrong value", a.ID, first.UserID)
-		}
-		if a.ID != second.UserID {
-			t.Error("foreign key was wrong value", a.ID, second.UserID)
-		}
-
-		if first.R.User != &a {
-			t.Error("relationship was not added properly to the foreign slice")
-		}
-		if second.R.User != &a {
-			t.Error("relationship was not added properly to the foreign slice")
-		}
-
-		if a.R.Submissions[i*2] != first {
-			t.Error("relationship struct slice not set to correct value")
-		}
-		if a.R.Submissions[i*2+1] != second {
-			t.Error("relationship struct slice not set to correct value")
-		}
-
-		count, err := a.Submissions().Count(tx)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if want := int64((i + 1) * 2); count != want {
-			t.Error("want", want, "got", count)
-		}
-	}
-}
-
-func testUsersReload(t *testing.T) {
+func testTagsReload(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &User{}
-	if err = randomize.Struct(seed, o, userDBTypes, true, userColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -807,14 +655,14 @@ func testUsersReload(t *testing.T) {
 	}
 }
 
-func testUsersReloadAll(t *testing.T) {
+func testTagsReloadAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &User{}
-	if err = randomize.Struct(seed, o, userDBTypes, true, userColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -823,21 +671,21 @@ func testUsersReloadAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := UserSlice{o}
+	slice := TagSlice{o}
 
 	if err = slice.ReloadAll(tx); err != nil {
 		t.Error(err)
 	}
 }
 
-func testUsersSelect(t *testing.T) {
+func testTagsSelect(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &User{}
-	if err = randomize.Struct(seed, o, userDBTypes, true, userColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -846,7 +694,7 @@ func testUsersSelect(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice, err := Users().All(tx)
+	slice, err := Tags().All(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -857,25 +705,25 @@ func testUsersSelect(t *testing.T) {
 }
 
 var (
-	userDBTypes = map[string]string{`ID`: `integer`, `Name`: `text`, `Password`: `text`, `Email`: `text`, `ActivationKey`: `text`, `Role`: `text`, `Points`: `real`}
-	_           = bytes.MinRead
+	tagDBTypes = map[string]string{`ID`: `integer`, `Name`: `text`}
+	_          = bytes.MinRead
 )
 
-func testUsersUpdate(t *testing.T) {
+func testTagsUpdate(t *testing.T) {
 	t.Parallel()
 
-	if 0 == len(userPrimaryKeyColumns) {
+	if 0 == len(tagPrimaryKeyColumns) {
 		t.Skip("Skipping table with no primary key columns")
 	}
-	if len(userAllColumns) == len(userPrimaryKeyColumns) {
+	if len(tagAllColumns) == len(tagPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &User{}
-	if err = randomize.Struct(seed, o, userDBTypes, true, userColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -884,7 +732,7 @@ func testUsersUpdate(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := Users().Count(tx)
+	count, err := Tags().Count(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -893,8 +741,8 @@ func testUsersUpdate(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, userDBTypes, true, userPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	if rowsAff, err := o.Update(tx, boil.Infer()); err != nil {
@@ -904,18 +752,18 @@ func testUsersUpdate(t *testing.T) {
 	}
 }
 
-func testUsersSliceUpdateAll(t *testing.T) {
+func testTagsSliceUpdateAll(t *testing.T) {
 	t.Parallel()
 
-	if len(userAllColumns) == len(userPrimaryKeyColumns) {
+	if len(tagAllColumns) == len(tagPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &User{}
-	if err = randomize.Struct(seed, o, userDBTypes, true, userColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
@@ -924,7 +772,7 @@ func testUsersSliceUpdateAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := Users().Count(tx)
+	count, err := Tags().Count(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -933,18 +781,18 @@ func testUsersSliceUpdateAll(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, userDBTypes, true, userPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	// Remove Primary keys and unique columns from what we plan to update
 	var fields []string
-	if strmangle.StringSliceMatch(userAllColumns, userPrimaryKeyColumns) {
-		fields = userAllColumns
+	if strmangle.StringSliceMatch(tagAllColumns, tagPrimaryKeyColumns) {
+		fields = tagAllColumns
 	} else {
 		fields = strmangle.SetComplement(
-			userAllColumns,
-			userPrimaryKeyColumns,
+			tagAllColumns,
+			tagPrimaryKeyColumns,
 		)
 	}
 
@@ -962,7 +810,7 @@ func testUsersSliceUpdateAll(t *testing.T) {
 		}
 	}
 
-	slice := UserSlice{o}
+	slice := TagSlice{o}
 	if rowsAff, err := slice.UpdateAll(tx, updateMap); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
@@ -970,28 +818,28 @@ func testUsersSliceUpdateAll(t *testing.T) {
 	}
 }
 
-func testUsersUpsert(t *testing.T) {
+func testTagsUpsert(t *testing.T) {
 	t.Parallel()
 
-	if len(userAllColumns) == len(userPrimaryKeyColumns) {
+	if len(tagAllColumns) == len(tagPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
 	// Attempt the INSERT side of an UPSERT
-	o := User{}
-	if err = randomize.Struct(seed, &o, userDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	o := Tag{}
+	if err = randomize.Struct(seed, &o, tagDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	tx := MustTx(boil.Begin())
 	defer func() { _ = tx.Rollback() }()
 	if err = o.Upsert(tx, false, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert User: %s", err)
+		t.Errorf("Unable to upsert Tag: %s", err)
 	}
 
-	count, err := Users().Count(tx)
+	count, err := Tags().Count(tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -1000,15 +848,15 @@ func testUsersUpsert(t *testing.T) {
 	}
 
 	// Attempt the UPDATE side of an UPSERT
-	if err = randomize.Struct(seed, &o, userDBTypes, false, userPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
+	if err = randomize.Struct(seed, &o, tagDBTypes, false, tagPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	if err = o.Upsert(tx, true, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert User: %s", err)
+		t.Errorf("Unable to upsert Tag: %s", err)
 	}
 
-	count, err = Users().Count(tx)
+	count, err = Tags().Count(tx)
 	if err != nil {
 		t.Error(err)
 	}

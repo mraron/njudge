@@ -33,6 +33,8 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	ps.GET("/:name/:problem/status", problemset.GetProblemStatus(s.DB, s.ProblemStore))
 	ps.GET("/:name/:problem/submit", problemset.GetProblemSubmit(s.DB, s.ProblemStore))
 	ps.GET("/:name/:problem/ranklist", problemset.GetProblemRanklist(s.DB, s.ProblemStore))
+	ps.POST("/:name/:problem/tags", problemset.PostProblemTags(s.DB, s.ProblemStore))
+	ps.GET("/:name/:problem/delete_tag/:id", problemset.DeleteProblemTags(s.DB, s.ProblemStore))
 	ps.GET("/:name/:problem/pdf/:language/", problemset.GetProblemPDF(s.ProblemStore))
 	ps.GET("/:name/:problem/attachment/:attachment/", problemset.GetProblemAttachment(s.ProblemStore))
 	ps.GET("/:name/:problem/:file", problemset.GetProblemFile(s.Server, s.ProblemStore))

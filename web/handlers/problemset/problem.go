@@ -37,18 +37,78 @@ type Problem struct {
 	LastLanguage string
 	CategoryLink helpers.Link
 	CategoryId   int
+	Tags         []*models.Tag
+}
+
+func topCategoryLink(cat int, DB *sqlx.DB) (helpers.Link, error) {
+	var (
+		category *models.ProblemCategory
+		err      error
+	)
+
+	orig := cat
+
+	for {
+		category, err = models.ProblemCategories(Where("id = ?", cat)).One(DB)
+		if err != nil {
+			return helpers.Link{}, err
+		}
+
+		if !category.ParentID.Valid {
+			break
+		}
+		cat = category.ParentID.Int
+	}
+
+	return helpers.Link{
+		Text: category.Name,
+		Href: "/task_archive#category" + strconv.Itoa(orig),
+	}, nil
 }
 
 func lastLanguage(c echo.Context, DB *sqlx.DB) string {
+	if res := c.Get("last_language"); res != nil {
+		return c.Get("last_language").(string)
+	}
+
 	res := ""
 	if u := c.Get("user").(*models.User); u != nil {
 		sub, err := models.Submissions(Select("language"), Where("user_id = ?", u.ID), OrderBy("id DESC"), Limit(1)).One(DB)
 		if err == nil {
+			c.Set("last_language", sub.Language)
 			res = sub.Language
 		}
 	}
 
 	return res
+}
+
+func (p *Problem) FillFields(c echo.Context, DB *sqlx.DB, problemRel *models.ProblemRel) error {
+	var err error
+	p.SolverCount = problemRel.SolverCount
+	if u := c.Get("user").(*models.User); u != nil {
+		p.LastLanguage = lastLanguage(c, DB)
+		p.SolvedStatus, err = helpers.HasUserSolved(DB, u, problemRel.Problemset, problemRel.Problem)
+		if err != nil {
+			return err
+		}
+	}
+
+	if problemRel.CategoryID.Valid {
+		p.CategoryId = problemRel.CategoryID.Int
+		p.CategoryLink, err = topCategoryLink(p.CategoryId, DB)
+		if err != nil {
+			return err
+		}
+	}
+
+	tags, err := models.Tags(InnerJoin("problem_tags pt on pt.tag_id = tags.id"), Where("pt.problem_id = ?", problemRel.ID)).All(DB)
+	if err != nil {
+		return err
+	}
+	p.Tags = tags
+
+	return nil
 }
 
 func RenameMiddleware(problemStore problems.Store) func(echo.HandlerFunc) echo.HandlerFunc {
@@ -76,33 +136,24 @@ func GetProblem(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		name, problem := c.Param("name"), c.Param("problem")
 
-		lst, err := models.ProblemRels(Where("problemset=?", name)).All(DB)
+		rel, err := models.ProblemRels(Where("problemset=?", name), Where("problem=?", problem)).One(DB)
 		if err != nil {
 			return err
 		}
 
-		ok := false
-		for _, val := range lst {
-			if val.Problem == problem {
-				ok = true
-			}
-
-			if ok {
-				break
-			}
-		}
-
-		if !ok {
+		if rel == nil {
 			return echo.NewHTTPError(http.StatusNotFound, errors.New("no such problem in problemset"))
 		}
 
 		prob := problemStore.MustGet(problem)
 
 		c.Set("title", fmt.Sprintf("Leírás - %s (%s)", i18n.TranslateContent("hungarian", prob.Titles()).String(), prob.Name()))
-		return c.Render(http.StatusOK, "problemset/problem/problem", Problem{
-			Problem:      prob,
-			LastLanguage: lastLanguage(c, DB),
-		})
+
+		p := Problem{Problem: prob}
+		if err := p.FillFields(c, DB, rel); err != nil {
+			return err
+		}
+		return c.Render(http.StatusOK, "problemset/problem/problem", p)
 	}
 }
 

@@ -9,6 +9,7 @@
                 <th scope="col">Azonosító</th>
                 <th scope="col">Cím</th>
                 <th scope="col">Kategória</th>
+                <th scope="col">Tagek</th>
                 <th scope="col"><a href="{{.Data.SolverSorter.Href}}">{{if eq .Data.SolverSorter.Order ""}}<i class="fas fa-sort"></i>{{else}}{{if eq .Data.SolverSorter.Order "ASC"}}<i class="fas fa-sort-down"></i>{{else}}<i class="fas fa-sort-up"></i>{{end}}{{end}} Megoldók</a></th>
             </tr>
         </thead>
@@ -19,6 +20,11 @@
                 <td>{{$i.Name}}</td>
                 <td><a href="{{$i.Name}}/">{{(translateContent "hungarian" $i.Titles).String}}</a></td>
                 <td>{{if $i.CategoryLink.Text}}<a href="{{$i.CategoryLink.Href}}">{{$i.CategoryLink.Text}}</a>{{end}}</td>
+                <td>
+                {{range $tag := $i.Tags}}
+                <span class="badge badge-secondary">{{$tag.Name}}</span>
+                {{end}}
+                </td>
                 <td><a href="{{$i.Name}}/status?ac=1"><i class="fas fa-user"></i> {{$i.SolverCount}}</a></td>
             </tr>
         {{end}}

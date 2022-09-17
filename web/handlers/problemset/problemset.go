@@ -39,7 +39,7 @@ type ProblemList struct {
 	CategoryFilters []CategoryFilter
 }
 
-func GetProblemList(DB *sqlx.DB, problemStore problems.Store, u *models.User, page, perPage int, order QueryMod, query []QueryMod, qu url.Values) (*ProblemList, error) {
+func GetProblemList(c echo.Context, DB *sqlx.DB, problemStore problems.Store, u *models.User, page, perPage int, order QueryMod, query []QueryMod, qu url.Values) (*ProblemList, error) {
 	ps, err := models.ProblemRels(append(append([]QueryMod{Limit(perPage), Offset((page - 1) * perPage)}, query...), order)...).All(DB)
 	if err != nil {
 		return nil, err
@@ -62,33 +62,8 @@ func GetProblemList(DB *sqlx.DB, problemStore problems.Store, u *models.User, pa
 			return nil, err
 		}
 
-		if u != nil {
-			problems[i].SolvedStatus, err = helpers.HasUserSolved(DB, u, p.Problemset, p.Problem)
-			if err != nil {
-				return nil, err
-			}
-		}
-
-		problems[i].SolverCount = p.SolverCount
-		if p.CategoryID.Valid {
-			cat := p.CategoryID.Int
-			var category *models.ProblemCategory
-			for {
-				category, err = models.ProblemCategories(Where("id = ?", cat)).One(DB)
-				if err != nil {
-					return nil, err
-				}
-
-				if !category.ParentID.Valid {
-					break
-				}
-				cat = category.ParentID.Int
-			}
-
-			problems[i].CategoryLink = helpers.Link{
-				Text: category.Name,
-				Href: "/task_archive#category" + strconv.Itoa(p.CategoryID.Int),
-			}
+		if err := problems[i].FillFields(c, DB, p); err != nil {
+			return nil, err
 		}
 	}
 
@@ -205,7 +180,7 @@ func GetList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 			qmods = append(qmods, WhereIn("category_id in ?", pars...))
 		}
 
-		problemList, err := GetProblemList(DB, problemStore, u, page, 20, OrderBy(by+" "+order), qmods, c.Request().URL.Query())
+		problemList, err := GetProblemList(c, DB, problemStore, u, page, 20, OrderBy(by+" "+order), qmods, c.Request().URL.Query())
 		if err != nil {
 			return err
 		}
@@ -293,7 +268,7 @@ func PostSubmit(cfg config.Server, DB *sqlx.DB, problemStore problems.Store) ech
 		)
 
 		if u = c.Get("user").(*models.User); u == nil {
-			return c.Render(http.StatusForbidden, "message.html", "Előbb lépj be.")
+			return c.Render(http.StatusForbidden, "message", "Előbb lépj be.")
 		}
 
 		problemName := c.FormValue("problem")
