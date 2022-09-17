@@ -23,7 +23,7 @@ insert into tags (name) values
 ('bitmaszk'),
 ('két mutató'),
 ('oszd meg és uralkodj'),
-('legröviebb utak'),
+('legrövidebb utak'),
 ('játékok'),
 ('párosítások');
 
