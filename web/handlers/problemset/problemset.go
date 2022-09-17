@@ -36,6 +36,7 @@ type ProblemList struct {
 
 	Filtered        bool
 	TitleFilter     string
+	TagsFilter      string
 	CategoryFilters []CategoryFilter
 }
 
@@ -180,6 +181,29 @@ func GetList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 			qmods = append(qmods, WhereIn("category_id in ?", pars...))
 		}
 
+		if c.QueryParam("tags") != "" {
+			filtered = true
+
+			tagNames := strings.Split(c.QueryParam("tags"), ",")
+			lst := make([]interface{}, len(tagNames))
+			for ind, val := range tagNames {
+				lst[ind] = val
+			}
+
+			rels, err := models.ProblemRels(InnerJoin("problem_tags pt on pt.problem_id = problem_rels.id"),
+				InnerJoin("tags t on pt.tag_id = t.id"), WhereIn("t.name in ?", lst...), GroupBy("problem_rels.id"), Having("COUNT(DISTINCT t.name) = ?", len(lst))).All(DB)
+			if err != nil {
+				return nil
+			}
+
+			lst = make([]interface{}, len(rels))
+			for ind, val := range rels {
+				lst[ind] = val.ID
+			}
+
+			qmods = append(qmods, WhereIn("id IN ?", lst...))
+		}
+
 		problemList, err := GetProblemList(c, DB, problemStore, u, page, 20, OrderBy(by+" "+order), qmods, c.Request().URL.Query())
 		if err != nil {
 			return err
@@ -187,6 +211,7 @@ func GetList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 
 		problemList.Filtered = filtered
 		problemList.TitleFilter = c.QueryParam("title")
+		problemList.TagsFilter = c.QueryParam("tags")
 
 		problemList.CategoryFilters = []CategoryFilter{{"-", "", false}}
 		nameById := make(map[int]string)
