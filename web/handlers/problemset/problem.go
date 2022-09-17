@@ -38,6 +38,7 @@ type Problem struct {
 	CategoryLink helpers.Link
 	CategoryId   int
 	Tags         []*models.Tag
+	Submissions  []*models.Submission
 }
 
 func topCategoryLink(cat int, DB *sqlx.DB) (helpers.Link, error) {
@@ -89,6 +90,10 @@ func (p *Problem) FillFields(c echo.Context, DB *sqlx.DB, problemRel *models.Pro
 	if u := c.Get("user").(*models.User); u != nil {
 		p.LastLanguage = lastLanguage(c, DB)
 		p.SolvedStatus, err = helpers.HasUserSolved(DB, u, problemRel.Problemset, problemRel.Problem)
+		if err != nil {
+			return err
+		}
+		p.Submissions, err = models.Submissions(Where("problemset = ?", problemRel.Problemset), Where("problem = ?", problemRel.Problem), Where("user_id = ?", u.ID), OrderBy("id DESC"), Limit(5)).All(DB)
 		if err != nil {
 			return err
 		}

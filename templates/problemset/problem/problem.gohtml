@@ -94,35 +94,42 @@
         {{end}}
     </div>
 </div>
-    {{if or .Data.Problem.Attachments .Data.Problem.PDFStatements}}
-        <br>
-        <div class="card">
-            <div class="card-header">
-                <i class="fas fa-paperclip"></i> Mellékletek
-            </div>
-            <div class="card-body">
-                {{range $a := .Data.Problem.Attachments}}
-                    <a href="attachment/{{$a.Name}}/"><i class="fas fa-file"></i> Fájl ({{$a.Name}})</a><br>
-                {{end}}
-                {{range $loc := .Data.Problem.PDFStatements.Locales}}
-                    <a href="pdf/{{$loc}}/"><i class="fas fa-file-pdf"></i> Leírás ({{$loc}})</a><br>
-                {{end}}
+{{if .Data.Submissions}}
+<br>
+<div class="card table-responsive">
+    <div class="card-header" style="border-bottom: 0px;">
+        <i class="fas fa-history"></i> Beküldések
+    </div>
+    <table class="card-body table" style="margin: 0px;">
+        {{range $s := .Data.Submissions}}
+            <tr>
+                <td><a href="/submission/{{$s.ID}}">{{$s.ID}}</a></td>
+                <td>{{.Submitted.Local.Year}}. {{fixedlen (month2int .Submitted.Local.Month) 2}}. {{fixedlen .Submitted.Local.Day 2}} {{fixedlen .Submitted.Local.Hour 2}}:{{fixedlen .Submitted.Local.Minute 2}}:{{fixedlen .Submitted.Local.Second 2}}</td>
+                <td>{{template "submissionStatus" $s}}</td>
+            </tr>
+        {{end}}
+    </table>
+</div>
 
-            </div>
-        </div>
-    {{end}}
-    <!--<a href="/problemset/status?problem_set={{get .Context "problemset"}}&problem={{.Data.Problem.Name}}">Összes beküldés</a> <br>
-    <a href="/problemset/status?problem_set={{get .Context "problemset"}}&problem={{.Data.Problem.Name}}&ac=1">Elfogadott beküldések</a>
-    -->
+{{end}}
+{{if or .Data.Problem.Attachments .Data.Problem.PDFStatements}}
+<br>
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-paperclip"></i> Mellékletek
+    </div>
+    <div class="card-body">
+        {{range $a := .Data.Problem.Attachments}}
+            <a href="attachment/{{$a.Name}}/"><i class="fas fa-file"></i> Fájl ({{$a.Name}})</a><br>
+        {{end}}
+        {{range $loc := .Data.Problem.PDFStatements.Locales}}
+            <a href="pdf/{{$loc}}/"><i class="fas fa-file-pdf"></i> Leírás ({{$loc}})</a><br>
+        {{end}}
+
+    </div>
+</div>
+{{end}}
 </div>
 
 </div>
-<!--</div>-->
-<!--
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb" style="background-color: #f7f7f7;">
-        <li class="breadcrumb-item active" aria-current="page">Home</li>
-    </ol>
-</nav>
--->
 {{template "footer" .}}
