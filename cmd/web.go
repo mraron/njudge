@@ -6,14 +6,44 @@ import (
 	"io/ioutil"
 	"log"
 
+	"github.com/mraron/njudge/pkg/glue"
+	"github.com/mraron/njudge/pkg/web"
+	"github.com/mraron/njudge/pkg/web/helpers/config"
+	"github.com/mraron/njudge/pkg/web/models"
+
 	"github.com/mraron/njudge/pkg/problems"
-	"github.com/mraron/njudge/web"
-	"github.com/mraron/njudge/web/helpers/config"
-	"github.com/mraron/njudge/web/models"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
+
+var GlueCmd = &cobra.Command{
+	Use:   "glue",
+	Short: "",
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		BindEnvs(config.Server{})
+		viper.SetEnvPrefix("njudge")
+
+		viper.SetConfigName("glue")
+		viper.AddConfigPath(".")
+		viper.AutomaticEnv()
+		return viper.MergeInConfig()
+	},
+
+	RunE: func(cmd *cobra.Command, args []string) error {
+		cfg := glue.Config{}
+
+		err := viper.Unmarshal(&cfg)
+		if err != nil {
+			return err
+		}
+
+		s := glue.Server{Config: cfg}
+		s.Run()
+
+		return nil
+	},
+}
 
 var WebCmd = &cobra.Command{
 	Use:   "web",

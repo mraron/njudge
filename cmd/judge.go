@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/mraron/njudge/judge"
+	"github.com/mraron/njudge/pkg/judge"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

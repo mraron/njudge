@@ -12,9 +12,7 @@ RUN go mod download && go install github.com/go-delve/delve/cmd/dlv@latest
 
 COPY static/ ./static
 COPY cmd/ ./cmd
-COPY judge/ ./judge
 COPY pkg/ ./pkg
-COPY web/ ./web
 COPY templates/ ./templates
 COPY main.go ./
 
