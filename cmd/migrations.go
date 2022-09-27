@@ -1,10 +1,11 @@
 package cmd
 
 import (
-	"github.com/mraron/njudge/pkg/web"
-	"github.com/mraron/njudge/pkg/web/helpers/config"
 	"log"
 	"os"
+
+	"github.com/mraron/njudge/pkg/web"
+	"github.com/mraron/njudge/pkg/web/helpers/config"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -46,7 +47,7 @@ var MigrateCmd = &cobra.Command{
 			return err
 		}
 
-		m, err := migrate.NewWithDatabaseInstance("file://web/migrations", "postgres", driver)
+		m, err := migrate.NewWithDatabaseInstance("file://migrations", "postgres", driver)
 		if err != nil {
 			return err
 		}

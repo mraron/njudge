@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y ca-certificates tzdata cython3 golang p
 RUN go mod download && go install github.com/go-delve/delve/cmd/dlv@latest
 
 COPY static/ ./static
+COPY migrations/ ./migrations
 COPY cmd/ ./cmd
 COPY pkg/ ./pkg
 COPY templates/ ./templates
