@@ -27,7 +27,7 @@ func (o *JudgesUpdaterFromDB) UpdateJudges(ctx context.Context) ([]*models.Judge
 
 	var judgesError error
 	for ind := range judges {
-		c := judge.NewClient("http://"+judges[ind].Host+":"+judges[ind].Port, "")
+		c := judge.NewClient("http://" + judges[ind].Host + ":" + judges[ind].Port)
 		st, err := c.Status(ctx)
 		if err != nil {
 			judges[ind].Online = false

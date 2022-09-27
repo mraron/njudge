@@ -13,7 +13,7 @@ type FindJudgerNaive struct{}
 
 func (FindJudgerNaive) FindJudge(judges []*models.Judge, sub *models.Submission) (*models.Judge, error) {
 	for _, j := range judges {
-		st, err := judge.ParseServerStatus(j.State)
+		st, err := judge.ParseStatus(j.State)
 		if err != nil {
 			return nil, err
 		}

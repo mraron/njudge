@@ -8,35 +8,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/hashicorp/go-multierror"
 	"github.com/mraron/njudge/pkg/problems"
 )
 
 type Callbacker interface {
 	Callback(test string, status problems.Status, done bool) error
-}
-
-//@TODO Create cached callback
-
-type CombineCallback struct {
-	lst []Callbacker
-}
-
-func NewCombineCallback(lst ...Callbacker) CombineCallback {
-	return CombineCallback{lst}
-}
-
-func (c CombineCallback) Callback(test string, status problems.Status, done bool) error {
-	var err error
-	for _, cb := range c.lst {
-		err = multierror.Append(err, cb.Callback(test, status, done))
-	}
-
-	return err
-}
-
-func (c *CombineCallback) Append(callbacker Callbacker) {
-	c.lst = append(c.lst, callbacker)
 }
 
 type WriterCallback struct {
@@ -54,7 +30,7 @@ func (wc *WriterCallback) Callback(test string, status problems.Status, done boo
 		return wc.err
 	}
 
-	wc.err = wc.enc.Encode(Status{test, status, done, time.Now()})
+	wc.err = wc.enc.Encode(SubmissionStatus{test, status, done, time.Now()})
 	if wc.err == nil {
 		wc.afterFunc()
 	}
@@ -75,7 +51,7 @@ func NewHTTPCallback(url string) HTTPCallback {
 }
 
 func (h HTTPCallback) Callback(test string, status problems.Status, done bool) error {
-	raw := Status{test, status, done, time.Now()}
+	raw := SubmissionStatus{test, status, done, time.Now()}
 
 	buf := &bytes.Buffer{}
 

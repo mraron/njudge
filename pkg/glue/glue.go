@@ -93,7 +93,7 @@ func (s *Server) runServer() {
 			return err
 		}
 
-		st := judge.Status{}
+		st := judge.SubmissionStatus{}
 		if err = c.Bind(&st); err != nil {
 			return err
 		}
@@ -142,14 +142,14 @@ func (s *Server) runJudger() {
 			}
 			s.judgesMutex.RUnlock()
 
-			var st judge.ServerStatus
-			st, err = judge.ParseServerStatus(j.State)
+			var st judge.Status
+			st, err = judge.ParseStatus(j.State)
 			if err != nil {
 				log.Print(err)
 				continue
 			}
 
-			client := judge.NewClient(st.Url, "")
+			client := judge.NewClient(st.Url)
 			if err := client.SubmitCallback(context.TODO(), judge.Submission{Id: strconv.Itoa(sub.ID), Problem: sub.Problem, Language: sub.Language, Source: sub.Source}, "http://glue:"+s.Port+"/callback/"+strconv.Itoa(sub.ID)); err != nil {
 				log.Print("Trying to submit to server", j.Host, j.Port, "Error", err)
 				continue

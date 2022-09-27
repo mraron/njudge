@@ -2,46 +2,46 @@ package judge
 
 import (
 	"bytes"
-	"log"
+	"context"
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
 	"go.uber.org/multierr"
+	"go.uber.org/zap"
 )
 
-type Status struct {
+type SubmissionStatus struct {
 	Test   string
 	Status problems.Status
 	Done   bool
 	Time   time.Time
 }
 
-//@TODO add separated logger for problem
-
-func truncate(s string, to int) string {
-	if len(s) < to {
-		return s
-	}
-
-	return s[:to-1] + "..."
+type Worker struct {
+	id              int
+	sandboxProvider *language.SandboxProvider
 }
 
-func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Language, sandboxProvider *language.SandboxProvider, c Callbacker) (st problems.Status, err error) {
-	logger.Print("Started Judge")
+func NewWorker(id int, sandboxProvider *language.SandboxProvider) *Worker {
+	return &Worker{id: id, sandboxProvider: sandboxProvider}
+}
 
-	//@TODO do smth better
+func (w Worker) Judge(ctx context.Context, plogger *zap.Logger, p problems.Problem, src []byte, lang language.Language, c Callbacker) (st problems.Status, err error) {
+	logger := plogger.With(zap.Int("worker", w.id))
+	logger.Info("started to judge")
+
 	sandboxes := language.NewSandboxProvider()
 	for i := 0; i < 2; i++ {
 		var sandbox language.Sandbox
-		sandbox, err = sandboxProvider.Get()
+		sandbox, err = w.sandboxProvider.Get()
 		if err != nil {
-			logger.Print("Error while getting sandbox: ", err)
+			logger.Error("can't get sandbox", zap.Error(err))
 			return
 		}
-		defer sandboxProvider.Put(sandbox)
+		defer w.sandboxProvider.Put(sandbox)
 
-		err = sandbox.Init(logger)
+		err = sandbox.Init(zap.NewStdLog(logger))
 		if err != nil {
 			return
 		}
@@ -52,19 +52,18 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 		}(sandbox)
 	}
 
-	logger.Print("Getting tasktype")
 	tt := p.GetTaskType()
 
 	stderr := bytes.Buffer{}
 
-	logger.Print("Trying to compile")
+	logger.Info("compiling")
 
 	compileSandbox := sandboxes.MustGet()
 	bin, err := tt.Compile(p, compileSandbox, lang, bytes.NewReader(src), &stderr)
 	sandboxes.Put(compileSandbox)
 
 	if err != nil {
-		logger.Print("Compile got error: ", err)
+		logger.Error("compilation error", zap.Error(err))
 		st.Compiled = false
 		st.CompilerOutput = err.Error() + "\n" + truncate(stderr.String(), 1024)
 		err = multierr.Append(err, c.Callback("", st, true))
@@ -94,7 +93,7 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 
 				err = c.Callback(test, status, false)
 				if err != nil {
-					logger.Print("Error while calling callback", err)
+					logger.Error("error while calling callback", zap.Error(err))
 					return
 				}
 			}
@@ -107,10 +106,18 @@ func Judge(logger *log.Logger, p problems.Problem, src []byte, lang language.Lan
 	err = multierr.Combine(err, errRun)
 
 	if err == nil {
-		logger.Print("Successful judging! removing tempfile and calling back for the last time...")
+		logger.Info("successful judging")
 	} else {
-		logger.Print("Got error! removing tempfile and calling back for the last time... error is", err)
+		logger.Info("got error while judging", zap.Error(err))
 	}
 
 	return
+}
+
+func truncate(s string, to int) string {
+	if len(s) < to {
+		return s
+	}
+
+	return s[:to-1] + "..."
 }

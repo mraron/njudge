@@ -11,8 +11,11 @@ import (
 	"net/http"
 )
 
-type submission struct {
-	Submission
+type Submission struct {
+	Id       string `json:"id"`
+	Problem  string `json:"problem"`
+	Language string `json:"language"`
+	Source   []byte `json:"source"`
 
 	Stream      bool   `json:"stream"`
 	CallbackUrl string `json:"callback_url"`
@@ -21,31 +24,25 @@ type submission struct {
 	done chan bool
 }
 
-type Submission struct {
-	Id       string `json:"id"`
-	Problem  string `json:"problem"`
-	Language string `json:"language"`
-	Source   []byte `json:"source"`
-}
-
-type Client interface {
-	SubmitCallback(context.Context, Submission, string) error
-	SubmitStream(context.Context, Submission, chan Status) error
-	Status(ctx context.Context) (ServerStatus, error)
-}
-
-type defaultClient struct {
+type Client struct {
 	client *http.Client
 
 	url   string
 	token string
 }
 
-func NewClient(url, token string) Client {
-	return &defaultClient{url: url, token: token, client: &http.Client{}}
+type ClientOption func(*Client)
+
+func NewClient(url string, opts ...ClientOption) *Client {
+	client := &Client{url: url, client: &http.Client{}}
+	for i := range opts {
+		opts[i](client)
+	}
+
+	return client
 }
 
-func (dc defaultClient) submit(ctx context.Context, sub submission) (*http.Response, error) {
+func (dc Client) submit(ctx context.Context, sub Submission) (*http.Response, error) {
 	dst := dc.url + "/judge"
 
 	buf := bytes.Buffer{}
@@ -74,8 +71,10 @@ func (dc defaultClient) submit(ctx context.Context, sub submission) (*http.Respo
 	return resp, nil
 }
 
-func (dc defaultClient) SubmitCallback(ctx context.Context, sub Submission, callback string) error {
-	resp, err := dc.submit(ctx, submission{Submission: sub, Stream: false, CallbackUrl: callback})
+func (dc Client) SubmitCallback(ctx context.Context, sub Submission, callback string) error {
+	sub.Stream = false
+	sub.CallbackUrl = callback
+	resp, err := dc.submit(ctx, sub)
 	if err != nil {
 		return err
 	}
@@ -94,10 +93,12 @@ func (dc defaultClient) SubmitCallback(ctx context.Context, sub Submission, call
 	return nil
 }
 
-func (dc defaultClient) SubmitStream(ctx context.Context, sub Submission, res chan Status) error {
+func (dc Client) SubmitStream(ctx context.Context, sub Submission, res chan SubmissionStatus) error {
 	var err error
 
-	resp, err := dc.submit(ctx, submission{Submission: sub, Stream: true, CallbackUrl: ""})
+	sub.Stream = true
+	sub.CallbackUrl = ""
+	resp, err := dc.submit(ctx, sub)
 	if err != nil {
 		return err
 	}
@@ -108,7 +109,7 @@ func (dc defaultClient) SubmitStream(ctx context.Context, sub Submission, res ch
 		s := bufio.NewScanner(resp.Body)
 
 		for s.Scan() {
-			status := Status{}
+			status := SubmissionStatus{}
 			if err = json.Unmarshal([]byte(s.Text()), &status); err != nil {
 				return
 			}
@@ -128,12 +129,12 @@ func (dc defaultClient) SubmitStream(ctx context.Context, sub Submission, res ch
 	}
 }
 
-func (dc defaultClient) Status(ctx context.Context) (ServerStatus, error) {
+func (dc Client) Status(ctx context.Context) (Status, error) {
 	dst := dc.url + "/status"
 
 	req, err := http.NewRequestWithContext(ctx, "GET", dst, nil)
 	if err != nil {
-		return ServerStatus{}, err
+		return Status{}, err
 	}
 
 	if dc.token != "" {
@@ -142,19 +143,19 @@ func (dc defaultClient) Status(ctx context.Context) (ServerStatus, error) {
 
 	resp, err := dc.client.Do(req)
 	if err != nil {
-		return ServerStatus{}, err
+		return Status{}, err
 	}
 
-	ans := ServerStatus{}
+	ans := Status{}
 
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&ans)
 	if err != nil {
-		return ServerStatus{}, err
+		return Status{}, err
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return ServerStatus{}, errors.New("judger returned: " + resp.Status)
+		return Status{}, errors.New("judger returned: " + resp.Status)
 	}
 
 	return ans, nil

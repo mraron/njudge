@@ -1,20 +1,19 @@
 package judge
 
 import (
-	"crypto/rsa"
-	"crypto/x509"
-	"encoding/pem"
-	"github.com/mraron/njudge/pkg/language/sandbox"
+	"context"
+	"fmt"
 	"log"
 	"net/http"
-	"os"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 
-	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 	"github.com/shirou/gopsutil/load"
 	"go.uber.org/multierr"
+	"go.uber.org/zap"
 
 	"github.com/mraron/njudge/pkg/problems"
 	_ "github.com/mraron/njudge/pkg/problems/config/feladat_txt"
@@ -23,13 +22,8 @@ import (
 	_ "github.com/mraron/njudge/pkg/problems/tasktype/communication"
 	_ "github.com/mraron/njudge/pkg/problems/tasktype/stub"
 
-	"io/ioutil"
-	"path/filepath"
-
 	"encoding/json"
-	"fmt"
 
-	"github.com/kataras/go-errors"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/mraron/njudge/pkg/language"
 	_ "github.com/mraron/njudge/pkg/language/langs/cpp"
@@ -39,120 +33,91 @@ import (
 	_ "github.com/mraron/njudge/pkg/language/langs/octave"
 	_ "github.com/mraron/njudge/pkg/language/langs/pascal"
 	_ "github.com/mraron/njudge/pkg/language/langs/python3"
+	"github.com/mraron/njudge/pkg/language/sandbox"
 )
 
-//@TODO use contexts and afero => tests
-
-type ServerStatus struct {
-	Id          string        `json:"id" mapstructure:"id"`
-	Host        string        `json:"host" mapstructure:"host"`
-	Port        string        `json:"port" mapstructure:"port"`
-	Url         string        `json:"url"`
-	Load        float64       `json:"load"`
-	Uptime      time.Duration `json:"uptime"`
-	ProblemList []string      `json:"problem_list"`
-}
-
-func ParseServerStatus(s string) (res ServerStatus, err error) {
-	err = json.Unmarshal([]byte(s), &res)
-	return
-}
-
-func (s ServerStatus) SupportsProblem(want string) bool {
-	for _, key := range s.ProblemList {
-		if key == want {
-			return true
-		}
-	}
-
-	return false
-}
-
-func (s ServerStatus) String() string {
-	res, _ := json.Marshal(s)
-	return string(res)
-}
-
 type Server struct {
-	serverStatusMutex sync.RWMutex
-	ServerStatus      `mapstructure:",squash"`
+	Status      `mapstructure:",squash"`
+	statusMutex sync.RWMutex
 
 	ProblemsDir string `json:"problems_dir" mapstructure:"problems_dir"`
 	LogDir      string `json:"log_dir" mapstructure:"log_dir"`
-	SandboxIds  []int  `json:"sandbox_ids" mapstructure:"sandbox_ids"`
+	SandboxIds  string `json:"sandbox_ids" mapstructure:"sandbox_ids"`
+	WorkerCount int    `json:"worker_count" mapstructure:"worker_count"`
 
-	PublicKeyLocation string `json:"public_key" mapstructure:"public_key"`
-
-	ProblemStore problems.Store
-
-	sandboxProvider *language.SandboxProvider
-	publicKey       *rsa.PublicKey
-	start           time.Time
-	queue           chan submission
+	minSandboxId, maxSandboxId int
+	problemStore               problems.Store
+	start                      time.Time
+	queue                      chan Submission
+	workers                    chan *Worker
+	logger                     *zap.Logger
 }
 
 func NewServer() *Server {
 	s := Server{}
 	s.start = time.Now()
-	s.queue = make(chan submission, 100)
+	s.queue = make(chan Submission, 128)
 
 	return &s
 }
 
 func (s *Server) Run() error {
-	s.ProblemStore = problems.NewFsStore(s.ProblemsDir)
+	var err error
+	s.logger, err = zap.NewDevelopment()
+	if err != nil {
+		return err
+	}
+
+	if s.SandboxIds == "" {
+		s.minSandboxId = 100
+		s.maxSandboxId = 999
+	} else {
+		splitted := strings.Split(s.SandboxIds, "-")
+		if len(splitted) != 2 {
+			return fmt.Errorf("sandbox_ids wrong format")
+		}
+
+		var err1, err2 error
+		s.minSandboxId, err1 = strconv.Atoi(splitted[0])
+		s.maxSandboxId, err2 = strconv.Atoi(splitted[1])
+		if err1 != nil || err2 != nil {
+			return multierr.Combine(err1, err2)
+		}
+	}
+
+	s.logger.Info("initializing workers")
+	s.workers = make(chan *Worker, s.WorkerCount)
+	used := make(map[int]struct{})
+	for i := 0; i < s.WorkerCount; i++ {
+		provider := language.NewSandboxProvider()
+		cnt := 2
+		for j := s.minSandboxId; j <= s.maxSandboxId; j++ {
+			if _, ok := used[j]; !ok {
+				provider.Put(sandbox.NewIsolate(j))
+				used[j] = struct{}{}
+				cnt -= 1
+			}
+
+			if cnt == 0 {
+				break
+			}
+		}
+
+		if cnt != 0 {
+			return fmt.Errorf("not enough sandboxes")
+		}
+
+		s.workers <- NewWorker(i+1, provider)
+	}
+
+	s.logger.Info("parsing problems")
+	s.problemStore = problems.NewFsStore(s.ProblemsDir)
 	s.updateProblems()
-
-	s.sandboxProvider = language.NewSandboxProvider()
-	for _, id := range s.SandboxIds {
-		s.sandboxProvider.Put(sandbox.NewIsolate(id))
-	}
-
-	if s.PublicKeyLocation != "" {
-		publicKeyContents, err := ioutil.ReadFile(s.PublicKeyLocation)
-		if err != nil {
-			return err
-		}
-
-		block, _ := pem.Decode(publicKeyContents)
-		if block == nil {
-			return fmt.Errorf("can't parse pem public key file: %s", s.PublicKeyLocation)
-		}
-
-		s.publicKey, err = x509.ParsePKCS1PublicKey(block.Bytes)
-		if err != nil {
-			return fmt.Errorf("can't decode publickey: %v", err)
-		}
-	}
 
 	s.Url = "http://" + s.Host + ":" + s.Port
 
 	e := echo.New()
 	e.Use(middleware.Logger())
-
-	if s.PublicKeyLocation != "" {
-		e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
-			SigningMethod: "RS512",
-			ParseTokenFunc: func(auth string, c echo.Context) (interface{}, error) {
-				keyFunc := func(t *jwt.Token) (interface{}, error) {
-					if t.Method.Alg() != "RS512" {
-						return nil, fmt.Errorf("unexpected jwt signing method=%v", t.Header["alg"])
-					}
-					return s.publicKey, nil
-				}
-
-				// claims are of type `jwt.MapClaims` when token is created with `jwt.Parse`
-				token, err := jwt.Parse(auth, keyFunc)
-				if err != nil {
-					return nil, err
-				}
-				if !token.Valid {
-					return nil, errors.New("invalid token")
-				}
-				return token, nil
-			},
-		}))
-	}
 
 	e.GET("/status", s.getStatus)
 	e.POST("/update", s.postUpdateProblems)
@@ -172,11 +137,11 @@ func (s *Server) updateProblems() error {
 		err2 error
 	)
 
-	s.serverStatusMutex.Lock()
-	defer s.serverStatusMutex.Unlock()
+	s.statusMutex.Lock()
+	defer s.statusMutex.Unlock()
 
-	err = s.ProblemStore.Update()
-	s.ProblemList, err2 = s.ProblemStore.List()
+	err = s.problemStore.Update()
+	s.ProblemList, err2 = s.problemStore.List()
 
 	return multierr.Append(err, err2)
 }
@@ -197,9 +162,9 @@ func (s *Server) runUpdateLoad() {
 		if err != nil {
 			log.Print("Error while getting load: ", err)
 		} else {
-			s.serverStatusMutex.Lock()
-			s.ServerStatus.Load = l.Load1
-			s.serverStatusMutex.Unlock()
+			s.statusMutex.Lock()
+			s.Status.Load = l.Load1
+			s.statusMutex.Unlock()
 		}
 
 		time.Sleep(60 * time.Second)
@@ -208,54 +173,48 @@ func (s *Server) runUpdateLoad() {
 
 func (s *Server) runUpdateUptime() {
 	for {
-		s.serverStatusMutex.Lock()
-		s.ServerStatus.Uptime = time.Since(s.start)
-		s.serverStatusMutex.Unlock()
+		s.statusMutex.Lock()
+		s.Status.Uptime = time.Since(s.start)
+		s.statusMutex.Unlock()
 		time.Sleep(1 * time.Second)
 	}
 }
 
 func (s *Server) runJudger() {
-	judge := func() error {
-		sub := <-s.queue
-
+	judge := func(worker *Worker, sub Submission) error {
 		defer func() {
 			sub.done <- true
 		}()
 
-		if ok, err := s.ProblemStore.Has(sub.Problem); !ok {
+		if ok, err := s.problemStore.Has(sub.Problem); !ok {
 			return err
 		}
 
-		f, err := os.Create(filepath.Join(s.LogDir, fmt.Sprintf("judger.%s", sub.Id)))
-		if err != nil {
-			return multierr.Append(err, f.Close())
-		}
-
-		logger := log.New(f, "[judging]", log.Lshortfile)
-
-		p, _ := s.ProblemStore.Get(sub.Problem)
-		st, err := Judge(logger, p, sub.Source, language.Get(sub.Language), s.sandboxProvider, sub.c)
+		p, _ := s.problemStore.Get(sub.Problem)
+		st, err := worker.Judge(context.Background(), s.logger, p, sub.Source, language.Get(sub.Language), sub.c)
 		if err != nil {
 			st.Compiled = false
 			st.CompilerOutput = "internal error"
-			return multierr.Combine(sub.c.Callback("", st, true), err, f.Close())
+			return multierr.Combine(sub.c.Callback("", st, true), err)
 		} else {
-			return multierr.Append(sub.c.Callback("", st, true), f.Close())
+			return sub.c.Callback("", st, true)
 		}
 	}
 
 	for {
-		if err := judge(); err != nil {
+		w := <-s.workers
+		sub := <-s.queue
+
+		if err := judge(w, sub); err != nil {
 			log.Print("judger: ", err)
 		}
 	}
 }
 
 func (s *Server) getStatus(c echo.Context) error {
-	s.serverStatusMutex.RLock()
-	defer s.serverStatusMutex.RUnlock()
-	return c.JSON(http.StatusOK, s.ServerStatus)
+	s.statusMutex.RLock()
+	defer s.statusMutex.RUnlock()
+	return c.JSON(http.StatusOK, s.Status)
 }
 
 func (s *Server) postUpdateProblems(c echo.Context) error {
@@ -263,7 +222,7 @@ func (s *Server) postUpdateProblems(c echo.Context) error {
 }
 
 func (s *Server) postJudge(c echo.Context) error {
-	sub := submission{}
+	sub := Submission{}
 	if err := c.Bind(&sub); err != nil {
 		log.Print("getJudge error binding:", err)
 		return c.String(http.StatusBadRequest, "Parse error")

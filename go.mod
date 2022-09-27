@@ -70,6 +70,7 @@ require (
 	github.com/valyala/fasttemplate v1.2.1 // indirect
 	github.com/volatiletech/inflect v0.0.1 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
+	go.uber.org/zap v1.23.0 // indirect
 	golang.org/x/exp v0.0.0-20220827204233-334a2380cb91 // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
 	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
