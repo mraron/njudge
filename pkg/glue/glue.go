@@ -3,6 +3,7 @@ package glue
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -13,12 +14,16 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/mraron/njudge/pkg/judge"
 	"github.com/mraron/njudge/pkg/web/extmodels"
+	"github.com/mraron/njudge/pkg/web/helpers/config"
 	"github.com/mraron/njudge/pkg/web/models"
+	"github.com/volatiletech/sqlboiler/v4/boil"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 type Config struct {
 	Port string
+
+	config.Database `mapstructure:",squash"`
 }
 
 type Server struct {
@@ -26,13 +31,38 @@ type Server struct {
 
 	DB            *sql.DB
 	JudgesUpdater JudgesUpdater
-	FindJudger    FindJudger
+	JudgeFinder   JudgeFinder
 
 	judges      []*models.Judge
 	judgesMutex sync.RWMutex
 }
 
+func (s *Server) ConnectToDB() {
+	var err error
+
+	sslmode := "require"
+	if !s.DBSSLMode {
+		sslmode = "disable"
+	}
+
+	if s.DBPort == 0 {
+		s.DBPort = 5432
+	}
+
+	connStr := fmt.Sprintf("user=%s password=%s host=%s dbname=%s port=%d sslmode=%s", s.DBAccount, s.DBPassword, s.DBHost, s.DBName, s.DBPort, sslmode)
+	s.DB, err = sql.Open("postgres", connStr)
+	if err != nil {
+		panic(err)
+	}
+
+	boil.SetDB(s.DB)
+}
+
 func (s *Server) Run() {
+	s.ConnectToDB()
+	s.JudgesUpdater = &JudgesUpdaterFromDB{s.DB}
+	s.JudgeFinder = &FindJudgerNaive{}
+
 	go s.runSyncJudges()
 	go s.runJudger()
 	s.runServer()
@@ -42,7 +72,7 @@ func (s *Server) runSyncJudges() {
 	var err error
 	for {
 		s.judgesMutex.Lock()
-		if s.judges, err = s.JudgesUpdater.JudgesUpdate(); err != nil {
+		if s.judges, err = s.JudgesUpdater.UpdateJudges(context.Background()); err != nil {
 			log.Print(err)
 		}
 		s.judgesMutex.Unlock()
@@ -105,7 +135,7 @@ func (s *Server) runJudger() {
 
 		for _, sub := range ss {
 			s.judgesMutex.RLock()
-			j, err := s.FindJudger.FindJudge(s.judges, sub)
+			j, err := s.JudgeFinder.FindJudge(s.judges, sub)
 			if err != nil {
 				log.Print(err)
 				continue

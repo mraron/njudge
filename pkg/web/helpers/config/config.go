@@ -52,9 +52,7 @@ type Server struct {
 
 	CustomHead string
 
-	Database
-
-	GluePort string
+	Database `mapstructure:",squash"`
 
 	Keys Keys
 }

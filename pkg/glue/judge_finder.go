@@ -5,7 +5,7 @@ import (
 	"github.com/mraron/njudge/pkg/web/models"
 )
 
-type FindJudger interface {
+type JudgeFinder interface {
 	FindJudge([]*models.Judge, *models.Submission) (*models.Judge, error)
 }
 

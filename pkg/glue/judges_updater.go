@@ -12,14 +12,14 @@ import (
 )
 
 type JudgesUpdater interface {
-	JudgesUpdate() ([]*models.Judge, error)
+	UpdateJudges(ctx context.Context) ([]*models.Judge, error)
 }
 
 type JudgesUpdaterFromDB struct {
 	DB *sql.DB
 }
 
-func (o *JudgesUpdaterFromDB) JudgesUpdate(ctx context.Context) ([]*models.Judge, error) {
+func (o *JudgesUpdaterFromDB) UpdateJudges(ctx context.Context) ([]*models.Judge, error) {
 	judges, err := models.Judges().All(o.DB)
 	if err != nil {
 		return nil, err
