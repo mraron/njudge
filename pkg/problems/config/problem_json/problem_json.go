@@ -164,7 +164,7 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 				return nil, err
 			}
 
-			tc.Index = i
+			tc.Index = i + 1
 			tc.Group = "base"
 
 			ans.Feedback[0].Groups[0].Testcases = append(ans.Feedback[0].Groups[0].Testcases, tc)
@@ -196,7 +196,7 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 					tc.MaxScore = p.Tests.Subtasks[s].MaxScore
 				}
 
-				tc.Index = i
+				tc.Index = i + 1
 				tc.Group = ans.Feedback[0].Groups[s].Name
 
 				ans.Feedback[0].Groups[s].Testcases = append(ans.Feedback[0].Groups[s].Testcases, tc)
