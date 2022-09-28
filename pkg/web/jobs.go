@@ -48,13 +48,7 @@ func (s *Server) runStatisticsUpdate() {
 				userPoints[uid.UserID] += points
 			}
 
-			sub, err := models.Submissions(Where("id=?", p.ID)).One(s.DB)
-			if err != nil {
-				log.Print(err)
-				continue
-			}
-
-			if _, err = s.DB.Exec("UPDATE problem_rels SET solver_count = (SELECT COUNT(distinct user_id) from submissions where problemset = problem_rels.problemset and problem = problem_rels.problem and verdict = 0) WHERE problemset = $1 and problem = $2", sub.Problemset, sub.Problem); err != nil {
+			if _, err = s.DB.Exec("UPDATE problem_rels SET solver_count = (SELECT COUNT(distinct user_id) from submissions where problemset = problem_rels.problemset and problem = problem_rels.problem and verdict = 0) WHERE problemset = $1 and problem = $2", p.Problemset, p.Problem); err != nil {
 				log.Print(err)
 				continue
 			}
