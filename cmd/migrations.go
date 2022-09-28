@@ -4,12 +4,13 @@ import (
 	"log"
 	"os"
 
+	"github.com/mraron/njudge/pkg/web"
+	"github.com/mraron/njudge/pkg/web/helpers/config"
+
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
-	"github.com/mraron/njudge/web"
-	"github.com/mraron/njudge/web/helpers/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -46,7 +47,7 @@ var MigrateCmd = &cobra.Command{
 			return err
 		}
 
-		m, err := migrate.NewWithDatabaseInstance("file://web/migrations", "postgres", driver)
+		m, err := migrate.NewWithDatabaseInstance("file://migrations", "postgres", driver)
 		if err != nil {
 			return err
 		}

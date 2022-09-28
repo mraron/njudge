@@ -11,11 +11,11 @@ services:
       - POSTGRES_PASSWORD=postgres
     volumes:
       - db:/var/lib/postgresql/data
-      - ./web/migrations/1_init.up.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      - ./migrations/1_init.up.sql:/docker-entrypoint-initdb.d/create_tables.sql
   web:
     build:
       context: .
-      dockerfile: web/Dockerfile
+      dockerfile: pkg/web/Dockerfile
     ports:
       - 5555:5555
     env_file:
@@ -25,14 +25,13 @@ services:
       - db
     volumes:
       - problems:/njudge_problems
-    links:
-      - db
-      - judge
+    networks:
+      - default
   judge:
     privileged: true
     build:
       context: .
-      dockerfile: judge/Dockerfile
+      dockerfile: pkg/judge/Dockerfile
     env_file:
       - judge.env
     depends_on:
@@ -40,6 +39,19 @@ services:
     volumes:
       - problems:/njudge_problems
       - logs:/njudge_logs
+    networks:
+      - default
+  glue:
+    build:
+      context: .
+      dockerfile: pkg/glue/Dockerfile
+    env_file:
+      - glue.env
+    depends_on:
+      - base
+      - db
+    networks:
+      - default
 volumes:
   db:
     driver: local
@@ -49,3 +61,6 @@ volumes:
     driver: local
   logs:
     driver: local
+networks:
+  default:
+    name: njudge_default

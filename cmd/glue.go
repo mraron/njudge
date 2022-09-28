@@ -1,34 +1,39 @@
 package cmd
 
 import (
-	"github.com/mraron/njudge/pkg/judge"
+	"github.com/mraron/njudge/pkg/glue"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-var JudgeCmd = &cobra.Command{
-	Use:   "judge",
-	Short: "start judge server",
+var GlueCmd = &cobra.Command{
+	Use:   "glue",
+	Short: "",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		BindEnvs(judge.Server{})
+		BindEnvs(glue.Config{})
 		viper.SetEnvPrefix("njudge")
 
-		viper.SetConfigName("judge")
+		viper.SetConfigName("glue")
 		viper.AddConfigPath(".")
 		viper.AutomaticEnv()
 		return viper.MergeInConfig()
 	},
 
 	RunE: func(cmd *cobra.Command, args []string) error {
-		s := judge.NewServer()
-		if err := viper.Unmarshal(&s); err != nil {
+		cfg := glue.Config{}
+
+		err := viper.Unmarshal(&cfg)
+		if err != nil {
 			return err
 		}
 
-		return s.Run()
+		s := glue.Server{Config: cfg}
+		s.Run()
+
+		return nil
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(JudgeCmd)
+	RootCmd.AddCommand(GlueCmd)
 }

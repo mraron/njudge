@@ -6,10 +6,11 @@ import (
 	"io/ioutil"
 	"log"
 
+	"github.com/mraron/njudge/pkg/web"
+	"github.com/mraron/njudge/pkg/web/helpers/config"
+	"github.com/mraron/njudge/pkg/web/models"
+
 	"github.com/mraron/njudge/pkg/problems"
-	"github.com/mraron/njudge/web"
-	"github.com/mraron/njudge/web/helpers/config"
-	"github.com/mraron/njudge/web/models"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
