@@ -66,7 +66,7 @@ func (w Worker) Judge(ctx context.Context, plogger *zap.Logger, p problems.Probl
 		logger.Error("compilation error", zap.Error(err))
 		st.Compiled = false
 		st.CompilerOutput = err.Error() + "\n" + truncate(stderr.String(), 1024)
-		err = multierr.Append(err, c.Callback("", st, true))
+		err = c.Callback("", st, true) //shouldn't return compile error to parent
 		return
 	}
 	st.Compiled = true

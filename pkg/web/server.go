@@ -6,7 +6,9 @@ import (
 	"github.com/mraron/njudge/pkg/web/helpers/roles"
 	"github.com/mraron/njudge/pkg/web/helpers/templates"
 	"github.com/mraron/njudge/pkg/web/models"
-	"sync"
+
+	_ "mime"
+	"net/http"
 
 	"github.com/gorilla/sessions"
 	"github.com/jmoiron/sqlx"
@@ -30,8 +32,6 @@ import (
 	_ "github.com/mraron/njudge/pkg/problems/tasktype/communication"
 	_ "github.com/mraron/njudge/pkg/problems/tasktype/output_only"
 	_ "github.com/mraron/njudge/pkg/problems/tasktype/stub"
-	_ "mime"
-	"net/http"
 
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
@@ -41,9 +41,6 @@ type Server struct {
 	DB *sqlx.DB
 
 	ProblemStore problems.Store
-
-	judgesMutex sync.RWMutex
-	judges      []*models.Judge
 }
 
 func (s *Server) Run() {

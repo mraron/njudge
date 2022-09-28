@@ -40,6 +40,7 @@ type Server struct {
 	Status      `mapstructure:",squash"`
 	statusMutex sync.RWMutex
 
+	Mode        string `json:"mode" mapstructure:"mode"`
 	ProblemsDir string `json:"problems_dir" mapstructure:"problems_dir"`
 	LogDir      string `json:"log_dir" mapstructure:"log_dir"`
 	SandboxIds  string `json:"sandbox_ids" mapstructure:"sandbox_ids"`
@@ -63,7 +64,11 @@ func NewServer() *Server {
 
 func (s *Server) Run() error {
 	var err error
-	s.logger, err = zap.NewDevelopment()
+	if s.Mode == "development" {
+		s.logger, err = zap.NewDevelopment()
+	} else {
+		s.logger, err = zap.NewProduction()
+	}
 	if err != nil {
 		return err
 	}
@@ -94,8 +99,8 @@ func (s *Server) Run() error {
 		for j := s.minSandboxId; j <= s.maxSandboxId; j++ {
 			if _, ok := used[j]; !ok {
 				provider.Put(sandbox.NewIsolate(j))
-				used[j] = struct{}{}
 				cnt -= 1
+				used[j] = struct{}{}
 			}
 
 			if cnt == 0 {
@@ -117,7 +122,24 @@ func (s *Server) Run() error {
 	s.Url = "http://" + s.Host + ":" + s.Port
 
 	e := echo.New()
-	e.Use(middleware.Logger())
+	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogMethod:   true,
+		LogURI:      true,
+		LogStatus:   true,
+		LogHost:     true,
+		LogRemoteIP: true,
+		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+			s.logger.Info("request",
+				zap.String("method", v.Method),
+				zap.String("URI", v.URI),
+				zap.String("host", v.Host),
+				zap.String("remoteip", v.RemoteIP),
+				zap.Int("status", v.Status),
+			)
+
+			return nil
+		},
+	}))
 
 	e.GET("/status", s.getStatus)
 	e.POST("/update", s.postUpdateProblems)
@@ -193,6 +215,8 @@ func (s *Server) runJudger() {
 		p, _ := s.problemStore.Get(sub.Problem)
 		st, err := worker.Judge(context.Background(), s.logger, p, sub.Source, language.Get(sub.Language), sub.c)
 		if err != nil {
+			s.logger.Error("judge error", zap.Error(err))
+
 			st.Compiled = false
 			st.CompilerOutput = "internal error"
 			return multierr.Combine(sub.c.Callback("", st, true), err)
@@ -206,8 +230,10 @@ func (s *Server) runJudger() {
 		sub := <-s.queue
 
 		if err := judge(w, sub); err != nil {
-			log.Print("judger: ", err)
+			s.logger.Error("judging error", zap.Error(err))
 		}
+
+		s.workers <- w
 	}
 }
 
