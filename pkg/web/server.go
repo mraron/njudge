@@ -1,6 +1,7 @@
 package web
 
 import (
+	"github.com/antonlindstrom/pgstore"
 	"github.com/mraron/njudge/pkg/web/helpers"
 	"github.com/mraron/njudge/pkg/web/helpers/config"
 	"github.com/mraron/njudge/pkg/web/helpers/roles"
@@ -10,7 +11,6 @@ import (
 	_ "mime"
 	"net/http"
 
-	"github.com/gorilla/sessions"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
@@ -65,7 +65,10 @@ func (s *Server) Run() {
 		}
 	}
 
-	store := sessions.NewCookieStore([]byte(s.CookieSecret))
+	store, err := pgstore.NewPGStoreFromPool(s.DB.DB, []byte(s.CookieSecret))
+	if err != nil {
+		panic(err)
+	}
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
