@@ -84,10 +84,18 @@ func funcs(store problems.Store, db *sql.DB) template.FuncMap {
 			return template.HTML(s)
 		},
 		"logged": func(c echo.Context) bool {
-			return nil != c.Get("user").(*models.User)
+			if _, ok := c.Get("user").(*models.User); ok {
+				return nil != c.Get("user").(*models.User)
+			}
+
+			return false
 		},
 		"user": func(c echo.Context) *models.User {
-			return c.Get("user").(*models.User)
+			if _, ok := c.Get("user").(*models.User); ok {
+				return c.Get("user").(*models.User)
+			}
+
+			return nil
 		},
 		"canView": func(role string, entity roles.Entity) bool {
 			return roles.Can(roles.Role(role), roles.ActionView, entity)

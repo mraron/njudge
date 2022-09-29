@@ -1,6 +1,8 @@
 package web
 
 import (
+	"log"
+
 	"github.com/antonlindstrom/pgstore"
 	"github.com/mraron/njudge/pkg/web/helpers"
 	"github.com/mraron/njudge/pkg/web/helpers/config"
@@ -83,7 +85,7 @@ func (s *Server) Run() {
 
 				storage, err := session.Get("user", c)
 				if err != nil {
-					panic(err)
+					return nil, err
 				}
 
 				if _, ok := storage.Values["id"]; !ok {
@@ -94,10 +96,11 @@ func (s *Server) Run() {
 			}
 
 			user, err := currentUser(c)
-			if err != nil {
-				return err
-			}
 			c.Set("user", user)
+			if err != nil {
+				log.Print(err)
+				return next(c)
+			}
 
 			return next(c)
 		}

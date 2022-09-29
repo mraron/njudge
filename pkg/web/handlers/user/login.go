@@ -1,8 +1,9 @@
 package user
 
 import (
-	"github.com/mraron/njudge/pkg/web/models"
 	"net/http"
+
+	"github.com/mraron/njudge/pkg/web/models"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo-contrib/session"
