@@ -1,0 +1,7 @@
+.git
+.idea
+.vscode
+.github
+node_modules
+njudge_problems
+njudge
