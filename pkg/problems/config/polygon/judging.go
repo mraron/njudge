@@ -30,10 +30,15 @@ func (tc Test) Testcase() problems.Testcase {
 	}
 }
 
+type Dependency struct {
+	Group string `xml:"group,attr"`
+}
+
 type Group struct {
-	Name         string  `xml:"name,attr"`
-	PointsPolicy string  `xml:"points-policy,attr"`
-	Points       float64 `xml:"points,attr"`
+	Name         string       `xml:"name,attr"`
+	PointsPolicy string       `xml:"points-policy,attr"`
+	Points       float64      `xml:"points,attr"`
+	Dependencies []Dependency `xml:"dependencies>dependency"`
 }
 
 type Testset struct {
@@ -63,7 +68,7 @@ func (ts Testset) Testset(path string) problems.Testset {
 	}
 
 	if len(ts.Groups) == 0 {
-		ts.Groups = append(ts.Groups, Group{"", "sum", -1.0})
+		ts.Groups = append(ts.Groups, Group{Name: "", PointsPolicy: "sum", Points: -1.0})
 	}
 
 	idx := 1
@@ -76,6 +81,11 @@ func (ts Testset) Testset(path string) problems.Testset {
 			group.Scoring = problems.ScoringGroup
 		} else {
 			group.Scoring = problems.ScoringSum
+		}
+
+		group.Dependencies = make([]string, 0, len(grp.Dependencies))
+		for _, dep := range grp.Dependencies {
+			group.Dependencies = append(group.Dependencies, dep.Group)
 		}
 
 		for _, tc := range testcases[grp.Name] {

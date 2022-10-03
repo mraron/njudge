@@ -149,6 +149,10 @@ func (p Problem) Files() []problems.File {
 }
 
 func (p Problem) GetTaskType() problems.TaskType {
+	if p.Assets.Interactor.Source.Path != "" {
+		p.TaskType = "communication"
+	}
+
 	if p.TaskType == "" {
 		p.TaskType = "batch"
 	}

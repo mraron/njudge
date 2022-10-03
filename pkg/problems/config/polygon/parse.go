@@ -153,17 +153,16 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 
 				p.GeneratedStatementList = append(p.GeneratedStatementList, problems.BytesData{Loc: dir.Name(), Val: contents, Typ: "text/html"})
 			}
+		}
 
-			for _, stmt := range p.StatementList {
-				statementPath := filepath.Join(path, stmt.Path)
-
-				cont, err := ioutil.ReadFile(statementPath)
-				if err != nil {
-					return nil, err
-				}
-
-				p.GeneratedStatementList = append(p.GeneratedStatementList, problems.BytesData{Loc: stmt.Language, Val: cont, Typ: stmt.Type})
+		for _, stmt := range p.StatementList {
+			statementPath := filepath.Join(path, stmt.Path)
+			cont, err := ioutil.ReadFile(statementPath)
+			if err != nil {
+				return nil, err
 			}
+
+			p.GeneratedStatementList = append(p.GeneratedStatementList, problems.BytesData{Loc: stmt.Language, Val: cont, Typ: stmt.Type})
 		}
 
 		if cfg.compileBinaries {
