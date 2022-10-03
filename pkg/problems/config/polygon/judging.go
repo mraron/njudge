@@ -79,6 +79,8 @@ func (ts Testset) Testset(path string) problems.Testset {
 		group.Name = grp.Name
 		if grp.PointsPolicy == "complete-group" {
 			group.Scoring = problems.ScoringGroup
+		} else if grp.PointsPolicy == "min-group" {
+			group.Scoring = problems.ScoringMin
 		} else {
 			group.Scoring = problems.ScoringSum
 		}

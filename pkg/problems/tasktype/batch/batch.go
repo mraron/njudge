@@ -288,6 +288,10 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 				testNotifier <- strconv.Itoa(tc.Index)
 				statusNotifier <- ans
 
+				if ans.FeedbackType == problems.FeedbackLazyIOI && !ac {
+					continue
+				}
+
 				if dependenciesOK(g.Dependencies) {
 					ctx.Stdout = &bytes.Buffer{}
 					res, err := b.RunF(&ctx, group, tc)
@@ -302,7 +306,7 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 						} else {
 							if tc.VerdictName == problems.VerdictWA || tc.VerdictName == problems.VerdictPE {
 								ac = false
-								if skeleton.FeedbackType != problems.FeedbackIOI {
+								if skeleton.FeedbackType != problems.FeedbackIOI && skeleton.FeedbackType != problems.FeedbackLazyIOI {
 									return ans, nil
 								}
 							}
@@ -314,10 +318,12 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 						}
 
 						ac = false
-						if skeleton.FeedbackType != problems.FeedbackIOI {
+						if skeleton.FeedbackType != problems.FeedbackIOI && skeleton.FeedbackType != problems.FeedbackLazyIOI {
 							return ans, nil
 						}
 					}
+				} else {
+					ac = false
 				}
 			}
 

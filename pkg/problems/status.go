@@ -5,6 +5,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+	"math"
 	"time"
 )
 
@@ -38,7 +39,7 @@ func (v VerdictName) String() string {
 	case VerdictXX:
 		return "Belső hiba"
 	case VerdictDR:
-		return "Nem fut"
+		return "Nem futott"
 	case VerdictPC:
 		return "Részben elfogadva"
 	case VerdictPE:
@@ -58,6 +59,7 @@ const (
 	FeedbackCF FeedbackType = iota
 	FeedbackIOI
 	FeedbackACM
+	FeedbackLazyIOI
 )
 
 // FeedbackFromString parses a string into FeedbackType, the default is FEEDBACK_CF, "ioi" is for FeedbackIOI and "acm" is for FeedbackACM
@@ -66,6 +68,8 @@ func FeedbackFromString(str string) FeedbackType {
 		return FeedbackIOI
 	} else if str == "acm" {
 		return FeedbackACM
+	} else if str == "lazyioi" {
+		return FeedbackLazyIOI
 	}
 
 	return FeedbackCF
@@ -80,11 +84,14 @@ type ScoringType int
 const (
 	ScoringGroup ScoringType = iota
 	ScoringSum
+	ScoringMin
 )
 
 func ScoringFromString(str string) ScoringType {
 	if str == "group" {
 		return ScoringGroup
+	} else if str == "min" {
+		return ScoringMin
 	}
 
 	return ScoringSum
@@ -247,6 +254,15 @@ func (g Group) Score() float64 {
 		return sum
 	case ScoringSum:
 		return sum
+	case ScoringMin:
+		res := math.MaxFloat64
+		for _, val := range g.Testcases {
+			if val.Score < res {
+				res = val.Score
+			}
+		}
+
+		return res
 	}
 
 	return -1.0
@@ -256,6 +272,9 @@ func (g Group) MaxScore() float64 {
 	sum := 0.0
 	for _, val := range g.Testcases {
 		sum += val.MaxScore
+		if g.Scoring == ScoringMin {
+			sum = val.MaxScore
+		}
 	}
 
 	return sum
@@ -263,7 +282,7 @@ func (g Group) MaxScore() float64 {
 
 func (g Group) FirstNonAC() int {
 	for ind, val := range g.Testcases {
-		if val.VerdictName != VerdictAC {
+		if val.VerdictName != VerdictAC && val.VerdictName != VerdictDR {
 			return ind + 1
 		}
 	}
@@ -408,7 +427,7 @@ func (v Status) FirstNonAC() int {
 	ind := 1
 	for _, val := range v.Feedback {
 		for _, val2 := range val.Testcases() {
-			if val2.VerdictName != VerdictAC {
+			if val2.VerdictName != VerdictAC && val2.VerdictName != VerdictDR {
 				return ind
 			}
 

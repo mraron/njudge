@@ -21,7 +21,7 @@
         {{end}}
     {{end}}
 {{end}}
-{{if eq $status.FeedbackType 1}}
+{{if or (eq $status.FeedbackType 1) (eq $status.FeedbackType 3)}}
     {{if .Judged.Valid}}
         {{if $status.IsAC}}
             <span class="text-success">Elfogadva {{roundto $status.Score 2}}/{{$status.MaxScore}}</span>

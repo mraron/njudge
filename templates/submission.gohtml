@@ -58,7 +58,7 @@
     {{end}}
 {{end}}
 
-{{if eq $status.FeedbackType 1}}
+{{if or (eq $status.FeedbackType 1) (eq $status.FeedbackType 3)}}
     <div class="table-responsive">
         <table class="table table-bordered table-sm">
             <thead>
