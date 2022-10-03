@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/mraron/njudge/pkg/language"
 	"io"
 	"io/ioutil"
 	"log"
@@ -13,7 +12,10 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
+
+	"github.com/mraron/njudge/pkg/language"
 )
 
 func getEnv(key, fallback string) string {
@@ -93,6 +95,8 @@ func (s Isolate) getPathToFile(name string) string {
 func (s *Isolate) CreateFile(name string, r io.Reader) error {
 	filename := s.getPathToFile(name)
 	s.logger.Print("Creating file ", filename)
+
+	syscall.Unlink(filename)
 
 	f, err := os.Create(filename)
 	if err != nil {
