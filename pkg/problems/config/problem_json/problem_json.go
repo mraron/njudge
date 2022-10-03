@@ -132,9 +132,11 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	ans := problems.Status{Compiled: false, CompilerOutput: "status skeleton", FeedbackType: problems.FeedbackFromString(p.Tests.FeedbackType), Feedback: make([]problems.Testset, 0)}
 	ans.Feedback = append(ans.Feedback, problems.Testset{Name: "tests"})
 
-	getIthIO := func(typ string, index int, pattern string, list []string) (string, error) {
+	getIthIO := func(typ string, index int, pattern string, gindex int, gpattern string, list []string) (string, error) {
 		if pattern != "" {
 			return fmt.Sprintf(filepath.Join(p.Path, "tests", pattern), index+1), nil
+		} else if gpattern != "" {
+			return fmt.Sprintf(filepath.Join(p.Path, "tests", gpattern), gindex+1), nil
 		} else {
 			if index < len(list) {
 				return filepath.Join(p.Path, "tests", list[index]), nil
@@ -157,10 +159,10 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 			var err error
 
 			tc := problems.Testcase{}
-			if tc.InputPath, err = getIthIO("input", i, p.Tests.InputPattern, p.Tests.InputList); err != nil {
+			if tc.InputPath, err = getIthIO("input", i, p.Tests.InputPattern, -1, "", p.Tests.InputList); err != nil {
 				return nil, err
 			}
-			if tc.AnswerPath, err = getIthIO("output", i, p.Tests.OutputPattern, p.Tests.OutputList); err != nil {
+			if tc.AnswerPath, err = getIthIO("output", i, p.Tests.OutputPattern, -1, "", p.Tests.OutputList); err != nil {
 				return nil, err
 			}
 
@@ -171,6 +173,7 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 		}
 	} else {
 		ans.Feedback[0].Groups = make([]problems.Group, len(p.Tests.Subtasks))
+		globalIdx := 0
 		for s := 0; s < len(p.Tests.Subtasks); s++ {
 			ans.Feedback[0].Groups[s].Name = fmt.Sprintf("subtask%d", s+1)
 			ans.Feedback[0].Groups[s].Scoring = problems.ScoringFromString(p.Tests.Subtasks[s].Scoring)
@@ -183,10 +186,10 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 				var err error
 
 				tc := problems.Testcase{}
-				if tc.InputPath, err = getIthIO("input", i, p.Tests.Subtasks[s].InputPattern, p.Tests.Subtasks[s].InputList); err != nil {
+				if tc.InputPath, err = getIthIO("input", i, p.Tests.Subtasks[s].InputPattern, globalIdx, p.Tests.InputPattern, p.Tests.Subtasks[s].InputList); err != nil {
 					return nil, err
 				}
-				if tc.AnswerPath, err = getIthIO("output", i, p.Tests.Subtasks[s].OutputPattern, p.Tests.Subtasks[s].OutputList); err != nil {
+				if tc.AnswerPath, err = getIthIO("output", i, p.Tests.Subtasks[s].OutputPattern, globalIdx, p.Tests.OutputPattern, p.Tests.Subtasks[s].OutputList); err != nil {
 					return nil, err
 				}
 
@@ -200,6 +203,7 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 				tc.Group = ans.Feedback[0].Groups[s].Name
 
 				ans.Feedback[0].Groups[s].Testcases = append(ans.Feedback[0].Groups[s].Testcases, tc)
+				globalIdx++
 			}
 		}
 	}
