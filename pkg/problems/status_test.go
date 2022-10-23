@@ -78,7 +78,7 @@ func TestGroup_FirstNonAC(t *testing.T) {
 	}{
 		{"AC", fields{Testcases: []Testcase{{VerdictName: VerdictAC}, {VerdictName: VerdictAC}}}, -1},
 		{"WA", fields{Testcases: []Testcase{{VerdictName: VerdictAC}, {VerdictName: VerdictWA}}}, 2},
-		{"DR", fields{Testcases: []Testcase{{VerdictName: VerdictAC}, {VerdictName: VerdictAC}, {VerdictName: VerdictDR}}}, 3},
+		{"DR", fields{Testcases: []Testcase{{VerdictName: VerdictAC}, {VerdictName: VerdictAC}, {VerdictName: VerdictDR}}}, -1},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -109,7 +109,7 @@ func TestGroup_IsAC(t *testing.T) {
 	}{
 		{"AC", fields{Testcases: []Testcase{{VerdictName: VerdictAC}, {VerdictName: VerdictAC}}}, true},
 		{"WA", fields{Testcases: []Testcase{{VerdictName: VerdictAC}, {VerdictName: VerdictWA}}}, false},
-		{"DR", fields{Testcases: []Testcase{{VerdictName: VerdictAC}, {VerdictName: VerdictAC}, {VerdictName: VerdictDR}}}, false},
+		{"DR", fields{Testcases: []Testcase{{VerdictName: VerdictAC}, {VerdictName: VerdictAC}, {VerdictName: VerdictDR}}}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
