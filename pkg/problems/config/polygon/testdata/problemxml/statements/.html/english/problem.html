@@ -1,0 +1,23 @@
+<HTML><HEAD><META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <META content="no-cache" http-equiv="pragma">
+    <META content="-1" http-equiv="expires">
+    <META content="text/html;charset=UTF-8" http-equiv="content-type">
+    <LINK href="problem-statement.css" rel="stylesheet" type="text/css">
+    <TITLE>Fancy Fence</TITLE>
+    <SCRIPT type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['$$$','$$$']], displayMath: [['$$$$$$','$$$$$$']]}
+        });
+        </SCRIPT>
+        <SCRIPT async="" src="https://polygon.codeforces.com/lib/MathJax/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript">
+    </SCRIPT>
+</HEAD><BODY>
+    <DIV class="problem-statement"><DIV class="header"><DIV class="title">Fancy Fence</DIV><DIV class="time-limit"><DIV class="property-title">time limit per test</DIV>1 second</DIV><DIV class="memory-limit"><DIV class="property-title">memory limit per test</DIV>256 megabytes</DIV><DIV class="input-file"><DIV class="property-title">input</DIV>standard input</DIV><DIV class="output-file"><DIV class="property-title">output</DIV>standard output</DIV></DIV><DIV class="legend"><P>Everybody knows that Bal&aacute;zs has the fanciest fence in the whole town. It's built up from $$$N$$$ fancy sections. The sections are rectangles standing closely next to each other on the ground. The $$$i$$$th section has integer height $$$h_i$$$ and integer width $$$w_i$$$.  We are looking for fancy rectangles on this fancy fence.  A rectangle is fancy if: </P><UL type="disc"> <LI> its sides are either horizontal or vertical and have integer lengths </LI><LI> the distance between the rectangle and the ground is integer </LI><LI> the distance between the rectangle and the left side of the first section is integer </LI><LI> it's lying completely on sections </LI></UL> What is the number of fancy rectangles?  This number can be very big, so we are interested in it modulo $$$10^9+7$$$.</DIV><P></P><P></P><DIV class="input-specification"><DIV class="section-title">Input</DIV><P></P><P>The first line contains $$$N$$$ ($$$1\leq N \leq 10^{5}$$$) &ndash; the number of sections.  The second line contains $$$N$$$ space-separated integers, the $$$i$$$th number is $$$h_i$$$ ($$$1 \leq h_i \leq 10^{9}$$$).  The third line contains $$$N$$$ space-separated integers, the $$$i$$$th number is $$$w_i$$$ ($$$1 \leq w_i \leq 10^{9}$$$).</P></DIV><P></P><P></P><DIV class="output-specification"><DIV class="section-title">Output</DIV><P></P><P>You should print a single integer, the number of fancy rectangles modulo $$$10^9+7$$$. So the output range is $$$0,1,2,\ldots, 10^9+6$$$.</P></DIV><P></P><P></P><DIV class="scoring"><DIV class="section-title">Scoring</DIV><P></P><P></P><CENTER> $$$ \begin{array}{|c|c|c|} \hline \text{Subtask} &amp; \text{Points} &amp; \text{Constraints} \\ \hline 1 &amp; 0 &amp; \text{sample}\\ \hline 2 &amp; 12 &amp; N \leq 50 \: \text{and} \: h_i \leq 50 \: \text{and} \: w_i = 1 \: \text{for all} \: i \\ \hline 3 &amp; 13 &amp; h_i = 1 \: \text{or} \: h_i = 2 \: \text{for all} \: i \\ \hline 4 &amp; 15 &amp; \text{all} \: h_i \: \text{are equal} \\ \hline 5 &amp; 15 &amp; h_i \leq h_{i+1} \: \text{for all} \: i \leq N-1 \\ \hline 6 &amp; 18 &amp; N \leq 1000\\ \hline 7 &amp; 27 &amp; \text{no additional constraints}\\ \hline \end{array} $$$<P></P><P></P></CENTER></DIV><P></P><P></P><DIV class="sample-tests"><DIV class="section-title">Example</DIV><P></P><P></P><DIV class="sample-test"><DIV class="input"><DIV class="title">Input</DIV><PRE class="content">
+2
+1 2
+1 2
+</PRE></DIV><DIV class="output"><DIV class="title">Output</DIV><PRE class="content">
+12
+</PRE></DIV></DIV></DIV><P></P><P></P><DIV class="note"><DIV class="section-title">Note</DIV><P></P><P>The fence looks like this:  <IMG class="tex-graphics" src="4cdd9740a73dbe20839f9c2c6f63013dc64c3228.png"></P><P>There are 5 fancy rectangles of shape:  <IMG class="tex-graphics" src="623fa3317dbe6f14bfc09de4e84a5697f7fd50b4.png"></P><P>There are 3 fancy rectangles of shape:  <IMG class="tex-graphics" src="ed1242a9b1ba23b3ed0fb1091687db4c38636361.png"></P><P>There is 1 fancy rectangle of shape:  <IMG class="tex-graphics" src="dc72fb71437165929d3c2e8f75bf36f4a3ebde55.png"></P><P>There are 2 fancy rectangles of shape:  <IMG class="tex-graphics" src="aa2d3c6f72712ddf9675a15cf8ae86163213bf9f.png"></P><P>There is 1 fancy rectangle of shape:  <IMG class="tex-graphics" src="e7cccc5f98caea29c15d0cefc2a709b195d3e85b.png"></P></DIV></DIV><P></P><P>  
+
+</P></BODY></HTML>
