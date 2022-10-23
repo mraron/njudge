@@ -123,7 +123,7 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 
 		p.Path = path
 
-		list, err := ioutil.ReadDir(filepath.Join(path, "statements"))
+		list, err := afero.ReadDir(cfg.fs, filepath.Join(path, "statements"))
 		if err == nil {
 			for _, dir := range list {
 				if !dir.IsDir() || strings.HasPrefix(dir.Name(), ".") {
@@ -157,7 +157,7 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 
 		for _, stmt := range p.StatementList {
 			statementPath := filepath.Join(path, stmt.Path)
-			cont, err := ioutil.ReadFile(statementPath)
+			cont, err := afero.ReadFile(cfg.fs, statementPath)
 			if err != nil {
 				return nil, err
 			}
@@ -188,7 +188,7 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 
 		for _, val := range p.Assets.Attachments {
 			attachmentLocation := filepath.Join(path, val.Location)
-			contents, err := ioutil.ReadFile(attachmentLocation)
+			contents, err := afero.ReadFile(cfg.fs, attachmentLocation)
 			if err != nil {
 				return nil, err
 			}
