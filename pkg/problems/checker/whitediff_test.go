@@ -12,6 +12,11 @@ func TestDoWhitediff(t *testing.T) {
 		b io.Reader
 	}
 
+	longLine := make([]byte, 1024*100)
+	for i := range longLine {
+		longLine[i] = 'a'
+	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -45,6 +50,8 @@ func TestDoWhitediff(t *testing.T) {
 		{"test_diff_wrong_line1", args{strings.NewReader("\n1"), strings.NewReader("1")}, 0.0, false},
 		{"test_diff_wrong_line2", args{strings.NewReader("1 2"), strings.NewReader("1\n2")}, 0.0, false},
 		{"test_diff_wrong_line3", args{strings.NewReader("1\n\n2"), strings.NewReader("1\n2")}, 0.0, false},
+
+		{"test_long_line", args{strings.NewReader(string(longLine)), strings.NewReader(string(longLine))}, 1.0, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

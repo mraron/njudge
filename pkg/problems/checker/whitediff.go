@@ -1,11 +1,11 @@
 package checker
 
 import (
-	"bufio"
 	"io"
 	"os"
 	"strings"
 
+	"github.com/karrick/gobls"
 	"github.com/mraron/njudge/pkg/problems"
 	"go.uber.org/multierr"
 )
@@ -71,7 +71,7 @@ func canonicalize(str string) string {
 //
 // [whitediff]: https://cms.readthedocs.io/en/v1.4/Task%20types.html#tasktypes-white-diff
 func DoWhitediff(a io.Reader, b io.Reader) (float64, error) {
-	x, y := bufio.NewScanner(a), bufio.NewScanner(b)
+	x, y := gobls.NewScanner(a), gobls.NewScanner(b)
 	eq := true
 	for {
 		hasA, hasB := x.Scan(), y.Scan()
