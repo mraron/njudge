@@ -37,24 +37,24 @@
     <script>
         if(window.location.hash)
         {
-            // carets are kinda buggy :D
-
             const hash = window.location.hash.substring(1);
 
             const elem = document.getElementById(hash);
             let curr = elem;
-
+            let prev = null;
             while(1) {
                 curr.classList.add('show');
 
-                // don't show non-important nodes
-                for(let child of document.querySelectorAll("div[data-nparent='#"+curr.id+"']")) {
-                    console.log(child);
-                    child.classList.remove('show');
+                if(prev!==null) {
+                    for(let child of document.querySelectorAll("div[data-nparent='#"+curr.id+"']")) {
+                        if(child!=prev)
+                            child.classList.remove('show');
+                    }
                 }
 
-                if(!('parent' in curr.dataset)) break ;
-                curr = document.querySelector(curr.dataset['parent']);
+                if(!('nparent' in curr.dataset)) break ;
+                prev = curr;
+                curr = document.querySelector(curr.dataset['nparent']);
             }
 
             elem.classList.add('show');
