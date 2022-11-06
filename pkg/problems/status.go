@@ -5,6 +5,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"math"
 	"time"
 )
@@ -73,6 +74,21 @@ func FeedbackFromString(str string) FeedbackType {
 	}
 
 	return FeedbackCF
+}
+
+func (f FeedbackType) String() string {
+	switch f {
+	case FeedbackACM:
+		return "FeedbackACM"
+	case FeedbackCF:
+		return "FeedbackCF"
+	case FeedbackIOI:
+		return "FeedbackIOI"
+	case FeedbackLazyIOI:
+		return "FeedbackLazyIOI"
+	}
+
+	return fmt.Sprintf("Feedback(%d)", f)
 }
 
 // ScoringType represents the scoring of a group of tests,

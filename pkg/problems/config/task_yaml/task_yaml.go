@@ -238,6 +238,7 @@ func (p Problem) GetTaskType() problems.TaskType {
 			if err != nil {
 				return st, err
 			}
+			itou.Close()
 
 			fmt.Fscanf(rc.Stdout, "%f", &tc.Score)
 			if tc.Score == 0 {
@@ -255,8 +256,9 @@ func (p Problem) GetTaskType() problems.TaskType {
 		}
 
 		res.RunUserF = func(rc *batch.RunContext, utoi, itou *os.File, g *problems.Group, tc *problems.Testcase) (language.Status, error) {
-			time.Sleep(25 * time.Millisecond) // TODO very hacky
-			return rc.Lang.Run(rc.Sandbox, bytes.NewReader(rc.Binary), itou, utoi, tc.TimeLimit, tc.MemoryLimit)
+			res, err := rc.Lang.Run(rc.Sandbox, bytes.NewReader(rc.Binary), itou, utoi, tc.TimeLimit, tc.MemoryLimit)
+			utoi.Close()
+			return res, err
 		}
 
 		tt = res
@@ -480,7 +482,7 @@ func parser(path string) (problems.Problem, error) {
 		}
 	}
 
-	if hasStub {
+	if hasStub && p.tasktype != "communication" {
 		p.tasktype = "stub"
 	}
 
