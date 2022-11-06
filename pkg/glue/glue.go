@@ -141,6 +141,9 @@ func (s *Server) runJudger() {
 				continue
 			}
 			s.judgesMutex.RUnlock()
+			if j == nil {
+				continue
+			}
 
 			var st judge.Status
 			st, err = judge.ParseStatus(j.State)
