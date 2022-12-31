@@ -70,10 +70,9 @@ func (t *Renderer) Render(w io.Writer, name string, data interface{}, c echo.Con
 	}
 
 	return t.templates[name].ExecuteTemplate(w, filepath.Base(name), struct {
-		Data       interface{}
-		Context    echo.Context
-		CustomHead string
-	}{data, c, t.cfg.CustomHead})
+		Data    interface{}
+		Context echo.Context
+	}{data, c})
 }
 
 func funcs(store problems.Store, db *sql.DB) template.FuncMap {

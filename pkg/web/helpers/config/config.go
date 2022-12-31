@@ -50,8 +50,6 @@ type Server struct {
 		MailAccountPassword string `json:"mail_password" mapstructure:"mailpassword"`
 	} `json:"smtp" mapstructure:"smtp"`
 
-	CustomHead string
-
 	Database `mapstructure:",squash"`
 
 	Keys Keys
