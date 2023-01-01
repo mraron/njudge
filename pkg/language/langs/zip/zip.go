@@ -1,9 +1,10 @@
 package zip
 
 import (
-	"github.com/mraron/njudge/pkg/language"
 	"io"
 	"time"
+
+	"github.com/mraron/njudge/pkg/language"
 )
 
 type zip struct{}
@@ -30,6 +31,10 @@ func (zip) Compile(s language.Sandbox, src language.File, bin io.Writer, cerr io
 
 func (zip) Run(s language.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, mem int) (language.Status, error) {
 	return language.Status{}, nil
+}
+
+func (zip) Test(language.Sandbox) error {
+	return nil
 }
 
 func init() {

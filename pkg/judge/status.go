@@ -3,16 +3,19 @@ package judge
 import (
 	"encoding/json"
 	"time"
+
+	"golang.org/x/exp/slices"
 )
 
 type Status struct {
-	Id          string        `json:"id" mapstructure:"id"`
-	Host        string        `json:"host" mapstructure:"host"`
-	Port        string        `json:"port" mapstructure:"port"`
-	Url         string        `json:"url"`
-	Load        float64       `json:"load"`
-	Uptime      time.Duration `json:"uptime"`
-	ProblemList []string      `json:"problem_list"`
+	Id           string        `json:"id" mapstructure:"id"`
+	Host         string        `json:"host" mapstructure:"host"`
+	Port         string        `json:"port" mapstructure:"port"`
+	Url          string        `json:"url"`
+	Load         float64       `json:"load"`
+	Uptime       time.Duration `json:"uptime"`
+	ProblemList  []string      `json:"problem_list"`
+	LanguageList []string      `json:"language_list"`
 }
 
 func ParseStatus(s string) (res Status, err error) {
@@ -21,13 +24,11 @@ func ParseStatus(s string) (res Status, err error) {
 }
 
 func (s Status) SupportsProblem(want string) bool {
-	for _, key := range s.ProblemList {
-		if key == want {
-			return true
-		}
-	}
+	return slices.Contains(s.ProblemList, want)
+}
 
-	return false
+func (s Status) SupportsLanguage(want string) bool {
+	return slices.Contains(s.LanguageList, want)
 }
 
 func (s Status) String() string {

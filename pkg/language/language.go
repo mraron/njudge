@@ -2,11 +2,11 @@ package language
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"sort"
-	"testing"
 	"time"
 )
 
@@ -57,10 +57,11 @@ type Language interface {
 	DefaultFileName() string
 	Compile(Sandbox, File, io.Writer, io.Writer, []File) error
 	Run(Sandbox, io.Reader, io.Reader, io.Writer, time.Duration, int) (Status, error)
+
+	Test(Sandbox) error
 }
 
 type LanguageTest struct {
-	Sandbox         Sandbox
 	Language        Language
 	Source          string
 	ExpectedVerdict Verdict
@@ -70,38 +71,49 @@ type LanguageTest struct {
 	MemoryLimit     int
 }
 
-func (test LanguageTest) Run(t *testing.T) {
-	err := test.Sandbox.Init(log.New(ioutil.Discard, "", 0))
+func (test LanguageTest) Run(sandbox Sandbox) error {
+	err := sandbox.Init(log.New(ioutil.Discard, "", 0))
 	if err != nil {
-		t.Error(err)
+		return err
 	}
 
 	src := bytes.NewBufferString(test.Source)
 	bin := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 
-	err = test.Language.Compile(test.Sandbox, File{test.Language.DefaultFileName(), src}, bin, stderr, []File{})
+	err = test.Language.Compile(sandbox, File{test.Language.DefaultFileName(), src}, bin, stderr, []File{})
 	stderrContent := stderr.String()
 
 	if (test.ExpectedVerdict&VERDICT_CE == 0 && err != nil) || (test.ExpectedVerdict&VERDICT_CE != 0 && err == nil && stderrContent == "") {
-		t.Errorf("error: %v stderr: %s", err, stderrContent)
+		return fmt.Errorf("error: %w stderr: %s", err, stderrContent)
+	}
+
+	err = sandbox.Cleanup()
+	if err != nil {
+		return fmt.Errorf("cleanup err: %w", err)
 	}
 
 	if test.ExpectedVerdict&VERDICT_CE == 0 {
+		err := sandbox.Init(log.New(io.Discard, "", 0))
+		if err != nil {
+			return err
+		}
+
 		output := &bytes.Buffer{}
-		status, err := test.Language.Run(test.Sandbox, bin, bytes.NewBufferString(test.Input), output, test.TimeLimit, test.MemoryLimit)
+		status, err := test.Language.Run(sandbox, bin, bytes.NewBufferString(test.Input), output, test.TimeLimit, test.MemoryLimit)
 
 		outputContent := output.String()
 		if status.Verdict&test.ExpectedVerdict == 0 || err != nil || outputContent != test.ExpectedOutput {
-			t.Errorf("EXPECTED %s got %s, source %q\n error: %v status: %v output: %q", test.ExpectedVerdict, status.Verdict, test.Source, err, status, outputContent)
+			return fmt.Errorf("EXPECTED %s got %s, source %q\n error: %w status: %v output: %q expected output: %q", test.ExpectedVerdict, status.Verdict, test.Source, err, status, outputContent, test.ExpectedOutput)
+		}
+
+		err = sandbox.Cleanup()
+		if err != nil {
+			return fmt.Errorf("cleanup err: %w", err)
 		}
 	}
 
-	err = test.Sandbox.Cleanup()
-	if err != nil {
-		t.Errorf("cleanup err: %v", err.Error())
-	}
-
+	return nil
 }
 
 var langList map[string]Language

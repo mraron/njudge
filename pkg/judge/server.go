@@ -27,11 +27,13 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/mraron/njudge/pkg/language"
 	_ "github.com/mraron/njudge/pkg/language/langs/cpp"
+	_ "github.com/mraron/njudge/pkg/language/langs/csharp"
 	_ "github.com/mraron/njudge/pkg/language/langs/golang"
+	_ "github.com/mraron/njudge/pkg/language/langs/java"
 	_ "github.com/mraron/njudge/pkg/language/langs/julia"
 	_ "github.com/mraron/njudge/pkg/language/langs/nim"
-	_ "github.com/mraron/njudge/pkg/language/langs/octave"
 	_ "github.com/mraron/njudge/pkg/language/langs/pascal"
+	_ "github.com/mraron/njudge/pkg/language/langs/pypy3"
 	_ "github.com/mraron/njudge/pkg/language/langs/python3"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 )
@@ -52,74 +54,22 @@ type Server struct {
 	queue                      chan Submission
 	workers                    chan *Worker
 	logger                     *zap.Logger
+	sandboxIdUsed              map[int]struct{}
 }
 
 func NewServer() *Server {
 	s := Server{}
 	s.start = time.Now()
 	s.queue = make(chan Submission, 128)
+	s.sandboxIdUsed = make(map[int]struct{})
 
 	return &s
 }
 
 func (s *Server) Run() error {
-	var err error
-	if s.Mode == "development" {
-		s.logger, err = zap.NewDevelopment()
-	} else {
-		s.logger, err = zap.NewProduction()
-	}
-	if err != nil {
+	if err := s.init(); err != nil {
 		return err
 	}
-
-	if s.SandboxIds == "" {
-		s.minSandboxId = 100
-		s.maxSandboxId = 999
-	} else {
-		splitted := strings.Split(s.SandboxIds, "-")
-		if len(splitted) != 2 {
-			return fmt.Errorf("sandbox_ids wrong format")
-		}
-
-		var err1, err2 error
-		s.minSandboxId, err1 = strconv.Atoi(splitted[0])
-		s.maxSandboxId, err2 = strconv.Atoi(splitted[1])
-		if err1 != nil || err2 != nil {
-			return multierr.Combine(err1, err2)
-		}
-	}
-
-	s.logger.Info("initializing workers")
-	s.workers = make(chan *Worker, s.WorkerCount)
-	used := make(map[int]struct{})
-	for i := 0; i < s.WorkerCount; i++ {
-		provider := language.NewSandboxProvider()
-		cnt := 2
-		for j := s.minSandboxId; j <= s.maxSandboxId; j++ {
-			if _, ok := used[j]; !ok {
-				provider.Put(sandbox.NewIsolate(j))
-				cnt -= 1
-				used[j] = struct{}{}
-			}
-
-			if cnt == 0 {
-				break
-			}
-		}
-
-		if cnt != 0 {
-			return fmt.Errorf("not enough sandboxes")
-		}
-
-		s.workers <- NewWorker(i+1, provider)
-	}
-
-	s.logger.Info("parsing problems")
-	s.problemStore = problems.NewFsStore(s.ProblemsDir)
-	s.updateProblems()
-
-	s.Url = "http://" + s.Host + ":" + s.Port
 
 	e := echo.New()
 	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
@@ -151,6 +101,106 @@ func (s *Server) Run() error {
 	go s.runJudger()
 
 	return e.Start(":" + s.Port)
+}
+
+func (s *Server) init() error {
+	var err error
+	if s.Mode == "development" {
+		s.logger, err = zap.NewDevelopment()
+	} else {
+		s.logger, err = zap.NewProduction()
+	}
+	if err != nil {
+		return err
+	}
+
+	s.Url = "http://" + s.Host + ":" + s.Port
+
+	if s.SandboxIds == "" {
+		s.minSandboxId = 100
+		s.maxSandboxId = 999
+	} else {
+		splitted := strings.Split(s.SandboxIds, "-")
+		if len(splitted) != 2 {
+			return fmt.Errorf("sandbox_ids wrong format")
+		}
+
+		var err1, err2 error
+		s.minSandboxId, err1 = strconv.Atoi(splitted[0])
+		s.maxSandboxId, err2 = strconv.Atoi(splitted[1])
+		if err1 != nil || err2 != nil {
+			return multierr.Combine(err1, err2)
+		}
+	}
+
+	s.logger.Info("initializing workers")
+	s.workers = make(chan *Worker, s.WorkerCount)
+	for i := 0; i < s.WorkerCount; i++ {
+		provider := language.NewSandboxProvider()
+		if err := s.populateProvider(provider, 2); err != nil {
+			return err
+		}
+
+		s.workers <- NewWorker(i+1, provider)
+	}
+
+	s.logger.Info("testing languages")
+	if err := s.updateLanguages(); err != nil {
+		return err
+	}
+	s.logger.Sugar().Info("languages: ", s.LanguageList)
+
+	s.logger.Info("parsing problems")
+	s.problemStore = problems.NewFsStore(s.ProblemsDir)
+	return s.updateProblems()
+}
+
+func (s *Server) populateProvider(provider *language.SandboxProvider, cnt int) error {
+	for j := s.minSandboxId; j <= s.maxSandboxId; j++ {
+		if _, ok := s.sandboxIdUsed[j]; !ok {
+			provider.Put(sandbox.NewIsolate(j))
+			cnt -= 1
+			s.sandboxIdUsed[j] = struct{}{}
+		}
+
+		if cnt == 0 {
+			break
+		}
+	}
+
+	if cnt != 0 {
+		return fmt.Errorf("not enough sandboxes")
+	}
+
+	return nil
+}
+
+func (s *Server) updateLanguages() error {
+	if len(s.LanguageList) == 0 {
+		for _, l := range language.List() {
+			s.LanguageList = append(s.LanguageList, l.Id())
+		}
+	}
+
+	provider := language.NewSandboxProvider()
+	s.populateProvider(provider, 1)
+
+	var errs error
+	for _, l := range s.LanguageList {
+		if language.Get(l) == nil {
+			errs = multierr.Append(errs, fmt.Errorf("no such language: %q", l))
+			continue
+		}
+
+		sandbox := provider.MustGet()
+
+		err := language.Get(l).Test(sandbox)
+		errs = multierr.Append(errs, err)
+
+		provider.Put(sandbox)
+	}
+
+	return errs
 }
 
 func (s *Server) updateProblems() error {

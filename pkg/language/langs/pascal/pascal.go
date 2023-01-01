@@ -2,9 +2,10 @@ package pascal
 
 import (
 	"errors"
-	"github.com/mraron/njudge/pkg/language"
 	"io"
 	"time"
+
+	"github.com/mraron/njudge/pkg/language"
 )
 
 type pascal struct{}
