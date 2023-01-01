@@ -79,8 +79,6 @@ func (s *Isolate) Init(l *log.Logger) error {
 
 	args := []string{"--cg", "-b", strconv.Itoa(s.id), "--init"}
 	s.MapDir("/etc/alternatives", "/etc/alternatives", []string{}, true)
-	s.MapDir("/usr/share", "/usr/share", []string{}, true)
-	s.MapDir("/usr/lib", "/usr/lib", []string{}, true)
 
 	s.logger.Print("Running init: isolate with args ", args)
 
@@ -156,7 +154,7 @@ func (s *Isolate) TimeLimit(tl time.Duration) language.Sandbox {
 }
 
 func (s *Isolate) MemoryLimit(ml int) language.Sandbox {
-	s.argv = append(s.argv, "--cg-mem="+strconv.Itoa(ml), "--mem="+strconv.Itoa(ml))
+	s.argv = append(s.argv, "--cg-mem="+strconv.Itoa(ml))
 	return s
 }
 
@@ -248,8 +246,6 @@ func (s *Isolate) Run(prg string, needStatus bool) (language.Status, error) {
 
 		if st == -1 {
 			s.st.Verdict = language.VERDICT_XX
-		} else if st == 127 {
-			s.st.Verdict = language.VERDICT_ML
 		} else { //eg. signal 8/136?? -> division by zero
 			s.st.Verdict = language.VERDICT_RE
 		}
