@@ -15,7 +15,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: pkg/web/Dockerfile
+      dockerfile: internal/web/Dockerfile
     ports:
       - 5555:5555
     env_file:
@@ -31,7 +31,7 @@ services:
     privileged: true
     build:
       context: .
-      dockerfile: pkg/judge/Dockerfile
+      dockerfile: internal/judge/Dockerfile
     env_file:
       - judge.env
     depends_on:
@@ -44,7 +44,7 @@ services:
   glue:
     build:
       context: .
-      dockerfile: pkg/glue/Dockerfile
+      dockerfile: internal/glue/Dockerfile
     env_file:
       - glue.env
     depends_on:

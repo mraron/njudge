@@ -3,12 +3,11 @@ package cmd
 import (
 	"database/sql"
 	"fmt"
+	"github.com/mraron/njudge/internal/web"
+	"github.com/mraron/njudge/internal/web/helpers/config"
+	"github.com/mraron/njudge/internal/web/models"
 	"io/ioutil"
 	"log"
-
-	"github.com/mraron/njudge/pkg/web"
-	"github.com/mraron/njudge/pkg/web/helpers/config"
-	"github.com/mraron/njudge/pkg/web/models"
 
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/spf13/cobra"

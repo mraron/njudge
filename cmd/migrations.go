@@ -1,11 +1,10 @@
 package cmd
 
 import (
+	"github.com/mraron/njudge/internal/web"
+	"github.com/mraron/njudge/internal/web/helpers/config"
 	"log"
 	"os"
-
-	"github.com/mraron/njudge/pkg/web"
-	"github.com/mraron/njudge/pkg/web/helpers/config"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
