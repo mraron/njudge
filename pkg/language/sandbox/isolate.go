@@ -79,6 +79,7 @@ func (s *Isolate) Init(l *log.Logger) error {
 
 	args := []string{"--cg", "-b", strconv.Itoa(s.id), "--init"}
 	s.MapDir("/etc/alternatives", "/etc/alternatives", []string{}, true)
+	s.MapDir("/languages", "/languages", []string{"maybe"}, true)
 
 	s.logger.Print("Running init: isolate with args ", args)
 
