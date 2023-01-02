@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -54,7 +53,7 @@ func (s Isolate) Pwd() string {
 }
 
 func (s *Isolate) GetFile(name string) (io.Reader, error) {
-	f, err := ioutil.ReadFile(filepath.Join(s.Pwd(), name))
+	f, err := os.ReadFile(filepath.Join(s.Pwd(), name))
 	if err != nil {
 		return nil, err
 	}

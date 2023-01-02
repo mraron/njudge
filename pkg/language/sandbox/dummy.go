@@ -36,7 +36,7 @@ func (s Dummy) Id() string {
 
 func (s *Dummy) Init(logger *log.Logger) error {
 	var err error
-	if s.tmpdir, err = ioutil.TempDir("", "dummysandbox"); err != nil {
+	if s.tmpdir, err = os.MkdirTemp("", "dummysandbox"); err != nil {
 		return err
 	}
 
