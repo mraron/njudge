@@ -38,6 +38,7 @@ require (
 require (
 	github.com/antonlindstrom/pgstore v0.0.0-20220421113606-e3a6e3fed12a
 	github.com/gomarkdown/markdown v0.0.0-20220905174103-7b278df48cfb
+	github.com/karrick/gobls v1.3.5
 	go.uber.org/zap v1.23.0
 	golang.org/x/exp v0.0.0-20220827204233-334a2380cb91
 	golang.org/x/text v0.3.7
@@ -53,7 +54,6 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
-	github.com/karrick/gobls v1.3.5 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect

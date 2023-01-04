@@ -14,6 +14,7 @@ COPY static/ ./static
 COPY migrations/ ./migrations
 COPY cmd/ ./cmd
 COPY pkg/ ./pkg
+COPY internal/ ./internal
 COPY templates/ ./templates
 COPY main.go ./
 
