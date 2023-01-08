@@ -69,21 +69,23 @@ func (s *Isolate) ClearArguments() {
 	s.st = language.Status{}
 }
 
-func (s *Isolate) Init(l *log.Logger) error {
-	s.ClearArguments()
-	s.logger = l
+func (s *Isolate) init() error {
 	if err := s.Cleanup(); err != nil { //cleanup because the previous invocation might not have cleaned up
 		return err
 	}
 
 	args := []string{"--cg", "-b", strconv.Itoa(s.id), "--init"}
-	s.MapDir("/etc/alternatives", "/etc/alternatives", []string{}, true)
-	s.MapDir("/languages", "/languages", []string{"maybe"}, true)
-
 	s.logger.Print("Running init: isolate with args ", args)
 
 	err := exec.Command("isolate", args...).Run()
 	return err
+}
+
+func (s *Isolate) Init(l *log.Logger) error {
+	s.ClearArguments()
+	s.logger = l
+
+	return s.init()
 }
 
 func (s Isolate) getPathToFile(name string) string {
@@ -208,6 +210,9 @@ func (s *Isolate) Run(prg string, needStatus bool) (language.Status, error) {
 		st       int
 		metafile = "/tmp/metafile" + strconv.Itoa(s.id)
 	)
+
+	s.MapDir("/etc/alternatives", "/etc/alternatives", []string{}, true)
+	s.MapDir("/languages", "/languages", []string{"maybe"}, true)
 
 	defer s.ClearArguments()
 
