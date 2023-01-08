@@ -4,13 +4,14 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"github.com/mraron/njudge/pkg/language/langs/cpp"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/mraron/njudge/pkg/language/langs/cpp"
 
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
@@ -91,7 +92,7 @@ func (p Problem) Tags() []string {
 }
 
 func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
-	ans := problems.Status{Compiled: false, CompilerOutput: "status skeleton", FeedbackType: problems.FeedbackIOI, Feedback: make([]problems.Testset, 0)}
+	ans := problems.Status{Compiled: false, CompilerOutput: "", FeedbackType: problems.FeedbackIOI, Feedback: make([]problems.Testset, 0)}
 	ans.Feedback = append(ans.Feedback, problems.Testset{Name: "tests"})
 	testset := &ans.Feedback[len(ans.Feedback)-1]
 
