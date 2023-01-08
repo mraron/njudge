@@ -240,8 +240,8 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 	ans.FeedbackType = skeleton.FeedbackType
 
 	defer func() {
-		close(testNotifier)
 		close(statusNotifier)
+		close(testNotifier)
 	}()
 
 	groupAC := make(map[string]bool)
@@ -279,20 +279,35 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 			testset.Groups = append(testset.Groups, problems.Group{Name: g.Name, Scoring: g.Scoring})
 			group := &testset.Groups[len(testset.Groups)-1]
 
-			ac := true
-
 			for ind := range g.Testcases {
 				group.Testcases = append(group.Testcases, g.Testcases[ind])
-				tc := &group.Testcases[len(group.Testcases)-1]
+			}
+		}
+	}
 
-				testNotifier <- strconv.Itoa(tc.Index)
+	for tsind := range ans.Feedback {
+		testset := &ans.Feedback[tsind]
+
+		for gind := range testset.Groups {
+			group := &testset.Groups[gind]
+
+			ac := true
+
+			for tcind := range group.Testcases {
+				tc := &group.Testcases[tcind]
+
 				statusNotifier <- ans
+				testNotifier <- strconv.Itoa(tc.Index)
+
+				if tc.VerdictName != problems.VerdictDR {
+					continue
+				}
 
 				if ans.FeedbackType == problems.FeedbackLazyIOI && !ac {
 					continue
 				}
 
-				if dependenciesOK(g.Dependencies) {
+				if dependenciesOK(group.Dependencies) {
 					ctx.Stdout = &bytes.Buffer{}
 					res, err := b.RunF(&ctx, group, tc)
 
@@ -327,7 +342,7 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 				}
 			}
 
-			groupAC[g.Name] = ac
+			groupAC[group.Name] = ac
 		}
 	}
 

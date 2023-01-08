@@ -52,9 +52,10 @@ func (w Worker) Judge(ctx context.Context, plogger *zap.Logger, p problems.Probl
 		}(sandbox)
 	}
 
-	tt := p.GetTaskType()
-
-	stderr := bytes.Buffer{}
+	var (
+		tt     problems.TaskType = p.GetTaskType()
+		stderr bytes.Buffer      = bytes.Buffer{}
+	)
 
 	logger.Info("compiling")
 
@@ -74,37 +75,24 @@ func (w Worker) Judge(ctx context.Context, plogger *zap.Logger, p problems.Probl
 	var (
 		testNotifier   = make(chan string)
 		statusNotifier = make(chan problems.Status)
-		ran            = make(chan bool)
 		errRun         error
+		test           string = "1"
 	)
 
 	go func() {
 		st, errRun = tt.Run(p, sandboxes, lang, bin, testNotifier, statusNotifier)
-		ran <- true
-		close(ran)
 	}()
 
-	run := true
-	for run {
-		select {
-		case test, ok := <-testNotifier:
-			if ok {
-				status := <-statusNotifier
-
-				err = c.Callback(test, status, false)
-				if err != nil {
-					logger.Error("error while calling callback", zap.Error(err))
-					return
-				}
-			}
-		case <-ran:
-			run = false
-			break
-
+	for status := range statusNotifier {
+		err = c.Callback(test, status, false) //@TODO this is not the current test to avoid concurrency stuff
+		if err != nil {
+			logger.Error("error while calling callback", zap.Error(err))
+			return
 		}
+		test = <-testNotifier
 	}
-	err = multierr.Combine(err, errRun)
 
+	err = multierr.Combine(err, errRun)
 	if err == nil {
 		logger.Info("successful judging")
 	} else {
