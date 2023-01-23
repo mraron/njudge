@@ -2,6 +2,7 @@ package web
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -54,4 +55,13 @@ func (s *Server) ConnectToDB() {
 	}
 
 	boil.SetDB(s.DB)
+
+	for {
+		log.Print("Trying to ping database...")
+		if err := s.DB.Ping(); err == nil {
+			log.Print("OK, connected to database")
+			break 
+		}
+		time.Sleep(5*time.Second)
+	}
 }
