@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"io"
-	"os"
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
@@ -54,7 +53,7 @@ func (j *Java) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Wr
 		if err := s.CreateFile(j.jars[ind].Name, bytes.NewBuffer(j.jars[ind].Contents)); err != nil {
 			return err
 		}
-		classPath += ":"+j.jars[ind].Name
+		classPath += ":" + j.jars[ind].Name
 	}
 
 	if _, err := s.AddArg("--open-files=2048").SetMaxProcesses(-1).Env().TimeLimit(10*time.Second).MemoryLimit(4*256000).Stdout(e).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/javac -cp "+classPath+" "+j.sourceName, false); err != nil {
@@ -84,10 +83,10 @@ func (j *Java) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer
 		if err := s.CreateFile(j.jars[ind].Name, bytes.NewBuffer(j.jars[ind].Contents)); err != nil {
 			return stat, err
 		}
-		classPath += ":"+j.jars[ind].Name
+		classPath += ":" + j.jars[ind].Name
 	}
 
-	return s.SetMaxProcesses(-1).Env().Stdin(stdin).Stdout(stdout).Stderr(os.Stderr).TimeLimit(tl).MemoryLimit(ml/1024).WorkingDirectory(s.Pwd()).Run("/usr/bin/java -cp "+classPath+" "+j.execName, true)
+	return s.SetMaxProcesses(-1).Env().Stdin(stdin).Stdout(stdout).TimeLimit(tl).MemoryLimit(ml/1024).WorkingDirectory(s.Pwd()).Run("/usr/bin/java -cp "+classPath+" "+j.execName, true)
 }
 
 func init() {
