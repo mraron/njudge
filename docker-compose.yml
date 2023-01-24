@@ -16,6 +16,8 @@ services:
   web:
     build:
       context: .
+      args:
+        - PROJECT_NAME=${COMPOSE_PROJECT_NAME}
       dockerfile: internal/web/Dockerfile
     ports:
       - 5555:5555
@@ -32,6 +34,8 @@ services:
     privileged: true
     build:
       context: .
+      args:
+        - PROJECT_NAME=${COMPOSE_PROJECT_NAME}
       dockerfile: internal/judge/Dockerfile
     env_file:
       - judge.env
@@ -45,6 +49,8 @@ services:
   glue:
     build:
       context: .
+      args:
+        - PROJECT_NAME=${COMPOSE_PROJECT_NAME}
       dockerfile: internal/glue/Dockerfile
     env_file:
       - glue.env
