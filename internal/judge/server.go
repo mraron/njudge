@@ -144,7 +144,7 @@ func (s *Server) init() error {
 		s.workers <- NewWorker(i+1, provider)
 	}
 
-	s.logger.Info("testing languages")
+	s.logger.Info("updating languages")
 	if err := s.updateLanguages(); err != nil {
 		return err
 	}
@@ -182,25 +182,7 @@ func (s *Server) updateLanguages() error {
 		}
 	}
 
-	provider := language.NewSandboxProvider()
-	s.populateProvider(provider, 1)
-
-	var errs error
-	for _, l := range s.LanguageList {
-		if language.Get(l) == nil {
-			errs = multierr.Append(errs, fmt.Errorf("no such language: %q", l))
-			continue
-		}
-
-		sandbox := provider.MustGet()
-
-		err := language.Get(l).Test(sandbox)
-		errs = multierr.Append(errs, err)
-
-		provider.Put(sandbox)
-	}
-
-	return errs
+	return nil
 }
 
 func (s *Server) updateProblems() error {
