@@ -3,6 +3,7 @@ package checker
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -94,7 +95,14 @@ func (f Ellen) Check(tc *problems.Testcase) error {
 		allOk := true
 		for i := 0; i < len(spltd); i++ {
 			spltd[i] = strings.TrimSpace(spltd[i])
+			if len(spltd[i]) == 0 {
+				continue
+			}
+
 			curr := strings.Split(spltd[i], ";")
+			if len(curr) < 2 {
+				return fmt.Errorf("wrong format for ellen output: %q %v", str, curr)
+			}
 
 			if strings.TrimSpace(curr[len(curr)-2]) == "1" {
 				score = score + float64(f.points[i*f.testCount+tc.Index-1])
