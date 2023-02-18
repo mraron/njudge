@@ -159,6 +159,8 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 			var err error
 
 			tc := problems.Testcase{}
+			tc.VerdictName = problems.VerdictDR
+
 			if tc.InputPath, err = getIthIO("input", i, p.Tests.InputPattern, -1, "", p.Tests.InputList); err != nil {
 				return nil, err
 			}
@@ -186,6 +188,8 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 				var err error
 
 				tc := problems.Testcase{}
+				tc.VerdictName = problems.VerdictDR
+
 				if tc.InputPath, err = getIthIO("input", i, p.Tests.Subtasks[s].InputPattern, globalIdx, p.Tests.InputPattern, p.Tests.Subtasks[s].InputList); err != nil {
 					return nil, err
 				}
