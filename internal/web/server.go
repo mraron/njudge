@@ -1,14 +1,12 @@
 package web
 
 import (
+	"github.com/antonlindstrom/pgstore"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/config"
 	"github.com/mraron/njudge/internal/web/helpers/roles"
 	"github.com/mraron/njudge/internal/web/helpers/templates"
 	"github.com/mraron/njudge/internal/web/models"
-	"log"
-
-	"github.com/antonlindstrom/pgstore"
 	_ "mime"
 	"net/http"
 
@@ -26,8 +24,6 @@ import (
 	_ "github.com/mraron/njudge/pkg/problems/tasktype/communication"
 	_ "github.com/mraron/njudge/pkg/problems/tasktype/output_only"
 	_ "github.com/mraron/njudge/pkg/problems/tasktype/stub"
-
-	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 type Server struct {
@@ -58,6 +54,7 @@ func (s *Server) Run() {
 			c.Logger().Error(err)
 		}
 	}
+	e.Renderer = templates.New(s.Server, s.ProblemStore, s.DB.DB)
 
 	store, err := pgstore.NewPGStoreFromPool(s.DB.DB, []byte(s.CookieSecret))
 	if err != nil {
@@ -67,38 +64,6 @@ func (s *Server) Run() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(session.Middleware(store))
-	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			currentUser := func(c echo.Context) (*models.User, error) {
-				var (
-					u   *models.User
-					err error
-				)
-
-				storage, err := session.Get("user", c)
-				if err != nil {
-					return nil, err
-				}
-
-				if _, ok := storage.Values["id"]; !ok {
-					return nil, nil
-				}
-				u, err = models.Users(Where("id=?", storage.Values["id"])).One(s.DB)
-				return u, err
-			}
-
-			user, err := currentUser(c)
-			c.Set("user", user)
-			if err != nil {
-				log.Print(err)
-				return next(c)
-			}
-
-			return next(c)
-		}
-	})
-
-	e.Renderer = templates.New(s.Server, s.ProblemStore, s.DB.DB)
 
 	s.prepareRoutes(e)
 

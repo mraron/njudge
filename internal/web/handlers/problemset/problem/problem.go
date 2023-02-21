@@ -1,14 +1,10 @@
-package problemset
+package problem
 
 import (
 	"bytes"
 	"context"
 	"errors"
 	"fmt"
-	"github.com/mraron/njudge/internal/web/helpers"
-	"github.com/mraron/njudge/internal/web/helpers/config"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
-	"github.com/mraron/njudge/internal/web/models"
 	"io"
 	"mime"
 	"net/http"
@@ -17,13 +13,17 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/mraron/njudge/internal/web/helpers"
+	"github.com/mraron/njudge/internal/web/helpers/config"
+	"github.com/mraron/njudge/internal/web/helpers/i18n"
+	"github.com/mraron/njudge/internal/web/models"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/config/polygon"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"golang.org/x/exp/slices"
 )
 
 var (
@@ -116,28 +116,7 @@ func (p *Problem) FillFields(c echo.Context, DB *sqlx.DB, problemRel *models.Pro
 	return nil
 }
 
-func RenameMiddleware(problemStore problems.Store) func(echo.HandlerFunc) echo.HandlerFunc {
-	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			lst, err := problemStore.List()
-			if err != nil {
-				return err
-			}
-
-			if !slices.Contains(lst, c.Param("problem")) {
-				for _, elem := range lst {
-					if strings.HasSuffix(elem, "_"+c.Param("problem")) {
-						return c.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("/problemset/%s/%s/", c.Param("name"), elem))
-					}
-				}
-			}
-
-			return next(c)
-		}
-	}
-}
-
-func GetProblem(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
+func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		name, problem := c.Param("name"), c.Param("problem")
 
@@ -162,7 +141,7 @@ func GetProblem(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	}
 }
 
-func GetProblemPDF(problemStore problems.Store) echo.HandlerFunc {
+func GetPDF(problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		p, err := problemStore.Get(c.Param("problem"))
 		lang := c.Param("language")
@@ -188,7 +167,7 @@ func GetProblemPDF(problemStore problems.Store) echo.HandlerFunc {
 	}
 }
 
-func GetProblemFile(cfg config.Server, problemStore problems.Store) echo.HandlerFunc {
+func GetFile(cfg config.Server, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		p, err := problemStore.Get(c.Param("problem"))
 
@@ -222,7 +201,7 @@ func GetProblemFile(cfg config.Server, problemStore problems.Store) echo.Handler
 	}
 }
 
-func GetProblemAttachment(problemStore problems.Store) echo.HandlerFunc {
+func GetAttachment(problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		p, err := problemStore.Get(c.Param("problem"))
 		attachment := c.Param("attachment")
@@ -258,7 +237,7 @@ func GetProblemAttachment(problemStore problems.Store) echo.HandlerFunc {
 	}
 }
 
-func GetProblemRanklist(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
+func GetRanklist(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		problemSet := c.Param("name")
 		problem := c.Param("problem")
@@ -290,7 +269,7 @@ func GetProblemRanklist(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFu
 	}
 }
 
-func GetProblemSubmit(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
+func GetSubmit(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		problem := c.Param("problem")
 		prob, err := problemStore.Get(problem)
@@ -310,7 +289,7 @@ func GetProblemSubmit(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc
 	}
 }
 
-func GetProblemStatus(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
+func GetStatus(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ac := c.QueryParam("ac")
 		problemset := c.Param("name")

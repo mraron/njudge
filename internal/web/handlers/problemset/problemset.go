@@ -1,6 +1,7 @@
 package problemset
 
 import (
+	"github.com/mraron/njudge/internal/web/handlers/problemset/problem"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/config"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
@@ -31,7 +32,7 @@ type CategoryFilter struct {
 
 type ProblemList struct {
 	Pages        []pagination.Link
-	Problems     []Problem
+	Problems     []problem.Problem
 	SolverSorter helpers.SortColumn
 
 	Filtered        bool
@@ -40,7 +41,7 @@ type ProblemList struct {
 	CategoryFilters []CategoryFilter
 }
 
-func GetProblemList(c echo.Context, DB *sqlx.DB, problemStore problems.Store, u *models.User, page, perPage int, order QueryMod, query []QueryMod, qu url.Values) (*ProblemList, error) {
+func getProblemList(c echo.Context, DB *sqlx.DB, problemStore problems.Store, u *models.User, page, perPage int, order QueryMod, query []QueryMod, qu url.Values) (*ProblemList, error) {
 	ps, err := models.ProblemRels(append(append([]QueryMod{Limit(perPage), Offset((page - 1) * perPage)}, query...), order)...).All(DB)
 	if err != nil {
 		return nil, err
@@ -56,7 +57,7 @@ func GetProblemList(c echo.Context, DB *sqlx.DB, problemStore problems.Store, u 
 		return nil, err
 	}
 
-	problems := make([]Problem, len(ps))
+	problems := make([]problem.Problem, len(ps))
 	for i, p := range ps {
 		problems[i].Problem, err = problemStore.Get(p.Problem)
 		if err != nil {
@@ -86,7 +87,7 @@ func GetProblemList(c echo.Context, DB *sqlx.DB, problemStore problems.Store, u 
 	return &ProblemList{Pages: pages, Problems: problems, SolverSorter: helpers.SortColumn{sortOrder, "?" + qu.Encode()}}, nil
 }
 
-func GetList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
+func GetProblemList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		u := c.Get("user").(*models.User)
 
@@ -204,7 +205,7 @@ func GetList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 			qmods = append(qmods, WhereIn("id IN ?", lst...))
 		}
 
-		problemList, err := GetProblemList(c, DB, problemStore, u, page, 20, OrderBy(by+" "+order), qmods, c.Request().URL.Query())
+		problemList, err := getProblemList(c, DB, problemStore, u, page, 20, OrderBy(by+" "+order), qmods, c.Request().URL.Query())
 		if err != nil {
 			return err
 		}

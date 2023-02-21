@@ -21,7 +21,7 @@ func GetLogin() echo.HandlerFunc {
 	}
 }
 
-func Login(DB *sqlx.DB) echo.HandlerFunc {
+func PostLogin(DB *sqlx.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
 			u   = &models.User{}

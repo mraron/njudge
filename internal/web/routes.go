@@ -5,13 +5,17 @@ import (
 	"github.com/mraron/njudge/internal/web/extmodels"
 	"github.com/mraron/njudge/internal/web/handlers/api"
 	"github.com/mraron/njudge/internal/web/handlers/problemset"
+	"github.com/mraron/njudge/internal/web/handlers/problemset/problem"
 	"github.com/mraron/njudge/internal/web/handlers/submission"
 	"github.com/mraron/njudge/internal/web/handlers/taskarchive"
 	"github.com/mraron/njudge/internal/web/handlers/user"
+	"github.com/mraron/njudge/internal/web/handlers/user/profile"
 	"github.com/mraron/njudge/internal/web/models"
 )
 
 func (s *Server) prepareRoutes(e *echo.Echo) {
+	e.Use(user.SetUserMiddleware(s.DB))
+
 	e.GET("/", s.getHome)
 
 	e.Static("/static", "static")
@@ -20,26 +24,22 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	e.GET("/submission/rejudge/:id", submission.Rejudge(s.DB))
 	e.GET("/task_archive", taskarchive.Get(s.DB, s.ProblemStore))
 
-	ps := e.Group("/problemset", func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			c.Set("problemset", c.Param("name"))
-			return next(c)
-		}
-	})
-
-	ps.GET("/:name/", problemset.GetList(s.DB, s.ProblemStore))
-	ps.GET("/:name/:problem/", problemset.GetProblem(s.DB, s.ProblemStore), problemset.RenameMiddleware(s.ProblemStore))
-	ps.GET("/:name/:problem/problem", problemset.GetProblem(s.DB, s.ProblemStore))
-	ps.GET("/:name/:problem/status", problemset.GetProblemStatus(s.DB, s.ProblemStore))
-	ps.GET("/:name/:problem/submit", problemset.GetProblemSubmit(s.DB, s.ProblemStore))
-	ps.GET("/:name/:problem/ranklist", problemset.GetProblemRanklist(s.DB, s.ProblemStore))
-	ps.POST("/:name/:problem/tags", problemset.PostProblemTags(s.DB, s.ProblemStore))
-	ps.GET("/:name/:problem/delete_tag/:id", problemset.DeleteProblemTags(s.DB, s.ProblemStore))
-	ps.GET("/:name/:problem/pdf/:language/", problemset.GetProblemPDF(s.ProblemStore))
-	ps.GET("/:name/:problem/attachment/:attachment/", problemset.GetProblemAttachment(s.ProblemStore))
-	ps.GET("/:name/:problem/:file", problemset.GetProblemFile(s.Server, s.ProblemStore))
+	ps := e.Group("/problemset", problemset.SetNameMiddleware())
+	ps.GET("/:name/", problemset.GetProblemList(s.DB, s.ProblemStore))
 	ps.POST("/:name/submit", problemset.PostSubmit(s.Server, s.DB, s.ProblemStore))
 	ps.GET("/status/", problemset.GetStatus(s.DB))
+
+	psProb := ps.Group("/:name/:problem", problem.RenameMiddleware(s.ProblemStore))
+	psProb.GET("/", problem.Get(s.DB, s.ProblemStore))
+	psProb.GET("/problem", problem.Get(s.DB, s.ProblemStore))
+	psProb.GET("/status", problem.GetStatus(s.DB, s.ProblemStore))
+	psProb.GET("/submit", problem.GetSubmit(s.DB, s.ProblemStore))
+	psProb.GET("/ranklist", problem.GetRanklist(s.DB, s.ProblemStore))
+	psProb.POST("/tags", problem.PostTag(s.DB, s.ProblemStore))
+	psProb.GET("/delete_tag/:id", problem.DeleteTag(s.DB, s.ProblemStore))
+	psProb.GET("/pdf/:language/", problem.GetPDF(s.ProblemStore))
+	psProb.GET("/attachment/:attachment/", problem.GetAttachment(s.ProblemStore))
+	psProb.GET("/:file", problem.GetFile(s.Server, s.ProblemStore))
 
 	u := e.Group("/user")
 
@@ -47,16 +47,16 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	u.GET("/auth", user.Auth())
 
 	u.GET("/login", user.GetLogin())
-	u.POST("/login", user.Login(s.DB))
+	u.POST("/login", user.PostLogin(s.DB))
 	u.GET("/logout", user.Logout())
 	u.GET("/register", user.GetRegister())
 	u.POST("/register", user.Register(s.Server, s.DB))
 	u.GET("/activate", user.GetActivateInfo())
 	u.GET("/activate/:name/:key", user.Activate(s.DB))
 
-	profile := u.Group("/profile", user.ProfileMiddleware(s.DB))
-	profile.GET("/:name/", user.Profile(s.DB))
-	profile.GET("/:name/submissions/", user.Submissions(s.DB))
+	pr := u.Group("/profile", profile.SetProfileMiddleware(s.DB))
+	pr.GET("/:name/", profile.GetProfile(s.DB))
+	pr.GET("/:name/submissions/", profile.GetSubmissions(s.DB))
 
 	v1 := e.Group("/api/v1")
 

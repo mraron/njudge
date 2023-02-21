@@ -1,4 +1,4 @@
-package problemset
+package problem
 
 import (
 	"errors"
@@ -16,7 +16,7 @@ import (
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
-func PostProblemTags(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
+func PostTag(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, err := strconv.Atoi(c.FormValue("tagID"))
 		if err != nil {
@@ -62,7 +62,7 @@ func PostProblemTags(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc 
 	}
 }
 
-func DeleteProblemTags(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
+func DeleteTag(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		name, problem := c.Param("name"), c.Param("problem")
 
