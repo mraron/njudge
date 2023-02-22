@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/web/models"
 
 	"github.com/jmoiron/sqlx"
@@ -43,4 +44,21 @@ func HasUserSolved(DB *sqlx.DB, u *models.User, problemSet, problem string) (Sol
 	}
 
 	return solvedStatus, nil
+}
+
+func GetUserLastLanguage(c echo.Context, DB *sqlx.DB) string {
+	if res := c.Get("last_language"); res != nil {
+		return c.Get("last_language").(string)
+	}
+
+	res := ""
+	if u := c.Get("user").(*models.User); u != nil {
+		sub, err := models.Submissions(Select("language"), Where("user_id = ?", u.ID), OrderBy("id DESC"), Limit(1)).One(DB)
+		if err == nil {
+			c.Set("last_language", sub.Language)
+			res = sub.Language
+		}
+	}
+
+	return res
 }

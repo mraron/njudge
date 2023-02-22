@@ -7,7 +7,7 @@ import (
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
 	"github.com/mraron/njudge/internal/web/models"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"sort"
@@ -57,14 +57,15 @@ func getProblemList(c echo.Context, DB *sqlx.DB, problemStore problems.Store, u 
 		return nil, err
 	}
 
-	problems := make([]problem.Problem, len(ps))
+	problemsList := make([]problem.Problem, len(ps))
 	for i, p := range ps {
-		problems[i].Problem, err = problemStore.Get(p.Problem)
+		problemsList[i].Problem, err = problemStore.Get(p.Problem)
 		if err != nil {
 			return nil, err
 		}
+		problemsList[i].ProblemRel = p
 
-		if err := problems[i].FillFields(c, DB, p); err != nil {
+		if err := problemsList[i].FillFields(c, DB); err != nil {
 			return nil, err
 		}
 	}
@@ -84,7 +85,7 @@ func getProblemList(c echo.Context, DB *sqlx.DB, problemStore problems.Store, u 
 		qu.Set("order", "DESC")
 	}
 
-	return &ProblemList{Pages: pages, Problems: problems, SolverSorter: helpers.SortColumn{sortOrder, "?" + qu.Encode()}}, nil
+	return &ProblemList{Pages: pages, Problems: problemsList, SolverSorter: helpers.SortColumn{sortOrder, "?" + qu.Encode()}}, nil
 }
 
 func GetProblemList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
@@ -328,7 +329,7 @@ func PostSubmit(cfg config.Server, DB *sqlx.DB, problemStore problems.Store) ech
 				return err
 			}
 
-			contents, err := ioutil.ReadAll(f)
+			contents, err := io.ReadAll(f)
 			if err != nil {
 				return err
 			}
