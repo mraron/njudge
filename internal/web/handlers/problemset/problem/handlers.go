@@ -154,3 +154,47 @@ func GetStatus(DB *sqlx.DB) echo.HandlerFunc {
 		return c.Render(http.StatusOK, "problemset/problem/status", statusPage)
 	}
 }
+
+func PostTag(DB *sqlx.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id, err := strconv.Atoi(c.FormValue("tagID"))
+		if err != nil {
+			return err
+		}
+
+		u := c.Get("user").(*models.User)
+		if u == nil {
+			return helpers.UnauthorizedError(c)
+		}
+
+		p := New(c)
+		tg := TagManager{p}
+		if err = tg.CreateTag(DB, id, u); err != nil {
+			return err
+		}
+
+		return c.Redirect(http.StatusFound, filepath.Dir(c.Request().URL.Path)+"/")
+	}
+}
+
+func DeleteTag(DB *sqlx.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			return err
+		}
+
+		u := c.Get("user").(*models.User)
+		if u == nil {
+			return helpers.UnauthorizedError(c)
+		}
+
+		p := New(c)
+		tg := TagManager{p}
+		if err = tg.DeleteTag(DB, id, u); err != nil {
+			return err
+		}
+
+		return c.Redirect(http.StatusFound, filepath.Dir(filepath.Dir(c.Request().URL.Path))+"/")
+	}
+}

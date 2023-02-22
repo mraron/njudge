@@ -2,6 +2,7 @@ package problem
 
 import (
 	"errors"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -35,7 +36,7 @@ type Problem struct {
 }
 
 func New(c echo.Context) *Problem {
-	return &Problem{Problem: c.Get("problem").(problems.Problem), ProblemRel: c.Get("ProblemRel").(*models.ProblemRel)}
+	return &Problem{Problem: c.Get("problem").(problems.Problem), ProblemRel: c.Get("problemRel").(*models.ProblemRel)}
 }
 
 func (p *Problem) FillFields(c echo.Context, DB *sqlx.DB) error {
@@ -85,12 +86,10 @@ func (p *Problem) GetFile(file string) (fileLoc string, err error) {
 			err = ErrorFileNotFound
 		}
 
-		if strings.HasSuffix(file, ".css") {
-			fileLoc = filepath.Join(p.Path, "statements", ".html", p.HTMLStatements()[0].Locale(), file)
-		} else {
+		fileLoc = filepath.Join(p.Path, "statements", ".html", p.HTMLStatements()[0].Locale(), file)
+		if _, err := os.Stat(fileLoc); err != nil {
 			fileLoc = filepath.Join(p.Path, "statements", p.HTMLStatements()[0].Locale(), file)
 		}
-
 	default:
 		err = ErrorFileNotFound
 	}
