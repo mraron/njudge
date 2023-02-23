@@ -41,7 +41,7 @@ require (
 	github.com/karrick/gobls v1.3.5
 	go.uber.org/zap v1.23.0
 	golang.org/x/exp v0.0.0-20220827204233-334a2380cb91
-	golang.org/x/text v0.3.7
+	golang.org/x/text v0.3.8
 )
 
 require (
