@@ -392,6 +392,14 @@ func parser(path string) (problems.Problem, error) {
 		}
 	}
 
+	isEmptyFile := func(path string) bool {
+		if st, err := os.Stat(path); errors.Is(err, fs.ErrNotExist) {
+			return false
+		} else {
+			return st.Size() == 0
+		}
+	}
+
 	compile := func(src string, to string) error {
 		if bin, err := os.Create(to); err == nil {
 			defer bin.Close()
@@ -399,8 +407,8 @@ func parser(path string) (problems.Problem, error) {
 			if file, err := os.Open(src); err == nil {
 				defer file.Close()
 
-				if err := cpp.Std14.InsecureCompile(filepath.Dir(src), file, bin, os.Stderr); err != nil {
-					return err
+				if err := cpp.Std17.InsecureCompile(filepath.Dir(src), file, bin, os.Stderr); err != nil {
+					return multierr.Combine(err, os.Remove(to))
 				}
 
 				if err := os.Chmod(to, os.ModePerm); err != nil {
@@ -435,7 +443,7 @@ func parser(path string) (problems.Problem, error) {
 		managerPath := filepath.Join(checkPath, "manager")
 
 		if exists(checkerCppPath) {
-			if !exists(checkerPath) {
+			if !exists(checkerPath) || isEmptyFile(checkerPath) {
 				if err := compile(checkerCppPath, checkerPath); err != nil {
 					return nil, err
 				}

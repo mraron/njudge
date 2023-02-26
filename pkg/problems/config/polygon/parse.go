@@ -53,7 +53,7 @@ func compileIfNotCompiled(fs afero.Fs, wd, src, dst string) error {
 					})
 				}
 
-				if err := cpp.Std14.Compile(s, language.File{
+				if err := cpp.Std17.Compile(s, language.File{
 					Name:   filepath.Base(src),
 					Source: file,
 				}, binary, &buf, headers); err != nil {
