@@ -2,6 +2,8 @@ package submission
 
 import (
 	"fmt"
+	"github.com/mraron/njudge/internal/web/helpers"
+	"github.com/mraron/njudge/internal/web/helpers/roles"
 	"github.com/mraron/njudge/internal/web/models"
 	"net/http"
 	"strconv"
@@ -32,6 +34,11 @@ func Get(DB *sqlx.DB) echo.HandlerFunc {
 
 func Rejudge(DB *sqlx.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		u := c.Get("user").(*models.User)
+		if !roles.Can(roles.Role(u.Role), roles.ActionCreate, "submissions/rejudge") {
+			return helpers.UnauthorizedError(c)
+		}
+
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			return err
