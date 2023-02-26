@@ -4,6 +4,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
+	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/models"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
@@ -34,6 +35,18 @@ func SetUserMiddleware(DB *sqlx.DB) func(echo.HandlerFunc) echo.HandlerFunc {
 
 			if err != nil {
 				return next(c)
+			}
+
+			return next(c)
+		}
+	}
+}
+
+func RequireLoginMiddleware() func(echo.HandlerFunc) echo.HandlerFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			if c.Get("user").(*models.User) == nil {
+				return helpers.UnauthorizedError(c)
 			}
 
 			return next(c)

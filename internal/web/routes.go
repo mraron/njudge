@@ -25,7 +25,7 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	e.Static("/static", "static")
 
 	e.GET("/submission/:id", submission.Get(s.DB))
-	e.GET("/submission/rejudge/:id", submission.Rejudge(s.DB))
+	e.GET("/submission/rejudge/:id", submission.Rejudge(s.DB), user.RequireLoginMiddleware())
 	e.GET("/task_archive", taskarchive.Get(s.DB, s.ProblemStore))
 
 	ps := e.Group("/problemset", problemset.SetNameMiddleware())
