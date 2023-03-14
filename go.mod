@@ -41,7 +41,7 @@ require (
 	github.com/karrick/gobls v1.3.5
 	go.uber.org/zap v1.23.0
 	golang.org/x/exp v0.0.0-20220827204233-334a2380cb91
-	golang.org/x/text v0.4.0
+	golang.org/x/text v0.7.0
 )
 
 require (
@@ -67,8 +67,8 @@ require (
 	github.com/valyala/fasttemplate v1.2.1 // indirect
 	github.com/volatiletech/inflect v0.0.1 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
-	golang.org/x/net v0.1.0 // indirect
-	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/net v0.7.0 // indirect
+	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/time v0.0.0-20220224211638-0e9765cccd65 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
