@@ -458,6 +458,8 @@ func parser(path string) (problems.Problem, error) {
 			p.files = append(p.files, problems.File{Name: "manager.cpp", Role: "interactor", Path: managerPath})
 
 			chmodX(managerPath)
+		} else {
+			p.whiteDiffChecker = true
 		}
 	}
 
