@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"sort"
 	"time"
 )
 
@@ -114,38 +113,4 @@ func (test LanguageTest) Run(sandbox Sandbox) error {
 	}
 
 	return nil
-}
-
-var langList map[string]Language
-
-func Register(name string, l Language) {
-	langList[name] = l
-}
-
-func List() []Language {
-	ans := make([]Language, len(langList))
-
-	ind := 0
-	for _, val := range langList {
-		ans[ind] = val
-		ind++
-	}
-
-	sort.Slice(ans, func(i, j int) bool {
-		return ans[i].Name() < ans[j].Name()
-	})
-
-	return ans
-}
-
-func Get(name string) Language {
-	if val, ok := langList[name]; ok {
-		return val
-	}
-
-	return nil
-}
-
-func init() {
-	langList = make(map[string]Language)
 }

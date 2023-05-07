@@ -3,9 +3,10 @@ package cython3
 import (
 	"bytes"
 	"errors"
-	"github.com/mraron/njudge/pkg/language"
 	"io"
 	"time"
+
+	"github.com/mraron/njudge/pkg/language"
 )
 
 type cython3 struct {
@@ -69,5 +70,5 @@ func (cython3) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer
 }
 
 func init() {
-	language.Register("cython3", cython3{})
+	language.DefaultStore.Register("cython3", cython3{})
 }

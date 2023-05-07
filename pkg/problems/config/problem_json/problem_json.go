@@ -108,7 +108,7 @@ func (p Problem) InputOutputFiles() (string, string) {
 }
 
 func (p Problem) Languages() []language.Language {
-	lst1 := language.List()
+	lst1 := language.DefaultStore.List()
 
 	lst2 := make([]language.Language, 0, len(lst1))
 	for _, val := range lst1 {

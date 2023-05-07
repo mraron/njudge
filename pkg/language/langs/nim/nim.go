@@ -2,9 +2,10 @@ package nim
 
 import (
 	"errors"
-	"github.com/mraron/njudge/pkg/language"
 	"io"
 	"time"
+
+	"github.com/mraron/njudge/pkg/language"
 )
 
 type nim struct{}
@@ -63,5 +64,5 @@ func (nim) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, tl
 }
 
 func init() {
-	language.Register("nim", nim{})
+	language.DefaultStore.Register("nim", nim{})
 }

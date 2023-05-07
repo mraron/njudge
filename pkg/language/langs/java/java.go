@@ -90,5 +90,5 @@ func (j *Java) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer
 }
 
 func init() {
-	language.Register("java", New("main"))
+	language.DefaultStore.Register("java", New("main"))
 }

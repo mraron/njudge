@@ -116,7 +116,7 @@ var Std17 = New("cpp17", "C++ 17", "c++17").(Cpp)
 var latest = Std17
 
 func init() {
-	language.Register("cpp11", Std11)
-	language.Register("cpp14", Std14)
-	language.Register("cpp17", Std17)
+	language.DefaultStore.Register("cpp11", Std11)
+	language.DefaultStore.Register("cpp14", Std14)
+	language.DefaultStore.Register("cpp17", Std17)
 }

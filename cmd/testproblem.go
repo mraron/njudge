@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/mraron/njudge/internal/judge"
 	"io"
 	"os"
+
+	"github.com/mraron/njudge/internal/judge"
 
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/language/sandbox"
@@ -39,7 +40,7 @@ var TestProblemCmd = &cobra.Command{
 			return err
 		}
 
-		l := language.Get(TestProblemArgs.Language)
+		l := language.DefaultStore.Get(TestProblemArgs.Language)
 		src, err := os.ReadFile(TestProblemArgs.SolutionPath)
 		if err != nil {
 			return err

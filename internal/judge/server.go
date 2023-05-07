@@ -177,7 +177,7 @@ func (s *Server) populateProvider(provider *language.SandboxProvider, cnt int) e
 
 func (s *Server) updateLanguages() error {
 	if len(s.LanguageList) == 0 {
-		for _, l := range language.List() {
+		for _, l := range language.DefaultStore.List() {
 			s.LanguageList = append(s.LanguageList, l.Id())
 		}
 	}
@@ -245,7 +245,7 @@ func (s *Server) runJudger() {
 		}
 
 		p, _ := s.problemStore.Get(sub.Problem)
-		st, err := worker.Judge(context.Background(), s.logger, p, sub.Source, language.Get(sub.Language), sub.c)
+		st, err := worker.Judge(context.Background(), s.logger, p, sub.Source, language.DefaultStore.Get(sub.Language), sub.c)
 		if err != nil {
 			s.logger.Error("judge error", zap.Error(err))
 

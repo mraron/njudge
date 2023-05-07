@@ -1,9 +1,10 @@
 package pypy3
 
 import (
-	"github.com/mraron/njudge/pkg/language"
 	"io"
 	"time"
+
+	"github.com/mraron/njudge/pkg/language"
 )
 
 type pypy3 struct{}
@@ -47,5 +48,5 @@ func (pypy3) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, 
 }
 
 func init() {
-	language.Register("pypy3", pypy3{})
+	language.DefaultStore.Register("pypy3", pypy3{})
 }

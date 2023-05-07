@@ -1,10 +1,11 @@
 package golang
 
 import (
-	"github.com/mraron/njudge/pkg/language"
 	"io"
 	"os/exec"
 	"time"
+
+	"github.com/mraron/njudge/pkg/language"
 )
 
 type golang struct{}
@@ -69,5 +70,5 @@ func (golang) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer,
 }
 
 func init() {
-	language.Register("golang", golang{})
+	language.DefaultStore.Register("golang", golang{})
 }

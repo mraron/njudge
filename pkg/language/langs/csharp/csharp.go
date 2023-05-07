@@ -58,5 +58,5 @@ func (csharp) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer,
 }
 
 func init() {
-	language.Register("csharp", csharp{})
+	language.DefaultStore.Register("csharp", csharp{})
 }

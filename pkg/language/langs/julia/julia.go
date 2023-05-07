@@ -47,5 +47,5 @@ func (julia) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, 
 }
 
 func init() {
-	language.Register("julia", julia{})
+	language.DefaultStore.Register("julia", julia{})
 }

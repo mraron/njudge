@@ -62,5 +62,5 @@ func (pascal) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer,
 }
 
 func init() {
-	language.Register("pascal", pascal{})
+	language.DefaultStore.Register("pascal", pascal{})
 }
