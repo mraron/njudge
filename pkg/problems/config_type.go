@@ -3,6 +3,8 @@ package problems
 import (
 	"errors"
 	"fmt"
+
+	"github.com/spf13/afero"
 )
 
 var (
@@ -11,17 +13,17 @@ var (
 )
 
 // ConfigIdentifier is a function for some config type which takes a path and returns true if it thinks that its respective parser can parse it
-type ConfigIdentifier func(string) bool
+type ConfigIdentifier func(afero.Fs, string) bool
 
 // ConfigParser is a function for some config type which parses the problem from some path provided to it
-type ConfigParser func(string) (Problem, error)
+type ConfigParser func(afero.Fs, string) (Problem, error)
 
 // ConfigStore is an interface with which you can register/deregister certain config types and parse a problem using these config types
 type ConfigStore interface {
 	Register(string, ConfigParser, ConfigIdentifier) error
 	Deregister(string) error
 
-	Parse(string) (Problem, error)
+	Parse(afero.Fs, string) (Problem, error)
 }
 
 type problemConfigType struct {
@@ -74,10 +76,10 @@ func (cs *configStore) Deregister(name string) error {
 	return nil
 }
 
-func (cs *configStore) Parse(path string) (Problem, error) {
+func (cs *configStore) Parse(fs afero.Fs, path string) (Problem, error) {
 	match := -1
 	for ind := range cs.configTypes {
-		if cs.configTypes[ind].identifiers(path) {
+		if cs.configTypes[ind].identifiers(fs, path) {
 			match = ind
 			break
 		}
@@ -87,7 +89,7 @@ func (cs *configStore) Parse(path string) (Problem, error) {
 		return nil, ErrorNoMatch
 	}
 
-	return cs.configTypes[match].parser(path)
+	return cs.configTypes[match].parser(fs, path)
 }
 
 var globalConfigStore ConfigStore
@@ -104,7 +106,7 @@ func DeregisterConfigType(name string) error {
 
 // Parse tries to parse a problem with the help of the global ConfigStore
 func Parse(path string) (Problem, error) {
-	return globalConfigStore.Parse(path)
+	return globalConfigStore.Parse(afero.NewOsFs(), path)
 }
 
 func init() {

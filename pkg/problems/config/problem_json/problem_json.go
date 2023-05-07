@@ -241,21 +241,14 @@ func (p Problem) GetTaskType() problems.TaskType {
 }
 
 type config struct {
-	fs              afero.Fs
 	compileBinaries bool
 }
 
 func newConfig() *config {
-	return &config{fs: afero.NewOsFs(), compileBinaries: true}
+	return &config{compileBinaries: true}
 }
 
 type Option func(*config)
-
-func UseFS(fs afero.Fs) Option {
-	return func(c *config) {
-		c.fs = fs
-	}
-}
 
 func CompileBinaries(compile bool) Option {
 	return func(c *config) {
@@ -269,8 +262,8 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 		opt(cfg)
 	}
 
-	parser := func(path string) (problems.Problem, error) {
-		problemJSON, err := cfg.fs.Open(filepath.Join(path, "problem.json"))
+	parser := func(fs afero.Fs, path string) (problems.Problem, error) {
+		problemJSON, err := fs.Open(filepath.Join(path, "problem.json"))
 		if err != nil {
 			return nil, err
 		}
@@ -287,7 +280,7 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 
 		p.AttachmentList = make(problems.Attachments, len(p.AttachmentInfo))
 		for ind, val := range p.AttachmentInfo {
-			contents, err := afero.ReadFile(cfg.fs, filepath.Join(path, val.Path))
+			contents, err := afero.ReadFile(fs, filepath.Join(path, val.Path))
 
 			if err != nil {
 				return nil, err
@@ -303,7 +296,7 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 				err      error
 			)
 
-			contents, err = afero.ReadFile(cfg.fs, filepath.Join(path, val.Path))
+			contents, err = afero.ReadFile(fs, filepath.Join(path, val.Path))
 			if err != nil {
 				return nil, err
 			}
@@ -319,8 +312,8 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 		return p, nil
 	}
 
-	identifier := func(path string) bool {
-		_, err := cfg.fs.Stat(filepath.Join(path, "problem.json"))
+	identifier := func(fs afero.Fs, path string) bool {
+		_, err := fs.Stat(filepath.Join(path, "problem.json"))
 		return !os.IsNotExist(err)
 	}
 

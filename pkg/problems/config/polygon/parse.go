@@ -5,7 +5,6 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"io/fs"
 	"io/ioutil"
 	"log"
 	"os"
@@ -78,12 +77,6 @@ func compileIfNotCompiled(fs afero.Fs, wd, src, dst string) error {
 
 type Option func(*config)
 
-func UseFS(fs afero.Fs) Option {
-	return func(c *config) {
-		c.fs = fs
-	}
-}
-
 func CompileBinaries(compile bool) Option {
 	return func(c *config) {
 		c.compileBinaries = compile
@@ -91,12 +84,11 @@ func CompileBinaries(compile bool) Option {
 }
 
 type config struct {
-	fs              afero.Fs
 	compileBinaries bool
 }
 
 func newConfig() *config {
-	return &config{fs: afero.NewOsFs(), compileBinaries: true}
+	return &config{compileBinaries: true}
 }
 
 func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.ConfigIdentifier) {
@@ -105,10 +97,10 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 		opt(cfg)
 	}
 
-	parser := func(path string) (problems.Problem, error) {
+	parser := func(fs afero.Fs, path string) (problems.Problem, error) {
 		problemXML := filepath.Join(path, "problem.xml")
 
-		f, err := cfg.fs.Open(problemXML)
+		f, err := fs.Open(problemXML)
 		if err != nil {
 			return nil, err
 		}
@@ -123,14 +115,14 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 
 		p.Path = path
 
-		list, err := afero.ReadDir(cfg.fs, filepath.Join(path, "statements"))
+		list, err := afero.ReadDir(fs, filepath.Join(path, "statements"))
 		if err == nil {
 			for _, dir := range list {
 				if !dir.IsDir() || strings.HasPrefix(dir.Name(), ".") {
 					continue
 				}
 
-				jsonStmt, err := ParseJSONStatement(cfg.fs, filepath.Join(path, "statements", dir.Name()))
+				jsonStmt, err := ParseJSONStatement(fs, filepath.Join(path, "statements", dir.Name()))
 				if err != nil {
 					return nil, err
 				}
@@ -157,7 +149,7 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 
 		for _, stmt := range p.StatementList {
 			statementPath := filepath.Join(path, stmt.Path)
-			cont, err := afero.ReadFile(cfg.fs, statementPath)
+			cont, err := afero.ReadFile(fs, statementPath)
 			if err != nil {
 				return nil, err
 			}
@@ -167,7 +159,7 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 
 		if cfg.compileBinaries {
 			workingDirectory := p.Path
-			if _, err := cfg.fs.Stat(filepath.Join(p.Path, "files")); !errors.Is(err, fs.ErrNotExist) {
+			if _, err := fs.Stat(filepath.Join(p.Path, "files")); !errors.Is(err, os.ErrNotExist) {
 				workingDirectory = filepath.Join(p.Path, "files")
 			}
 
@@ -175,12 +167,12 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 			if checkerPath == "" {
 				checkerPath = "check.cpp"
 			}
-			if err := compileIfNotCompiled(cfg.fs, workingDirectory, filepath.Join(p.Path, checkerPath), filepath.Join(p.Path, "check")); err != nil {
+			if err := compileIfNotCompiled(fs, workingDirectory, filepath.Join(p.Path, checkerPath), filepath.Join(p.Path, "check")); err != nil {
 				return nil, err
 			}
 
 			if p.Assets.Interactor.Source.Path != "" {
-				if err := compileIfNotCompiled(cfg.fs, workingDirectory, filepath.Join(p.Path, p.Assets.Interactor.Source.Path), filepath.Join(p.Path, "files/interactor")); err != nil {
+				if err := compileIfNotCompiled(fs, workingDirectory, filepath.Join(p.Path, p.Assets.Interactor.Source.Path), filepath.Join(p.Path, "files/interactor")); err != nil {
 					return nil, err
 				}
 			}
@@ -188,7 +180,7 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 
 		for _, val := range p.Assets.Attachments {
 			attachmentLocation := filepath.Join(path, val.Location)
-			contents, err := afero.ReadFile(cfg.fs, attachmentLocation)
+			contents, err := afero.ReadFile(fs, attachmentLocation)
 			if err != nil {
 				return nil, err
 			}
@@ -199,8 +191,8 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 		return p, nil
 	}
 
-	identifier := func(path string) bool {
-		_, err := cfg.fs.Stat(filepath.Join(path, "problem.xml"))
+	identifier := func(fs afero.Fs, path string) bool {
+		_, err := fs.Stat(filepath.Join(path, "problem.xml"))
 		return !os.IsNotExist(err)
 	}
 

@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -15,6 +14,7 @@ import (
 	"time"
 
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
+	"github.com/spf13/afero"
 
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
@@ -339,7 +339,7 @@ func parseGen(r io.Reader) (int, [][2]int, error) {
 	return inputCount, subtasks, nil
 }
 
-func parser(path string) (problems.Problem, error) {
+func parser(fs afero.Fs, path string) (problems.Problem, error) {
 	p := Problem{
 		Path:              path,
 		InputPathPattern:  filepath.Join(path, "input", "input%d.txt"),
@@ -348,7 +348,7 @@ func parser(path string) (problems.Problem, error) {
 		files:             make([]problems.File, 0),
 	}
 
-	YAMLFile, err := os.Open(filepath.Join(path, "task.yaml"))
+	YAMLFile, err := fs.Open(filepath.Join(path, "task.yaml"))
 	if err != nil {
 		return nil, err
 	}
@@ -364,8 +364,8 @@ func parser(path string) (problems.Problem, error) {
 	}
 
 	genPath := filepath.Join(p.Path, "gen", "GEN")
-	if _, err = os.Stat(genPath); err == nil {
-		gen, err := os.Open(genPath)
+	if _, err = fs.Stat(genPath); err == nil {
+		gen, err := fs.Open(genPath)
 		if err != nil {
 			return nil, err
 		}
@@ -383,7 +383,7 @@ func parser(path string) (problems.Problem, error) {
 	p.StatementList = append(p.StatementList, problems.BytesData{Loc: "hungarian", Val: statementPDF, Typ: "application/pdf"})
 
 	exists := func(path string) bool {
-		if _, err := os.Stat(path); errors.Is(err, fs.ErrNotExist) {
+		if _, err := fs.Stat(path); errors.Is(err, os.ErrNotExist) {
 			return false
 		} else if err == nil {
 			return true
@@ -393,17 +393,17 @@ func parser(path string) (problems.Problem, error) {
 	}
 
 	compile := func(src string, to string) error {
-		if bin, err := os.Create(to); err == nil {
+		if bin, err := fs.Create(to); err == nil {
 			defer bin.Close()
 
-			if file, err := os.Open(src); err == nil {
+			if file, err := fs.Open(src); err == nil {
 				defer file.Close()
 
 				if err := cpp.Std14.InsecureCompile(filepath.Dir(src), file, bin, os.Stderr); err != nil {
 					return err
 				}
 
-				if err := os.Chmod(to, os.ModePerm); err != nil {
+				if err := fs.Chmod(to, os.ModePerm); err != nil {
 					return err
 				}
 			}
@@ -415,8 +415,8 @@ func parser(path string) (problems.Problem, error) {
 	}
 
 	chmodX := func(path string) error {
-		if stat, _ := os.Stat(path); stat.Mode().Perm()&fs.ModePerm != fs.ModePerm {
-			return os.Chmod(path, os.ModePerm)
+		if stat, _ := fs.Stat(path); stat.Mode().Perm()&os.ModePerm != os.ModePerm {
+			return fs.Chmod(path, os.ModePerm)
 		}
 
 		return nil
@@ -516,8 +516,8 @@ func parser(path string) (problems.Problem, error) {
 	return p, nil
 }
 
-func identifier(path string) bool {
-	_, err := os.Stat(filepath.Join(path, "task.yaml"))
+func identifier(fs afero.Fs, path string) bool {
+	_, err := fs.Stat(filepath.Join(path, "task.yaml"))
 	return !os.IsNotExist(err)
 }
 

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
+	"github.com/spf13/afero"
 
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
@@ -151,8 +152,8 @@ func (p Problem) GetTaskType() problems.TaskType {
 	return tt
 }
 
-func parser(path string) (problems.Problem, error) {
-	f, err := os.Open(filepath.Join(path, "feladat.txt"))
+func parser(fs afero.Fs, path string) (problems.Problem, error) {
+	f, err := fs.Open(filepath.Join(path, "feladat.txt"))
 	if err != nil {
 		return nil, err
 	}
@@ -225,7 +226,7 @@ func parser(path string) (problems.Problem, error) {
 		ind++
 	}
 
-	feladat_pdf, err := os.Open(filepath.Join(path, "feladat.pdf"))
+	feladat_pdf, err := fs.Open(filepath.Join(path, "feladat.pdf"))
 	if err != nil {
 		return nil, err
 	}
@@ -241,17 +242,17 @@ func parser(path string) (problems.Problem, error) {
 
 	p.AttachmentList = make(problems.Attachments, 0)
 
-	if _, err := os.Stat(filepath.Join(path, "ellen")); os.IsNotExist(err) {
-		if checkerBinary, err := os.Create(filepath.Join(path, "ellen")); err == nil {
+	if _, err := fs.Stat(filepath.Join(path, "ellen")); os.IsNotExist(err) {
+		if checkerBinary, err := fs.Create(filepath.Join(path, "ellen")); err == nil {
 			defer checkerBinary.Close()
-			if checkerFile, err := os.Open(filepath.Join(path, "ellen.cpp")); err == nil {
+			if checkerFile, err := fs.Open(filepath.Join(path, "ellen.cpp")); err == nil {
 				defer checkerFile.Close()
 
 				if err := cpp.Std14.InsecureCompile(path, checkerFile, checkerBinary, os.Stderr); err != nil {
 					return nil, err
 				}
 
-				if err := os.Chmod(filepath.Join(path, "ellen"), os.ModePerm); err != nil {
+				if err := fs.Chmod(filepath.Join(path, "ellen"), os.ModePerm); err != nil {
 					return nil, err
 				}
 			} else {
@@ -263,8 +264,8 @@ func parser(path string) (problems.Problem, error) {
 		}
 	}
 
-	if _, err = os.Stat(filepath.Join(path, "minta.zip")); err == nil {
-		cont, err := ioutil.ReadFile(filepath.Join(path, "minta.zip"))
+	if _, err = fs.Stat(filepath.Join(path, "minta.zip")); err == nil {
+		cont, err := afero.ReadFile(fs, filepath.Join(path, "minta.zip"))
 		if err != nil {
 			return nil, err
 		}
@@ -277,8 +278,8 @@ func parser(path string) (problems.Problem, error) {
 	return p, nil
 }
 
-func identifier(path string) bool {
-	_, err := os.Stat(filepath.Join(path, "feladat.txt"))
+func identifier(fs afero.Fs, path string) bool {
+	_, err := fs.Stat(filepath.Join(path, "feladat.txt"))
 	return !os.IsNotExist(err)
 }
 

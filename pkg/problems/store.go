@@ -249,7 +249,7 @@ func (s *FsStore) UpdateProblem(path string, id string) error {
 	s.Lock()
 	defer s.Unlock()
 
-	prob, err := s.cs.Parse(path)
+	prob, err := s.cs.Parse(s.fs, path)
 	if err != nil {
 		return err
 	}
