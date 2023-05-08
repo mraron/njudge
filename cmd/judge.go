@@ -10,7 +10,7 @@ var JudgeCmd = &cobra.Command{
 	Use:   "judge",
 	Short: "start judge server",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		BindEnvs(judge.Server{})
+		BindEnvs(judge.HTTPServer{})
 		viper.SetEnvPrefix("njudge")
 
 		viper.SetConfigName("judge")
@@ -20,12 +20,18 @@ var JudgeCmd = &cobra.Command{
 	},
 
 	RunE: func(cmd *cobra.Command, args []string) error {
-		s := judge.NewServer()
-		if err := viper.Unmarshal(&s); err != nil {
+		cfg := judge.ServerConfig{}
+		if err := viper.Unmarshal(&cfg); err != nil {
 			return err
 		}
 
-		return s.Run()
+		s, err := judge.NewServer(cfg)
+		if err != nil {
+			return err
+		}
+
+		s.Run()
+		return nil
 	},
 }
 

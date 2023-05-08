@@ -7,10 +7,9 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-type Status struct {
-	Id           string        `json:"id" mapstructure:"id"`
-	Host         string        `json:"host" mapstructure:"host"`
-	Port         string        `json:"port" mapstructure:"port"`
+type ServerStatus struct {
+	Host         string        `json:"host"`
+	Port         string        `json:"port"`
 	Url          string        `json:"url"`
 	Load         float64       `json:"load"`
 	Uptime       time.Duration `json:"uptime"`
@@ -18,20 +17,20 @@ type Status struct {
 	LanguageList []string      `json:"language_list"`
 }
 
-func ParseStatus(s string) (res Status, err error) {
+func ParseServerStatus(s string) (res ServerStatus, err error) {
 	err = json.Unmarshal([]byte(s), &res)
 	return
 }
 
-func (s Status) SupportsProblem(want string) bool {
+func (s ServerStatus) SupportsProblem(want string) bool {
 	return slices.Contains(s.ProblemList, want)
 }
 
-func (s Status) SupportsLanguage(want string) bool {
+func (s ServerStatus) SupportsLanguage(want string) bool {
 	return slices.Contains(s.LanguageList, want)
 }
 
-func (s Status) String() string {
+func (s ServerStatus) String() string {
 	res, _ := json.Marshal(s)
 	return string(res)
 }

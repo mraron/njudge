@@ -4,15 +4,16 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/mraron/njudge/internal/judge"
-	"github.com/mraron/njudge/internal/web/extmodels"
-	"github.com/mraron/njudge/internal/web/helpers/config"
-	"github.com/mraron/njudge/internal/web/models"
 	"log"
 	"net/http"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/mraron/njudge/internal/judge"
+	"github.com/mraron/njudge/internal/web/extmodels"
+	"github.com/mraron/njudge/internal/web/helpers/config"
+	"github.com/mraron/njudge/internal/web/models"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -145,8 +146,8 @@ func (s *Server) runJudger() {
 				continue
 			}
 
-			var st judge.Status
-			st, err = judge.ParseStatus(j.State)
+			var st judge.ServerStatus
+			st, err = judge.ParseServerStatus(j.State)
 			if err != nil {
 				log.Print(err)
 				continue

@@ -38,6 +38,7 @@ require (
 require (
 	github.com/antonlindstrom/pgstore v0.0.0-20220421113606-e3a6e3fed12a
 	github.com/gomarkdown/markdown v0.0.0-20220905174103-7b278df48cfb
+	github.com/google/go-cmp v0.5.8
 	github.com/karrick/gobls v1.3.5
 	go.uber.org/zap v1.23.0
 	golang.org/x/exp v0.0.0-20220827204233-334a2380cb91
