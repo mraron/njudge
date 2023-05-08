@@ -28,7 +28,7 @@ func (cc *ChanCallback) Callback(test string, status problems.Status, done bool)
 	if (done) {
 		close(cc.c)
 	}
-	
+
 	return nil
 }
 
@@ -47,7 +47,7 @@ func (wc *WriterCallback) Callback(test string, status problems.Status, done boo
 		return wc.err
 	}
 
-	wc.err = wc.enc.Encode(SubmissionStatus{test, status, done, time.Now()})
+	wc.err = wc.enc.Encode(SubmissionStatus{Test: test, Status: status, Done: done, Time: time.Now()})
 	if wc.err == nil {
 		wc.afterFunc()
 	}
@@ -68,7 +68,7 @@ func NewHTTPCallback(url string) HTTPCallback {
 }
 
 func (h HTTPCallback) Callback(test string, status problems.Status, done bool) error {
-	raw := SubmissionStatus{test, status, done, time.Now()}
+	raw := SubmissionStatus{Test: test, Status: status, Done: done, Time: time.Now()}
 
 	buf := &bytes.Buffer{}
 

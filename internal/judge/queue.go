@@ -70,7 +70,7 @@ func (j *Queue) Run() {
 			j.logger.Error("judge error", zap.Error(err))
 
 			st.Compiled = false
-			st.CompilerOutput = "internal error"
+			st.CompilerOutput = "internal error: " + err.Error()
 			return multierr.Combine(sub.c.Callback("", st, true), err)
 		} else {
 			return sub.c.Callback("", st, true)
