@@ -19,8 +19,6 @@ type Submission struct {
 
 	Stream      bool   `json:"stream"`
 	CallbackUrl string `json:"callback_url"`
-
-	c    Callbacker
 }
 
 type Client struct {

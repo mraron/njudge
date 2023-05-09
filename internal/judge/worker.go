@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/language/sandbox"
@@ -12,13 +11,6 @@ import (
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
 )
-
-type SubmissionStatus struct {
-	Test   string
-	Status problems.Status
-	Done   bool
-	Time   time.Time
-}
 
 type Worker struct {
 	id              int
@@ -90,7 +82,7 @@ func (w Worker) Judge(ctx context.Context, plogger *zap.Logger, p problems.Judge
 
 	for status := range statusNotifier {
 		test = <-testNotifier
-		err = c.Callback(test, status, false)
+		err = c.Callback(Response{test, status, false, ""})
 		if err != nil {
 			logger.Error("error while calling callback", zap.Error(err))
 			return

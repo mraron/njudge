@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 )
 
 type customEnqueuer struct {
@@ -30,6 +31,15 @@ func (c customEnqueuer) Enqueue(context.Context, Submission) (<-chan Response, e
 	return c.ch, nil
 }
 
+func (c customEnqueuer) SupportedProblems() ([]string, error) {
+	return nil, nil
+}
+
+func (c customEnqueuer) SupportedLanguages() ([]string, error) {
+	return nil, nil
+}
+
+
 func TestPostJudgeStream(t *testing.T) {
 	resps := []Response{
 		{Test: "1"},
@@ -37,7 +47,7 @@ func TestPostJudgeStream(t *testing.T) {
 		{Test: "2", Done: true},
 	}
 
-	s := NewHTTPServer(HTTPConfig{"", ""}, newCustomEnqueuer(resps))
+	s := NewHTTPServer(HTTPConfig{"", ""}, newCustomEnqueuer(resps), zap.NewNop())
 	
 	buf := bytes.Buffer{}
 

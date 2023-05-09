@@ -38,7 +38,7 @@ import (
 )
 
 type ServerConfig struct {
-	HTTPConfig
+	HTTPConfig `mapstructure:",squash"`
 	SandboxIds  string `json:"sandbox_ids" mapstructure:"sandbox_ids"`
 	WorkerCount int    `json:"worker_count" mapstructure:"worker_count"`
 	ProblemsDir string `json:"problems_dir" mapstructure:"problems_dir"`
@@ -48,6 +48,9 @@ type ServerConfig struct {
 type Server struct {
 	ServerConfig
 	
+	problemStore problems.Store
+	httpServer *HTTPServer
+
 	queue *Queue
 	logger *zap.Logger
 }
@@ -90,13 +93,21 @@ func NewServer(cfg ServerConfig) (*Server, error) {
 		return nil, err
 	}
 
-	ps := problems.NewFsStore(cfg.ProblemsDir)
+	s.problemStore = problems.NewFsStore(cfg.ProblemsDir)
+	if err = s.problemStore.Update(); err != nil {
+		s.logger.Info("failed to initialize problems", zap.Error(err))
+	}
+
 	ls := language.DefaultStore
 
-	s.queue, err = NewQueue(s.logger, ps, ls, wp)
+	s.logger.Info("initializing the queue")
+	s.queue, err = NewQueue(s.logger, s.problemStore, ls, wp)
 	if err != nil {
 		return nil, err
 	}
+
+	s.logger.Info("initializing the http server")
+	s.httpServer = NewHTTPServer(s.HTTPConfig, s.queue, s.logger)
 
 	return s, nil	
 }
@@ -104,15 +115,19 @@ func NewServer(cfg ServerConfig) (*Server, error) {
 func (s *Server) Run() {
 	go func() {
 		for {
-			if err := s.queue.problemStore.Update(); err != nil {
+			if err := s.problemStore.Update(); err != nil {
 				s.logger.Error("updating problems", zap.Error(err))
 			}
 
 			time.Sleep(20 * time.Second)
 		}
 	}()
+	
+	s.logger.Info("starting the queue")
+	go s.queue.Run()
 
-	s.queue.Run()
+	s.logger.Info("starting the http server")
+	s.httpServer.Run()
 }
 
 type HTTPConfig struct {
@@ -131,8 +146,8 @@ type HTTPServer struct {
 	logger                     *zap.Logger
 }
 
-func NewHTTPServer(cfg HTTPConfig, j Enqueuer) *HTTPServer {
-	s := HTTPServer{HTTPConfig: cfg, Enqueuer: j}
+func NewHTTPServer(cfg HTTPConfig, j Enqueuer, logger *zap.Logger) *HTTPServer {
+	s := HTTPServer{HTTPConfig: cfg, Enqueuer: j, logger: logger}
 	s.start = time.Now()
 
 	return &s
@@ -166,8 +181,7 @@ func (s *HTTPServer) Run() error {
 	e.GET("/status", s.getStatus)
 	e.POST("/judge", s.postJudge)
 
-	go s.runUpdateLoad()
-	go s.runUpdateUptime()
+	go s.runUpdate()
 
 	return e.Start(":" + s.Port)
 }
@@ -180,23 +194,32 @@ func (s *HTTPServer) init() error {
 	return nil
 }
 
-func (s *HTTPServer) runUpdateLoad() {
-	for {
-		l, err := load.Avg()
+func (s *HTTPServer) runUpdate() {
+	go func() {
+		for {
+			l, err := load.Avg()
 
-		if err != nil {
-			log.Print("Error while getting load: ", err)
-		} else {
-			s.statusMutex.Lock()
-			s.status.Load = l.Load1
-			s.statusMutex.Unlock()
+			if err != nil {
+				log.Print("Error while getting load: ", err)
+			} else {
+				s.statusMutex.Lock()
+				s.status.Load = l.Load1
+				s.statusMutex.Unlock()
+			}
+
+			time.Sleep(60 * time.Second)
 		}
+	}()
 
-		time.Sleep(60 * time.Second)
-	}
-}
+	go func() {
+		s.statusMutex.Lock()
+		s.status.LanguageList, _ = s.Enqueuer.SupportedLanguages()
+		s.status.ProblemList, _ = s.Enqueuer.SupportedProblems()
+		s.statusMutex.Unlock()
 
-func (s *HTTPServer) runUpdateUptime() {
+		time.Sleep(20 * time.Second)
+	}()
+
 	for {
 		s.statusMutex.Lock()
 		s.status.Uptime = time.Since(s.start)
@@ -204,6 +227,7 @@ func (s *HTTPServer) runUpdateUptime() {
 		time.Sleep(1 * time.Second)
 	}
 }
+
 
 func (s *HTTPServer) getStatus(c echo.Context) error {
 	s.statusMutex.RLock()
@@ -231,7 +255,7 @@ func (s *HTTPServer) postJudge(c echo.Context) error {
 			return err
 		}
 		for resp := range res {
-			if err := callback.Callback(resp.Test, resp.Status, resp.Done); err != nil {
+			if err := callback.Callback(resp); err != nil {
 				return err
 			}
 		}
@@ -245,7 +269,7 @@ func (s *HTTPServer) postJudge(c echo.Context) error {
 		}
 		go func() {
 			for resp := range res {
-				callback.Callback(resp.Test, resp.Status, resp.Done)
+				callback.Callback(resp)
 			}
 		}()
 
