@@ -285,6 +285,7 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 		}
 	}
 
+	testCache := make(map[string]*problems.Testcase)
 	for tsind := range ans.Feedback {
 		testset := &ans.Feedback[tsind]
 
@@ -302,6 +303,15 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 				if tc.VerdictName != problems.VerdictDR {
 					continue
 				}
+				
+				if _, ok := testCache[tc.InputPath]; ok {
+					tmpIndex, tmpGroup := tc.Index, tc.Group
+					*tc = *testCache[tc.InputPath]
+					tc.Index = tmpIndex
+					tc.Group = tmpGroup
+					continue 
+				}
+				testCache[tc.InputPath] = tc
 
 				if ans.FeedbackType == problems.FeedbackLazyIOI && !ac {
 					continue

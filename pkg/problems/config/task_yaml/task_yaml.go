@@ -170,6 +170,7 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	advanceTests()
 
 	subtasks := make([]string, len(p.ScoreTypeParameters))
+	idx := 0
 	for len(testsLeft) > 0 {
 		tc := problems.Testcase{}
 		tc.InputPath, tc.AnswerPath = testsLeft[0][0], testsLeft[0][1]
@@ -177,7 +178,8 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 			// default cms loader behaviour
 			tc.OutputPath = fmt.Sprintf("output_%03d.txt", testIndices[0])
 		}
-		tc.Index = testIndices[0] + 1
+		tc.Index = idx + 1
+		idx += 1
 		tc.MaxScore = 0
 		tc.VerdictName = problems.VerdictDR
 		tc.MemoryLimit = p.MemoryLimit()
@@ -289,7 +291,7 @@ func (p Problem) GetTaskType() problems.TaskType {
 
 		tt = res
 	}
-
+	
 	if err != nil {
 		panic(err)
 	}
@@ -390,7 +392,7 @@ func parser(fs afero.Fs, path string) (problems.Problem, error) {
 	}
 
 	genPath := filepath.Join(p.Path, "gen", "GEN")
-	if _, err = fs.Stat(genPath); err == nil {
+	if _, err = fs.Stat(genPath); err == nil && len(p.ScoreTypeParameters) == 0 {
 		gen, err := fs.Open(genPath)
 		if err != nil {
 			return nil, err
