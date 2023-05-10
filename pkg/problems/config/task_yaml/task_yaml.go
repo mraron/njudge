@@ -22,7 +22,7 @@ import (
 	"github.com/mraron/njudge/pkg/problems/tasktype/batch"
 	"github.com/mraron/njudge/pkg/problems/tasktype/communication"
 	"go.uber.org/multierr"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type TaskYAML struct {
@@ -39,7 +39,7 @@ type TaskYAML struct {
 	PublicTestcases     string   `yaml:"public_testcases"`
 	FeedbackLevel       string   `yaml:"feedback_level"`
 	ScoreType           string   `yaml:"score_type"`
-	ScoreTypeParameters [][2]int `yaml:"score_type_parameters"`
+	ScoreTypeParameters [][2]interface{} `yaml:"score_type_parameters"`
 	ScorePrecision      int      `yaml:"score_precision"`
 	ScoreMode           string   `yaml:"score_mode"`
 	TotalValue          int      `yaml:"total_value"`
@@ -144,40 +144,66 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	testset := &ans.Feedback[len(ans.Feedback)-1]
 
 	tcByGroup := make(map[string][]problems.Testcase)
-	subtask := 0
-	testsLeft := p.ScoreTypeParameters[subtask][1]
+	ind, subtask := 0, 0
+
+	testsLeft := make([][2]string, 0)
+	testIndices := make([]int, 0)
+	advanceTests := func() {
+		if val, ok := p.ScoreTypeParameters[subtask][1].(int); ok {
+			for i := 0; i < val; i ++ {
+				fmt.Println(i, ind)
+				testsLeft = append(testsLeft, [2]string{fmt.Sprintf(p.InputPathPattern, ind), fmt.Sprintf(p.AnswerPathPattern, ind)})
+				testIndices = append(testIndices, ind)
+				ind ++
+			}
+		}else if val, ok := p.ScoreTypeParameters[subtask][1].(string); ok {
+			indices := strings.Split(val, "|")
+			for i := range indices {
+				num, _ := strconv.Atoi(indices[i])
+				testsLeft = append(testsLeft, [2]string{fmt.Sprintf(p.InputPathPattern, num), fmt.Sprintf(p.AnswerPathPattern, num)})
+				testIndices = append(testIndices, num)
+			}
+		}else {
+			panic("wrong format")
+		}
+	}
+	advanceTests()
+	
 	subtasks := make([]string, len(p.ScoreTypeParameters))
-	for ind := 0; ind < p.InputCount; ind++ {
+	for len(testsLeft) > 0 {
 		tc := problems.Testcase{}
-		tc.InputPath, tc.AnswerPath = fmt.Sprintf(p.InputPathPattern, ind), fmt.Sprintf(p.AnswerPathPattern, ind)
+		tc.InputPath, tc.AnswerPath = testsLeft[0][0], testsLeft[0][1]
 		if p.OutputOnly {
 			// default cms loader behaviour
-			tc.OutputPath = fmt.Sprintf("output_%03d.txt", ind)
+			tc.OutputPath = fmt.Sprintf("output_%03d.txt", testIndices[0])
 		}
-
-		tc.Index = ind + 1
+		tc.Index = testIndices[0] + 1
 		tc.MaxScore = 0
 		tc.VerdictName = problems.VerdictDR
 		tc.MemoryLimit = p.MemoryLimit()
 		tc.TimeLimit = time.Duration(p.TimeLimit()) * time.Millisecond
 
-		if testsLeft == 0 {
-			subtask++
-			if subtask < len(p.ScoreTypeParameters) {
-				testsLeft = p.ScoreTypeParameters[subtask][1]
-			}
-		}
+		testsLeft = testsLeft[1:]
+		testIndices = testIndices[1:]
 
 		subtasks[subtask] = "subtask" + strconv.Itoa(subtask+1)
 		tc.Group = "subtask" + strconv.Itoa(subtask+1)
 
 		if len(tcByGroup[tc.Group]) == 0 {
 			tcByGroup[tc.Group] = make([]problems.Testcase, 0)
-			tc.MaxScore = float64(p.ScoreTypeParameters[subtask][0])
+			tc.MaxScore = float64(p.ScoreTypeParameters[subtask][0].(int))
 		}
 
-		testsLeft--
 		tcByGroup[tc.Group] = append(tcByGroup[tc.Group], tc)
+		
+		if len(testsLeft) == 0 {
+			subtask++
+			if subtask < len(p.ScoreTypeParameters) {
+				advanceTests()
+			}else {
+				break 
+			}
+		}
 	}
 
 	for _, subtask := range subtasks {
@@ -271,9 +297,9 @@ func (p Problem) GetTaskType() problems.TaskType {
 	return tt
 }
 
-func parseGen(r io.Reader) (int, [][2]int, error) {
+func parseGen(r io.Reader) (int, [][2]interface{}, error) {
 	var err error
-	subtasks, testcases, points := make([][2]int, 0), 0, -1
+	subtasks, testcases, points := make([][2]interface{}, 0), 0, -1
 	inputCount := 0
 
 	sc := bufio.NewScanner(r)
@@ -320,7 +346,7 @@ func parseGen(r io.Reader) (int, [][2]int, error) {
 						return -1, nil, errors.New("trailing testcases")
 					}
 				} else {
-					subtasks = append(subtasks, [2]int{points, testcases})
+					subtasks = append(subtasks, [2]interface{}{points, testcases})
 				}
 
 				testcases = 0
@@ -335,7 +361,7 @@ func parseGen(r io.Reader) (int, [][2]int, error) {
 		return -1, nil, err
 	}
 
-	subtasks = append(subtasks, [2]int{points, testcases})
+	subtasks = append(subtasks, [2]interface{}{points, testcases})
 	return inputCount, subtasks, nil
 }
 

@@ -148,3 +148,59 @@ gen_rand.py 100000 100000 20000000 0.94 0.4 1
 		})
 	}
 }
+
+func TestStatusSkeleton(t *testing.T) {
+	p := Problem{
+		TaskYAML: TaskYAML{
+			ScoreTypeParameters: [][2]interface{}{
+				{10, 2},
+				{80, 5},
+				{11, 10},
+			},
+		},
+	}
+
+	st, err := p.StatusSkeleton("")
+	if err != nil {
+		t.Error(err)
+	}
+	
+	if len(st.Feedback[0].Testcases()) != 17 {
+		t.Error("wrong no of tests")
+	}
+
+	if st.Feedback[0].MaxScore() != 101.0 {
+		t.Error("wrong max score")
+	}
+
+	p = Problem{
+		InputPathPattern: "%d",
+		TaskYAML: TaskYAML{
+			ScoreTypeParameters: [][2]interface{}{
+				{10, "001|002"},
+				{80, "002|003|004"},
+				{12, "002|003|004|005"},
+			},
+		},
+	}
+
+	st, err = p.StatusSkeleton("")
+	if err != nil {
+		t.Error(err)
+	}
+	
+	if len(st.Feedback[0].Testcases()) != 9 {
+		t.Error("wrong no of tests")
+	}
+
+	inputs := []string{"1","2","2","3","4","2","3","4","5"}
+	for ind, tc := range st.Feedback[0].Testcases() {
+		if tc.InputPath != inputs[ind] {
+			t.Errorf("%s != %s input path", tc.InputPath, inputs[ind])
+		}
+	}
+
+	if st.Feedback[0].MaxScore() != 102.0 {
+		t.Error("wrong max score")
+	}
+}
