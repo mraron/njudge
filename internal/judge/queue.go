@@ -15,13 +15,13 @@ type Enqueuer interface {
 
 	SupportedProblems() ([]string, error)
 	SupportedLanguages() ([]string, error)
-} 
+}
 
 type Response struct {
-	Test string
+	Test   string
 	Status problems.Status
-	Done bool
-	Error string
+	Done   bool
+	Error  string
 }
 
 type queueSubmission struct {
@@ -30,38 +30,36 @@ type queueSubmission struct {
 }
 
 type Queue struct {
-	problemStore               problems.Store
-	languageStore              language.Store
+	problemStore   problems.Store
+	languageStore  language.Store
 	workerProvider WorkerProvider
 
-	queue                      chan queueSubmission
-	
-	logger                     *zap.Logger
+	queue chan queueSubmission
+
+	logger *zap.Logger
 }
 
-func NewQueue(logger *zap.Logger, problemStore problems.Store, languageStore language.Store, workerProvider WorkerProvider)  (*Queue, error) {
+func NewQueue(logger *zap.Logger, problemStore problems.Store, languageStore language.Store, workerProvider WorkerProvider) (*Queue, error) {
 	queue := &Queue{
-		problemStore: problemStore,
-		languageStore: languageStore,
+		problemStore:   problemStore,
+		languageStore:  languageStore,
 		workerProvider: workerProvider,
-		queue:  make(chan queueSubmission, 128),
-		logger: logger,
+		queue:          make(chan queueSubmission, 128),
+		logger:         logger,
 	}
-
 
 	return queue, nil
 }
 
 func (j *Queue) Enqueue(ctx context.Context, sub Submission) (<-chan Response, error) {
 	channel := make(chan Response)
-	
+
 	qs := queueSubmission{Submission: sub}
 	qs.c = NewChanCallback(channel)
 	j.queue <- qs
 
 	return channel, nil
 }
-
 
 func (q *Queue) SupportedProblems() ([]string, error) {
 	return q.problemStore.List()
@@ -105,7 +103,6 @@ func (j *Queue) Run() {
 		sub := <-j.queue
 
 		if err := judge(w, sub); err != nil {
-			sub.c.Callback(Response{"",problems.Status{},true,err.Error()})
 			j.logger.Error("judging error", zap.Error(err))
 		}
 

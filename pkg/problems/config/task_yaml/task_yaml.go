@@ -33,18 +33,18 @@ type TaskYAML struct {
 	InputCount          int     `yaml:"n_input"`
 	Infile              string
 	Outfile             string
-	PrimaryLanguage     string   `yaml:"primary_language"`
-	TokenMode           string   `yaml:"token_mode"`
-	MaxSubmissionCount  int      `yaml:"max_submission_number"`
-	PublicTestcases     string   `yaml:"public_testcases"`
-	FeedbackLevel       string   `yaml:"feedback_level"`
-	ScoreType           string   `yaml:"score_type"`
+	PrimaryLanguage     string           `yaml:"primary_language"`
+	TokenMode           string           `yaml:"token_mode"`
+	MaxSubmissionCount  int              `yaml:"max_submission_number"`
+	PublicTestcases     string           `yaml:"public_testcases"`
+	FeedbackLevel       string           `yaml:"feedback_level"`
+	ScoreType           string           `yaml:"score_type"`
 	ScoreTypeParameters [][2]interface{} `yaml:"score_type_parameters"`
-	ScorePrecision      int      `yaml:"score_precision"`
-	ScoreMode           string   `yaml:"score_mode"`
-	TotalValue          int      `yaml:"total_value"`
-	OutputOnly          bool     `yaml:"output_only"`
-	TaskTypeParameters  []string `yaml:"task_type_parameters"`
+	ScorePrecision      int              `yaml:"score_precision"`
+	ScoreMode           string           `yaml:"score_mode"`
+	TotalValue          int              `yaml:"total_value"`
+	OutputOnly          bool             `yaml:"output_only"`
+	TaskTypeParameters  []string         `yaml:"task_type_parameters"`
 }
 
 type Problem struct {
@@ -150,25 +150,25 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	testIndices := make([]int, 0)
 	advanceTests := func() {
 		if val, ok := p.ScoreTypeParameters[subtask][1].(int); ok {
-			for i := 0; i < val; i ++ {
+			for i := 0; i < val; i++ {
 				fmt.Println(i, ind)
 				testsLeft = append(testsLeft, [2]string{fmt.Sprintf(p.InputPathPattern, ind), fmt.Sprintf(p.AnswerPathPattern, ind)})
 				testIndices = append(testIndices, ind)
-				ind ++
+				ind++
 			}
-		}else if val, ok := p.ScoreTypeParameters[subtask][1].(string); ok {
+		} else if val, ok := p.ScoreTypeParameters[subtask][1].(string); ok {
 			indices := strings.Split(val, "|")
 			for i := range indices {
 				num, _ := strconv.Atoi(indices[i])
 				testsLeft = append(testsLeft, [2]string{fmt.Sprintf(p.InputPathPattern, num), fmt.Sprintf(p.AnswerPathPattern, num)})
 				testIndices = append(testIndices, num)
 			}
-		}else {
+		} else {
 			panic("wrong format")
 		}
 	}
 	advanceTests()
-	
+
 	subtasks := make([]string, len(p.ScoreTypeParameters))
 	for len(testsLeft) > 0 {
 		tc := problems.Testcase{}
@@ -195,13 +195,13 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 		}
 
 		tcByGroup[tc.Group] = append(tcByGroup[tc.Group], tc)
-		
+
 		if len(testsLeft) == 0 {
 			subtask++
 			if subtask < len(p.ScoreTypeParameters) {
 				advanceTests()
-			}else {
-				break 
+			} else {
+				break
 			}
 		}
 	}
@@ -419,7 +419,7 @@ func parser(fs afero.Fs, path string) (problems.Problem, error) {
 	}
 
 	isEmptyFile := func(path string) bool {
-		if st, err := os.Stat(path); errors.Is(err, fs.ErrNotExist) {
+		if st, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
 			return false
 		} else {
 			return st.Size() == 0

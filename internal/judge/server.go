@@ -36,7 +36,6 @@ import (
 	_ "github.com/mraron/njudge/pkg/language/langs/pypy3"
 	_ "github.com/mraron/njudge/pkg/language/langs/python3"
 	_ "github.com/mraron/njudge/pkg/language/langs/zip"
-	"github.com/mraron/njudge/pkg/language/sandbox"
 )
 
 type ServerConfig struct {
