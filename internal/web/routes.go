@@ -61,6 +61,7 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	pr := u.Group("/profile", profile.SetProfileMiddleware(s.DB))
 	pr.GET("/:name/", profile.GetProfile(s.DB))
 	pr.GET("/:name/submissions/", profile.GetSubmissions(s.DB))
+	pr.GET("/:name/settings/", profile.GetSettings(s.DB), user.RequireLoginMiddleware())
 
 	v1 := e.Group("/api/v1")
 

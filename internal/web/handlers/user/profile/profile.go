@@ -65,3 +65,17 @@ func GetSubmissions(DB *sqlx.DB) echo.HandlerFunc {
 		}{u, statusPage})
 	}
 }
+
+func GetSettings(DB *sqlx.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		p := c.Get("profile").(*models.User)
+		u := c.Get("user").(*models.User)
+		if p.Name != u.Name {
+			return c.Redirect(http.StatusForbidden, "../")
+		}
+
+		return c.Render(http.StatusOK, "user/profile/settings", struct {
+			User *models.User
+		}{u})
+	}
+}
