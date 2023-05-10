@@ -418,6 +418,14 @@ func parser(fs afero.Fs, path string) (problems.Problem, error) {
 		}
 	}
 
+	isEmptyFile := func(path string) bool {
+		if st, err := os.Stat(path); errors.Is(err, fs.ErrNotExist) {
+			return false
+		} else {
+			return st.Size() == 0
+		}
+	}
+
 	compile := func(src string, to string) error {
 		if bin, err := fs.Create(to); err == nil {
 			defer bin.Close()
@@ -425,8 +433,8 @@ func parser(fs afero.Fs, path string) (problems.Problem, error) {
 			if file, err := fs.Open(src); err == nil {
 				defer file.Close()
 
-				if err := cpp.Std14.InsecureCompile(filepath.Dir(src), file, bin, os.Stderr); err != nil {
-					return err
+				if err := cpp.Std17.InsecureCompile(filepath.Dir(src), file, bin, os.Stderr); err != nil {
+					return multierr.Combine(err, os.Remove(to))
 				}
 
 				if err := fs.Chmod(to, os.ModePerm); err != nil {
@@ -461,7 +469,7 @@ func parser(fs afero.Fs, path string) (problems.Problem, error) {
 		managerPath := filepath.Join(checkPath, "manager")
 
 		if exists(checkerCppPath) {
-			if !exists(checkerPath) {
+			if !exists(checkerPath) || isEmptyFile(checkerPath) {
 				if err := compile(checkerCppPath, checkerPath); err != nil {
 					return nil, err
 				}
@@ -476,6 +484,8 @@ func parser(fs afero.Fs, path string) (problems.Problem, error) {
 			p.files = append(p.files, problems.File{Name: "manager.cpp", Role: "interactor", Path: managerPath})
 
 			chmodX(managerPath)
+		} else {
+			p.whiteDiffChecker = true
 		}
 	}
 

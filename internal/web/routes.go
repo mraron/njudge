@@ -3,6 +3,7 @@ package web
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/web/extmodels"
+	"github.com/mraron/njudge/internal/web/handlers"
 	"github.com/mraron/njudge/internal/web/handlers/api"
 	"github.com/mraron/njudge/internal/web/handlers/problemset"
 	"github.com/mraron/njudge/internal/web/handlers/problemset/problem"
@@ -10,18 +11,21 @@ import (
 	"github.com/mraron/njudge/internal/web/handlers/taskarchive"
 	"github.com/mraron/njudge/internal/web/handlers/user"
 	"github.com/mraron/njudge/internal/web/handlers/user/profile"
+	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
 	"github.com/mraron/njudge/internal/web/models"
+	"time"
 )
 
 func (s *Server) prepareRoutes(e *echo.Echo) {
 	e.Use(user.SetUserMiddleware(s.DB))
 
-	e.GET("/", s.getHome)
+	e.GET("/", handlers.GetHome())
+	e.GET("/page/:page", handlers.GetPage(partials.NewCached(s.DB.DB, 30*time.Second)))
 
 	e.Static("/static", "static")
 
 	e.GET("/submission/:id", submission.Get(s.DB))
-	e.GET("/submission/rejudge/:id", submission.Rejudge(s.DB))
+	e.GET("/submission/rejudge/:id", submission.Rejudge(s.DB), user.RequireLoginMiddleware())
 	e.GET("/task_archive", taskarchive.Get(s.DB, s.ProblemStore))
 
 	ps := e.Group("/problemset", problemset.SetNameMiddleware())
@@ -95,5 +99,5 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	v1.PUT("/submissions/:id", api.Put[models.Submission](submissionDataProvider))
 	v1.DELETE("/submissions/:id", api.Delete[models.Submission](submissionDataProvider))
 
-	e.GET("/admin", s.getAdmin)
+	e.GET("/admin", handlers.GetAdmin(s.Server))
 }

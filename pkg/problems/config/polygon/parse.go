@@ -43,7 +43,7 @@ func compileIfNotCompiled(fs afero.Fs, wd, src, dst string) error {
 				if bytes.Contains(conts, []byte("testlib.h")) {
 					f, err := fs.Open(filepath.Join(wd, "testlib.h"))
 					if err != nil {
-						return multierr.Combine(err, f.Close(), file.Close(), binary.Close())
+						return multierr.Combine(err, file.Close(), binary.Close())
 					}
 
 					headers = append(headers, language.File{
@@ -52,7 +52,7 @@ func compileIfNotCompiled(fs afero.Fs, wd, src, dst string) error {
 					})
 				}
 
-				if err := cpp.Std14.Compile(s, language.File{
+				if err := cpp.Std17.Compile(s, language.File{
 					Name:   filepath.Base(src),
 					Source: file,
 				}, binary, &buf, headers); err != nil {

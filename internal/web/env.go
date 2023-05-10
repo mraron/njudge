@@ -60,8 +60,8 @@ func (s *Server) ConnectToDB() {
 		log.Print("Trying to ping database...")
 		if err := s.DB.Ping(); err == nil {
 			log.Print("OK, connected to database")
-			break 
+			break
 		}
-		time.Sleep(5*time.Second)
+		time.Sleep(5 * time.Second)
 	}
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/mraron/njudge/internal/web/helpers/config"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/helpers/roles"
+	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
 	"github.com/mraron/njudge/internal/web/models"
 	"html/template"
 	"io"
@@ -28,7 +29,7 @@ type Renderer struct {
 	cfg       config.Server
 }
 
-func New(cfg config.Server, problemStore problems.Store, db *sql.DB) *Renderer {
+func New(cfg config.Server, problemStore problems.Store, db *sql.DB, store partials.Store) *Renderer {
 	renderer := &Renderer{make(map[string]*template.Template), cfg}
 
 	layoutFiles := make([]string, 0)
@@ -46,7 +47,7 @@ func New(cfg config.Server, problemStore problems.Store, db *sql.DB) *Renderer {
 					panic(err)
 				}
 
-				renderer.templates[name] = template.Must(template.New(info.Name()).Funcs(funcs(problemStore, db)).ParseFiles(append(layoutFiles, path)...))
+				renderer.templates[name] = template.Must(template.New(info.Name()).Funcs(funcs(problemStore, db, store)).ParseFiles(append(layoutFiles, path)...))
 			}
 		}
 		return nil
@@ -74,7 +75,7 @@ func (t *Renderer) Render(w io.Writer, name string, data interface{}, c echo.Con
 	}{data, c})
 }
 
-func funcs(store problems.Store, db *sql.DB) template.FuncMap {
+func funcs(store problems.Store, db *sql.DB, store2 partials.Store) template.FuncMap {
 	return template.FuncMap{
 		"translateContent": i18n.TranslateContent,
 		"problem":          store.Get,
@@ -148,7 +149,10 @@ func funcs(store problems.Store, db *sql.DB) template.FuncMap {
 			}
 			return dict, nil
 		},
-		"partial": NewPartialCache(db, 30*time.Second).Get,
+		"partial": func(name string) string {
+			c, _ := store2.Get(name)
+			return c
+		},
 		"roundto": func(num float64, digs int) float64 {
 			return math.Round(num*100) / 100
 		},

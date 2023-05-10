@@ -35,10 +35,12 @@ import (
 	_ "github.com/mraron/njudge/pkg/language/langs/pascal"
 	_ "github.com/mraron/njudge/pkg/language/langs/pypy3"
 	_ "github.com/mraron/njudge/pkg/language/langs/python3"
+	_ "github.com/mraron/njudge/pkg/language/langs/zip"
+	"github.com/mraron/njudge/pkg/language/sandbox"
 )
 
 type ServerConfig struct {
-	HTTPConfig `mapstructure:",squash"`
+	HTTPConfig  `mapstructure:",squash"`
 	SandboxIds  string `json:"sandbox_ids" mapstructure:"sandbox_ids"`
 	WorkerCount int    `json:"worker_count" mapstructure:"worker_count"`
 	ProblemsDir string `json:"problems_dir" mapstructure:"problems_dir"`
@@ -47,11 +49,11 @@ type ServerConfig struct {
 
 type Server struct {
 	ServerConfig
-	
-	problemStore problems.Store
-	httpServer *HTTPServer
 
-	queue *Queue
+	problemStore problems.Store
+	httpServer   *HTTPServer
+
+	queue  *Queue
 	logger *zap.Logger
 }
 
@@ -64,12 +66,12 @@ func NewServer(cfg ServerConfig) (*Server, error) {
 	} else {
 		s.logger, err = zap.NewProduction()
 	}
-	
+
 	if err != nil {
 		return nil, err
 	}
 
-	minSandboxId, maxSandboxId := -1,-1
+	minSandboxId, maxSandboxId := -1, -1
 	if s.SandboxIds == "" {
 		minSandboxId = 100
 		maxSandboxId = 999
@@ -109,7 +111,7 @@ func NewServer(cfg ServerConfig) (*Server, error) {
 	s.logger.Info("initializing the http server")
 	s.httpServer = NewHTTPServer(s.HTTPConfig, s.queue, s.logger)
 
-	return s, nil	
+	return s, nil
 }
 
 func (s *Server) Run() {
@@ -122,7 +124,7 @@ func (s *Server) Run() {
 			time.Sleep(20 * time.Second)
 		}
 	}()
-	
+
 	s.logger.Info("starting the queue")
 	go s.queue.Run()
 
@@ -131,19 +133,19 @@ func (s *Server) Run() {
 }
 
 type HTTPConfig struct {
-	Host         string        `json:"host" mapstructure:"host"`
-	Port         string        `json:"port" mapstructure:"port"`
+	Host string `json:"host" mapstructure:"host"`
+	Port string `json:"port" mapstructure:"port"`
 }
 
 type HTTPServer struct {
 	HTTPConfig
 	Enqueuer
 
-	status ServerStatus 
+	status      ServerStatus
 	statusMutex sync.RWMutex
 
-	start                      time.Time
-	logger                     *zap.Logger
+	start  time.Time
+	logger *zap.Logger
 }
 
 func NewHTTPServer(cfg HTTPConfig, j Enqueuer, logger *zap.Logger) *HTTPServer {
@@ -228,7 +230,6 @@ func (s *HTTPServer) runUpdate() {
 	}
 }
 
-
 func (s *HTTPServer) getStatus(c echo.Context) error {
 	s.statusMutex.RLock()
 	defer s.statusMutex.RUnlock()
@@ -245,7 +246,7 @@ func (s *HTTPServer) postJudge(c echo.Context) error {
 	if sub.Stream {
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		c.Response().WriteHeader(http.StatusOK)
-		
+
 		callback := NewWriterCallback(c.Response(), func() {
 			c.Response().Flush()
 		})
@@ -259,7 +260,7 @@ func (s *HTTPServer) postJudge(c echo.Context) error {
 				return err
 			}
 		}
-		
+
 		return nil
 	} else {
 		callback := NewHTTPCallback(sub.CallbackUrl)

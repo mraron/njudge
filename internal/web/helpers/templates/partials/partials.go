@@ -1,4 +1,4 @@
-package templates
+package partials
 
 import (
 	"database/sql"
@@ -8,7 +8,11 @@ import (
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
-type PartialCache struct {
+type Store interface {
+	Get(name string) (string, error)
+}
+
+type Cached struct {
 	DB *sql.DB
 
 	validFor time.Duration
@@ -16,8 +20,8 @@ type PartialCache struct {
 	accessed map[string]time.Time
 }
 
-func NewPartialCache(db *sql.DB, validFor time.Duration) *PartialCache {
-	return &PartialCache{
+func NewCached(db *sql.DB, validFor time.Duration) *Cached {
+	return &Cached{
 		DB:       db,
 		validFor: validFor,
 		cache:    make(map[string]string),
@@ -25,11 +29,11 @@ func NewPartialCache(db *sql.DB, validFor time.Duration) *PartialCache {
 	}
 }
 
-func (pc *PartialCache) Get(name string) (string, error) {
+func (pc *Cached) Get(name string) (string, error) {
 	if time.Since(pc.accessed[name]) > pc.validFor {
 		p, err := models.Partials(Where("name = ?", name)).One(pc.DB)
 		if err != nil {
-			return "", nil
+			return "", err
 		}
 
 		pc.accessed[name] = time.Now()

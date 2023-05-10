@@ -4,11 +4,11 @@ import (
 	"github.com/antonlindstrom/pgstore"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/config"
-	"github.com/mraron/njudge/internal/web/helpers/roles"
 	"github.com/mraron/njudge/internal/web/helpers/templates"
-	"github.com/mraron/njudge/internal/web/models"
+	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
 	_ "mime"
 	"net/http"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo-contrib/session"
@@ -54,7 +54,7 @@ func (s *Server) Run() {
 			c.Logger().Error(err)
 		}
 	}
-	e.Renderer = templates.New(s.Server, s.ProblemStore, s.DB.DB)
+	e.Renderer = templates.New(s.Server, s.ProblemStore, s.DB.DB, partials.NewCached(s.DB.DB, 30*time.Second))
 
 	store, err := pgstore.NewPGStoreFromPool(s.DB.DB, []byte(s.CookieSecret))
 	if err != nil {
@@ -68,21 +68,6 @@ func (s *Server) Run() {
 	s.prepareRoutes(e)
 
 	panic(e.Start(":" + s.Port))
-}
-
-func (s *Server) getHome(c echo.Context) error {
-	return c.Render(http.StatusOK, "home.gohtml", nil)
-}
-
-func (s *Server) getAdmin(c echo.Context) error {
-	u := c.Get("user").(*models.User)
-	if !roles.Can(roles.Role(u.Role), roles.ActionView, "admin_panel") {
-		return c.Render(http.StatusUnauthorized, "error.gohtml", "Engedély megtagadva.")
-	}
-
-	return c.Render(http.StatusOK, "admin.gohtml", struct {
-		Url string
-	}{s.Url})
 }
 
 func (s *Server) Submit(uid int, problemset, problem, language string, source []byte) (int, error) {

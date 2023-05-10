@@ -6,6 +6,7 @@ import (
 	"github.com/mraron/njudge/internal/web/helpers/roles"
 	"github.com/mraron/njudge/internal/web/models"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
@@ -68,7 +69,10 @@ func Get[T any](dp Provider[T]) echo.HandlerFunc {
 			return helpers.UnauthorizedError(c)
 		}
 
-		id := c.Param(dp.Identifier())
+		id, err := url.QueryUnescape(c.Param(dp.Identifier()))
+		if err != nil {
+			return err
+		}
 
 		elem, err := dp.Get(id)
 		if err != nil {
@@ -106,14 +110,17 @@ func Put[T any](dp WritableProvider[T]) echo.HandlerFunc {
 			return helpers.UnauthorizedError(c)
 		}
 
-		id := c.Param(dp.Identifier())
+		id, err := url.QueryUnescape(c.Param(dp.Identifier()))
+		if err != nil {
+			return err
+		}
 
 		elem := new(T)
 		if err := c.Bind(elem); err != nil {
 			return err
 		}
 
-		err := dp.Update(id, elem)
+		err = dp.Update(id, elem)
 		if err != nil {
 			return err
 		}
@@ -131,8 +138,12 @@ func Delete[T any](dp WritableProvider[T]) echo.HandlerFunc {
 			return helpers.UnauthorizedError(c)
 		}
 
-		id := c.Param(dp.Identifier())
-		if err := dp.Delete(id); err != nil {
+		id, err := url.QueryUnescape(c.Param(dp.Identifier()))
+		if err != nil {
+			return err
+		}
+
+		if err = dp.Delete(id); err != nil {
 			return err
 		}
 
