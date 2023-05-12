@@ -309,6 +309,8 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 					*tc = *testCache[tc.InputPath]
 					tc.Index = tmpIndex
 					tc.Group = tmpGroup
+					tc.Score = 0.0
+					tc.MaxScore = 0.0
 					continue 
 				}
 				testCache[tc.InputPath] = tc

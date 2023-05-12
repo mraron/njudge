@@ -151,7 +151,6 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	advanceTests := func() {
 		if val, ok := p.ScoreTypeParameters[subtask][1].(int); ok {
 			for i := 0; i < val; i++ {
-				fmt.Println(i, ind)
 				testsLeft = append(testsLeft, [2]string{fmt.Sprintf(p.InputPathPattern, ind), fmt.Sprintf(p.AnswerPathPattern, ind)})
 				testIndices = append(testIndices, ind)
 				ind++
@@ -185,27 +184,29 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 		tc.MemoryLimit = p.MemoryLimit()
 		tc.TimeLimit = time.Duration(p.TimeLimit()) * time.Millisecond
 
-		testsLeft = testsLeft[1:]
-		testIndices = testIndices[1:]
-
 		subtasks[subtask] = "subtask" + strconv.Itoa(subtask+1)
 		tc.Group = "subtask" + strconv.Itoa(subtask+1)
 
-		if len(tcByGroup[tc.Group]) == 0 {
-			tcByGroup[tc.Group] = make([]problems.Testcase, 0)
+		if len(testsLeft) == 1 {
 			tc.MaxScore = float64(p.ScoreTypeParameters[subtask][0].(int))
-		}
 
-		tcByGroup[tc.Group] = append(tcByGroup[tc.Group], tc)
-
-		if len(testsLeft) == 0 {
 			subtask++
 			if subtask < len(p.ScoreTypeParameters) {
 				advanceTests()
-			} else {
-				break
+			}else {
+				testsLeft = testsLeft[1:]
+				testIndices = testIndices[1:]
 			}
+		}else {
+			testsLeft = testsLeft[1:]
+			testIndices = testIndices[1:]
 		}
+
+		if len(tcByGroup[tc.Group]) == 0 {
+			tcByGroup[tc.Group] = make([]problems.Testcase, 0)
+		}
+		
+		tcByGroup[tc.Group] = append(tcByGroup[tc.Group], tc)
 	}
 
 	for _, subtask := range subtasks {
@@ -214,9 +215,7 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 
 		group.Name = subtask
 		group.Scoring = problems.ScoringGroup
-		for _, tc := range tcByGroup[subtask] {
-			group.Testcases = append(group.Testcases, tc)
-		}
+		group.Testcases = append(group.Testcases, tcByGroup[subtask]...)
 	}
 
 	return &ans, nil
