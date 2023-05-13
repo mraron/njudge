@@ -60,6 +60,9 @@ func TestGroup_AddTestcase(t *testing.T) {
 			if got := g.Testcases[len(g.Testcases)-1].Index; got != tt.want {
 				t.Errorf("AddTestcase(): got %d want %d", got, tt.want)
 			}
+			if g.Testcases[len(g.Testcases)-1].Group != g.Name {
+				t.Errorf("AddTestcase(): didn't set group name correctly")
+			}
 		})
 	}
 }
@@ -168,8 +171,8 @@ func TestGroup_MaxScore(t *testing.T) {
 		fields fields
 		want   float64
 	}{
-		{"last", fields{Testcases: []Testcase{{MaxScore: 0.5}, {MaxScore: 0.5}}}, 1},
-		{"first", fields{Testcases: []Testcase{{MaxScore: 1}, {MaxScore: 2}}}, 3},
+		{"last", fields{Scoring: ScoringSum, Testcases: []Testcase{{MaxScore: 0.5}, {MaxScore: 0.5}}}, 1},
+		{"first", fields{Scoring: ScoringSum, Testcases: []Testcase{{MaxScore: 1}, {MaxScore: 2}}}, 3},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

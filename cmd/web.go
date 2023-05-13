@@ -3,11 +3,12 @@ package cmd
 import (
 	"database/sql"
 	"fmt"
+	"io/ioutil"
+	"log"
+
 	"github.com/mraron/njudge/internal/web"
 	"github.com/mraron/njudge/internal/web/helpers/config"
 	"github.com/mraron/njudge/internal/web/models"
-	"io/ioutil"
-	"log"
 
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/spf13/cobra"
@@ -137,7 +138,7 @@ var PrefixCmd = &cobra.Command{
 		server := web.Server{Server: cfg}
 		server.ConnectToDB()
 
-		withoutPrefixes := problems.NewFsStore(cfg.ProblemsDir, problems.FsStoreIgnorePreifx())
+		withoutPrefixes := problems.NewFsStore(cfg.ProblemsDir, problems.FsStoreIgnorePrefix())
 		err = withoutPrefixes.Update()
 		if err != nil {
 			return nil

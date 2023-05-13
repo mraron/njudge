@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -80,7 +79,7 @@ func FsStoreUseFs(afs afero.Fs) FsStoreOptions {
 	}
 }
 
-func FsStoreIgnorePreifx() FsStoreOptions {
+func FsStoreIgnorePrefix() FsStoreOptions {
 	return func(fs *FsStore) {
 		fs.ignorePrefix = true
 	}
@@ -178,22 +177,22 @@ func (s *FsStore) Update() error {
 		}
 
 		//skip directories recursively with the .njudge_ignore file
-		if _, err := os.Stat(filepath.Join(path, ".njudge_ignore")); err != nil {
+		if _, err := s.fs.Stat(filepath.Join(path, ".njudge_ignore")); err != nil {
 			if !errors.Is(err, os.ErrNotExist) {
 				return err
 			}
 		} else {
-			return nil
+			return filepath.SkipDir
 		}
 
 		if !s.ignorePrefix {
 			prefixFile := filepath.Join(path, ".njudge_prefix")
-			if _, err := os.Stat(prefixFile); err != nil {
+			if _, err := s.fs.Stat(prefixFile); err != nil {
 				if !errors.Is(err, os.ErrNotExist) {
 					return err
 				}
 			} else {
-				prefixBytes, err := ioutil.ReadFile(prefixFile)
+				prefixBytes, err := afero.ReadFile(s.fs, prefixFile)
 				if err != nil {
 					return err
 				}

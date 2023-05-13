@@ -238,6 +238,7 @@ type Group struct {
 
 func (g *Group) AddTestcase(testcase Testcase) {
 	testcase.Index = len(g.Testcases) + 1
+	testcase.Group = g.Name
 	g.Testcases = append(g.Testcases, testcase)
 }
 
@@ -377,16 +378,16 @@ func (v *Status) Scan(value interface{}) error {
 	if sv, err := driver.String.ConvertValue(value); err == nil {
 		var arr []byte
 
-		switch sv.(type) {
+		switch sv := sv.(type) {
 		case []uint8:
-			orig := sv.([]uint8)
+			orig := sv
 
 			arr = make([]byte, len(orig))
 			for i := 0; i < len(orig); i++ {
 				arr[i] = byte(orig[i])
 			}
 		case string:
-			arr = []byte(sv.(string))
+			arr = []byte(sv)
 		}
 
 		if err := json.Unmarshal(arr, v); err != nil {
