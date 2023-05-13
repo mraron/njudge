@@ -1,8 +1,10 @@
 package user
 
 import (
-	"github.com/mraron/njudge/internal/web/models"
 	"net/http"
+
+	"github.com/mraron/njudge/internal/web/helpers"
+	"github.com/mraron/njudge/internal/web/models"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo-contrib/session"
@@ -16,6 +18,14 @@ func GetLogin() echo.HandlerFunc {
 		if u := c.Get("user").(*models.User); u != nil {
 			return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
 		}
+
+		helpers.DeleteFlash(c, "LoginMessage")
+
+		to := "/"
+		if val := c.QueryParams().Get("next"); val != "" {
+			to = val
+		}
+		helpers.SetFlash(c, "LoginRedirect", to)
 
 		return c.Render(http.StatusOK, "user/login", nil)
 	}
@@ -32,17 +42,22 @@ func PostLogin(DB *sqlx.DB) echo.HandlerFunc {
 			return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
 		}
 
+		defer helpers.DeleteFlash(c, "LoginRedirect")
+
 		u, err = models.Users(Where("name=?", c.FormValue("name"))).One(DB)
 		if err != nil {
-			return c.Render(http.StatusOK, "user/login", []string{"Hibás felhasználónév és jelszó páros."})
+			helpers.SetFlash(c, "Login", "Hibás felhasználónév és jelszó páros.")
+			return c.Redirect(http.StatusFound, "/user/login")
 		}
 
 		if err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(c.FormValue("password"))); err != nil {
-			return c.Render(http.StatusOK, "user/login", []string{"Hibás felhasználónév és jelszó páros."})
+			helpers.SetFlash(c, "Login", "Hibás felhasználónév és jelszó páros.")
+			return c.Redirect(http.StatusFound, "/user/login")
 		}
 
 		if u.ActivationKey.Valid {
-			return c.Render(http.StatusOK, "user/login", []string{"Hiba: az account nincs aktiválva."})
+			helpers.SetFlash(c, "Login", "Hiba: az account nincs aktiválva.")
+			return c.Redirect(http.StatusFound, "/user/login")
 		}
 
 		storage, _ := session.Get("user", c)
@@ -54,7 +69,13 @@ func PostLogin(DB *sqlx.DB) echo.HandlerFunc {
 
 		c.Set("user", u)
 
-		return c.Render(http.StatusOK, "message.gohtml", "Sikeres belépés.")
+		to := "/"
+		if val, ok := helpers.GetFlash(c, "LoginRedirect").(string); ok {
+			to = val
+		}
+
+		helpers.SetFlash(c, "TopMessage", "Sikeres belépés!")
+		return c.Redirect(http.StatusFound, to)
 	}
 }
 

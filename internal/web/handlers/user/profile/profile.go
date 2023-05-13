@@ -2,10 +2,11 @@ package profile
 
 import (
 	"fmt"
-	"github.com/mraron/njudge/internal/web/helpers"
-	"github.com/mraron/njudge/internal/web/models"
 	"net/http"
 	"strconv"
+
+	"github.com/mraron/njudge/internal/web/helpers"
+	"github.com/mraron/njudge/internal/web/models"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
@@ -68,14 +69,17 @@ func GetSubmissions(DB *sqlx.DB) echo.HandlerFunc {
 
 func GetSettings(DB *sqlx.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		p := c.Get("profile").(*models.User)
 		u := c.Get("user").(*models.User)
-		if p.Name != u.Name {
-			return c.Redirect(http.StatusForbidden, "../")
-		}
 
+		helpers.DeleteFlash(c, "ChangePassword")
 		return c.Render(http.StatusOK, "user/profile/settings", struct {
 			User *models.User
 		}{u})
+	}
+}
+
+func PostSettingsChangePassword(DB *sqlx.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		return c.Redirect(http.StatusFound, "../")
 	}
 }

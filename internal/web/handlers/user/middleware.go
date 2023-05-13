@@ -46,7 +46,7 @@ func RequireLoginMiddleware() func(echo.HandlerFunc) echo.HandlerFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			if c.Get("user").(*models.User) == nil {
-				return helpers.UnauthorizedError(c)
+				return helpers.LoginRequired(c)
 			}
 
 			return next(c)
