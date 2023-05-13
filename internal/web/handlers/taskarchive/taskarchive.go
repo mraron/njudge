@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
-	models2 "github.com/mraron/njudge/internal/web/models"
+	"github.com/mraron/njudge/internal/web/models"
 	"net/http"
 
 	"github.com/jmoiron/sqlx"
@@ -25,19 +25,19 @@ type TreeNode struct {
 // @TODO optimize this to use less queries, most likely caching it
 func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := c.Get("user").(*models2.User)
+		u := c.Get("user").(*models.User)
 
-		lst, err := models2.ProblemCategories(Where("parent_id IS NULL")).All(DB)
+		lst, err := models.ProblemCategories(Where("parent_id IS NULL")).All(DB)
 		if err != nil {
 			return err
 		}
 
 		roots := make([]*TreeNode, 0)
 
-		var dfs func(category *models2.ProblemCategory, node *TreeNode) error
+		var dfs func(category *models.ProblemCategory, node *TreeNode) error
 		id := 1000
-		dfs = func(root *models2.ProblemCategory, tree *TreeNode) error {
-			problems, err := models2.ProblemRels(Where("category_id = ?", root.ID), OrderBy("problem")).All(DB)
+		dfs = func(root *models.ProblemCategory, tree *TreeNode) error {
+			problems, err := models.ProblemRels(Where("category_id = ?", root.ID), OrderBy("problem")).All(DB)
 			if err != nil {
 				return err
 			}
@@ -57,7 +57,7 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 			}
 
 			//@TODO make a way to control sorting order from DB (add migrations etc.)
-			subcats, err := models2.ProblemCategories(Where("parent_id = ?", root.ID), OrderBy("name")).All(DB)
+			subcats, err := models.ProblemCategories(Where("parent_id = ?", root.ID), OrderBy("name")).All(DB)
 			if err != nil {
 				return err
 			}
