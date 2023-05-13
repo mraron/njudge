@@ -191,11 +191,11 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 			tc.MaxScore = float64(p.ScoreTypeParameters[subtask][0].(int))
 
 			subtask++
+			testsLeft = testsLeft[1:]
+			testIndices = testIndices[1:]
+			
 			if subtask < len(p.ScoreTypeParameters) {
 				advanceTests()
-			}else {
-				testsLeft = testsLeft[1:]
-				testIndices = testIndices[1:]
 			}
 		}else {
 			testsLeft = testsLeft[1:]
