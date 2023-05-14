@@ -16,7 +16,7 @@ func TestDummyParsing(t *testing.T) {
 
 	memFs := afero.NewMemMapFs()
 
-	cs := problems.NewConfigStore()
+	cs := problems.NewConfigList()
 	parser, identifier := ParserAndIdentifier()
 
 	handleError(cs.Register("polygon", parser, identifier))
@@ -102,7 +102,7 @@ func testProblemXML(t *testing.T, p Problem) {
 
 func TestFSParsing(t *testing.T) {
 	fs := afero.NewBasePathFs(afero.NewOsFs(), "./testdata/")
-	cs := problems.NewConfigStore()
+	cs := problems.NewConfigList()
 	parser, identifier := ParserAndIdentifier(CompileBinaries(false))
 
 	if err := cs.Register("polygon", parser, identifier); err != nil {

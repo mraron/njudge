@@ -31,7 +31,7 @@ func (d dummyProblemConfig) parser() problems.ConfigParser {
 
 func TestFSStore(t *testing.T) {
 	config := newDummyProblemConfig("feladat.xhtml")
-	configStore := problems.NewConfigStore()
+	configStore := problems.NewConfigList()
 	configStore.Register("dummy", config.parser(), config.identifier())
 
 	f := afero.NewMemMapFs()
@@ -41,7 +41,7 @@ func TestFSStore(t *testing.T) {
 	afero.WriteFile(f, "problems/aplusb2/feladat.xhtml", []byte("lalal"), 0644)
 	f.MkdirAll("problems/aplusb2/aplusb3", 0755)
 	afero.WriteFile(f, "problems/aplusb2/aplusb3/feladat.xhtml", []byte("lalal"), 0644)
-	
+
 	f.MkdirAll("problems/prefixed", 0755)
 	afero.WriteFile(f, "problems/prefixed/.njudge_prefix", []byte("XX"), 0644)
 	f.MkdirAll("problems/prefixed/first", 0755)
@@ -54,12 +54,11 @@ func TestFSStore(t *testing.T) {
 	f.MkdirAll("problems/prefixed/ignored", 0755)
 	afero.WriteFile(f, "problems/prefixed/ignored/feladat.xhtml", []byte("lalal"), 0644)
 	afero.WriteFile(f, "problems/prefixed/ignored/.njudge_ignore", []byte("lalal"), 0644)
-	
+
 	f.MkdirAll("problems/recursive", 0755)
 	afero.WriteFile(f, "problems/recursive/.njudge_ignore", []byte("lalal"), 0644)
 	f.MkdirAll("problems/recursive/nono", 0755)
 	afero.WriteFile(f, "problems/recursive/nono/feladat.xhtml", []byte("lalal"), 0644)
-	
 
 	store := problems.NewFsStore("problems/", problems.FsStoreUseFs(f), problems.FsStoreUseConfigStore(configStore))
 	if err := store.Update(); err != nil {
@@ -71,7 +70,7 @@ func TestFSStore(t *testing.T) {
 	if has, err := store.Has("aplusb2"); !has || err != nil {
 		t.Error("aplusb2", has, err)
 	}
-	if has, err := store.Has("aplusb3"); has{
+	if has, err := store.Has("aplusb3"); has {
 		t.Error("aplusb3", has, err)
 	}
 
@@ -84,16 +83,16 @@ func TestFSStore(t *testing.T) {
 	if has, err := store.Has("XX_third"); has {
 		t.Error("XX_third", has, err)
 	}
-	if has, err := store.Has("XX_.hidden"); has{
+	if has, err := store.Has("XX_.hidden"); has {
 		t.Error("XX_.hidden", has, err)
 	}
-	if has, err := store.Has("XX_hidden"); has{
+	if has, err := store.Has("XX_hidden"); has {
 		t.Error("XX_hidden", has, err)
 	}
-	if has, err := store.Has("XX_ignored"); has{
+	if has, err := store.Has("XX_ignored"); has {
 		t.Error("XX_ignored", has, err)
 	}
-	if has, err := store.Has("nono"); has{
+	if has, err := store.Has("nono"); has {
 		t.Error("nono", has, err)
 	}
 }
