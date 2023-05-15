@@ -50,7 +50,7 @@ var TestProblemCmd = &cobra.Command{
 		for _, test := range st.Feedback[0].Testcases() {
 			fmt.Println(test.Group, test.Index, test.VerdictName, test.Score, test.MaxScore)
 		}
-		fmt.Println(st.Verdict(), st.Score(), "/", st.MaxScore())
+		fmt.Println(st.Feedback[0].Verdict(), st.Feedback[0].Score(), "/", st.Feedback[0].MaxScore())
 		fmt.Println(st.FeedbackType.String())
 
 		if TestProblemArgs.Verbose > 0 {
