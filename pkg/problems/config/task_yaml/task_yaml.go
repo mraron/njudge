@@ -76,11 +76,11 @@ func (p Problem) Statements() problems.Contents {
 }
 
 func (p Problem) HTMLStatements() problems.Contents {
-	return p.StatementList.FilterByType("text/html")
+	return p.StatementList.FilterByType(problems.DataTypeHTML)
 }
 
 func (p Problem) PDFStatements() problems.Contents {
-	return p.StatementList.FilterByType("application/pdf")
+	return p.StatementList.FilterByType(problems.DataTypePDF)
 }
 
 func (p Problem) MemoryLimit() int {
@@ -193,11 +193,11 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 			subtask++
 			testsLeft = testsLeft[1:]
 			testIndices = testIndices[1:]
-			
+
 			if subtask < len(p.ScoreTypeParameters) {
 				advanceTests()
 			}
-		}else {
+		} else {
 			testsLeft = testsLeft[1:]
 			testIndices = testIndices[1:]
 		}
@@ -205,7 +205,7 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 		if len(tcByGroup[tc.Group]) == 0 {
 			tcByGroup[tc.Group] = make([]problems.Testcase, 0)
 		}
-		
+
 		tcByGroup[tc.Group] = append(tcByGroup[tc.Group], tc)
 	}
 
@@ -290,7 +290,7 @@ func (p Problem) GetTaskType() problems.TaskType {
 
 		tt = res
 	}
-	
+
 	if err != nil {
 		panic(err)
 	}

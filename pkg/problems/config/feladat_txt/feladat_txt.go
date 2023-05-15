@@ -48,11 +48,11 @@ func (p Problem) Statements() problems.Contents {
 }
 
 func (p Problem) HTMLStatements() problems.Contents {
-	return p.StatementList.FilterByType("text/html")
+	return p.StatementList.FilterByType(problems.DataTypeHTML)
 }
 
 func (p Problem) PDFStatements() problems.Contents {
-	return p.StatementList.FilterByType("application/pdf")
+	return p.StatementList.FilterByType(problems.DataTypePDF)
 }
 
 func (p Problem) MemoryLimit() int {

@@ -88,11 +88,11 @@ func (p Problem) Statements() problems.Contents {
 }
 
 func (p Problem) HTMLStatements() problems.Contents {
-	return p.GeneratedStatementList.FilterByType("text/html")
+	return p.GeneratedStatementList.FilterByType(problems.DataTypeHTML)
 }
 
 func (p Problem) PDFStatements() problems.Contents {
-	return p.GeneratedStatementList.FilterByType("application/pdf")
+	return p.GeneratedStatementList.FilterByType(problems.DataTypePDF)
 }
 
 func (p Problem) MemoryLimit() int {
@@ -303,7 +303,7 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 
 			if val.Type == "text/markdown" {
 				contents = markdown.ToHTML(contents, nil, nil)
-				val.Type = "text/html"
+				val.Type = problems.DataTypeHTML
 			}
 
 			p.GeneratedStatementList[ind] = problems.BytesData{Loc: val.Language, Val: contents, Typ: val.Type}

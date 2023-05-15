@@ -72,17 +72,17 @@ func (p *Problem) FillFields(c echo.Context, DB *sqlx.DB) error {
 }
 
 func (p *Problem) GetPDF(lang string) ([]byte, error) {
-	if len(p.PDFStatements()) == 0 {
+	if len(p.Statements().FilterByType(problems.DataTypePDF)) == 0 {
 		return nil, ErrorStatementNotFound
 	}
 
-	return i18n.TranslateContent(lang, p.PDFStatements()).Value()
+	return i18n.TranslateContent(lang, p.Statements().FilterByType(problems.DataTypePDF)).Value()
 }
 
 func (p *Problem) GetFile(file string) (fileLoc string, err error) {
 	switch p := p.Problem.(problems.ProblemWrapper).Problem.(type) {
 	case polygon.Problem:
-		if len(p.HTMLStatements()) == 0 || strings.HasSuffix(file, ".tex") || strings.HasSuffix(file, ".json") {
+		if len(p.Statements().FilterByType(problems.DataTypeHTML)) == 0 || strings.HasSuffix(file, ".tex") || strings.HasSuffix(file, ".json") {
 			err = ErrorFileNotFound
 		}
 

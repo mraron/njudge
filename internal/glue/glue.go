@@ -100,12 +100,12 @@ func (s *Server) runServer() {
 		}
 
 		if st.Done {
-			verdict := st.Status.Verdict()
+			verdict := st.Status.Feedback[0].Verdict()
 			if !st.Status.Compiled {
 				verdict = extmodels.VERDICT_CE
 			}
 
-			if _, err := s.DB.Exec("UPDATE submissions SET verdict=$1, status=$2, ontest=NULL, judged=$3, score=$5 WHERE id=$4", verdict, st.Status, time.Now(), id, st.Status.Score()); err != nil {
+			if _, err := s.DB.Exec("UPDATE submissions SET verdict=$1, status=$2, ontest=NULL, judged=$3, score=$5 WHERE id=$4", verdict, st.Status, time.Now(), id, st.Status.Feedback[0].Score()); err != nil {
 				return err
 			}
 		} else {

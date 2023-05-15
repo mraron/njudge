@@ -49,16 +49,22 @@ func (s BytesData) Type() string {
 	return s.Typ
 }
 
+var (
+	DataTypeText = "text"
+	DataTypeHTML = "text/html"
+	DataTypePDF  = "application/pdf"
+)
+
 func (s BytesData) IsText() bool {
-	return s.Typ == "text"
+	return s.Typ == DataTypeText
 }
 
 func (s BytesData) IsHTML() bool {
-	return s.Typ == "text/html"
+	return s.Typ == DataTypeHTML
 }
 
 func (s BytesData) IsPDF() bool {
-	return s.Typ == "application/pdf"
+	return s.Typ == DataTypePDF
 }
 
 func (s BytesData) Locale() string {
