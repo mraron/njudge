@@ -55,11 +55,11 @@ func New() OutputOnly {
 				rc.Stdout = &bytes.Buffer{}
 				rc.Stdout.Write(conts)
 
-				return language.Status{Verdict: language.VERDICT_OK}, nil
+				return language.Status{Verdict: language.VerdictOK}, nil
 			}
 		}
 
-		return language.Status{Verdict: language.VERDICT_RE}, err
+		return language.Status{Verdict: language.VerdictRE}, err
 	}
 
 	oo.Batch.CheckFailF = func(rc *batch.RunContext, s language.Status, g *problems.Group, t *problems.Testcase) error {

@@ -22,12 +22,12 @@ print(x[4])`
 
 func (p pypy3) Test(s language.Sandbox) error {
 	for _, test := range []language.LanguageTest{
-		{p, PYTHON3_aplusb, language.VERDICT_OK, "1 2", "3\n", 1 * time.Second, 128 * 1024 * 1024},
-		{p, PYTHON3_ce, language.VERDICT_RE, "", "", 1 * time.Second, 128 * 1024 * 1024},
-		{p, PYTHON3_print, language.VERDICT_OK, "", "Hello world\n", 1 * time.Second, 128 * 1024 * 1024},
-		{p, PYTHON3_tl, language.VERDICT_TL, "", "", 100 * time.Millisecond, 128 * 1024 * 1024},
-		{p, PYTHON3_re, language.VERDICT_RE, "", "", 1000 * time.Millisecond, 128 * 1024 * 1024},
-		{p, PYTHON3_rediv0, language.VERDICT_RE, "", "", 1000 * time.Millisecond, 128 * 1024 * 1024},
+		{p, PYTHON3_aplusb, language.VerdictOK, "1 2", "3\n", 1 * time.Second, 128 * 1024 * 1024},
+		{p, PYTHON3_ce, language.VerdictRE, "", "", 1 * time.Second, 128 * 1024 * 1024},
+		{p, PYTHON3_print, language.VerdictOK, "", "Hello world\n", 1 * time.Second, 128 * 1024 * 1024},
+		{p, PYTHON3_tl, language.VerdictTL, "", "", 100 * time.Millisecond, 128 * 1024 * 1024},
+		{p, PYTHON3_re, language.VerdictRE, "", "", 1000 * time.Millisecond, 128 * 1024 * 1024},
+		{p, PYTHON3_rediv0, language.VerdictRE, "", "", 1000 * time.Millisecond, 128 * 1024 * 1024},
 	} {
 		if err := test.Run(s); err != nil {
 			return err

@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
+	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/spf13/afero"
 
 	"github.com/mraron/njudge/pkg/language"
@@ -419,44 +420,6 @@ func parser(fs afero.Fs, path string) (problems.Problem, error) {
 		}
 	}
 
-	isEmptyFile := func(path string) bool {
-		if st, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
-			return false
-		} else {
-			return st.Size() == 0
-		}
-	}
-
-	compile := func(src string, to string) error {
-		if bin, err := fs.Create(to); err == nil {
-			defer bin.Close()
-
-			if file, err := fs.Open(src); err == nil {
-				defer file.Close()
-
-				if err := cpp.Std17.InsecureCompile(filepath.Dir(src), file, bin, os.Stderr); err != nil {
-					return multierr.Combine(err, os.Remove(to))
-				}
-
-				if err := fs.Chmod(to, os.ModePerm); err != nil {
-					return err
-				}
-			}
-
-			return nil
-		} else {
-			return err
-		}
-	}
-
-	chmodX := func(path string) error {
-		if stat, _ := fs.Stat(path); stat.Mode().Perm()&os.ModePerm != os.ModePerm {
-			return fs.Chmod(path, os.ModePerm)
-		}
-
-		return nil
-	}
-
 	checkPath := filepath.Join(p.Path, "check")
 	solPath := filepath.Join(p.Path, "sol")
 
@@ -470,21 +433,16 @@ func parser(fs afero.Fs, path string) (problems.Problem, error) {
 		managerPath := filepath.Join(checkPath, "manager")
 
 		if exists(checkerCppPath) {
-			if !exists(checkerPath) || isEmptyFile(checkerPath) {
-				if err := compile(checkerCppPath, checkerPath); err != nil {
-					return nil, err
-				}
-			}
-
-			chmodX(checkerPath)
-		} else if exists(managerCppPath) {
-			p.tasktype = "communication"
-			if err := compile(managerCppPath, managerPath); err != nil {
+			if err := cpp.AutoCompile(fs, sandbox.NewDummy(), checkPath, checkerCppPath, checkerPath); err != nil {
 				return nil, err
 			}
-			p.files = append(p.files, problems.File{Name: "manager.cpp", Role: "interactor", Path: managerPath})
+		} else if exists(managerCppPath) {
+			p.tasktype = "communication"
+			if err := cpp.AutoCompile(fs, sandbox.NewDummy(), checkPath, managerCppPath, managerPath); err != nil {
+				return nil, err
+			}
 
-			chmodX(managerPath)
+			p.files = append(p.files, problems.File{Name: "manager.cpp", Role: "interactor", Path: managerPath})
 		} else {
 			p.whiteDiffChecker = true
 		}

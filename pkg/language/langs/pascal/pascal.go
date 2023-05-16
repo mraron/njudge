@@ -48,7 +48,7 @@ func (pascal) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Wri
 
 func (pascal) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (language.Status, error) {
 	stat := language.Status{}
-	stat.Verdict = language.VERDICT_XX
+	stat.Verdict = language.VerdictXX
 
 	if err := s.CreateFile("a.out", binary); err != nil {
 		return stat, err

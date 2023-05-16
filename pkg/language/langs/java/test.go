@@ -14,7 +14,7 @@ const print = `public class main {
 
 func (j *Java) Test(s language.Sandbox) error {
 	for _, test := range []language.LanguageTest{
-		{Language: j, Source: print, ExpectedVerdict: language.VERDICT_OK, Input: "", ExpectedOutput: "Hello world\n", TimeLimit: 1 * time.Second, MemoryLimit: 50 * 128 * 1024 * 1024},
+		{Language: j, Source: print, ExpectedVerdict: language.VerdictOK, Input: "", ExpectedOutput: "Hello world\n", TimeLimit: 1 * time.Second, MemoryLimit: 50 * 128 * 1024 * 1024},
 	} {
 		if err := test.Run(s); err != nil {
 			return err

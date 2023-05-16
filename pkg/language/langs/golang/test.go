@@ -61,12 +61,12 @@ func main() {
 
 func (g golang) Test(s language.Sandbox) error {
 	for _, test := range []language.LanguageTest{
-		{g, aplusb, language.VERDICT_OK, "1 2", "3\n", 1 * time.Second, 2 * 512 * 1024 * 1024},
-		{g, ce, language.VERDICT_CE, "", "", 1 * time.Second, 2 * 512 * 1024 * 1024},
-		{g, print, language.VERDICT_OK, "", "Hello world\n", 1 * time.Second, 2 * 512 * 1024 * 1024},
-		{g, tl, language.VERDICT_TL, "", "", 100 * time.Millisecond, 2 * 512 * 1024 * 1024},
-		{g, re, language.VERDICT_RE | language.VERDICT_TL, "", "", 1000 * time.Millisecond, 2 * 512 * 1024 * 1024},
-		{g, rediv0, language.VERDICT_RE, "", "", 1000 * time.Millisecond, 2 * 512 * 1024 * 1024},
+		{g, aplusb, language.VerdictOK, "1 2", "3\n", 1 * time.Second, 2 * 512 * 1024 * 1024},
+		{g, ce, language.VerdictCE, "", "", 1 * time.Second, 2 * 512 * 1024 * 1024},
+		{g, print, language.VerdictOK, "", "Hello world\n", 1 * time.Second, 2 * 512 * 1024 * 1024},
+		{g, tl, language.VerdictTL, "", "", 100 * time.Millisecond, 2 * 512 * 1024 * 1024},
+		{g, re, language.VerdictRE | language.VerdictTL, "", "", 1000 * time.Millisecond, 2 * 512 * 1024 * 1024},
+		{g, rediv0, language.VerdictRE, "", "", 1000 * time.Millisecond, 2 * 512 * 1024 * 1024},
 	} {
 		if err := test.Run(s); err != nil {
 			return err

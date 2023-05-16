@@ -1,79 +1,17 @@
 package polygon
 
 import (
-	"bytes"
 	"encoding/xml"
 	"errors"
-	"fmt"
-	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
 	"github.com/mraron/njudge/pkg/language/sandbox"
-
-	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/spf13/afero"
-	"go.uber.org/multierr"
 )
-
-func compileIfNotCompiled(fs afero.Fs, wd, src, dst string) error {
-	if src == "" {
-		return nil
-	}
-
-	if st, err := fs.Stat(dst); os.IsNotExist(err) || st.Size() == 0 {
-		if binary, err := fs.Create(dst); err == nil {
-			if file, err := fs.Open(src); err == nil {
-				var buf bytes.Buffer
-				s := sandbox.NewDummy()
-				if err := s.Init(log.New(ioutil.Discard, "", 0)); err != nil {
-					return multierr.Combine(err, binary.Close(), file.Close())
-				}
-
-				//hacky solution
-				var headers []language.File
-				conts, err := afero.ReadFile(fs, src)
-				if err != nil {
-					return multierr.Combine(err, file.Close(), binary.Close())
-				}
-				if bytes.Contains(conts, []byte("testlib.h")) {
-					f, err := fs.Open(filepath.Join(wd, "testlib.h"))
-					if err != nil {
-						return multierr.Combine(err, file.Close(), binary.Close())
-					}
-
-					headers = append(headers, language.File{
-						Name:   "testlib.h",
-						Source: f,
-					})
-				}
-
-				if err := cpp.Std17.Compile(s, language.File{
-					Name:   filepath.Base(src),
-					Source: file,
-				}, binary, &buf, headers); err != nil {
-					return multierr.Combine(err, binary.Close(), file.Close(), fmt.Errorf("compile error: %v", buf.String()))
-				}
-
-				if err := fs.Chmod(dst, os.ModePerm); err != nil {
-					return multierr.Combine(err, binary.Close(), file.Close())
-				}
-
-				return multierr.Combine(binary.Close(), file.Close())
-			} else {
-				return multierr.Combine(err, binary.Close())
-			}
-		} else {
-			return err
-		}
-	} else {
-		return err
-	}
-}
 
 type Option func(*config)
 
@@ -167,12 +105,12 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 			if checkerPath == "" {
 				checkerPath = "check.cpp"
 			}
-			if err := compileIfNotCompiled(fs, workingDirectory, filepath.Join(p.Path, checkerPath), filepath.Join(p.Path, "check")); err != nil {
+			if err := cpp.AutoCompile(fs, sandbox.NewDummy(), workingDirectory, filepath.Join(p.Path, checkerPath), filepath.Join(p.Path, "check")); err != nil {
 				return nil, err
 			}
 
 			if p.Assets.Interactor.Source.Path != "" {
-				if err := compileIfNotCompiled(fs, workingDirectory, filepath.Join(p.Path, p.Assets.Interactor.Source.Path), filepath.Join(p.Path, "files/interactor")); err != nil {
+				if err := cpp.AutoCompile(fs, sandbox.NewDummy(), workingDirectory, filepath.Join(p.Path, p.Assets.Interactor.Source.Path), filepath.Join(p.Path, "files/interactor")); err != nil {
 					return nil, err
 				}
 			}

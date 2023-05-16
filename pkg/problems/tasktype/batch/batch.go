@@ -66,13 +66,13 @@ func PrepareFiles(ctx *CompileContext) (language.File, []language.File, error) {
 	lst, found := ctx.Problem.Languages(), false
 
 	for _, l := range lst {
-		if l.Name() == ctx.Lang.Name() {
+		if l.Id() == ctx.Lang.Id() {
 			found = true
 		}
 	}
 
 	if !found {
-		return language.File{}, nil, fmt.Errorf("language %s is not supported", ctx.Lang.Name())
+		return language.File{}, nil, fmt.Errorf("language %s is not supported", ctx.Lang.Id())
 	}
 
 	return language.File{Name: "main.cpp", Source: ctx.Source}, nil, nil
@@ -164,13 +164,13 @@ func CheckFail(ctx *RunContext, res language.Status, group *problems.Group, test
 	}
 
 	switch res.Verdict {
-	case language.VERDICT_RE:
+	case language.VerdictRE:
 		testcase.VerdictName = problems.VerdictRE
-	case language.VERDICT_XX:
+	case language.VerdictXX:
 		testcase.VerdictName = problems.VerdictXX
-	case language.VERDICT_ML:
+	case language.VerdictML:
 		testcase.VerdictName = problems.VerdictML
-	case language.VERDICT_TL:
+	case language.VerdictTL:
 		testcase.VerdictName = problems.VerdictTL
 	}
 
@@ -303,7 +303,7 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 				if tc.VerdictName != problems.VerdictDR {
 					continue
 				}
-				
+
 				if _, ok := testCache[tc.InputPath]; ok {
 					tmpIndex, tmpGroup := tc.Index, tc.Group
 					*tc = *testCache[tc.InputPath]
@@ -311,7 +311,7 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 					tc.Group = tmpGroup
 					tc.Score = 0.0
 					tc.MaxScore = 0.0
-					continue 
+					continue
 				}
 				testCache[tc.InputPath] = tc
 
@@ -326,7 +326,7 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 					if err != nil {
 						tc.VerdictName = problems.VerdictXX
 						return ans, err
-					} else if res.Verdict == language.VERDICT_OK {
+					} else if res.Verdict == language.VerdictOK {
 						if err := b.CheckOKF(&ctx, res, group, tc); err != nil {
 							tc.VerdictName = problems.VerdictXX
 							return ans, err

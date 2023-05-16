@@ -3,24 +3,33 @@ package language
 import "sort"
 
 type Store interface {
-	Register(name string, l Language)
+	Register(id string, l Language)
 	List() []Language
-	Get(name string) Language
+	Get(id string) Language
 }
 
-type MapStore struct {
-	langList map[string]Language
+type LanguageWrapper struct {
+	id string
+	Language
 }
 
-func NewMapStore() *MapStore {
-	return &MapStore{make(map[string]Language)}
+func (lw LanguageWrapper) Id() string {
+	return lw.id
 }
 
-func (m *MapStore) Register(name string, l Language) {
-	m.langList[name] = l
+type ListStore struct {
+	langList []Language
 }
 
-func (m *MapStore) List() []Language {
+func NewListStore() *ListStore {
+	return &ListStore{make([]Language, 0)}
+}
+
+func (m *ListStore) Register(id string, l Language) {
+	m.langList = append(m.langList, LanguageWrapper{id, l})
+}
+
+func (m *ListStore) List() []Language {
 	ans := make([]Language, len(m.langList))
 
 	ind := 0
@@ -30,15 +39,17 @@ func (m *MapStore) List() []Language {
 	}
 
 	sort.Slice(ans, func(i, j int) bool {
-		return ans[i].Name() < ans[j].Name()
+		return ans[i].Id() < ans[j].Id()
 	})
 
 	return ans
 }
 
-func (m *MapStore) Get(name string) Language {
-	if val, ok := m.langList[name]; ok {
-		return val
+func (m *ListStore) Get(id string) Language {
+	for ind := range m.langList {
+		if m.langList[ind].Id() == id {
+			return m.langList[ind]
+		}
 	}
 
 	return nil
@@ -47,5 +58,5 @@ func (m *MapStore) Get(name string) Language {
 var DefaultStore Store
 
 func init() {
-	DefaultStore = NewMapStore()
+	DefaultStore = NewListStore()
 }

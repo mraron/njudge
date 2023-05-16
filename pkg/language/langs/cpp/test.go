@@ -58,14 +58,14 @@ int main() {
 
 func (c Cpp) Test(s language.Sandbox) error {
 	for _, test := range []language.LanguageTest{
-		{latest, aplusb, language.VERDICT_OK, "1 2", "3\n", 1 * time.Second, 128 * 1024 * 1024},
-		{latest, compilerError, language.VERDICT_CE, "", "", 1 * time.Second, 128 * 1024 * 1024},
-		{latest, print, language.VERDICT_OK, "", "Hello world", 1 * time.Second, 128 * 1024 * 1024},
-		{latest, timelimitExceeded, language.VERDICT_TL, "", "", 100 * time.Millisecond, 128 * 1024 * 1024},
-		{latest, runtimeError, language.VERDICT_RE | language.VERDICT_TL, "", "", 1000 * time.Millisecond, 128 * 1024 * 1024},
-		{latest, runtimeErrorDiv0, language.VERDICT_RE, "", "", 1000 * time.Millisecond, 128 * 1024 * 1024},
-		{latest, longSleep, language.VERDICT_TL, "", "", 2 * time.Second, 128 * 1024 * 1024},
-		{latest, shortSleep, language.VERDICT_OK, "", "", 2 * time.Second, 128 * 1024 * 1024},
+		{latest, aplusb, language.VerdictOK, "1 2", "3\n", 1 * time.Second, 128 * 1024 * 1024},
+		{latest, compilerError, language.VerdictCE, "", "", 1 * time.Second, 128 * 1024 * 1024},
+		{latest, print, language.VerdictOK, "", "Hello world", 1 * time.Second, 128 * 1024 * 1024},
+		{latest, timelimitExceeded, language.VerdictTL, "", "", 100 * time.Millisecond, 128 * 1024 * 1024},
+		{latest, runtimeError, language.VerdictRE | language.VerdictTL, "", "", 1000 * time.Millisecond, 128 * 1024 * 1024},
+		{latest, runtimeErrorDiv0, language.VerdictRE, "", "", 1000 * time.Millisecond, 128 * 1024 * 1024},
+		{latest, longSleep, language.VerdictTL, "", "", 2 * time.Second, 128 * 1024 * 1024},
+		{latest, shortSleep, language.VerdictOK, "", "", 2 * time.Second, 128 * 1024 * 1024},
 	} {
 		if err := test.Run(s); err != nil {
 			return err

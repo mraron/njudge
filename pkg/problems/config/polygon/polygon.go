@@ -138,11 +138,11 @@ func (Problem) Languages() []language.Language {
 func (p Problem) Files() []problems.File {
 	res := make([]problems.File, 0)
 	for _, stub := range p.Assets.Stubs {
-		res = append(res, problems.File{stub.Name, "stub_" + stub.Language, filepath.Join(p.Path, stub.Path)})
+		res = append(res, problems.File{Name: stub.Name, Role: "stub_" + stub.Language, Path: filepath.Join(p.Path, stub.Path)})
 	}
 
 	if p.Assets.Interactor.Source.Path != "" {
-		res = append(res, problems.File{"interactor", "interactor", filepath.Join(p.Path, "files", "interactor")})
+		res = append(res, problems.File{Name: "interactor", Role: "interactor", Path: filepath.Join(p.Path, "files", "interactor")})
 	}
 
 	return res

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"time"
 )
@@ -12,35 +11,30 @@ import (
 type Verdict int
 
 const (
-	VERDICT_OK Verdict = 1 << iota
-	VERDICT_TL
-	VERDICT_ML
-	VERDICT_RE
-	VERDICT_XX
-	VERDICT_CE
+	VerdictOK Verdict = 1 << iota
+	VerdictTL
+	VerdictML
+	VerdictRE
+	VerdictXX
+	VerdictCE
 )
 
 func (v Verdict) String() string {
 	switch v {
-	case VERDICT_OK:
+	case VerdictOK:
 		return "OK"
-	case VERDICT_TL:
+	case VerdictTL:
 		return "TL"
-	case VERDICT_ML:
+	case VerdictML:
 		return "ML"
-	case VERDICT_RE:
+	case VerdictRE:
 		return "RE"
-	case VERDICT_XX:
+	case VerdictXX:
 		return "XX"
-	case VERDICT_CE:
+	case VerdictCE:
 		return "CE"
 	}
 	return "??"
-}
-
-type File struct {
-	Name   string
-	Source io.Reader
 }
 
 type Status struct {
@@ -48,6 +42,11 @@ type Status struct {
 	Signal  int
 	Memory  int
 	Time    time.Duration
+}
+
+type File struct {
+	Name   string
+	Source io.Reader
 }
 
 type Language interface {
@@ -71,7 +70,7 @@ type LanguageTest struct {
 }
 
 func (test LanguageTest) Run(sandbox Sandbox) error {
-	err := sandbox.Init(log.New(ioutil.Discard, "", 0))
+	err := sandbox.Init(log.New(io.Discard, "", 0))
 	if err != nil {
 		return err
 	}
@@ -83,7 +82,7 @@ func (test LanguageTest) Run(sandbox Sandbox) error {
 	err = test.Language.Compile(sandbox, File{test.Language.DefaultFileName(), src}, bin, stderr, []File{})
 	stderrContent := stderr.String()
 
-	if (test.ExpectedVerdict&VERDICT_CE == 0 && err != nil) || (test.ExpectedVerdict&VERDICT_CE != 0 && err == nil && stderrContent == "") {
+	if (test.ExpectedVerdict&VerdictCE == 0 && err != nil) || (test.ExpectedVerdict&VerdictCE != 0 && err == nil && stderrContent == "") {
 		return fmt.Errorf("error: %w stderr: %s", err, stderrContent)
 	}
 
@@ -92,7 +91,7 @@ func (test LanguageTest) Run(sandbox Sandbox) error {
 		return fmt.Errorf("cleanup err: %w", err)
 	}
 
-	if test.ExpectedVerdict&VERDICT_CE == 0 {
+	if test.ExpectedVerdict&VerdictCE == 0 {
 		err := sandbox.Init(log.New(io.Discard, "", 0))
 		if err != nil {
 			return err

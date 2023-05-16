@@ -131,33 +131,3 @@ func TestJSONStatement(t *testing.T) {
 		t.Error(err)
 	}
 }
-
-func TestCompileBinaries(t *testing.T) {
-	fs := afero.NewCopyOnWriteFs(afero.NewBasePathFs(afero.NewOsFs(), "./testdata/"), afero.NewMemMapFs())
-
-	if err := compileIfNotCompiled(fs, "", "check.cpp", "check"); err != nil {
-		t.Error(err)
-	}
-
-	if err := compileIfNotCompiled(fs, "", "check_syntaxerr.cpp", "check_syntaxerr"); err == nil {
-		t.Error("wanted error, but compiled fine")
-	}
-
-	// check already exists because of the first compilation
-	if err := compileIfNotCompiled(fs, "", "check_syntaxerr.cpp", "check"); err != nil {
-		t.Error(err)
-	}
-
-	f, err := fs.Create("check")
-	if err != nil {
-		t.Error(err)
-	}
-
-	if err := f.Close(); err != nil {
-		t.Error(err)
-	}
-
-	if err := compileIfNotCompiled(fs, "", "check_syntaxerr.cpp", "check"); err == nil {
-		t.Error("should have compile error")
-	}
-}
