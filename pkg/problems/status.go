@@ -257,12 +257,6 @@ type Group struct {
 	Dependencies []string
 }
 
-func (g *Group) AddTestcase(testcase Testcase) {
-	testcase.Index = len(g.Testcases) + 1
-	testcase.Group = g.Name
-	g.Testcases = append(g.Testcases, testcase)
-}
-
 func (g *Group) SetTimeLimit(tl time.Duration) {
 	for ind := range g.Testcases {
 		g.Testcases[ind].TimeLimit = tl
