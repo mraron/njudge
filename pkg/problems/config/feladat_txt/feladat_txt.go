@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -48,14 +47,6 @@ func (p Problem) Statements() problems.Contents {
 	return p.StatementList
 }
 
-func (p Problem) HTMLStatements() problems.Contents {
-	return p.StatementList.FilterByType(problems.DataTypeHTML)
-}
-
-func (p Problem) PDFStatements() problems.Contents {
-	return p.StatementList.FilterByType(problems.DataTypePDF)
-}
-
 func (p Problem) MemoryLimit() int {
 	return 1024 * p.MemoryLimitKB
 }
@@ -66,10 +57,6 @@ func (p Problem) TimeLimit() int {
 
 func (p Problem) InputOutputFiles() (string, string) {
 	return "", ""
-}
-
-func (p Problem) Interactive() bool {
-	return false
 }
 
 func (p Problem) Languages() []language.Language {
@@ -170,7 +157,7 @@ func (p Problem) GetTaskType() problems.TaskType {
 	return tt
 }
 
-func parser(fs afero.Fs, path string) (problems.Problem, error) {
+func Parse(fs afero.Fs, path string) (problems.Problem, error) {
 	f, err := fs.Open(filepath.Join(path, "feladat.txt"))
 	if err != nil {
 		return nil, err
@@ -244,26 +231,18 @@ func parser(fs afero.Fs, path string) (problems.Problem, error) {
 		ind++
 	}
 
-	feladat_pdf, err := fs.Open(filepath.Join(path, "feladat.pdf"))
-	if err != nil {
-		return nil, err
-	}
-	defer feladat_pdf.Close()
-
-	cont, err := ioutil.ReadAll(feladat_pdf)
-	if err != nil {
-		return nil, err
-	}
-
 	p.StatementList = make(problems.Contents, 0)
-	p.StatementList = append(p.StatementList, problems.BytesData{Loc: "hungarian", Val: cont, Typ: "application/pdf"})
-
-	p.AttachmentList = make(problems.Attachments, 0)
+	feladat_pdf, err := afero.ReadFile(fs, filepath.Join(path, "feladat.pdf"))
+	if err != nil {
+		return nil, err
+	}
+	p.StatementList = append(p.StatementList, problems.BytesData{Loc: "hungarian", Val: feladat_pdf, Typ: "application/pdf"})
 
 	if err := cpp.AutoCompile(fs, sandbox.NewDummy(), path, filepath.Join(path, "ellen.cpp"), filepath.Join(path, "ellen")); err != nil {
 		return nil, err
 	}
 
+	p.AttachmentList = make(problems.Attachments, 0)
 	if _, err = fs.Stat(filepath.Join(path, "minta.zip")); err == nil {
 		cont, err := afero.ReadFile(fs, filepath.Join(path, "minta.zip"))
 		if err != nil {
@@ -278,11 +257,11 @@ func parser(fs afero.Fs, path string) (problems.Problem, error) {
 	return p, nil
 }
 
-func identifier(fs afero.Fs, path string) bool {
+func Identify(fs afero.Fs, path string) bool {
 	_, err := fs.Stat(filepath.Join(path, "feladat.txt"))
 	return !os.IsNotExist(err)
 }
 
 func init() {
-	problems.RegisterConfigType("feladat_txt", parser, identifier)
+	problems.RegisterConfigType("feladat_txt", Parse, Identify)
 }
