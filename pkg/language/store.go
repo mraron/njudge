@@ -1,11 +1,26 @@
 package language
 
-import "sort"
+import (
+	"sort"
+
+	"golang.org/x/exp/slices"
+)
 
 type Store interface {
 	Register(id string, l Language)
 	List() []Language
 	Get(id string) Language
+}
+
+func StoreAllExcept(s Store, except []string) []Language {
+	res := []Language{}
+	for _, elem := range s.List() {
+		if !slices.Contains(except, elem.Id()) {
+			res = append(res, elem)
+		}
+	}
+
+	return res
 }
 
 type LanguageWrapper struct {
