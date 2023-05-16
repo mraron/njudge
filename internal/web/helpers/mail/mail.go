@@ -2,11 +2,13 @@ package mail
 
 import (
 	"crypto/tls"
+	"errors"
 	"fmt"
-	"github.com/mraron/njudge/internal/web/helpers/config"
 	"io"
 	"net/smtp"
 	"strings"
+
+	"github.com/mraron/njudge/internal/web/helpers/config"
 
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
@@ -82,15 +84,13 @@ func (m Mail) Send(s config.Server) error {
 		message := mail.NewSingleEmail(from, m.Subject, to, plainTextContent, htmlContent)
 
 		client := sendgrid.NewSendClient(s.Sendgrid.ApiKey)
-		resp, err := client.Send(message)
-		if err != nil {
-			return err
-		}
+		_, err := client.Send(message)
+		return err
+	}
 
-		fmt.Println(resp)
-
+	if s.Mode == "development" {
 		return nil
 	}
 
-	return fmt.Errorf("can't send mail")
+	return errors.New("can't sand mail")
 }
