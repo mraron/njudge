@@ -1,14 +1,15 @@
 package web
 
 import (
+	_ "mime"
+	"net/http"
+	"time"
+
 	"github.com/antonlindstrom/pgstore"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/config"
 	"github.com/mraron/njudge/internal/web/helpers/templates"
 	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
-	_ "mime"
-	"net/http"
-	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo-contrib/session"
@@ -18,7 +19,7 @@ import (
 	"github.com/mraron/njudge/pkg/problems"
 	_ "github.com/mraron/njudge/pkg/problems/config/feladat_txt"
 	_ "github.com/mraron/njudge/pkg/problems/config/polygon"
-	_ "github.com/mraron/njudge/pkg/problems/config/problem_json"
+	_ "github.com/mraron/njudge/pkg/problems/config/problem_yaml"
 	_ "github.com/mraron/njudge/pkg/problems/config/task_yaml"
 	_ "github.com/mraron/njudge/pkg/problems/tasktype/batch"
 	_ "github.com/mraron/njudge/pkg/problems/tasktype/communication"

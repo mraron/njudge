@@ -1,7 +1,6 @@
-package problem_json
+package problem_yaml
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,6 +10,7 @@ import (
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/checker"
 	"github.com/spf13/afero"
+	"gopkg.in/yaml.v3"
 )
 
 type Title struct {
@@ -30,44 +30,44 @@ type Attachment struct {
 }
 
 type Subtask struct {
-	TestCount     int      `json:"test_count"`
-	InputList     []string `json:"input_list"`
-	OutputList    []string `json:"output_list"`
-	InputPattern  string   `json:"input_pattern"`
-	OutputPattern string   `json:"output_pattern"`
-	Scoring       string   `json:"scoring"`
-	MaxScore      float64  `json:"max_score"`
+	TestCount     int      `yaml:"test_count"`
+	InputList     []string `yaml:"input_list"`
+	OutputList    []string `yaml:"output_list"`
+	InputPattern  string   `yaml:"input_pattern"`
+	OutputPattern string   `yaml:"output_pattern"`
+	Scoring       string   `yaml:"scoring"`
+	MaxScore      float64  `yaml:"max_score"`
 }
 
 type Checker struct {
-	Type string `json:"type"`
-	Path string `json:"path"`
+	Type string `yaml:"type"`
+	Path string `yaml:"path"`
 }
 
 type Problem struct {
-	Path                   string               `json:"-"`
-	GeneratedStatementList problems.Contents    `json:"-"`
-	AttachmentList         problems.Attachments `json:"-"`
+	Path                   string               `yaml:"-"`
+	GeneratedStatementList problems.Contents    `yaml:"-"`
+	AttachmentList         problems.Attachments `yaml:"-"`
 
-	ShortName      string       `json:"shortname"`
-	TitleList      []Title      `json:"titles"`
-	StatementList  []Statement  `json:"statements"`
-	AttachmentInfo []Attachment `json:"attachments"`
+	ShortName      string       `yaml:"shortname"`
+	TitleList      []Title      `yaml:"titles"`
+	StatementList  []Statement  `yaml:"statements"`
+	AttachmentInfo []Attachment `yaml:"attachments"`
 
 	Tests struct {
-		InputFile     string    `json:"input_file"`
-		OutputFile    string    `json:"output_file"`
-		MemoryLimit   int       `json:"memory_limit"`
-		TimeLimit     float64   `json:"time_limit"`
-		TestCount     int       `json:"test_count"`
-		InputPattern  string    `json:"input_pattern"`
-		OutputPattern string    `json:"output_pattern"`
-		InputList     []string  `json:"input_list"`
-		OutputList    []string  `json:"output_list"`
-		Checker       Checker   `json:"checker"`
-		FeedbackType  string    `json:"feedback_type"`
-		Subtasks      []Subtask `json:"subtasks"`
-	} `json:"tests"`
+		InputFile     string    `yaml:"input_file"`
+		OutputFile    string    `yaml:"output_file"`
+		MemoryLimit   int       `yaml:"memory_limit"`
+		TimeLimit     float64   `yaml:"time_limit"`
+		TestCount     int       `yaml:"test_count"`
+		InputPattern  string    `yaml:"input_pattern"`
+		OutputPattern string    `yaml:"output_pattern"`
+		InputList     []string  `yaml:"input_list"`
+		OutputList    []string  `yaml:"output_list"`
+		Checker       Checker   `yaml:"checker"`
+		FeedbackType  string    `yaml:"feedback_type"`
+		Subtasks      []Subtask `yaml:"subtasks"`
+	} `yaml:"tests"`
 }
 
 func (p Problem) Name() string {
@@ -85,14 +85,6 @@ func (p Problem) Titles() problems.Contents {
 
 func (p Problem) Statements() problems.Contents {
 	return p.GeneratedStatementList
-}
-
-func (p Problem) HTMLStatements() problems.Contents {
-	return p.GeneratedStatementList.FilterByType(problems.DataTypeHTML)
-}
-
-func (p Problem) PDFStatements() problems.Contents {
-	return p.GeneratedStatementList.FilterByType(problems.DataTypePDF)
 }
 
 func (p Problem) MemoryLimit() int {
@@ -254,16 +246,16 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 	}
 
 	parser := func(fs afero.Fs, path string) (problems.Problem, error) {
-		problemJSON, err := fs.Open(filepath.Join(path, "problem.json"))
+		problemYAML, err := fs.Open(filepath.Join(path, "problem.yaml"))
 		if err != nil {
 			return nil, err
 		}
 
-		defer problemJSON.Close()
+		defer problemYAML.Close()
 
 		p := Problem{}
 
-		if err := json.NewDecoder(problemJSON).Decode(&p); err != nil {
+		if err := yaml.NewDecoder(problemYAML).Decode(&p); err != nil {
 			return nil, err
 		}
 
@@ -304,7 +296,7 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 	}
 
 	identifier := func(fs afero.Fs, path string) bool {
-		_, err := fs.Stat(filepath.Join(path, "problem.json"))
+		_, err := fs.Stat(filepath.Join(path, "problem.yaml"))
 		return !os.IsNotExist(err)
 	}
 
@@ -313,5 +305,5 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 
 func init() {
 	parser, identifier := ParserAndIdentifier()
-	problems.RegisterConfigType("problem_json", parser, identifier)
+	problems.RegisterConfigType("problem_yaml", parser, identifier)
 }
