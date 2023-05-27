@@ -1,7 +1,8 @@
-package helpers
+package ui
 
 import (
-	"github.com/jmoiron/sqlx"
+	"context"
+	"database/sql"
 	"github.com/mraron/njudge/internal/web/models"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"strconv"
@@ -12,16 +13,16 @@ type Link struct {
 	Href string
 }
 
-func TopCategoryLink(cat int, DB *sqlx.DB) (Link, error) {
+func TopCategoryLink(ctx context.Context, db *sql.DB, categoryID int) (Link, error) {
 	var (
 		category *models.ProblemCategory
 		err      error
 	)
 
-	orig := cat
+	orig := categoryID
 
 	for {
-		category, err = models.ProblemCategories(qm.Where("id = ?", cat)).One(DB)
+		category, err = models.ProblemCategories(qm.Where("id = ?", categoryID)).One(ctx, db)
 		if err != nil {
 			return Link{}, err
 		}
@@ -29,7 +30,7 @@ func TopCategoryLink(cat int, DB *sqlx.DB) (Link, error) {
 		if !category.ParentID.Valid {
 			break
 		}
-		cat = category.ParentID.Int
+		categoryID = category.ParentID.Int
 	}
 
 	return Link{

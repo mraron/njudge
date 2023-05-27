@@ -1,13 +1,16 @@
 package problemset
 
 import (
-	"github.com/mraron/njudge/internal/web/handlers/problemset/problem"
+	"context"
+	"github.com/mraron/njudge/internal/web/domain/problem"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/config"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
+	"github.com/mraron/njudge/internal/web/helpers/ui"
 	"github.com/mraron/njudge/internal/web/models"
-	"io"
+	"github.com/mraron/njudge/internal/web/services"
+	"github.com/mraron/njudge/pkg/problems"
 	"net/http"
 	"net/url"
 	"sort"
@@ -17,7 +20,6 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
-	"github.com/mraron/njudge/pkg/problems"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
@@ -30,10 +32,15 @@ type CategoryFilter struct {
 	Selected bool
 }
 
+type StatProblem struct {
+	problem.Problem
+	problem.StatsData
+}
+
 type ProblemList struct {
 	Pages        []pagination.Link
-	Problems     []problem.Problem
-	SolverSorter helpers.SortColumn
+	Problems     []StatProblem
+	SolverSorter ui.SortColumn
 
 	Filtered        bool
 	TitleFilter     string
@@ -41,13 +48,13 @@ type ProblemList struct {
 	CategoryFilters []CategoryFilter
 }
 
-func getProblemList(c echo.Context, DB *sqlx.DB, problemStore problems.Store, u *models.User, page, perPage int, order QueryMod, query []QueryMod, qu url.Values) (*ProblemList, error) {
-	ps, err := models.ProblemRels(append(append([]QueryMod{Limit(perPage), Offset((page - 1) * perPage)}, query...), order)...).All(DB)
+func getProblemList(c echo.Context, DB *sqlx.DB, problemRepo problem.Repository, problemStatsService services.ProblemStatsService, page, perPage int, order QueryMod, query []QueryMod, qu url.Values) (*ProblemList, error) {
+	ps, err := models.ProblemRels(append(append([]QueryMod{Limit(perPage), Offset((page - 1) * perPage)}, query...), order)...).All(context.TODO(), DB)
 	if err != nil {
 		return nil, err
 	}
 
-	cnt, err := models.ProblemRels(query...).Count(DB)
+	cnt, err := models.ProblemRels(query...).Count(context.TODO(), DB)
 	if err != nil {
 		return nil, err
 	}
@@ -57,16 +64,21 @@ func getProblemList(c echo.Context, DB *sqlx.DB, problemStore problems.Store, u 
 		return nil, err
 	}
 
-	problemsList := make([]problem.Problem, len(ps))
+	problemsList := make([]StatProblem, len(ps))
 	for i, p := range ps {
-		problemsList[i].Problem, err = problemStore.Get(p.Problem)
+		res, err := problemRepo.Get(c.Request().Context(), p.ID)
 		if err != nil {
 			return nil, err
 		}
-		problemsList[i].ProblemRel = p
 
-		if err := problemsList[i].FillFields(c, DB); err != nil {
+		stats, err := problemStatsService.GetStatsData(c.Request().Context(), *res, c.Get("userID").(int))
+		if err != nil {
 			return nil, err
+		}
+
+		problemsList[i] = StatProblem{
+			Problem:   *res,
+			StatsData: *stats,
 		}
 	}
 
@@ -85,13 +97,11 @@ func getProblemList(c echo.Context, DB *sqlx.DB, problemStore problems.Store, u 
 		qu.Set("order", "DESC")
 	}
 
-	return &ProblemList{Pages: pages, Problems: problemsList, SolverSorter: helpers.SortColumn{sortOrder, "?" + qu.Encode()}}, nil
+	return &ProblemList{Pages: pages, Problems: problemsList, SolverSorter: ui.SortColumn{sortOrder, "?" + qu.Encode()}}, nil
 }
 
-func GetProblemList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
+func GetProblemList(DB *sqlx.DB, problemStore problems.Store, problemRepo problem.Repository, problemStatsService services.ProblemStatsService) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := c.Get("user").(*models.User)
-
 		problemSet := c.Param("name")
 		page, err := strconv.Atoi(c.QueryParam("page"))
 		if err != nil || page <= 0 {
@@ -112,7 +122,7 @@ func GetProblemList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 		if c.QueryParam("title") != "" {
 			filtered = true
 
-			rels, err := models.ProblemRels().All(DB)
+			rels, err := models.ProblemRels().All(context.TODO(), DB)
 			if err != nil {
 				return err
 			}
@@ -139,7 +149,7 @@ func GetProblemList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 			qmods = append(qmods, WhereIn("problem in ?", lst...))
 		}
 
-		cats, err := models.ProblemCategories().All(DB)
+		cats, err := models.ProblemCategories().All(context.TODO(), DB)
 		if err != nil {
 			return err
 		}
@@ -193,7 +203,7 @@ func GetProblemList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 			}
 
 			rels, err := models.ProblemRels(InnerJoin("problem_tags pt on pt.problem_id = problem_rels.id"),
-				InnerJoin("tags t on pt.tag_id = t.id"), WhereIn("t.name in ?", lst...), GroupBy("problem_rels.id"), Having("COUNT(DISTINCT t.name) = ?", len(lst))).All(DB)
+				InnerJoin("tags t on pt.tag_id = t.id"), WhereIn("t.name in ?", lst...), GroupBy("problem_rels.id"), Having("COUNT(DISTINCT t.name) = ?", len(lst))).All(context.TODO(), DB)
 			if err != nil {
 				return nil
 			}
@@ -206,7 +216,7 @@ func GetProblemList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 			qmods = append(qmods, WhereIn("id IN ?", lst...))
 		}
 
-		problemList, err := getProblemList(c, DB, problemStore, u, page, 20, OrderBy(by+" "+order), qmods, c.Request().URL.Query())
+		problemList, err := getProblemList(c, DB, problemRepo, problemStatsService, page, 20, OrderBy(by+" "+order), qmods, c.Request().URL.Query())
 		if err != nil {
 			return err
 		}
@@ -275,7 +285,7 @@ func GetStatus(DB *sqlx.DB) echo.HandlerFunc {
 			query = append(query, Where("user_id = ?", userID))
 		}
 
-		statusPage, err := helpers.GetStatusPage(DB, page, 20, OrderBy("id DESC"), query, c.Request().URL.Query())
+		statusPage, err := helpers.GetStatusPage(DB.DB, page, 20, OrderBy("id DESC"), query, c.Request().URL.Query())
 		if err != nil {
 			return err
 		}
@@ -285,62 +295,41 @@ func GetStatus(DB *sqlx.DB) echo.HandlerFunc {
 	}
 }
 
-func PostSubmit(cfg config.Server, DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
+func PostSubmit(cfg config.Server, subService services.SubmitService) echo.HandlerFunc {
+	type request struct {
+		Problemset     string `param:"problemset"`
+		ProblemName    string `form:"problem"`
+		LanguageName   string `form:"language"`
+		SubmissionCode []byte `form:"submissionCode"`
+		SubmissionFile []byte `form:"source"`
+	}
 	return func(c echo.Context) error {
-		var (
-			u   *models.User
-			err error
-			id  int
-			p   problems.Problem
-		)
-
-		if u = c.Get("user").(*models.User); u == nil {
+		u := c.Get("user").(*models.User)
+		if u == nil {
 			return c.Render(http.StatusForbidden, "message", "Előbb lépj be.")
 		}
 
-		problemName := c.FormValue("problem")
-		if p, err = problemStore.Get(problemName); err != nil {
+		data := request{}
+		if err := c.Bind(&data); err != nil {
 			return err
 		}
 
-		languageName := c.FormValue("language")
-
-		found := false
-		for _, lang := range p.Languages() {
-			if lang.Id() == languageName {
-				found = true
-				break
-			}
+		code := data.SubmissionCode
+		if len(code) == 0 {
+			code = data.SubmissionFile
 		}
 
-		if !found {
-			return c.Render(http.StatusOK, "error.gohtml", "Hibás nyelvazonosító.")
-		}
-
-		code := []byte(c.FormValue("submissionCode"))
-		if string(code) == "" {
-			fileHeader, err := c.FormFile("source")
-			if err != nil {
-				return err
-			}
-
-			f, err := fileHeader.Open()
-			if err != nil {
-				return err
-			}
-
-			contents, err := io.ReadAll(f)
-			if err != nil {
-				return err
-			}
-
-			code = contents
-		}
-
-		if id, err = helpers.Submit(cfg, DB, problemStore, u.ID, c.Get("problemset").(string), problemStore.MustGet(c.FormValue("problem")).Name(), languageName, code); err != nil {
+		sub, err := subService.Submit(c.Request().Context(), services.SubmitRequest{
+			UserID:     u.ID,
+			Problemset: data.Problemset,
+			Problem:    data.ProblemName,
+			Language:   data.LanguageName,
+			Source:     code,
+		})
+		if err != nil {
 			return err
 		}
 
-		return c.Redirect(http.StatusFound, "/problemset/status/#submission"+strconv.Itoa(id))
+		return c.Redirect(http.StatusFound, "/problemset/status/#submission"+strconv.Itoa(sub.ID))
 	}
 }

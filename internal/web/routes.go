@@ -6,13 +6,12 @@ import (
 	"github.com/mraron/njudge/internal/web/handlers"
 	"github.com/mraron/njudge/internal/web/handlers/api"
 	"github.com/mraron/njudge/internal/web/handlers/problemset"
-	"github.com/mraron/njudge/internal/web/handlers/problemset/problem"
-	"github.com/mraron/njudge/internal/web/handlers/submission"
 	"github.com/mraron/njudge/internal/web/handlers/taskarchive"
 	"github.com/mraron/njudge/internal/web/handlers/user"
 	"github.com/mraron/njudge/internal/web/handlers/user/profile"
 	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
 	"github.com/mraron/njudge/internal/web/models"
+	"github.com/mraron/njudge/internal/web/services"
 	"time"
 )
 
@@ -24,26 +23,26 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 
 	e.Static("/static", "static")
 
-	e.GET("/submission/:id", submission.Get(s.DB))
-	e.GET("/submission/rejudge/:id", submission.Rejudge(s.DB), user.RequireLoginMiddleware())
+	e.GET("/submission/:id", handlers.GetSubmission(services.NewSQLSubmission(s.DB.DB))).Name = "getSubmission"
+	e.GET("/submission/rejudge/:id", handlers.RejudgeSubmission(services.NewSQLSubmission(s.DB.DB)), user.RequireLoginMiddleware()).Name = "rejudgeSubmission"
 	e.GET("/task_archive", taskarchive.Get(s.DB, s.ProblemStore))
 
 	ps := e.Group("/problemset", problemset.SetNameMiddleware())
-	ps.GET("/:name/", problemset.GetProblemList(s.DB, s.ProblemStore))
-	ps.POST("/:name/submit", problemset.PostSubmit(s.Server, s.DB, s.ProblemStore))
+	ps.GET("/:name/", problemset.GetProblemList(s.DB, s.ProblemStore, services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
+	ps.POST("/:name/submit", problemset.PostSubmit(s.Server, services.NewSQLSubmitService(s.DB.DB, s.ProblemStore)))
 	ps.GET("/status/", problemset.GetStatus(s.DB))
 
-	psProb := ps.Group("/:name/:problem", problem.RenameMiddleware(s.ProblemStore), problem.SetProblemMiddleware(s.DB, s.ProblemStore))
-	psProb.GET("/", problem.Get(s.DB))
-	psProb.GET("/problem", problem.Get(s.DB))
-	psProb.GET("/status", problem.GetStatus(s.DB))
-	psProb.GET("/submit", problem.GetSubmit(s.DB))
-	psProb.GET("/ranklist", problem.GetRanklist(s.DB))
-	psProb.POST("/tags", problem.PostTag(s.DB))
-	psProb.GET("/delete_tag/:id", problem.DeleteTag(s.DB))
-	psProb.GET("/pdf/:language/", problem.GetPDF())
-	psProb.GET("/attachment/:attachment/", problem.GetAttachment())
-	psProb.GET("/:file", problem.GetFile())
+	psProb := ps.Group("/:name/:problem", problemset.RenameProblemMiddleware(s.ProblemStore), problemset.SetProblemMiddleware(services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
+	psProb.GET("/", problemset.GetProblem()).Name = "getProblemMain"
+	psProb.GET("/problem", problemset.GetProblem())
+	psProb.GET("/status", problemset.GetProblemStatus(s.DB))
+	psProb.GET("/submit", problemset.GetProblemSubmit())
+	psProb.GET("/ranklist", problemset.GetProblemRanklist(s.DB))
+	psProb.POST("/tags", problemset.PostProblemTag(services.NewSQLTagsService(s.DB.DB)))
+	psProb.GET("/delete_tag/:id", problemset.DeleteProblemTag(services.NewSQLTagsService(s.DB.DB)))
+	psProb.GET("/pdf/:language/", problemset.GetProblemPDF())
+	psProb.GET("/attachment/:attachment/", problemset.GetProblemAttachment())
+	psProb.GET("/:file", problemset.GetProblemFile())
 
 	u := e.Group("/user")
 

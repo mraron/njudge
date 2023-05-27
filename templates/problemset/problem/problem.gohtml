@@ -28,10 +28,10 @@
 
 <div class="row">
 <div class="col-12 col-lg-9">
-{{if .Data.Problem.HTMLStatements}}
-    {{str2html (translateContent "hungarian" .Data.Problem.HTMLStatements).String}}
-{{else if .Data.Problem.PDFStatements}}
-    <embed src="pdf/{{(translateContent "hungarian" .Data.Problem.PDFStatements).Locale}}/" width="100%" height="800px"></embed>
+{{if $htmls := .Data.Problem.Statements.FilterByType "text/html"}}
+    {{str2html (translateContent "hungarian" $htmls).String}}
+{{else if $pdfs := .Data.Problem.Statements.FilterByType "application/pdf"}}
+    <embed src="pdf/{{(translateContent "hungarian" $pdfs).Locale}}/" width="100%" height="800px"/>
 {{end}}
 </div>
 
@@ -112,7 +112,7 @@
 </div>
 
 {{end}}
-{{if or .Data.Problem.Attachments .Data.Problem.PDFStatements}}
+{{if or .Data.Problem.Attachments (.Data.Problem.Statements.FilterByType "application/pdf")}}
 <br>
 <div class="card">
     <div class="card-header">
@@ -122,7 +122,7 @@
         {{range $a := .Data.Problem.Attachments}}
             <a href="attachment/{{$a.Name}}/"><i class="fas fa-file"></i> Fájl ({{$a.Name}})</a><br>
         {{end}}
-        {{range $loc := .Data.Problem.PDFStatements.Locales}}
+        {{range $loc := (.Data.Problem.Statements.FilterByType "application/pdf").Locales}}
             <a href="pdf/{{$loc}}/"><i class="fas fa-file-pdf"></i> Leírás ({{$loc}})</a><br>
         {{end}}
 

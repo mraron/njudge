@@ -1,6 +1,7 @@
 package templates
 
 import (
+	"context"
 	"crypto/md5"
 	"database/sql"
 	"encoding/json"
@@ -157,7 +158,10 @@ func funcs(store problems.Store, db *sql.DB, store2 partials.Store) template.Fun
 			return math.Round(num*100) / 100
 		},
 		"tags": func() (models.TagSlice, error) {
-			return models.Tags().All(db)
+			return models.Tags().All(context.Background(), db)
+		},
+		"contextTODO": func() context.Context {
+			return context.TODO()
 		},
 	}
 }

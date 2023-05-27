@@ -1,8 +1,8 @@
 package api
 
 import (
+	"context"
 	"database/sql"
-	"fmt"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
 	"github.com/mraron/njudge/internal/web/models"
 
@@ -33,34 +33,33 @@ func (dp PartialDataProvider) List(data *pagination.Data) ([]*models.Partial, er
 		qms = append(qms, Offset(data.PerPage*(data.Page-1)))
 	}
 
-	return models.Partials(qms...).All(dp.DB)
+	return models.Partials(qms...).All(context.TODO(), dp.DB)
 }
 
 func (dp PartialDataProvider) Count() (int64, error) {
-	return models.Partials().Count(dp.DB)
+	return models.Partials().Count(context.TODO(), dp.DB)
 }
 
 func (dp PartialDataProvider) Get(name string) (*models.Partial, error) {
-	return models.Partials(Where("name = ?", name)).One(dp.DB)
+	return models.Partials(Where("name = ?", name)).One(context.TODO(), dp.DB)
 }
 
 func (dp PartialDataProvider) Insert(elem *models.Partial) error {
-	fmt.Println(elem)
-	return elem.Insert(dp.DB, boil.Infer())
+	return elem.Insert(context.TODO(), dp.DB, boil.Infer())
 }
 
 func (dp PartialDataProvider) Delete(name string) error {
-	elem, err := models.Partials(Where("name=?", name)).One(dp.DB)
+	elem, err := models.Partials(Where("name=?", name)).One(context.TODO(), dp.DB)
 	if err != nil {
 		return err
 	}
 
-	_, err = elem.Delete(dp.DB)
+	_, err = elem.Delete(context.TODO(), dp.DB)
 	return err
 }
 
 func (dp PartialDataProvider) Update(name string, elem *models.Partial) error {
 	elem.Name = name
-	_, err := elem.Update(dp.DB, boil.Infer())
+	_, err := elem.Update(context.TODO(), dp.DB, boil.Infer())
 	return err
 }

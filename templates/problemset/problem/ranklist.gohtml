@@ -8,9 +8,10 @@
     <th scope="col">Pont</th>
 </tr>
 </thead>
-{{$mx := (.Data.Problem.StatusSkeleton "").MaxScore}}
+{{$mx := (index (.Data.Problem.StatusSkeleton "").Feedback 0).MaxScore}}
 {{range $i := .Data.Submissions}}
-    <tr><td><a href="/user/profile/{{$i.User.OneG.Name}}/">{{$i.User.OneG.Name}}</a></td><td><a href="/submission/{{$i.ID}}">{{$i.Score.Value}}/{{$mx}}</a></td></tr>
+    {{$user := $i.User.OneG contextTODO}}
+    <tr><td><a href="/user/profile/{{$user.Name}}/">{{$user.Name}}</a></td><td><a href="/submission/{{$i.ID}}">{{$i.Score.Value}}/{{$mx}}</a></td></tr>
 {{end}}
 </table>
 

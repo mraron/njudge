@@ -12,11 +12,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type SortColumn struct {
-	Order string
-	Href  string
-}
-
 func GenerateActivationKey(length int) string {
 	var (
 		alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678901234567890123456789"

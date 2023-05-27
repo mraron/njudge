@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"github.com/mraron/njudge/internal/web/models"
 	"net/http"
 
@@ -32,7 +33,7 @@ func PostLogin(DB *sqlx.DB) echo.HandlerFunc {
 			return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
 		}
 
-		u, err = models.Users(Where("name=?", c.FormValue("name"))).One(DB)
+		u, err = models.Users(Where("name=?", c.FormValue("name"))).One(context.TODO(), DB)
 		if err != nil {
 			return c.Render(http.StatusOK, "user/login", []string{"Hibás felhasználónév és jelszó páros."})
 		}

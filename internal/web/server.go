@@ -1,12 +1,13 @@
 package web
 
 import (
+	"context"
+	"github.com/mraron/njudge/internal/web/services"
 	_ "mime"
 	"net/http"
 	"time"
 
 	"github.com/antonlindstrom/pgstore"
-	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/config"
 	"github.com/mraron/njudge/internal/web/helpers/templates"
 	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
@@ -72,5 +73,17 @@ func (s *Server) Run() {
 }
 
 func (s *Server) Submit(uid int, problemset, problem, language string, source []byte) (int, error) {
-	return helpers.Submit(s.Server, s.DB, s.ProblemStore, uid, problemset, problem, language, source)
+	subService := services.NewSQLSubmitService(s.DB.DB, s.ProblemStore)
+	sub, err := subService.Submit(context.Background(), services.SubmitRequest{
+		UserID:     uid,
+		Problemset: problemset,
+		Problem:    problem,
+		Language:   language,
+		Source:     source,
+	})
+
+	if err != nil {
+		return -1, err
+	}
+	return sub.ID, nil
 }

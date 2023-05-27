@@ -1,6 +1,7 @@
 package partials
 
 import (
+	"context"
 	"database/sql"
 	"github.com/mraron/njudge/internal/web/models"
 	"time"
@@ -31,7 +32,7 @@ func NewCached(db *sql.DB, validFor time.Duration) *Cached {
 
 func (pc *Cached) Get(name string) (string, error) {
 	if time.Since(pc.accessed[name]) > pc.validFor {
-		p, err := models.Partials(Where("name = ?", name)).One(pc.DB)
+		p, err := models.Partials(Where("name = ?", name)).One(context.TODO(), pc.DB)
 		if err != nil {
 			return "", err
 		}

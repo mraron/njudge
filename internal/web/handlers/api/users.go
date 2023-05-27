@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"database/sql"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
@@ -34,7 +35,7 @@ func (dp UserDataProvider) List(data *pagination.Data) ([]*models.User, error) {
 		qms = append(qms, Offset(data.PerPage*(data.Page-1)))
 	}
 
-	res, err := models.Users(qms...).All(dp.DB)
+	res, err := models.Users(qms...).All(context.TODO(), dp.DB)
 	if err != nil {
 		return nil, err
 	}
@@ -47,11 +48,11 @@ func (dp UserDataProvider) List(data *pagination.Data) ([]*models.User, error) {
 }
 
 func (dp UserDataProvider) Count() (int64, error) {
-	return models.Users().Count(dp.DB)
+	return models.Users().Count(context.TODO(), dp.DB)
 }
 
 func (dp UserDataProvider) Get(id string) (*models.User, error) {
-	elem, err := models.Users(Where("id = ?", id)).One(dp.DB)
+	elem, err := models.Users(Where("id = ?", id)).One(context.TODO(), dp.DB)
 	if err != nil {
 		return nil, err
 	}
@@ -61,16 +62,16 @@ func (dp UserDataProvider) Get(id string) (*models.User, error) {
 }
 
 func (dp UserDataProvider) Insert(elem *models.User) error {
-	return elem.Insert(dp.DB, boil.Infer())
+	return elem.Insert(context.TODO(), dp.DB, boil.Infer())
 }
 
 func (dp UserDataProvider) Delete(id string) error {
-	elem, err := models.Users(Where("id=?", id)).One(dp.DB)
+	elem, err := models.Users(Where("id=?", id)).One(context.TODO(), dp.DB)
 	if err != nil {
 		return err
 	}
 
-	_, err = elem.Delete(dp.DB)
+	_, err = elem.Delete(context.TODO(), dp.DB)
 	return err
 }
 
@@ -81,6 +82,6 @@ func (dp UserDataProvider) Update(id string, elem *models.User) error {
 	}
 
 	elem.ID = idInt
-	_, err = elem.Update(dp.DB, boil.Infer())
+	_, err = elem.Update(context.TODO(), dp.DB, boil.Infer())
 	return err
 }

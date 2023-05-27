@@ -124,7 +124,7 @@ func (s *Server) runJudger() {
 	for {
 		time.Sleep(1 * time.Second)
 
-		ss, err := models.Submissions(Where("started=?", false), OrderBy("id ASC"), Limit(1)).All(s.DB)
+		ss, err := models.Submissions(Where("started=?", false), OrderBy("id ASC"), Limit(1)).All(context.Background(), s.DB)
 		if err != nil {
 			log.Print("judger query error", err)
 			continue

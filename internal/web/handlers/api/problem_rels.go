@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"database/sql"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
 	"github.com/mraron/njudge/internal/web/models"
@@ -33,28 +34,28 @@ func (dp ProblemRelDataProvider) List(data *pagination.Data) ([]*models.ProblemR
 		qms = append(qms, Offset(data.PerPage*(data.Page-1)))
 	}
 
-	return models.ProblemRels(qms...).All(dp.DB)
+	return models.ProblemRels(qms...).All(context.TODO(), dp.DB)
 }
 
 func (dp ProblemRelDataProvider) Count() (int64, error) {
-	return models.ProblemRels().Count(dp.DB)
+	return models.ProblemRels().Count(context.TODO(), dp.DB)
 }
 
 func (dp ProblemRelDataProvider) Get(id string) (*models.ProblemRel, error) {
-	return models.ProblemRels(Where("id = ?", id)).One(dp.DB)
+	return models.ProblemRels(Where("id = ?", id)).One(context.TODO(), dp.DB)
 }
 
 func (dp ProblemRelDataProvider) Insert(elem *models.ProblemRel) error {
-	return elem.Insert(dp.DB, boil.Infer())
+	return elem.Insert(context.TODO(), dp.DB, boil.Infer())
 }
 
 func (dp ProblemRelDataProvider) Delete(id string) error {
-	elem, err := models.ProblemRels(Where("id=?", id)).One(dp.DB)
+	elem, err := models.ProblemRels(Where("id=?", id)).One(context.TODO(), dp.DB)
 	if err != nil {
 		return err
 	}
 
-	_, err = elem.Delete(dp.DB)
+	_, err = elem.Delete(context.TODO(), dp.DB)
 	return err
 }
 
@@ -65,6 +66,6 @@ func (dp ProblemRelDataProvider) Update(id string, elem *models.ProblemRel) erro
 	}
 
 	elem.ID = idInt
-	_, err = elem.Update(dp.DB, boil.Infer())
+	_, err = elem.Update(context.TODO(), dp.DB, boil.Infer())
 	return err
 }

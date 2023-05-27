@@ -1,10 +1,10 @@
 package taskarchive
 
 import (
-	"fmt"
+	"github.com/mraron/njudge/internal/web/domain/problem"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
-	models2 "github.com/mraron/njudge/internal/web/models"
+	"github.com/mraron/njudge/internal/web/models"
 	"net/http"
 
 	"github.com/jmoiron/sqlx"
@@ -13,39 +13,51 @@ import (
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
+type TaskArchive struct {
+	Roots []TreeNode
+}
+
 type TreeNode struct {
-	Id           int
+	ID           int
 	Type         string
 	Name         string
 	Link         string
-	SolvedStatus helpers.SolvedStatus
-	Children     []*TreeNode
+	SolvedStatus problem.SolvedStatus
+	Children     []TreeNode
 }
 
-// @TODO optimize this to use less queries, most likely caching it
 func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := c.Get("user").(*models2.User)
+		u := c.Get("user").(*models.User)
 
-		lst, err := models2.ProblemCategories(Where("parent_id IS NULL")).All(DB)
+		lst, err := models.ProblemCategories(Where("parent_id IS NULL")).All(c.Request().Context(), DB)
 		if err != nil {
 			return err
 		}
 
-		roots := make([]*TreeNode, 0)
+		taskArchive := TaskArchive{Roots: make([]TreeNode, 0)}
 
-		var dfs func(category *models2.ProblemCategory, node *TreeNode) error
+		var dfs func(category *models.ProblemCategory, node TreeNode) error
 		id := 1000
-		dfs = func(root *models2.ProblemCategory, tree *TreeNode) error {
-			problems, err := models2.ProblemRels(Where("category_id = ?", root.ID), OrderBy("problem")).All(DB)
+
+		dfs = func(root *models.ProblemCategory, tree TreeNode) error {
+			problemList, err := models.ProblemRels(Where("category_id = ?", root.ID), OrderBy("problem")).All(c.Request().Context(), DB)
 			if err != nil {
 				return err
 			}
 
-			for _, problem := range problems {
-				elem := &TreeNode{Id: id, Type: "problem", Name: i18n.TranslateContent("hungarian", problemStore.MustGet(problem.Problem).Titles()).String(), Link: fmt.Sprintf("/problemset/%s/%s/", problem.Problemset, problem.Problem), Children: make([]*TreeNode, 0), SolvedStatus: -1}
+			for _, p := range problemList {
+				elem := TreeNode{
+					ID:           id,
+					Type:         "problem",
+					Name:         i18n.TranslateContent("hungarian", problemStore.MustGet(p.Problem).Titles()).String(),
+					Link:         c.Echo().Reverse("getProblemMain", p.Problemset, p.Problem),
+					Children:     make([]TreeNode, 0),
+					SolvedStatus: -1,
+				}
+
 				if u != nil {
-					elem.SolvedStatus, err = helpers.HasUserSolved(DB, u, problem.Problemset, problem.Problem)
+					elem.SolvedStatus, err = helpers.HasUserSolved(DB.DB, u.ID, p.Problemset, p.Problem)
 					if err != nil {
 						return err
 					}
@@ -56,14 +68,21 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 				id++
 			}
 
-			//@TODO make a way to control sorting order from DB (add migrations etc.)
-			subcats, err := models2.ProblemCategories(Where("parent_id = ?", root.ID), OrderBy("name")).All(DB)
+			subCategories, err := models.ProblemCategories(Where("parent_id = ?", root.ID), OrderBy("name")).All(c.Request().Context(), DB)
 			if err != nil {
 				return err
 			}
 
-			for _, cat := range subcats {
-				akt := &TreeNode{Id: cat.ID, Type: "category", Name: cat.Name, Link: "", Children: make([]*TreeNode, 0), SolvedStatus: -1}
+			for _, cat := range subCategories {
+				akt := TreeNode{
+					ID:           cat.ID,
+					Type:         "category",
+					Name:         cat.Name,
+					Link:         "",
+					Children:     make([]TreeNode, 0),
+					SolvedStatus: -1,
+				}
+
 				tree.Children = append(tree.Children, akt)
 				if err := dfs(cat, akt); err != nil {
 					return err
@@ -74,13 +93,13 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 		}
 
 		for _, start := range lst {
-			roots = append(roots, &TreeNode{Id: start.ID, Type: "category", Name: start.Name, Link: "", Children: make([]*TreeNode, 0), SolvedStatus: -1})
-			if dfs(start, roots[len(roots)-1]) != nil {
+			taskArchive.Roots = append(taskArchive.Roots, TreeNode{ID: start.ID, Type: "category", Name: start.Name, Link: "", Children: make([]TreeNode, 0), SolvedStatus: -1})
+			if dfs(start, taskArchive.Roots[len(taskArchive.Roots)-1]) != nil {
 				return err
 			}
 		}
 
 		c.Set("title", "Archívum")
-		return c.Render(http.StatusOK, "task_archive.gohtml", roots)
+		return c.Render(http.StatusOK, "task_archive.gohtml", taskArchive)
 	}
 }

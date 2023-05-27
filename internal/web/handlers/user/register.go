@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"github.com/mraron/njudge/internal/web/helpers"
@@ -144,7 +145,7 @@ func Activate(DB *sqlx.DB) echo.HandlerFunc {
 			return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
 		}
 
-		if user, err = models.Users(Where("name=?", c.Param("name"))).One(DB); err != nil {
+		if user, err = models.Users(Where("name=?", c.Param("name"))).One(context.TODO(), DB); err != nil {
 			return err
 		}
 

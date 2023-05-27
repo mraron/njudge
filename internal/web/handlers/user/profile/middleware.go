@@ -1,6 +1,7 @@
 package profile
 
 import (
+	"context"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/web/models"
@@ -16,7 +17,7 @@ func SetProfileMiddleware(DB *sqlx.DB) echo.MiddlewareFunc {
 				return err
 			}
 
-			user, err := models.Users(Where("name = ?", name)).One(DB)
+			user, err := models.Users(Where("name = ?", name)).One(context.TODO(), DB)
 			if err != nil {
 				return err
 			}

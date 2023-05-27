@@ -1,6 +1,7 @@
 package web
 
 import (
+	"context"
 	"github.com/mraron/njudge/internal/web/models"
 	"log"
 	"math"
@@ -28,7 +29,7 @@ func (s *Server) runUpdateProblems() {
 
 func (s *Server) runStatisticsUpdate() {
 	for {
-		probs, err := models.ProblemRels().All(s.DB)
+		probs, err := models.ProblemRels().All(context.Background(), s.DB)
 		if err != nil {
 			log.Print(err)
 			continue
@@ -37,7 +38,7 @@ func (s *Server) runStatisticsUpdate() {
 		userPoints := make(map[int]float64)
 		for _, p := range probs {
 			points := math.Sqrt(1.0 / float64(p.SolverCount))
-			solvedBy, err := models.Submissions(Distinct("user_id"), Where("verdict = 0"), Where("problemset = ?", p.Problemset), Where("problem = ?", p.Problem)).All(s.DB)
+			solvedBy, err := models.Submissions(Distinct("user_id"), Where("verdict = 0"), Where("problemset = ?", p.Problemset), Where("problem = ?", p.Problem)).All(context.TODO(), s.DB)
 			if err != nil {
 				log.Print(err)
 				continue
@@ -57,7 +58,7 @@ func (s *Server) runStatisticsUpdate() {
 			var user models.User
 			user.ID = uid
 			user.Points = null.Float32{Float32: float32(pts), Valid: true}
-			if _, err := user.Update(s.DB, boil.Whitelist("points")); err != nil {
+			if _, err := user.Update(context.TODO(), s.DB, boil.Whitelist("points")); err != nil {
 				log.Print(err)
 				continue
 			}

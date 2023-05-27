@@ -1,6 +1,6 @@
 {{template "header" .}}
 {{define "ta_tree_view"}}
-    {{$id := .Id}}
+    {{$id := .ID}}
     {{if eq .Type "problem"}}
     {{else}}
         {{range $c := .Children}}
@@ -8,9 +8,9 @@
                 <a href="{{$c.Link}}">{{$c.Name}} {{if eq $c.SolvedStatus 3}}<i class="fas fa-check text-success"></i>{{end}}{{if eq $c.SolvedStatus 1}}<i class="fas fa-times text-danger"></i>{{end}}</a><br>
             {{else}}
                 <div class="problemcategory-header">
-                    <a class="collapse-toggle" data-toggle="collapse" href="#category{{$c.Id}}">{{$c.Name}}</a>
+                    <a class="collapse-toggle" data-toggle="collapse" href="#category{{$c.ID}}">{{$c.Name}}</a>
                 </div>
-                <div class="collapse show problemcategory-body" id="category{{$c.Id}}" data-nparent="#category{{$id}}">
+                <div class="collapse show problemcategory-body" id="category{{$c.ID}}" data-nparent="#category{{$id}}">
                     {{template "ta_tree_view" $c}}
                 </div>
             {{end}}
@@ -19,14 +19,14 @@
 {{end}}
     <div class="card">
         {{$first := true}}
-        {{range $root := .Data}}
+        {{range $root := .Data.Roots}}
                 <div class="{{if not $first}}card-footer{{end}} card-header">{{$root.Name}}</div>
-                <div class="card-body" id="top_category{{$root.Id}}">
+                <div class="card-body" id="top_category{{$root.ID}}">
                     {{range $c := $root.Children}}
                         <div class="problemcategory-header">
-                            <a class="collapse-toggle collapsed" data-toggle="collapse" href="#category{{$c.Id}}">{{$c.Name}}</a>
+                            <a class="collapse-toggle collapsed" data-toggle="collapse" href="#category{{$c.ID}}">{{$c.Name}}</a>
                         </div>
-                        <div class="collapse problemcategory-body" id="category{{$c.Id}}">
+                        <div class="collapse problemcategory-body" id="category{{$c.ID}}">
                             {{template "ta_tree_view" $c}}
                         </div>
                     {{end}}
@@ -47,7 +47,7 @@
 
                 if(prev!==null) {
                     for(let child of document.querySelectorAll("div[data-nparent='#"+curr.id+"']")) {
-                        if(child!=prev)
+                        if(child!==prev)
                             child.classList.remove('show');
                     }
                 }

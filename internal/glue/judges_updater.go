@@ -20,7 +20,7 @@ type JudgesUpdaterFromDB struct {
 }
 
 func (o *JudgesUpdaterFromDB) UpdateJudges(ctx context.Context) ([]*models.Judge, error) {
-	judges, err := models.Judges().All(o.DB)
+	judges, err := models.Judges().All(ctx, o.DB)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (o *JudgesUpdaterFromDB) UpdateJudges(ctx context.Context) ([]*models.Judge
 			judges[ind].Online = false
 			judges[ind].Ping = -1
 
-			_, err2 := judges[ind].Update(o.DB, boil.Infer())
+			_, err2 := judges[ind].Update(ctx, o.DB, boil.Infer())
 			judgesError = multierr.Combine(judgesError, err, err2)
 		}
 
@@ -41,7 +41,7 @@ func (o *JudgesUpdaterFromDB) UpdateJudges(ctx context.Context) ([]*models.Judge
 		judges[ind].State = st.String()
 		judges[ind].Ping = 1
 
-		_, err = judges[ind].Update(o.DB, boil.Infer())
+		_, err = judges[ind].Update(ctx, o.DB, boil.Infer())
 		if err != nil {
 			log.Print("trying to access judge on", judges[ind].Host, judges[ind].Port, " unsuccessful update in database", err)
 			continue

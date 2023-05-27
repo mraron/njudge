@@ -1,11 +1,12 @@
 package helpers
 
 import (
+	"context"
+	"database/sql"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
 	"github.com/mraron/njudge/internal/web/models"
 	"net/url"
 
-	"github.com/jmoiron/sqlx"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
@@ -15,13 +16,13 @@ type StatusPage struct {
 	Submissions []*models.Submission
 }
 
-func GetStatusPage(DB *sqlx.DB, page, perPage int, order QueryMod, query []QueryMod, qu url.Values) (*StatusPage, error) {
-	sbs, err := models.Submissions(append(append([]QueryMod{Limit(perPage), Offset((page - 1) * perPage)}, query...), order)...).All(DB)
+func GetStatusPage(DB *sql.DB, page, perPage int, order QueryMod, query []QueryMod, qu url.Values) (*StatusPage, error) {
+	sbs, err := models.Submissions(append(append([]QueryMod{Limit(perPage), Offset((page - 1) * perPage)}, query...), order)...).All(context.TODO(), DB)
 	if err != nil {
 		return nil, err
 	}
 
-	cnt, err := models.Submissions(query...).Count(DB)
+	cnt, err := models.Submissions(query...).Count(context.TODO(), DB)
 	if err != nil {
 		return nil, err
 	}

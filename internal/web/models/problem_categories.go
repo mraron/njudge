@@ -4,6 +4,7 @@
 package models
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"reflect"
@@ -161,7 +162,7 @@ type (
 	// This should almost always be used instead of []ProblemCategory.
 	ProblemCategorySlice []*ProblemCategory
 	// ProblemCategoryHook is the signature for custom ProblemCategory hook methods
-	ProblemCategoryHook func(boil.Executor, *ProblemCategory) error
+	ProblemCategoryHook func(context.Context, boil.ContextExecutor, *ProblemCategory) error
 
 	problemCategoryQuery struct {
 		*queries.Query
@@ -204,9 +205,13 @@ var problemCategoryBeforeUpsertHooks []ProblemCategoryHook
 var problemCategoryAfterUpsertHooks []ProblemCategoryHook
 
 // doAfterSelectHooks executes all "after Select" hooks.
-func (o *ProblemCategory) doAfterSelectHooks(exec boil.Executor) (err error) {
+func (o *ProblemCategory) doAfterSelectHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemCategoryAfterSelectHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -215,9 +220,13 @@ func (o *ProblemCategory) doAfterSelectHooks(exec boil.Executor) (err error) {
 }
 
 // doBeforeInsertHooks executes all "before insert" hooks.
-func (o *ProblemCategory) doBeforeInsertHooks(exec boil.Executor) (err error) {
+func (o *ProblemCategory) doBeforeInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemCategoryBeforeInsertHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -226,9 +235,13 @@ func (o *ProblemCategory) doBeforeInsertHooks(exec boil.Executor) (err error) {
 }
 
 // doAfterInsertHooks executes all "after Insert" hooks.
-func (o *ProblemCategory) doAfterInsertHooks(exec boil.Executor) (err error) {
+func (o *ProblemCategory) doAfterInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemCategoryAfterInsertHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -237,9 +250,13 @@ func (o *ProblemCategory) doAfterInsertHooks(exec boil.Executor) (err error) {
 }
 
 // doBeforeUpdateHooks executes all "before Update" hooks.
-func (o *ProblemCategory) doBeforeUpdateHooks(exec boil.Executor) (err error) {
+func (o *ProblemCategory) doBeforeUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemCategoryBeforeUpdateHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -248,9 +265,13 @@ func (o *ProblemCategory) doBeforeUpdateHooks(exec boil.Executor) (err error) {
 }
 
 // doAfterUpdateHooks executes all "after Update" hooks.
-func (o *ProblemCategory) doAfterUpdateHooks(exec boil.Executor) (err error) {
+func (o *ProblemCategory) doAfterUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemCategoryAfterUpdateHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -259,9 +280,13 @@ func (o *ProblemCategory) doAfterUpdateHooks(exec boil.Executor) (err error) {
 }
 
 // doBeforeDeleteHooks executes all "before Delete" hooks.
-func (o *ProblemCategory) doBeforeDeleteHooks(exec boil.Executor) (err error) {
+func (o *ProblemCategory) doBeforeDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemCategoryBeforeDeleteHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -270,9 +295,13 @@ func (o *ProblemCategory) doBeforeDeleteHooks(exec boil.Executor) (err error) {
 }
 
 // doAfterDeleteHooks executes all "after Delete" hooks.
-func (o *ProblemCategory) doAfterDeleteHooks(exec boil.Executor) (err error) {
+func (o *ProblemCategory) doAfterDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemCategoryAfterDeleteHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -281,9 +310,13 @@ func (o *ProblemCategory) doAfterDeleteHooks(exec boil.Executor) (err error) {
 }
 
 // doBeforeUpsertHooks executes all "before Upsert" hooks.
-func (o *ProblemCategory) doBeforeUpsertHooks(exec boil.Executor) (err error) {
+func (o *ProblemCategory) doBeforeUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemCategoryBeforeUpsertHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -292,9 +325,13 @@ func (o *ProblemCategory) doBeforeUpsertHooks(exec boil.Executor) (err error) {
 }
 
 // doAfterUpsertHooks executes all "after Upsert" hooks.
-func (o *ProblemCategory) doAfterUpsertHooks(exec boil.Executor) (err error) {
+func (o *ProblemCategory) doAfterUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemCategoryAfterUpsertHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -327,17 +364,17 @@ func AddProblemCategoryHook(hookPoint boil.HookPoint, problemCategoryHook Proble
 }
 
 // OneG returns a single problemCategory record from the query using the global executor.
-func (q problemCategoryQuery) OneG() (*ProblemCategory, error) {
-	return q.One(boil.GetDB())
+func (q problemCategoryQuery) OneG(ctx context.Context) (*ProblemCategory, error) {
+	return q.One(ctx, boil.GetContextDB())
 }
 
 // One returns a single problemCategory record from the query.
-func (q problemCategoryQuery) One(exec boil.Executor) (*ProblemCategory, error) {
+func (q problemCategoryQuery) One(ctx context.Context, exec boil.ContextExecutor) (*ProblemCategory, error) {
 	o := &ProblemCategory{}
 
 	queries.SetLimit(q.Query, 1)
 
-	err := q.Bind(nil, exec, o)
+	err := q.Bind(ctx, exec, o)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
@@ -345,7 +382,7 @@ func (q problemCategoryQuery) One(exec boil.Executor) (*ProblemCategory, error) 
 		return nil, errors.Wrap(err, "models: failed to execute a one query for problem_categories")
 	}
 
-	if err := o.doAfterSelectHooks(exec); err != nil {
+	if err := o.doAfterSelectHooks(ctx, exec); err != nil {
 		return o, err
 	}
 
@@ -353,22 +390,22 @@ func (q problemCategoryQuery) One(exec boil.Executor) (*ProblemCategory, error) 
 }
 
 // AllG returns all ProblemCategory records from the query using the global executor.
-func (q problemCategoryQuery) AllG() (ProblemCategorySlice, error) {
-	return q.All(boil.GetDB())
+func (q problemCategoryQuery) AllG(ctx context.Context) (ProblemCategorySlice, error) {
+	return q.All(ctx, boil.GetContextDB())
 }
 
 // All returns all ProblemCategory records from the query.
-func (q problemCategoryQuery) All(exec boil.Executor) (ProblemCategorySlice, error) {
+func (q problemCategoryQuery) All(ctx context.Context, exec boil.ContextExecutor) (ProblemCategorySlice, error) {
 	var o []*ProblemCategory
 
-	err := q.Bind(nil, exec, &o)
+	err := q.Bind(ctx, exec, &o)
 	if err != nil {
 		return nil, errors.Wrap(err, "models: failed to assign all query results to ProblemCategory slice")
 	}
 
 	if len(problemCategoryAfterSelectHooks) != 0 {
 		for _, obj := range o {
-			if err := obj.doAfterSelectHooks(exec); err != nil {
+			if err := obj.doAfterSelectHooks(ctx, exec); err != nil {
 				return o, err
 			}
 		}
@@ -378,18 +415,18 @@ func (q problemCategoryQuery) All(exec boil.Executor) (ProblemCategorySlice, err
 }
 
 // CountG returns the count of all ProblemCategory records in the query using the global executor
-func (q problemCategoryQuery) CountG() (int64, error) {
-	return q.Count(boil.GetDB())
+func (q problemCategoryQuery) CountG(ctx context.Context) (int64, error) {
+	return q.Count(ctx, boil.GetContextDB())
 }
 
 // Count returns the count of all ProblemCategory records in the query.
-func (q problemCategoryQuery) Count(exec boil.Executor) (int64, error) {
+func (q problemCategoryQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
 	queries.SetCount(q.Query)
 
-	err := q.Query.QueryRow(exec).Scan(&count)
+	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to count problem_categories rows")
 	}
@@ -398,19 +435,19 @@ func (q problemCategoryQuery) Count(exec boil.Executor) (int64, error) {
 }
 
 // ExistsG checks if the row exists in the table using the global executor.
-func (q problemCategoryQuery) ExistsG() (bool, error) {
-	return q.Exists(boil.GetDB())
+func (q problemCategoryQuery) ExistsG(ctx context.Context) (bool, error) {
+	return q.Exists(ctx, boil.GetContextDB())
 }
 
 // Exists checks if the row exists in the table.
-func (q problemCategoryQuery) Exists(exec boil.Executor) (bool, error) {
+func (q problemCategoryQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
 	queries.SetCount(q.Query)
 	queries.SetLimit(q.Query, 1)
 
-	err := q.Query.QueryRow(exec).Scan(&count)
+	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
 		return false, errors.Wrap(err, "models: failed to check if problem_categories exists")
 	}
@@ -459,7 +496,7 @@ func (o *ProblemCategory) CategoryProblemRels(mods ...qm.QueryMod) problemRelQue
 
 // LoadParent allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (problemCategoryL) LoadParent(e boil.Executor, singular bool, maybeProblemCategory interface{}, mods queries.Applicator) error {
+func (problemCategoryL) LoadParent(ctx context.Context, e boil.ContextExecutor, singular bool, maybeProblemCategory interface{}, mods queries.Applicator) error {
 	var slice []*ProblemCategory
 	var object *ProblemCategory
 
@@ -526,7 +563,7 @@ func (problemCategoryL) LoadParent(e boil.Executor, singular bool, maybeProblemC
 		mods.Apply(query)
 	}
 
-	results, err := query.Query(e)
+	results, err := query.QueryContext(ctx, e)
 	if err != nil {
 		return errors.Wrap(err, "failed to eager load ProblemCategory")
 	}
@@ -545,7 +582,7 @@ func (problemCategoryL) LoadParent(e boil.Executor, singular bool, maybeProblemC
 
 	if len(problemCategoryAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(e); err != nil {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
 				return err
 			}
 		}
@@ -583,7 +620,7 @@ func (problemCategoryL) LoadParent(e boil.Executor, singular bool, maybeProblemC
 
 // LoadParentProblemCategories allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (problemCategoryL) LoadParentProblemCategories(e boil.Executor, singular bool, maybeProblemCategory interface{}, mods queries.Applicator) error {
+func (problemCategoryL) LoadParentProblemCategories(ctx context.Context, e boil.ContextExecutor, singular bool, maybeProblemCategory interface{}, mods queries.Applicator) error {
 	var slice []*ProblemCategory
 	var object *ProblemCategory
 
@@ -644,7 +681,7 @@ func (problemCategoryL) LoadParentProblemCategories(e boil.Executor, singular bo
 		mods.Apply(query)
 	}
 
-	results, err := query.Query(e)
+	results, err := query.QueryContext(ctx, e)
 	if err != nil {
 		return errors.Wrap(err, "failed to eager load problem_categories")
 	}
@@ -663,7 +700,7 @@ func (problemCategoryL) LoadParentProblemCategories(e boil.Executor, singular bo
 
 	if len(problemCategoryAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(e); err != nil {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
 				return err
 			}
 		}
@@ -697,7 +734,7 @@ func (problemCategoryL) LoadParentProblemCategories(e boil.Executor, singular bo
 
 // LoadCategoryProblemRels allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (problemCategoryL) LoadCategoryProblemRels(e boil.Executor, singular bool, maybeProblemCategory interface{}, mods queries.Applicator) error {
+func (problemCategoryL) LoadCategoryProblemRels(ctx context.Context, e boil.ContextExecutor, singular bool, maybeProblemCategory interface{}, mods queries.Applicator) error {
 	var slice []*ProblemCategory
 	var object *ProblemCategory
 
@@ -758,7 +795,7 @@ func (problemCategoryL) LoadCategoryProblemRels(e boil.Executor, singular bool, 
 		mods.Apply(query)
 	}
 
-	results, err := query.Query(e)
+	results, err := query.QueryContext(ctx, e)
 	if err != nil {
 		return errors.Wrap(err, "failed to eager load problem_rels")
 	}
@@ -777,7 +814,7 @@ func (problemCategoryL) LoadCategoryProblemRels(e boil.Executor, singular bool, 
 
 	if len(problemRelAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(e); err != nil {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
 				return err
 			}
 		}
@@ -813,17 +850,17 @@ func (problemCategoryL) LoadCategoryProblemRels(e boil.Executor, singular bool, 
 // Sets o.R.Parent to related.
 // Adds o to related.R.ParentProblemCategories.
 // Uses the global database handle.
-func (o *ProblemCategory) SetParentG(insert bool, related *ProblemCategory) error {
-	return o.SetParent(boil.GetDB(), insert, related)
+func (o *ProblemCategory) SetParentG(ctx context.Context, insert bool, related *ProblemCategory) error {
+	return o.SetParent(ctx, boil.GetContextDB(), insert, related)
 }
 
 // SetParent of the problemCategory to the related item.
 // Sets o.R.Parent to related.
 // Adds o to related.R.ParentProblemCategories.
-func (o *ProblemCategory) SetParent(exec boil.Executor, insert bool, related *ProblemCategory) error {
+func (o *ProblemCategory) SetParent(ctx context.Context, exec boil.ContextExecutor, insert bool, related *ProblemCategory) error {
 	var err error
 	if insert {
-		if err = related.Insert(exec, boil.Infer()); err != nil {
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
 			return errors.Wrap(err, "failed to insert into foreign table")
 		}
 	}
@@ -835,11 +872,12 @@ func (o *ProblemCategory) SetParent(exec boil.Executor, insert bool, related *Pr
 	)
 	values := []interface{}{related.ID, o.ID}
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, updateQuery)
-		fmt.Fprintln(boil.DebugWriter, values)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, values)
 	}
-	if _, err = exec.Exec(updateQuery, values...); err != nil {
+	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
 		return errors.Wrap(err, "failed to update local table")
 	}
 
@@ -867,18 +905,18 @@ func (o *ProblemCategory) SetParent(exec boil.Executor, insert bool, related *Pr
 // Sets o.R.Parent to nil.
 // Removes o from all passed in related items' relationships struct.
 // Uses the global database handle.
-func (o *ProblemCategory) RemoveParentG(related *ProblemCategory) error {
-	return o.RemoveParent(boil.GetDB(), related)
+func (o *ProblemCategory) RemoveParentG(ctx context.Context, related *ProblemCategory) error {
+	return o.RemoveParent(ctx, boil.GetContextDB(), related)
 }
 
 // RemoveParent relationship.
 // Sets o.R.Parent to nil.
 // Removes o from all passed in related items' relationships struct.
-func (o *ProblemCategory) RemoveParent(exec boil.Executor, related *ProblemCategory) error {
+func (o *ProblemCategory) RemoveParent(ctx context.Context, exec boil.ContextExecutor, related *ProblemCategory) error {
 	var err error
 
 	queries.SetScanner(&o.ParentID, nil)
-	if _, err = o.Update(exec, boil.Whitelist("parent_id")); err != nil {
+	if _, err = o.Update(ctx, exec, boil.Whitelist("parent_id")); err != nil {
 		return errors.Wrap(err, "failed to update local table")
 	}
 
@@ -909,20 +947,20 @@ func (o *ProblemCategory) RemoveParent(exec boil.Executor, related *ProblemCateg
 // Appends related to o.R.ParentProblemCategories.
 // Sets related.R.Parent appropriately.
 // Uses the global database handle.
-func (o *ProblemCategory) AddParentProblemCategoriesG(insert bool, related ...*ProblemCategory) error {
-	return o.AddParentProblemCategories(boil.GetDB(), insert, related...)
+func (o *ProblemCategory) AddParentProblemCategoriesG(ctx context.Context, insert bool, related ...*ProblemCategory) error {
+	return o.AddParentProblemCategories(ctx, boil.GetContextDB(), insert, related...)
 }
 
 // AddParentProblemCategories adds the given related objects to the existing relationships
 // of the problem_category, optionally inserting them as new records.
 // Appends related to o.R.ParentProblemCategories.
 // Sets related.R.Parent appropriately.
-func (o *ProblemCategory) AddParentProblemCategories(exec boil.Executor, insert bool, related ...*ProblemCategory) error {
+func (o *ProblemCategory) AddParentProblemCategories(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*ProblemCategory) error {
 	var err error
 	for _, rel := range related {
 		if insert {
 			queries.Assign(&rel.ParentID, o.ID)
-			if err = rel.Insert(exec, boil.Infer()); err != nil {
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
@@ -933,11 +971,12 @@ func (o *ProblemCategory) AddParentProblemCategories(exec boil.Executor, insert 
 			)
 			values := []interface{}{o.ID, rel.ID}
 
-			if boil.DebugMode {
-				fmt.Fprintln(boil.DebugWriter, updateQuery)
-				fmt.Fprintln(boil.DebugWriter, values)
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
 			}
-			if _, err = exec.Exec(updateQuery, values...); err != nil {
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
@@ -972,8 +1011,8 @@ func (o *ProblemCategory) AddParentProblemCategories(exec boil.Executor, insert 
 // Replaces o.R.ParentProblemCategories with related.
 // Sets related.R.Parent's ParentProblemCategories accordingly.
 // Uses the global database handle.
-func (o *ProblemCategory) SetParentProblemCategoriesG(insert bool, related ...*ProblemCategory) error {
-	return o.SetParentProblemCategories(boil.GetDB(), insert, related...)
+func (o *ProblemCategory) SetParentProblemCategoriesG(ctx context.Context, insert bool, related ...*ProblemCategory) error {
+	return o.SetParentProblemCategories(ctx, boil.GetContextDB(), insert, related...)
 }
 
 // SetParentProblemCategories removes all previously related items of the
@@ -982,14 +1021,15 @@ func (o *ProblemCategory) SetParentProblemCategoriesG(insert bool, related ...*P
 // Sets o.R.Parent's ParentProblemCategories accordingly.
 // Replaces o.R.ParentProblemCategories with related.
 // Sets related.R.Parent's ParentProblemCategories accordingly.
-func (o *ProblemCategory) SetParentProblemCategories(exec boil.Executor, insert bool, related ...*ProblemCategory) error {
+func (o *ProblemCategory) SetParentProblemCategories(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*ProblemCategory) error {
 	query := "update \"problem_categories\" set \"parent_id\" = null where \"parent_id\" = $1"
 	values := []interface{}{o.ID}
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, query)
-		fmt.Fprintln(boil.DebugWriter, values)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, query)
+		fmt.Fprintln(writer, values)
 	}
-	_, err := exec.Exec(query, values...)
+	_, err := exec.ExecContext(ctx, query, values...)
 	if err != nil {
 		return errors.Wrap(err, "failed to remove relationships before set")
 	}
@@ -1006,21 +1046,21 @@ func (o *ProblemCategory) SetParentProblemCategories(exec boil.Executor, insert 
 		o.R.ParentProblemCategories = nil
 	}
 
-	return o.AddParentProblemCategories(exec, insert, related...)
+	return o.AddParentProblemCategories(ctx, exec, insert, related...)
 }
 
 // RemoveParentProblemCategoriesG relationships from objects passed in.
 // Removes related items from R.ParentProblemCategories (uses pointer comparison, removal does not keep order)
 // Sets related.R.Parent.
 // Uses the global database handle.
-func (o *ProblemCategory) RemoveParentProblemCategoriesG(related ...*ProblemCategory) error {
-	return o.RemoveParentProblemCategories(boil.GetDB(), related...)
+func (o *ProblemCategory) RemoveParentProblemCategoriesG(ctx context.Context, related ...*ProblemCategory) error {
+	return o.RemoveParentProblemCategories(ctx, boil.GetContextDB(), related...)
 }
 
 // RemoveParentProblemCategories relationships from objects passed in.
 // Removes related items from R.ParentProblemCategories (uses pointer comparison, removal does not keep order)
 // Sets related.R.Parent.
-func (o *ProblemCategory) RemoveParentProblemCategories(exec boil.Executor, related ...*ProblemCategory) error {
+func (o *ProblemCategory) RemoveParentProblemCategories(ctx context.Context, exec boil.ContextExecutor, related ...*ProblemCategory) error {
 	if len(related) == 0 {
 		return nil
 	}
@@ -1031,7 +1071,7 @@ func (o *ProblemCategory) RemoveParentProblemCategories(exec boil.Executor, rela
 		if rel.R != nil {
 			rel.R.Parent = nil
 		}
-		if _, err = rel.Update(exec, boil.Whitelist("parent_id")); err != nil {
+		if _, err = rel.Update(ctx, exec, boil.Whitelist("parent_id")); err != nil {
 			return err
 		}
 	}
@@ -1062,20 +1102,20 @@ func (o *ProblemCategory) RemoveParentProblemCategories(exec boil.Executor, rela
 // Appends related to o.R.CategoryProblemRels.
 // Sets related.R.Category appropriately.
 // Uses the global database handle.
-func (o *ProblemCategory) AddCategoryProblemRelsG(insert bool, related ...*ProblemRel) error {
-	return o.AddCategoryProblemRels(boil.GetDB(), insert, related...)
+func (o *ProblemCategory) AddCategoryProblemRelsG(ctx context.Context, insert bool, related ...*ProblemRel) error {
+	return o.AddCategoryProblemRels(ctx, boil.GetContextDB(), insert, related...)
 }
 
 // AddCategoryProblemRels adds the given related objects to the existing relationships
 // of the problem_category, optionally inserting them as new records.
 // Appends related to o.R.CategoryProblemRels.
 // Sets related.R.Category appropriately.
-func (o *ProblemCategory) AddCategoryProblemRels(exec boil.Executor, insert bool, related ...*ProblemRel) error {
+func (o *ProblemCategory) AddCategoryProblemRels(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*ProblemRel) error {
 	var err error
 	for _, rel := range related {
 		if insert {
 			queries.Assign(&rel.CategoryID, o.ID)
-			if err = rel.Insert(exec, boil.Infer()); err != nil {
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
@@ -1086,11 +1126,12 @@ func (o *ProblemCategory) AddCategoryProblemRels(exec boil.Executor, insert bool
 			)
 			values := []interface{}{o.ID, rel.ID}
 
-			if boil.DebugMode {
-				fmt.Fprintln(boil.DebugWriter, updateQuery)
-				fmt.Fprintln(boil.DebugWriter, values)
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
 			}
-			if _, err = exec.Exec(updateQuery, values...); err != nil {
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
@@ -1125,8 +1166,8 @@ func (o *ProblemCategory) AddCategoryProblemRels(exec boil.Executor, insert bool
 // Replaces o.R.CategoryProblemRels with related.
 // Sets related.R.Category's CategoryProblemRels accordingly.
 // Uses the global database handle.
-func (o *ProblemCategory) SetCategoryProblemRelsG(insert bool, related ...*ProblemRel) error {
-	return o.SetCategoryProblemRels(boil.GetDB(), insert, related...)
+func (o *ProblemCategory) SetCategoryProblemRelsG(ctx context.Context, insert bool, related ...*ProblemRel) error {
+	return o.SetCategoryProblemRels(ctx, boil.GetContextDB(), insert, related...)
 }
 
 // SetCategoryProblemRels removes all previously related items of the
@@ -1135,14 +1176,15 @@ func (o *ProblemCategory) SetCategoryProblemRelsG(insert bool, related ...*Probl
 // Sets o.R.Category's CategoryProblemRels accordingly.
 // Replaces o.R.CategoryProblemRels with related.
 // Sets related.R.Category's CategoryProblemRels accordingly.
-func (o *ProblemCategory) SetCategoryProblemRels(exec boil.Executor, insert bool, related ...*ProblemRel) error {
+func (o *ProblemCategory) SetCategoryProblemRels(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*ProblemRel) error {
 	query := "update \"problem_rels\" set \"category_id\" = null where \"category_id\" = $1"
 	values := []interface{}{o.ID}
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, query)
-		fmt.Fprintln(boil.DebugWriter, values)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, query)
+		fmt.Fprintln(writer, values)
 	}
-	_, err := exec.Exec(query, values...)
+	_, err := exec.ExecContext(ctx, query, values...)
 	if err != nil {
 		return errors.Wrap(err, "failed to remove relationships before set")
 	}
@@ -1159,21 +1201,21 @@ func (o *ProblemCategory) SetCategoryProblemRels(exec boil.Executor, insert bool
 		o.R.CategoryProblemRels = nil
 	}
 
-	return o.AddCategoryProblemRels(exec, insert, related...)
+	return o.AddCategoryProblemRels(ctx, exec, insert, related...)
 }
 
 // RemoveCategoryProblemRelsG relationships from objects passed in.
 // Removes related items from R.CategoryProblemRels (uses pointer comparison, removal does not keep order)
 // Sets related.R.Category.
 // Uses the global database handle.
-func (o *ProblemCategory) RemoveCategoryProblemRelsG(related ...*ProblemRel) error {
-	return o.RemoveCategoryProblemRels(boil.GetDB(), related...)
+func (o *ProblemCategory) RemoveCategoryProblemRelsG(ctx context.Context, related ...*ProblemRel) error {
+	return o.RemoveCategoryProblemRels(ctx, boil.GetContextDB(), related...)
 }
 
 // RemoveCategoryProblemRels relationships from objects passed in.
 // Removes related items from R.CategoryProblemRels (uses pointer comparison, removal does not keep order)
 // Sets related.R.Category.
-func (o *ProblemCategory) RemoveCategoryProblemRels(exec boil.Executor, related ...*ProblemRel) error {
+func (o *ProblemCategory) RemoveCategoryProblemRels(ctx context.Context, exec boil.ContextExecutor, related ...*ProblemRel) error {
 	if len(related) == 0 {
 		return nil
 	}
@@ -1184,7 +1226,7 @@ func (o *ProblemCategory) RemoveCategoryProblemRels(exec boil.Executor, related 
 		if rel.R != nil {
 			rel.R.Category = nil
 		}
-		if _, err = rel.Update(exec, boil.Whitelist("category_id")); err != nil {
+		if _, err = rel.Update(ctx, exec, boil.Whitelist("category_id")); err != nil {
 			return err
 		}
 	}
@@ -1222,13 +1264,13 @@ func ProblemCategories(mods ...qm.QueryMod) problemCategoryQuery {
 }
 
 // FindProblemCategoryG retrieves a single record by ID.
-func FindProblemCategoryG(iD int, selectCols ...string) (*ProblemCategory, error) {
-	return FindProblemCategory(boil.GetDB(), iD, selectCols...)
+func FindProblemCategoryG(ctx context.Context, iD int, selectCols ...string) (*ProblemCategory, error) {
+	return FindProblemCategory(ctx, boil.GetContextDB(), iD, selectCols...)
 }
 
 // FindProblemCategory retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindProblemCategory(exec boil.Executor, iD int, selectCols ...string) (*ProblemCategory, error) {
+func FindProblemCategory(ctx context.Context, exec boil.ContextExecutor, iD int, selectCols ...string) (*ProblemCategory, error) {
 	problemCategoryObj := &ProblemCategory{}
 
 	sel := "*"
@@ -1241,7 +1283,7 @@ func FindProblemCategory(exec boil.Executor, iD int, selectCols ...string) (*Pro
 
 	q := queries.Raw(query, iD)
 
-	err := q.Bind(nil, exec, problemCategoryObj)
+	err := q.Bind(ctx, exec, problemCategoryObj)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
@@ -1249,7 +1291,7 @@ func FindProblemCategory(exec boil.Executor, iD int, selectCols ...string) (*Pro
 		return nil, errors.Wrap(err, "models: unable to select from problem_categories")
 	}
 
-	if err = problemCategoryObj.doAfterSelectHooks(exec); err != nil {
+	if err = problemCategoryObj.doAfterSelectHooks(ctx, exec); err != nil {
 		return problemCategoryObj, err
 	}
 
@@ -1257,20 +1299,20 @@ func FindProblemCategory(exec boil.Executor, iD int, selectCols ...string) (*Pro
 }
 
 // InsertG a single record. See Insert for whitelist behavior description.
-func (o *ProblemCategory) InsertG(columns boil.Columns) error {
-	return o.Insert(boil.GetDB(), columns)
+func (o *ProblemCategory) InsertG(ctx context.Context, columns boil.Columns) error {
+	return o.Insert(ctx, boil.GetContextDB(), columns)
 }
 
 // Insert a single record using an executor.
 // See boil.Columns.InsertColumnSet documentation to understand column list inference for inserts.
-func (o *ProblemCategory) Insert(exec boil.Executor, columns boil.Columns) error {
+func (o *ProblemCategory) Insert(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
 	if o == nil {
 		return errors.New("models: no problem_categories provided for insertion")
 	}
 
 	var err error
 
-	if err := o.doBeforeInsertHooks(exec); err != nil {
+	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
 		return err
 	}
 
@@ -1315,15 +1357,16 @@ func (o *ProblemCategory) Insert(exec boil.Executor, columns boil.Columns) error
 	value := reflect.Indirect(reflect.ValueOf(o))
 	vals := queries.ValuesFromMapping(value, cache.valueMapping)
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, cache.query)
-		fmt.Fprintln(boil.DebugWriter, vals)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, cache.query)
+		fmt.Fprintln(writer, vals)
 	}
 
 	if len(cache.retMapping) != 0 {
-		err = exec.QueryRow(cache.query, vals...).Scan(queries.PtrsFromMapping(value, cache.retMapping)...)
+		err = exec.QueryRowContext(ctx, cache.query, vals...).Scan(queries.PtrsFromMapping(value, cache.retMapping)...)
 	} else {
-		_, err = exec.Exec(cache.query, vals...)
+		_, err = exec.ExecContext(ctx, cache.query, vals...)
 	}
 
 	if err != nil {
@@ -1336,21 +1379,21 @@ func (o *ProblemCategory) Insert(exec boil.Executor, columns boil.Columns) error
 		problemCategoryInsertCacheMut.Unlock()
 	}
 
-	return o.doAfterInsertHooks(exec)
+	return o.doAfterInsertHooks(ctx, exec)
 }
 
 // UpdateG a single ProblemCategory record using the global executor.
 // See Update for more documentation.
-func (o *ProblemCategory) UpdateG(columns boil.Columns) (int64, error) {
-	return o.Update(boil.GetDB(), columns)
+func (o *ProblemCategory) UpdateG(ctx context.Context, columns boil.Columns) (int64, error) {
+	return o.Update(ctx, boil.GetContextDB(), columns)
 }
 
 // Update uses an executor to update the ProblemCategory.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
-func (o *ProblemCategory) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
+func (o *ProblemCategory) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
 	var err error
-	if err = o.doBeforeUpdateHooks(exec); err != nil {
+	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
 		return 0, err
 	}
 	key := makeCacheKey(columns, nil)
@@ -1383,12 +1426,13 @@ func (o *ProblemCategory) Update(exec boil.Executor, columns boil.Columns) (int6
 
 	values := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), cache.valueMapping)
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, cache.query)
-		fmt.Fprintln(boil.DebugWriter, values)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, cache.query)
+		fmt.Fprintln(writer, values)
 	}
 	var result sql.Result
-	result, err = exec.Exec(cache.query, values...)
+	result, err = exec.ExecContext(ctx, cache.query, values...)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to update problem_categories row")
 	}
@@ -1404,19 +1448,19 @@ func (o *ProblemCategory) Update(exec boil.Executor, columns boil.Columns) (int6
 		problemCategoryUpdateCacheMut.Unlock()
 	}
 
-	return rowsAff, o.doAfterUpdateHooks(exec)
+	return rowsAff, o.doAfterUpdateHooks(ctx, exec)
 }
 
 // UpdateAllG updates all rows with the specified column values.
-func (q problemCategoryQuery) UpdateAllG(cols M) (int64, error) {
-	return q.UpdateAll(boil.GetDB(), cols)
+func (q problemCategoryQuery) UpdateAllG(ctx context.Context, cols M) (int64, error) {
+	return q.UpdateAll(ctx, boil.GetContextDB(), cols)
 }
 
 // UpdateAll updates all rows with the specified column values.
-func (q problemCategoryQuery) UpdateAll(exec boil.Executor, cols M) (int64, error) {
+func (q problemCategoryQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
 	queries.SetUpdate(q.Query, cols)
 
-	result, err := q.Query.Exec(exec)
+	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to update all for problem_categories")
 	}
@@ -1430,12 +1474,12 @@ func (q problemCategoryQuery) UpdateAll(exec boil.Executor, cols M) (int64, erro
 }
 
 // UpdateAllG updates all rows with the specified column values.
-func (o ProblemCategorySlice) UpdateAllG(cols M) (int64, error) {
-	return o.UpdateAll(boil.GetDB(), cols)
+func (o ProblemCategorySlice) UpdateAllG(ctx context.Context, cols M) (int64, error) {
+	return o.UpdateAll(ctx, boil.GetContextDB(), cols)
 }
 
 // UpdateAll updates all rows with the specified column values, using an executor.
-func (o ProblemCategorySlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
+func (o ProblemCategorySlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
 	ln := int64(len(o))
 	if ln == 0 {
 		return 0, nil
@@ -1465,11 +1509,12 @@ func (o ProblemCategorySlice) UpdateAll(exec boil.Executor, cols M) (int64, erro
 		strmangle.SetParamNames("\"", "\"", 1, colNames),
 		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), len(colNames)+1, problemCategoryPrimaryKeyColumns, len(o)))
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, sql)
-		fmt.Fprintln(boil.DebugWriter, args...)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, sql)
+		fmt.Fprintln(writer, args...)
 	}
-	result, err := exec.Exec(sql, args...)
+	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to update all in problemCategory slice")
 	}
@@ -1482,18 +1527,18 @@ func (o ProblemCategorySlice) UpdateAll(exec boil.Executor, cols M) (int64, erro
 }
 
 // UpsertG attempts an insert, and does an update or ignore on conflict.
-func (o *ProblemCategory) UpsertG(updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
-	return o.Upsert(boil.GetDB(), updateOnConflict, conflictColumns, updateColumns, insertColumns)
+func (o *ProblemCategory) UpsertG(ctx context.Context, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
+	return o.Upsert(ctx, boil.GetContextDB(), updateOnConflict, conflictColumns, updateColumns, insertColumns)
 }
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
-func (o *ProblemCategory) Upsert(exec boil.Executor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
+func (o *ProblemCategory) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
 	if o == nil {
 		return errors.New("models: no problem_categories provided for upsert")
 	}
 
-	if err := o.doBeforeUpsertHooks(exec); err != nil {
+	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
 		return err
 	}
 
@@ -1576,17 +1621,18 @@ func (o *ProblemCategory) Upsert(exec boil.Executor, updateOnConflict bool, conf
 		returns = queries.PtrsFromMapping(value, cache.retMapping)
 	}
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, cache.query)
-		fmt.Fprintln(boil.DebugWriter, vals)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, cache.query)
+		fmt.Fprintln(writer, vals)
 	}
 	if len(cache.retMapping) != 0 {
-		err = exec.QueryRow(cache.query, vals...).Scan(returns...)
+		err = exec.QueryRowContext(ctx, cache.query, vals...).Scan(returns...)
 		if errors.Is(err, sql.ErrNoRows) {
 			err = nil // Postgres doesn't return anything when there's no update
 		}
 	} else {
-		_, err = exec.Exec(cache.query, vals...)
+		_, err = exec.ExecContext(ctx, cache.query, vals...)
 	}
 	if err != nil {
 		return errors.Wrap(err, "models: unable to upsert problem_categories")
@@ -1598,34 +1644,35 @@ func (o *ProblemCategory) Upsert(exec boil.Executor, updateOnConflict bool, conf
 		problemCategoryUpsertCacheMut.Unlock()
 	}
 
-	return o.doAfterUpsertHooks(exec)
+	return o.doAfterUpsertHooks(ctx, exec)
 }
 
 // DeleteG deletes a single ProblemCategory record.
 // DeleteG will match against the primary key column to find the record to delete.
-func (o *ProblemCategory) DeleteG() (int64, error) {
-	return o.Delete(boil.GetDB())
+func (o *ProblemCategory) DeleteG(ctx context.Context) (int64, error) {
+	return o.Delete(ctx, boil.GetContextDB())
 }
 
 // Delete deletes a single ProblemCategory record with an executor.
 // Delete will match against the primary key column to find the record to delete.
-func (o *ProblemCategory) Delete(exec boil.Executor) (int64, error) {
+func (o *ProblemCategory) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if o == nil {
 		return 0, errors.New("models: no ProblemCategory provided for delete")
 	}
 
-	if err := o.doBeforeDeleteHooks(exec); err != nil {
+	if err := o.doBeforeDeleteHooks(ctx, exec); err != nil {
 		return 0, err
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), problemCategoryPrimaryKeyMapping)
 	sql := "DELETE FROM \"problem_categories\" WHERE \"id\"=$1"
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, sql)
-		fmt.Fprintln(boil.DebugWriter, args...)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, sql)
+		fmt.Fprintln(writer, args...)
 	}
-	result, err := exec.Exec(sql, args...)
+	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to delete from problem_categories")
 	}
@@ -1635,26 +1682,26 @@ func (o *ProblemCategory) Delete(exec boil.Executor) (int64, error) {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for problem_categories")
 	}
 
-	if err := o.doAfterDeleteHooks(exec); err != nil {
+	if err := o.doAfterDeleteHooks(ctx, exec); err != nil {
 		return 0, err
 	}
 
 	return rowsAff, nil
 }
 
-func (q problemCategoryQuery) DeleteAllG() (int64, error) {
-	return q.DeleteAll(boil.GetDB())
+func (q problemCategoryQuery) DeleteAllG(ctx context.Context) (int64, error) {
+	return q.DeleteAll(ctx, boil.GetContextDB())
 }
 
 // DeleteAll deletes all matching rows.
-func (q problemCategoryQuery) DeleteAll(exec boil.Executor) (int64, error) {
+func (q problemCategoryQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if q.Query == nil {
 		return 0, errors.New("models: no problemCategoryQuery provided for delete all")
 	}
 
 	queries.SetDelete(q.Query)
 
-	result, err := q.Query.Exec(exec)
+	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to delete all from problem_categories")
 	}
@@ -1668,19 +1715,19 @@ func (q problemCategoryQuery) DeleteAll(exec boil.Executor) (int64, error) {
 }
 
 // DeleteAllG deletes all rows in the slice.
-func (o ProblemCategorySlice) DeleteAllG() (int64, error) {
-	return o.DeleteAll(boil.GetDB())
+func (o ProblemCategorySlice) DeleteAllG(ctx context.Context) (int64, error) {
+	return o.DeleteAll(ctx, boil.GetContextDB())
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
-func (o ProblemCategorySlice) DeleteAll(exec boil.Executor) (int64, error) {
+func (o ProblemCategorySlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if len(o) == 0 {
 		return 0, nil
 	}
 
 	if len(problemCategoryBeforeDeleteHooks) != 0 {
 		for _, obj := range o {
-			if err := obj.doBeforeDeleteHooks(exec); err != nil {
+			if err := obj.doBeforeDeleteHooks(ctx, exec); err != nil {
 				return 0, err
 			}
 		}
@@ -1695,11 +1742,12 @@ func (o ProblemCategorySlice) DeleteAll(exec boil.Executor) (int64, error) {
 	sql := "DELETE FROM \"problem_categories\" WHERE " +
 		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, problemCategoryPrimaryKeyColumns, len(o))
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, sql)
-		fmt.Fprintln(boil.DebugWriter, args)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, sql)
+		fmt.Fprintln(writer, args)
 	}
-	result, err := exec.Exec(sql, args...)
+	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to delete all from problemCategory slice")
 	}
@@ -1711,7 +1759,7 @@ func (o ProblemCategorySlice) DeleteAll(exec boil.Executor) (int64, error) {
 
 	if len(problemCategoryAfterDeleteHooks) != 0 {
 		for _, obj := range o {
-			if err := obj.doAfterDeleteHooks(exec); err != nil {
+			if err := obj.doAfterDeleteHooks(ctx, exec); err != nil {
 				return 0, err
 			}
 		}
@@ -1721,18 +1769,18 @@ func (o ProblemCategorySlice) DeleteAll(exec boil.Executor) (int64, error) {
 }
 
 // ReloadG refetches the object from the database using the primary keys.
-func (o *ProblemCategory) ReloadG() error {
+func (o *ProblemCategory) ReloadG(ctx context.Context) error {
 	if o == nil {
 		return errors.New("models: no ProblemCategory provided for reload")
 	}
 
-	return o.Reload(boil.GetDB())
+	return o.Reload(ctx, boil.GetContextDB())
 }
 
 // Reload refetches the object from the database
 // using the primary keys with an executor.
-func (o *ProblemCategory) Reload(exec boil.Executor) error {
-	ret, err := FindProblemCategory(exec, o.ID)
+func (o *ProblemCategory) Reload(ctx context.Context, exec boil.ContextExecutor) error {
+	ret, err := FindProblemCategory(ctx, exec, o.ID)
 	if err != nil {
 		return err
 	}
@@ -1743,17 +1791,17 @@ func (o *ProblemCategory) Reload(exec boil.Executor) error {
 
 // ReloadAllG refetches every row with matching primary key column values
 // and overwrites the original object slice with the newly updated slice.
-func (o *ProblemCategorySlice) ReloadAllG() error {
+func (o *ProblemCategorySlice) ReloadAllG(ctx context.Context) error {
 	if o == nil {
 		return errors.New("models: empty ProblemCategorySlice provided for reload all")
 	}
 
-	return o.ReloadAll(boil.GetDB())
+	return o.ReloadAll(ctx, boil.GetContextDB())
 }
 
 // ReloadAll refetches every row with matching primary key column values
 // and overwrites the original object slice with the newly updated slice.
-func (o *ProblemCategorySlice) ReloadAll(exec boil.Executor) error {
+func (o *ProblemCategorySlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) error {
 	if o == nil || len(*o) == 0 {
 		return nil
 	}
@@ -1770,7 +1818,7 @@ func (o *ProblemCategorySlice) ReloadAll(exec boil.Executor) error {
 
 	q := queries.Raw(sql, args...)
 
-	err := q.Bind(nil, exec, &slice)
+	err := q.Bind(ctx, exec, &slice)
 	if err != nil {
 		return errors.Wrap(err, "models: unable to reload all in ProblemCategorySlice")
 	}
@@ -1781,20 +1829,21 @@ func (o *ProblemCategorySlice) ReloadAll(exec boil.Executor) error {
 }
 
 // ProblemCategoryExistsG checks if the ProblemCategory row exists.
-func ProblemCategoryExistsG(iD int) (bool, error) {
-	return ProblemCategoryExists(boil.GetDB(), iD)
+func ProblemCategoryExistsG(ctx context.Context, iD int) (bool, error) {
+	return ProblemCategoryExists(ctx, boil.GetContextDB(), iD)
 }
 
 // ProblemCategoryExists checks if the ProblemCategory row exists.
-func ProblemCategoryExists(exec boil.Executor, iD int) (bool, error) {
+func ProblemCategoryExists(ctx context.Context, exec boil.ContextExecutor, iD int) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from \"problem_categories\" where \"id\"=$1 limit 1)"
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, sql)
-		fmt.Fprintln(boil.DebugWriter, iD)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, sql)
+		fmt.Fprintln(writer, iD)
 	}
-	row := exec.QueryRow(sql, iD)
+	row := exec.QueryRowContext(ctx, sql, iD)
 
 	err := row.Scan(&exists)
 	if err != nil {
@@ -1805,6 +1854,6 @@ func ProblemCategoryExists(exec boil.Executor, iD int) (bool, error) {
 }
 
 // Exists checks if the ProblemCategory row exists.
-func (o *ProblemCategory) Exists(exec boil.Executor) (bool, error) {
-	return ProblemCategoryExists(exec, o.ID)
+func (o *ProblemCategory) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
+	return ProblemCategoryExists(ctx, exec, o.ID)
 }

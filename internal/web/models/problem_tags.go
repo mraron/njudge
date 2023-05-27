@@ -4,6 +4,7 @@
 package models
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"reflect"
@@ -157,7 +158,7 @@ type (
 	// This should almost always be used instead of []ProblemTag.
 	ProblemTagSlice []*ProblemTag
 	// ProblemTagHook is the signature for custom ProblemTag hook methods
-	ProblemTagHook func(boil.Executor, *ProblemTag) error
+	ProblemTagHook func(context.Context, boil.ContextExecutor, *ProblemTag) error
 
 	problemTagQuery struct {
 		*queries.Query
@@ -200,9 +201,13 @@ var problemTagBeforeUpsertHooks []ProblemTagHook
 var problemTagAfterUpsertHooks []ProblemTagHook
 
 // doAfterSelectHooks executes all "after Select" hooks.
-func (o *ProblemTag) doAfterSelectHooks(exec boil.Executor) (err error) {
+func (o *ProblemTag) doAfterSelectHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemTagAfterSelectHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -211,9 +216,13 @@ func (o *ProblemTag) doAfterSelectHooks(exec boil.Executor) (err error) {
 }
 
 // doBeforeInsertHooks executes all "before insert" hooks.
-func (o *ProblemTag) doBeforeInsertHooks(exec boil.Executor) (err error) {
+func (o *ProblemTag) doBeforeInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemTagBeforeInsertHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -222,9 +231,13 @@ func (o *ProblemTag) doBeforeInsertHooks(exec boil.Executor) (err error) {
 }
 
 // doAfterInsertHooks executes all "after Insert" hooks.
-func (o *ProblemTag) doAfterInsertHooks(exec boil.Executor) (err error) {
+func (o *ProblemTag) doAfterInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemTagAfterInsertHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -233,9 +246,13 @@ func (o *ProblemTag) doAfterInsertHooks(exec boil.Executor) (err error) {
 }
 
 // doBeforeUpdateHooks executes all "before Update" hooks.
-func (o *ProblemTag) doBeforeUpdateHooks(exec boil.Executor) (err error) {
+func (o *ProblemTag) doBeforeUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemTagBeforeUpdateHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -244,9 +261,13 @@ func (o *ProblemTag) doBeforeUpdateHooks(exec boil.Executor) (err error) {
 }
 
 // doAfterUpdateHooks executes all "after Update" hooks.
-func (o *ProblemTag) doAfterUpdateHooks(exec boil.Executor) (err error) {
+func (o *ProblemTag) doAfterUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemTagAfterUpdateHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -255,9 +276,13 @@ func (o *ProblemTag) doAfterUpdateHooks(exec boil.Executor) (err error) {
 }
 
 // doBeforeDeleteHooks executes all "before Delete" hooks.
-func (o *ProblemTag) doBeforeDeleteHooks(exec boil.Executor) (err error) {
+func (o *ProblemTag) doBeforeDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemTagBeforeDeleteHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -266,9 +291,13 @@ func (o *ProblemTag) doBeforeDeleteHooks(exec boil.Executor) (err error) {
 }
 
 // doAfterDeleteHooks executes all "after Delete" hooks.
-func (o *ProblemTag) doAfterDeleteHooks(exec boil.Executor) (err error) {
+func (o *ProblemTag) doAfterDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemTagAfterDeleteHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -277,9 +306,13 @@ func (o *ProblemTag) doAfterDeleteHooks(exec boil.Executor) (err error) {
 }
 
 // doBeforeUpsertHooks executes all "before Upsert" hooks.
-func (o *ProblemTag) doBeforeUpsertHooks(exec boil.Executor) (err error) {
+func (o *ProblemTag) doBeforeUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemTagBeforeUpsertHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -288,9 +321,13 @@ func (o *ProblemTag) doBeforeUpsertHooks(exec boil.Executor) (err error) {
 }
 
 // doAfterUpsertHooks executes all "after Upsert" hooks.
-func (o *ProblemTag) doAfterUpsertHooks(exec boil.Executor) (err error) {
+func (o *ProblemTag) doAfterUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemTagAfterUpsertHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -323,17 +360,17 @@ func AddProblemTagHook(hookPoint boil.HookPoint, problemTagHook ProblemTagHook) 
 }
 
 // OneG returns a single problemTag record from the query using the global executor.
-func (q problemTagQuery) OneG() (*ProblemTag, error) {
-	return q.One(boil.GetDB())
+func (q problemTagQuery) OneG(ctx context.Context) (*ProblemTag, error) {
+	return q.One(ctx, boil.GetContextDB())
 }
 
 // One returns a single problemTag record from the query.
-func (q problemTagQuery) One(exec boil.Executor) (*ProblemTag, error) {
+func (q problemTagQuery) One(ctx context.Context, exec boil.ContextExecutor) (*ProblemTag, error) {
 	o := &ProblemTag{}
 
 	queries.SetLimit(q.Query, 1)
 
-	err := q.Bind(nil, exec, o)
+	err := q.Bind(ctx, exec, o)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
@@ -341,7 +378,7 @@ func (q problemTagQuery) One(exec boil.Executor) (*ProblemTag, error) {
 		return nil, errors.Wrap(err, "models: failed to execute a one query for problem_tags")
 	}
 
-	if err := o.doAfterSelectHooks(exec); err != nil {
+	if err := o.doAfterSelectHooks(ctx, exec); err != nil {
 		return o, err
 	}
 
@@ -349,22 +386,22 @@ func (q problemTagQuery) One(exec boil.Executor) (*ProblemTag, error) {
 }
 
 // AllG returns all ProblemTag records from the query using the global executor.
-func (q problemTagQuery) AllG() (ProblemTagSlice, error) {
-	return q.All(boil.GetDB())
+func (q problemTagQuery) AllG(ctx context.Context) (ProblemTagSlice, error) {
+	return q.All(ctx, boil.GetContextDB())
 }
 
 // All returns all ProblemTag records from the query.
-func (q problemTagQuery) All(exec boil.Executor) (ProblemTagSlice, error) {
+func (q problemTagQuery) All(ctx context.Context, exec boil.ContextExecutor) (ProblemTagSlice, error) {
 	var o []*ProblemTag
 
-	err := q.Bind(nil, exec, &o)
+	err := q.Bind(ctx, exec, &o)
 	if err != nil {
 		return nil, errors.Wrap(err, "models: failed to assign all query results to ProblemTag slice")
 	}
 
 	if len(problemTagAfterSelectHooks) != 0 {
 		for _, obj := range o {
-			if err := obj.doAfterSelectHooks(exec); err != nil {
+			if err := obj.doAfterSelectHooks(ctx, exec); err != nil {
 				return o, err
 			}
 		}
@@ -374,18 +411,18 @@ func (q problemTagQuery) All(exec boil.Executor) (ProblemTagSlice, error) {
 }
 
 // CountG returns the count of all ProblemTag records in the query using the global executor
-func (q problemTagQuery) CountG() (int64, error) {
-	return q.Count(boil.GetDB())
+func (q problemTagQuery) CountG(ctx context.Context) (int64, error) {
+	return q.Count(ctx, boil.GetContextDB())
 }
 
 // Count returns the count of all ProblemTag records in the query.
-func (q problemTagQuery) Count(exec boil.Executor) (int64, error) {
+func (q problemTagQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
 	queries.SetCount(q.Query)
 
-	err := q.Query.QueryRow(exec).Scan(&count)
+	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to count problem_tags rows")
 	}
@@ -394,19 +431,19 @@ func (q problemTagQuery) Count(exec boil.Executor) (int64, error) {
 }
 
 // ExistsG checks if the row exists in the table using the global executor.
-func (q problemTagQuery) ExistsG() (bool, error) {
-	return q.Exists(boil.GetDB())
+func (q problemTagQuery) ExistsG(ctx context.Context) (bool, error) {
+	return q.Exists(ctx, boil.GetContextDB())
 }
 
 // Exists checks if the row exists in the table.
-func (q problemTagQuery) Exists(exec boil.Executor) (bool, error) {
+func (q problemTagQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
 	queries.SetCount(q.Query)
 	queries.SetLimit(q.Query, 1)
 
-	err := q.Query.QueryRow(exec).Scan(&count)
+	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
 		return false, errors.Wrap(err, "models: failed to check if problem_tags exists")
 	}
@@ -449,7 +486,7 @@ func (o *ProblemTag) User(mods ...qm.QueryMod) userQuery {
 
 // LoadProblem allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (problemTagL) LoadProblem(e boil.Executor, singular bool, maybeProblemTag interface{}, mods queries.Applicator) error {
+func (problemTagL) LoadProblem(ctx context.Context, e boil.ContextExecutor, singular bool, maybeProblemTag interface{}, mods queries.Applicator) error {
 	var slice []*ProblemTag
 	var object *ProblemTag
 
@@ -512,7 +549,7 @@ func (problemTagL) LoadProblem(e boil.Executor, singular bool, maybeProblemTag i
 		mods.Apply(query)
 	}
 
-	results, err := query.Query(e)
+	results, err := query.QueryContext(ctx, e)
 	if err != nil {
 		return errors.Wrap(err, "failed to eager load ProblemRel")
 	}
@@ -531,7 +568,7 @@ func (problemTagL) LoadProblem(e boil.Executor, singular bool, maybeProblemTag i
 
 	if len(problemRelAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(e); err != nil {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
 				return err
 			}
 		}
@@ -569,7 +606,7 @@ func (problemTagL) LoadProblem(e boil.Executor, singular bool, maybeProblemTag i
 
 // LoadTag allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (problemTagL) LoadTag(e boil.Executor, singular bool, maybeProblemTag interface{}, mods queries.Applicator) error {
+func (problemTagL) LoadTag(ctx context.Context, e boil.ContextExecutor, singular bool, maybeProblemTag interface{}, mods queries.Applicator) error {
 	var slice []*ProblemTag
 	var object *ProblemTag
 
@@ -632,7 +669,7 @@ func (problemTagL) LoadTag(e boil.Executor, singular bool, maybeProblemTag inter
 		mods.Apply(query)
 	}
 
-	results, err := query.Query(e)
+	results, err := query.QueryContext(ctx, e)
 	if err != nil {
 		return errors.Wrap(err, "failed to eager load Tag")
 	}
@@ -651,7 +688,7 @@ func (problemTagL) LoadTag(e boil.Executor, singular bool, maybeProblemTag inter
 
 	if len(tagAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(e); err != nil {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
 				return err
 			}
 		}
@@ -689,7 +726,7 @@ func (problemTagL) LoadTag(e boil.Executor, singular bool, maybeProblemTag inter
 
 // LoadUser allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (problemTagL) LoadUser(e boil.Executor, singular bool, maybeProblemTag interface{}, mods queries.Applicator) error {
+func (problemTagL) LoadUser(ctx context.Context, e boil.ContextExecutor, singular bool, maybeProblemTag interface{}, mods queries.Applicator) error {
 	var slice []*ProblemTag
 	var object *ProblemTag
 
@@ -752,7 +789,7 @@ func (problemTagL) LoadUser(e boil.Executor, singular bool, maybeProblemTag inte
 		mods.Apply(query)
 	}
 
-	results, err := query.Query(e)
+	results, err := query.QueryContext(ctx, e)
 	if err != nil {
 		return errors.Wrap(err, "failed to eager load User")
 	}
@@ -771,7 +808,7 @@ func (problemTagL) LoadUser(e boil.Executor, singular bool, maybeProblemTag inte
 
 	if len(userAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(e); err != nil {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
 				return err
 			}
 		}
@@ -811,17 +848,17 @@ func (problemTagL) LoadUser(e boil.Executor, singular bool, maybeProblemTag inte
 // Sets o.R.Problem to related.
 // Adds o to related.R.ProblemProblemTags.
 // Uses the global database handle.
-func (o *ProblemTag) SetProblemG(insert bool, related *ProblemRel) error {
-	return o.SetProblem(boil.GetDB(), insert, related)
+func (o *ProblemTag) SetProblemG(ctx context.Context, insert bool, related *ProblemRel) error {
+	return o.SetProblem(ctx, boil.GetContextDB(), insert, related)
 }
 
 // SetProblem of the problemTag to the related item.
 // Sets o.R.Problem to related.
 // Adds o to related.R.ProblemProblemTags.
-func (o *ProblemTag) SetProblem(exec boil.Executor, insert bool, related *ProblemRel) error {
+func (o *ProblemTag) SetProblem(ctx context.Context, exec boil.ContextExecutor, insert bool, related *ProblemRel) error {
 	var err error
 	if insert {
-		if err = related.Insert(exec, boil.Infer()); err != nil {
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
 			return errors.Wrap(err, "failed to insert into foreign table")
 		}
 	}
@@ -833,11 +870,12 @@ func (o *ProblemTag) SetProblem(exec boil.Executor, insert bool, related *Proble
 	)
 	values := []interface{}{related.ID, o.ID}
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, updateQuery)
-		fmt.Fprintln(boil.DebugWriter, values)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, values)
 	}
-	if _, err = exec.Exec(updateQuery, values...); err != nil {
+	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
 		return errors.Wrap(err, "failed to update local table")
 	}
 
@@ -865,17 +903,17 @@ func (o *ProblemTag) SetProblem(exec boil.Executor, insert bool, related *Proble
 // Sets o.R.Tag to related.
 // Adds o to related.R.ProblemTags.
 // Uses the global database handle.
-func (o *ProblemTag) SetTagG(insert bool, related *Tag) error {
-	return o.SetTag(boil.GetDB(), insert, related)
+func (o *ProblemTag) SetTagG(ctx context.Context, insert bool, related *Tag) error {
+	return o.SetTag(ctx, boil.GetContextDB(), insert, related)
 }
 
 // SetTag of the problemTag to the related item.
 // Sets o.R.Tag to related.
 // Adds o to related.R.ProblemTags.
-func (o *ProblemTag) SetTag(exec boil.Executor, insert bool, related *Tag) error {
+func (o *ProblemTag) SetTag(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Tag) error {
 	var err error
 	if insert {
-		if err = related.Insert(exec, boil.Infer()); err != nil {
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
 			return errors.Wrap(err, "failed to insert into foreign table")
 		}
 	}
@@ -887,11 +925,12 @@ func (o *ProblemTag) SetTag(exec boil.Executor, insert bool, related *Tag) error
 	)
 	values := []interface{}{related.ID, o.ID}
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, updateQuery)
-		fmt.Fprintln(boil.DebugWriter, values)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, values)
 	}
-	if _, err = exec.Exec(updateQuery, values...); err != nil {
+	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
 		return errors.Wrap(err, "failed to update local table")
 	}
 
@@ -919,17 +958,17 @@ func (o *ProblemTag) SetTag(exec boil.Executor, insert bool, related *Tag) error
 // Sets o.R.User to related.
 // Adds o to related.R.ProblemTags.
 // Uses the global database handle.
-func (o *ProblemTag) SetUserG(insert bool, related *User) error {
-	return o.SetUser(boil.GetDB(), insert, related)
+func (o *ProblemTag) SetUserG(ctx context.Context, insert bool, related *User) error {
+	return o.SetUser(ctx, boil.GetContextDB(), insert, related)
 }
 
 // SetUser of the problemTag to the related item.
 // Sets o.R.User to related.
 // Adds o to related.R.ProblemTags.
-func (o *ProblemTag) SetUser(exec boil.Executor, insert bool, related *User) error {
+func (o *ProblemTag) SetUser(ctx context.Context, exec boil.ContextExecutor, insert bool, related *User) error {
 	var err error
 	if insert {
-		if err = related.Insert(exec, boil.Infer()); err != nil {
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
 			return errors.Wrap(err, "failed to insert into foreign table")
 		}
 	}
@@ -941,11 +980,12 @@ func (o *ProblemTag) SetUser(exec boil.Executor, insert bool, related *User) err
 	)
 	values := []interface{}{related.ID, o.ID}
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, updateQuery)
-		fmt.Fprintln(boil.DebugWriter, values)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, values)
 	}
-	if _, err = exec.Exec(updateQuery, values...); err != nil {
+	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
 		return errors.Wrap(err, "failed to update local table")
 	}
 
@@ -981,13 +1021,13 @@ func ProblemTags(mods ...qm.QueryMod) problemTagQuery {
 }
 
 // FindProblemTagG retrieves a single record by ID.
-func FindProblemTagG(iD int, selectCols ...string) (*ProblemTag, error) {
-	return FindProblemTag(boil.GetDB(), iD, selectCols...)
+func FindProblemTagG(ctx context.Context, iD int, selectCols ...string) (*ProblemTag, error) {
+	return FindProblemTag(ctx, boil.GetContextDB(), iD, selectCols...)
 }
 
 // FindProblemTag retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindProblemTag(exec boil.Executor, iD int, selectCols ...string) (*ProblemTag, error) {
+func FindProblemTag(ctx context.Context, exec boil.ContextExecutor, iD int, selectCols ...string) (*ProblemTag, error) {
 	problemTagObj := &ProblemTag{}
 
 	sel := "*"
@@ -1000,7 +1040,7 @@ func FindProblemTag(exec boil.Executor, iD int, selectCols ...string) (*ProblemT
 
 	q := queries.Raw(query, iD)
 
-	err := q.Bind(nil, exec, problemTagObj)
+	err := q.Bind(ctx, exec, problemTagObj)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
@@ -1008,7 +1048,7 @@ func FindProblemTag(exec boil.Executor, iD int, selectCols ...string) (*ProblemT
 		return nil, errors.Wrap(err, "models: unable to select from problem_tags")
 	}
 
-	if err = problemTagObj.doAfterSelectHooks(exec); err != nil {
+	if err = problemTagObj.doAfterSelectHooks(ctx, exec); err != nil {
 		return problemTagObj, err
 	}
 
@@ -1016,20 +1056,20 @@ func FindProblemTag(exec boil.Executor, iD int, selectCols ...string) (*ProblemT
 }
 
 // InsertG a single record. See Insert for whitelist behavior description.
-func (o *ProblemTag) InsertG(columns boil.Columns) error {
-	return o.Insert(boil.GetDB(), columns)
+func (o *ProblemTag) InsertG(ctx context.Context, columns boil.Columns) error {
+	return o.Insert(ctx, boil.GetContextDB(), columns)
 }
 
 // Insert a single record using an executor.
 // See boil.Columns.InsertColumnSet documentation to understand column list inference for inserts.
-func (o *ProblemTag) Insert(exec boil.Executor, columns boil.Columns) error {
+func (o *ProblemTag) Insert(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
 	if o == nil {
 		return errors.New("models: no problem_tags provided for insertion")
 	}
 
 	var err error
 
-	if err := o.doBeforeInsertHooks(exec); err != nil {
+	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
 		return err
 	}
 
@@ -1074,15 +1114,16 @@ func (o *ProblemTag) Insert(exec boil.Executor, columns boil.Columns) error {
 	value := reflect.Indirect(reflect.ValueOf(o))
 	vals := queries.ValuesFromMapping(value, cache.valueMapping)
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, cache.query)
-		fmt.Fprintln(boil.DebugWriter, vals)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, cache.query)
+		fmt.Fprintln(writer, vals)
 	}
 
 	if len(cache.retMapping) != 0 {
-		err = exec.QueryRow(cache.query, vals...).Scan(queries.PtrsFromMapping(value, cache.retMapping)...)
+		err = exec.QueryRowContext(ctx, cache.query, vals...).Scan(queries.PtrsFromMapping(value, cache.retMapping)...)
 	} else {
-		_, err = exec.Exec(cache.query, vals...)
+		_, err = exec.ExecContext(ctx, cache.query, vals...)
 	}
 
 	if err != nil {
@@ -1095,21 +1136,21 @@ func (o *ProblemTag) Insert(exec boil.Executor, columns boil.Columns) error {
 		problemTagInsertCacheMut.Unlock()
 	}
 
-	return o.doAfterInsertHooks(exec)
+	return o.doAfterInsertHooks(ctx, exec)
 }
 
 // UpdateG a single ProblemTag record using the global executor.
 // See Update for more documentation.
-func (o *ProblemTag) UpdateG(columns boil.Columns) (int64, error) {
-	return o.Update(boil.GetDB(), columns)
+func (o *ProblemTag) UpdateG(ctx context.Context, columns boil.Columns) (int64, error) {
+	return o.Update(ctx, boil.GetContextDB(), columns)
 }
 
 // Update uses an executor to update the ProblemTag.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
-func (o *ProblemTag) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
+func (o *ProblemTag) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
 	var err error
-	if err = o.doBeforeUpdateHooks(exec); err != nil {
+	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
 		return 0, err
 	}
 	key := makeCacheKey(columns, nil)
@@ -1142,12 +1183,13 @@ func (o *ProblemTag) Update(exec boil.Executor, columns boil.Columns) (int64, er
 
 	values := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), cache.valueMapping)
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, cache.query)
-		fmt.Fprintln(boil.DebugWriter, values)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, cache.query)
+		fmt.Fprintln(writer, values)
 	}
 	var result sql.Result
-	result, err = exec.Exec(cache.query, values...)
+	result, err = exec.ExecContext(ctx, cache.query, values...)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to update problem_tags row")
 	}
@@ -1163,19 +1205,19 @@ func (o *ProblemTag) Update(exec boil.Executor, columns boil.Columns) (int64, er
 		problemTagUpdateCacheMut.Unlock()
 	}
 
-	return rowsAff, o.doAfterUpdateHooks(exec)
+	return rowsAff, o.doAfterUpdateHooks(ctx, exec)
 }
 
 // UpdateAllG updates all rows with the specified column values.
-func (q problemTagQuery) UpdateAllG(cols M) (int64, error) {
-	return q.UpdateAll(boil.GetDB(), cols)
+func (q problemTagQuery) UpdateAllG(ctx context.Context, cols M) (int64, error) {
+	return q.UpdateAll(ctx, boil.GetContextDB(), cols)
 }
 
 // UpdateAll updates all rows with the specified column values.
-func (q problemTagQuery) UpdateAll(exec boil.Executor, cols M) (int64, error) {
+func (q problemTagQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
 	queries.SetUpdate(q.Query, cols)
 
-	result, err := q.Query.Exec(exec)
+	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to update all for problem_tags")
 	}
@@ -1189,12 +1231,12 @@ func (q problemTagQuery) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 }
 
 // UpdateAllG updates all rows with the specified column values.
-func (o ProblemTagSlice) UpdateAllG(cols M) (int64, error) {
-	return o.UpdateAll(boil.GetDB(), cols)
+func (o ProblemTagSlice) UpdateAllG(ctx context.Context, cols M) (int64, error) {
+	return o.UpdateAll(ctx, boil.GetContextDB(), cols)
 }
 
 // UpdateAll updates all rows with the specified column values, using an executor.
-func (o ProblemTagSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
+func (o ProblemTagSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
 	ln := int64(len(o))
 	if ln == 0 {
 		return 0, nil
@@ -1224,11 +1266,12 @@ func (o ProblemTagSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 		strmangle.SetParamNames("\"", "\"", 1, colNames),
 		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), len(colNames)+1, problemTagPrimaryKeyColumns, len(o)))
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, sql)
-		fmt.Fprintln(boil.DebugWriter, args...)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, sql)
+		fmt.Fprintln(writer, args...)
 	}
-	result, err := exec.Exec(sql, args...)
+	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to update all in problemTag slice")
 	}
@@ -1241,18 +1284,18 @@ func (o ProblemTagSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 }
 
 // UpsertG attempts an insert, and does an update or ignore on conflict.
-func (o *ProblemTag) UpsertG(updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
-	return o.Upsert(boil.GetDB(), updateOnConflict, conflictColumns, updateColumns, insertColumns)
+func (o *ProblemTag) UpsertG(ctx context.Context, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
+	return o.Upsert(ctx, boil.GetContextDB(), updateOnConflict, conflictColumns, updateColumns, insertColumns)
 }
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
-func (o *ProblemTag) Upsert(exec boil.Executor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
+func (o *ProblemTag) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
 	if o == nil {
 		return errors.New("models: no problem_tags provided for upsert")
 	}
 
-	if err := o.doBeforeUpsertHooks(exec); err != nil {
+	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
 		return err
 	}
 
@@ -1335,17 +1378,18 @@ func (o *ProblemTag) Upsert(exec boil.Executor, updateOnConflict bool, conflictC
 		returns = queries.PtrsFromMapping(value, cache.retMapping)
 	}
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, cache.query)
-		fmt.Fprintln(boil.DebugWriter, vals)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, cache.query)
+		fmt.Fprintln(writer, vals)
 	}
 	if len(cache.retMapping) != 0 {
-		err = exec.QueryRow(cache.query, vals...).Scan(returns...)
+		err = exec.QueryRowContext(ctx, cache.query, vals...).Scan(returns...)
 		if errors.Is(err, sql.ErrNoRows) {
 			err = nil // Postgres doesn't return anything when there's no update
 		}
 	} else {
-		_, err = exec.Exec(cache.query, vals...)
+		_, err = exec.ExecContext(ctx, cache.query, vals...)
 	}
 	if err != nil {
 		return errors.Wrap(err, "models: unable to upsert problem_tags")
@@ -1357,34 +1401,35 @@ func (o *ProblemTag) Upsert(exec boil.Executor, updateOnConflict bool, conflictC
 		problemTagUpsertCacheMut.Unlock()
 	}
 
-	return o.doAfterUpsertHooks(exec)
+	return o.doAfterUpsertHooks(ctx, exec)
 }
 
 // DeleteG deletes a single ProblemTag record.
 // DeleteG will match against the primary key column to find the record to delete.
-func (o *ProblemTag) DeleteG() (int64, error) {
-	return o.Delete(boil.GetDB())
+func (o *ProblemTag) DeleteG(ctx context.Context) (int64, error) {
+	return o.Delete(ctx, boil.GetContextDB())
 }
 
 // Delete deletes a single ProblemTag record with an executor.
 // Delete will match against the primary key column to find the record to delete.
-func (o *ProblemTag) Delete(exec boil.Executor) (int64, error) {
+func (o *ProblemTag) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if o == nil {
 		return 0, errors.New("models: no ProblemTag provided for delete")
 	}
 
-	if err := o.doBeforeDeleteHooks(exec); err != nil {
+	if err := o.doBeforeDeleteHooks(ctx, exec); err != nil {
 		return 0, err
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), problemTagPrimaryKeyMapping)
 	sql := "DELETE FROM \"problem_tags\" WHERE \"id\"=$1"
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, sql)
-		fmt.Fprintln(boil.DebugWriter, args...)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, sql)
+		fmt.Fprintln(writer, args...)
 	}
-	result, err := exec.Exec(sql, args...)
+	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to delete from problem_tags")
 	}
@@ -1394,26 +1439,26 @@ func (o *ProblemTag) Delete(exec boil.Executor) (int64, error) {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for problem_tags")
 	}
 
-	if err := o.doAfterDeleteHooks(exec); err != nil {
+	if err := o.doAfterDeleteHooks(ctx, exec); err != nil {
 		return 0, err
 	}
 
 	return rowsAff, nil
 }
 
-func (q problemTagQuery) DeleteAllG() (int64, error) {
-	return q.DeleteAll(boil.GetDB())
+func (q problemTagQuery) DeleteAllG(ctx context.Context) (int64, error) {
+	return q.DeleteAll(ctx, boil.GetContextDB())
 }
 
 // DeleteAll deletes all matching rows.
-func (q problemTagQuery) DeleteAll(exec boil.Executor) (int64, error) {
+func (q problemTagQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if q.Query == nil {
 		return 0, errors.New("models: no problemTagQuery provided for delete all")
 	}
 
 	queries.SetDelete(q.Query)
 
-	result, err := q.Query.Exec(exec)
+	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to delete all from problem_tags")
 	}
@@ -1427,19 +1472,19 @@ func (q problemTagQuery) DeleteAll(exec boil.Executor) (int64, error) {
 }
 
 // DeleteAllG deletes all rows in the slice.
-func (o ProblemTagSlice) DeleteAllG() (int64, error) {
-	return o.DeleteAll(boil.GetDB())
+func (o ProblemTagSlice) DeleteAllG(ctx context.Context) (int64, error) {
+	return o.DeleteAll(ctx, boil.GetContextDB())
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
-func (o ProblemTagSlice) DeleteAll(exec boil.Executor) (int64, error) {
+func (o ProblemTagSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if len(o) == 0 {
 		return 0, nil
 	}
 
 	if len(problemTagBeforeDeleteHooks) != 0 {
 		for _, obj := range o {
-			if err := obj.doBeforeDeleteHooks(exec); err != nil {
+			if err := obj.doBeforeDeleteHooks(ctx, exec); err != nil {
 				return 0, err
 			}
 		}
@@ -1454,11 +1499,12 @@ func (o ProblemTagSlice) DeleteAll(exec boil.Executor) (int64, error) {
 	sql := "DELETE FROM \"problem_tags\" WHERE " +
 		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, problemTagPrimaryKeyColumns, len(o))
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, sql)
-		fmt.Fprintln(boil.DebugWriter, args)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, sql)
+		fmt.Fprintln(writer, args)
 	}
-	result, err := exec.Exec(sql, args...)
+	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to delete all from problemTag slice")
 	}
@@ -1470,7 +1516,7 @@ func (o ProblemTagSlice) DeleteAll(exec boil.Executor) (int64, error) {
 
 	if len(problemTagAfterDeleteHooks) != 0 {
 		for _, obj := range o {
-			if err := obj.doAfterDeleteHooks(exec); err != nil {
+			if err := obj.doAfterDeleteHooks(ctx, exec); err != nil {
 				return 0, err
 			}
 		}
@@ -1480,18 +1526,18 @@ func (o ProblemTagSlice) DeleteAll(exec boil.Executor) (int64, error) {
 }
 
 // ReloadG refetches the object from the database using the primary keys.
-func (o *ProblemTag) ReloadG() error {
+func (o *ProblemTag) ReloadG(ctx context.Context) error {
 	if o == nil {
 		return errors.New("models: no ProblemTag provided for reload")
 	}
 
-	return o.Reload(boil.GetDB())
+	return o.Reload(ctx, boil.GetContextDB())
 }
 
 // Reload refetches the object from the database
 // using the primary keys with an executor.
-func (o *ProblemTag) Reload(exec boil.Executor) error {
-	ret, err := FindProblemTag(exec, o.ID)
+func (o *ProblemTag) Reload(ctx context.Context, exec boil.ContextExecutor) error {
+	ret, err := FindProblemTag(ctx, exec, o.ID)
 	if err != nil {
 		return err
 	}
@@ -1502,17 +1548,17 @@ func (o *ProblemTag) Reload(exec boil.Executor) error {
 
 // ReloadAllG refetches every row with matching primary key column values
 // and overwrites the original object slice with the newly updated slice.
-func (o *ProblemTagSlice) ReloadAllG() error {
+func (o *ProblemTagSlice) ReloadAllG(ctx context.Context) error {
 	if o == nil {
 		return errors.New("models: empty ProblemTagSlice provided for reload all")
 	}
 
-	return o.ReloadAll(boil.GetDB())
+	return o.ReloadAll(ctx, boil.GetContextDB())
 }
 
 // ReloadAll refetches every row with matching primary key column values
 // and overwrites the original object slice with the newly updated slice.
-func (o *ProblemTagSlice) ReloadAll(exec boil.Executor) error {
+func (o *ProblemTagSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) error {
 	if o == nil || len(*o) == 0 {
 		return nil
 	}
@@ -1529,7 +1575,7 @@ func (o *ProblemTagSlice) ReloadAll(exec boil.Executor) error {
 
 	q := queries.Raw(sql, args...)
 
-	err := q.Bind(nil, exec, &slice)
+	err := q.Bind(ctx, exec, &slice)
 	if err != nil {
 		return errors.Wrap(err, "models: unable to reload all in ProblemTagSlice")
 	}
@@ -1540,20 +1586,21 @@ func (o *ProblemTagSlice) ReloadAll(exec boil.Executor) error {
 }
 
 // ProblemTagExistsG checks if the ProblemTag row exists.
-func ProblemTagExistsG(iD int) (bool, error) {
-	return ProblemTagExists(boil.GetDB(), iD)
+func ProblemTagExistsG(ctx context.Context, iD int) (bool, error) {
+	return ProblemTagExists(ctx, boil.GetContextDB(), iD)
 }
 
 // ProblemTagExists checks if the ProblemTag row exists.
-func ProblemTagExists(exec boil.Executor, iD int) (bool, error) {
+func ProblemTagExists(ctx context.Context, exec boil.ContextExecutor, iD int) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from \"problem_tags\" where \"id\"=$1 limit 1)"
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, sql)
-		fmt.Fprintln(boil.DebugWriter, iD)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, sql)
+		fmt.Fprintln(writer, iD)
 	}
-	row := exec.QueryRow(sql, iD)
+	row := exec.QueryRowContext(ctx, sql, iD)
 
 	err := row.Scan(&exists)
 	if err != nil {
@@ -1564,6 +1611,6 @@ func ProblemTagExists(exec boil.Executor, iD int) (bool, error) {
 }
 
 // Exists checks if the ProblemTag row exists.
-func (o *ProblemTag) Exists(exec boil.Executor) (bool, error) {
-	return ProblemTagExists(exec, o.ID)
+func (o *ProblemTag) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
+	return ProblemTagExists(ctx, exec, o.ID)
 }

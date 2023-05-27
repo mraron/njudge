@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"io/ioutil"
@@ -101,7 +102,7 @@ var ActivateCmd = &cobra.Command{
 
 		s.SetupEnvironment()
 		s.ConnectToDB()
-		_, err = models.Users(qm.Where("name = ?", ActivateCmdArgs.Name)).UpdateAll(s.DB, models.M{"activation_key": nil})
+		_, err = models.Users(qm.Where("name = ?", ActivateCmdArgs.Name)).UpdateAll(context.Background(), s.DB, models.M{"activation_key": nil})
 
 		return err
 	},
@@ -110,13 +111,13 @@ var ActivateCmd = &cobra.Command{
 func RenameInDB(from, to string, tx *sql.Tx) error {
 	log.Print("Renaming ", from, " to ", to)
 
-	n, err := models.ProblemRels(qm.Where("problem = ?", from)).UpdateAll(tx, models.M{"problem": to})
+	n, err := models.ProblemRels(qm.Where("problem = ?", from)).UpdateAll(context.Background(), tx, models.M{"problem": to})
 	fmt.Println(n, err)
 	if err != nil {
 		return err
 	}
 
-	n, err = models.Submissions(qm.Where("problem = ?", from)).UpdateAll(tx, models.M{"problem": to})
+	n, err = models.Submissions(qm.Where("problem = ?", from)).UpdateAll(context.Background(), tx, models.M{"problem": to})
 	fmt.Println(n, err)
 	return err
 }

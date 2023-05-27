@@ -164,6 +164,7 @@ func (s *Dummy) Run(prg string, needStatus bool) (language.Status, error) {
 		st.Verdict = language.VerdictXX
 		return st, err
 	}
+	defer start.Stop()
 
 	wg.Add(1)
 	go func() {
