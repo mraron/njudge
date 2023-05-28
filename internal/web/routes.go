@@ -31,8 +31,8 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	e.GET("/task_archive", taskarchive.Get(s.DB, s.ProblemStore))
 
 	ps := e.Group("/problemset", problemset.SetNameMiddleware())
-	ps.GET("/:name/", problemset.GetProblemList(s.DB, s.ProblemStore, services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
-	ps.POST("/:name/submit", problemset.PostSubmit(s.Server, services.NewSQLSubmitService(s.DB.DB, s.ProblemStore)))
+	ps.GET("/:name/", problemset.GetProblemList(s.DB, services.NewSQLProblemListService(s.DB.DB, s.ProblemStore, services.NewSQLProblem(s.DB.DB, s.ProblemStore)), services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
+	ps.POST("/:name/submit", problemset.PostSubmit(services.NewSQLSubmitService(s.DB.DB, s.ProblemStore)))
 	ps.GET("/status/", problemset.GetStatus(services.NewSQLStatusPageService(s.DB.DB)))
 
 	psProb := ps.Group("/:name/:problem", problemset.RenameProblemMiddleware(s.ProblemStore), problemset.SetProblemMiddleware(services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
@@ -64,7 +64,7 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	pr.GET("/:name/", profile.GetProfile(s.DB))
 	pr.GET("/:name/submissions/", profile.GetSubmissions(services.NewSQLStatusPageService(s.DB.DB)))
 
-	prs := pr.Group("/:name/settings", user.RequireLoginMiddleware(), profile.ProfilePrivateMiddleware())
+	prs := pr.Group("/:name/settings", user.RequireLoginMiddleware(), profile.PrivateMiddleware())
 	prs.GET("/", profile.GetSettings(s.DB))
 	prs.POST("/change_password/", profile.PostSettingsChangePassword(s.DB), user.RequireLoginMiddleware(), user.RequireLoginMiddleware())
 

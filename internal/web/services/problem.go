@@ -80,6 +80,27 @@ func (s SQLProblem) Get(ctx context.Context, ID int) (*problem.Problem, error) {
 	return &problem.Problem{Problem: p, ProblemRel: *pr}, nil
 }
 
+func (s SQLProblem) GetAll(ctx context.Context) ([]problem.Problem, error) {
+	prs, err := models.ProblemRels().All(ctx, s.db)
+	if err != nil {
+		return nil, err
+	}
+
+	var res []problem.Problem
+	for ind := range prs {
+		p, err := s.ps.Get(prs[ind].Problem)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, problem.Problem{
+			Problem:    p,
+			ProblemRel: *prs[ind],
+		})
+	}
+
+	return res, nil
+}
+
 func (s SQLProblem) GetByNames(ctx context.Context, problemset string, problemName string) (*problem.Problem, error) {
 	pr, err := models.ProblemRels(models.ProblemRelWhere.Problemset.EQ(problemset), models.ProblemRelWhere.Problem.EQ(problemName)).One(ctx, s.db)
 	if err != nil {

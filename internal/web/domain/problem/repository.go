@@ -4,6 +4,7 @@ import "context"
 
 type Repository interface {
 	Get(ctx context.Context, ID int) (*Problem, error)
+	GetAll(ctx context.Context) ([]Problem, error)
 	GetByNames(ctx context.Context, problemset string, problemName string) (*Problem, error)
 }
 

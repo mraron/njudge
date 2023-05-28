@@ -23,7 +23,7 @@
                 <div class="form-group">
                     <label for="categoryFilter">Kategória</label>
                     <select name="category" class="custom-select" id="categoryFilter">
-                    {{range $i := .Data.CategoryFilters}}
+                    {{range $i := .Data.CategoryFilterOptions}}
                     <option value="{{$i.Value}}"{{if $i.Selected}} selected{{end}}>{{$i.Name}}</option>
                     {{end}}
                     </select>
