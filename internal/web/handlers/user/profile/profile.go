@@ -2,14 +2,14 @@ package profile
 
 import (
 	"fmt"
-	"github.com/mraron/njudge/internal/web/helpers"
-	"github.com/mraron/njudge/internal/web/models"
-	"net/http"
-	"strconv"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
+	"github.com/mraron/njudge/internal/web/domain/submission"
+	"github.com/mraron/njudge/internal/web/helpers/pagination"
+	"github.com/mraron/njudge/internal/web/models"
+	"github.com/mraron/njudge/internal/web/services"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
+	"net/http"
 )
 
 func GetProfile(DB *sqlx.DB) echo.HandlerFunc {
@@ -47,16 +47,34 @@ func GetProfile(DB *sqlx.DB) echo.HandlerFunc {
 	}
 }
 
-func GetSubmissions(DB *sqlx.DB) echo.HandlerFunc {
+func GetSubmissions(statusPageService services.StatusPageService) echo.HandlerFunc {
+	type request struct {
+		Page int `query:"page"`
+	}
 	return func(c echo.Context) error {
 		u := c.Get("profile").(*models.User)
 
-		page, err := strconv.Atoi(c.QueryParam("page"))
-		if err != nil || page <= 0 {
-			page = 1
+		data := request{}
+		if err := c.Bind(&data); err != nil {
+			return err
 		}
 
-		statusPage, err := helpers.GetStatusPage(DB.DB, page, 20, OrderBy("id DESC"), []QueryMod{Where("user_id = ?", u.ID)}, c.Request().URL.Query())
+		if data.Page <= 0 {
+			data.Page = 1
+		}
+
+		statusReq := services.StatusPageRequest{
+			Pagination: pagination.Data{
+				Page:      data.Page,
+				PerPage:   20,
+				SortDir:   "DESC",
+				SortField: "id",
+			},
+			UserID:    u.ID,
+			GETValues: c.Request().URL.Query(),
+		}
+
+		statusPage, err := statusPageService.GetStatusPage(c.Request().Context(), statusReq)
 		if err != nil {
 			return err
 		}
@@ -64,7 +82,7 @@ func GetSubmissions(DB *sqlx.DB) echo.HandlerFunc {
 		c.Set("title", fmt.Sprintf("%s beküldései", u.Name))
 		return c.Render(http.StatusOK, "user/profile/submissions", struct {
 			User       *models.User
-			StatusPage *helpers.StatusPage
+			StatusPage *submission.StatusPage
 		}{u, statusPage})
 	}
 }

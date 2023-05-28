@@ -3,7 +3,6 @@ package problemset
 import (
 	"context"
 	"github.com/mraron/njudge/internal/web/domain/problem"
-	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/config"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
@@ -168,7 +167,7 @@ func GetProblemList(DB *sqlx.DB, problemStore problems.Store, problemRepo proble
 				return err
 			}
 
-			pars := []interface{}{}
+			var pars []interface{}
 			for _, cat := range cats {
 				curr := cat.ID
 				ok := false
@@ -263,29 +262,43 @@ func GetProblemList(DB *sqlx.DB, problemStore problems.Store, problemRepo proble
 	}
 }
 
-func GetStatus(DB *sqlx.DB) echo.HandlerFunc {
+func GetStatus(statusPageService services.StatusPageService) echo.HandlerFunc {
+	type request struct {
+		AC         string `query:"ac"`
+		UserID     int    `query:"user_id"`
+		Problemset string `query:"problem_set"`
+		Problem    string `query:"problem"`
+		Page       int    `query:"page"`
+	}
 	return func(c echo.Context) error {
-		ac := c.QueryParam("ac")
-		userID := c.QueryParam("user_id")
-		problemset := c.QueryParam("problem_set")
-		problem := c.QueryParam("problem")
-		page, err := strconv.Atoi(c.QueryParam("page"))
-		if err != nil || page <= 0 {
-			page = 1
+		data := request{}
+		if err := c.Bind(&data); err != nil {
+			return err
 		}
 
-		query := make([]QueryMod, 0)
-		if problem != "" {
-			query = append(query, Where("problem = ?", problem), Where("problemset = ?", problemset))
-		}
-		if ac == "1" {
-			query = append(query, Where("verdict = 0"))
-		}
-		if userID != "" {
-			query = append(query, Where("user_id = ?", userID))
+		if data.Page <= 0 {
+			data.Page = 1
 		}
 
-		statusPage, err := helpers.GetStatusPage(DB.DB, page, 20, OrderBy("id DESC"), query, c.Request().URL.Query())
+		statusReq := services.StatusPageRequest{
+			Pagination: pagination.Data{
+				Page:      data.Page,
+				PerPage:   20,
+				SortDir:   "DESC",
+				SortField: "id",
+			},
+			Problemset: data.Problemset,
+			Problem:    data.Problem,
+			UserID:     data.UserID,
+			GETValues:  c.Request().URL.Query(),
+		}
+
+		if data.AC == "1" {
+			ac := problems.VerdictAC
+			statusReq.Verdict = &ac
+		}
+
+		statusPage, err := statusPageService.GetStatusPage(c.Request().Context(), statusReq)
 		if err != nil {
 			return err
 		}

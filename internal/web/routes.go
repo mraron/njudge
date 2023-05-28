@@ -30,12 +30,12 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	ps := e.Group("/problemset", problemset.SetNameMiddleware())
 	ps.GET("/:name/", problemset.GetProblemList(s.DB, s.ProblemStore, services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
 	ps.POST("/:name/submit", problemset.PostSubmit(s.Server, services.NewSQLSubmitService(s.DB.DB, s.ProblemStore)))
-	ps.GET("/status/", problemset.GetStatus(s.DB))
+	ps.GET("/status/", problemset.GetStatus(services.NewSQLStatusPageService(s.DB.DB)))
 
 	psProb := ps.Group("/:name/:problem", problemset.RenameProblemMiddleware(s.ProblemStore), problemset.SetProblemMiddleware(services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
 	psProb.GET("/", problemset.GetProblem()).Name = "getProblemMain"
 	psProb.GET("/problem", problemset.GetProblem())
-	psProb.GET("/status", problemset.GetProblemStatus(s.DB))
+	psProb.GET("/status", problemset.GetProblemStatus(services.NewSQLStatusPageService(s.DB.DB)))
 	psProb.GET("/submit", problemset.GetProblemSubmit())
 	psProb.GET("/ranklist", problemset.GetProblemRanklist(s.DB))
 	psProb.POST("/tags", problemset.PostProblemTag(services.NewSQLTagsService(s.DB.DB)))
@@ -59,7 +59,7 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 
 	pr := u.Group("/profile", profile.SetProfileMiddleware(s.DB))
 	pr.GET("/:name/", profile.GetProfile(s.DB))
-	pr.GET("/:name/submissions/", profile.GetSubmissions(s.DB))
+	pr.GET("/:name/submissions/", profile.GetSubmissions(services.NewSQLStatusPageService(s.DB.DB)))
 
 	v1 := e.Group("/api/v1")
 
