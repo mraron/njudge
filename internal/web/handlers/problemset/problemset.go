@@ -247,11 +247,11 @@ func GetStatus(statusPageService services.StatusPageService) echo.HandlerFunc {
 
 func PostSubmit(subService services.SubmitService) echo.HandlerFunc {
 	type request struct {
-		Problemset     string `param:"problemset"`
+		Problemset     string `param:"name"`
 		ProblemName    string `form:"problem"`
 		LanguageName   string `form:"language"`
-		SubmissionCode []byte `form:"submissionCode"`
-		SubmissionFile []byte `form:"source"`
+		SubmissionCode string `form:"submissionCode"`
+		SubmissionFile string `form:"source"`
 	}
 	return func(c echo.Context) error {
 		u := c.Get("user").(*models.User)
@@ -274,7 +274,7 @@ func PostSubmit(subService services.SubmitService) echo.HandlerFunc {
 			Problemset: data.Problemset,
 			Problem:    data.ProblemName,
 			Language:   data.LanguageName,
-			Source:     code,
+			Source:     []byte(code),
 		})
 		if err != nil {
 			return err
