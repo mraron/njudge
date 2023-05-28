@@ -105,5 +105,5 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	v1.PUT("/submissions/:id", api.Put[models.Submission](submissionDataProvider))
 	v1.DELETE("/submissions/:id", api.Delete[models.Submission](submissionDataProvider))
 
-	e.GET("/admin", handlers.GetAdmin(s.Server))
+	e.GET("/admin", handlers.GetAdmin(s.Server), user.RequireLoginMiddleware())
 }
