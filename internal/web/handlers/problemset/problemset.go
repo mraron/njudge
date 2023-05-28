@@ -9,6 +9,7 @@ import (
 	"github.com/mraron/njudge/internal/web/models"
 	"github.com/mraron/njudge/internal/web/services"
 	"github.com/mraron/njudge/pkg/problems"
+	"io"
 	"net/http"
 	"sort"
 	"strconv"
@@ -251,7 +252,6 @@ func PostSubmit(subService services.SubmitService) echo.HandlerFunc {
 		ProblemName    string `form:"problem"`
 		LanguageName   string `form:"language"`
 		SubmissionCode string `form:"submissionCode"`
-		SubmissionFile string `form:"source"`
 	}
 	return func(c echo.Context) error {
 		u := c.Get("user").(*models.User)
@@ -266,7 +266,25 @@ func PostSubmit(subService services.SubmitService) echo.HandlerFunc {
 
 		code := data.SubmissionCode
 		if len(code) == 0 {
-			code = data.SubmissionFile
+			fileHeader, err := c.FormFile("source")
+			if err != nil {
+				return err
+			}
+
+			f, err := fileHeader.Open()
+			if err != nil {
+				return err
+			}
+
+			contents, err := io.ReadAll(f)
+			if err != nil {
+				return err
+			}
+
+			code = string(contents)
+			if err := f.Close(); err != nil {
+				return err
+			}
 		}
 
 		sub, err := subService.Submit(c.Request().Context(), services.SubmitRequest{
