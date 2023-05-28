@@ -2,11 +2,12 @@ package helpers
 
 import (
 	"errors"
-	"github.com/mraron/njudge/internal/web/helpers/config"
-	"github.com/mraron/njudge/internal/web/models"
 	"math/rand"
 	"net/http"
 	"time"
+
+	"github.com/mraron/njudge/internal/web/helpers/config"
+	"github.com/mraron/njudge/internal/web/models"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
@@ -29,6 +30,15 @@ func GenerateActivationKey(length int) string {
 
 func CensorUserPassword(user *models.User) {
 	user.Password = "***CENSORED***"
+}
+
+func LoginRequired(c echo.Context) error {
+	SetFlash(c, "LoginMessage", "A kért oldal megtekintéséhez belépés szükséges!")
+	to := ""
+	if c.Request().Method == "GET" {
+		to = "?next=" + c.Request().URL.Path
+	}
+	return c.Redirect(http.StatusFound, "/user/login"+to)
 }
 
 func UnauthorizedError(c echo.Context) error {

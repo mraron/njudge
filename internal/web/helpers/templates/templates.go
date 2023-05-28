@@ -7,11 +7,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/mraron/njudge/internal/web/helpers/config"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
-	"github.com/mraron/njudge/internal/web/helpers/roles"
-	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
-	"github.com/mraron/njudge/internal/web/models"
 	"html/template"
 	"io"
 	"io/fs"
@@ -19,6 +14,13 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/mraron/njudge/internal/web/helpers"
+	"github.com/mraron/njudge/internal/web/helpers/config"
+	"github.com/mraron/njudge/internal/web/helpers/i18n"
+	"github.com/mraron/njudge/internal/web/helpers/roles"
+	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
+	"github.com/mraron/njudge/internal/web/models"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
@@ -163,5 +165,14 @@ func funcs(store problems.Store, db *sql.DB, store2 partials.Store) template.Fun
 		"contextTODO": func() context.Context {
 			return context.TODO()
 		},
+		"getCookie": func(c echo.Context, name string) *string {
+			val, err := c.Cookie(name)
+			if err != nil {
+				return nil
+			}
+
+			return &val.Value
+		},
+		"getFlash": helpers.GetFlash,
 	}
 }

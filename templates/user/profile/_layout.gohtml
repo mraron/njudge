@@ -6,6 +6,13 @@
         <li class="nav-item">
             <a class="nav-link{{if eq .Page "submissions"}} active{{end}}" href="/user/profile/{{.User.Name}}/submissions/">Beküldések</a>
         </li>
+        {{if (logged .Context)}}
+        {{if (eq (user .Context).Name .User.Name)}}
+        <li class="nav-item ml-auto">
+            <a class="nav-link{{if eq .Page "settings"}} active{{end}}"  href="/user/profile/{{.User.Name}}/settings/">Beállítások</a>
+        </li>
+        {{end}}
+        {{end}}
     </ul>
     <br>
 {{end}}

@@ -1,6 +1,12 @@
 {{template "header" .}}
 
 <form method="post" action="/user/login">
+{{$msg := getFlash .Context "LoginMessage"}}
+{{if $msg}}
+<div class="alert alert-info" role="alert">
+{{$msg}}
+</div>
+{{end}}
 {{if .Data}}
     <div class="alert alert-danger" role="alert">
         A következő hibákat találtuk:

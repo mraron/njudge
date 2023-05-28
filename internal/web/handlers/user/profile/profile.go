@@ -5,6 +5,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/web/domain/submission"
+	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
 	"github.com/mraron/njudge/internal/web/models"
 	"github.com/mraron/njudge/internal/web/services"
@@ -84,5 +85,22 @@ func GetSubmissions(statusPageService services.StatusPageService) echo.HandlerFu
 			User       *models.User
 			StatusPage *submission.StatusPage
 		}{u, statusPage})
+	}
+}
+
+func GetSettings(DB *sqlx.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		u := c.Get("user").(*models.User)
+
+		helpers.DeleteFlash(c, "ChangePassword")
+		return c.Render(http.StatusOK, "user/profile/settings", struct {
+			User *models.User
+		}{u})
+	}
+}
+
+func PostSettingsChangePassword(DB *sqlx.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		return c.Redirect(http.StatusFound, "../")
 	}
 }

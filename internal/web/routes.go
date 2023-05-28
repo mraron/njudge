@@ -1,6 +1,8 @@
 package web
 
 import (
+	"time"
+
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/web/extmodels"
 	"github.com/mraron/njudge/internal/web/handlers"
@@ -9,14 +11,15 @@ import (
 	"github.com/mraron/njudge/internal/web/handlers/taskarchive"
 	"github.com/mraron/njudge/internal/web/handlers/user"
 	"github.com/mraron/njudge/internal/web/handlers/user/profile"
+	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
 	"github.com/mraron/njudge/internal/web/models"
 	"github.com/mraron/njudge/internal/web/services"
-	"time"
 )
 
 func (s *Server) prepareRoutes(e *echo.Echo) {
 	e.Use(user.SetUserMiddleware(s.DB))
+	e.Use(helpers.ClearTemporaryFlashes())
 
 	e.GET("/", handlers.GetHome())
 	e.GET("/page/:page", handlers.GetPage(partials.NewCached(s.DB.DB, 30*time.Second)))
@@ -60,6 +63,10 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	pr := u.Group("/profile", profile.SetProfileMiddleware(s.DB))
 	pr.GET("/:name/", profile.GetProfile(s.DB))
 	pr.GET("/:name/submissions/", profile.GetSubmissions(services.NewSQLStatusPageService(s.DB.DB)))
+
+	prs := pr.Group("/:name/settings", user.RequireLoginMiddleware(), profile.ProfilePrivateMiddleware())
+	prs.GET("/", profile.GetSettings(s.DB))
+	prs.POST("/change_password/", profile.PostSettingsChangePassword(s.DB), user.RequireLoginMiddleware(), user.RequireLoginMiddleware())
 
 	v1 := e.Group("/api/v1")
 
