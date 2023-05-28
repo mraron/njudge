@@ -13,7 +13,7 @@ import (
 
 type TagsService interface {
 	Add(ctx context.Context, tagID int, problemID int, userID int) error
-	Delete(ctx context.Context, tagID int, userID int) error
+	Delete(ctx context.Context, tagID int, problemID int, userID int) error
 }
 
 var (
@@ -55,8 +55,8 @@ func (tg SQLTagsService) Add(ctx context.Context, tagID int, problemID int, user
 		models.ProblemTagColumns.ProblemID, models.ProblemTagColumns.Added, models.ProblemTagColumns.UserID))
 }
 
-func (tg SQLTagsService) Delete(ctx context.Context, tagID int, userID int) error {
-	tag, err := models.ProblemTags(models.ProblemTagWhere.ID.EQ(tagID)).One(ctx, tg.db)
+func (tg SQLTagsService) Delete(ctx context.Context, tagID int, problemID int, userID int) error {
+	tag, err := models.ProblemTags(models.ProblemTagWhere.TagID.EQ(tagID), models.ProblemTagWhere.ProblemID.EQ(problemID)).One(ctx, tg.db)
 	if err != nil {
 		return err
 	}

@@ -202,13 +202,13 @@ func PostProblemTag(tgs services.TagsService) echo.HandlerFunc {
 			return err
 		}
 
-		return c.Redirect(http.StatusFound, c.Echo().Reverse("getProblemMain", pr.Problemset, pr.Problem))
+		return c.Redirect(http.StatusFound, c.Echo().Reverse("getProblemMain", pr.Problemset, pr.ProblemRel.Problem))
 	}
 }
 
 func DeleteProblemTag(tgs services.TagsService) echo.HandlerFunc {
 	type request struct {
-		TagID int `form:"tagID"`
+		TagID int `param:"id"`
 	}
 	return func(c echo.Context) error {
 		data := request{}
@@ -221,11 +221,11 @@ func DeleteProblemTag(tgs services.TagsService) echo.HandlerFunc {
 			return helpers.UnauthorizedError(c)
 		}
 
-		pr := c.Get("problemRel").(problem.Problem)
-		if err := tgs.Delete(c.Request().Context(), data.TagID, u.ID); err != nil {
+		pr := c.Get("problem").(problem.Problem)
+		if err := tgs.Delete(c.Request().Context(), data.TagID, pr.ID, u.ID); err != nil {
 			return err
 		}
 
-		return c.Redirect(http.StatusFound, c.Echo().Reverse("getProblemMain", pr.Problemset, pr.Problem))
+		return c.Redirect(http.StatusFound, c.Echo().Reverse("getProblemMain", pr.Problemset, pr.ProblemRel.Problem))
 	}
 }
