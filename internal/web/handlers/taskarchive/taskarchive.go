@@ -93,7 +93,15 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 		}
 
 		for _, start := range lst {
-			taskArchive.Roots = append(taskArchive.Roots, TreeNode{ID: start.ID, Type: "category", Name: start.Name, Link: "", Children: make([]TreeNode, 0), SolvedStatus: -1})
+			taskArchive.Roots = append(taskArchive.Roots, TreeNode{
+				ID:           start.ID,
+				Type:         "category",
+				Name:         start.Name,
+				Link:         "",
+				Children:     make([]TreeNode, 0),
+				SolvedStatus: -1,
+			})
+
 			if dfs(start, taskArchive.Roots[len(taskArchive.Roots)-1]) != nil {
 				return err
 			}

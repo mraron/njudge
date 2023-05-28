@@ -1,7 +1,6 @@
 package user
 
 import (
-	"context"
 	"github.com/mraron/njudge/internal/web/models"
 	"net/http"
 
@@ -23,7 +22,7 @@ func AuthCallback(DB *sqlx.DB) echo.HandlerFunc {
 			return c.Render(http.StatusOK, "login.gohtml", []string{"Hiba: érvénytelen token."})
 		}
 
-		lst, err := models.Users(Where("email = ?", user.Email)).All(context.TODO(), DB)
+		lst, err := models.Users(Where("email = ?", user.Email)).All(c.Request().Context(), DB)
 		if len(lst) == 0 {
 			return c.Render(http.StatusOK, "login.gohtml", []string{"Hiba: a felhasználó nincs regisztrálva."})
 		}
