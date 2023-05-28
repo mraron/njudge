@@ -18,6 +18,7 @@ van
         <label for="passwordNew2">Új jelszó ismét</label>
         <input type="password" class="form-control" id="passwordNew2" name="passwordNew2">
     </div>
+    <input type="hidden" name="_csrf" value="{{csrf .Context}}">
     <button type="submit" class="btn btn-primary">Jelszó megváltoztatása</button>
 </form>
 <br>
@@ -33,6 +34,7 @@ van
 
         </div>
     </div>
+    <input type="hidden" name="_csrf" value="{{csrf .Context}}">
     <button type="submit" class="btn btn-primary">Beállítás</button>
 </form>
 {{template "footer" .}}

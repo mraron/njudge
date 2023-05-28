@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/labstack/echo/v4/middleware"
 	"html/template"
 	"io"
 	"io/fs"
@@ -174,5 +175,8 @@ func funcs(store problems.Store, db *sql.DB, store2 partials.Store) template.Fun
 			return &val.Value
 		},
 		"getFlash": helpers.GetFlash,
+		"csrf": func(c echo.Context) string {
+			return c.Get(middleware.DefaultCSRFConfig.ContextKey).(string)
+		},
 	}
 }

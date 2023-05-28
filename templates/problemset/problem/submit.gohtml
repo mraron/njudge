@@ -21,6 +21,7 @@
         {{end}}
     </select>
 </div>
+<input type="hidden" name="_csrf" value="{{csrf .Context}}">
 <button type="submit" class="btn btn-primary">Beküld</button>
 </form>
 <style>
@@ -74,7 +75,7 @@
 </script>
 
 {{else}}
-Beküldéshez lépj be vagy regisztrálj!
+    Beküldéshez <a href="/user/login?next={{.Context.Request.URL.Path}}">lépj be</a> vagy <a href="/user/register">regisztrálj</a>!
 {{end}}
 
 {{template "footer" .}}

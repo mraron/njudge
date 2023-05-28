@@ -1,6 +1,8 @@
 package web
 
 import (
+	"github.com/labstack/echo/v4/middleware"
+	"strings"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -18,6 +20,12 @@ import (
 )
 
 func (s *Server) prepareRoutes(e *echo.Echo) {
+	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
+		TokenLookup: "form:_csrf",
+		Skipper: func(c echo.Context) bool {
+			return strings.HasPrefix(c.Request().URL.Path, "/api") || strings.HasPrefix(c.Request().URL.Path, "/admin")
+		},
+	}))
 	e.Use(user.SetUserMiddleware(s.DB))
 	e.Use(helpers.ClearTemporaryFlashes())
 

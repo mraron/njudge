@@ -16,6 +16,7 @@
             <option value="{{$tag.ID}}">{{$tag.Name}}</option>
             {{end}}
         </select>
+        <input type="hidden" name="_csrf" value="{{csrf .Context}}">
         </form>
       </div>
       <div class="modal-footer">
@@ -87,10 +88,12 @@
                 {{end}}
             </select>
             <br><br>
+            <input type="hidden" name="_csrf" value="{{csrf .Context}}">
+
             <input type="submit" class="btn btn-primary" value="Beküld">
             </form>
         {{else}}
-            Beküldéshez lépj be vagy regisztrálj!
+            Beküldéshez <a href="/user/login?next={{.Context.Request.URL.Path}}">lépj be</a> vagy <a href="/user/register">regisztrálj</a>!
         {{end}}
     </div>
 </div>
