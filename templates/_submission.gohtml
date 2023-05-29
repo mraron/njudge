@@ -26,12 +26,12 @@
     {{if .Judged.Valid}}
         {{$testset := (index $status.Feedback 0)}}
         {{if $testset.IsAC}}
-            <span class="text-success">Elfogadva {{roundto $testset.Score 2}}/{{$testset.MaxScore}}</span>
+            <span class="text-success">Elfogadva {{roundTo $testset.Score 2}}/{{$testset.MaxScore}}</span>
         {{else}}
             {{if eq .Verdict 998}}
                 Fordítási Hiba
             {{else}}
-                <span class="text-info">{{($testset.IndexTestcase $testset.FirstNonAC).VerdictName}} {{roundto $testset.Score 2}}/{{$testset.MaxScore}}</span>
+                <span class="text-info">{{($testset.IndexTestcase $testset.FirstNonAC).VerdictName}} {{roundTo $testset.Score 2}}/{{$testset.MaxScore}}</span>
             {{end}}
         {{end}}
     {{else}}
@@ -70,7 +70,7 @@
 {{define "submissionRow"}}
     <tr id="submission{{.ID}}">
         <td><a href="/submission/{{.ID}}">{{.ID}}</a></td>
-        <td>{{.Submitted.Local.Year}}. {{fixedlen (month2int .Submitted.Local.Month) 2}}. {{fixedlen .Submitted.Local.Day 2}} {{fixedlen .Submitted.Local.Hour 2}}:{{fixedlen .Submitted.Local.Minute 2}}:{{fixedlen .Submitted.Local.Second 2}}</td>
+        <td>{{.Submitted.Local.Year}}. {{fixedLen (month2int .Submitted.Local.Month) 2}}. {{fixedLen .Submitted.Local.Day 2}} {{fixedLen .Submitted.Local.Hour 2}}:{{fixedLen .Submitted.Local.Minute 2}}:{{fixedLen .Submitted.Local.Second 2}}</td>
         {{$userName := (.User.OneG contextTODO).Name}}
         <td><a href="/user/profile/{{$userName}}/">{{$userName}}</a></td>
         <td><a href="/problemset/{{.Problemset}}/{{.Problem}}/">{{translateContent "hungarian" (problem .Problem).Titles}}</a></td>

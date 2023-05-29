@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/labstack/echo/v4/middleware"
 	"html/template"
 	"io"
 	"io/fs"
@@ -15,6 +14,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/labstack/echo/v4/middleware"
 
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/config"
@@ -51,7 +52,7 @@ func New(cfg config.Server, problemStore problems.Store, db *sql.DB, store parti
 					panic(err)
 				}
 
-				renderer.templates[name] = template.Must(template.New(info.Name()).Funcs(funcs(problemStore, db, store)).ParseFiles(append(layoutFiles, path)...))
+				renderer.templates[name] = template.Must(template.New(info.Name()).Funcs(contextFuncs(nil)).Funcs(statelessFuncs(problemStore, db, store)).ParseFiles(append(layoutFiles, path)...))
 			}
 		}
 		return nil
@@ -73,43 +74,62 @@ func (t *Renderer) Render(w io.Writer, name string, data interface{}, c echo.Con
 		return fmt.Errorf("can find template %q", name)
 	}
 
-	return t.templates[name].ExecuteTemplate(w, filepath.Base(name), struct {
+	return t.templates[name].Funcs(contextFuncs(c)).ExecuteTemplate(w, filepath.Base(name), struct {
 		Data    interface{}
 		Context echo.Context
 	}{data, c})
 }
 
-func funcs(store problems.Store, db *sql.DB, store2 partials.Store) template.FuncMap {
+func contextFuncs(c echo.Context) template.FuncMap {
 	return template.FuncMap{
-		"translateContent": i18n.TranslateContent,
-		"problem":          store.Get,
-		"str2html": func(s string) template.HTML {
-			return template.HTML(s)
-		},
-		"logged": func(c echo.Context) bool {
+		"logged": func() bool {
 			if _, ok := c.Get("user").(*models.User); ok {
 				return nil != c.Get("user").(*models.User)
 			}
 
 			return false
 		},
-		"user": func(c echo.Context) *models.User {
+		"user": func() *models.User {
 			if _, ok := c.Get("user").(*models.User); ok {
 				return c.Get("user").(*models.User)
 			}
 
 			return nil
 		},
+		"get": func(key string) interface{} {
+			return c.Get(key)
+		},
+		"getCookie": func(name string) *string {
+			val, err := c.Cookie(name)
+			if err != nil {
+				return nil
+			}
+
+			return &val.Value
+		},
+		"getFlash": func(name string) interface{} {
+			return helpers.GetFlash(c, name)
+		},
+		"csrf": func() string {
+			return c.Get(middleware.DefaultCSRFConfig.ContextKey).(string)
+		},
+	}
+}
+
+func statelessFuncs(store problems.Store, db *sql.DB, store2 partials.Store) template.FuncMap {
+	return template.FuncMap{
+		"translateContent": i18n.TranslateContent,
+		"problem":          store.Get,
+		"str2html": func(s string) template.HTML {
+			return template.HTML(s)
+		},
 		"canView": func(role string, entity roles.Entity) bool {
 			return roles.Can(roles.Role(role), roles.ActionView, entity)
 		},
-		"get": func(c echo.Context, key string) interface{} {
-			return c.Get(key)
-		},
-		"fixedlen": func(a int, len int) string {
+		"fixedLen": func(a int, len int) string {
 			return fmt.Sprintf(fmt.Sprintf("%%0%dd", len), a)
 		},
-		"fixedlenFloat32": func(a float32, len int) string {
+		"fixedLenFloat32": func(a float32, len int) string {
 			return fmt.Sprintf(fmt.Sprintf("%%.%df", len), a)
 		},
 		"month2int": func(month time.Month) int {
@@ -133,7 +153,7 @@ func funcs(store problems.Store, db *sql.DB, store2 partials.Store) template.Fun
 		"divide": func(a, b int) int {
 			return a / b
 		},
-		"tostring": func(b []byte) string {
+		"toString": func(b []byte) string {
 			return string(b)
 		},
 		"gravatarHash": func(user *models.User) string {
@@ -157,7 +177,7 @@ func funcs(store problems.Store, db *sql.DB, store2 partials.Store) template.Fun
 			c, _ := store2.Get(name)
 			return c
 		},
-		"roundto": func(num float64, digs int) float64 {
+		"roundTo": func(num float64, digs int) float64 {
 			return math.Round(num*100) / 100
 		},
 		"tags": func() (models.TagSlice, error) {
@@ -165,18 +185,6 @@ func funcs(store problems.Store, db *sql.DB, store2 partials.Store) template.Fun
 		},
 		"contextTODO": func() context.Context {
 			return context.TODO()
-		},
-		"getCookie": func(c echo.Context, name string) *string {
-			val, err := c.Cookie(name)
-			if err != nil {
-				return nil
-			}
-
-			return &val.Value
-		},
-		"getFlash": helpers.GetFlash,
-		"csrf": func(c echo.Context) string {
-			return c.Get(middleware.DefaultCSRFConfig.ContextKey).(string)
 		},
 	}
 }

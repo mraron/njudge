@@ -1,7 +1,7 @@
 {{template "header" .}}
 
 <form method="post" action="/user/login">
-{{$msg := getFlash .Context "LoginMessage"}}
+{{$msg := getFlash "LoginMessage"}}
 {{if $msg}}
 <div class="alert alert-info" role="alert">
 {{$msg}}
@@ -28,7 +28,7 @@
         <label for="loginpassword">Jelszó: </label>
         <input type="password" name="password" id="loginpassword" class="form-control">
     </div>
-    <input type="hidden" name="_csrf" value="{{csrf .Context}}">
+    <input type="hidden" name="_csrf" value="{{csrf}}">
     <input type="submit" value="Belépés" class="btn btn-primary">
 </form>
 

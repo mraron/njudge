@@ -1,7 +1,7 @@
 {{template "header" .}}
 
-{{if logged .Context}}
-    {{if canView (user .Context).Role "submissions/rejudge"}}
+{{if logged}}
+    {{if canView (user).Role "submissions/rejudge"}}
         <a class="btn btn-secondary" href="/submission/rejudge/{{.Data.ID}}"><i class="fas fa-sync"></i> Rejudge</a>
         <br>
         <br>
@@ -22,7 +22,7 @@
             <button id="source-expand" class="btn" data-target="source-code"><i class="fa fa-arrows-alt-v"></i></button>
             <button id="source-copy" class="btn" data-target="source-code"><i class="fa fa-copy"></i></button>
         </div>
-        <pre id="source-code" style="max-height: 400px;" data-expanded="false"><code class="{{.Data.Language}}">{{tostring .Data.Source}}</code></pre>
+        <pre id="source-code" style="max-height: 400px;" data-expanded="false"><code class="{{.Data.Language}}">{{toString .Data.Source}}</code></pre>
     </div>
 {{end}}
 
@@ -85,7 +85,7 @@
                             {{$g.Name}}
                         </td>
                         <td class="align-middle text-center" rowspan="{{add (len $g.Testcases) 1}}">
-                            {{roundto $g.Score 2}}/{{$g.MaxScore}}
+                            {{roundTo $g.Score 2}}/{{$g.MaxScore}}
                         </td>
                     </tr>
                     {{range $t := $g.Testcases}}
@@ -93,7 +93,7 @@
                             <td>{{$t.Index}}</td>
                             <td {{if ne $g.Scoring 1}}colspan="2"{{end}}><span class="{{if eq $t.VerdictName 0}}text-success{{else}}text-info{{end}}">{{$t.VerdictName.String}}</span></td>
                             {{if eq $g.Scoring 1}}
-                                <td>{{roundto $t.Score 2}}/{{$t.MaxScore}}</td>
+                                <td>{{roundTo $t.Score 2}}/{{$t.MaxScore}}</td>
                             {{end}}
                             <td>{{$t.TimeSpent}}</td>
                             <td>{{$t.MemoryUsed}} KiB</td>

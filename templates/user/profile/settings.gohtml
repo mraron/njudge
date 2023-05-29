@@ -1,8 +1,8 @@
 {{template "header" .}}
 {{template "user_menu" dict "Page" "settings" "User" .Data.User "Context" .Context}}
 
-{{getFlash .Context "ChangePassword"}}
-{{if (getFlash .Context "ChangePassword")}}
+{{getFlash "ChangePassword"}}
+{{if (getFlash "ChangePassword")}}
 van
 {{end}}
 <form action="change_password/" method="post">
@@ -18,7 +18,7 @@ van
         <label for="passwordNew2">Új jelszó ismét</label>
         <input type="password" class="form-control" id="passwordNew2" name="passwordNew2">
     </div>
-    <input type="hidden" name="_csrf" value="{{csrf .Context}}">
+    <input type="hidden" name="_csrf" value="{{csrf}}">
     <button type="submit" class="btn btn-primary">Jelszó megváltoztatása</button>
 </form>
 <br>
@@ -34,7 +34,7 @@ van
 
         </div>
     </div>
-    <input type="hidden" name="_csrf" value="{{csrf .Context}}">
+    <input type="hidden" name="_csrf" value="{{csrf}}">
     <button type="submit" class="btn btn-primary">Beállítás</button>
 </form>
 {{template "footer" .}}
