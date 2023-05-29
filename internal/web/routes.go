@@ -2,6 +2,7 @@ package web
 
 import (
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"strings"
 	"time"
 
@@ -25,7 +26,9 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 		Skipper: func(c echo.Context) bool {
 			return strings.HasPrefix(c.Request().URL.Path, "/api") || strings.HasPrefix(c.Request().URL.Path, "/admin")
 		},
+		CookiePath: "/",
 	}))
+	e.Use(i18n.SetTranslatorMiddleware())
 	e.Use(user.SetUserMiddleware(s.DB))
 	e.Use(helpers.ClearTemporaryFlashes())
 
