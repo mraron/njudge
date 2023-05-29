@@ -5,6 +5,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" href="/static/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
+    <link rel="manifest" href="/static/site.webmanifest">
 
     <title>{{if get "title"}}{{get "title"}} :: {{end}}njudge</title>
 
@@ -67,7 +71,8 @@
     <div class="row justify-content-md-center">
         <div class="col col-xl-9">
             <br>
-            {{if ($msg := getFlash "TopMessage")}}
+            {{$msg := getFlash "TopMessage"}}
+            {{if $msg}}
                 <div class="alert alert-secondary" role="alert">{{$msg}}<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
             {{end}}
             

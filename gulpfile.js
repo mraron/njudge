@@ -25,7 +25,7 @@ function mainJS() {
 }
 
 function mainFavicon() {
-    return src("static_src/favicon.ico").pipe(dest("static"))
+    return src("static_src/favicon.ico").pipe(src("static_src/*.png")).pipe(src("static_src/site.webmanifest")).pipe(dest("static"))
 }
 
 const admin = parallel(adminCSS, adminJS)
