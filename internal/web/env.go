@@ -2,7 +2,9 @@ package web
 
 import (
 	"fmt"
+	"github.com/mraron/njudge/internal/web/services"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -34,6 +36,32 @@ func (s *Server) SetupEnvironment() {
 	s.Keys.MustParse()
 
 	s.ProblemStore = problems.NewFsStore(s.ProblemsDir)
+	if s.SMTP.Enabled {
+		port, err := strconv.Atoi(s.SMTP.MailServerPort)
+		if err != nil {
+			panic(err)
+		}
+
+		s.MailService = services.SMTPMailService{
+			From:     s.SMTP.MailAccount,
+			Host:     s.SMTP.MailServerHost,
+			Port:     port,
+			User:     s.SMTP.MailAccount,
+			Password: s.SMTP.MailAccountPassword,
+		}
+	} else if s.Sendgrid.Enabled {
+		s.MailService = services.SendgridMailService{
+			SenderName:    s.Sendgrid.SenderName,
+			SenderAddress: s.Sendgrid.SenderAddress,
+			APIKey:        s.Sendgrid.ApiKey,
+		}
+	} else {
+		if s.Mode == "development" {
+			s.MailService = services.LogMailService{Logger: log.Default()}
+		} else {
+			s.MailService = services.ErrorMailService{}
+		}
+	}
 }
 
 func (s *Server) ConnectToDB() {

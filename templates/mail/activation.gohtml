@@ -1,0 +1,16 @@
+{{template "mailtemplate_header"}}
+Kedves {{.Data.Name}}!
+<br>
+<br>
+Köszönjük regisztrációd az njudge oldalra!
+<br>
+Az alábbi linkre kattintva tudod véglegesíteni a regisztrációdat: <a href="{{.Data.URL}}/user/activate/{{.Data.Name}}/{{.Data.ActivationKey}}">aktiváló link</a>
+<br>
+
+<div style="display:none">Ha a fenti link nem lenne kattintható, ezt a linket másold a böngésződ címsorába: {{.Data.URL}}/user/activate/{{.Data.Name}}/{{.Data.ActivationKey}}</div>
+
+<br>
+Üdv,
+<br>
+<a href="{{.Data.URL}}">njudge.hu</a>
+{{template "mailtemplate_footer"}}

@@ -64,7 +64,7 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	u.POST("/login", user.PostLogin(s.DB))
 	u.GET("/logout", user.Logout())
 	u.GET("/register", user.GetRegister())
-	u.POST("/register", user.Register(s.Server, s.DB))
+	u.POST("/register", user.Register(s.Server, s.DB, s.MailService))
 	u.GET("/activate", user.GetActivateInfo())
 	u.GET("/activate/:name/:key", user.Activate(s.DB))
 

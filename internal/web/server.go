@@ -33,6 +33,7 @@ type Server struct {
 	DB *sqlx.DB
 
 	ProblemStore problems.Store
+	MailService  services.MailService
 }
 
 func (s *Server) Run() {

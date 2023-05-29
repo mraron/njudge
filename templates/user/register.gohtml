@@ -1,11 +1,11 @@
 {{template "header" .}}
 
 <form action="/user/register" method="post">
-{{if .Data}}
+{{with .Data.ErrorStrings}}
     <div class="alert alert-danger" role="alert">
         A következő hibákat találtuk:
         <ul>
-        {{range $i := .Data}}
+        {{range $i := .}}
             <li><b>{{$i}}</b></li>
         {{end}}
         </ul>
@@ -13,7 +13,7 @@
 {{end}}
     <div class="form-group">
         <label for="regname">Felhasználónév: </label>
-        <input type="text" name="name" class="form-control" id="regname">
+        <input type="text" name="name" class="form-control" id="regname" value="{{.Data.Name}}">
     </div>
     <div class="form-group">
         <label for="regpassword">Jelszó: </label>
@@ -25,7 +25,7 @@
     </div>
     <div class="form-group">
         <label for="regemail">Email cím: </label>
-        <input type="email" name="email" class="form-control" id="regemail">
+        <input type="email" name="email" class="form-control" id="regemail" value="{{.Data.Email}}">
     </div>
 
     <input type="hidden" name="_csrf" value="{{csrf}}">

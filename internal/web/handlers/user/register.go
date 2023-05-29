@@ -1,13 +1,15 @@
 package user
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/mraron/njudge/internal/web/domain/email"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/config"
-	"github.com/mraron/njudge/internal/web/helpers/mail"
 	"github.com/mraron/njudge/internal/web/models"
+	"github.com/mraron/njudge/internal/web/services"
 	"net/http"
 	"unicode"
 
@@ -17,21 +19,38 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type RegistrationPageData struct {
+	ErrorStrings []string
+	Name         string
+	Email        string
+}
+
 func GetRegister() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if u := c.Get("user").(*models.User); u != nil {
 			return c.Render(http.StatusOK, "error", "Már be vagy lépve...")
 		}
 
-		return c.Render(http.StatusOK, "user/register", nil)
+		return c.Render(http.StatusOK, "user/register", RegistrationPageData{})
 	}
 }
 
-func Register(cfg config.Server, DB *sqlx.DB) echo.HandlerFunc {
+func Register(cfg config.Server, DB *sqlx.DB, mailService services.MailService) echo.HandlerFunc {
+	type request struct {
+		Name      string `form:"name"`
+		Email     string `form:"email"`
+		Password  string `form:"password"`
+		Password2 string `form:"password2"`
+	}
 	return func(c echo.Context) error {
+		data := request{}
+		if err := c.Bind(&data); err != nil {
+			return err
+		}
+
 		var (
 			errStrings = make([]string, 0)
-			key        = helpers.GenerateActivationKey(255)
+			key        = helpers.GenerateActivationKey(32)
 			err        error
 		)
 
@@ -40,9 +59,12 @@ func Register(cfg config.Server, DB *sqlx.DB) echo.HandlerFunc {
 		}
 
 		used := func(col, value, msg string) {
-			u := ""
-			if DB.Get(&u, "SELECT name FROM users WHERE "+col+"=$1", value); u != "" {
-				errStrings = append(errStrings, msg)
+			if err != nil {
+				u := ""
+				err = DB.Get(&u, "SELECT name FROM users WHERE "+col+"=$1", value)
+				if u != "" {
+					errStrings = append(errStrings, msg)
+				}
 			}
 		}
 
@@ -61,22 +83,30 @@ func Register(cfg config.Server, DB *sqlx.DB) echo.HandlerFunc {
 			}
 		}
 
-		used("name", c.FormValue("name"), "A név foglalt")
-		used("email", c.FormValue("email"), "Az email cím foglalt")
+		used("name", data.Name, "A név foglalt")
+		used("email", data.Email, "Az email cím foglalt")
 
 		required("name", "A név mező szükséges")
 		required("password", "A jelszó mező szükséges")
 		required("password2", "A jelszó ellenörző mező szükséges")
 		required("email", "Az email mező szükséges")
 
-		alphaNumeric(c.FormValue("name"), "A név csak alfanumerikus karakterekből állhat")
+		alphaNumeric(data.Name, "A név csak alfanumerikus karakterekből állhat")
 
-		if c.FormValue("password") != c.FormValue("password2") {
+		if data.Password != data.Password2 {
 			errStrings = append(errStrings, "A két jelszó nem egyezik meg")
 		}
 
+		if err != nil {
+			return err
+		}
+
 		if len(errStrings) > 0 {
-			return c.Render(http.StatusOK, "user/register", errStrings)
+			return c.Render(http.StatusOK, "user/register", RegistrationPageData{
+				ErrorStrings: errStrings,
+				Name:         data.Name,
+				Email:        data.Email,
+			})
 		}
 
 		mustPanic := func(err error) {
@@ -100,17 +130,29 @@ func Register(cfg config.Server, DB *sqlx.DB) echo.HandlerFunc {
 
 			mustPanic(err)
 
-			hashed, err := bcrypt.GenerateFromPassword([]byte(c.FormValue("password")), bcrypt.DefaultCost)
+			hashed, err := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
 			mustPanic(err)
 
-			_, err = tx.Exec("INSERT INTO users (name,password,email,activation_key,role) VALUES ($1,$2,$3,$4,$5)", c.FormValue("name"), hashed, c.FormValue("email"), key, "user")
+			_, err = tx.Exec("INSERT INTO users (name,password,email,activation_key,role) VALUES ($1,$2,$3,$4,$5)", data.Name, hashed, data.Email, key, "user")
 			mustPanic(err)
 
-			m := mail.Mail{}
+			m := email.Mail{}
 			m.Recipients = []string{c.FormValue("email")}
-			m.Message = fmt.Sprintf(`Kedves %s!<br> Köszönjük regisztrációd. Aktiváló link: <a href="`+cfg.Url+`/user/activate/%s/%s">`+cfg.Url+`/user/activate/%s/%s</a>`, c.FormValue("name"), c.FormValue("name"), key, c.FormValue("name"), key)
 			m.Subject = "Regisztráció aktiválása"
-			mustPanic(m.Send(cfg))
+
+			message := &bytes.Buffer{}
+			mustPanic(c.Echo().Renderer.Render(message, "mail/activation", struct {
+				Name          string
+				URL           string
+				ActivationKey string
+			}{
+				c.FormValue("name"),
+				cfg.Url,
+				key,
+			}, nil))
+			m.Message = message.String()
+
+			mustPanic(mailService.Send(c.Request().Context(), m))
 
 			mustPanic(tx.Commit())
 		}
