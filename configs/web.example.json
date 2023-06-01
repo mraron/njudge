@@ -4,7 +4,7 @@
   "port": "5555",
   "url": "http://192.168.4.128:5555",
   "problemsDir": "/home/aron/njudge_problems",
-  "templatesDir": "/home/aron/njudge/templates",
+  "templatesDir": "/home/aron/njudge/internal/web/templates",
   "gluePort": "3000",
   "DBName": "[SECRET]",
   "DBAccount": "[SECRET]",

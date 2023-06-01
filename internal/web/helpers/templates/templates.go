@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/fsnotify/fsnotify"
-	"github.com/mraron/njudge/templates"
+	"github.com/mraron/njudge/internal/web/templates"
 	"html/template"
 	"io"
 	"io/fs"
