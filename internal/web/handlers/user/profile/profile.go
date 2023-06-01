@@ -1,6 +1,8 @@
 package profile
 
 import (
+	"net/http"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/web/domain/submission"
@@ -10,12 +12,11 @@ import (
 	"github.com/mraron/njudge/internal/web/models"
 	"github.com/mraron/njudge/internal/web/services"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"net/http"
 )
 
 func GetProfile(DB *sqlx.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		tr := c.Get("translator").(i18n.Translator)
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		u := c.Get("profile").(*models.User)
 		var (
@@ -55,7 +56,7 @@ func GetSubmissions(statusPageService services.StatusPageService) echo.HandlerFu
 		Page int `query:"page"`
 	}
 	return func(c echo.Context) error {
-		tr := c.Get("translator").(i18n.Translator)
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		u := c.Get("profile").(*models.User)
 

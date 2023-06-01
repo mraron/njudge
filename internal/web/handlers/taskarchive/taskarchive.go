@@ -1,11 +1,12 @@
 package taskarchive
 
 import (
+	"net/http"
+
 	"github.com/mraron/njudge/internal/web/domain/problem"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/models"
-	"net/http"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
@@ -28,7 +29,7 @@ type TreeNode struct {
 
 func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		tr := c.Get("translator").(i18n.Translator)
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		u := c.Get("user").(*models.User)
 

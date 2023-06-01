@@ -3,6 +3,9 @@ package user
 import (
 	"bytes"
 	"fmt"
+	"net/http"
+	"unicode"
+
 	"github.com/mraron/njudge/internal/web/domain/email"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/config"
@@ -10,8 +13,6 @@ import (
 	"github.com/mraron/njudge/internal/web/models"
 	"github.com/mraron/njudge/internal/web/services"
 	"github.com/volatiletech/sqlboiler/v4/boil"
-	"net/http"
-	"unicode"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
@@ -42,7 +43,7 @@ func Register(cfg config.Server, DB *sqlx.DB, mailService services.MailService) 
 		Password2 string `form:"password2"`
 	}
 	return func(c echo.Context) error {
-		tr := c.Get("translator").(i18n.Translator)
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		data := request{}
 		if err := c.Bind(&data); err != nil {
@@ -168,7 +169,7 @@ func Register(cfg config.Server, DB *sqlx.DB, mailService services.MailService) 
 
 func GetActivateInfo() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		tr := c.Get("translator").(i18n.Translator)
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		if u := c.Get("user").(*models.User); u != nil {
 			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
@@ -189,7 +190,7 @@ func Activate(DB *sqlx.DB) echo.HandlerFunc {
 			return err
 		}
 
-		tr := c.Get("translator").(i18n.Translator)
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		if u := c.Get("user").(*models.User); u != nil {
 			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))

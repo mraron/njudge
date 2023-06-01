@@ -1,6 +1,12 @@
 package problemset
 
 import (
+	"io"
+	"net/http"
+	"sort"
+	"strconv"
+	"strings"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/web/domain/problem"
@@ -10,11 +16,6 @@ import (
 	"github.com/mraron/njudge/internal/web/models"
 	"github.com/mraron/njudge/internal/web/services"
 	"github.com/mraron/njudge/pkg/problems"
-	"io"
-	"net/http"
-	"sort"
-	"strconv"
-	"strings"
 )
 
 type CategoryFilterOption struct {
@@ -53,7 +54,7 @@ func GetProblemList(DB *sqlx.DB, problemListService services.ProblemListService,
 		Problemset string `param:"name"`
 	}
 	return func(c echo.Context) error {
-		tr := c.Get("translator").(i18n.Translator)
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		data := request{}
 		if err := c.Bind(&data); err != nil {
@@ -212,7 +213,7 @@ func GetStatus(statusPageService services.StatusPageService) echo.HandlerFunc {
 		Page       int    `query:"page"`
 	}
 	return func(c echo.Context) error {
-		tr := c.Get("translator").(i18n.Translator)
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		data := request{}
 		if err := c.Bind(&data); err != nil {

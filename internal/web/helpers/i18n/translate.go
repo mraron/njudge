@@ -2,12 +2,13 @@ package i18n
 
 import (
 	"errors"
+	"net/http"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/pkg/problems"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
-	"net/http"
-	"time"
 
 	_ "github.com/mraron/njudge/internal/web/translations"
 )
@@ -75,12 +76,14 @@ func (t Translator) TranslateContent(cs problems.Contents) problems.LocalizedDat
 	return TranslateContent(t.LocaleName, cs)
 }
 
+const TranslatorContextKey = "translator"
+
 func SetTranslatorMiddleware() func(echo.HandlerFunc) echo.HandlerFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			trySetting := func(langCode string) bool {
 				if t, ok := Get(langCode); ok {
-					c.Set("translator", t)
+					c.Set(TranslatorContextKey, t)
 					c.SetCookie(&http.Cookie{
 						Name:    "lang",
 						Value:   t.ID,

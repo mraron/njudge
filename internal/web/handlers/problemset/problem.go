@@ -2,6 +2,13 @@ package problemset
 
 import (
 	"bytes"
+	"io"
+	"mime"
+	"net/http"
+	"path/filepath"
+	"sort"
+	"strconv"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/web/domain/problem"
@@ -12,17 +19,11 @@ import (
 	"github.com/mraron/njudge/internal/web/services"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/volatiletech/sqlboiler/v4/queries"
-	"io"
-	"mime"
-	"net/http"
-	"path/filepath"
-	"sort"
-	"strconv"
 )
 
 func GetProblem() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		tr := c.Get("translator").(i18n.Translator)
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 		prob := c.Get("problem").(problem.Problem)
 		stats := c.Get("problemStats").(problem.StatsData)
 
@@ -97,7 +98,7 @@ func GetProblemAttachment() echo.HandlerFunc {
 
 func GetProblemRanklist(DB *sqlx.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		tr := c.Get("translator").(i18n.Translator)
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		problemset, problemName := c.Param("name"), c.Param("problem")
 		prob := c.Get("problem").(problem.Problem)
@@ -123,7 +124,7 @@ func GetProblemRanklist(DB *sqlx.DB) echo.HandlerFunc {
 
 func GetProblemSubmit() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		tr := c.Get("translator").(i18n.Translator)
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		prob := c.Get("problem").(problem.Problem)
 		stats := c.Get("problemStats").(problem.StatsData)
@@ -146,7 +147,7 @@ func GetProblemStatus(statusPageService services.StatusPageService) echo.Handler
 		Problem    string `param:"problem"`
 	}
 	return func(c echo.Context) error {
-		tr := c.Get("translator").(i18n.Translator)
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		prob := c.Get("problem").(problem.Problem)
 

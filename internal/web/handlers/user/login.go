@@ -3,9 +3,10 @@ package user
 import (
 	"database/sql"
 	"errors"
+	"net/http"
+
 	"github.com/markbates/goth/gothic"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
-	"net/http"
 
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/models"
@@ -37,7 +38,7 @@ type Authenticator func(c echo.Context) (*models.User, error)
 
 func loginUserHandler(auth Authenticator) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		tr := c.Get("translator").(i18n.Translator)
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		if u := c.Get("user").(*models.User); u != nil {
 			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
@@ -80,7 +81,7 @@ func loginUserHandler(auth Authenticator) echo.HandlerFunc {
 
 func BeginOAuth() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		tr := c.Get("translator").(i18n.Translator)
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		if u := c.Get("user").(*models.User); u != nil {
 			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
@@ -93,7 +94,7 @@ func BeginOAuth() echo.HandlerFunc {
 
 func GetLogin() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		tr := c.Get("translator").(i18n.Translator)
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		if u := c.Get("user").(*models.User); u != nil {
 			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
@@ -118,7 +119,7 @@ func PostLogin(DB *sqlx.DB) echo.HandlerFunc {
 	}
 
 	return loginUserHandler(func(c echo.Context) (*models.User, error) {
-		tr := c.Get("translator").(i18n.Translator)
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		data := request{}
 		if err := c.Bind(&data); err != nil {
@@ -146,7 +147,7 @@ func PostLogin(DB *sqlx.DB) echo.HandlerFunc {
 
 func OAuthCallback(DB *sqlx.DB) echo.HandlerFunc {
 	return loginUserHandler(func(c echo.Context) (*models.User, error) {
-		tr := c.Get("translator").(i18n.Translator)
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		user, err := gothic.CompleteUserAuth(c.Response(), c.Request())
 		if err != nil {
@@ -164,7 +165,7 @@ func OAuthCallback(DB *sqlx.DB) echo.HandlerFunc {
 
 func Logout() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		tr := c.Get("translator").(i18n.Translator)
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 		if u := c.Get("user").(*models.User); u == nil {
 			return c.Render(http.StatusOK, "error.gohtml", tr.Translate("Can't logout if you've not logged in."))
 		}

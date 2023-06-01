@@ -1,0 +1,260 @@
+{
+    "language": "hu-HU",
+    "messages": [
+        {
+            "id": "Submission #{ID}",
+            "message": "Submission #{ID}",
+            "translation": "Beküldés #{ID}",
+            "placeholders": [
+                {
+                    "id": "ID",
+                    "string": "%[1]d",
+                    "type": "int",
+                    "underlyingType": "int",
+                    "argNum": 1,
+                    "expr": "data.ID"
+                }
+            ]
+        },
+        {
+            "id": "Statement - {String} ({Name})",
+            "message": "Statement - {String} ({Name})",
+            "translation": "Leírás - {String} ({Name})",
+            "placeholders": [
+                {
+                    "id": "String",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "tr.TranslateContent(prob.Titles()).String()"
+                },
+                {
+                    "id": "Name",
+                    "string": "%[2]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 2,
+                    "expr": "prob.Name()"
+                }
+            ]
+        },
+        {
+            "id": "Results - {String} ({Name})",
+            "message": "Results - {String} ({Name})",
+            "translation": "Eredmények - {String} ({Name})",
+            "placeholders": [
+                {
+                    "id": "String",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "tr.TranslateContent(prob.Titles()).String()"
+                },
+                {
+                    "id": "Name",
+                    "string": "%[2]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 2,
+                    "expr": "prob.Name()"
+                }
+            ]
+        },
+        {
+            "id": "Submit - {String} ({Name})",
+            "message": "Submit - {String} ({Name})",
+            "translation": "Beküld - {String} ({Name})",
+            "placeholders": [
+                {
+                    "id": "String",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "tr.TranslateContent(prob.Titles()).String()"
+                },
+                {
+                    "id": "Name",
+                    "string": "%[2]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 2,
+                    "expr": "prob.Name()"
+                }
+            ]
+        },
+        {
+            "id": "Submissions - {String} ({Name})",
+            "message": "Submissions - {String} ({Name})",
+            "translation": "Beküldések - {String} ({Name})",
+            "placeholders": [
+                {
+                    "id": "String",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "tr.TranslateContent(prob.Titles()).String()"
+                },
+                {
+                    "id": "Name",
+                    "string": "%[2]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 2,
+                    "expr": "prob.Name()"
+                }
+            ]
+        },
+        {
+            "id": "No category",
+            "message": "No category",
+            "translation": "Nincs kategória"
+        },
+        {
+            "id": "Problems",
+            "message": "Problems",
+            "translation": "Feladatok"
+        },
+        {
+            "id": "Submissions",
+            "message": "Submissions",
+            "translation": "Beküldések"
+        },
+        {
+            "id": "Archive",
+            "message": "Archive",
+            "translation": "Archívum"
+        },
+        {
+            "id": [
+                "alreadyLoggedInMessage",
+                "You're already logged in..."
+            ],
+            "message": "You're already logged in...",
+            "translation": "Már be vagy lépve..."
+        },
+        {
+            "id": "The account is not activated. Check your emails!",
+            "message": "The account is not activated. Check your emails!",
+            "translation": "Ez a felhasználó fiók nincs aktiválva. Ellenőrízd az emailjeid!"
+        },
+        {
+            "id": "Successful login!",
+            "message": "Successful login!",
+            "translation": "Sikeres belépés!"
+        },
+        {
+            "id": "Wrong credentials.",
+            "message": "Wrong credentials.",
+            "translation": "Hibás felhasználónév-jelszó páros!"
+        },
+        {
+            "id": "Invalid authentication token.",
+            "message": "Invalid authentication token.",
+            "translation": "Hibás authentikációs token."
+        },
+        {
+            "id": "Your email is not associated with any registered account.",
+            "message": "Your email is not associated with any registered account.",
+            "translation": "Az email címed nem tartozik egy regisztrált fiókhoz sem."
+        },
+        {
+            "id": "Can't logout if you've not logged in.",
+            "message": "Can't logout if you've not logged in.",
+            "translation": "A kilépéshez előbb lépj be."
+        },
+        {
+            "id": "The nickname is already registered.",
+            "message": "The nickname is already registered.",
+            "translation": "Ez a név már foglalt."
+        },
+        {
+            "id": "The email is already registered.",
+            "message": "The email is already registered.",
+            "translation": "Ez az email cím már foglalt."
+        },
+        {
+            "id": "The nickname field is required.",
+            "message": "The nickname field is required.",
+            "translation": "A név mező kitöltése kötelező."
+        },
+        {
+            "id": "The password field is required.",
+            "message": "The password field is required.",
+            "translation": "A jelszó mező kitöltése kötelező."
+        },
+        {
+            "id": "The password confirmation field is required.",
+            "message": "The password confirmation field is required.",
+            "translation": "A jelszó megerősítő mező kitöltése kötelező."
+        },
+        {
+            "id": "The email field is required.",
+            "message": "The email field is required.",
+            "translation": "Az email mező kitöltése kötelező."
+        },
+        {
+            "id": "The nickname can only consist of alphanumeric characters: letters (including non-latin characters such as 'á' or 'ű') and digits.",
+            "message": "The nickname can only consist of alphanumeric characters: letters (including non-latin characters such as 'á' or 'ű') and digits.",
+            "translation": "A név csak alfanumerikus karakterekből állhat, azaz: betűkből (beleértve a nem latin karaktereket is, pl. 'á' vagy 'ű') és számjegyekből."
+        },
+        {
+            "id": "The two passwords don't match.",
+            "message": "The two passwords don't match.",
+            "translation": "A két megadott jelszó nem egyezik meg."
+        },
+        {
+            "id": "Activate your account",
+            "message": "Activate your account",
+            "translation": "Aktiváld a fiókod"
+        },
+        {
+            "id": "This account has already been activated.",
+            "message": "This account has already been activated.",
+            "translation": "Ez a fiók már aktiválva van."
+        },
+        {
+            "id": "Wrong activation key. Are you sure you've clicked on the right link?",
+            "message": "Wrong activation key. Are you sure you've clicked on the right link?",
+            "translation": "Helytelen aktiválási kulcs. Biztos vagy benne hogy megfelelő linkre kattintottál?"
+        },
+        {
+            "id": "Successful activation. You can login now!",
+            "message": "Successful activation. You can login now!",
+            "translation": "Sikeres aktiválás. Most már beléphetsz!"
+        },
+        {
+            "id": "{Name}'s profile",
+            "message": "{Name}'s profile",
+            "translation": "{Name} profilja",
+            "placeholders": [
+                {
+                    "id": "Name",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "u.Name"
+                }
+            ]
+        },
+        {
+            "id": "{Name}'s submissions",
+            "message": "{Name}'s submissions",
+            "translation": "{Name} beküldései",
+            "placeholders": [
+                {
+                    "id": "Name",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "u.Name"
+                }
+            ]
+        }
+    ]
+}
