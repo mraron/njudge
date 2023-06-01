@@ -4,10 +4,12 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/fsnotify/fsnotify"
+	"github.com/mraron/njudge/templates"
 	"html/template"
 	"io"
 	"io/fs"
 	"log"
+	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -87,7 +89,13 @@ func (t *Renderer) Update() error {
 	defer t.Unlock()
 
 	layoutFiles := make([]string, 0)
-	return filepath.Walk(t.cfg.TemplatesDir, func(path string, info fs.FileInfo, err error) error {
+
+	usedFS := os.DirFS(t.cfg.TemplatesDir)
+	if t.cfg.Mode == "production" {
+		usedFS = templates.FS
+	}
+
+	return fs.WalkDir(usedFS, ".", func(path string, info fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -96,15 +104,10 @@ func (t *Renderer) Update() error {
 			if strings.HasPrefix(info.Name(), "_") {
 				layoutFiles = append(layoutFiles, path)
 			} else {
-				name, err := filepath.Rel(t.cfg.TemplatesDir, path)
-				if err != nil {
-					return err
-				}
-
-				t.templates[name] = template.Must(template.New(info.Name()).
+				t.templates[path] = template.Must(template.New(info.Name()).
 					Funcs(contextFuncs(nil)).
 					Funcs(statelessFuncs(t.problemStore, t.db, t.partialsStore)).
-					ParseFiles(append(layoutFiles, path)...))
+					ParseFS(usedFS, append(layoutFiles, path)...))
 			}
 		}
 
