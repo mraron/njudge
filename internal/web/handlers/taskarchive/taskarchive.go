@@ -28,6 +28,8 @@ type TreeNode struct {
 
 func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		tr := c.Get("translator").(i18n.Translator)
+
 		u := c.Get("user").(*models.User)
 
 		lst, err := models.ProblemCategories(Where("parent_id IS NULL")).All(c.Request().Context(), DB)
@@ -107,7 +109,7 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 			}
 		}
 
-		c.Set("title", "Archívum")
+		c.Set("title", tr.Translate("Archive"))
 		return c.Render(http.StatusOK, "task_archive.gohtml", taskArchive)
 	}
 }

@@ -38,18 +38,94 @@ func init() {
 	message.DefaultCatalog = cat
 }
 
-var messageKeyToIndex = map[string]int{}
+var messageKeyToIndex = map[string]int{
+	"%s's profile":                              28,
+	"%s's submissions":                          29,
+	"Activate your account":                     24,
+	"Archive":                                   8,
+	"Can't logout if you've not logged in.":     15,
+	"Invalid authentication token.":             13,
+	"No category":                               5,
+	"Problems":                                  6,
+	"Results - %s (%s)":                         2,
+	"Statement - %s (%s)":                       1,
+	"Submission #%d":                            0,
+	"Submissions":                               7,
+	"Submissions - %s (%s)":                     4,
+	"Submit - %s (%s)":                          3,
+	"Successful activation. You can login now!": 27,
+	"Successful login!":                         11,
+	"The account is not activated. Check your emails!": 10,
+	"The email field is required.":                     21,
+	"The email is already registered.":                 17,
+	"The nickname can only consist of alphanumeric characters: letters (including non-latin characters such as 'á' or 'ű') and digits.": 22,
+	"The nickname field is required.":                                      18,
+	"The nickname is already registered.":                                  16,
+	"The password confirmation field is required.":                         20,
+	"The password field is required.":                                      19,
+	"The two passwords don't match.":                                       23,
+	"This account has already been activated.":                             25,
+	"Wrong activation key. Are you sure you've clicked on the right link?": 26,
+	"Wrong credentials.":                                                   12,
+	"You're already logged in...":                                          9,
+	"Your email is not associated with any registered account.":            14,
+}
 
-var en_USIndex = []uint32{ // 1 elements
-	0x00000000,
-} // Size: 28 bytes
+var en_USIndex = []uint32{ // 31 elements
+	0x00000000, 0x00000012, 0x0000002c, 0x00000044,
+	0x0000005b, 0x00000077, 0x00000083, 0x0000008c,
+	0x00000098, 0x000000a0, 0x000000bc, 0x000000ed,
+	0x000000ff, 0x00000112, 0x00000130, 0x0000016a,
+	0x00000190, 0x000001b4, 0x000001d5, 0x000001f5,
+	0x00000215, 0x00000242, 0x0000025f, 0x000002e3,
+	0x00000302, 0x00000318, 0x00000341, 0x00000386,
+	0x000003b0, 0x000003c0, 0x000003d4,
+} // Size: 148 bytes
 
-const en_USData string = ""
+const en_USData string = "" + // Size: 980 bytes
+	"\x02Submission #%[1]d\x02Statement - %[1]s (%[2]s)\x02Results - %[1]s (%" +
+	"[2]s)\x02Submit - %[1]s (%[2]s)\x02Submissions - %[1]s (%[2]s)\x02No cat" +
+	"egory\x02Problems\x02Submissions\x02Archive\x02You're already logged in." +
+	"..\x02The account is not activated. Check your emails!\x02Successful log" +
+	"in!\x02Wrong credentials.\x02Invalid authentication token.\x02Your email" +
+	" is not associated with any registered account.\x02Can't logout if you'v" +
+	"e not logged in.\x02The nickname is already registered.\x02The email is " +
+	"already registered.\x02The nickname field is required.\x02The password f" +
+	"ield is required.\x02The password confirmation field is required.\x02The" +
+	" email field is required.\x02The nickname can only consist of alphanumer" +
+	"ic characters: letters (including non-latin characters such as 'á' or 'ű" +
+	"') and digits.\x02The two passwords don't match.\x02Activate your accoun" +
+	"t\x02This account has already been activated.\x02Wrong activation key. A" +
+	"re you sure you've clicked on the right link?\x02Successful activation. " +
+	"You can login now!\x02%[1]s's profile\x02%[1]s's submissions"
 
-var hu_HUIndex = []uint32{ // 1 elements
-	0x00000000,
-} // Size: 28 bytes
+var hu_HUIndex = []uint32{ // 31 elements
+	0x00000000, 0x00000012, 0x0000002b, 0x00000047,
+	0x0000005f, 0x0000007c, 0x0000008d, 0x00000097,
+	0x000000a4, 0x000000ae, 0x000000c5, 0x0000010b,
+	0x0000011e, 0x00000147, 0x00000166, 0x000001a2,
+	0x000001c2, 0x000001da, 0x000001f9, 0x0000021e,
+	0x00000246, 0x0000027c, 0x000002a3, 0x00000338,
+	0x00000361, 0x00000375, 0x00000395, 0x000003eb,
+	0x00000417, 0x00000426, 0x00000439,
+} // Size: 148 bytes
 
-const hu_HUData string = ""
+const hu_HUData string = "" + // Size: 1081 bytes
+	"\x02Beküldés #%[1]d\x02Leírás - %[1]s (%[2]s)\x02Eredmények - %[1]s (%[2" +
+	"]s)\x02Beküld - %[1]s (%[2]s)\x02Beküldések - %[1]s (%[2]s)\x02Nincs kat" +
+	"egória\x02Feladatok\x02Beküldések\x02Archívum\x02Már be vagy lépve..." +
+	"\x02Ez a felhasználó fiók nincs aktiválva. Ellenőrízd az emailjeid!\x02S" +
+	"ikeres belépés!\x02Hibás felhasználónév-jelszó páros!\x02Hibás authentik" +
+	"ációs token.\x02Az email címed nem tartozik egy regisztrált fiókhoz sem" +
+	".\x02A kilépéshez előbb lépj be.\x02Ez a név már foglalt.\x02Ez az email" +
+	" cím már foglalt.\x02A név mező kitöltése kötelező.\x02A jelszó mező kit" +
+	"öltése kötelező.\x02A jelszó megerősítő mező kitöltése kötelező.\x02Az " +
+	"email mező kitöltése kötelező.\x02A név csak alfanumerikus karakterekből" +
+	" állhat, azaz: betűkből (beleértve a nem latin karaktereket is, pl. 'á' " +
+	"vagy 'ű') és számjegyekből.\x02A két megadott jelszó nem egyezik meg." +
+	"\x02Aktiváld a fiókod\x02Ez a fiók már aktiválva van.\x02Helytelen aktiv" +
+	"álási kulcs. Biztos vagy benne hogy megfelelő linkre kattintottál?\x02S" +
+	"ikeres aktiválás. Most már beléphetsz!\x02%[1]s profilja\x02%[1]s beküld" +
+	"ései"
 
-// Total table size 56 bytes (0KiB); checksum: 32CC3CAD
+	// Total table size 2357 bytes (2KiB); checksum: FB7FA853

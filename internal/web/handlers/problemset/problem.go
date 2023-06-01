@@ -2,7 +2,6 @@ package problemset
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/web/domain/problem"
@@ -23,10 +22,11 @@ import (
 
 func GetProblem() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		tr := c.Get("translator").(i18n.Translator)
 		prob := c.Get("problem").(problem.Problem)
 		stats := c.Get("problemStats").(problem.StatsData)
 
-		c.Set("title", fmt.Sprintf("Leírás - %s (%s)", i18n.TranslateContent("hungarian", prob.Titles()).String(), prob.Name()))
+		c.Set("title", tr.Translate("Statement - %s (%s)", tr.TranslateContent(prob.Titles()).String(), prob.Name()))
 
 		return c.Render(http.StatusOK, "problemset/problem/problem", struct {
 			problem.Problem
@@ -97,6 +97,8 @@ func GetProblemAttachment() echo.HandlerFunc {
 
 func GetProblemRanklist(DB *sqlx.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		tr := c.Get("translator").(i18n.Translator)
+
 		problemset, problemName := c.Param("name"), c.Param("problem")
 		prob := c.Get("problem").(problem.Problem)
 
@@ -111,7 +113,7 @@ func GetProblemRanklist(DB *sqlx.DB) echo.HandlerFunc {
 			return sbs[i].Score.Float32 > sbs[j].Score.Float32
 		})
 
-		c.Set("title", fmt.Sprintf("Eredmények - %s (%s)", i18n.TranslateContent("hungarian", prob.Titles()).String(), prob.Name()))
+		c.Set("title", tr.Translate("Results - %s (%s)", tr.TranslateContent(prob.Titles()).String(), prob.Name()))
 		return c.Render(http.StatusOK, "problemset/problem/ranklist", struct {
 			Problem     problem.Problem
 			Submissions []*models.Submission
@@ -121,10 +123,12 @@ func GetProblemRanklist(DB *sqlx.DB) echo.HandlerFunc {
 
 func GetProblemSubmit() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		tr := c.Get("translator").(i18n.Translator)
+
 		prob := c.Get("problem").(problem.Problem)
 		stats := c.Get("problemStats").(problem.StatsData)
 
-		c.Set("title", fmt.Sprintf("Beküldés - %s (%s)", i18n.TranslateContent("hungarian", prob.Titles()).String(), prob.Name()))
+		c.Set("title", tr.Translate("Submit - %s (%s)", tr.TranslateContent(prob.Titles()).String(), prob.Name()))
 		return c.Render(http.StatusOK, "problemset/problem/submit", struct {
 			problem.Problem
 			problem.StatsData
@@ -142,6 +146,8 @@ func GetProblemStatus(statusPageService services.StatusPageService) echo.Handler
 		Problem    string `param:"problem"`
 	}
 	return func(c echo.Context) error {
+		tr := c.Get("translator").(i18n.Translator)
+
 		prob := c.Get("problem").(problem.Problem)
 
 		data := request{}
@@ -177,7 +183,7 @@ func GetProblemStatus(statusPageService services.StatusPageService) echo.Handler
 			return err
 		}
 
-		c.Set("title", fmt.Sprintf("Beküldések - %s (%s)", i18n.TranslateContent("hungarian", prob.Titles()).String(), prob.Name()))
+		c.Set("title", tr.Translate("Submissions - %s (%s)", tr.TranslateContent(prob.Titles()).String(), prob.Name()))
 		return c.Render(http.StatusOK, "problemset/problem/status", statusPage)
 	}
 }
