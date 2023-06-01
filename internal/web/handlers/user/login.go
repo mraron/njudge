@@ -32,7 +32,7 @@ func (LoginErrorWithMessage) Is(target error) bool {
 	return target == LoginError
 }
 
-const alreadyLoggedInMessage = "You're already logged in..."
+var alreadyLoggedInMessage = "You're already logged in..."
 
 type Authenticator func(c echo.Context) (*models.User, error)
 

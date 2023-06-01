@@ -255,6 +255,46 @@
                     "expr": "u.Name"
                 }
             ]
+        },
+        {
+            "id": "Home",
+            "message": "Home",
+            "translation": "Főoldal"
+        },
+        {
+            "id": "Profile",
+            "message": "Profile",
+            "translation": "Profil"
+        },
+        {
+            "id": "Admin",
+            "message": "Admin",
+            "translation": "Admin"
+        },
+        {
+            "id": "Logout",
+            "message": "Logout",
+            "translation": "Kilépés"
+        },
+        {
+            "id": "Login",
+            "message": "Login",
+            "translation": "Belépés"
+        },
+        {
+            "id": "Register",
+            "message": "Register",
+            "translation": "Regisztráció"
+        },
+        {
+            "id": "source",
+            "message": "source",
+            "translation": "forráskód"
+        },
+        {
+            "id": "language",
+            "message": "language",
+            "translation": "nyelv"
         }
     ]
 }

@@ -27,16 +27,16 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-                <a class="nav-link" href="/">Főoldal</a>
+                <a class="nav-link" href="/">{{Tr "Home"}}</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/task_archive">Archívum</a>
+                <a class="nav-link" href="/task_archive">{{Tr "Archive"}}</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/problemset/status/">Beküldések</a>
+                <a class="nav-link" href="/problemset/status/">{{Tr "Submissions"}}</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/problemset/main/">Feladatok</a>
+                <a class="nav-link" href="/problemset/main/">{{Tr "Problems"}}</a>
             </li>
             {{str2html (partial "custom_menu")}}
         </ul>
@@ -47,19 +47,19 @@
                         {{(user).Name}}
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-                        <a class="dropdown-item" href="/user/profile/{{(user).Name}}/">Profil</a>
+                        <a class="dropdown-item" href="/user/profile/{{(user).Name}}/">{{Tr "Profile"}}</a>
                         {{if canView (user).Role "admin_panel"}}
-                            <a class="dropdown-item" href="/admin">Admin</a>
+                            <a class="dropdown-item" href="/admin">{{Tr "Admin"}}</a>
                         {{end}}
-                        <a class="dropdown-item" href="/user/logout">Kilépés</a>
+                        <a class="dropdown-item" href="/user/logout">{{Tr "Logout"}}</a>
                     </div>
                 </li>
             {{else}}
                 <li class="nav-item">
-                    <a class="nav-link" href="/user/login">Belépés</a>
+                    <a class="nav-link" href="/user/login">{{Tr "Login"}}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/user/register">Regisztráció</a>
+                    <a class="nav-link" href="/user/register">{{Tr "Register"}}</a>
                 </li>
             {{end}}
         </ul>
@@ -90,10 +90,10 @@
     <div class="container">
 
         <div class="text-muted">
-            <span title="commit: {{commitHash}}">njudge<sup>v0</sup></span> forráskód: <a href="https://github.com/mraron/njudge"><i class="fab fa-github"></i> Github</a>
+            <span title="commit: {{commitHash}}">njudge<sup>v0</sup></span> {{Tr "source"}}: <a href="https://github.com/mraron/njudge"><i class="fab fa-github"></i> Github</a>
         </div>
         <div class="text-muted">
-            nyelv: <a href="?lang=en-US">english</a> <a href="?lang=hu-HU">magyar</a>
+            {{Tr "language"}}: <a href="?lang=en-US">english</a> <a href="?lang=hu-HU">magyar</a>
         </div>
 
     </div>

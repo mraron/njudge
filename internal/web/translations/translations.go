@@ -1,3 +1,3 @@
 package translations
 
-//go:generate gotext -srclang=en-US update -out=catalog.go -lang=en-US,hu-HU github.com/mraron/njudge/internal/web
+//go:generate gotext-update-templates -srclang=en-US -lang=en-US,hu-HU -out=catalog.go ../templates github.com/mraron/njudge/internal/web

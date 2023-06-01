@@ -15,6 +15,7 @@ import (
 	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
 	"github.com/mraron/njudge/internal/web/models"
 	"github.com/mraron/njudge/pkg/problems"
+	"golang.org/x/text/message"
 	"html/template"
 	"math"
 	"runtime/debug"
@@ -54,6 +55,9 @@ func contextFuncs(c echo.Context) template.FuncMap {
 		},
 		"csrf": func() string {
 			return c.Get(middleware.DefaultCSRFConfig.ContextKey).(string)
+		},
+		"Tr": func(key message.Reference, args ...string) string {
+			return c.Get(i18n.TranslatorContextKey).(i18n.Translator).Translate(key, args)
 		},
 	}
 }

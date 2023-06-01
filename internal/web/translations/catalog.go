@@ -39,22 +39,28 @@ func init() {
 }
 
 var messageKeyToIndex = map[string]int{
-	"%s's profile":                              28,
-	"%s's submissions":                          29,
-	"Activate your account":                     24,
-	"Archive":                                   8,
-	"Can't logout if you've not logged in.":     15,
-	"Invalid authentication token.":             13,
-	"No category":                               5,
-	"Problems":                                  6,
-	"Results - %s (%s)":                         2,
-	"Statement - %s (%s)":                       1,
-	"Submission #%d":                            0,
-	"Submissions":                               7,
-	"Submissions - %s (%s)":                     4,
-	"Submit - %s (%s)":                          3,
-	"Successful activation. You can login now!": 27,
-	"Successful login!":                         11,
+	"%s's profile":                          28,
+	"%s's submissions":                      29,
+	"Activate your account":                 24,
+	"Admin":                                 32,
+	"Archive":                               8,
+	"Can't logout if you've not logged in.": 15,
+	"Home":                                  30,
+	"Invalid authentication token.":         13,
+	"Login":                                 34,
+	"Logout":                                33,
+	"No category":                           5,
+	"Problems":                              6,
+	"Profile":                               31,
+	"Register":                              35,
+	"Results - %s (%s)":                     2,
+	"Statement - %s (%s)":                   1,
+	"Submission #%d":                        0,
+	"Submissions":                           7,
+	"Submissions - %s (%s)":                 4,
+	"Submit - %s (%s)":                      3,
+	"Successful activation. You can login now!":        27,
+	"Successful login!":                                11,
 	"The account is not activated. Check your emails!": 10,
 	"The email field is required.":                     21,
 	"The email is already registered.":                 17,
@@ -69,9 +75,12 @@ var messageKeyToIndex = map[string]int{
 	"Wrong credentials.":                                                   12,
 	"You're already logged in...":                                          9,
 	"Your email is not associated with any registered account.":            14,
+	"language": 37,
+	"source":   36,
 }
 
-var en_USIndex = []uint32{ // 31 elements
+var en_USIndex = []uint32{ // 39 elements
+	// Entry 0 - 1F
 	0x00000000, 0x00000012, 0x0000002c, 0x00000044,
 	0x0000005b, 0x00000077, 0x00000083, 0x0000008c,
 	0x00000098, 0x000000a0, 0x000000bc, 0x000000ed,
@@ -79,10 +88,13 @@ var en_USIndex = []uint32{ // 31 elements
 	0x00000190, 0x000001b4, 0x000001d5, 0x000001f5,
 	0x00000215, 0x00000242, 0x0000025f, 0x000002e3,
 	0x00000302, 0x00000318, 0x00000341, 0x00000386,
-	0x000003b0, 0x000003c0, 0x000003d4,
-} // Size: 148 bytes
+	0x000003b0, 0x000003c0, 0x000003d4, 0x000003d9,
+	// Entry 20 - 3F
+	0x000003e1, 0x000003e7, 0x000003ee, 0x000003f4,
+	0x000003fd, 0x00000404, 0x0000040d,
+} // Size: 180 bytes
 
-const en_USData string = "" + // Size: 980 bytes
+const en_USData string = "" + // Size: 1037 bytes
 	"\x02Submission #%[1]d\x02Statement - %[1]s (%[2]s)\x02Results - %[1]s (%" +
 	"[2]s)\x02Submit - %[1]s (%[2]s)\x02Submissions - %[1]s (%[2]s)\x02No cat" +
 	"egory\x02Problems\x02Submissions\x02Archive\x02You're already logged in." +
@@ -97,9 +109,11 @@ const en_USData string = "" + // Size: 980 bytes
 	"') and digits.\x02The two passwords don't match.\x02Activate your accoun" +
 	"t\x02This account has already been activated.\x02Wrong activation key. A" +
 	"re you sure you've clicked on the right link?\x02Successful activation. " +
-	"You can login now!\x02%[1]s's profile\x02%[1]s's submissions"
+	"You can login now!\x02%[1]s's profile\x02%[1]s's submissions\x02Home\x02" +
+	"Profile\x02Admin\x02Logout\x02Login\x02Register\x02source\x02language"
 
-var hu_HUIndex = []uint32{ // 31 elements
+var hu_HUIndex = []uint32{ // 39 elements
+	// Entry 0 - 1F
 	0x00000000, 0x00000012, 0x0000002b, 0x00000047,
 	0x0000005f, 0x0000007c, 0x0000008d, 0x00000097,
 	0x000000a4, 0x000000ae, 0x000000c5, 0x0000010b,
@@ -107,10 +121,13 @@ var hu_HUIndex = []uint32{ // 31 elements
 	0x000001c2, 0x000001da, 0x000001f9, 0x0000021e,
 	0x00000246, 0x0000027c, 0x000002a3, 0x00000338,
 	0x00000361, 0x00000375, 0x00000395, 0x000003eb,
-	0x00000417, 0x00000426, 0x00000439,
-} // Size: 148 bytes
+	0x00000417, 0x00000426, 0x00000439, 0x00000442,
+	// Entry 20 - 3F
+	0x00000449, 0x0000044f, 0x00000459, 0x00000463,
+	0x00000472, 0x0000047e, 0x00000484,
+} // Size: 180 bytes
 
-const hu_HUData string = "" + // Size: 1081 bytes
+const hu_HUData string = "" + // Size: 1156 bytes
 	"\x02Beküldés #%[1]d\x02Leírás - %[1]s (%[2]s)\x02Eredmények - %[1]s (%[2" +
 	"]s)\x02Beküld - %[1]s (%[2]s)\x02Beküldések - %[1]s (%[2]s)\x02Nincs kat" +
 	"egória\x02Feladatok\x02Beküldések\x02Archívum\x02Már be vagy lépve..." +
@@ -126,6 +143,7 @@ const hu_HUData string = "" + // Size: 1081 bytes
 	"\x02Aktiváld a fiókod\x02Ez a fiók már aktiválva van.\x02Helytelen aktiv" +
 	"álási kulcs. Biztos vagy benne hogy megfelelő linkre kattintottál?\x02S" +
 	"ikeres aktiválás. Most már beléphetsz!\x02%[1]s profilja\x02%[1]s beküld" +
-	"ései"
+	"ései\x02Főoldal\x02Profil\x02Admin\x02Kilépés\x02Belépés\x02Regisztráci" +
+	"ó\x02forráskód\x02nyelv"
 
-	// Total table size 2357 bytes (2KiB); checksum: FB7FA853
+	// Total table size 2553 bytes (2KiB); checksum: 9D3892C7
