@@ -4,15 +4,17 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/mraron/njudge/internal/judge"
-	"github.com/mraron/njudge/internal/web/extmodels"
-	"github.com/mraron/njudge/internal/web/helpers/config"
-	"github.com/mraron/njudge/internal/web/models"
+	"github.com/mraron/njudge/internal/web/domain/problem"
+	"github.com/mraron/njudge/pkg/problems"
 	"log"
 	"net/http"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/mraron/njudge/internal/judge"
+	"github.com/mraron/njudge/internal/web/helpers/config"
+	"github.com/mraron/njudge/internal/web/models"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -99,16 +101,23 @@ func (s *Server) runServer() {
 		}
 
 		if st.Done {
-			verdict := st.Status.Verdict()
+			var (
+				verdict problems.VerdictName
+				score   float64 = 0.0
+			)
+
 			if !st.Status.Compiled {
-				verdict = extmodels.VERDICT_CE
+				verdict = problems.VerdictName(problem.VerdictCE)
+			} else {
+				verdict = st.Status.Feedback[0].Verdict()
+				score = st.Status.Feedback[0].Score()
 			}
 
-			if _, err := s.DB.Exec("UPDATE submissions SET verdict=$1, status=$2, ontest=NULL, judged=$3, score=$5 WHERE id=$4", verdict, st.Status, time.Now(), id, st.Status.Score()); err != nil {
+			if _, err := s.DB.Exec("UPDATE submissions SET verdict=$1, status=$2, ontest=NULL, judged=$3, score=$5 WHERE id=$4", verdict, st.Status, time.Now(), id, score); err != nil {
 				return err
 			}
 		} else {
-			if _, err := s.DB.Exec("UPDATE submissions SET ontest=$1, status=$2, verdict=$3 WHERE id=$4", st.Test, st.Status, extmodels.VERDICT_RU, id); err != nil {
+			if _, err := s.DB.Exec("UPDATE submissions SET ontest=$1, status=$2, verdict=$3 WHERE id=$4", st.Test, st.Status, problem.VerdictRU, id); err != nil {
 				log.Print("can't realtime update status", err)
 			}
 		}
@@ -123,7 +132,7 @@ func (s *Server) runJudger() {
 	for {
 		time.Sleep(1 * time.Second)
 
-		ss, err := models.Submissions(Where("started=?", false), OrderBy("id ASC"), Limit(1)).All(s.DB)
+		ss, err := models.Submissions(Where("started=?", false), OrderBy("id ASC"), Limit(1)).All(context.Background(), s.DB)
 		if err != nil {
 			log.Print("judger query error", err)
 			continue
@@ -145,8 +154,8 @@ func (s *Server) runJudger() {
 				continue
 			}
 
-			var st judge.Status
-			st, err = judge.ParseStatus(j.State)
+			var st judge.ServerStatus
+			st, err = judge.ParseServerStatus(j.State)
 			if err != nil {
 				log.Print(err)
 				continue

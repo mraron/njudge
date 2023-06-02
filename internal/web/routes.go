@@ -1,66 +1,84 @@
 package web
 
 import (
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/mraron/njudge/internal/web/helpers/i18n"
+	"strings"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/web/extmodels"
 	"github.com/mraron/njudge/internal/web/handlers"
 	"github.com/mraron/njudge/internal/web/handlers/api"
 	"github.com/mraron/njudge/internal/web/handlers/problemset"
-	"github.com/mraron/njudge/internal/web/handlers/problemset/problem"
-	"github.com/mraron/njudge/internal/web/handlers/submission"
 	"github.com/mraron/njudge/internal/web/handlers/taskarchive"
 	"github.com/mraron/njudge/internal/web/handlers/user"
 	"github.com/mraron/njudge/internal/web/handlers/user/profile"
+	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
 	"github.com/mraron/njudge/internal/web/models"
-	"time"
+	"github.com/mraron/njudge/internal/web/services"
 )
 
 func (s *Server) prepareRoutes(e *echo.Echo) {
+	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
+		TokenLookup: "form:_csrf",
+		Skipper: func(c echo.Context) bool {
+			return strings.HasPrefix(c.Request().URL.Path, "/api") || strings.HasPrefix(c.Request().URL.Path, "/admin")
+		},
+		CookiePath: "/",
+	}))
+	e.Use(i18n.SetTranslatorMiddleware())
 	e.Use(user.SetUserMiddleware(s.DB))
+	e.Use(helpers.ClearTemporaryFlashes())
 
 	e.GET("/", handlers.GetHome())
 	e.GET("/page/:page", handlers.GetPage(partials.NewCached(s.DB.DB, 30*time.Second)))
 
 	e.Static("/static", "static")
 
-	e.GET("/submission/:id", submission.Get(s.DB))
-	e.GET("/submission/rejudge/:id", submission.Rejudge(s.DB), user.RequireLoginMiddleware())
+	e.GET("/submission/:id", handlers.GetSubmission(services.NewSQLSubmission(s.DB.DB))).Name = "getSubmission"
+	e.GET("/submission/rejudge/:id", handlers.RejudgeSubmission(services.NewSQLSubmission(s.DB.DB)), user.RequireLoginMiddleware()).Name = "rejudgeSubmission"
 	e.GET("/task_archive", taskarchive.Get(s.DB, s.ProblemStore))
 
 	ps := e.Group("/problemset", problemset.SetNameMiddleware())
-	ps.GET("/:name/", problemset.GetProblemList(s.DB, s.ProblemStore))
-	ps.POST("/:name/submit", problemset.PostSubmit(s.Server, s.DB, s.ProblemStore))
-	ps.GET("/status/", problemset.GetStatus(s.DB))
+	ps.GET("/:name/", problemset.GetProblemList(s.DB, services.NewSQLProblemListService(s.DB.DB, s.ProblemStore, services.NewSQLProblem(s.DB.DB, s.ProblemStore)), services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
+	ps.POST("/:name/submit", problemset.PostSubmit(services.NewSQLSubmitService(s.DB.DB, s.ProblemStore)), user.RequireLoginMiddleware())
+	ps.GET("/status/", problemset.GetStatus(services.NewSQLStatusPageService(s.DB.DB))).Name = "getProblemsetStatus"
 
-	psProb := ps.Group("/:name/:problem", problem.RenameMiddleware(s.ProblemStore), problem.SetProblemMiddleware(s.DB, s.ProblemStore))
-	psProb.GET("/", problem.Get(s.DB))
-	psProb.GET("/problem", problem.Get(s.DB))
-	psProb.GET("/status", problem.GetStatus(s.DB))
-	psProb.GET("/submit", problem.GetSubmit(s.DB))
-	psProb.GET("/ranklist", problem.GetRanklist(s.DB))
-	psProb.POST("/tags", problem.PostTag(s.DB))
-	psProb.GET("/delete_tag/:id", problem.DeleteTag(s.DB))
-	psProb.GET("/pdf/:language/", problem.GetPDF())
-	psProb.GET("/attachment/:attachment/", problem.GetAttachment())
-	psProb.GET("/:file", problem.GetFile())
+	psProb := ps.Group("/:name/:problem", problemset.RenameProblemMiddleware(s.ProblemStore), problemset.SetProblemMiddleware(services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
+	psProb.GET("/", problemset.GetProblem()).Name = "getProblemMain"
+	psProb.GET("/problem", problemset.GetProblem())
+	psProb.GET("/status", problemset.GetProblemStatus(services.NewSQLStatusPageService(s.DB.DB)))
+	psProb.GET("/submit", problemset.GetProblemSubmit())
+	psProb.GET("/ranklist", problemset.GetProblemRanklist(s.DB))
+	psProb.POST("/tags", problemset.PostProblemTag(services.NewSQLTagsService(s.DB.DB)))
+	psProb.GET("/delete_tag/:id", problemset.DeleteProblemTag(services.NewSQLTagsService(s.DB.DB)))
+	psProb.GET("/pdf/:language/", problemset.GetProblemPDF())
+	psProb.GET("/attachment/:attachment/", problemset.GetProblemAttachment())
+	psProb.GET("/:file", problemset.GetProblemFile())
 
 	u := e.Group("/user")
 
-	u.GET("/auth/callback", user.AuthCallback(s.DB))
-	u.GET("/auth", user.Auth())
+	u.GET("/auth/callback", user.OAuthCallback(s.DB))
+	u.GET("/auth", user.BeginOAuth())
 
-	u.GET("/login", user.GetLogin())
+	u.GET("/login", user.GetLogin()).Name = "getUserLogin"
 	u.POST("/login", user.PostLogin(s.DB))
 	u.GET("/logout", user.Logout())
 	u.GET("/register", user.GetRegister())
-	u.POST("/register", user.Register(s.Server, s.DB))
+	u.POST("/register", user.Register(s.Server, s.DB, s.MailService))
 	u.GET("/activate", user.GetActivateInfo())
 	u.GET("/activate/:name/:key", user.Activate(s.DB))
 
 	pr := u.Group("/profile", profile.SetProfileMiddleware(s.DB))
 	pr.GET("/:name/", profile.GetProfile(s.DB))
-	pr.GET("/:name/submissions/", profile.GetSubmissions(s.DB))
+	pr.GET("/:name/submissions/", profile.GetSubmissions(services.NewSQLStatusPageService(s.DB.DB)))
+
+	prs := pr.Group("/:name/settings", user.RequireLoginMiddleware(), profile.PrivateMiddleware())
+	prs.GET("/", profile.GetSettings(s.DB))
+	prs.POST("/change_password/", profile.PostSettingsChangePassword(s.DB))
+	prs.POST("/misc/", profile.PostSettingsMisc(s.DB))
 
 	v1 := e.Group("/api/v1")
 
@@ -99,5 +117,5 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	v1.PUT("/submissions/:id", api.Put[models.Submission](submissionDataProvider))
 	v1.DELETE("/submissions/:id", api.Delete[models.Submission](submissionDataProvider))
 
-	e.GET("/admin", handlers.GetAdmin(s.Server))
+	e.GET("/admin", handlers.GetAdmin(s.Server), user.RequireLoginMiddleware())
 }

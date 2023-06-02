@@ -15,7 +15,7 @@ const print = `class Hello {
 
 func (c csharp) Test(s language.Sandbox) error {
 	for _, test := range []language.LanguageTest{
-		{Language: c, Source: print, ExpectedVerdict: language.VERDICT_OK, Input: "", ExpectedOutput: "Hello world\n", TimeLimit: 1 * time.Second, MemoryLimit: 50 * 128 * 1024 * 1024},
+		{Language: c, Source: print, ExpectedVerdict: language.VerdictOK, Input: "", ExpectedOutput: "Hello world\n", TimeLimit: 1 * time.Second, MemoryLimit: 50 * 128 * 1024 * 1024},
 	} {
 		if err := test.Run(s); err != nil {
 			return err

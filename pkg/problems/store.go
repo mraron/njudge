@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -15,15 +14,15 @@ import (
 
 var ErrorProblemNotFound = errors.New("problem not found")
 
-type problemNotFoundError struct {
-	name string
+type ProblemNotFoundError struct {
+	Name string
 }
 
-func (perr problemNotFoundError) Error() string {
-	return "problem not found: " + perr.name
+func (perr ProblemNotFoundError) Error() string {
+	return "problem not found: " + perr.Name
 }
 
-func (perr problemNotFoundError) Is(target error) bool {
+func (perr ProblemNotFoundError) Is(target error) bool {
 	return target == ErrorProblemNotFound
 }
 
@@ -42,7 +41,7 @@ func (perr ProblemParseError) Is(target error) bool {
 	return target == ErrorProblemParse
 }
 
-//Store is an interface which is used to access a bunch of problems for example from the filesystem
+// Store is an interface which is used to access a bunch of problems for example from the filesystem
 type Store interface {
 	List() ([]string, error)
 	Has(string) (bool, error)
@@ -52,10 +51,15 @@ type Store interface {
 	UpdateProblem(path string, id string) error
 }
 
+var (
+	FsStoreIgnoreFile = ".njudge_ignore"
+	FsStorePrefixFile = ".njudge_prefix"
+)
+
 type FsStore struct {
 	cs           ConfigStore
 	fs           afero.Fs
-	dir          string
+	root         string
 	ignorePrefix bool
 
 	ByPath map[string]string
@@ -80,17 +84,17 @@ func FsStoreUseFs(afs afero.Fs) FsStoreOptions {
 	}
 }
 
-func FsStoreIgnorePreifx() FsStoreOptions {
+func FsStoreIgnorePrefix() FsStoreOptions {
 	return func(fs *FsStore) {
 		fs.ignorePrefix = true
 	}
 }
 
-func NewFsStore(dir string, options ...FsStoreOptions) *FsStore {
+func NewFsStore(root string, options ...FsStoreOptions) *FsStore {
 	fsStore := &FsStore{
 		cs:           globalConfigStore,
 		fs:           afero.NewOsFs(),
-		dir:          dir,
+		root:         root,
 		problems:     make(map[string]Problem),
 		problemsList: make([]string, 0),
 		ByPath:       make(map[string]string),
@@ -134,7 +138,7 @@ func (s *FsStore) Get(p string) (Problem, error) {
 		}
 	}
 
-	return nil, problemNotFoundError{p}
+	return nil, ProblemNotFoundError{p}
 }
 
 func (s *FsStore) MustGet(p string) Problem {
@@ -164,7 +168,7 @@ func (s *FsStore) Update() error {
 		return filepath.Base(path)
 	}
 
-	if err := afero.Walk(s.fs, s.dir, func(path string, info fs.FileInfo, err error) error {
+	if err := afero.Walk(s.fs, s.root, func(path string, info fs.FileInfo, err error) error {
 		if err != nil || !info.IsDir() {
 			return err
 		}
@@ -173,27 +177,27 @@ func (s *FsStore) Update() error {
 			return filepath.SkipDir
 		}
 
-		if s.dir == path {
+		if s.root == path {
 			return nil
 		}
 
 		//skip directories recursively with the .njudge_ignore file
-		if _, err := os.Stat(filepath.Join(path, ".njudge_ignore")); err != nil {
+		if _, err := s.fs.Stat(filepath.Join(path, FsStoreIgnoreFile)); err != nil {
 			if !errors.Is(err, os.ErrNotExist) {
 				return err
 			}
 		} else {
-			return nil
+			return filepath.SkipDir
 		}
 
 		if !s.ignorePrefix {
-			prefixFile := filepath.Join(path, ".njudge_prefix")
-			if _, err := os.Stat(prefixFile); err != nil {
+			prefixFile := filepath.Join(path, FsStorePrefixFile)
+			if _, err := s.fs.Stat(prefixFile); err != nil {
 				if !errors.Is(err, os.ErrNotExist) {
 					return err
 				}
 			} else {
-				prefixBytes, err := ioutil.ReadFile(prefixFile)
+				prefixBytes, err := afero.ReadFile(s.fs, prefixFile)
 				if err != nil {
 					return err
 				}
@@ -245,16 +249,16 @@ func (pw ProblemWrapper) Name() string {
 	return pw.NameOverride
 }
 
-func (s *FsStore) UpdateProblem(path string, id string) error {
+func (s *FsStore) UpdateProblem(path string, name string) error {
 	s.Lock()
 	defer s.Unlock()
 
-	prob, err := s.cs.Parse(path)
+	prob, err := s.cs.Parse(s.fs, path)
 	if err != nil {
 		return err
 	}
 
-	s.ByPath[path] = id
-	s.problems[id] = ProblemWrapper{prob, id}
+	s.ByPath[path] = name
+	s.problems[name] = ProblemWrapper{prob, name}
 	return nil
 }

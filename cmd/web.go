@@ -1,13 +1,15 @@
 package cmd
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"io/ioutil"
+	"log"
+
 	"github.com/mraron/njudge/internal/web"
 	"github.com/mraron/njudge/internal/web/helpers/config"
 	"github.com/mraron/njudge/internal/web/models"
-	"io/ioutil"
-	"log"
 
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/spf13/cobra"
@@ -100,7 +102,7 @@ var ActivateCmd = &cobra.Command{
 
 		s.SetupEnvironment()
 		s.ConnectToDB()
-		_, err = models.Users(qm.Where("name = ?", ActivateCmdArgs.Name)).UpdateAll(s.DB, models.M{"activation_key": nil})
+		_, err = models.Users(qm.Where("name = ?", ActivateCmdArgs.Name)).UpdateAll(context.Background(), s.DB, models.M{"activation_key": nil})
 
 		return err
 	},
@@ -109,13 +111,13 @@ var ActivateCmd = &cobra.Command{
 func RenameInDB(from, to string, tx *sql.Tx) error {
 	log.Print("Renaming ", from, " to ", to)
 
-	n, err := models.ProblemRels(qm.Where("problem = ?", from)).UpdateAll(tx, models.M{"problem": to})
+	n, err := models.ProblemRels(qm.Where("problem = ?", from)).UpdateAll(context.Background(), tx, models.M{"problem": to})
 	fmt.Println(n, err)
 	if err != nil {
 		return err
 	}
 
-	n, err = models.Submissions(qm.Where("problem = ?", from)).UpdateAll(tx, models.M{"problem": to})
+	n, err = models.Submissions(qm.Where("problem = ?", from)).UpdateAll(context.Background(), tx, models.M{"problem": to})
 	fmt.Println(n, err)
 	return err
 }
@@ -137,7 +139,7 @@ var PrefixCmd = &cobra.Command{
 		server := web.Server{Server: cfg}
 		server.ConnectToDB()
 
-		withoutPrefixes := problems.NewFsStore(cfg.ProblemsDir, problems.FsStoreIgnorePreifx())
+		withoutPrefixes := problems.NewFsStore(cfg.ProblemsDir, problems.FsStoreIgnorePrefix())
 		err = withoutPrefixes.Update()
 		if err != nil {
 			return nil

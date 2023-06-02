@@ -4,6 +4,7 @@
 package models
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"reflect"
@@ -289,7 +290,7 @@ type (
 	// This should almost always be used instead of []Submission.
 	SubmissionSlice []*Submission
 	// SubmissionHook is the signature for custom Submission hook methods
-	SubmissionHook func(boil.Executor, *Submission) error
+	SubmissionHook func(context.Context, boil.ContextExecutor, *Submission) error
 
 	submissionQuery struct {
 		*queries.Query
@@ -332,9 +333,13 @@ var submissionBeforeUpsertHooks []SubmissionHook
 var submissionAfterUpsertHooks []SubmissionHook
 
 // doAfterSelectHooks executes all "after Select" hooks.
-func (o *Submission) doAfterSelectHooks(exec boil.Executor) (err error) {
+func (o *Submission) doAfterSelectHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range submissionAfterSelectHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -343,9 +348,13 @@ func (o *Submission) doAfterSelectHooks(exec boil.Executor) (err error) {
 }
 
 // doBeforeInsertHooks executes all "before insert" hooks.
-func (o *Submission) doBeforeInsertHooks(exec boil.Executor) (err error) {
+func (o *Submission) doBeforeInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range submissionBeforeInsertHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -354,9 +363,13 @@ func (o *Submission) doBeforeInsertHooks(exec boil.Executor) (err error) {
 }
 
 // doAfterInsertHooks executes all "after Insert" hooks.
-func (o *Submission) doAfterInsertHooks(exec boil.Executor) (err error) {
+func (o *Submission) doAfterInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range submissionAfterInsertHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -365,9 +378,13 @@ func (o *Submission) doAfterInsertHooks(exec boil.Executor) (err error) {
 }
 
 // doBeforeUpdateHooks executes all "before Update" hooks.
-func (o *Submission) doBeforeUpdateHooks(exec boil.Executor) (err error) {
+func (o *Submission) doBeforeUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range submissionBeforeUpdateHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -376,9 +393,13 @@ func (o *Submission) doBeforeUpdateHooks(exec boil.Executor) (err error) {
 }
 
 // doAfterUpdateHooks executes all "after Update" hooks.
-func (o *Submission) doAfterUpdateHooks(exec boil.Executor) (err error) {
+func (o *Submission) doAfterUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range submissionAfterUpdateHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -387,9 +408,13 @@ func (o *Submission) doAfterUpdateHooks(exec boil.Executor) (err error) {
 }
 
 // doBeforeDeleteHooks executes all "before Delete" hooks.
-func (o *Submission) doBeforeDeleteHooks(exec boil.Executor) (err error) {
+func (o *Submission) doBeforeDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range submissionBeforeDeleteHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -398,9 +423,13 @@ func (o *Submission) doBeforeDeleteHooks(exec boil.Executor) (err error) {
 }
 
 // doAfterDeleteHooks executes all "after Delete" hooks.
-func (o *Submission) doAfterDeleteHooks(exec boil.Executor) (err error) {
+func (o *Submission) doAfterDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range submissionAfterDeleteHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -409,9 +438,13 @@ func (o *Submission) doAfterDeleteHooks(exec boil.Executor) (err error) {
 }
 
 // doBeforeUpsertHooks executes all "before Upsert" hooks.
-func (o *Submission) doBeforeUpsertHooks(exec boil.Executor) (err error) {
+func (o *Submission) doBeforeUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range submissionBeforeUpsertHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -420,9 +453,13 @@ func (o *Submission) doBeforeUpsertHooks(exec boil.Executor) (err error) {
 }
 
 // doAfterUpsertHooks executes all "after Upsert" hooks.
-func (o *Submission) doAfterUpsertHooks(exec boil.Executor) (err error) {
+func (o *Submission) doAfterUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range submissionAfterUpsertHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -455,17 +492,17 @@ func AddSubmissionHook(hookPoint boil.HookPoint, submissionHook SubmissionHook) 
 }
 
 // OneG returns a single submission record from the query using the global executor.
-func (q submissionQuery) OneG() (*Submission, error) {
-	return q.One(boil.GetDB())
+func (q submissionQuery) OneG(ctx context.Context) (*Submission, error) {
+	return q.One(ctx, boil.GetContextDB())
 }
 
 // One returns a single submission record from the query.
-func (q submissionQuery) One(exec boil.Executor) (*Submission, error) {
+func (q submissionQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Submission, error) {
 	o := &Submission{}
 
 	queries.SetLimit(q.Query, 1)
 
-	err := q.Bind(nil, exec, o)
+	err := q.Bind(ctx, exec, o)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
@@ -473,7 +510,7 @@ func (q submissionQuery) One(exec boil.Executor) (*Submission, error) {
 		return nil, errors.Wrap(err, "models: failed to execute a one query for submissions")
 	}
 
-	if err := o.doAfterSelectHooks(exec); err != nil {
+	if err := o.doAfterSelectHooks(ctx, exec); err != nil {
 		return o, err
 	}
 
@@ -481,22 +518,22 @@ func (q submissionQuery) One(exec boil.Executor) (*Submission, error) {
 }
 
 // AllG returns all Submission records from the query using the global executor.
-func (q submissionQuery) AllG() (SubmissionSlice, error) {
-	return q.All(boil.GetDB())
+func (q submissionQuery) AllG(ctx context.Context) (SubmissionSlice, error) {
+	return q.All(ctx, boil.GetContextDB())
 }
 
 // All returns all Submission records from the query.
-func (q submissionQuery) All(exec boil.Executor) (SubmissionSlice, error) {
+func (q submissionQuery) All(ctx context.Context, exec boil.ContextExecutor) (SubmissionSlice, error) {
 	var o []*Submission
 
-	err := q.Bind(nil, exec, &o)
+	err := q.Bind(ctx, exec, &o)
 	if err != nil {
 		return nil, errors.Wrap(err, "models: failed to assign all query results to Submission slice")
 	}
 
 	if len(submissionAfterSelectHooks) != 0 {
 		for _, obj := range o {
-			if err := obj.doAfterSelectHooks(exec); err != nil {
+			if err := obj.doAfterSelectHooks(ctx, exec); err != nil {
 				return o, err
 			}
 		}
@@ -506,18 +543,18 @@ func (q submissionQuery) All(exec boil.Executor) (SubmissionSlice, error) {
 }
 
 // CountG returns the count of all Submission records in the query using the global executor
-func (q submissionQuery) CountG() (int64, error) {
-	return q.Count(boil.GetDB())
+func (q submissionQuery) CountG(ctx context.Context) (int64, error) {
+	return q.Count(ctx, boil.GetContextDB())
 }
 
 // Count returns the count of all Submission records in the query.
-func (q submissionQuery) Count(exec boil.Executor) (int64, error) {
+func (q submissionQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
 	queries.SetCount(q.Query)
 
-	err := q.Query.QueryRow(exec).Scan(&count)
+	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to count submissions rows")
 	}
@@ -526,19 +563,19 @@ func (q submissionQuery) Count(exec boil.Executor) (int64, error) {
 }
 
 // ExistsG checks if the row exists in the table using the global executor.
-func (q submissionQuery) ExistsG() (bool, error) {
-	return q.Exists(boil.GetDB())
+func (q submissionQuery) ExistsG(ctx context.Context) (bool, error) {
+	return q.Exists(ctx, boil.GetContextDB())
 }
 
 // Exists checks if the row exists in the table.
-func (q submissionQuery) Exists(exec boil.Executor) (bool, error) {
+func (q submissionQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
 	queries.SetCount(q.Query)
 	queries.SetLimit(q.Query, 1)
 
-	err := q.Query.QueryRow(exec).Scan(&count)
+	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
 		return false, errors.Wrap(err, "models: failed to check if submissions exists")
 	}
@@ -559,7 +596,7 @@ func (o *Submission) User(mods ...qm.QueryMod) userQuery {
 
 // LoadUser allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (submissionL) LoadUser(e boil.Executor, singular bool, maybeSubmission interface{}, mods queries.Applicator) error {
+func (submissionL) LoadUser(ctx context.Context, e boil.ContextExecutor, singular bool, maybeSubmission interface{}, mods queries.Applicator) error {
 	var slice []*Submission
 	var object *Submission
 
@@ -622,7 +659,7 @@ func (submissionL) LoadUser(e boil.Executor, singular bool, maybeSubmission inte
 		mods.Apply(query)
 	}
 
-	results, err := query.Query(e)
+	results, err := query.QueryContext(ctx, e)
 	if err != nil {
 		return errors.Wrap(err, "failed to eager load User")
 	}
@@ -641,7 +678,7 @@ func (submissionL) LoadUser(e boil.Executor, singular bool, maybeSubmission inte
 
 	if len(userAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(e); err != nil {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
 				return err
 			}
 		}
@@ -681,17 +718,17 @@ func (submissionL) LoadUser(e boil.Executor, singular bool, maybeSubmission inte
 // Sets o.R.User to related.
 // Adds o to related.R.Submissions.
 // Uses the global database handle.
-func (o *Submission) SetUserG(insert bool, related *User) error {
-	return o.SetUser(boil.GetDB(), insert, related)
+func (o *Submission) SetUserG(ctx context.Context, insert bool, related *User) error {
+	return o.SetUser(ctx, boil.GetContextDB(), insert, related)
 }
 
 // SetUser of the submission to the related item.
 // Sets o.R.User to related.
 // Adds o to related.R.Submissions.
-func (o *Submission) SetUser(exec boil.Executor, insert bool, related *User) error {
+func (o *Submission) SetUser(ctx context.Context, exec boil.ContextExecutor, insert bool, related *User) error {
 	var err error
 	if insert {
-		if err = related.Insert(exec, boil.Infer()); err != nil {
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
 			return errors.Wrap(err, "failed to insert into foreign table")
 		}
 	}
@@ -703,11 +740,12 @@ func (o *Submission) SetUser(exec boil.Executor, insert bool, related *User) err
 	)
 	values := []interface{}{related.ID, o.ID}
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, updateQuery)
-		fmt.Fprintln(boil.DebugWriter, values)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, values)
 	}
-	if _, err = exec.Exec(updateQuery, values...); err != nil {
+	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
 		return errors.Wrap(err, "failed to update local table")
 	}
 
@@ -743,13 +781,13 @@ func Submissions(mods ...qm.QueryMod) submissionQuery {
 }
 
 // FindSubmissionG retrieves a single record by ID.
-func FindSubmissionG(iD int, selectCols ...string) (*Submission, error) {
-	return FindSubmission(boil.GetDB(), iD, selectCols...)
+func FindSubmissionG(ctx context.Context, iD int, selectCols ...string) (*Submission, error) {
+	return FindSubmission(ctx, boil.GetContextDB(), iD, selectCols...)
 }
 
 // FindSubmission retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindSubmission(exec boil.Executor, iD int, selectCols ...string) (*Submission, error) {
+func FindSubmission(ctx context.Context, exec boil.ContextExecutor, iD int, selectCols ...string) (*Submission, error) {
 	submissionObj := &Submission{}
 
 	sel := "*"
@@ -762,7 +800,7 @@ func FindSubmission(exec boil.Executor, iD int, selectCols ...string) (*Submissi
 
 	q := queries.Raw(query, iD)
 
-	err := q.Bind(nil, exec, submissionObj)
+	err := q.Bind(ctx, exec, submissionObj)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
@@ -770,7 +808,7 @@ func FindSubmission(exec boil.Executor, iD int, selectCols ...string) (*Submissi
 		return nil, errors.Wrap(err, "models: unable to select from submissions")
 	}
 
-	if err = submissionObj.doAfterSelectHooks(exec); err != nil {
+	if err = submissionObj.doAfterSelectHooks(ctx, exec); err != nil {
 		return submissionObj, err
 	}
 
@@ -778,20 +816,20 @@ func FindSubmission(exec boil.Executor, iD int, selectCols ...string) (*Submissi
 }
 
 // InsertG a single record. See Insert for whitelist behavior description.
-func (o *Submission) InsertG(columns boil.Columns) error {
-	return o.Insert(boil.GetDB(), columns)
+func (o *Submission) InsertG(ctx context.Context, columns boil.Columns) error {
+	return o.Insert(ctx, boil.GetContextDB(), columns)
 }
 
 // Insert a single record using an executor.
 // See boil.Columns.InsertColumnSet documentation to understand column list inference for inserts.
-func (o *Submission) Insert(exec boil.Executor, columns boil.Columns) error {
+func (o *Submission) Insert(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
 	if o == nil {
 		return errors.New("models: no submissions provided for insertion")
 	}
 
 	var err error
 
-	if err := o.doBeforeInsertHooks(exec); err != nil {
+	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
 		return err
 	}
 
@@ -836,15 +874,16 @@ func (o *Submission) Insert(exec boil.Executor, columns boil.Columns) error {
 	value := reflect.Indirect(reflect.ValueOf(o))
 	vals := queries.ValuesFromMapping(value, cache.valueMapping)
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, cache.query)
-		fmt.Fprintln(boil.DebugWriter, vals)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, cache.query)
+		fmt.Fprintln(writer, vals)
 	}
 
 	if len(cache.retMapping) != 0 {
-		err = exec.QueryRow(cache.query, vals...).Scan(queries.PtrsFromMapping(value, cache.retMapping)...)
+		err = exec.QueryRowContext(ctx, cache.query, vals...).Scan(queries.PtrsFromMapping(value, cache.retMapping)...)
 	} else {
-		_, err = exec.Exec(cache.query, vals...)
+		_, err = exec.ExecContext(ctx, cache.query, vals...)
 	}
 
 	if err != nil {
@@ -857,21 +896,21 @@ func (o *Submission) Insert(exec boil.Executor, columns boil.Columns) error {
 		submissionInsertCacheMut.Unlock()
 	}
 
-	return o.doAfterInsertHooks(exec)
+	return o.doAfterInsertHooks(ctx, exec)
 }
 
 // UpdateG a single Submission record using the global executor.
 // See Update for more documentation.
-func (o *Submission) UpdateG(columns boil.Columns) (int64, error) {
-	return o.Update(boil.GetDB(), columns)
+func (o *Submission) UpdateG(ctx context.Context, columns boil.Columns) (int64, error) {
+	return o.Update(ctx, boil.GetContextDB(), columns)
 }
 
 // Update uses an executor to update the Submission.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
-func (o *Submission) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
+func (o *Submission) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
 	var err error
-	if err = o.doBeforeUpdateHooks(exec); err != nil {
+	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
 		return 0, err
 	}
 	key := makeCacheKey(columns, nil)
@@ -904,12 +943,13 @@ func (o *Submission) Update(exec boil.Executor, columns boil.Columns) (int64, er
 
 	values := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), cache.valueMapping)
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, cache.query)
-		fmt.Fprintln(boil.DebugWriter, values)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, cache.query)
+		fmt.Fprintln(writer, values)
 	}
 	var result sql.Result
-	result, err = exec.Exec(cache.query, values...)
+	result, err = exec.ExecContext(ctx, cache.query, values...)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to update submissions row")
 	}
@@ -925,19 +965,19 @@ func (o *Submission) Update(exec boil.Executor, columns boil.Columns) (int64, er
 		submissionUpdateCacheMut.Unlock()
 	}
 
-	return rowsAff, o.doAfterUpdateHooks(exec)
+	return rowsAff, o.doAfterUpdateHooks(ctx, exec)
 }
 
 // UpdateAllG updates all rows with the specified column values.
-func (q submissionQuery) UpdateAllG(cols M) (int64, error) {
-	return q.UpdateAll(boil.GetDB(), cols)
+func (q submissionQuery) UpdateAllG(ctx context.Context, cols M) (int64, error) {
+	return q.UpdateAll(ctx, boil.GetContextDB(), cols)
 }
 
 // UpdateAll updates all rows with the specified column values.
-func (q submissionQuery) UpdateAll(exec boil.Executor, cols M) (int64, error) {
+func (q submissionQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
 	queries.SetUpdate(q.Query, cols)
 
-	result, err := q.Query.Exec(exec)
+	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to update all for submissions")
 	}
@@ -951,12 +991,12 @@ func (q submissionQuery) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 }
 
 // UpdateAllG updates all rows with the specified column values.
-func (o SubmissionSlice) UpdateAllG(cols M) (int64, error) {
-	return o.UpdateAll(boil.GetDB(), cols)
+func (o SubmissionSlice) UpdateAllG(ctx context.Context, cols M) (int64, error) {
+	return o.UpdateAll(ctx, boil.GetContextDB(), cols)
 }
 
 // UpdateAll updates all rows with the specified column values, using an executor.
-func (o SubmissionSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
+func (o SubmissionSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
 	ln := int64(len(o))
 	if ln == 0 {
 		return 0, nil
@@ -986,11 +1026,12 @@ func (o SubmissionSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 		strmangle.SetParamNames("\"", "\"", 1, colNames),
 		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), len(colNames)+1, submissionPrimaryKeyColumns, len(o)))
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, sql)
-		fmt.Fprintln(boil.DebugWriter, args...)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, sql)
+		fmt.Fprintln(writer, args...)
 	}
-	result, err := exec.Exec(sql, args...)
+	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to update all in submission slice")
 	}
@@ -1003,18 +1044,18 @@ func (o SubmissionSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 }
 
 // UpsertG attempts an insert, and does an update or ignore on conflict.
-func (o *Submission) UpsertG(updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
-	return o.Upsert(boil.GetDB(), updateOnConflict, conflictColumns, updateColumns, insertColumns)
+func (o *Submission) UpsertG(ctx context.Context, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
+	return o.Upsert(ctx, boil.GetContextDB(), updateOnConflict, conflictColumns, updateColumns, insertColumns)
 }
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
-func (o *Submission) Upsert(exec boil.Executor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
+func (o *Submission) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
 	if o == nil {
 		return errors.New("models: no submissions provided for upsert")
 	}
 
-	if err := o.doBeforeUpsertHooks(exec); err != nil {
+	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
 		return err
 	}
 
@@ -1097,17 +1138,18 @@ func (o *Submission) Upsert(exec boil.Executor, updateOnConflict bool, conflictC
 		returns = queries.PtrsFromMapping(value, cache.retMapping)
 	}
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, cache.query)
-		fmt.Fprintln(boil.DebugWriter, vals)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, cache.query)
+		fmt.Fprintln(writer, vals)
 	}
 	if len(cache.retMapping) != 0 {
-		err = exec.QueryRow(cache.query, vals...).Scan(returns...)
+		err = exec.QueryRowContext(ctx, cache.query, vals...).Scan(returns...)
 		if errors.Is(err, sql.ErrNoRows) {
 			err = nil // Postgres doesn't return anything when there's no update
 		}
 	} else {
-		_, err = exec.Exec(cache.query, vals...)
+		_, err = exec.ExecContext(ctx, cache.query, vals...)
 	}
 	if err != nil {
 		return errors.Wrap(err, "models: unable to upsert submissions")
@@ -1119,34 +1161,35 @@ func (o *Submission) Upsert(exec boil.Executor, updateOnConflict bool, conflictC
 		submissionUpsertCacheMut.Unlock()
 	}
 
-	return o.doAfterUpsertHooks(exec)
+	return o.doAfterUpsertHooks(ctx, exec)
 }
 
 // DeleteG deletes a single Submission record.
 // DeleteG will match against the primary key column to find the record to delete.
-func (o *Submission) DeleteG() (int64, error) {
-	return o.Delete(boil.GetDB())
+func (o *Submission) DeleteG(ctx context.Context) (int64, error) {
+	return o.Delete(ctx, boil.GetContextDB())
 }
 
 // Delete deletes a single Submission record with an executor.
 // Delete will match against the primary key column to find the record to delete.
-func (o *Submission) Delete(exec boil.Executor) (int64, error) {
+func (o *Submission) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if o == nil {
 		return 0, errors.New("models: no Submission provided for delete")
 	}
 
-	if err := o.doBeforeDeleteHooks(exec); err != nil {
+	if err := o.doBeforeDeleteHooks(ctx, exec); err != nil {
 		return 0, err
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), submissionPrimaryKeyMapping)
 	sql := "DELETE FROM \"submissions\" WHERE \"id\"=$1"
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, sql)
-		fmt.Fprintln(boil.DebugWriter, args...)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, sql)
+		fmt.Fprintln(writer, args...)
 	}
-	result, err := exec.Exec(sql, args...)
+	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to delete from submissions")
 	}
@@ -1156,26 +1199,26 @@ func (o *Submission) Delete(exec boil.Executor) (int64, error) {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for submissions")
 	}
 
-	if err := o.doAfterDeleteHooks(exec); err != nil {
+	if err := o.doAfterDeleteHooks(ctx, exec); err != nil {
 		return 0, err
 	}
 
 	return rowsAff, nil
 }
 
-func (q submissionQuery) DeleteAllG() (int64, error) {
-	return q.DeleteAll(boil.GetDB())
+func (q submissionQuery) DeleteAllG(ctx context.Context) (int64, error) {
+	return q.DeleteAll(ctx, boil.GetContextDB())
 }
 
 // DeleteAll deletes all matching rows.
-func (q submissionQuery) DeleteAll(exec boil.Executor) (int64, error) {
+func (q submissionQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if q.Query == nil {
 		return 0, errors.New("models: no submissionQuery provided for delete all")
 	}
 
 	queries.SetDelete(q.Query)
 
-	result, err := q.Query.Exec(exec)
+	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to delete all from submissions")
 	}
@@ -1189,19 +1232,19 @@ func (q submissionQuery) DeleteAll(exec boil.Executor) (int64, error) {
 }
 
 // DeleteAllG deletes all rows in the slice.
-func (o SubmissionSlice) DeleteAllG() (int64, error) {
-	return o.DeleteAll(boil.GetDB())
+func (o SubmissionSlice) DeleteAllG(ctx context.Context) (int64, error) {
+	return o.DeleteAll(ctx, boil.GetContextDB())
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
-func (o SubmissionSlice) DeleteAll(exec boil.Executor) (int64, error) {
+func (o SubmissionSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if len(o) == 0 {
 		return 0, nil
 	}
 
 	if len(submissionBeforeDeleteHooks) != 0 {
 		for _, obj := range o {
-			if err := obj.doBeforeDeleteHooks(exec); err != nil {
+			if err := obj.doBeforeDeleteHooks(ctx, exec); err != nil {
 				return 0, err
 			}
 		}
@@ -1216,11 +1259,12 @@ func (o SubmissionSlice) DeleteAll(exec boil.Executor) (int64, error) {
 	sql := "DELETE FROM \"submissions\" WHERE " +
 		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, submissionPrimaryKeyColumns, len(o))
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, sql)
-		fmt.Fprintln(boil.DebugWriter, args)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, sql)
+		fmt.Fprintln(writer, args)
 	}
-	result, err := exec.Exec(sql, args...)
+	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to delete all from submission slice")
 	}
@@ -1232,7 +1276,7 @@ func (o SubmissionSlice) DeleteAll(exec boil.Executor) (int64, error) {
 
 	if len(submissionAfterDeleteHooks) != 0 {
 		for _, obj := range o {
-			if err := obj.doAfterDeleteHooks(exec); err != nil {
+			if err := obj.doAfterDeleteHooks(ctx, exec); err != nil {
 				return 0, err
 			}
 		}
@@ -1242,18 +1286,18 @@ func (o SubmissionSlice) DeleteAll(exec boil.Executor) (int64, error) {
 }
 
 // ReloadG refetches the object from the database using the primary keys.
-func (o *Submission) ReloadG() error {
+func (o *Submission) ReloadG(ctx context.Context) error {
 	if o == nil {
 		return errors.New("models: no Submission provided for reload")
 	}
 
-	return o.Reload(boil.GetDB())
+	return o.Reload(ctx, boil.GetContextDB())
 }
 
 // Reload refetches the object from the database
 // using the primary keys with an executor.
-func (o *Submission) Reload(exec boil.Executor) error {
-	ret, err := FindSubmission(exec, o.ID)
+func (o *Submission) Reload(ctx context.Context, exec boil.ContextExecutor) error {
+	ret, err := FindSubmission(ctx, exec, o.ID)
 	if err != nil {
 		return err
 	}
@@ -1264,17 +1308,17 @@ func (o *Submission) Reload(exec boil.Executor) error {
 
 // ReloadAllG refetches every row with matching primary key column values
 // and overwrites the original object slice with the newly updated slice.
-func (o *SubmissionSlice) ReloadAllG() error {
+func (o *SubmissionSlice) ReloadAllG(ctx context.Context) error {
 	if o == nil {
 		return errors.New("models: empty SubmissionSlice provided for reload all")
 	}
 
-	return o.ReloadAll(boil.GetDB())
+	return o.ReloadAll(ctx, boil.GetContextDB())
 }
 
 // ReloadAll refetches every row with matching primary key column values
 // and overwrites the original object slice with the newly updated slice.
-func (o *SubmissionSlice) ReloadAll(exec boil.Executor) error {
+func (o *SubmissionSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) error {
 	if o == nil || len(*o) == 0 {
 		return nil
 	}
@@ -1291,7 +1335,7 @@ func (o *SubmissionSlice) ReloadAll(exec boil.Executor) error {
 
 	q := queries.Raw(sql, args...)
 
-	err := q.Bind(nil, exec, &slice)
+	err := q.Bind(ctx, exec, &slice)
 	if err != nil {
 		return errors.Wrap(err, "models: unable to reload all in SubmissionSlice")
 	}
@@ -1302,20 +1346,21 @@ func (o *SubmissionSlice) ReloadAll(exec boil.Executor) error {
 }
 
 // SubmissionExistsG checks if the Submission row exists.
-func SubmissionExistsG(iD int) (bool, error) {
-	return SubmissionExists(boil.GetDB(), iD)
+func SubmissionExistsG(ctx context.Context, iD int) (bool, error) {
+	return SubmissionExists(ctx, boil.GetContextDB(), iD)
 }
 
 // SubmissionExists checks if the Submission row exists.
-func SubmissionExists(exec boil.Executor, iD int) (bool, error) {
+func SubmissionExists(ctx context.Context, exec boil.ContextExecutor, iD int) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from \"submissions\" where \"id\"=$1 limit 1)"
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, sql)
-		fmt.Fprintln(boil.DebugWriter, iD)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, sql)
+		fmt.Fprintln(writer, iD)
 	}
-	row := exec.QueryRow(sql, iD)
+	row := exec.QueryRowContext(ctx, sql, iD)
 
 	err := row.Scan(&exists)
 	if err != nil {
@@ -1326,6 +1371,6 @@ func SubmissionExists(exec boil.Executor, iD int) (bool, error) {
 }
 
 // Exists checks if the Submission row exists.
-func (o *Submission) Exists(exec boil.Executor) (bool, error) {
-	return SubmissionExists(exec, o.ID)
+func (o *Submission) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
+	return SubmissionExists(ctx, exec, o.ID)
 }

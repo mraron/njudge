@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/mraron/njudge/internal/judge"
 	"io"
 	"os"
+
+	"github.com/mraron/njudge/internal/judge"
 
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/language/sandbox"
@@ -39,7 +40,7 @@ var TestProblemCmd = &cobra.Command{
 			return err
 		}
 
-		l := language.Get(TestProblemArgs.Language)
+		l := language.DefaultStore.Get(TestProblemArgs.Language)
 		src, err := os.ReadFile(TestProblemArgs.SolutionPath)
 		if err != nil {
 			return err
@@ -49,7 +50,7 @@ var TestProblemCmd = &cobra.Command{
 		for _, test := range st.Feedback[0].Testcases() {
 			fmt.Println(test.Group, test.Index, test.VerdictName, test.Score, test.MaxScore)
 		}
-		fmt.Println(st.Verdict(), st.Score(), "/", st.MaxScore())
+		fmt.Println(st.Feedback[0].Verdict(), st.Feedback[0].Score(), "/", st.Feedback[0].MaxScore())
 		fmt.Println(st.FeedbackType.String())
 
 		if TestProblemArgs.Verbose > 0 {

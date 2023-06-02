@@ -2,7 +2,6 @@ package sandbox
 
 import (
 	"bytes"
-	"github.com/mraron/njudge/pkg/language"
 	"io"
 	"io/ioutil"
 	"log"
@@ -12,6 +11,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/mraron/njudge/pkg/language"
 )
 
 type Dummy struct {
@@ -156,13 +157,14 @@ func (s *Dummy) Run(prg string, needStatus bool) (language.Status, error) {
 		wg               sync.WaitGroup
 	)
 
-	st.Verdict = language.VERDICT_OK
+	st.Verdict = language.VerdictOK
 
 	start := time.NewTimer(s.tl)
 	if err := cmd.Start(); err != nil {
-		st.Verdict = language.VERDICT_XX
+		st.Verdict = language.VerdictXX
 		return st, err
 	}
+	defer start.Stop()
 
 	wg.Add(1)
 	go func() {
@@ -173,9 +175,9 @@ func (s *Dummy) Run(prg string, needStatus bool) (language.Status, error) {
 
 	select {
 	case <-start.C:
-		st.Verdict = language.VERDICT_TL
+		st.Verdict = language.VerdictTL
 		if errKill = cmd.Process.Kill(); errKill != nil {
-			st.Verdict = language.VERDICT_XX
+			st.Verdict = language.VerdictXX
 		}
 	case <-finish:
 	}
@@ -183,8 +185,8 @@ func (s *Dummy) Run(prg string, needStatus bool) (language.Status, error) {
 	wg.Wait()
 
 	if errWait != nil && (strings.HasPrefix(errWait.Error(), "exit status") || strings.HasPrefix(errWait.Error(), "signal:")) {
-		if st.Verdict == language.VERDICT_OK {
-			st.Verdict = language.VERDICT_RE
+		if st.Verdict == language.VerdictOK {
+			st.Verdict = language.VerdictRE
 		}
 		errWait = nil
 	}

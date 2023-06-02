@@ -28,13 +28,13 @@ func (s Stub) Compile(jinfo problems.Judgeable, sandbox language.Sandbox, lang l
 	lst, found := jinfo.Languages(), false
 
 	for _, l := range lst {
-		if l.Name() == lang.Name() {
+		if l.Id() == lang.Id() {
 			found = true
 		}
 	}
 
 	if !found {
-		return nil, fmt.Errorf("%s tasktype: language %s is not supported", s.Name(), lang.Name())
+		return nil, fmt.Errorf("%s tasktype: language %s is not supported", s.Name(), lang.Id())
 	}
 
 	files := jinfo.Files()

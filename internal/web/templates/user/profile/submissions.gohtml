@@ -1,0 +1,6 @@
+{{template "header" .}}
+
+{{template "user_menu" dict "Page" "submissions" "User" .Data.User "Context" .Context}}
+{{template "submissions" .Data.StatusPage}}
+
+{{template "footer" .}}

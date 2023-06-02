@@ -16,20 +16,20 @@ func TestDummyParsing(t *testing.T) {
 
 	memFs := afero.NewMemMapFs()
 
-	cs := problems.NewConfigStore()
-	parser, identifier := ParserAndIdentifier(UseFS(memFs))
+	cs := problems.NewConfigList()
+	parser, identifier := ParserAndIdentifier()
 
 	handleError(cs.Register("polygon", parser, identifier))
 	handleError(memFs.Mkdir("testproblem", 0700))
 
-	if p, err := cs.Parse("testproblem/"); p != nil || err != problems.ErrorNoMatch {
+	if p, err := cs.Parse(memFs, "testproblem/"); p != nil || err != problems.ErrorNoMatch {
 		t.Error("no problem.xml but found it")
 	}
 
 	f, _ := memFs.Create("testproblem/problem.xml")
 	handleError(f.Close())
 
-	if p, _ := cs.Parse("testproblem/"); p != nil {
+	if p, _ := cs.Parse(memFs, "testproblem/"); p != nil {
 		t.Error("empty problem.xml")
 	}
 }
@@ -102,14 +102,14 @@ func testProblemXML(t *testing.T, p Problem) {
 
 func TestFSParsing(t *testing.T) {
 	fs := afero.NewBasePathFs(afero.NewOsFs(), "./testdata/")
-	cs := problems.NewConfigStore()
-	parser, identifier := ParserAndIdentifier(CompileBinaries(false), UseFS(fs))
+	cs := problems.NewConfigList()
+	parser, identifier := ParserAndIdentifier(CompileBinaries(false))
 
 	if err := cs.Register("polygon", parser, identifier); err != nil {
 		t.Error(err)
 	}
 
-	if p, err := cs.Parse("problemxml/"); err != nil {
+	if p, err := cs.Parse(fs, "problemxml/"); err != nil {
 		t.Fatalf("got error: %v", err)
 	} else {
 		t.Run("problemXML", func(t *testing.T) {
@@ -129,35 +129,5 @@ func TestJSONStatement(t *testing.T) {
 	_, err := ParseJSONStatement(fs, "json_statement/")
 	if err != nil {
 		t.Error(err)
-	}
-}
-
-func TestCompileBinaries(t *testing.T) {
-	fs := afero.NewCopyOnWriteFs(afero.NewBasePathFs(afero.NewOsFs(), "./testdata/"), afero.NewMemMapFs())
-
-	if err := compileIfNotCompiled(fs, "", "check.cpp", "check"); err != nil {
-		t.Error(err)
-	}
-
-	if err := compileIfNotCompiled(fs, "", "check_syntaxerr.cpp", "check_syntaxerr"); err == nil {
-		t.Error("wanted error, but compiled fine")
-	}
-
-	// check already exists because of the first compilation
-	if err := compileIfNotCompiled(fs, "", "check_syntaxerr.cpp", "check"); err != nil {
-		t.Error(err)
-	}
-
-	f, err := fs.Create("check")
-	if err != nil {
-		t.Error(err)
-	}
-
-	if err := f.Close(); err != nil {
-		t.Error(err)
-	}
-
-	if err := compileIfNotCompiled(fs, "", "check_syntaxerr.cpp", "check"); err == nil {
-		t.Error("should have compile error")
 	}
 }

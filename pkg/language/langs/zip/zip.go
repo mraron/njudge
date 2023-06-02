@@ -38,5 +38,5 @@ func (zip) Test(language.Sandbox) error {
 }
 
 func init() {
-	language.Register("zip", zip{})
+	language.DefaultStore.Register("zip", zip{})
 }

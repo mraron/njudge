@@ -3,6 +3,8 @@ package problems
 import (
 	"errors"
 	"fmt"
+
+	"github.com/spf13/afero"
 )
 
 var (
@@ -11,37 +13,37 @@ var (
 )
 
 // ConfigIdentifier is a function for some config type which takes a path and returns true if it thinks that its respective parser can parse it
-type ConfigIdentifier func(string) bool
+type ConfigIdentifier func(afero.Fs, string) bool
 
 // ConfigParser is a function for some config type which parses the problem from some path provided to it
-type ConfigParser func(string) (Problem, error)
+type ConfigParser func(afero.Fs, string) (Problem, error)
 
 // ConfigStore is an interface with which you can register/deregister certain config types and parse a problem using these config types
 type ConfigStore interface {
 	Register(string, ConfigParser, ConfigIdentifier) error
 	Deregister(string) error
 
-	Parse(string) (Problem, error)
+	Parse(afero.Fs, string) (Problem, error)
 }
 
-type problemConfigType struct {
-	name        string
-	parser      ConfigParser
-	identifiers ConfigIdentifier
+type ProblemConfigType struct {
+	Name       string
+	Parser     ConfigParser
+	Identifier ConfigIdentifier
 }
 
-type configStore struct {
-	configTypes []problemConfigType
+type ConfigList struct {
+	ConfigTypes []ProblemConfigType
 }
 
-// NewConfigStore returns the default implementation of ConfigStore
-func NewConfigStore() ConfigStore {
-	return &configStore{make([]problemConfigType, 0)}
+// NewConfigList returns the default implementation of ConfigStore
+func NewConfigList() *ConfigList {
+	return &ConfigList{make([]ProblemConfigType, 0)}
 }
 
-func (cs *configStore) Register(name string, parser ConfigParser, identifier ConfigIdentifier) error {
-	for _, val := range cs.configTypes {
-		if val.name == name {
+func (cs *ConfigList) Register(name string, parser ConfigParser, identifier ConfigIdentifier) error {
+	for _, val := range cs.ConfigTypes {
+		if val.Name == name {
 			return ErrorNameUsed
 		}
 	}
@@ -54,14 +56,14 @@ func (cs *configStore) Register(name string, parser ConfigParser, identifier Con
 		return fmt.Errorf("identifier can't be nil")
 	}
 
-	cs.configTypes = append(cs.configTypes, problemConfigType{name, parser, identifier})
+	cs.ConfigTypes = append(cs.ConfigTypes, ProblemConfigType{name, parser, identifier})
 	return nil
 }
 
-func (cs *configStore) Deregister(name string) error {
+func (cs *ConfigList) Deregister(name string) error {
 	index := -1
-	for ind := range cs.configTypes {
-		if cs.configTypes[ind].name == name {
+	for ind := range cs.ConfigTypes {
+		if cs.ConfigTypes[ind].Name == name {
 			index = ind
 		}
 	}
@@ -70,14 +72,14 @@ func (cs *configStore) Deregister(name string) error {
 		return fmt.Errorf("config type name not found")
 	}
 
-	cs.configTypes = append(cs.configTypes[:index], cs.configTypes[index+1:]...)
+	cs.ConfigTypes = append(cs.ConfigTypes[:index], cs.ConfigTypes[index+1:]...)
 	return nil
 }
 
-func (cs *configStore) Parse(path string) (Problem, error) {
+func (cs *ConfigList) Parse(fs afero.Fs, path string) (Problem, error) {
 	match := -1
-	for ind := range cs.configTypes {
-		if cs.configTypes[ind].identifiers(path) {
+	for ind := range cs.ConfigTypes {
+		if cs.ConfigTypes[ind].Identifier(fs, path) {
 			match = ind
 			break
 		}
@@ -87,7 +89,7 @@ func (cs *configStore) Parse(path string) (Problem, error) {
 		return nil, ErrorNoMatch
 	}
 
-	return cs.configTypes[match].parser(path)
+	return cs.ConfigTypes[match].Parser(fs, path)
 }
 
 var globalConfigStore ConfigStore
@@ -104,9 +106,9 @@ func DeregisterConfigType(name string) error {
 
 // Parse tries to parse a problem with the help of the global ConfigStore
 func Parse(path string) (Problem, error) {
-	return globalConfigStore.Parse(path)
+	return globalConfigStore.Parse(afero.NewOsFs(), path)
 }
 
 func init() {
-	globalConfigStore = NewConfigStore()
+	globalConfigStore = NewConfigList()
 }

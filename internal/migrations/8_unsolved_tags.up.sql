@@ -1,0 +1,1 @@
+alter table users add column show_unsolved_tags boolean NOT NULL default true;

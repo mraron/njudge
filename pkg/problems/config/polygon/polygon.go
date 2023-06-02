@@ -90,11 +90,11 @@ func (p Problem) Statements() problems.Contents {
 }
 
 func (p Problem) HTMLStatements() problems.Contents {
-	return p.GeneratedStatementList.FilterByType("text/html")
+	return p.GeneratedStatementList.FilterByType(problems.DataTypeHTML)
 }
 
 func (p Problem) PDFStatements() problems.Contents {
-	return p.GeneratedStatementList.FilterByType("application/pdf")
+	return p.GeneratedStatementList.FilterByType(problems.DataTypePDF)
 }
 
 func (p Problem) MemoryLimit() int {
@@ -123,26 +123,17 @@ func (p Problem) Tags() (lst []string) {
 }
 
 func (Problem) Languages() []language.Language {
-	lst1 := language.List()
-
-	lst2 := make([]language.Language, 0, len(lst1))
-	for _, val := range lst1 {
-		if val.Id() != "zip" {
-			lst2 = append(lst2, val)
-		}
-	}
-
-	return lst2
+	return language.StoreAllExcept(language.DefaultStore, []string{"zip"})
 }
 
 func (p Problem) Files() []problems.File {
 	res := make([]problems.File, 0)
 	for _, stub := range p.Assets.Stubs {
-		res = append(res, problems.File{stub.Name, "stub_" + stub.Language, filepath.Join(p.Path, stub.Path)})
+		res = append(res, problems.File{Name: stub.Name, Role: "stub_" + stub.Language, Path: filepath.Join(p.Path, stub.Path)})
 	}
 
 	if p.Assets.Interactor.Source.Path != "" {
-		res = append(res, problems.File{"interactor", "interactor", filepath.Join(p.Path, "files", "interactor")})
+		res = append(res, problems.File{Name: "interactor", Role: "interactor", Path: filepath.Join(p.Path, "files", "interactor")})
 	}
 
 	return res

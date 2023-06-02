@@ -1,0 +1,85 @@
+{{define "submissionStatus"}}
+{{$status := parseStatus .Status}}
+{{if eq $status.FeedbackType 0}}
+    {{if .Judged.Valid}}
+        {{if eq .Verdict 0}}
+            <span class="text-success">{{Tr "Accepted"}}</span>
+        {{else}}
+            {{if eq .Verdict 998}}
+                {{Tr "Compilation error"}}
+            {{else}}
+                {{$testset := (index $status.Feedback 0)}}
+                <span class="text-info">{{$tc := $testset.FirstNonAC}}{{ $verdict := (verdict (($testset.IndexTestcase $tc).VerdictName)) }}{{Tr "%s on test %d" (Tr $verdict) $tc}}</span>
+            {{end}}
+        {{end}}
+    {{else}}
+        {{if eq .Verdict 8}}
+            <span class="text-muted">{{Tr "Uploaded"}}</span>
+        {{else}}
+            <span class="text-info">
+                {{Tr "Running"}}{{if .Ontest.Valid}}{{$test := .Ontest.String}} {{Tr "on test %s" $test}} {{end}}
+            </span>
+        {{end}}
+    {{end}}
+{{end}}
+{{if or (eq $status.FeedbackType 1) (eq $status.FeedbackType 3)}}
+    {{if .Judged.Valid}}
+        {{$testset := (index $status.Feedback 0)}}
+        {{if eq .Verdict 998}}
+            {{Tr "Compilation error"}}
+        {{else}}
+            {{if $testset.IsAC}}
+                <span class="text-success">{{Tr "Accepted"}} {{roundTo $testset.Score 2}}/{{$testset.MaxScore}}</span>
+            {{else}}
+                <span class="text-info">{{$tc := $testset.FirstNonAC}}{{ (verdict (($testset.IndexTestcase $tc).VerdictName)).String | Tr }} {{roundTo $testset.Score 2}}/{{$testset.MaxScore}}</span>
+            {{end}}
+        {{end}}
+    {{else}}
+        {{if eq .Verdict 8}}
+            <span class="text-muted">{{Tr "Uploaded"}}</span>
+        {{else}}
+            <span class="text-info">{{Tr "Running"}}</span>
+        {{end}}
+    {{end}}
+{{end}}
+{{if eq $status.FeedbackType 2}}
+    {{if .Judged.Valid}}
+        {{if eq .Verdict 998}}
+            {{Tr "Compilation error"}}
+        {{else}}
+            {{$testset := (index $status.Feedback 0)}}
+            {{if $testset.IsAC}}
+                <span class="text-success">{{Tr "Accepted"}}</span>
+            {{else}}
+                <span class="text-info">{{$tc := $testset.FirstNonAC}}{{(verdict (($testset.IndexTestcase $tc).VerdictName)).String | Tr}}</span>
+            {{end}}
+        {{end}}
+    {{else}}
+        {{if ne $status.Compiled true}}
+            <span class="text-danger">{{Tr "Compilation error"}}</span>
+        {{else}}
+            {{if eq .Verdict 8}}
+                <span class="text-muted">{{Tr "Uploaded"}}</span>
+            {{else}}
+                <span class="text-info">{{Tr "Running"}}</span>
+            {{end}}
+        {{end}}
+    {{end}}
+{{end}}
+{{end}}
+{{define "submissionRow"}}
+    <tr id="submission{{.ID}}">
+        <td><a href="/submission/{{.ID}}">{{.ID}}</a></td>
+        <td>{{.Submitted.Local.Year}}. {{fixedLen (month2int .Submitted.Local.Month) 2}}. {{fixedLen .Submitted.Local.Day 2}} {{fixedLen .Submitted.Local.Hour 2}}:{{fixedLen .Submitted.Local.Minute 2}}:{{fixedLen .Submitted.Local.Second 2}}</td>
+        {{$userName := (.User.OneG contextTODO).Name}}
+        <td><a href="/user/profile/{{$userName}}/">{{$userName}}</a></td>
+        <td><a href="/problemset/{{.Problemset}}/{{.Problem}}/">{{(get "translator").TranslateContent ((problem .Problem).Titles)}}</a></td>
+        <td>{{.Language}}</td>
+        <td>
+            {{$status := parseStatus .Status}}
+            {{template "submissionStatus" .}}
+        </td>
+        <td>{{if and .Judged.Valid (ne .Verdict 998)}}{{(index $status.Feedback 0).MaxTimeSpent}}{{end}}</td>
+        <td>{{if and .Judged.Valid (ne .Verdict 998)}}{{(index $status.Feedback 0).MaxMemoryUsage}} KiB{{end}}</td>
+    </tr>
+{{end}}

@@ -11,7 +11,7 @@ type Judge struct {
 	Ping   int    `json:"ping"`
 	Online bool   `json:"online"`
 
-	judge.Status
+	judge.ServerStatus
 }
 
 func NewJudgeFromModelsJudge(j *models.Judge) *Judge {
@@ -23,8 +23,8 @@ func NewJudgeFromModelsJudge(j *models.Judge) *Judge {
 	res.Ping = j.Ping
 	res.Online = j.Online
 
-	if server, err := judge.ParseStatus(j.State); err == nil {
-		res.Name = server.Id
+	if server, err := judge.ParseServerStatus(j.State); err == nil {
+		res.Name = "placeholder"
 		res.Load = server.Load
 		res.ProblemList = server.ProblemList
 		res.Uptime = server.Uptime

@@ -92,7 +92,7 @@ func (c Cpp) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Writ
 
 func (Cpp) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (language.Status, error) {
 	stat := language.Status{}
-	stat.Verdict = language.VERDICT_XX
+	stat.Verdict = language.VerdictXX
 
 	if err := s.CreateFile("a.out", binary); err != nil {
 		return stat, err
@@ -116,7 +116,7 @@ var Std17 = New("cpp17", "C++ 17", "c++17").(Cpp)
 var latest = Std17
 
 func init() {
-	language.Register("cpp11", Std11)
-	language.Register("cpp14", Std14)
-	language.Register("cpp17", Std17)
+	language.DefaultStore.Register("cpp11", Std11)
+	language.DefaultStore.Register("cpp14", Std14)
+	language.DefaultStore.Register("cpp17", Std17)
 }

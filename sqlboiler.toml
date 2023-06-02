@@ -1,6 +1,6 @@
 output="internal/web/models"
 wipe=true
-no-context=true
+no-context=false
 no-tests=true
 add-global-variants=true
 [psql]

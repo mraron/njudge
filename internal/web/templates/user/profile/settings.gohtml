@@ -1,0 +1,41 @@
+{{template "header" .}}
+{{template "user_menu" dict "Page" "settings" "User" .Data.User "Context" .Context}}
+
+{{if (getFlash "ChangePassword")}}
+<div class="alert alert-danger">
+    {{getFlash "ChangePassword"}}
+</div>
+{{end}}
+<form action="change_password/" method="post">
+    <div class="form-group">
+        <label for="passwordOld">{{Tr "Old password"}}</label>
+        <input type="password" class="form-control" id="passwordOld" name="passwordOld">
+    </div>
+    <div class="form-group">
+        <label for="passwordNew1">{{Tr "New password"}}</label>
+        <input type="password" class="form-control" id="passwordNew1" name="passwordNew1">
+    </div>
+    <div class="form-group">
+        <label for="passwordNew2">{{Tr "New password again"}}</label>
+        <input type="password" class="form-control" id="passwordNew2" name="passwordNew2">
+    </div>
+    <input type="hidden" name="_csrf" value="{{csrf}}">
+    <button type="submit" class="btn btn-primary">{{Tr "Change"}}</button>
+</form>
+<br>
+<br>
+<br>
+<form action="misc/" method="post">
+    <div class="form-group">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="true" id="showTagsForUnsolved" name="showTagsForUnsolved"{{if .Data.User.ShowUnsolvedTags}} checked{{end}}>
+            <label class="form-check-label" for="showTagsForUnsolved">
+                {{Tr "Show tags for unsolved problems"}}
+            </label>
+
+        </div>
+    </div>
+    <input type="hidden" name="_csrf" value="{{csrf}}">
+    <button type="submit" class="btn btn-primary">{{Tr "Save"}}</button>
+</form>
+{{template "footer" .}}

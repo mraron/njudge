@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -12,6 +11,8 @@ import (
 	"time"
 
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
+	"github.com/mraron/njudge/pkg/language/sandbox"
+	"github.com/spf13/afero"
 
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
@@ -46,14 +47,6 @@ func (p Problem) Statements() problems.Contents {
 	return p.StatementList
 }
 
-func (p Problem) HTMLStatements() problems.Contents {
-	return p.StatementList.FilterByType("text/html")
-}
-
-func (p Problem) PDFStatements() problems.Contents {
-	return p.StatementList.FilterByType("application/pdf")
-}
-
 func (p Problem) MemoryLimit() int {
 	return 1024 * p.MemoryLimitKB
 }
@@ -66,21 +59,8 @@ func (p Problem) InputOutputFiles() (string, string) {
 	return "", ""
 }
 
-func (p Problem) Interactive() bool {
-	return false
-}
-
 func (p Problem) Languages() []language.Language {
-	lst1 := language.List()
-
-	lst2 := make([]language.Language, 0, len(lst1))
-	for _, val := range lst1 {
-		if val.Id() != "zip" {
-			lst2 = append(lst2, val)
-		}
-	}
-
-	return lst2
+	return language.StoreAllExcept(language.DefaultStore, []string{"zip"})
 }
 
 func (p Problem) Attachments() problems.Attachments {
@@ -125,7 +105,24 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	group.Scoring = problems.ScoringSum
 
 	for _, tc := range tcbygroup[""] {
-		testcase := problems.Testcase{idx, tc.InputPath, "", tc.AnswerPath, "tests", "base", problems.VerdictDR, float64(0.0), float64(tc.MaxScore), "-", "-", "-", 0 * time.Millisecond, 0, time.Duration(p.TimeLimit()) * time.Millisecond, p.MemoryLimit()}
+		testcase := problems.Testcase{
+			Index:          idx,
+			InputPath:      tc.InputPath,
+			OutputPath:     "",
+			AnswerPath:     tc.AnswerPath,
+			Testset:        "tests",
+			Group:          "base",
+			VerdictName:    problems.VerdictDR,
+			Score:          float64(0.0),
+			MaxScore:       float64(tc.MaxScore),
+			Output:         "-",
+			ExpectedOutput: "-",
+			CheckerOutput:  "-",
+			TimeSpent:      0 * time.Millisecond,
+			MemoryUsed:     0,
+			TimeLimit:      time.Duration(p.TimeLimit()) * time.Millisecond,
+			MemoryLimit:    p.MemoryLimit(),
+		}
 		group.Testcases = append(group.Testcases, testcase)
 
 		idx++
@@ -151,8 +148,8 @@ func (p Problem) GetTaskType() problems.TaskType {
 	return tt
 }
 
-func parser(path string) (problems.Problem, error) {
-	f, err := os.Open(filepath.Join(path, "feladat.txt"))
+func Parse(fs afero.Fs, path string) (problems.Problem, error) {
+	f, err := fs.Open(filepath.Join(path, "feladat.txt"))
 	if err != nil {
 		return nil, err
 	}
@@ -225,46 +222,20 @@ func parser(path string) (problems.Problem, error) {
 		ind++
 	}
 
-	feladat_pdf, err := os.Open(filepath.Join(path, "feladat.pdf"))
-	if err != nil {
-		return nil, err
-	}
-	defer feladat_pdf.Close()
-
-	cont, err := ioutil.ReadAll(feladat_pdf)
-	if err != nil {
-		return nil, err
-	}
-
 	p.StatementList = make(problems.Contents, 0)
-	p.StatementList = append(p.StatementList, problems.BytesData{Loc: "hungarian", Val: cont, Typ: "application/pdf"})
+	feladat_pdf, err := afero.ReadFile(fs, filepath.Join(path, "feladat.pdf"))
+	if err != nil {
+		return nil, err
+	}
+	p.StatementList = append(p.StatementList, problems.BytesData{Loc: "hungarian", Val: feladat_pdf, Typ: "application/pdf"})
+
+	if err := cpp.AutoCompile(fs, sandbox.NewDummy(), path, filepath.Join(path, "ellen.cpp"), filepath.Join(path, "ellen")); err != nil {
+		return nil, err
+	}
 
 	p.AttachmentList = make(problems.Attachments, 0)
-
-	if _, err := os.Stat(filepath.Join(path, "ellen")); os.IsNotExist(err) {
-		if checkerBinary, err := os.Create(filepath.Join(path, "ellen")); err == nil {
-			defer checkerBinary.Close()
-			if checkerFile, err := os.Open(filepath.Join(path, "ellen.cpp")); err == nil {
-				defer checkerFile.Close()
-
-				if err := cpp.Std14.InsecureCompile(path, checkerFile, checkerBinary, os.Stderr); err != nil {
-					return nil, err
-				}
-
-				if err := os.Chmod(filepath.Join(path, "ellen"), os.ModePerm); err != nil {
-					return nil, err
-				}
-			} else {
-				return nil, err
-			}
-
-		} else {
-			return nil, err
-		}
-	}
-
-	if _, err = os.Stat(filepath.Join(path, "minta.zip")); err == nil {
-		cont, err := ioutil.ReadFile(filepath.Join(path, "minta.zip"))
+	if _, err = fs.Stat(filepath.Join(path, "minta.zip")); err == nil {
+		cont, err := afero.ReadFile(fs, filepath.Join(path, "minta.zip"))
 		if err != nil {
 			return nil, err
 		}
@@ -277,11 +248,11 @@ func parser(path string) (problems.Problem, error) {
 	return p, nil
 }
 
-func identifier(path string) bool {
-	_, err := os.Stat(filepath.Join(path, "feladat.txt"))
+func Identify(fs afero.Fs, path string) bool {
+	_, err := fs.Stat(filepath.Join(path, "feladat.txt"))
 	return !os.IsNotExist(err)
 }
 
 func init() {
-	problems.RegisterConfigType("feladat_txt", parser, identifier)
+	problems.RegisterConfigType("feladat_txt", Parse, Identify)
 }

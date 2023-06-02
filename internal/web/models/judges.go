@@ -4,6 +4,7 @@
 package models
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"reflect"
@@ -167,7 +168,7 @@ type (
 	// This should almost always be used instead of []Judge.
 	JudgeSlice []*Judge
 	// JudgeHook is the signature for custom Judge hook methods
-	JudgeHook func(boil.Executor, *Judge) error
+	JudgeHook func(context.Context, boil.ContextExecutor, *Judge) error
 
 	judgeQuery struct {
 		*queries.Query
@@ -210,9 +211,13 @@ var judgeBeforeUpsertHooks []JudgeHook
 var judgeAfterUpsertHooks []JudgeHook
 
 // doAfterSelectHooks executes all "after Select" hooks.
-func (o *Judge) doAfterSelectHooks(exec boil.Executor) (err error) {
+func (o *Judge) doAfterSelectHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range judgeAfterSelectHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -221,9 +226,13 @@ func (o *Judge) doAfterSelectHooks(exec boil.Executor) (err error) {
 }
 
 // doBeforeInsertHooks executes all "before insert" hooks.
-func (o *Judge) doBeforeInsertHooks(exec boil.Executor) (err error) {
+func (o *Judge) doBeforeInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range judgeBeforeInsertHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -232,9 +241,13 @@ func (o *Judge) doBeforeInsertHooks(exec boil.Executor) (err error) {
 }
 
 // doAfterInsertHooks executes all "after Insert" hooks.
-func (o *Judge) doAfterInsertHooks(exec boil.Executor) (err error) {
+func (o *Judge) doAfterInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range judgeAfterInsertHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -243,9 +256,13 @@ func (o *Judge) doAfterInsertHooks(exec boil.Executor) (err error) {
 }
 
 // doBeforeUpdateHooks executes all "before Update" hooks.
-func (o *Judge) doBeforeUpdateHooks(exec boil.Executor) (err error) {
+func (o *Judge) doBeforeUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range judgeBeforeUpdateHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -254,9 +271,13 @@ func (o *Judge) doBeforeUpdateHooks(exec boil.Executor) (err error) {
 }
 
 // doAfterUpdateHooks executes all "after Update" hooks.
-func (o *Judge) doAfterUpdateHooks(exec boil.Executor) (err error) {
+func (o *Judge) doAfterUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range judgeAfterUpdateHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -265,9 +286,13 @@ func (o *Judge) doAfterUpdateHooks(exec boil.Executor) (err error) {
 }
 
 // doBeforeDeleteHooks executes all "before Delete" hooks.
-func (o *Judge) doBeforeDeleteHooks(exec boil.Executor) (err error) {
+func (o *Judge) doBeforeDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range judgeBeforeDeleteHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -276,9 +301,13 @@ func (o *Judge) doBeforeDeleteHooks(exec boil.Executor) (err error) {
 }
 
 // doAfterDeleteHooks executes all "after Delete" hooks.
-func (o *Judge) doAfterDeleteHooks(exec boil.Executor) (err error) {
+func (o *Judge) doAfterDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range judgeAfterDeleteHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -287,9 +316,13 @@ func (o *Judge) doAfterDeleteHooks(exec boil.Executor) (err error) {
 }
 
 // doBeforeUpsertHooks executes all "before Upsert" hooks.
-func (o *Judge) doBeforeUpsertHooks(exec boil.Executor) (err error) {
+func (o *Judge) doBeforeUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range judgeBeforeUpsertHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -298,9 +331,13 @@ func (o *Judge) doBeforeUpsertHooks(exec boil.Executor) (err error) {
 }
 
 // doAfterUpsertHooks executes all "after Upsert" hooks.
-func (o *Judge) doAfterUpsertHooks(exec boil.Executor) (err error) {
+func (o *Judge) doAfterUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range judgeAfterUpsertHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -333,17 +370,17 @@ func AddJudgeHook(hookPoint boil.HookPoint, judgeHook JudgeHook) {
 }
 
 // OneG returns a single judge record from the query using the global executor.
-func (q judgeQuery) OneG() (*Judge, error) {
-	return q.One(boil.GetDB())
+func (q judgeQuery) OneG(ctx context.Context) (*Judge, error) {
+	return q.One(ctx, boil.GetContextDB())
 }
 
 // One returns a single judge record from the query.
-func (q judgeQuery) One(exec boil.Executor) (*Judge, error) {
+func (q judgeQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Judge, error) {
 	o := &Judge{}
 
 	queries.SetLimit(q.Query, 1)
 
-	err := q.Bind(nil, exec, o)
+	err := q.Bind(ctx, exec, o)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
@@ -351,7 +388,7 @@ func (q judgeQuery) One(exec boil.Executor) (*Judge, error) {
 		return nil, errors.Wrap(err, "models: failed to execute a one query for judges")
 	}
 
-	if err := o.doAfterSelectHooks(exec); err != nil {
+	if err := o.doAfterSelectHooks(ctx, exec); err != nil {
 		return o, err
 	}
 
@@ -359,22 +396,22 @@ func (q judgeQuery) One(exec boil.Executor) (*Judge, error) {
 }
 
 // AllG returns all Judge records from the query using the global executor.
-func (q judgeQuery) AllG() (JudgeSlice, error) {
-	return q.All(boil.GetDB())
+func (q judgeQuery) AllG(ctx context.Context) (JudgeSlice, error) {
+	return q.All(ctx, boil.GetContextDB())
 }
 
 // All returns all Judge records from the query.
-func (q judgeQuery) All(exec boil.Executor) (JudgeSlice, error) {
+func (q judgeQuery) All(ctx context.Context, exec boil.ContextExecutor) (JudgeSlice, error) {
 	var o []*Judge
 
-	err := q.Bind(nil, exec, &o)
+	err := q.Bind(ctx, exec, &o)
 	if err != nil {
 		return nil, errors.Wrap(err, "models: failed to assign all query results to Judge slice")
 	}
 
 	if len(judgeAfterSelectHooks) != 0 {
 		for _, obj := range o {
-			if err := obj.doAfterSelectHooks(exec); err != nil {
+			if err := obj.doAfterSelectHooks(ctx, exec); err != nil {
 				return o, err
 			}
 		}
@@ -384,18 +421,18 @@ func (q judgeQuery) All(exec boil.Executor) (JudgeSlice, error) {
 }
 
 // CountG returns the count of all Judge records in the query using the global executor
-func (q judgeQuery) CountG() (int64, error) {
-	return q.Count(boil.GetDB())
+func (q judgeQuery) CountG(ctx context.Context) (int64, error) {
+	return q.Count(ctx, boil.GetContextDB())
 }
 
 // Count returns the count of all Judge records in the query.
-func (q judgeQuery) Count(exec boil.Executor) (int64, error) {
+func (q judgeQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
 	queries.SetCount(q.Query)
 
-	err := q.Query.QueryRow(exec).Scan(&count)
+	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to count judges rows")
 	}
@@ -404,19 +441,19 @@ func (q judgeQuery) Count(exec boil.Executor) (int64, error) {
 }
 
 // ExistsG checks if the row exists in the table using the global executor.
-func (q judgeQuery) ExistsG() (bool, error) {
-	return q.Exists(boil.GetDB())
+func (q judgeQuery) ExistsG(ctx context.Context) (bool, error) {
+	return q.Exists(ctx, boil.GetContextDB())
 }
 
 // Exists checks if the row exists in the table.
-func (q judgeQuery) Exists(exec boil.Executor) (bool, error) {
+func (q judgeQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
 	queries.SetCount(q.Query)
 	queries.SetLimit(q.Query, 1)
 
-	err := q.Query.QueryRow(exec).Scan(&count)
+	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
 		return false, errors.Wrap(err, "models: failed to check if judges exists")
 	}
@@ -436,13 +473,13 @@ func Judges(mods ...qm.QueryMod) judgeQuery {
 }
 
 // FindJudgeG retrieves a single record by ID.
-func FindJudgeG(iD int, selectCols ...string) (*Judge, error) {
-	return FindJudge(boil.GetDB(), iD, selectCols...)
+func FindJudgeG(ctx context.Context, iD int, selectCols ...string) (*Judge, error) {
+	return FindJudge(ctx, boil.GetContextDB(), iD, selectCols...)
 }
 
 // FindJudge retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindJudge(exec boil.Executor, iD int, selectCols ...string) (*Judge, error) {
+func FindJudge(ctx context.Context, exec boil.ContextExecutor, iD int, selectCols ...string) (*Judge, error) {
 	judgeObj := &Judge{}
 
 	sel := "*"
@@ -455,7 +492,7 @@ func FindJudge(exec boil.Executor, iD int, selectCols ...string) (*Judge, error)
 
 	q := queries.Raw(query, iD)
 
-	err := q.Bind(nil, exec, judgeObj)
+	err := q.Bind(ctx, exec, judgeObj)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
@@ -463,7 +500,7 @@ func FindJudge(exec boil.Executor, iD int, selectCols ...string) (*Judge, error)
 		return nil, errors.Wrap(err, "models: unable to select from judges")
 	}
 
-	if err = judgeObj.doAfterSelectHooks(exec); err != nil {
+	if err = judgeObj.doAfterSelectHooks(ctx, exec); err != nil {
 		return judgeObj, err
 	}
 
@@ -471,20 +508,20 @@ func FindJudge(exec boil.Executor, iD int, selectCols ...string) (*Judge, error)
 }
 
 // InsertG a single record. See Insert for whitelist behavior description.
-func (o *Judge) InsertG(columns boil.Columns) error {
-	return o.Insert(boil.GetDB(), columns)
+func (o *Judge) InsertG(ctx context.Context, columns boil.Columns) error {
+	return o.Insert(ctx, boil.GetContextDB(), columns)
 }
 
 // Insert a single record using an executor.
 // See boil.Columns.InsertColumnSet documentation to understand column list inference for inserts.
-func (o *Judge) Insert(exec boil.Executor, columns boil.Columns) error {
+func (o *Judge) Insert(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
 	if o == nil {
 		return errors.New("models: no judges provided for insertion")
 	}
 
 	var err error
 
-	if err := o.doBeforeInsertHooks(exec); err != nil {
+	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
 		return err
 	}
 
@@ -529,15 +566,16 @@ func (o *Judge) Insert(exec boil.Executor, columns boil.Columns) error {
 	value := reflect.Indirect(reflect.ValueOf(o))
 	vals := queries.ValuesFromMapping(value, cache.valueMapping)
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, cache.query)
-		fmt.Fprintln(boil.DebugWriter, vals)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, cache.query)
+		fmt.Fprintln(writer, vals)
 	}
 
 	if len(cache.retMapping) != 0 {
-		err = exec.QueryRow(cache.query, vals...).Scan(queries.PtrsFromMapping(value, cache.retMapping)...)
+		err = exec.QueryRowContext(ctx, cache.query, vals...).Scan(queries.PtrsFromMapping(value, cache.retMapping)...)
 	} else {
-		_, err = exec.Exec(cache.query, vals...)
+		_, err = exec.ExecContext(ctx, cache.query, vals...)
 	}
 
 	if err != nil {
@@ -550,21 +588,21 @@ func (o *Judge) Insert(exec boil.Executor, columns boil.Columns) error {
 		judgeInsertCacheMut.Unlock()
 	}
 
-	return o.doAfterInsertHooks(exec)
+	return o.doAfterInsertHooks(ctx, exec)
 }
 
 // UpdateG a single Judge record using the global executor.
 // See Update for more documentation.
-func (o *Judge) UpdateG(columns boil.Columns) (int64, error) {
-	return o.Update(boil.GetDB(), columns)
+func (o *Judge) UpdateG(ctx context.Context, columns boil.Columns) (int64, error) {
+	return o.Update(ctx, boil.GetContextDB(), columns)
 }
 
 // Update uses an executor to update the Judge.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
-func (o *Judge) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
+func (o *Judge) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
 	var err error
-	if err = o.doBeforeUpdateHooks(exec); err != nil {
+	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
 		return 0, err
 	}
 	key := makeCacheKey(columns, nil)
@@ -597,12 +635,13 @@ func (o *Judge) Update(exec boil.Executor, columns boil.Columns) (int64, error) 
 
 	values := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), cache.valueMapping)
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, cache.query)
-		fmt.Fprintln(boil.DebugWriter, values)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, cache.query)
+		fmt.Fprintln(writer, values)
 	}
 	var result sql.Result
-	result, err = exec.Exec(cache.query, values...)
+	result, err = exec.ExecContext(ctx, cache.query, values...)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to update judges row")
 	}
@@ -618,19 +657,19 @@ func (o *Judge) Update(exec boil.Executor, columns boil.Columns) (int64, error) 
 		judgeUpdateCacheMut.Unlock()
 	}
 
-	return rowsAff, o.doAfterUpdateHooks(exec)
+	return rowsAff, o.doAfterUpdateHooks(ctx, exec)
 }
 
 // UpdateAllG updates all rows with the specified column values.
-func (q judgeQuery) UpdateAllG(cols M) (int64, error) {
-	return q.UpdateAll(boil.GetDB(), cols)
+func (q judgeQuery) UpdateAllG(ctx context.Context, cols M) (int64, error) {
+	return q.UpdateAll(ctx, boil.GetContextDB(), cols)
 }
 
 // UpdateAll updates all rows with the specified column values.
-func (q judgeQuery) UpdateAll(exec boil.Executor, cols M) (int64, error) {
+func (q judgeQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
 	queries.SetUpdate(q.Query, cols)
 
-	result, err := q.Query.Exec(exec)
+	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to update all for judges")
 	}
@@ -644,12 +683,12 @@ func (q judgeQuery) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 }
 
 // UpdateAllG updates all rows with the specified column values.
-func (o JudgeSlice) UpdateAllG(cols M) (int64, error) {
-	return o.UpdateAll(boil.GetDB(), cols)
+func (o JudgeSlice) UpdateAllG(ctx context.Context, cols M) (int64, error) {
+	return o.UpdateAll(ctx, boil.GetContextDB(), cols)
 }
 
 // UpdateAll updates all rows with the specified column values, using an executor.
-func (o JudgeSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
+func (o JudgeSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
 	ln := int64(len(o))
 	if ln == 0 {
 		return 0, nil
@@ -679,11 +718,12 @@ func (o JudgeSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 		strmangle.SetParamNames("\"", "\"", 1, colNames),
 		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), len(colNames)+1, judgePrimaryKeyColumns, len(o)))
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, sql)
-		fmt.Fprintln(boil.DebugWriter, args...)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, sql)
+		fmt.Fprintln(writer, args...)
 	}
-	result, err := exec.Exec(sql, args...)
+	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to update all in judge slice")
 	}
@@ -696,18 +736,18 @@ func (o JudgeSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 }
 
 // UpsertG attempts an insert, and does an update or ignore on conflict.
-func (o *Judge) UpsertG(updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
-	return o.Upsert(boil.GetDB(), updateOnConflict, conflictColumns, updateColumns, insertColumns)
+func (o *Judge) UpsertG(ctx context.Context, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
+	return o.Upsert(ctx, boil.GetContextDB(), updateOnConflict, conflictColumns, updateColumns, insertColumns)
 }
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
-func (o *Judge) Upsert(exec boil.Executor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
+func (o *Judge) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
 	if o == nil {
 		return errors.New("models: no judges provided for upsert")
 	}
 
-	if err := o.doBeforeUpsertHooks(exec); err != nil {
+	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
 		return err
 	}
 
@@ -790,17 +830,18 @@ func (o *Judge) Upsert(exec boil.Executor, updateOnConflict bool, conflictColumn
 		returns = queries.PtrsFromMapping(value, cache.retMapping)
 	}
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, cache.query)
-		fmt.Fprintln(boil.DebugWriter, vals)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, cache.query)
+		fmt.Fprintln(writer, vals)
 	}
 	if len(cache.retMapping) != 0 {
-		err = exec.QueryRow(cache.query, vals...).Scan(returns...)
+		err = exec.QueryRowContext(ctx, cache.query, vals...).Scan(returns...)
 		if errors.Is(err, sql.ErrNoRows) {
 			err = nil // Postgres doesn't return anything when there's no update
 		}
 	} else {
-		_, err = exec.Exec(cache.query, vals...)
+		_, err = exec.ExecContext(ctx, cache.query, vals...)
 	}
 	if err != nil {
 		return errors.Wrap(err, "models: unable to upsert judges")
@@ -812,34 +853,35 @@ func (o *Judge) Upsert(exec boil.Executor, updateOnConflict bool, conflictColumn
 		judgeUpsertCacheMut.Unlock()
 	}
 
-	return o.doAfterUpsertHooks(exec)
+	return o.doAfterUpsertHooks(ctx, exec)
 }
 
 // DeleteG deletes a single Judge record.
 // DeleteG will match against the primary key column to find the record to delete.
-func (o *Judge) DeleteG() (int64, error) {
-	return o.Delete(boil.GetDB())
+func (o *Judge) DeleteG(ctx context.Context) (int64, error) {
+	return o.Delete(ctx, boil.GetContextDB())
 }
 
 // Delete deletes a single Judge record with an executor.
 // Delete will match against the primary key column to find the record to delete.
-func (o *Judge) Delete(exec boil.Executor) (int64, error) {
+func (o *Judge) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if o == nil {
 		return 0, errors.New("models: no Judge provided for delete")
 	}
 
-	if err := o.doBeforeDeleteHooks(exec); err != nil {
+	if err := o.doBeforeDeleteHooks(ctx, exec); err != nil {
 		return 0, err
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), judgePrimaryKeyMapping)
 	sql := "DELETE FROM \"judges\" WHERE \"id\"=$1"
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, sql)
-		fmt.Fprintln(boil.DebugWriter, args...)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, sql)
+		fmt.Fprintln(writer, args...)
 	}
-	result, err := exec.Exec(sql, args...)
+	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to delete from judges")
 	}
@@ -849,26 +891,26 @@ func (o *Judge) Delete(exec boil.Executor) (int64, error) {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for judges")
 	}
 
-	if err := o.doAfterDeleteHooks(exec); err != nil {
+	if err := o.doAfterDeleteHooks(ctx, exec); err != nil {
 		return 0, err
 	}
 
 	return rowsAff, nil
 }
 
-func (q judgeQuery) DeleteAllG() (int64, error) {
-	return q.DeleteAll(boil.GetDB())
+func (q judgeQuery) DeleteAllG(ctx context.Context) (int64, error) {
+	return q.DeleteAll(ctx, boil.GetContextDB())
 }
 
 // DeleteAll deletes all matching rows.
-func (q judgeQuery) DeleteAll(exec boil.Executor) (int64, error) {
+func (q judgeQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if q.Query == nil {
 		return 0, errors.New("models: no judgeQuery provided for delete all")
 	}
 
 	queries.SetDelete(q.Query)
 
-	result, err := q.Query.Exec(exec)
+	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to delete all from judges")
 	}
@@ -882,19 +924,19 @@ func (q judgeQuery) DeleteAll(exec boil.Executor) (int64, error) {
 }
 
 // DeleteAllG deletes all rows in the slice.
-func (o JudgeSlice) DeleteAllG() (int64, error) {
-	return o.DeleteAll(boil.GetDB())
+func (o JudgeSlice) DeleteAllG(ctx context.Context) (int64, error) {
+	return o.DeleteAll(ctx, boil.GetContextDB())
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
-func (o JudgeSlice) DeleteAll(exec boil.Executor) (int64, error) {
+func (o JudgeSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if len(o) == 0 {
 		return 0, nil
 	}
 
 	if len(judgeBeforeDeleteHooks) != 0 {
 		for _, obj := range o {
-			if err := obj.doBeforeDeleteHooks(exec); err != nil {
+			if err := obj.doBeforeDeleteHooks(ctx, exec); err != nil {
 				return 0, err
 			}
 		}
@@ -909,11 +951,12 @@ func (o JudgeSlice) DeleteAll(exec boil.Executor) (int64, error) {
 	sql := "DELETE FROM \"judges\" WHERE " +
 		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, judgePrimaryKeyColumns, len(o))
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, sql)
-		fmt.Fprintln(boil.DebugWriter, args)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, sql)
+		fmt.Fprintln(writer, args)
 	}
-	result, err := exec.Exec(sql, args...)
+	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to delete all from judge slice")
 	}
@@ -925,7 +968,7 @@ func (o JudgeSlice) DeleteAll(exec boil.Executor) (int64, error) {
 
 	if len(judgeAfterDeleteHooks) != 0 {
 		for _, obj := range o {
-			if err := obj.doAfterDeleteHooks(exec); err != nil {
+			if err := obj.doAfterDeleteHooks(ctx, exec); err != nil {
 				return 0, err
 			}
 		}
@@ -935,18 +978,18 @@ func (o JudgeSlice) DeleteAll(exec boil.Executor) (int64, error) {
 }
 
 // ReloadG refetches the object from the database using the primary keys.
-func (o *Judge) ReloadG() error {
+func (o *Judge) ReloadG(ctx context.Context) error {
 	if o == nil {
 		return errors.New("models: no Judge provided for reload")
 	}
 
-	return o.Reload(boil.GetDB())
+	return o.Reload(ctx, boil.GetContextDB())
 }
 
 // Reload refetches the object from the database
 // using the primary keys with an executor.
-func (o *Judge) Reload(exec boil.Executor) error {
-	ret, err := FindJudge(exec, o.ID)
+func (o *Judge) Reload(ctx context.Context, exec boil.ContextExecutor) error {
+	ret, err := FindJudge(ctx, exec, o.ID)
 	if err != nil {
 		return err
 	}
@@ -957,17 +1000,17 @@ func (o *Judge) Reload(exec boil.Executor) error {
 
 // ReloadAllG refetches every row with matching primary key column values
 // and overwrites the original object slice with the newly updated slice.
-func (o *JudgeSlice) ReloadAllG() error {
+func (o *JudgeSlice) ReloadAllG(ctx context.Context) error {
 	if o == nil {
 		return errors.New("models: empty JudgeSlice provided for reload all")
 	}
 
-	return o.ReloadAll(boil.GetDB())
+	return o.ReloadAll(ctx, boil.GetContextDB())
 }
 
 // ReloadAll refetches every row with matching primary key column values
 // and overwrites the original object slice with the newly updated slice.
-func (o *JudgeSlice) ReloadAll(exec boil.Executor) error {
+func (o *JudgeSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) error {
 	if o == nil || len(*o) == 0 {
 		return nil
 	}
@@ -984,7 +1027,7 @@ func (o *JudgeSlice) ReloadAll(exec boil.Executor) error {
 
 	q := queries.Raw(sql, args...)
 
-	err := q.Bind(nil, exec, &slice)
+	err := q.Bind(ctx, exec, &slice)
 	if err != nil {
 		return errors.Wrap(err, "models: unable to reload all in JudgeSlice")
 	}
@@ -995,20 +1038,21 @@ func (o *JudgeSlice) ReloadAll(exec boil.Executor) error {
 }
 
 // JudgeExistsG checks if the Judge row exists.
-func JudgeExistsG(iD int) (bool, error) {
-	return JudgeExists(boil.GetDB(), iD)
+func JudgeExistsG(ctx context.Context, iD int) (bool, error) {
+	return JudgeExists(ctx, boil.GetContextDB(), iD)
 }
 
 // JudgeExists checks if the Judge row exists.
-func JudgeExists(exec boil.Executor, iD int) (bool, error) {
+func JudgeExists(ctx context.Context, exec boil.ContextExecutor, iD int) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from \"judges\" where \"id\"=$1 limit 1)"
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, sql)
-		fmt.Fprintln(boil.DebugWriter, iD)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, sql)
+		fmt.Fprintln(writer, iD)
 	}
-	row := exec.QueryRow(sql, iD)
+	row := exec.QueryRowContext(ctx, sql, iD)
 
 	err := row.Scan(&exists)
 	if err != nil {
@@ -1019,6 +1063,6 @@ func JudgeExists(exec boil.Executor, iD int) (bool, error) {
 }
 
 // Exists checks if the Judge row exists.
-func (o *Judge) Exists(exec boil.Executor) (bool, error) {
-	return JudgeExists(exec, o.ID)
+func (o *Judge) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
+	return JudgeExists(ctx, exec, o.ID)
 }

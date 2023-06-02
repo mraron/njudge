@@ -15,8 +15,6 @@ type Problem interface {
 	Name() string
 	Titles() Contents
 	Statements() Contents
-	HTMLStatements() Contents
-	PDFStatements() Contents
 
 	Attachments() Attachments
 	Tags() []string
@@ -36,7 +34,6 @@ type Judgeable interface {
 }
 
 type Checker interface {
-	Name() string
 	Check(testcase *Testcase) error
 }
 

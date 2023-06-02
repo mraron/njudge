@@ -1,38 +1,54 @@
 # njudge
 
-[![Tests](https://github.com/mraron/njudge/actions/workflows/tests.yml/badge.svg)](https://github.com/mraron/njudge/actions/workflows/tests.yml) [![Go Report Card](https://goreportcard.com/badge/github.com/mraron/njudge)](https://goreportcard.com/report/github.com/mraron/njudge)
+[![Tests](https://github.com/mraron/njudge/actions/workflows/tests.yml/badge.svg)](https://github.com/mraron/njudge/actions/workflows/tests.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/mraron/njudge.svg)](https://pkg.go.dev/github.com/mraron/njudge)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mraron/njudge)](https://goreportcard.com/report/github.com/mraron/njudge)
 
-Online Judge system written in golang.
+Online Judge system written in golang. A running version can be found [here](https://njudge.hu).
 
-## Installation
+It consists of two main parts:
+* A group of reusable components, located in `pkg/`, which can be used in a variety ways related to the conversion, running and modification of algorithmic/olympiad tasks.
+* A web based online judge system, located in `internal/`. 
 
-Build and start the containers:
+<!--
+## Features
+@TODO
+-->
+
+## How to run the online judge
+
+Disclaimer: it's possible to run the system without docker, but it's much more of a hassle to set up the environment. 
+
+First, build the containers:
 
 ```
 docker-compose build
+```
+
+Then, run the migrations:
+```
+docker-compose run web ./njudge web migrate --up
+```
+
+Modify the environment files `web.env` and `judge.env`. Typically only `web.env` needs to be changed. A quite minimal `web.env` file for example would be:
+```env
+NJUDGE_MODE="production"
+NJUDGE_HOSTNAME="yourhost.domain"
+NJUDGE_URL="https://yourhost.domain"
+NJUDGE_COOKIESECRET="somesecretstring"
+```
+Probably you would want some of `NJUDGE_SENDGRID`, `NJUDGE_SMTP`, `NJUDGE_GOOGLEAUTH` as well to provide OAuth login and email sending capabilities. 
+For the full list of the configuration options supported by the web component check out [config.go](https://github.com/mraron/njudge/blob/v1-refactor/internal/web/helpers/config/config.go).
+
+Then you can start all containers necessary via:
+```
 docker-compose up
 ```
 
-Run migrations:
-```
-docker exec -it judge_web_1 ./njudge web migrate --up
-```
+<!--@TODO create admin account -->
 
-Modify the environment files `web.env` and `judge.env` (restart the containers for the changes to take effect).
+To make problems available to the system you have two options: 
+1. Use the automatically created `njudge_problems` volume, copy the problems there via `docker cp`.
+2. Modify the `docker-compose.yml` to use a bind mount pointing to a directory on your host system. 
 
-Add problems to the problems volume, both the web and judge will detect them. 
-
-## Modules
-* njudge/web: web frontend [![](https://godoc.org/github.com/mraron/njudge/web?status.svg)](http://godoc.org/github.com/mraron/njudge/web)
-* njudge/judge: judges programs sent to it by an njudge/web instance [![](https://godoc.org/github.com/mraron/njudge/judge?status.svg)](http://godoc.org/github.com/mraron/njudge/judge)
-* njudge/utils/language: sandboxing utilities [![](https://godoc.org/github.com/mraron/njudge/utils/language?status.svg)](http://godoc.org/github.com/mraron/njudge/utils/language)
-* njudge/utils/problems: parsing and internal representation of problems [![](https://godoc.org/github.com/mraron/njudge/utils/problems?status.svg)](https://godoc.org/github.com/mraron/njudge/utils/problems)
-
-## Screenshots
-<img src="https://raw.githubusercontent.com/mraron/assets/master/njudge/1.png" width="25%" height="25%">
-<img src="https://raw.githubusercontent.com/mraron/assets/master/njudge/2.png" width="25%" height="25%">
-<img src="https://raw.githubusercontent.com/mraron/assets/master/njudge/3.png" width="25%" height="25%">
-<img src="https://raw.githubusercontent.com/mraron/assets/master/njudge/4.png" width="25%" height="25%">
-<img src="https://raw.githubusercontent.com/mraron/assets/master/njudge/5.png" width="25%" height="25%">
-<img src="https://raw.githubusercontent.com/mraron/assets/master/njudge/6.png" width="25%" height="25%">
-
+If both the judge and web component sees the problems, you have to use the admin panel (or some sql client) to create the necessary `ProblemRel`s for it to be displayed on the frontend.

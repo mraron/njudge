@@ -250,15 +250,15 @@ func (s *Isolate) Run(prg string, needStatus bool) (language.Status, error) {
 		}
 
 		if st == -1 {
-			s.st.Verdict = language.VERDICT_XX
+			s.st.Verdict = language.VerdictXX
 		} else { //eg. signal 8/136?? -> division by zero
-			s.st.Verdict = language.VERDICT_RE
+			s.st.Verdict = language.VerdictRE
 		}
 	} else {
 		s.logger.Print("Command exited successfully")
 		s.logger.Print("stderr of process: ", stderr.String())
 
-		s.st.Verdict = language.VERDICT_OK
+		s.st.Verdict = language.VerdictOK
 	}
 
 	if s.stderr != nil {
@@ -272,7 +272,7 @@ func (s *Isolate) Run(prg string, needStatus bool) (language.Status, error) {
 	memorySum := 0
 
 	if f, err = os.Open(metafile); err != nil {
-		s.st.Verdict = language.VERDICT_XX
+		s.st.Verdict = language.VerdictXX
 		s.logger.Print("Can't open metafile ", metafile, " error is: ", err)
 
 		return s.st, err
@@ -296,9 +296,9 @@ func (s *Isolate) Run(prg string, needStatus bool) (language.Status, error) {
 		} else if lst[0] == "status" {
 			switch lst[1] {
 			case "TO":
-				s.st.Verdict = language.VERDICT_TL
+				s.st.Verdict = language.VerdictTL
 			case "SG":
-				s.st.Verdict = language.VERDICT_RE
+				s.st.Verdict = language.VerdictRE
 			}
 		}
 	}

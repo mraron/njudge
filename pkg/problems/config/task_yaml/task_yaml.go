@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -15,6 +14,8 @@ import (
 	"time"
 
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
+	"github.com/mraron/njudge/pkg/language/sandbox"
+	"github.com/spf13/afero"
 
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
@@ -22,7 +23,7 @@ import (
 	"github.com/mraron/njudge/pkg/problems/tasktype/batch"
 	"github.com/mraron/njudge/pkg/problems/tasktype/communication"
 	"go.uber.org/multierr"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type TaskYAML struct {
@@ -33,18 +34,18 @@ type TaskYAML struct {
 	InputCount          int     `yaml:"n_input"`
 	Infile              string
 	Outfile             string
-	PrimaryLanguage     string   `yaml:"primary_language"`
-	TokenMode           string   `yaml:"token_mode"`
-	MaxSubmissionCount  int      `yaml:"max_submission_number"`
-	PublicTestcases     string   `yaml:"public_testcases"`
-	FeedbackLevel       string   `yaml:"feedback_level"`
-	ScoreType           string   `yaml:"score_type"`
-	ScoreTypeParameters [][2]int `yaml:"score_type_parameters"`
-	ScorePrecision      int      `yaml:"score_precision"`
-	ScoreMode           string   `yaml:"score_mode"`
-	TotalValue          int      `yaml:"total_value"`
-	OutputOnly          bool     `yaml:"output_only"`
-	TaskTypeParameters  []string `yaml:"task_type_parameters"`
+	PrimaryLanguage     string           `yaml:"primary_language"`
+	TokenMode           string           `yaml:"token_mode"`
+	MaxSubmissionCount  int              `yaml:"max_submission_number"`
+	PublicTestcases     string           `yaml:"public_testcases"`
+	FeedbackLevel       string           `yaml:"feedback_level"`
+	ScoreType           string           `yaml:"score_type"`
+	ScoreTypeParameters [][2]interface{} `yaml:"score_type_parameters"`
+	ScorePrecision      int              `yaml:"score_precision"`
+	ScoreMode           string           `yaml:"score_mode"`
+	TotalValue          int              `yaml:"total_value"`
+	OutputOnly          bool             `yaml:"output_only"`
+	TaskTypeParameters  []string         `yaml:"task_type_parameters"`
 }
 
 type Problem struct {
@@ -76,11 +77,11 @@ func (p Problem) Statements() problems.Contents {
 }
 
 func (p Problem) HTMLStatements() problems.Contents {
-	return p.StatementList.FilterByType("text/html")
+	return p.StatementList.FilterByType(problems.DataTypeHTML)
 }
 
 func (p Problem) PDFStatements() problems.Contents {
-	return p.StatementList.FilterByType("application/pdf")
+	return p.StatementList.FilterByType(problems.DataTypePDF)
 }
 
 func (p Problem) MemoryLimit() int {
@@ -101,10 +102,10 @@ func (p Problem) Interactive() bool {
 
 func (p Problem) Languages() []language.Language {
 	if p.OutputOnly {
-		return []language.Language{language.Get("zip")}
+		return []language.Language{language.DefaultStore.Get("zip")}
 	}
 
-	lst1 := language.List()
+	lst1 := language.DefaultStore.List()
 
 	lst2 := make([]language.Language, 0, len(lst1))
 	for _, val := range lst1 {
@@ -144,39 +145,68 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	testset := &ans.Feedback[len(ans.Feedback)-1]
 
 	tcByGroup := make(map[string][]problems.Testcase)
-	subtask := 0
-	testsLeft := p.ScoreTypeParameters[subtask][1]
+	ind, subtask := 0, 0
+
+	testsLeft := make([][2]string, 0)
+	testIndices := make([]int, 0)
+	advanceTests := func() {
+		if val, ok := p.ScoreTypeParameters[subtask][1].(int); ok {
+			for i := 0; i < val; i++ {
+				testsLeft = append(testsLeft, [2]string{fmt.Sprintf(p.InputPathPattern, ind), fmt.Sprintf(p.AnswerPathPattern, ind)})
+				testIndices = append(testIndices, ind)
+				ind++
+			}
+		} else if val, ok := p.ScoreTypeParameters[subtask][1].(string); ok {
+			indices := strings.Split(val, "|")
+			for i := range indices {
+				num, _ := strconv.Atoi(indices[i])
+				testsLeft = append(testsLeft, [2]string{fmt.Sprintf(p.InputPathPattern, num), fmt.Sprintf(p.AnswerPathPattern, num)})
+				testIndices = append(testIndices, num)
+			}
+		} else {
+			panic("wrong format")
+		}
+	}
+	advanceTests()
+
 	subtasks := make([]string, len(p.ScoreTypeParameters))
-	for ind := 0; ind < p.InputCount; ind++ {
+	idx := 0
+	for len(testsLeft) > 0 {
 		tc := problems.Testcase{}
-		tc.InputPath, tc.AnswerPath = fmt.Sprintf(p.InputPathPattern, ind), fmt.Sprintf(p.AnswerPathPattern, ind)
+		tc.InputPath, tc.AnswerPath = testsLeft[0][0], testsLeft[0][1]
 		if p.OutputOnly {
 			// default cms loader behaviour
-			tc.OutputPath = fmt.Sprintf("output_%03d.txt", ind)
+			tc.OutputPath = fmt.Sprintf("output_%03d.txt", testIndices[0])
 		}
-
-		tc.Index = ind + 1
+		tc.Index = idx + 1
+		idx += 1
 		tc.MaxScore = 0
 		tc.VerdictName = problems.VerdictDR
 		tc.MemoryLimit = p.MemoryLimit()
 		tc.TimeLimit = time.Duration(p.TimeLimit()) * time.Millisecond
 
-		if testsLeft == 0 {
-			subtask++
-			if subtask < len(p.ScoreTypeParameters) {
-				testsLeft = p.ScoreTypeParameters[subtask][1]
-			}
-		}
-
 		subtasks[subtask] = "subtask" + strconv.Itoa(subtask+1)
 		tc.Group = "subtask" + strconv.Itoa(subtask+1)
 
-		if len(tcByGroup[tc.Group]) == 0 {
-			tcByGroup[tc.Group] = make([]problems.Testcase, 0)
-			tc.MaxScore = float64(p.ScoreTypeParameters[subtask][0])
+		if len(testsLeft) == 1 {
+			tc.MaxScore = float64(p.ScoreTypeParameters[subtask][0].(int))
+
+			subtask++
+			testsLeft = testsLeft[1:]
+			testIndices = testIndices[1:]
+
+			if subtask < len(p.ScoreTypeParameters) {
+				advanceTests()
+			}
+		} else {
+			testsLeft = testsLeft[1:]
+			testIndices = testIndices[1:]
 		}
 
-		testsLeft--
+		if len(tcByGroup[tc.Group]) == 0 {
+			tcByGroup[tc.Group] = make([]problems.Testcase, 0)
+		}
+
 		tcByGroup[tc.Group] = append(tcByGroup[tc.Group], tc)
 	}
 
@@ -186,9 +216,7 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 
 		group.Name = subtask
 		group.Scoring = problems.ScoringGroup
-		for _, tc := range tcByGroup[subtask] {
-			group.Testcases = append(group.Testcases, tc)
-		}
+		group.Testcases = append(group.Testcases, tcByGroup[subtask]...)
 	}
 
 	return &ans, nil
@@ -271,9 +299,9 @@ func (p Problem) GetTaskType() problems.TaskType {
 	return tt
 }
 
-func parseGen(r io.Reader) (int, [][2]int, error) {
+func parseGen(r io.Reader) (int, [][2]interface{}, error) {
 	var err error
-	subtasks, testcases, points := make([][2]int, 0), 0, -1
+	subtasks, testcases, points := make([][2]interface{}, 0), 0, -1
 	inputCount := 0
 
 	sc := bufio.NewScanner(r)
@@ -320,7 +348,7 @@ func parseGen(r io.Reader) (int, [][2]int, error) {
 						return -1, nil, errors.New("trailing testcases")
 					}
 				} else {
-					subtasks = append(subtasks, [2]int{points, testcases})
+					subtasks = append(subtasks, [2]interface{}{points, testcases})
 				}
 
 				testcases = 0
@@ -335,11 +363,11 @@ func parseGen(r io.Reader) (int, [][2]int, error) {
 		return -1, nil, err
 	}
 
-	subtasks = append(subtasks, [2]int{points, testcases})
+	subtasks = append(subtasks, [2]interface{}{points, testcases})
 	return inputCount, subtasks, nil
 }
 
-func parser(path string) (problems.Problem, error) {
+func parser(fs afero.Fs, path string) (problems.Problem, error) {
 	p := Problem{
 		Path:              path,
 		InputPathPattern:  filepath.Join(path, "input", "input%d.txt"),
@@ -348,7 +376,7 @@ func parser(path string) (problems.Problem, error) {
 		files:             make([]problems.File, 0),
 	}
 
-	YAMLFile, err := os.Open(filepath.Join(path, "task.yaml"))
+	YAMLFile, err := fs.Open(filepath.Join(path, "task.yaml"))
 	if err != nil {
 		return nil, err
 	}
@@ -364,8 +392,8 @@ func parser(path string) (problems.Problem, error) {
 	}
 
 	genPath := filepath.Join(p.Path, "gen", "GEN")
-	if _, err = os.Stat(genPath); err == nil {
-		gen, err := os.Open(genPath)
+	if _, err = fs.Stat(genPath); err == nil && len(p.ScoreTypeParameters) == 0 {
+		gen, err := fs.Open(genPath)
 		if err != nil {
 			return nil, err
 		}
@@ -383,51 +411,13 @@ func parser(path string) (problems.Problem, error) {
 	p.StatementList = append(p.StatementList, problems.BytesData{Loc: "hungarian", Val: statementPDF, Typ: "application/pdf"})
 
 	exists := func(path string) bool {
-		if _, err := os.Stat(path); errors.Is(err, fs.ErrNotExist) {
+		if _, err := fs.Stat(path); errors.Is(err, os.ErrNotExist) {
 			return false
 		} else if err == nil {
 			return true
 		} else { // could be both
 			return false
 		}
-	}
-
-	isEmptyFile := func(path string) bool {
-		if st, err := os.Stat(path); errors.Is(err, fs.ErrNotExist) {
-			return false
-		} else {
-			return st.Size() == 0
-		}
-	}
-
-	compile := func(src string, to string) error {
-		if bin, err := os.Create(to); err == nil {
-			defer bin.Close()
-
-			if file, err := os.Open(src); err == nil {
-				defer file.Close()
-
-				if err := cpp.Std17.InsecureCompile(filepath.Dir(src), file, bin, os.Stderr); err != nil {
-					return multierr.Combine(err, os.Remove(to))
-				}
-
-				if err := os.Chmod(to, os.ModePerm); err != nil {
-					return err
-				}
-			}
-
-			return nil
-		} else {
-			return err
-		}
-	}
-
-	chmodX := func(path string) error {
-		if stat, _ := os.Stat(path); stat.Mode().Perm()&fs.ModePerm != fs.ModePerm {
-			return os.Chmod(path, os.ModePerm)
-		}
-
-		return nil
 	}
 
 	checkPath := filepath.Join(p.Path, "check")
@@ -443,21 +433,16 @@ func parser(path string) (problems.Problem, error) {
 		managerPath := filepath.Join(checkPath, "manager")
 
 		if exists(checkerCppPath) {
-			if !exists(checkerPath) || isEmptyFile(checkerPath) {
-				if err := compile(checkerCppPath, checkerPath); err != nil {
-					return nil, err
-				}
-			}
-
-			chmodX(checkerPath)
-		} else if exists(managerCppPath) {
-			p.tasktype = "communication"
-			if err := compile(managerCppPath, managerPath); err != nil {
+			if err := cpp.AutoCompile(fs, sandbox.NewDummy(), checkPath, checkerCppPath, checkerPath); err != nil {
 				return nil, err
 			}
-			p.files = append(p.files, problems.File{Name: "manager.cpp", Role: "interactor", Path: managerPath})
+		} else if exists(managerCppPath) {
+			p.tasktype = "communication"
+			if err := cpp.AutoCompile(fs, sandbox.NewDummy(), checkPath, managerCppPath, managerPath); err != nil {
+				return nil, err
+			}
 
-			chmodX(managerPath)
+			p.files = append(p.files, problems.File{Name: "manager.cpp", Role: "interactor", Path: managerPath})
 		} else {
 			p.whiteDiffChecker = true
 		}
@@ -526,8 +511,8 @@ func parser(path string) (problems.Problem, error) {
 	return p, nil
 }
 
-func identifier(path string) bool {
-	_, err := os.Stat(filepath.Join(path, "task.yaml"))
+func identifier(fs afero.Fs, path string) bool {
+	_, err := fs.Stat(filepath.Join(path, "task.yaml"))
 	return !os.IsNotExist(err)
 }
 

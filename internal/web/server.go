@@ -1,14 +1,16 @@
 package web
 
 import (
-	"github.com/antonlindstrom/pgstore"
-	"github.com/mraron/njudge/internal/web/helpers"
-	"github.com/mraron/njudge/internal/web/helpers/config"
-	"github.com/mraron/njudge/internal/web/helpers/templates"
-	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
+	"context"
+	"github.com/mraron/njudge/internal/web/services"
 	_ "mime"
 	"net/http"
 	"time"
+
+	"github.com/antonlindstrom/pgstore"
+	"github.com/mraron/njudge/internal/web/helpers/config"
+	"github.com/mraron/njudge/internal/web/helpers/templates"
+	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo-contrib/session"
@@ -18,7 +20,7 @@ import (
 	"github.com/mraron/njudge/pkg/problems"
 	_ "github.com/mraron/njudge/pkg/problems/config/feladat_txt"
 	_ "github.com/mraron/njudge/pkg/problems/config/polygon"
-	_ "github.com/mraron/njudge/pkg/problems/config/problem_json"
+	_ "github.com/mraron/njudge/pkg/problems/config/problem_yaml"
 	_ "github.com/mraron/njudge/pkg/problems/config/task_yaml"
 	_ "github.com/mraron/njudge/pkg/problems/tasktype/batch"
 	_ "github.com/mraron/njudge/pkg/problems/tasktype/communication"
@@ -31,6 +33,7 @@ type Server struct {
 	DB *sqlx.DB
 
 	ProblemStore problems.Store
+	MailService  services.MailService
 }
 
 func (s *Server) Run() {
@@ -71,5 +74,17 @@ func (s *Server) Run() {
 }
 
 func (s *Server) Submit(uid int, problemset, problem, language string, source []byte) (int, error) {
-	return helpers.Submit(s.Server, s.DB, s.ProblemStore, uid, problemset, problem, language, source)
+	subService := services.NewSQLSubmitService(s.DB.DB, s.ProblemStore)
+	sub, err := subService.Submit(context.Background(), services.SubmitRequest{
+		UserID:     uid,
+		Problemset: problemset,
+		Problem:    problem,
+		Language:   language,
+		Source:     source,
+	})
+
+	if err != nil {
+		return -1, err
+	}
+	return sub.ID, nil
 }

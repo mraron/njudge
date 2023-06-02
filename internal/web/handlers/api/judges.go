@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"database/sql"
 	"github.com/mraron/njudge/internal/web/extmodels"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
@@ -33,7 +34,7 @@ func (dp JudgeDataProvider) List(data *pagination.Data) ([]*extmodels.Judge, err
 		qms = append(qms, Offset(data.PerPage*(data.Page-1)))
 	}
 
-	orig, err := models.Judges(qms...).All(dp.DB)
+	orig, err := models.Judges(qms...).All(context.TODO(), dp.DB)
 	if err != nil {
 		return nil, err
 	}
@@ -48,11 +49,11 @@ func (dp JudgeDataProvider) List(data *pagination.Data) ([]*extmodels.Judge, err
 }
 
 func (dp JudgeDataProvider) Count() (int64, error) {
-	return models.Judges().Count(dp.DB)
+	return models.Judges().Count(context.TODO(), dp.DB)
 }
 
 func (dp JudgeDataProvider) Get(id string) (*extmodels.Judge, error) {
-	elem, err := models.Judges(Where("id = ?", id)).One(dp.DB)
+	elem, err := models.Judges(Where("id = ?", id)).One(context.TODO(), dp.DB)
 	if err != nil {
 		return nil, err
 	}
@@ -66,29 +67,29 @@ func (dp JudgeDataProvider) Insert(elem *extmodels.Judge) error {
 	model.Host = elem.Host
 	model.Port = elem.Port
 
-	err := model.Insert(dp.DB, boil.Infer())
+	err := model.Insert(context.TODO(), dp.DB, boil.Infer())
 	elem.Id = int64(model.ID)
 	return err
 }
 
 func (dp JudgeDataProvider) Delete(id string) error {
-	elem, err := models.Judges(Where("id=?", id)).One(dp.DB)
+	elem, err := models.Judges(Where("id=?", id)).One(context.TODO(), dp.DB)
 	if err != nil {
 		return err
 	}
 
-	_, err = elem.Delete(dp.DB)
+	_, err = elem.Delete(context.TODO(), dp.DB)
 	return err
 }
 
 func (dp JudgeDataProvider) Update(id string, elem *extmodels.Judge) error {
-	model, err := models.Judges(Where("id=?", id)).One(dp.DB)
+	model, err := models.Judges(Where("id=?", id)).One(context.TODO(), dp.DB)
 	if err != nil {
 		return err
 	}
 
 	model.Host = elem.Host
 	model.Port = elem.Port
-	_, err = model.Update(dp.DB, boil.Infer())
+	_, err = model.Update(context.TODO(), dp.DB, boil.Infer())
 	return err
 }

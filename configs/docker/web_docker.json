@@ -4,7 +4,7 @@
   "port": "5555",
   "url": "http://localhost:5555",
   "problemsDir": "/njudge_problems",
-  "templatesDir": "./templates",
+  "templatesDir": "./internal/web/templates",
   "DBName": "njudge",
   "DBAccount": "postgres",
   "DBPassword": "postgres",

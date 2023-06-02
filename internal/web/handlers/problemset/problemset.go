@@ -1,324 +1,274 @@
 package problemset
 
 import (
-	"github.com/mraron/njudge/internal/web/handlers/problemset/problem"
-	"github.com/mraron/njudge/internal/web/helpers"
-	"github.com/mraron/njudge/internal/web/helpers/config"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
-	"github.com/mraron/njudge/internal/web/helpers/pagination"
-	"github.com/mraron/njudge/internal/web/models"
 	"io"
 	"net/http"
-	"net/url"
 	"sort"
 	"strconv"
 	"strings"
-	"unicode"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
+	"github.com/mraron/njudge/internal/web/domain/problem"
+	"github.com/mraron/njudge/internal/web/helpers/i18n"
+	"github.com/mraron/njudge/internal/web/helpers/pagination"
+	"github.com/mraron/njudge/internal/web/helpers/ui"
+	"github.com/mraron/njudge/internal/web/models"
+	"github.com/mraron/njudge/internal/web/services"
 	"github.com/mraron/njudge/pkg/problems"
-	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"golang.org/x/text/runes"
-	"golang.org/x/text/transform"
-	"golang.org/x/text/unicode/norm"
 )
 
-type CategoryFilter struct {
+type CategoryFilterOption struct {
 	Name     string
 	Value    string
 	Selected bool
 }
 
+type StatProblem struct {
+	problem.Problem
+	problem.StatsData
+}
+
 type ProblemList struct {
 	Pages        []pagination.Link
-	Problems     []problem.Problem
-	SolverSorter helpers.SortColumn
+	Problems     []StatProblem
+	SolverSorter ui.SortColumn
 
-	Filtered        bool
-	TitleFilter     string
-	TagsFilter      string
-	CategoryFilters []CategoryFilter
+	Filtered bool
+
+	TitleFilter           string
+	TagsFilter            string
+	CategoryFilterOptions []CategoryFilterOption
 }
 
-func getProblemList(c echo.Context, DB *sqlx.DB, problemStore problems.Store, u *models.User, page, perPage int, order QueryMod, query []QueryMod, qu url.Values) (*ProblemList, error) {
-	ps, err := models.ProblemRels(append(append([]QueryMod{Limit(perPage), Offset((page - 1) * perPage)}, query...), order)...).All(DB)
-	if err != nil {
-		return nil, err
+func GetProblemList(DB *sqlx.DB, problemListService services.ProblemListService, problemRepo problem.Repository, problemStatsService services.ProblemStatsService) echo.HandlerFunc {
+	type request struct {
+		Page  int `query:"page"`
+		Order string
+		By    string
+
+		TitleFilter    string `query:"title"`
+		CategoryFilter int    `query:"category"`
+		TagFilter      string `query:"tags"`
+
+		Problemset string `param:"name"`
 	}
-
-	cnt, err := models.ProblemRels(query...).Count(DB)
-	if err != nil {
-		return nil, err
-	}
-
-	pages, err := pagination.Links(page, perPage, cnt, qu)
-	if err != nil {
-		return nil, err
-	}
-
-	problemsList := make([]problem.Problem, len(ps))
-	for i, p := range ps {
-		problemsList[i].Problem, err = problemStore.Get(p.Problem)
-		if err != nil {
-			return nil, err
-		}
-		problemsList[i].ProblemRel = p
-
-		if err := problemsList[i].FillFields(c, DB); err != nil {
-			return nil, err
-		}
-	}
-
-	sortOrder := ""
-	qu.Set("page", strconv.Itoa(page))
-	if qu.Get("by") == "solver_count" {
-		sortOrder = qu.Get("order")
-		if qu.Get("order") == "DESC" {
-			qu.Set("order", "ASC")
-		} else {
-			qu.Set("order", "")
-			qu.Set("by", "")
-		}
-	} else {
-		qu.Set("by", "solver_count")
-		qu.Set("order", "DESC")
-	}
-
-	return &ProblemList{Pages: pages, Problems: problemsList, SolverSorter: helpers.SortColumn{sortOrder, "?" + qu.Encode()}}, nil
-}
-
-func GetProblemList(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := c.Get("user").(*models.User)
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		problemSet := c.Param("name")
-		page, err := strconv.Atoi(c.QueryParam("page"))
-		if err != nil || page <= 0 {
-			page = 1
+		data := request{}
+		if err := c.Bind(&data); err != nil {
+			return err
+		}
+		if data.Page <= 0 {
+			data.Page = 1
 		}
 
-		order, by := "DESC", "id"
+		data.Order, data.By = "DESC", "id"
 		if c.QueryParam("by") == "solver_count" {
-			by = "solver_count"
+			data.By = "solver_count"
 		}
 		if c.QueryParam("order") == "ASC" {
-			order = "ASC"
+			data.Order = "ASC"
 		}
 
-		qmods := []QueryMod{Where("problemset=?", problemSet)}
-		filtered := false
-
-		if c.QueryParam("title") != "" {
-			filtered = true
-
-			rels, err := models.ProblemRels().All(DB)
-			if err != nil {
-				return err
-			}
-
-			lst := make([]interface{}, 0, len(rels))
-			for _, rel := range rels {
-				p, err := problemStore.Get(rel.Problem)
-				if err != nil {
-					return err
-				}
-
-				curr := strings.ToLower(i18n.TranslateContent("hungarian", p.Titles()).String())
-				want := strings.ToLower(c.QueryParam("title"))
-
-				t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
-				a, _, _ := transform.String(t, curr)
-				b, _, _ := transform.String(t, want)
-
-				if strings.Contains(a, b) {
-					lst = append(lst, rel.Problem)
-				}
-			}
-
-			qmods = append(qmods, WhereIn("problem in ?", lst...))
+		listRequest := services.ProblemListRequest{
+			Problemset: data.Problemset,
+			Pagination: pagination.Data{
+				Page:      data.Page,
+				PerPage:   20,
+				SortDir:   data.Order,
+				SortField: data.By,
+			},
+			TitleFilter: data.TitleFilter,
+			GETData:     c.Request().URL.Query(),
 		}
 
-		cats, err := models.ProblemCategories().All(DB)
-		if err != nil {
-			return err
-		}
-		par := make(map[int]int)
-		for _, cat := range cats {
-			if cat.ParentID.Valid {
-				par[cat.ID] = cat.ParentID.Int
-			}
+		if data.TagFilter != "" {
+			listRequest.TagFilter = strings.Split(data.TagFilter, ",")
 		}
 
-		if c.QueryParam("category") != "" {
-			filtered = true
-
-			cid, err := strconv.Atoi(c.QueryParam("category"))
-			if err != nil {
-				return err
-			}
-
-			pars := []interface{}{}
-			for _, cat := range cats {
-				curr := cat.ID
-				ok := false
-				for {
-					if curr == cid {
-						ok = true
-						break
-					}
-
-					if _, ok := par[curr]; ok {
-						curr = par[curr]
-					} else {
-						break
-					}
-				}
-
-				if ok {
-					pars = append(pars, cat.ID)
-				}
-			}
-
-			qmods = append(qmods, WhereIn("category_id in ?", pars...))
-		}
-
-		if c.QueryParam("tags") != "" {
-			filtered = true
-
-			tagNames := strings.Split(c.QueryParam("tags"), ",")
-			lst := make([]interface{}, len(tagNames))
-			for ind, val := range tagNames {
-				lst[ind] = val
-			}
-
-			rels, err := models.ProblemRels(InnerJoin("problem_tags pt on pt.problem_id = problem_rels.id"),
-				InnerJoin("tags t on pt.tag_id = t.id"), WhereIn("t.name in ?", lst...), GroupBy("problem_rels.id"), Having("COUNT(DISTINCT t.name) = ?", len(lst))).All(DB)
-			if err != nil {
-				return nil
-			}
-
-			lst = make([]interface{}, len(rels))
-			for ind, val := range rels {
-				lst[ind] = val.ID
-			}
-
-			qmods = append(qmods, WhereIn("id IN ?", lst...))
-		}
-
-		problemList, err := getProblemList(c, DB, problemStore, u, page, 20, OrderBy(by+" "+order), qmods, c.Request().URL.Query())
-		if err != nil {
-			return err
-		}
-
-		problemList.Filtered = filtered
-		problemList.TitleFilter = c.QueryParam("title")
-		problemList.TagsFilter = c.QueryParam("tags")
-
-		problemList.CategoryFilters = []CategoryFilter{{"-", "", false}}
-		nameById := make(map[int]string)
-		for _, cat := range cats {
-			nameById[cat.ID] = cat.Name
-		}
-
-		var getName func(int) string
-		getName = func(id int) string {
-			if _, ok := par[id]; !ok {
-				return nameById[id]
+		if data.CategoryFilter != 0 {
+			if data.CategoryFilter == -1 {
+				listRequest.CategoryFilter = problem.NewCategoryEmptyFilter()
 			} else {
-				return getName(par[id]) + " -- " + nameById[id]
+				listRequest.CategoryFilter = problem.NewCategoryIDFilter(data.CategoryFilter)
 			}
 		}
 
-		for _, cat := range cats {
-			curr := CategoryFilter{
-				Name:     getName(cat.ID),
-				Value:    strconv.Itoa(cat.ID),
+		problemList, err := problemListService.GetProblemList(c.Request().Context(), listRequest)
+		if err != nil {
+			return err
+		}
+
+		result := ProblemList{
+			Pages: problemList.Pages,
+		}
+		for ind := range problemList.Problems {
+			p, err := problemRepo.Get(c.Request().Context(), problemList.Problems[ind].ID)
+			if err != nil {
+				return err
+			}
+			stat, err := problemStatsService.GetStatsData(c.Request().Context(), *p, c.Get("userID").(int))
+			if err != nil {
+				return err
+			}
+
+			result.Problems = append(result.Problems, StatProblem{
+				Problem:   *p,
+				StatsData: *stat,
+			})
+		}
+
+		sortOrder, qu := "", c.Request().URL.Query()
+		if qu.Get("by") == "solver_count" {
+			sortOrder = qu.Get("order")
+			if qu.Get("order") == "DESC" {
+				qu.Set("order", "ASC")
+			} else {
+				qu.Set("order", "")
+				qu.Set("by", "")
+			}
+		} else {
+			qu.Set("by", "solver_count")
+			qu.Set("order", "DESC")
+		}
+		result.SolverSorter = ui.SortColumn{
+			Order: sortOrder,
+			Href:  "?" + qu.Encode(),
+		}
+
+		result.Filtered = listRequest.IsFiltered()
+		result.TitleFilter = data.TitleFilter
+		result.TagsFilter = data.TagFilter
+		result.CategoryFilterOptions = []CategoryFilterOption{
+			{Name: "-"},
+		}
+
+		emptySelected := false
+		if data.CategoryFilter == -1 {
+			emptySelected = true
+		}
+		result.CategoryFilterOptions = append(result.CategoryFilterOptions, CategoryFilterOption{
+			Name:     tr.Translate("No category"),
+			Value:    "-1",
+			Selected: emptySelected,
+		})
+
+		categories, err := models.ProblemCategories().All(c.Request().Context(), DB)
+		if err != nil {
+			return err
+		}
+
+		par := make(map[int]int)
+		for ind := range categories {
+			if categories[ind].ParentID.Valid {
+				par[categories[ind].ID] = categories[ind].ParentID.Int
+			}
+		}
+
+		categoryNameByID := make(map[int]string)
+		for ind := range categories {
+			categoryNameByID[categories[ind].ID] = categories[ind].Name
+		}
+
+		var getCategoryNameRec func(int) string
+		getCategoryNameRec = func(id int) string {
+			if _, ok := par[id]; !ok {
+				return categoryNameByID[id]
+			} else {
+				return getCategoryNameRec(par[id]) + " -- " + categoryNameByID[id]
+			}
+		}
+
+		for ind := range categories {
+			curr := CategoryFilterOption{
+				Name:     getCategoryNameRec(categories[ind].ID),
+				Value:    strconv.Itoa(categories[ind].ID),
 				Selected: false,
 			}
 
-			if strconv.Itoa(cat.ID) == c.QueryParam("category") {
+			if strconv.Itoa(categories[ind].ID) == c.QueryParam("category") {
 				curr.Selected = true
 			}
 
-			problemList.CategoryFilters = append(problemList.CategoryFilters, curr)
+			result.CategoryFilterOptions = append(result.CategoryFilterOptions, curr)
 		}
 
-		sort.Slice(problemList.CategoryFilters, func(i, j int) bool {
-			return problemList.CategoryFilters[i].Name < problemList.CategoryFilters[j].Name
+		sort.Slice(result.CategoryFilterOptions, func(i, j int) bool {
+			return result.CategoryFilterOptions[i].Name < result.CategoryFilterOptions[j].Name
 		})
 
-		c.Set("title", "Feladatok")
-		return c.Render(http.StatusOK, "problemset/list", problemList)
+		c.Set("title", tr.Translate("Problems"))
+		return c.Render(http.StatusOK, "problemset/list", result)
 	}
 }
 
-func GetStatus(DB *sqlx.DB) echo.HandlerFunc {
+func GetStatus(statusPageService services.StatusPageService) echo.HandlerFunc {
+	type request struct {
+		AC         string `query:"ac"`
+		UserID     int    `query:"user_id"`
+		Problemset string `query:"problem_set"`
+		Problem    string `query:"problem"`
+		Page       int    `query:"page"`
+	}
 	return func(c echo.Context) error {
-		ac := c.QueryParam("ac")
-		userID := c.QueryParam("user_id")
-		problemset := c.QueryParam("problem_set")
-		problem := c.QueryParam("problem")
-		page, err := strconv.Atoi(c.QueryParam("page"))
-		if err != nil || page <= 0 {
-			page = 1
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
+
+		data := request{}
+		if err := c.Bind(&data); err != nil {
+			return err
 		}
 
-		query := make([]QueryMod, 0)
-		if problem != "" {
-			query = append(query, Where("problem = ?", problem), Where("problemset = ?", problemset))
-		}
-		if ac == "1" {
-			query = append(query, Where("verdict = 0"))
-		}
-		if userID != "" {
-			query = append(query, Where("user_id = ?", userID))
+		if data.Page <= 0 {
+			data.Page = 1
 		}
 
-		statusPage, err := helpers.GetStatusPage(DB, page, 20, OrderBy("id DESC"), query, c.Request().URL.Query())
+		statusReq := services.StatusPageRequest{
+			Pagination: pagination.Data{
+				Page:      data.Page,
+				PerPage:   20,
+				SortDir:   "DESC",
+				SortField: "id",
+			},
+			Problemset: data.Problemset,
+			Problem:    data.Problem,
+			UserID:     data.UserID,
+			GETValues:  c.Request().URL.Query(),
+		}
+
+		if data.AC == "1" {
+			ac := problems.VerdictAC
+			statusReq.Verdict = &ac
+		}
+
+		statusPage, err := statusPageService.GetStatusPage(c.Request().Context(), statusReq)
 		if err != nil {
 			return err
 		}
 
-		c.Set("title", "Beküldések")
+		c.Set("title", tr.Translate("Submissions"))
 		return c.Render(http.StatusOK, "status.gohtml", statusPage)
 	}
 }
 
-func PostSubmit(cfg config.Server, DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
+func PostSubmit(subService services.SubmitService) echo.HandlerFunc {
+	type request struct {
+		Problemset     string `param:"name"`
+		ProblemName    string `form:"problem"`
+		LanguageName   string `form:"language"`
+		SubmissionCode string `form:"submissionCode"`
+	}
 	return func(c echo.Context) error {
-		var (
-			u   *models.User
-			err error
-			id  int
-			p   problems.Problem
-		)
+		u := c.Get("user").(*models.User)
 
-		if u = c.Get("user").(*models.User); u == nil {
-			return c.Render(http.StatusForbidden, "message", "Előbb lépj be.")
-		}
-
-		problemName := c.FormValue("problem")
-		if p, err = problemStore.Get(problemName); err != nil {
+		data := request{}
+		if err := c.Bind(&data); err != nil {
 			return err
 		}
 
-		languageName := c.FormValue("language")
-
-		found := false
-		for _, lang := range p.Languages() {
-			if lang.Id() == languageName {
-				found = true
-				break
-			}
-		}
-
-		if !found {
-			return c.Render(http.StatusOK, "error.gohtml", "Hibás nyelvazonosító.")
-		}
-
-		code := []byte(c.FormValue("submissionCode"))
-		if string(code) == "" {
+		code := data.SubmissionCode
+		if len(code) == 0 {
 			fileHeader, err := c.FormFile("source")
 			if err != nil {
 				return err
@@ -334,13 +284,23 @@ func PostSubmit(cfg config.Server, DB *sqlx.DB, problemStore problems.Store) ech
 				return err
 			}
 
-			code = contents
+			code = string(contents)
+			if err := f.Close(); err != nil {
+				return err
+			}
 		}
 
-		if id, err = helpers.Submit(cfg, DB, problemStore, u.ID, c.Get("problemset").(string), problemStore.MustGet(c.FormValue("problem")).Name(), languageName, code); err != nil {
+		sub, err := subService.Submit(c.Request().Context(), services.SubmitRequest{
+			UserID:     u.ID,
+			Problemset: data.Problemset,
+			Problem:    data.ProblemName,
+			Language:   data.LanguageName,
+			Source:     []byte(code),
+		})
+		if err != nil {
 			return err
 		}
 
-		return c.Redirect(http.StatusFound, "/problemset/status/#submission"+strconv.Itoa(id))
+		return c.Redirect(http.StatusFound, c.Echo().Reverse("getProblemsetStatus")+"#submission"+strconv.Itoa(sub.ID))
 	}
 }

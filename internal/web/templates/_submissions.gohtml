@@ -1,0 +1,15 @@
+{{define "submissions"}}
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+        <tr><td>Id</td><td>{{Tr "Date"}}</td><td>{{Tr "User"}}</td><td>{{Tr "Problem"}}</td><td>{{Tr "Language"}}</td><td>{{Tr "Verdict"}}</td><td>{{Tr "Time"}}</td><td>{{Tr "Memory"}}</td></tr>
+        </thead>
+        <tbody>
+        {{range $i := .Submissions}}
+            {{template "submissionRow" $i}}
+        {{end}}
+        </tbody>
+    </table>
+    {{template "pagination" .Pages}}
+</div>
+{{end}}

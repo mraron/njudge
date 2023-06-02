@@ -22,12 +22,12 @@ print(x[4])`
 
 func (p python3) Test(s language.Sandbox) error {
 	for _, test := range []language.LanguageTest{
-		{p, aplusb, language.VERDICT_OK, "1 2", "3\n", 1 * time.Second, 128 * 1024 * 1024},
-		{p, ce, language.VERDICT_RE, "", "", 1 * time.Second, 128 * 1024 * 1024},
-		{p, print, language.VERDICT_OK, "", "Hello world\n", 1 * time.Second, 128 * 1024 * 1024},
-		{p, tl, language.VERDICT_TL, "", "", 100 * time.Millisecond, 128 * 1024 * 1024},
-		{p, re, language.VERDICT_RE, "", "", 1000 * time.Millisecond, 128 * 1024 * 1024},
-		{p, rediv0, language.VERDICT_RE, "", "", 1000 * time.Millisecond, 128 * 1024 * 1024},
+		{p, aplusb, language.VerdictOK, "1 2", "3\n", 1 * time.Second, 128 * 1024 * 1024},
+		{p, ce, language.VerdictRE, "", "", 1 * time.Second, 128 * 1024 * 1024},
+		{p, print, language.VerdictOK, "", "Hello world\n", 1 * time.Second, 128 * 1024 * 1024},
+		{p, tl, language.VerdictTL, "", "", 100 * time.Millisecond, 128 * 1024 * 1024},
+		{p, re, language.VerdictRE, "", "", 1000 * time.Millisecond, 128 * 1024 * 1024},
+		{p, rediv0, language.VerdictRE, "", "", 1000 * time.Millisecond, 128 * 1024 * 1024},
 	} {
 		if err := test.Run(s); err != nil {
 			return err

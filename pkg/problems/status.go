@@ -140,6 +140,27 @@ type Testset struct {
 	Groups []Group
 }
 
+func (ts Testset) Verdict() VerdictName {
+	if ts.IsAC() {
+		return VerdictAC
+	}
+	return VerdictName(ts.IndexTestcase(ts.FirstNonAC()).VerdictName)
+}
+
+func (ts Testset) IndexTestcase(ind int) *Testcase {
+	curr := 1
+	tcs := ts.Testcases()
+	for idx := range tcs {
+		if curr == ind {
+			return tcs[idx]
+		}
+
+		curr++
+	}
+
+	return &Testcase{VerdictName: VerdictDR}
+}
+
 func (ts Testset) Testcases() (testcases []*Testcase) {
 	testcaseCount := 0
 	for i := range ts.Groups {
@@ -236,11 +257,6 @@ type Group struct {
 	Dependencies []string
 }
 
-func (g *Group) AddTestcase(testcase Testcase) {
-	testcase.Index = len(g.Testcases) + 1
-	g.Testcases = append(g.Testcases, testcase)
-}
-
 func (g *Group) SetTimeLimit(tl time.Duration) {
 	for ind := range g.Testcases {
 		g.Testcases[ind].TimeLimit = tl
@@ -334,28 +350,12 @@ func (g Group) MaxTimeSpent() time.Duration {
 
 // A Status represents the status of a submission after judging
 // It contains the information about compilation and the feedback
-// (Multiple testsets are currently outside of focus, but possible to implement)
+// The main Testset is always the first one in Feedback.
 type Status struct {
 	Compiled       bool
 	CompilerOutput string
 	FeedbackType   FeedbackType
 	Feedback       []Testset
-}
-
-func (v Status) Score() (ans float64) {
-	for _, f := range v.Feedback {
-		ans += f.Score()
-	}
-
-	return
-}
-
-func (v Status) MaxScore() (ans float64) {
-	for _, f := range v.Feedback {
-		ans += f.MaxScore()
-	}
-
-	return
 }
 
 func (v Status) Value() (driver.Value, error) {
@@ -377,16 +377,16 @@ func (v *Status) Scan(value interface{}) error {
 	if sv, err := driver.String.ConvertValue(value); err == nil {
 		var arr []byte
 
-		switch sv.(type) {
+		switch sv := sv.(type) {
 		case []uint8:
-			orig := sv.([]uint8)
+			orig := sv
 
 			arr = make([]byte, len(orig))
 			for i := 0; i < len(orig); i++ {
 				arr[i] = byte(orig[i])
 			}
 		case string:
-			arr = []byte(sv.(string))
+			arr = []byte(sv)
 		}
 
 		if err := json.Unmarshal(arr, v); err != nil {
@@ -397,74 +397,4 @@ func (v *Status) Scan(value interface{}) error {
 	}
 
 	return errors.New("can't scan from non string type")
-}
-
-func (v Status) Verdict() VerdictName {
-	if v.FirstNonAC() == -1 {
-		return VerdictAC
-	}
-
-	return v.IndexTestcase(v.FirstNonAC()).VerdictName
-}
-
-func (v Status) IsAC() bool {
-	for _, val := range v.Feedback {
-		if !val.IsAC() {
-			return false
-		}
-	}
-
-	return true
-}
-
-func (v Status) MaxMemoryUsage() int {
-	res := 0
-	for _, val := range v.Feedback {
-		if res < val.MaxMemoryUsage() {
-			res = val.MaxMemoryUsage()
-		}
-	}
-
-	return res
-}
-
-func (v Status) MaxTimeSpent() time.Duration {
-	res := time.Duration(0)
-	for _, val := range v.Feedback {
-		if res < val.MaxTimeSpent() {
-			res = val.MaxTimeSpent()
-		}
-	}
-
-	return res
-}
-
-func (v Status) FirstNonAC() int {
-	ind := 1
-	for _, val := range v.Feedback {
-		for _, val2 := range val.Testcases() {
-			if val2.VerdictName != VerdictAC && val2.VerdictName != VerdictDR {
-				return ind
-			}
-
-			ind++
-		}
-	}
-
-	return -1
-}
-
-func (v Status) IndexTestcase(ind int) Testcase {
-	curr := 1
-	for _, val := range v.Feedback {
-		for _, val2 := range val.Testcases() {
-			if curr == ind {
-				return *val2
-			}
-
-			curr++
-		}
-	}
-
-	return Testcase{}
 }

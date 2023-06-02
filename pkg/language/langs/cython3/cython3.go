@@ -3,9 +3,10 @@ package cython3
 import (
 	"bytes"
 	"errors"
-	"github.com/mraron/njudge/pkg/language"
 	"io"
 	"time"
+
+	"github.com/mraron/njudge/pkg/language"
 )
 
 type cython3 struct {
@@ -55,7 +56,7 @@ func (c cython3) Compile(s language.Sandbox, r language.File, w io.Writer, e io.
 
 func (cython3) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (language.Status, error) {
 	stat := language.Status{}
-	stat.Verdict = language.VERDICT_XX
+	stat.Verdict = language.VerdictXX
 
 	if err := s.CreateFile("a.out", binary); err != nil {
 		return stat, err
@@ -69,5 +70,5 @@ func (cython3) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer
 }
 
 func init() {
-	language.Register("cython3", cython3{})
+	language.DefaultStore.Register("cython3", cython3{})
 }

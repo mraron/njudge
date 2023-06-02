@@ -7,12 +7,32 @@ import (
 	"io"
 	"net/http"
 	"time"
-
-	"github.com/mraron/njudge/pkg/problems"
 )
 
+type SubmissionStatus struct {
+	Response
+	Time   time.Time
+}
+
 type Callbacker interface {
-	Callback(test string, status problems.Status, done bool) error
+	Callback(Response) error
+}
+
+type ChanCallback struct {
+	c chan Response
+}
+
+func NewChanCallback(c chan Response) *ChanCallback {
+	return &ChanCallback{c}
+}
+
+func (cc *ChanCallback) Callback(r Response) error {
+	cc.c <- r
+	if (r.Done) {
+		close(cc.c)
+	}
+
+	return nil
 }
 
 type WriterCallback struct {
@@ -25,12 +45,12 @@ func NewWriterCallback(w io.Writer, afterFunc func()) *WriterCallback {
 	return &WriterCallback{enc: json.NewEncoder(w), err: nil, afterFunc: afterFunc}
 }
 
-func (wc *WriterCallback) Callback(test string, status problems.Status, done bool) error {
+func (wc *WriterCallback) Callback(r Response) error {
 	if wc.err != nil {
 		return wc.err
 	}
 
-	wc.err = wc.enc.Encode(SubmissionStatus{test, status, done, time.Now()})
+	wc.err = wc.enc.Encode(SubmissionStatus{Response: r, Time: time.Now()})
 	if wc.err == nil {
 		wc.afterFunc()
 	}
@@ -50,8 +70,8 @@ func NewHTTPCallback(url string) HTTPCallback {
 	return HTTPCallback{url}
 }
 
-func (h HTTPCallback) Callback(test string, status problems.Status, done bool) error {
-	raw := SubmissionStatus{test, status, done, time.Now()}
+func (h HTTPCallback) Callback(r Response) error {
+	raw := SubmissionStatus{Response: r, Time: time.Now()}
 
 	buf := &bytes.Buffer{}
 

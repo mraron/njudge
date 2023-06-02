@@ -31,7 +31,7 @@ func (julia) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Writ
 
 func (julia) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (language.Status, error) {
 	stat := language.Status{}
-	stat.Verdict = language.VERDICT_XX
+	stat.Verdict = language.VerdictXX
 
 	if err := s.CreateFile("a.out", binary); err != nil {
 		return stat, err
@@ -47,5 +47,5 @@ func (julia) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, 
 }
 
 func init() {
-	language.Register("julia", julia{})
+	language.DefaultStore.Register("julia", julia{})
 }

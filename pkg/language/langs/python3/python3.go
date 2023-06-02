@@ -1,9 +1,10 @@
 package python3
 
 import (
-	"github.com/mraron/njudge/pkg/language"
 	"io"
 	"time"
+
+	"github.com/mraron/njudge/pkg/language"
 )
 
 type python3 struct{}
@@ -31,7 +32,7 @@ func (python3) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Wr
 
 func (python3) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (language.Status, error) {
 	stat := language.Status{}
-	stat.Verdict = language.VERDICT_XX
+	stat.Verdict = language.VerdictXX
 
 	if err := s.CreateFile("a.out", binary); err != nil {
 		return stat, err
@@ -47,5 +48,5 @@ func (python3) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer
 }
 
 func init() {
-	language.Register("python3", python3{})
+	language.DefaultStore.Register("python3", python3{})
 }

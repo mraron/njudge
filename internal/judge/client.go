@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -19,9 +19,6 @@ type Submission struct {
 
 	Stream      bool   `json:"stream"`
 	CallbackUrl string `json:"callback_url"`
-
-	c    Callbacker
-	done chan bool
 }
 
 type Client struct {
@@ -81,7 +78,7 @@ func (dc Client) SubmitCallback(ctx context.Context, sub Submission, callback st
 
 	defer resp.Body.Close()
 
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
@@ -129,12 +126,12 @@ func (dc Client) SubmitStream(ctx context.Context, sub Submission, res chan Subm
 	}
 }
 
-func (dc Client) Status(ctx context.Context) (Status, error) {
+func (dc Client) Status(ctx context.Context) (ServerStatus, error) {
 	dst := dc.url + "/status"
 
 	req, err := http.NewRequestWithContext(ctx, "GET", dst, nil)
 	if err != nil {
-		return Status{}, err
+		return ServerStatus{}, err
 	}
 
 	if dc.token != "" {
@@ -143,19 +140,19 @@ func (dc Client) Status(ctx context.Context) (Status, error) {
 
 	resp, err := dc.client.Do(req)
 	if err != nil {
-		return Status{}, err
+		return ServerStatus{}, err
 	}
 
-	ans := Status{}
+	ans := ServerStatus{}
 
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&ans)
 	if err != nil {
-		return Status{}, err
+		return ServerStatus{}, err
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return Status{}, errors.New("judger returned: " + resp.Status)
+		return ServerStatus{}, errors.New("judger returned: " + resp.Status)
 	}
 
 	return ans, nil

@@ -1,4 +1,4 @@
-version: "2"
+version: "2.3"
 services:
   base:
     build: .
@@ -12,7 +12,7 @@ services:
       - POSTGRES_PASSWORD=postgres
     volumes:
       - db:/var/lib/postgresql/data
-      - ./migrations/1_init.up.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      - ./internal/migrations/1_init.up.sql:/docker-entrypoint-initdb.d/create_tables.sql
   web:
     build:
       context: .
@@ -27,7 +27,9 @@ services:
       - base
       - db
     volumes:
-      - problems:/njudge_problems
+      - type: volume
+        source: problems
+        target: /njudge_problems
     networks:
       - default
   judge:
@@ -42,8 +44,9 @@ services:
     depends_on:
       - base
     volumes:
-      - problems:/njudge_problems
-      - logs:/njudge_logs
+      - type: volume
+        source: problems
+        target: /njudge_problems
     networks:
       - default
   glue:
@@ -63,10 +66,6 @@ volumes:
   db:
     driver: local
   problems:
-    driver: local
-  submissions:
-    driver: local
-  logs:
     driver: local
 networks:
   default:

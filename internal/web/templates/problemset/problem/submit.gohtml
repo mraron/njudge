@@ -1,0 +1,81 @@
+{{template "header" .}}
+{{template "problem_menu" "submit"}}
+{{if logged}}
+<form action="/problemset/{{get "problemset"}}/submit" method="post" >
+<div class="form-group">
+    <label for="problem" class="font-weight-bold">{{Tr "Problem"}}</label>
+    <input type="hidden" name="problem" value="{{.Data.Problem.Name}}">
+    <div id="problem">{{(translateContent "hungarian" .Data.Problem.Titles).String}}</div>
+</div>
+<div class="form-group">
+    <label for="submissionCode" class="font-weight-bolder">{{Tr "Code"}}</label>
+    <textarea class="form-control" id="submissionCode" rows="30" name="submissionCode"></textarea>
+    <div id="editor"></div>
+</div>
+<div class="form-group">
+    <label for="languagesList" class="font-weight-bolder">{{Tr "Language"}}</label>
+    {{$lastLang := .Data.LastLanguage}}
+    <select name="language" class="custom-select form-control" id="languagesList">
+        {{range $l := .Data.Problem.Languages}}
+            <option value="{{$l.Id}}"{{if eq $lastLang $l.Id}} selected="selected"{{end}}>{{$l.Name}}</option>
+        {{end}}
+    </select>
+</div>
+<input type="hidden" name="_csrf" value="{{csrf}}">
+<button type="submit" class="btn btn-primary">{{Tr "Submit"}}</button>
+</form>
+<style>
+    textarea[name="submissionCode"] {
+        display: none;
+    }
+    #editor {
+        width: 100%;
+        height: 500px;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/ace-builds@1.22.0/src-min-noconflict/ace.min.js "></script>
+<link href="https://cdn.jsdelivr.net/npm/ace-builds@1.22.0/css/ace.min.css " rel="stylesheet">
+<script>
+    const editor = ace.edit("editor", {
+        "mode": "ace/mode/c_cpp"
+    });
+    const textarea = document.querySelector('textarea[name="submissionCode"]');
+
+    editor.getSession().setValue(textarea.value);
+    editor.getSession().on('change', function(){
+        textarea.value = editor.getSession().getValue();
+    });
+
+    const languagesList = document.querySelector('#languagesList');
+    const convertLang = {
+        "cpp11": "c_cpp",
+        "cpp14": "c_cpp",
+        "cpp17": "c_cpp",
+        "csharp": "csharp",
+        "golang": "golang",
+        "java": "java",
+        "julia": "julia",
+        "nim": "nim",
+        "pascal": "pascal",
+        "pypy3": "python",
+        "python3": "python"
+    };
+
+    const updateLanguage = function() {
+        let langCode = "text";
+        if(languagesList.value in convertLang)
+            langCode = convertLang[languagesList.value];
+
+        editor.getSession().setMode({
+            path: "ace/mode/"+langCode
+        });
+    }
+    window.onload = updateLanguage;
+    languagesList.onchange = updateLanguage;
+</script>
+
+{{else}}
+    Beküldéshez <a href="/user/login?next={{.Context.Request.URL.Path}}">lépj be</a> vagy <a href="/user/register">regisztrálj</a>!
+{{end}}
+
+{{template "footer" .}}

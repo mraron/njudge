@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
@@ -23,7 +24,7 @@ func currentUser(c echo.Context, DB *sqlx.DB) (*models.User, error) {
 	if _, ok := storage.Values["id"]; !ok {
 		return nil, nil
 	}
-	u, err = models.Users(Where("id=?", storage.Values["id"])).One(DB)
+	u, err = models.Users(Where("id=?", storage.Values["id"])).One(context.TODO(), DB)
 	return u, err
 }
 
@@ -32,6 +33,12 @@ func SetUserMiddleware(DB *sqlx.DB) func(echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			user, err := currentUser(c, DB)
 			c.Set("user", user)
+
+			if user != nil {
+				c.Set("userID", user.ID)
+			} else {
+				c.Set("userID", 0)
+			}
 
 			if err != nil {
 				return next(c)
@@ -46,7 +53,7 @@ func RequireLoginMiddleware() func(echo.HandlerFunc) echo.HandlerFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			if c.Get("user").(*models.User) == nil {
-				return helpers.UnauthorizedError(c)
+				return helpers.LoginRequired(c)
 			}
 
 			return next(c)

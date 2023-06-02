@@ -1,0 +1,35 @@
+{{template "header" .}}
+
+<form action="/user/register" method="post">
+{{with .Data.ErrorStrings}}
+    <div class="alert alert-danger" role="alert">
+        {{Tr "We found the following problems"}}:
+        <ul>
+        {{range $i := .}}
+            <li><b>{{$i}}</b></li>
+        {{end}}
+        </ul>
+    </div>
+{{end}}
+    <div class="form-group">
+        <label for="regname">{{Tr "Nickname"}}: </label>
+        <input type="text" name="name" class="form-control" id="regname" value="{{.Data.Name}}">
+    </div>
+    <div class="form-group">
+        <label for="regpassword">{{Tr "Password"}}: </label>
+        <input type="password" name="password" class="form-control" id="regpassword">
+    </div>
+    <div class="form-group">
+        <label for="regpassword2">{{Tr "Password again"}}: </label>
+        <input type="password" name="password2" class="form-control" id="regpassword2">
+    </div>
+    <div class="form-group">
+        <label for="regemail">{{Tr "Email"}}: </label>
+        <input type="email" name="email" class="form-control" id="regemail" value="{{.Data.Email}}">
+    </div>
+
+    <input type="hidden" name="_csrf" value="{{csrf}}">
+    <input type="submit" value="{{Tr "Register"}}" class="btn btn-primary">
+</form>
+
+{{template "footer" .}}

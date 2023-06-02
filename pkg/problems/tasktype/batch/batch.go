@@ -66,16 +66,16 @@ func PrepareFiles(ctx *CompileContext) (language.File, []language.File, error) {
 	lst, found := ctx.Problem.Languages(), false
 
 	for _, l := range lst {
-		if l.Name() == ctx.Lang.Name() {
+		if l.Id() == ctx.Lang.Id() {
 			found = true
 		}
 	}
 
 	if !found {
-		return language.File{}, nil, fmt.Errorf("language %s is not supported", ctx.Lang.Name())
+		return language.File{}, nil, fmt.Errorf("language %s is not supported", ctx.Lang.Id())
 	}
 
-	return language.File{Name: "main.cpp", Source: ctx.Source}, nil, nil
+	return language.File{Name: ctx.Lang.DefaultFileName(), Source: ctx.Source}, nil, nil
 }
 
 func Init(*RunContext) error {
@@ -164,13 +164,13 @@ func CheckFail(ctx *RunContext, res language.Status, group *problems.Group, test
 	}
 
 	switch res.Verdict {
-	case language.VERDICT_RE:
+	case language.VerdictRE:
 		testcase.VerdictName = problems.VerdictRE
-	case language.VERDICT_XX:
+	case language.VerdictXX:
 		testcase.VerdictName = problems.VerdictXX
-	case language.VERDICT_ML:
+	case language.VerdictML:
 		testcase.VerdictName = problems.VerdictML
-	case language.VERDICT_TL:
+	case language.VerdictTL:
 		testcase.VerdictName = problems.VerdictTL
 	}
 
@@ -209,7 +209,7 @@ func (b Batch) Compile(jinfo problems.Judgeable, sandbox language.Sandbox, lang 
 	return buf, nil
 }
 
-func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
+func (b Batch) Run(judging problems.Judgeable, sp *language.SandboxProvider, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
 	var (
 		ans            problems.Status
 		skeleton       *problems.Status
@@ -218,7 +218,7 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 		sandbox        language.Sandbox
 	)
 
-	if skeleton, err = jinfo.StatusSkeleton(""); err != nil {
+	if skeleton, err = judging.StatusSkeleton(""); err != nil {
 		return ans, err
 	}
 
@@ -256,7 +256,7 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 	}
 
 	ctx := RunContext{
-		Problem:         jinfo,
+		Problem:         judging,
 		SandboxProvider: sp,
 		Sandbox:         sandbox,
 		Lang:            lang,
@@ -277,14 +277,13 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 
 		for _, g := range ts.Groups {
 			testset.Groups = append(testset.Groups, problems.Group{Name: g.Name, Scoring: g.Scoring})
-			group := &testset.Groups[len(testset.Groups)-1]
 
-			for ind := range g.Testcases {
-				group.Testcases = append(group.Testcases, g.Testcases[ind])
-			}
+			group := &testset.Groups[len(testset.Groups)-1]
+			group.Testcases = append(group.Testcases, g.Testcases...)
 		}
 	}
 
+	testCache := make(map[string]*problems.Testcase)
 	for tsind := range ans.Feedback {
 		testset := &ans.Feedback[tsind]
 
@@ -303,6 +302,17 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 					continue
 				}
 
+				if _, ok := testCache[tc.InputPath]; ok {
+					tmpIndex, tmpGroup := tc.Index, tc.Group
+					*tc = *testCache[tc.InputPath]
+					tc.Index = tmpIndex
+					tc.Group = tmpGroup
+					tc.Score = 0.0
+					tc.MaxScore = 0.0
+					continue
+				}
+				testCache[tc.InputPath] = tc
+
 				if ans.FeedbackType == problems.FeedbackLazyIOI && !ac {
 					continue
 				}
@@ -314,7 +324,7 @@ func (b Batch) Run(jinfo problems.Judgeable, sp *language.SandboxProvider, lang 
 					if err != nil {
 						tc.VerdictName = problems.VerdictXX
 						return ans, err
-					} else if res.Verdict == language.VERDICT_OK {
+					} else if res.Verdict == language.VerdictOK {
 						if err := b.CheckOKF(&ctx, res, group, tc); err != nil {
 							tc.VerdictName = problems.VerdictXX
 							return ans, err

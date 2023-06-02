@@ -4,6 +4,7 @@
 package models
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"reflect"
@@ -127,7 +128,7 @@ type (
 	// This should almost always be used instead of []ProblemRel.
 	ProblemRelSlice []*ProblemRel
 	// ProblemRelHook is the signature for custom ProblemRel hook methods
-	ProblemRelHook func(boil.Executor, *ProblemRel) error
+	ProblemRelHook func(context.Context, boil.ContextExecutor, *ProblemRel) error
 
 	problemRelQuery struct {
 		*queries.Query
@@ -170,9 +171,13 @@ var problemRelBeforeUpsertHooks []ProblemRelHook
 var problemRelAfterUpsertHooks []ProblemRelHook
 
 // doAfterSelectHooks executes all "after Select" hooks.
-func (o *ProblemRel) doAfterSelectHooks(exec boil.Executor) (err error) {
+func (o *ProblemRel) doAfterSelectHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemRelAfterSelectHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -181,9 +186,13 @@ func (o *ProblemRel) doAfterSelectHooks(exec boil.Executor) (err error) {
 }
 
 // doBeforeInsertHooks executes all "before insert" hooks.
-func (o *ProblemRel) doBeforeInsertHooks(exec boil.Executor) (err error) {
+func (o *ProblemRel) doBeforeInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemRelBeforeInsertHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -192,9 +201,13 @@ func (o *ProblemRel) doBeforeInsertHooks(exec boil.Executor) (err error) {
 }
 
 // doAfterInsertHooks executes all "after Insert" hooks.
-func (o *ProblemRel) doAfterInsertHooks(exec boil.Executor) (err error) {
+func (o *ProblemRel) doAfterInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemRelAfterInsertHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -203,9 +216,13 @@ func (o *ProblemRel) doAfterInsertHooks(exec boil.Executor) (err error) {
 }
 
 // doBeforeUpdateHooks executes all "before Update" hooks.
-func (o *ProblemRel) doBeforeUpdateHooks(exec boil.Executor) (err error) {
+func (o *ProblemRel) doBeforeUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemRelBeforeUpdateHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -214,9 +231,13 @@ func (o *ProblemRel) doBeforeUpdateHooks(exec boil.Executor) (err error) {
 }
 
 // doAfterUpdateHooks executes all "after Update" hooks.
-func (o *ProblemRel) doAfterUpdateHooks(exec boil.Executor) (err error) {
+func (o *ProblemRel) doAfterUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemRelAfterUpdateHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -225,9 +246,13 @@ func (o *ProblemRel) doAfterUpdateHooks(exec boil.Executor) (err error) {
 }
 
 // doBeforeDeleteHooks executes all "before Delete" hooks.
-func (o *ProblemRel) doBeforeDeleteHooks(exec boil.Executor) (err error) {
+func (o *ProblemRel) doBeforeDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemRelBeforeDeleteHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -236,9 +261,13 @@ func (o *ProblemRel) doBeforeDeleteHooks(exec boil.Executor) (err error) {
 }
 
 // doAfterDeleteHooks executes all "after Delete" hooks.
-func (o *ProblemRel) doAfterDeleteHooks(exec boil.Executor) (err error) {
+func (o *ProblemRel) doAfterDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemRelAfterDeleteHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -247,9 +276,13 @@ func (o *ProblemRel) doAfterDeleteHooks(exec boil.Executor) (err error) {
 }
 
 // doBeforeUpsertHooks executes all "before Upsert" hooks.
-func (o *ProblemRel) doBeforeUpsertHooks(exec boil.Executor) (err error) {
+func (o *ProblemRel) doBeforeUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemRelBeforeUpsertHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -258,9 +291,13 @@ func (o *ProblemRel) doBeforeUpsertHooks(exec boil.Executor) (err error) {
 }
 
 // doAfterUpsertHooks executes all "after Upsert" hooks.
-func (o *ProblemRel) doAfterUpsertHooks(exec boil.Executor) (err error) {
+func (o *ProblemRel) doAfterUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
 	for _, hook := range problemRelAfterUpsertHooks {
-		if err := hook(exec, o); err != nil {
+		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
 	}
@@ -293,17 +330,17 @@ func AddProblemRelHook(hookPoint boil.HookPoint, problemRelHook ProblemRelHook) 
 }
 
 // OneG returns a single problemRel record from the query using the global executor.
-func (q problemRelQuery) OneG() (*ProblemRel, error) {
-	return q.One(boil.GetDB())
+func (q problemRelQuery) OneG(ctx context.Context) (*ProblemRel, error) {
+	return q.One(ctx, boil.GetContextDB())
 }
 
 // One returns a single problemRel record from the query.
-func (q problemRelQuery) One(exec boil.Executor) (*ProblemRel, error) {
+func (q problemRelQuery) One(ctx context.Context, exec boil.ContextExecutor) (*ProblemRel, error) {
 	o := &ProblemRel{}
 
 	queries.SetLimit(q.Query, 1)
 
-	err := q.Bind(nil, exec, o)
+	err := q.Bind(ctx, exec, o)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
@@ -311,7 +348,7 @@ func (q problemRelQuery) One(exec boil.Executor) (*ProblemRel, error) {
 		return nil, errors.Wrap(err, "models: failed to execute a one query for problem_rels")
 	}
 
-	if err := o.doAfterSelectHooks(exec); err != nil {
+	if err := o.doAfterSelectHooks(ctx, exec); err != nil {
 		return o, err
 	}
 
@@ -319,22 +356,22 @@ func (q problemRelQuery) One(exec boil.Executor) (*ProblemRel, error) {
 }
 
 // AllG returns all ProblemRel records from the query using the global executor.
-func (q problemRelQuery) AllG() (ProblemRelSlice, error) {
-	return q.All(boil.GetDB())
+func (q problemRelQuery) AllG(ctx context.Context) (ProblemRelSlice, error) {
+	return q.All(ctx, boil.GetContextDB())
 }
 
 // All returns all ProblemRel records from the query.
-func (q problemRelQuery) All(exec boil.Executor) (ProblemRelSlice, error) {
+func (q problemRelQuery) All(ctx context.Context, exec boil.ContextExecutor) (ProblemRelSlice, error) {
 	var o []*ProblemRel
 
-	err := q.Bind(nil, exec, &o)
+	err := q.Bind(ctx, exec, &o)
 	if err != nil {
 		return nil, errors.Wrap(err, "models: failed to assign all query results to ProblemRel slice")
 	}
 
 	if len(problemRelAfterSelectHooks) != 0 {
 		for _, obj := range o {
-			if err := obj.doAfterSelectHooks(exec); err != nil {
+			if err := obj.doAfterSelectHooks(ctx, exec); err != nil {
 				return o, err
 			}
 		}
@@ -344,18 +381,18 @@ func (q problemRelQuery) All(exec boil.Executor) (ProblemRelSlice, error) {
 }
 
 // CountG returns the count of all ProblemRel records in the query using the global executor
-func (q problemRelQuery) CountG() (int64, error) {
-	return q.Count(boil.GetDB())
+func (q problemRelQuery) CountG(ctx context.Context) (int64, error) {
+	return q.Count(ctx, boil.GetContextDB())
 }
 
 // Count returns the count of all ProblemRel records in the query.
-func (q problemRelQuery) Count(exec boil.Executor) (int64, error) {
+func (q problemRelQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
 	queries.SetCount(q.Query)
 
-	err := q.Query.QueryRow(exec).Scan(&count)
+	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to count problem_rels rows")
 	}
@@ -364,19 +401,19 @@ func (q problemRelQuery) Count(exec boil.Executor) (int64, error) {
 }
 
 // ExistsG checks if the row exists in the table using the global executor.
-func (q problemRelQuery) ExistsG() (bool, error) {
-	return q.Exists(boil.GetDB())
+func (q problemRelQuery) ExistsG(ctx context.Context) (bool, error) {
+	return q.Exists(ctx, boil.GetContextDB())
 }
 
 // Exists checks if the row exists in the table.
-func (q problemRelQuery) Exists(exec boil.Executor) (bool, error) {
+func (q problemRelQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
 	queries.SetCount(q.Query)
 	queries.SetLimit(q.Query, 1)
 
-	err := q.Query.QueryRow(exec).Scan(&count)
+	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
 		return false, errors.Wrap(err, "models: failed to check if problem_rels exists")
 	}
@@ -411,7 +448,7 @@ func (o *ProblemRel) ProblemProblemTags(mods ...qm.QueryMod) problemTagQuery {
 
 // LoadCategory allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (problemRelL) LoadCategory(e boil.Executor, singular bool, maybeProblemRel interface{}, mods queries.Applicator) error {
+func (problemRelL) LoadCategory(ctx context.Context, e boil.ContextExecutor, singular bool, maybeProblemRel interface{}, mods queries.Applicator) error {
 	var slice []*ProblemRel
 	var object *ProblemRel
 
@@ -478,7 +515,7 @@ func (problemRelL) LoadCategory(e boil.Executor, singular bool, maybeProblemRel 
 		mods.Apply(query)
 	}
 
-	results, err := query.Query(e)
+	results, err := query.QueryContext(ctx, e)
 	if err != nil {
 		return errors.Wrap(err, "failed to eager load ProblemCategory")
 	}
@@ -497,7 +534,7 @@ func (problemRelL) LoadCategory(e boil.Executor, singular bool, maybeProblemRel 
 
 	if len(problemCategoryAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(e); err != nil {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
 				return err
 			}
 		}
@@ -535,7 +572,7 @@ func (problemRelL) LoadCategory(e boil.Executor, singular bool, maybeProblemRel 
 
 // LoadProblemProblemTags allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (problemRelL) LoadProblemProblemTags(e boil.Executor, singular bool, maybeProblemRel interface{}, mods queries.Applicator) error {
+func (problemRelL) LoadProblemProblemTags(ctx context.Context, e boil.ContextExecutor, singular bool, maybeProblemRel interface{}, mods queries.Applicator) error {
 	var slice []*ProblemRel
 	var object *ProblemRel
 
@@ -596,7 +633,7 @@ func (problemRelL) LoadProblemProblemTags(e boil.Executor, singular bool, maybeP
 		mods.Apply(query)
 	}
 
-	results, err := query.Query(e)
+	results, err := query.QueryContext(ctx, e)
 	if err != nil {
 		return errors.Wrap(err, "failed to eager load problem_tags")
 	}
@@ -615,7 +652,7 @@ func (problemRelL) LoadProblemProblemTags(e boil.Executor, singular bool, maybeP
 
 	if len(problemTagAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(e); err != nil {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
 				return err
 			}
 		}
@@ -651,17 +688,17 @@ func (problemRelL) LoadProblemProblemTags(e boil.Executor, singular bool, maybeP
 // Sets o.R.Category to related.
 // Adds o to related.R.CategoryProblemRels.
 // Uses the global database handle.
-func (o *ProblemRel) SetCategoryG(insert bool, related *ProblemCategory) error {
-	return o.SetCategory(boil.GetDB(), insert, related)
+func (o *ProblemRel) SetCategoryG(ctx context.Context, insert bool, related *ProblemCategory) error {
+	return o.SetCategory(ctx, boil.GetContextDB(), insert, related)
 }
 
 // SetCategory of the problemRel to the related item.
 // Sets o.R.Category to related.
 // Adds o to related.R.CategoryProblemRels.
-func (o *ProblemRel) SetCategory(exec boil.Executor, insert bool, related *ProblemCategory) error {
+func (o *ProblemRel) SetCategory(ctx context.Context, exec boil.ContextExecutor, insert bool, related *ProblemCategory) error {
 	var err error
 	if insert {
-		if err = related.Insert(exec, boil.Infer()); err != nil {
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
 			return errors.Wrap(err, "failed to insert into foreign table")
 		}
 	}
@@ -673,11 +710,12 @@ func (o *ProblemRel) SetCategory(exec boil.Executor, insert bool, related *Probl
 	)
 	values := []interface{}{related.ID, o.ID}
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, updateQuery)
-		fmt.Fprintln(boil.DebugWriter, values)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, values)
 	}
-	if _, err = exec.Exec(updateQuery, values...); err != nil {
+	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
 		return errors.Wrap(err, "failed to update local table")
 	}
 
@@ -705,18 +743,18 @@ func (o *ProblemRel) SetCategory(exec boil.Executor, insert bool, related *Probl
 // Sets o.R.Category to nil.
 // Removes o from all passed in related items' relationships struct.
 // Uses the global database handle.
-func (o *ProblemRel) RemoveCategoryG(related *ProblemCategory) error {
-	return o.RemoveCategory(boil.GetDB(), related)
+func (o *ProblemRel) RemoveCategoryG(ctx context.Context, related *ProblemCategory) error {
+	return o.RemoveCategory(ctx, boil.GetContextDB(), related)
 }
 
 // RemoveCategory relationship.
 // Sets o.R.Category to nil.
 // Removes o from all passed in related items' relationships struct.
-func (o *ProblemRel) RemoveCategory(exec boil.Executor, related *ProblemCategory) error {
+func (o *ProblemRel) RemoveCategory(ctx context.Context, exec boil.ContextExecutor, related *ProblemCategory) error {
 	var err error
 
 	queries.SetScanner(&o.CategoryID, nil)
-	if _, err = o.Update(exec, boil.Whitelist("category_id")); err != nil {
+	if _, err = o.Update(ctx, exec, boil.Whitelist("category_id")); err != nil {
 		return errors.Wrap(err, "failed to update local table")
 	}
 
@@ -747,20 +785,20 @@ func (o *ProblemRel) RemoveCategory(exec boil.Executor, related *ProblemCategory
 // Appends related to o.R.ProblemProblemTags.
 // Sets related.R.Problem appropriately.
 // Uses the global database handle.
-func (o *ProblemRel) AddProblemProblemTagsG(insert bool, related ...*ProblemTag) error {
-	return o.AddProblemProblemTags(boil.GetDB(), insert, related...)
+func (o *ProblemRel) AddProblemProblemTagsG(ctx context.Context, insert bool, related ...*ProblemTag) error {
+	return o.AddProblemProblemTags(ctx, boil.GetContextDB(), insert, related...)
 }
 
 // AddProblemProblemTags adds the given related objects to the existing relationships
 // of the problem_rel, optionally inserting them as new records.
 // Appends related to o.R.ProblemProblemTags.
 // Sets related.R.Problem appropriately.
-func (o *ProblemRel) AddProblemProblemTags(exec boil.Executor, insert bool, related ...*ProblemTag) error {
+func (o *ProblemRel) AddProblemProblemTags(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*ProblemTag) error {
 	var err error
 	for _, rel := range related {
 		if insert {
 			rel.ProblemID = o.ID
-			if err = rel.Insert(exec, boil.Infer()); err != nil {
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
@@ -771,11 +809,12 @@ func (o *ProblemRel) AddProblemProblemTags(exec boil.Executor, insert bool, rela
 			)
 			values := []interface{}{o.ID, rel.ID}
 
-			if boil.DebugMode {
-				fmt.Fprintln(boil.DebugWriter, updateQuery)
-				fmt.Fprintln(boil.DebugWriter, values)
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
 			}
-			if _, err = exec.Exec(updateQuery, values...); err != nil {
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
@@ -815,13 +854,13 @@ func ProblemRels(mods ...qm.QueryMod) problemRelQuery {
 }
 
 // FindProblemRelG retrieves a single record by ID.
-func FindProblemRelG(iD int, selectCols ...string) (*ProblemRel, error) {
-	return FindProblemRel(boil.GetDB(), iD, selectCols...)
+func FindProblemRelG(ctx context.Context, iD int, selectCols ...string) (*ProblemRel, error) {
+	return FindProblemRel(ctx, boil.GetContextDB(), iD, selectCols...)
 }
 
 // FindProblemRel retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindProblemRel(exec boil.Executor, iD int, selectCols ...string) (*ProblemRel, error) {
+func FindProblemRel(ctx context.Context, exec boil.ContextExecutor, iD int, selectCols ...string) (*ProblemRel, error) {
 	problemRelObj := &ProblemRel{}
 
 	sel := "*"
@@ -834,7 +873,7 @@ func FindProblemRel(exec boil.Executor, iD int, selectCols ...string) (*ProblemR
 
 	q := queries.Raw(query, iD)
 
-	err := q.Bind(nil, exec, problemRelObj)
+	err := q.Bind(ctx, exec, problemRelObj)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
@@ -842,7 +881,7 @@ func FindProblemRel(exec boil.Executor, iD int, selectCols ...string) (*ProblemR
 		return nil, errors.Wrap(err, "models: unable to select from problem_rels")
 	}
 
-	if err = problemRelObj.doAfterSelectHooks(exec); err != nil {
+	if err = problemRelObj.doAfterSelectHooks(ctx, exec); err != nil {
 		return problemRelObj, err
 	}
 
@@ -850,20 +889,20 @@ func FindProblemRel(exec boil.Executor, iD int, selectCols ...string) (*ProblemR
 }
 
 // InsertG a single record. See Insert for whitelist behavior description.
-func (o *ProblemRel) InsertG(columns boil.Columns) error {
-	return o.Insert(boil.GetDB(), columns)
+func (o *ProblemRel) InsertG(ctx context.Context, columns boil.Columns) error {
+	return o.Insert(ctx, boil.GetContextDB(), columns)
 }
 
 // Insert a single record using an executor.
 // See boil.Columns.InsertColumnSet documentation to understand column list inference for inserts.
-func (o *ProblemRel) Insert(exec boil.Executor, columns boil.Columns) error {
+func (o *ProblemRel) Insert(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
 	if o == nil {
 		return errors.New("models: no problem_rels provided for insertion")
 	}
 
 	var err error
 
-	if err := o.doBeforeInsertHooks(exec); err != nil {
+	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
 		return err
 	}
 
@@ -908,15 +947,16 @@ func (o *ProblemRel) Insert(exec boil.Executor, columns boil.Columns) error {
 	value := reflect.Indirect(reflect.ValueOf(o))
 	vals := queries.ValuesFromMapping(value, cache.valueMapping)
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, cache.query)
-		fmt.Fprintln(boil.DebugWriter, vals)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, cache.query)
+		fmt.Fprintln(writer, vals)
 	}
 
 	if len(cache.retMapping) != 0 {
-		err = exec.QueryRow(cache.query, vals...).Scan(queries.PtrsFromMapping(value, cache.retMapping)...)
+		err = exec.QueryRowContext(ctx, cache.query, vals...).Scan(queries.PtrsFromMapping(value, cache.retMapping)...)
 	} else {
-		_, err = exec.Exec(cache.query, vals...)
+		_, err = exec.ExecContext(ctx, cache.query, vals...)
 	}
 
 	if err != nil {
@@ -929,21 +969,21 @@ func (o *ProblemRel) Insert(exec boil.Executor, columns boil.Columns) error {
 		problemRelInsertCacheMut.Unlock()
 	}
 
-	return o.doAfterInsertHooks(exec)
+	return o.doAfterInsertHooks(ctx, exec)
 }
 
 // UpdateG a single ProblemRel record using the global executor.
 // See Update for more documentation.
-func (o *ProblemRel) UpdateG(columns boil.Columns) (int64, error) {
-	return o.Update(boil.GetDB(), columns)
+func (o *ProblemRel) UpdateG(ctx context.Context, columns boil.Columns) (int64, error) {
+	return o.Update(ctx, boil.GetContextDB(), columns)
 }
 
 // Update uses an executor to update the ProblemRel.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
-func (o *ProblemRel) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
+func (o *ProblemRel) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
 	var err error
-	if err = o.doBeforeUpdateHooks(exec); err != nil {
+	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
 		return 0, err
 	}
 	key := makeCacheKey(columns, nil)
@@ -976,12 +1016,13 @@ func (o *ProblemRel) Update(exec boil.Executor, columns boil.Columns) (int64, er
 
 	values := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), cache.valueMapping)
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, cache.query)
-		fmt.Fprintln(boil.DebugWriter, values)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, cache.query)
+		fmt.Fprintln(writer, values)
 	}
 	var result sql.Result
-	result, err = exec.Exec(cache.query, values...)
+	result, err = exec.ExecContext(ctx, cache.query, values...)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to update problem_rels row")
 	}
@@ -997,19 +1038,19 @@ func (o *ProblemRel) Update(exec boil.Executor, columns boil.Columns) (int64, er
 		problemRelUpdateCacheMut.Unlock()
 	}
 
-	return rowsAff, o.doAfterUpdateHooks(exec)
+	return rowsAff, o.doAfterUpdateHooks(ctx, exec)
 }
 
 // UpdateAllG updates all rows with the specified column values.
-func (q problemRelQuery) UpdateAllG(cols M) (int64, error) {
-	return q.UpdateAll(boil.GetDB(), cols)
+func (q problemRelQuery) UpdateAllG(ctx context.Context, cols M) (int64, error) {
+	return q.UpdateAll(ctx, boil.GetContextDB(), cols)
 }
 
 // UpdateAll updates all rows with the specified column values.
-func (q problemRelQuery) UpdateAll(exec boil.Executor, cols M) (int64, error) {
+func (q problemRelQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
 	queries.SetUpdate(q.Query, cols)
 
-	result, err := q.Query.Exec(exec)
+	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to update all for problem_rels")
 	}
@@ -1023,12 +1064,12 @@ func (q problemRelQuery) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 }
 
 // UpdateAllG updates all rows with the specified column values.
-func (o ProblemRelSlice) UpdateAllG(cols M) (int64, error) {
-	return o.UpdateAll(boil.GetDB(), cols)
+func (o ProblemRelSlice) UpdateAllG(ctx context.Context, cols M) (int64, error) {
+	return o.UpdateAll(ctx, boil.GetContextDB(), cols)
 }
 
 // UpdateAll updates all rows with the specified column values, using an executor.
-func (o ProblemRelSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
+func (o ProblemRelSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
 	ln := int64(len(o))
 	if ln == 0 {
 		return 0, nil
@@ -1058,11 +1099,12 @@ func (o ProblemRelSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 		strmangle.SetParamNames("\"", "\"", 1, colNames),
 		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), len(colNames)+1, problemRelPrimaryKeyColumns, len(o)))
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, sql)
-		fmt.Fprintln(boil.DebugWriter, args...)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, sql)
+		fmt.Fprintln(writer, args...)
 	}
-	result, err := exec.Exec(sql, args...)
+	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to update all in problemRel slice")
 	}
@@ -1075,18 +1117,18 @@ func (o ProblemRelSlice) UpdateAll(exec boil.Executor, cols M) (int64, error) {
 }
 
 // UpsertG attempts an insert, and does an update or ignore on conflict.
-func (o *ProblemRel) UpsertG(updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
-	return o.Upsert(boil.GetDB(), updateOnConflict, conflictColumns, updateColumns, insertColumns)
+func (o *ProblemRel) UpsertG(ctx context.Context, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
+	return o.Upsert(ctx, boil.GetContextDB(), updateOnConflict, conflictColumns, updateColumns, insertColumns)
 }
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
-func (o *ProblemRel) Upsert(exec boil.Executor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
+func (o *ProblemRel) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
 	if o == nil {
 		return errors.New("models: no problem_rels provided for upsert")
 	}
 
-	if err := o.doBeforeUpsertHooks(exec); err != nil {
+	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
 		return err
 	}
 
@@ -1169,17 +1211,18 @@ func (o *ProblemRel) Upsert(exec boil.Executor, updateOnConflict bool, conflictC
 		returns = queries.PtrsFromMapping(value, cache.retMapping)
 	}
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, cache.query)
-		fmt.Fprintln(boil.DebugWriter, vals)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, cache.query)
+		fmt.Fprintln(writer, vals)
 	}
 	if len(cache.retMapping) != 0 {
-		err = exec.QueryRow(cache.query, vals...).Scan(returns...)
+		err = exec.QueryRowContext(ctx, cache.query, vals...).Scan(returns...)
 		if errors.Is(err, sql.ErrNoRows) {
 			err = nil // Postgres doesn't return anything when there's no update
 		}
 	} else {
-		_, err = exec.Exec(cache.query, vals...)
+		_, err = exec.ExecContext(ctx, cache.query, vals...)
 	}
 	if err != nil {
 		return errors.Wrap(err, "models: unable to upsert problem_rels")
@@ -1191,34 +1234,35 @@ func (o *ProblemRel) Upsert(exec boil.Executor, updateOnConflict bool, conflictC
 		problemRelUpsertCacheMut.Unlock()
 	}
 
-	return o.doAfterUpsertHooks(exec)
+	return o.doAfterUpsertHooks(ctx, exec)
 }
 
 // DeleteG deletes a single ProblemRel record.
 // DeleteG will match against the primary key column to find the record to delete.
-func (o *ProblemRel) DeleteG() (int64, error) {
-	return o.Delete(boil.GetDB())
+func (o *ProblemRel) DeleteG(ctx context.Context) (int64, error) {
+	return o.Delete(ctx, boil.GetContextDB())
 }
 
 // Delete deletes a single ProblemRel record with an executor.
 // Delete will match against the primary key column to find the record to delete.
-func (o *ProblemRel) Delete(exec boil.Executor) (int64, error) {
+func (o *ProblemRel) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if o == nil {
 		return 0, errors.New("models: no ProblemRel provided for delete")
 	}
 
-	if err := o.doBeforeDeleteHooks(exec); err != nil {
+	if err := o.doBeforeDeleteHooks(ctx, exec); err != nil {
 		return 0, err
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), problemRelPrimaryKeyMapping)
 	sql := "DELETE FROM \"problem_rels\" WHERE \"id\"=$1"
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, sql)
-		fmt.Fprintln(boil.DebugWriter, args...)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, sql)
+		fmt.Fprintln(writer, args...)
 	}
-	result, err := exec.Exec(sql, args...)
+	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to delete from problem_rels")
 	}
@@ -1228,26 +1272,26 @@ func (o *ProblemRel) Delete(exec boil.Executor) (int64, error) {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for problem_rels")
 	}
 
-	if err := o.doAfterDeleteHooks(exec); err != nil {
+	if err := o.doAfterDeleteHooks(ctx, exec); err != nil {
 		return 0, err
 	}
 
 	return rowsAff, nil
 }
 
-func (q problemRelQuery) DeleteAllG() (int64, error) {
-	return q.DeleteAll(boil.GetDB())
+func (q problemRelQuery) DeleteAllG(ctx context.Context) (int64, error) {
+	return q.DeleteAll(ctx, boil.GetContextDB())
 }
 
 // DeleteAll deletes all matching rows.
-func (q problemRelQuery) DeleteAll(exec boil.Executor) (int64, error) {
+func (q problemRelQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if q.Query == nil {
 		return 0, errors.New("models: no problemRelQuery provided for delete all")
 	}
 
 	queries.SetDelete(q.Query)
 
-	result, err := q.Query.Exec(exec)
+	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to delete all from problem_rels")
 	}
@@ -1261,19 +1305,19 @@ func (q problemRelQuery) DeleteAll(exec boil.Executor) (int64, error) {
 }
 
 // DeleteAllG deletes all rows in the slice.
-func (o ProblemRelSlice) DeleteAllG() (int64, error) {
-	return o.DeleteAll(boil.GetDB())
+func (o ProblemRelSlice) DeleteAllG(ctx context.Context) (int64, error) {
+	return o.DeleteAll(ctx, boil.GetContextDB())
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
-func (o ProblemRelSlice) DeleteAll(exec boil.Executor) (int64, error) {
+func (o ProblemRelSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if len(o) == 0 {
 		return 0, nil
 	}
 
 	if len(problemRelBeforeDeleteHooks) != 0 {
 		for _, obj := range o {
-			if err := obj.doBeforeDeleteHooks(exec); err != nil {
+			if err := obj.doBeforeDeleteHooks(ctx, exec); err != nil {
 				return 0, err
 			}
 		}
@@ -1288,11 +1332,12 @@ func (o ProblemRelSlice) DeleteAll(exec boil.Executor) (int64, error) {
 	sql := "DELETE FROM \"problem_rels\" WHERE " +
 		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, problemRelPrimaryKeyColumns, len(o))
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, sql)
-		fmt.Fprintln(boil.DebugWriter, args)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, sql)
+		fmt.Fprintln(writer, args)
 	}
-	result, err := exec.Exec(sql, args...)
+	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
 		return 0, errors.Wrap(err, "models: unable to delete all from problemRel slice")
 	}
@@ -1304,7 +1349,7 @@ func (o ProblemRelSlice) DeleteAll(exec boil.Executor) (int64, error) {
 
 	if len(problemRelAfterDeleteHooks) != 0 {
 		for _, obj := range o {
-			if err := obj.doAfterDeleteHooks(exec); err != nil {
+			if err := obj.doAfterDeleteHooks(ctx, exec); err != nil {
 				return 0, err
 			}
 		}
@@ -1314,18 +1359,18 @@ func (o ProblemRelSlice) DeleteAll(exec boil.Executor) (int64, error) {
 }
 
 // ReloadG refetches the object from the database using the primary keys.
-func (o *ProblemRel) ReloadG() error {
+func (o *ProblemRel) ReloadG(ctx context.Context) error {
 	if o == nil {
 		return errors.New("models: no ProblemRel provided for reload")
 	}
 
-	return o.Reload(boil.GetDB())
+	return o.Reload(ctx, boil.GetContextDB())
 }
 
 // Reload refetches the object from the database
 // using the primary keys with an executor.
-func (o *ProblemRel) Reload(exec boil.Executor) error {
-	ret, err := FindProblemRel(exec, o.ID)
+func (o *ProblemRel) Reload(ctx context.Context, exec boil.ContextExecutor) error {
+	ret, err := FindProblemRel(ctx, exec, o.ID)
 	if err != nil {
 		return err
 	}
@@ -1336,17 +1381,17 @@ func (o *ProblemRel) Reload(exec boil.Executor) error {
 
 // ReloadAllG refetches every row with matching primary key column values
 // and overwrites the original object slice with the newly updated slice.
-func (o *ProblemRelSlice) ReloadAllG() error {
+func (o *ProblemRelSlice) ReloadAllG(ctx context.Context) error {
 	if o == nil {
 		return errors.New("models: empty ProblemRelSlice provided for reload all")
 	}
 
-	return o.ReloadAll(boil.GetDB())
+	return o.ReloadAll(ctx, boil.GetContextDB())
 }
 
 // ReloadAll refetches every row with matching primary key column values
 // and overwrites the original object slice with the newly updated slice.
-func (o *ProblemRelSlice) ReloadAll(exec boil.Executor) error {
+func (o *ProblemRelSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) error {
 	if o == nil || len(*o) == 0 {
 		return nil
 	}
@@ -1363,7 +1408,7 @@ func (o *ProblemRelSlice) ReloadAll(exec boil.Executor) error {
 
 	q := queries.Raw(sql, args...)
 
-	err := q.Bind(nil, exec, &slice)
+	err := q.Bind(ctx, exec, &slice)
 	if err != nil {
 		return errors.Wrap(err, "models: unable to reload all in ProblemRelSlice")
 	}
@@ -1374,20 +1419,21 @@ func (o *ProblemRelSlice) ReloadAll(exec boil.Executor) error {
 }
 
 // ProblemRelExistsG checks if the ProblemRel row exists.
-func ProblemRelExistsG(iD int) (bool, error) {
-	return ProblemRelExists(boil.GetDB(), iD)
+func ProblemRelExistsG(ctx context.Context, iD int) (bool, error) {
+	return ProblemRelExists(ctx, boil.GetContextDB(), iD)
 }
 
 // ProblemRelExists checks if the ProblemRel row exists.
-func ProblemRelExists(exec boil.Executor, iD int) (bool, error) {
+func ProblemRelExists(ctx context.Context, exec boil.ContextExecutor, iD int) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from \"problem_rels\" where \"id\"=$1 limit 1)"
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, sql)
-		fmt.Fprintln(boil.DebugWriter, iD)
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, sql)
+		fmt.Fprintln(writer, iD)
 	}
-	row := exec.QueryRow(sql, iD)
+	row := exec.QueryRowContext(ctx, sql, iD)
 
 	err := row.Scan(&exists)
 	if err != nil {
@@ -1398,6 +1444,6 @@ func ProblemRelExists(exec boil.Executor, iD int) (bool, error) {
 }
 
 // Exists checks if the ProblemRel row exists.
-func (o *ProblemRel) Exists(exec boil.Executor) (bool, error) {
-	return ProblemRelExists(exec, o.ID)
+func (o *ProblemRel) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
+	return ProblemRelExists(ctx, exec, o.ID)
 }

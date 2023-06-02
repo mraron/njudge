@@ -1,39 +1,108 @@
 package templates
 
 import (
-	"crypto/md5"
 	"database/sql"
-	"encoding/json"
-	"errors"
 	"fmt"
-	"github.com/mraron/njudge/internal/web/helpers/config"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
-	"github.com/mraron/njudge/internal/web/helpers/roles"
-	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
-	"github.com/mraron/njudge/internal/web/models"
+	"github.com/fsnotify/fsnotify"
+	"github.com/mraron/njudge/internal/web/templates"
 	"html/template"
 	"io"
 	"io/fs"
-	"math"
+	"log"
+	"os"
 	"path/filepath"
 	"strings"
-	"time"
+	"sync"
 
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/gommon/log"
+	"github.com/mraron/njudge/internal/web/helpers/config"
+	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
 	"github.com/mraron/njudge/pkg/problems"
 )
 
 type Renderer struct {
-	templates map[string]*template.Template
-	cfg       config.Server
+	templates     map[string]*template.Template
+	cfg           config.Server
+	problemStore  problems.Store
+	db            *sql.DB
+	partialsStore partials.Store
+
+	sync.RWMutex
 }
 
-func New(cfg config.Server, problemStore problems.Store, db *sql.DB, store partials.Store) *Renderer {
-	renderer := &Renderer{make(map[string]*template.Template), cfg}
+func New(cfg config.Server, problemStore problems.Store, db *sql.DB, partialsStore partials.Store) *Renderer {
+	renderer := &Renderer{
+		templates:     make(map[string]*template.Template),
+		cfg:           cfg,
+		problemStore:  problemStore,
+		db:            db,
+		partialsStore: partialsStore,
+	}
+
+	if err := renderer.Update(); err != nil {
+		log.Println("template parsing error:", err)
+	}
+
+	if cfg.Mode == "development" {
+		renderer.startWatcher()
+	}
+
+	return renderer
+}
+
+func (t *Renderer) startWatcher() {
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		panic(err)
+	}
+
+	go func() {
+		for {
+			select {
+			case event, ok := <-watcher.Events:
+				if !ok {
+					return
+				}
+
+				if event.Has(fsnotify.Write) {
+					if err := t.Update(); err != nil {
+						log.Println("error while parsing templates:", err)
+					}
+				}
+			case err, ok := <-watcher.Errors:
+				if !ok {
+					return
+				}
+				log.Println("watcher error:", err)
+			}
+		}
+	}()
+
+	err = fs.WalkDir(os.DirFS(t.cfg.TemplatesDir), ".", func(path string, d fs.DirEntry, err error) error {
+		if d.IsDir() {
+			if err := watcher.Add(filepath.Join(t.cfg.TemplatesDir, path)); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (t *Renderer) Update() error {
+	t.Lock()
+	defer t.Unlock()
 
 	layoutFiles := make([]string, 0)
-	err := filepath.Walk(cfg.TemplatesDir, func(path string, info fs.FileInfo, err error) error {
+
+	usedFS := os.DirFS(t.cfg.TemplatesDir)
+	if t.cfg.Mode == "production" {
+		usedFS = templates.FS
+	}
+
+	return fs.WalkDir(usedFS, ".", func(path string, info fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -42,25 +111,30 @@ func New(cfg config.Server, problemStore problems.Store, db *sql.DB, store parti
 			if strings.HasPrefix(info.Name(), "_") {
 				layoutFiles = append(layoutFiles, path)
 			} else {
-				name, err := filepath.Rel(cfg.TemplatesDir, path)
-				if err != nil {
-					panic(err)
-				}
+				tmpl, err := template.New(info.Name()).
+					Funcs(contextFuncs(nil)).
+					Funcs(statelessFuncs(t.problemStore, t.db, t.partialsStore)).
+					ParseFS(usedFS, append(layoutFiles, path)...)
 
-				renderer.templates[name] = template.Must(template.New(info.Name()).Funcs(funcs(problemStore, db, store)).ParseFiles(append(layoutFiles, path)...))
+				if err != nil {
+					t.templates[path] = template.Must(template.New(info.Name()).Funcs(template.FuncMap{
+						"error": err.Error,
+					}).Parse(`<h2>parse error</h2> <pre><code>{{error}}</code></pre>`))
+					return err
+				} else {
+					t.templates[path] = tmpl
+				}
 			}
 		}
+
 		return nil
 	})
-
-	if err != nil {
-		panic(err)
-	}
-
-	return renderer
 }
 
 func (t *Renderer) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	t.RLock()
+	defer t.RUnlock()
+
 	if !strings.HasSuffix(name, ".gohtml") {
 		name += ".gohtml"
 	}
@@ -69,95 +143,8 @@ func (t *Renderer) Render(w io.Writer, name string, data interface{}, c echo.Con
 		return fmt.Errorf("can find template %q", name)
 	}
 
-	return t.templates[name].ExecuteTemplate(w, filepath.Base(name), struct {
+	return t.templates[name].Funcs(contextFuncs(c)).ExecuteTemplate(w, filepath.Base(name), struct {
 		Data    interface{}
 		Context echo.Context
 	}{data, c})
-}
-
-func funcs(store problems.Store, db *sql.DB, store2 partials.Store) template.FuncMap {
-	return template.FuncMap{
-		"translateContent": i18n.TranslateContent,
-		"problem":          store.Get,
-		"str2html": func(s string) template.HTML {
-			return template.HTML(s)
-		},
-		"logged": func(c echo.Context) bool {
-			if _, ok := c.Get("user").(*models.User); ok {
-				return nil != c.Get("user").(*models.User)
-			}
-
-			return false
-		},
-		"user": func(c echo.Context) *models.User {
-			if _, ok := c.Get("user").(*models.User); ok {
-				return c.Get("user").(*models.User)
-			}
-
-			return nil
-		},
-		"canView": func(role string, entity roles.Entity) bool {
-			return roles.Can(roles.Role(role), roles.ActionView, entity)
-		},
-		"get": func(c echo.Context, key string) interface{} {
-			return c.Get(key)
-		},
-		"fixedlen": func(a int, len int) string {
-			return fmt.Sprintf(fmt.Sprintf("%%0%dd", len), a)
-		},
-		"fixedlenFloat32": func(a float32, len int) string {
-			return fmt.Sprintf(fmt.Sprintf("%%.%df", len), a)
-		},
-		"month2int": func(month time.Month) int {
-			return int(month)
-		},
-		"decr": func(val int) int {
-			return val - 1
-		},
-		"add": func(a, b int) int {
-			return a + b
-		},
-		"parseStatus": func(s string) *problems.Status {
-			st := &problems.Status{}
-			err := json.Unmarshal([]byte(s), st)
-			if err != nil {
-				log.Debug(err)
-			}
-
-			return st
-		},
-		"divide": func(a, b int) int {
-			return a / b
-		},
-		"tostring": func(b []byte) string {
-			return string(b)
-		},
-		"gravatarHash": func(user *models.User) string {
-			return fmt.Sprintf("%x", md5.Sum([]byte(strings.ToLower(strings.TrimSpace(user.Email)))))
-		},
-		"dict": func(values ...interface{}) (map[string]interface{}, error) {
-			if len(values)%2 != 0 {
-				return nil, errors.New("invalid dict call")
-			}
-			dict := make(map[string]interface{}, len(values)/2)
-			for i := 0; i < len(values); i += 2 {
-				key, ok := values[i].(string)
-				if !ok {
-					return nil, errors.New("dict keys must be strings")
-				}
-				dict[key] = values[i+1]
-			}
-			return dict, nil
-		},
-		"partial": func(name string) string {
-			c, _ := store2.Get(name)
-			return c
-		},
-		"roundto": func(num float64, digs int) float64 {
-			return math.Round(num*100) / 100
-		},
-		"tags": func() (models.TagSlice, error) {
-			return models.Tags().All(db)
-		},
-	}
 }

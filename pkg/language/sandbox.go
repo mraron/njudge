@@ -44,7 +44,7 @@ func NewSandboxProvider() *SandboxProvider {
 
 func (sp *SandboxProvider) Get() (Sandbox, error) {
 	if len(sp.sandboxes) == 0 {
-		return nil, errors.New("No sandbox available")
+		return nil, errors.New("no sandbox available")
 	}
 
 	return <-sp.sandboxes, nil

@@ -29,41 +29,6 @@ func TestFeedbackFromString(t *testing.T) {
 	}
 }
 
-func TestGroup_AddTestcase(t *testing.T) {
-	type fields struct {
-		Name         string
-		Scoring      ScoringType
-		Testcases    []Testcase
-		Dependencies []string
-	}
-	type args struct {
-		testcase Testcase
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		want   int
-	}{
-		{"test empty", fields{Name: "tests", Scoring: ScoringSum, Testcases: make([]Testcase, 0), Dependencies: nil}, args{testcase: Testcase{Index: 2}}, 1},
-		{"test non empty", fields{Name: "tests", Scoring: ScoringSum, Testcases: make([]Testcase, 5), Dependencies: nil}, args{testcase: Testcase{Index: 2}}, 6},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			g := &Group{
-				Name:         tt.fields.Name,
-				Scoring:      tt.fields.Scoring,
-				Testcases:    tt.fields.Testcases,
-				Dependencies: tt.fields.Dependencies,
-			}
-			g.AddTestcase(tt.args.testcase)
-			if got := g.Testcases[len(g.Testcases)-1].Index; got != tt.want {
-				t.Errorf("AddTestcase(): got %d want %d", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestGroup_FirstNonAC(t *testing.T) {
 	type fields struct {
 		Name         string
@@ -168,8 +133,8 @@ func TestGroup_MaxScore(t *testing.T) {
 		fields fields
 		want   float64
 	}{
-		{"last", fields{Testcases: []Testcase{{MaxScore: 0.5}, {MaxScore: 0.5}}}, 1},
-		{"first", fields{Testcases: []Testcase{{MaxScore: 1}, {MaxScore: 2}}}, 3},
+		{"last", fields{Scoring: ScoringSum, Testcases: []Testcase{{MaxScore: 0.5}, {MaxScore: 0.5}}}, 1},
+		{"first", fields{Scoring: ScoringSum, Testcases: []Testcase{{MaxScore: 1}, {MaxScore: 2}}}, 3},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
