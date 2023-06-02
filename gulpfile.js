@@ -12,7 +12,7 @@ function adminJS() {
 }
 
 function mainCSS() {
-    return src("static_src/css/*.css").pipe(src('node_modules/bootstrap/dist/css/bootstrap.min.css')).pipe(purgeCSS({
+    return src("src/css/*.css").pipe(src('node_modules/bootstrap/dist/css/bootstrap.min.css')).pipe(purgeCSS({
         content: ['templates/*.gohtml', 'templates/**/*.gohtml'],
         safelist: {
             deep: [/^modal/]
@@ -21,11 +21,11 @@ function mainCSS() {
 }
 
 function mainJS() {
-    return src("static_src/js/*.js").pipe(dest("static/js"))
+    return src("src/js/*.js").pipe(dest("static/js"))
 }
 
 function mainFavicon() {
-    return src("static_src/favicon.ico").pipe(src("static_src/*.png")).pipe(src("static_src/site.webmanifest")).pipe(dest("static"))
+    return src("src/favicon.ico").pipe(src("src/*.png")).pipe(src("src/site.webmanifest")).pipe(dest("static"))
 }
 
 const admin = parallel(adminCSS, adminJS)
