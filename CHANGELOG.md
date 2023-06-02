@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Updating language and problem list every 20 second.
+- Task archive only displaying the toplevel categories.
 
 ## [0.1.0] - 2023-06-02
 

@@ -40,10 +40,10 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 
 		taskArchive := TaskArchive{Roots: make([]TreeNode, 0)}
 
-		var dfs func(category *models.ProblemCategory, node TreeNode) error
+		var dfs func(category *models.ProblemCategory, node *TreeNode) error
 		id := 1000
 
-		dfs = func(root *models.ProblemCategory, tree TreeNode) error {
+		dfs = func(root *models.ProblemCategory, tree *TreeNode) error {
 			problemList, err := models.ProblemRels(Where("category_id = ?", root.ID), OrderBy("problem")).All(c.Request().Context(), DB)
 			if err != nil {
 				return err
@@ -87,7 +87,7 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 				}
 
 				tree.Children = append(tree.Children, akt)
-				if err := dfs(cat, akt); err != nil {
+				if err := dfs(cat, &akt); err != nil {
 					return err
 				}
 			}
@@ -105,7 +105,7 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 				SolvedStatus: -1,
 			})
 
-			if dfs(start, taskArchive.Roots[len(taskArchive.Roots)-1]) != nil {
+			if dfs(start, &taskArchive.Roots[len(taskArchive.Roots)-1]) != nil {
 				return err
 			}
 		}
