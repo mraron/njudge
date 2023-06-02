@@ -5,16 +5,16 @@
             <div class="col-md-auto col-12">
                 <img src="https://www.gravatar.com/avatar/{{gravatarHash .Data.User}}?d=identicon&s=128" width="96px" height="96px" alt=""><br>
                 <br>
-                <b>Pontok</b>: {{fixedLenFloat32 .Data.User.Points.Float32 2}}
+                <b>{{Tr "Points"}}</b>: {{fixedLenFloat32 .Data.User.Points.Float32 2}}
             </div>
             <div class="col">
                 <div class="card">
-                    <div class="card-header"><i class="fas fa-check"></i> Megoldott feladatok ({{len .Data.SolvedProblems}})</div>
+                    <div class="card-header"><i class="fas fa-check"></i> {{Tr "Solved problems"}} ({{len .Data.SolvedProblems}})</div>
                     <div class="card-body">{{range $i := .Data.SolvedProblems}}<a href="/submission/{{$i.ID}}">{{$i.Problem}}</a> {{end}}</div>
                 </div>
                 <br>
                 <div class="card">
-                    <div class="card-header"><i class="fas fa-times"></i> Megpróbált feladatok ({{len .Data.AttemptedNotSolvedProblems}}):</div>
+                    <div class="card-header"><i class="fas fa-times"></i> {{Tr "Attempted problems"}} ({{len .Data.AttemptedNotSolvedProblems}}):</div>
                     <div class="card-body">{{range $i := .Data.AttemptedNotSolvedProblems}}<a href="/submission/{{$i.ID}}">{{$i.Problem}}</a> {{end}}</div>
                 </div>
             </div>

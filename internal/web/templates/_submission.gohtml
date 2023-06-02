@@ -4,20 +4,20 @@
     {{if .Judged.Valid}}
         {{$testset := (index $status.Feedback 0)}}
         {{if eq .Verdict 0}}
-            <span class="text-success">Elfogadva</span>
+            <span class="text-success">{{Tr "Accepted"}}</span>
         {{else}}
             {{if eq .Verdict 998}}
-                Fordítási Hiba
+                {{Tr "Compilation error"}}
             {{else}}
-                <span class="text-info">{{$tc := $testset.FirstNonAC}}{{($testset.IndexTestcase $tc).VerdictName}} a(z) {{$tc}}. teszteseten</span>
+                <span class="text-info">{{$tc := $testset.FirstNonAC}}{{ $verdict := (verdict (($testset.IndexTestcase $tc).VerdictName)) }}{{Tr "%s on test %d" (Tr $verdict) $tc}}</span>
             {{end}}
         {{end}}
     {{else}}
         {{if eq .Verdict 8}}
-            <span class="text-muted">Beküldve</span>
+            <span class="text-muted">{{Tr "Uploaded"}}</span>
         {{else}}
             <span class="text-info">
-                Fut {{if .Ontest.Valid}} {{.Ontest.String}}. teszteseten {{end}}
+                {{Tr "Running"}}{{if .Ontest.Valid}}{{$test := .Ontest.String}} {{Tr "on test %s" $test}} {{end}}
             </span>
         {{end}}
     {{end}}
@@ -26,19 +26,19 @@
     {{if .Judged.Valid}}
         {{$testset := (index $status.Feedback 0)}}
         {{if $testset.IsAC}}
-            <span class="text-success">Elfogadva {{roundTo $testset.Score 2}}/{{$testset.MaxScore}}</span>
+            <span class="text-success">{{Tr "Accepted"}} {{roundTo $testset.Score 2}}/{{$testset.MaxScore}}</span>
         {{else}}
             {{if eq .Verdict 998}}
-                Fordítási Hiba
+                {{Tr "Compilation error"}}
             {{else}}
-                <span class="text-info">{{($testset.IndexTestcase $testset.FirstNonAC).VerdictName}} {{roundTo $testset.Score 2}}/{{$testset.MaxScore}}</span>
+                <span class="text-info">{{$tc := $testset.FirstNonAC}}{{ verdict (($testset.IndexTestcase $tc).VerdictName) | Tr }} {{roundTo $testset.Score 2}}/{{$testset.MaxScore}}</span>
             {{end}}
         {{end}}
     {{else}}
         {{if eq .Verdict 8}}
-            <span class="text-muted">Beküldve</span>
+            <span class="text-muted">{{Tr "Uploaded"}}</span>
         {{else}}
-            <span class="text-info">Fut</span>
+            <span class="text-info">{{Tr "Running"}}</span>
         {{end}}
     {{end}}
 {{end}}
@@ -46,22 +46,22 @@
     {{if .Judged.Valid}}
         {{$testset := (index $status.Feedback 0)}}
         {{if $testset.IsAC}}
-            <span class="text-success">Elfogadva</span>
+            <span class="text-success">{{Tr "Accepted"}}</span>
         {{else}}
             {{if eq .Verdict 998}}
-                Fordítási Hiba
+                {{Tr "Compilation error"}}
             {{else}}
-                <span class="text-info">{{(index $status.Feedback (decr $testset.FirstNonAC)).VerdictName}}</span>
+                <span class="text-info">{{$tc := $testset.FirstNonAC}}{{Tr (verdict (($testset.IndexTestcase $tc).VerdictName))}}</span>
             {{end}}
         {{end}}
     {{else}}
         {{if ne $status.Compiled true}}
-            <span class="text-danger">Fordítási hiba</span>
+            <span class="text-danger">{{Tr "Compilation error"}}</span>
         {{else}}
             {{if eq .Verdict 8}}
-                <span class="text-muted">Beküldve</span>
+                <span class="text-muted">{{Tr "Uploaded"}}</span>
             {{else}}
-                <span class="text-info">Fut</span>
+                <span class="text-info">{{Tr "Running"}}</span>
             {{end}}
         {{end}}
     {{end}}
@@ -73,7 +73,7 @@
         <td>{{.Submitted.Local.Year}}. {{fixedLen (month2int .Submitted.Local.Month) 2}}. {{fixedLen .Submitted.Local.Day 2}} {{fixedLen .Submitted.Local.Hour 2}}:{{fixedLen .Submitted.Local.Minute 2}}:{{fixedLen .Submitted.Local.Second 2}}</td>
         {{$userName := (.User.OneG contextTODO).Name}}
         <td><a href="/user/profile/{{$userName}}/">{{$userName}}</a></td>
-        <td><a href="/problemset/{{.Problemset}}/{{.Problem}}/">{{translateContent "hungarian" (problem .Problem).Titles}}</a></td>
+        <td><a href="/problemset/{{.Problemset}}/{{.Problem}}/">{{(get "translator").TranslateContent ((problem .Problem).Titles)}}</a></td>
         <td>{{.Language}}</td>
         <td>
             {{$status := parseStatus .Status}}

@@ -14,7 +14,6 @@ COPY static/ ./static
 COPY cmd/ ./cmd
 COPY pkg/ ./pkg
 COPY internal/ ./internal
-COPY templates/ ./templates
 COPY main.go ./
 
 RUN go build

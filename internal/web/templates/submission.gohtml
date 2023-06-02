@@ -2,7 +2,7 @@
 
 {{if logged}}
     {{if canView (user).Role "submissions/rejudge"}}
-        <a class="btn btn-secondary" href="/submission/rejudge/{{.Data.ID}}"><i class="fas fa-sync"></i> Rejudge</a>
+        <a class="btn btn-secondary" href="/submission/rejudge/{{.Data.ID}}"><i class="fas fa-sync"></i> {{Tr "Rejudge"}}</a>
         <br>
         <br>
     {{end}}
@@ -30,7 +30,7 @@
 
 {{if not $status.Compiled}}
     <div class="card">
-        <div class="card-header bg-warning"><i class="fas fa-exclamation-triangle"></i> Fordítási hiba</div>
+        <div class="card-header bg-warning"><i class="fas fa-exclamation-triangle"></i> {{Tr "Compilation error"}}</div>
         <div class="card-body">
             <pre><code class="nohighlight">{{$status.CompilerOutput}}</code></pre>
         </div>
@@ -42,14 +42,14 @@
         {{range $i, $e := $testset.Testcases}}
             {{$ind := add $i 1}}
             <div class="card">
-                <div class="card-header {{if and (eq $e.VerdictName 0) ($status.Compiled)}}bg-success{{else}}bg-danger{{end}}"><span class="fas fa-{{if and (eq $e.VerdictName 0) ($status.Compiled)}}check{{else}}times{{end}}"></span> {{$ind}} - {{if $status.Compiled}}{{$e.VerdictName.String}}{{else}}Fordítási hiba{{end}}</div>
+                <div class="card-header {{if and (eq $e.VerdictName 0) ($status.Compiled)}}bg-success{{else}}bg-danger{{end}}"><span class="fas fa-{{if and (eq $e.VerdictName 0) ($status.Compiled)}}check{{else}}times{{end}}"></span> {{$ind}} - {{if $status.Compiled}}{{verdict $e.VerdictName | Tr}}{{else}}{{Tr "Compilation error"}}{{end}}</div>
                 <div class="card-body">
-                    <span class="fas fa-hdd"></span> Memória: {{$e.MemoryUsed}}KB <br><span class="fas fa-clock"></span> Idő:{{$e.TimeSpent}}<br><br>
-                    Program kimenete:
+                    <span class="fas fa-hdd"></span> {{Tr "Memory"}}: {{$e.MemoryUsed}}KiB <br><span class="fas fa-clock"></span> {{Tr "Time"}}: {{$e.TimeSpent}}<br><br>
+                    {{Tr "Program's output"}}:
                     <pre><code class="nohighlight">{{$e.Output}}</code></pre>
-                    Elvárt kimenete:
+                    {{Tr "Expected output"}}:
                     <pre><code class="nohighlight">{{$e.ExpectedOutput}}</code></pre>
-                    Checker kimenete:
+                    {{Tr "Checker output"}}:
                     <pre><code class="nohighlight">{{$e.CheckerOutput}}</code></pre>
                 </div>
             </div>
@@ -63,12 +63,12 @@
         <table class="table table-bordered table-sm">
             <thead>
                 <tr>
-                    <th class="text-center" colspan="2">Részfeladat</th>
-                    <th class="text-center">Összpont</th>
-                    <th>Teszt</th>
-                    <th colspan="2">Verdikt</th>
-                    <th>Idő</th>
-                    <th>Memória</th>
+                    <th class="text-center" colspan="2">{{Tr "Subtask"}}</th>
+                    <th class="text-center">{{Tr "Sum"}}</th>
+                    <th>{{Tr "Test"}}</th>
+                    <th colspan="2">{{Tr "Verdict"}}</th>
+                    <th>{{Tr "Time"}}</th>
+                    <th>{{Tr "Memory"}}</th>
                 </tr>
             </thead>
             {{range $testset := $status.Feedback}}
@@ -91,7 +91,7 @@
                     {{range $t := $g.Testcases}}
                         <tr>
                             <td>{{$t.Index}}</td>
-                            <td {{if ne $g.Scoring 1}}colspan="2"{{end}}><span class="{{if eq $t.VerdictName 0}}text-success{{else}}text-info{{end}}">{{$t.VerdictName.String}}</span></td>
+                            <td {{if ne $g.Scoring 1}}colspan="2"{{end}}><span class="{{if eq $t.VerdictName 0}}text-success{{else}}text-info{{end}}">{{(verdict $t.VerdictName).String | Tr}}</span></td>
                             {{if eq $g.Scoring 1}}
                                 <td>{{roundTo $t.Score 2}}/{{$t.MaxScore}}</td>
                             {{end}}

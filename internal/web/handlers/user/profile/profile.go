@@ -1,20 +1,23 @@
 package profile
 
 import (
-	"fmt"
+	"net/http"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/web/domain/submission"
 	"github.com/mraron/njudge/internal/web/helpers"
+	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
 	"github.com/mraron/njudge/internal/web/models"
 	"github.com/mraron/njudge/internal/web/services"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"net/http"
 )
 
 func GetProfile(DB *sqlx.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
+
 		u := c.Get("profile").(*models.User)
 		var (
 			solved, attempted models.SubmissionSlice
@@ -39,7 +42,7 @@ func GetProfile(DB *sqlx.DB) echo.HandlerFunc {
 			return err
 		}
 
-		c.Set("title", fmt.Sprintf("%s", u.Name))
+		c.Set("title", tr.Translate("%s's profile", u.Name))
 		return c.Render(http.StatusOK, "user/profile/main", struct {
 			User                       *models.User
 			SolvedProblems             models.SubmissionSlice
@@ -53,6 +56,8 @@ func GetSubmissions(statusPageService services.StatusPageService) echo.HandlerFu
 		Page int `query:"page"`
 	}
 	return func(c echo.Context) error {
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
+
 		u := c.Get("profile").(*models.User)
 
 		data := request{}
@@ -80,7 +85,7 @@ func GetSubmissions(statusPageService services.StatusPageService) echo.HandlerFu
 			return err
 		}
 
-		c.Set("title", fmt.Sprintf("%s beküldései", u.Name))
+		c.Set("title", tr.Translate("%s's submissions", u.Name))
 		return c.Render(http.StatusOK, "user/profile/submissions", struct {
 			User       *models.User
 			StatusPage *submission.StatusPage

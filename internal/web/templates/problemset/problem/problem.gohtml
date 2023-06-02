@@ -1,10 +1,12 @@
 {{template "header" .}}
 {{template "problem_menu" "problem"}}
+{{$title := ((get "translator").TranslateContent .Data.Problem.Titles ).Value | toString}}
+{{$locale := (get "translator").LocaleName}}
 <div class="modal fade" id="tagModal" tabindex="-1" aria-labelledby="tagModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="tagModalLabel">Tag hozzáadása a "{{translateContent "hungarian" .Data.Problem.Titles}}" feladathoz</h5>
+        <h5 class="modal-title" id="tagModalLabel">{{Tr "Add a tag to problem %q" $title}}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -20,8 +22,8 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Mégse</button>
-        <button type="submit" class="btn btn-primary" form="addTag">Tag hozzáadása</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{Tr "Cancel"}}</button>
+        <button type="submit" class="btn btn-primary" form="addTag">{{Tr "Add"}}</button>
       </div>
     </div>
   </div>
@@ -30,32 +32,32 @@
 <div class="row">
 <div class="col-12 col-lg-9">
 {{if $htmls := .Data.Problem.Statements.FilterByType "text/html"}}
-    {{str2html (translateContent "hungarian" $htmls).String}}
+    {{str2html (translateContent $locale $htmls).String}}
 {{else if $pdfs := .Data.Problem.Statements.FilterByType "application/pdf"}}
-    <embed src="pdf/{{(translateContent "hungarian" $pdfs).Locale}}/" width="100%" height="800px"/>
+    <embed src="pdf/{{(translateContent $locale $pdfs).Locale}}/" width="100%" height="800px"/>
 {{end}}
 </div>
 
 <div class="col-12 col-lg-3">
 <div class="card">
     <div class="card-header">
-        <i class="fas fa-info"></i> Információk
+        <i class="fas fa-info"></i> {{Tr "Information"}}
     </div>
     <div class="card-body">
         <div class="row">
-            <div class="col-6">Azonosító:</div>
+            <div class="col-6">{{Tr "Identifier"}}:</div>
             <div class="col-6">{{.Data.Problem.Name}}</div>
-            <div class="col-6">Cím:</div>
-            <div class="col-6">{{translateContent "hungarian" .Data.Problem.Titles}}</div>
+            <div class="col-6">{{Tr "Title"}}:</div>
+            <div class="col-6">{{$title}}</div>
             {{if ne .Data.Problem.GetTaskType.Name "outputonly" }}
-            <div class="col-6">Időlimit:</div>
+            <div class="col-6">{{Tr "Time limit"}}:</div>
             <div class="col-6">{{.Data.Problem.TimeLimit}} ms</div>
-            <div class="col-6">Memórialimit:</div>
+            <div class="col-6">{{Tr "Memory limit"}}:</div>
             <div class="col-6">{{divide .Data.Problem.MemoryLimit 1048576}} MiB</div>
             {{end}}
             {{$solvedStatus := .Data.SolvedStatus}}
             {{if or .Data.Tags (eq $solvedStatus 3)}}
-            <div class="col-6">Tagek:</div>
+            <div class="col-6">{{Tr "Tags"}}:</div>
             <div class="col-6">
             {{range $i := .Data.Tags}}<span class="badge badge-secondary">{{$i.Name}}{{if (eq $solvedStatus 3)}} <a href="delete_tag/{{$i.ID}}" style="color:#fff;">&times;</a>{{end}}</span> {{end}}
             {{if (eq $solvedStatus 3)}}
@@ -63,7 +65,7 @@
             {{end}}
             </div>
             {{end}}
-            <div class="col-6">Típus:</div>
+            <div class="col-6">{{Tr "Task type"}}:</div>
             <div class="col-6">{{.Data.Problem.GetTaskType.Name}}</div>
         </div>
     </div>
@@ -74,7 +76,7 @@
 <br>
 <div class="card">
     <div class="card-header">
-        <i class="fas fa-paper-plane"></i> Megoldás beküldése
+        <i class="fas fa-paper-plane"></i> {{Tr "Submit solution"}}
     </div>
     <div class="card-body">
         {{if logged}}
@@ -101,7 +103,7 @@
 <br>
 <div class="card table-responsive">
     <div class="card-header" style="border-bottom: 0px;">
-        <i class="fas fa-history"></i> Beküldések
+        <i class="fas fa-history"></i> {{Tr "Last submissions"}}
     </div>
     <table class="card-body table" style="margin: 0px;">
         {{range $s := .Data.Submissions}}
@@ -119,14 +121,14 @@
 <br>
 <div class="card">
     <div class="card-header">
-        <i class="fas fa-paperclip"></i> Mellékletek
+        <i class="fas fa-paperclip"></i> {{Tr "Attachments"}}
     </div>
     <div class="card-body">
         {{range $a := .Data.Problem.Attachments}}
-            <a href="attachment/{{$a.Name}}/"><i class="fas fa-file"></i> Fájl ({{$a.Name}})</a><br>
+            <a href="attachment/{{$a.Name}}/"><i class="fas fa-file"></i> {{Tr "File"}} ({{$a.Name}})</a><br>
         {{end}}
         {{range $loc := (.Data.Problem.Statements.FilterByType "application/pdf").Locales}}
-            <a href="pdf/{{$loc}}/"><i class="fas fa-file-pdf"></i> Leírás ({{$loc}})</a><br>
+            <a href="pdf/{{$loc}}/"><i class="fas fa-file-pdf"></i> {{Tr "Statement"}} ({{$loc}})</a><br>
         {{end}}
 
     </div>
@@ -135,4 +137,7 @@
 </div>
 
 </div>
+<br>
+<br>
+<br>
 {{template "footer" .}}

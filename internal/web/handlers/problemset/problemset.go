@@ -1,19 +1,21 @@
 package problemset
 
 import (
-	"github.com/jmoiron/sqlx"
-	"github.com/labstack/echo/v4"
-	"github.com/mraron/njudge/internal/web/domain/problem"
-	"github.com/mraron/njudge/internal/web/helpers/pagination"
-	"github.com/mraron/njudge/internal/web/helpers/ui"
-	"github.com/mraron/njudge/internal/web/models"
-	"github.com/mraron/njudge/internal/web/services"
-	"github.com/mraron/njudge/pkg/problems"
 	"io"
 	"net/http"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/jmoiron/sqlx"
+	"github.com/labstack/echo/v4"
+	"github.com/mraron/njudge/internal/web/domain/problem"
+	"github.com/mraron/njudge/internal/web/helpers/i18n"
+	"github.com/mraron/njudge/internal/web/helpers/pagination"
+	"github.com/mraron/njudge/internal/web/helpers/ui"
+	"github.com/mraron/njudge/internal/web/models"
+	"github.com/mraron/njudge/internal/web/services"
+	"github.com/mraron/njudge/pkg/problems"
 )
 
 type CategoryFilterOption struct {
@@ -52,6 +54,8 @@ func GetProblemList(DB *sqlx.DB, problemListService services.ProblemListService,
 		Problemset string `param:"name"`
 	}
 	return func(c echo.Context) error {
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
+
 		data := request{}
 		if err := c.Bind(&data); err != nil {
 			return err
@@ -146,7 +150,7 @@ func GetProblemList(DB *sqlx.DB, problemListService services.ProblemListService,
 			emptySelected = true
 		}
 		result.CategoryFilterOptions = append(result.CategoryFilterOptions, CategoryFilterOption{
-			Name:     "Kategória nélkül",
+			Name:     tr.Translate("No category"),
 			Value:    "-1",
 			Selected: emptySelected,
 		})
@@ -195,7 +199,7 @@ func GetProblemList(DB *sqlx.DB, problemListService services.ProblemListService,
 			return result.CategoryFilterOptions[i].Name < result.CategoryFilterOptions[j].Name
 		})
 
-		c.Set("title", "Feladatok")
+		c.Set("title", tr.Translate("Problems"))
 		return c.Render(http.StatusOK, "problemset/list", result)
 	}
 }
@@ -209,6 +213,8 @@ func GetStatus(statusPageService services.StatusPageService) echo.HandlerFunc {
 		Page       int    `query:"page"`
 	}
 	return func(c echo.Context) error {
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
+
 		data := request{}
 		if err := c.Bind(&data); err != nil {
 			return err
@@ -241,7 +247,7 @@ func GetStatus(statusPageService services.StatusPageService) echo.HandlerFunc {
 			return err
 		}
 
-		c.Set("title", "Beküldések")
+		c.Set("title", tr.Translate("Submissions"))
 		return c.Render(http.StatusOK, "status.gohtml", statusPage)
 	}
 }
@@ -255,9 +261,6 @@ func PostSubmit(subService services.SubmitService) echo.HandlerFunc {
 	}
 	return func(c echo.Context) error {
 		u := c.Get("user").(*models.User)
-		if u == nil {
-			return c.Render(http.StatusForbidden, "message", "Előbb lépj be.")
-		}
 
 		data := request{}
 		if err := c.Bind(&data); err != nil {
@@ -298,6 +301,6 @@ func PostSubmit(subService services.SubmitService) echo.HandlerFunc {
 			return err
 		}
 
-		return c.Redirect(http.StatusFound, "/problemset/status/#submission"+strconv.Itoa(sub.ID))
+		return c.Redirect(http.StatusFound, c.Echo().Reverse("getProblemsetStatus")+"#submission"+strconv.Itoa(sub.ID))
 	}
 }

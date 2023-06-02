@@ -1,14 +1,15 @@
 package handlers
 
 import (
-	"fmt"
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/web/domain/submission"
 	"github.com/mraron/njudge/internal/web/helpers"
+	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/helpers/roles"
 	"github.com/mraron/njudge/internal/web/models"
 	"github.com/mraron/njudge/internal/web/services"
-	"net/http"
 )
 
 func GetSubmission(r submission.Repository) echo.HandlerFunc {
@@ -17,6 +18,8 @@ func GetSubmission(r submission.Repository) echo.HandlerFunc {
 	}
 
 	return func(c echo.Context) error {
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
+
 		data := &request{}
 		if err := c.Bind(data); err != nil {
 			return err
@@ -27,7 +30,7 @@ func GetSubmission(r submission.Repository) echo.HandlerFunc {
 			return err
 		}
 
-		c.Set("title", fmt.Sprintf("Beküldés #%d", data.ID))
+		c.Set("title", tr.Translate("Submission #%d", data.ID))
 		return c.Render(http.StatusOK, "submission.gohtml", sub)
 	}
 }

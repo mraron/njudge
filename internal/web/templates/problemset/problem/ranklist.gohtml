@@ -4,8 +4,8 @@
 <table class="table table-sm table-bordered">
 <thead>
 <tr>
-    <th scope="col">Név</th>
-    <th scope="col">Pont</th>
+    <th scope="col">{{Tr "Name"}}</th>
+    <th scope="col">{{Tr "Points"}}</th>
 </tr>
 </thead>
 {{$mx := (index (.Data.Problem.StatusSkeleton "").Feedback 0).MaxScore}}

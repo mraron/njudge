@@ -2,6 +2,7 @@ package web
 
 import (
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"strings"
 	"time"
 
@@ -25,7 +26,9 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 		Skipper: func(c echo.Context) bool {
 			return strings.HasPrefix(c.Request().URL.Path, "/api") || strings.HasPrefix(c.Request().URL.Path, "/admin")
 		},
+		CookiePath: "/",
 	}))
+	e.Use(i18n.SetTranslatorMiddleware())
 	e.Use(user.SetUserMiddleware(s.DB))
 	e.Use(helpers.ClearTemporaryFlashes())
 
@@ -40,8 +43,8 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 
 	ps := e.Group("/problemset", problemset.SetNameMiddleware())
 	ps.GET("/:name/", problemset.GetProblemList(s.DB, services.NewSQLProblemListService(s.DB.DB, s.ProblemStore, services.NewSQLProblem(s.DB.DB, s.ProblemStore)), services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
-	ps.POST("/:name/submit", problemset.PostSubmit(services.NewSQLSubmitService(s.DB.DB, s.ProblemStore)))
-	ps.GET("/status/", problemset.GetStatus(services.NewSQLStatusPageService(s.DB.DB)))
+	ps.POST("/:name/submit", problemset.PostSubmit(services.NewSQLSubmitService(s.DB.DB, s.ProblemStore)), user.RequireLoginMiddleware())
+	ps.GET("/status/", problemset.GetStatus(services.NewSQLStatusPageService(s.DB.DB))).Name = "getProblemsetStatus"
 
 	psProb := ps.Group("/:name/:problem", problemset.RenameProblemMiddleware(s.ProblemStore), problemset.SetProblemMiddleware(services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
 	psProb.GET("/", problemset.GetProblem()).Name = "getProblemMain"
@@ -57,10 +60,10 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 
 	u := e.Group("/user")
 
-	u.GET("/auth/callback", user.AuthCallback(s.DB))
-	u.GET("/auth", user.Auth())
+	u.GET("/auth/callback", user.OAuthCallback(s.DB))
+	u.GET("/auth", user.BeginOAuth())
 
-	u.GET("/login", user.GetLogin())
+	u.GET("/login", user.GetLogin()).Name = "getUserLogin"
 	u.POST("/login", user.PostLogin(s.DB))
 	u.GET("/logout", user.Logout())
 	u.GET("/register", user.GetRegister())

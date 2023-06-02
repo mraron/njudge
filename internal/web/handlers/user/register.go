@@ -2,20 +2,20 @@ package user
 
 import (
 	"bytes"
-	"context"
-	"database/sql"
 	"fmt"
-	"github.com/mraron/njudge/internal/web/domain/email"
-	"github.com/mraron/njudge/internal/web/helpers"
-	"github.com/mraron/njudge/internal/web/helpers/config"
-	"github.com/mraron/njudge/internal/web/models"
-	"github.com/mraron/njudge/internal/web/services"
 	"net/http"
 	"unicode"
 
+	"github.com/mraron/njudge/internal/web/domain/email"
+	"github.com/mraron/njudge/internal/web/helpers"
+	"github.com/mraron/njudge/internal/web/helpers/config"
+	"github.com/mraron/njudge/internal/web/helpers/i18n"
+	"github.com/mraron/njudge/internal/web/models"
+	"github.com/mraron/njudge/internal/web/services"
+	"github.com/volatiletech/sqlboiler/v4/boil"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
-	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -43,6 +43,8 @@ func Register(cfg config.Server, DB *sqlx.DB, mailService services.MailService) 
 		Password2 string `form:"password2"`
 	}
 	return func(c echo.Context) error {
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
+
 		data := request{}
 		if err := c.Bind(&data); err != nil {
 			return err
@@ -83,18 +85,18 @@ func Register(cfg config.Server, DB *sqlx.DB, mailService services.MailService) 
 			}
 		}
 
-		used("name", data.Name, "A név foglalt")
-		used("email", data.Email, "Az email cím foglalt")
+		used("name", data.Name, tr.Translate("The nickname is already registered."))
+		used("email", data.Email, tr.Translate("The email is already registered."))
 
-		required("name", "A név mező szükséges")
-		required("password", "A jelszó mező szükséges")
-		required("password2", "A jelszó ellenörző mező szükséges")
-		required("email", "Az email mező szükséges")
+		required("name", tr.Translate("The nickname field is required."))
+		required("password", tr.Translate("The password field is required."))
+		required("password2", tr.Translate("The password confirmation field is required."))
+		required("email", tr.Translate("The email field is required."))
 
-		alphaNumeric(data.Name, "A név csak alfanumerikus karakterekből állhat")
+		alphaNumeric(data.Name, tr.Translate("The nickname can only consist of alphanumeric characters: letters (including non-latin characters such as 'á' or 'ű') and digits."))
 
 		if data.Password != data.Password2 {
-			errStrings = append(errStrings, "A két jelszó nem egyezik meg")
+			errStrings = append(errStrings, tr.Translate("The two passwords don't match."))
 		}
 
 		if err != nil {
@@ -138,7 +140,7 @@ func Register(cfg config.Server, DB *sqlx.DB, mailService services.MailService) 
 
 			m := email.Mail{}
 			m.Recipients = []string{c.FormValue("email")}
-			m.Subject = "Regisztráció aktiválása"
+			m.Subject = tr.Translate("Activate your account")
 
 			message := &bytes.Buffer{}
 			mustPanic(c.Echo().Renderer.Render(message, "mail/activation", struct {
@@ -167,8 +169,10 @@ func Register(cfg config.Server, DB *sqlx.DB, mailService services.MailService) 
 
 func GetActivateInfo() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
+
 		if u := c.Get("user").(*models.User); u != nil {
-			return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
+			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
 		}
 
 		return c.Render(http.StatusOK, "user/activate.gohtml", nil)
@@ -176,41 +180,40 @@ func GetActivateInfo() echo.HandlerFunc {
 }
 
 func Activate(DB *sqlx.DB) echo.HandlerFunc {
+	type request struct {
+		Name string `param:"name"`
+		Key  string `param:"key"`
+	}
 	return func(c echo.Context) error {
-		var (
-			user *models.User
-			err  error
-			tx   *sql.Tx
-		)
-
-		if u := c.Get("user").(*models.User); u != nil {
-			return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
+		data := request{}
+		if err := c.Bind(&data); err != nil {
+			return err
 		}
 
-		if user, err = models.Users(Where("name=?", c.Param("name"))).One(context.TODO(), DB); err != nil {
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
+
+		if u := c.Get("user").(*models.User); u != nil {
+			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
+		}
+
+		user, err := models.Users(models.UserWhere.Name.EQ(data.Name)).One(c.Request().Context(), DB)
+		if err != nil {
 			return err
 		}
 
 		if !user.ActivationKey.Valid {
-			return c.Render(http.StatusOK, "error.gohtml", "Ez a regisztráció már aktív!")
+			return c.Render(http.StatusOK, "error.gohtml", tr.Translate("This account has already been activated."))
 		}
 
-		if user.ActivationKey.String != c.Param("key") {
-			return c.Render(http.StatusOK, "error.gohtml", "Hibás aktiválási kulcs. Biztos jó linkre kattintottál?")
+		if user.ActivationKey.String != data.Key {
+			return c.Render(http.StatusOK, "error.gohtml", tr.Translate("Wrong activation key. Are you sure you've clicked on the right link?"))
 		}
 
-		if tx, err = DB.Begin(); err != nil {
+		user.ActivationKey.Valid = false
+		if _, err := user.Update(c.Request().Context(), DB, boil.Whitelist(models.UserColumns.ActivationKey)); err != nil {
 			return err
 		}
 
-		if _, err = tx.Exec("UPDATE users SET activation_key=NULL WHERE name=$1", c.Param("name")); err != nil {
-			return err
-		}
-
-		if err = tx.Commit(); err != nil {
-			return err
-		}
-
-		return c.Render(http.StatusOK, "message.gohtml", "Sikeres aktiválás, mostmár beléphetsz.")
+		return c.Render(http.StatusOK, "message.gohtml", tr.Translate("Successful activation. You can login now!"))
 	}
 }

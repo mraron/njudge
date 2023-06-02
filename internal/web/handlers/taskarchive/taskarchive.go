@@ -1,11 +1,12 @@
 package taskarchive
 
 import (
+	"net/http"
+
 	"github.com/mraron/njudge/internal/web/domain/problem"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/models"
-	"net/http"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
@@ -28,6 +29,8 @@ type TreeNode struct {
 
 func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
+
 		u := c.Get("user").(*models.User)
 
 		lst, err := models.ProblemCategories(Where("parent_id IS NULL")).All(c.Request().Context(), DB)
@@ -50,7 +53,7 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 				elem := TreeNode{
 					ID:           id,
 					Type:         "problem",
-					Name:         i18n.TranslateContent("hungarian", problemStore.MustGet(p.Problem).Titles()).String(),
+					Name:         tr.TranslateContent(problemStore.MustGet(p.Problem).Titles()).String(),
 					Link:         c.Echo().Reverse("getProblemMain", p.Problemset, p.Problem),
 					Children:     make([]TreeNode, 0),
 					SolvedStatus: -1,
@@ -107,7 +110,7 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 			}
 		}
 
-		c.Set("title", "Archívum")
+		c.Set("title", tr.Translate("Archive"))
 		return c.Render(http.StatusOK, "task_archive.gohtml", taskArchive)
 	}
 }
