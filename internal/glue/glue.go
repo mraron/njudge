@@ -101,12 +101,19 @@ func (s *Server) runServer() {
 		}
 
 		if st.Done {
-			verdict := st.Status.Feedback[0].Verdict()
+			var (
+				verdict problems.VerdictName
+				score   float64 = 0.0
+			)
+
 			if !st.Status.Compiled {
 				verdict = problems.VerdictName(problem.VerdictCE)
+			} else {
+				verdict = st.Status.Feedback[0].Verdict()
+				score = st.Status.Feedback[0].Score()
 			}
 
-			if _, err := s.DB.Exec("UPDATE submissions SET verdict=$1, status=$2, ontest=NULL, judged=$3, score=$5 WHERE id=$4", verdict, st.Status, time.Now(), id, st.Status.Feedback[0].Score()); err != nil {
+			if _, err := s.DB.Exec("UPDATE submissions SET verdict=$1, status=$2, ontest=NULL, judged=$3, score=$5 WHERE id=$4", verdict, st.Status, time.Now(), id, score); err != nil {
 				return err
 			}
 		} else {

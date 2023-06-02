@@ -42,7 +42,7 @@
         {{range $i, $e := $testset.Testcases}}
             {{$ind := add $i 1}}
             <div class="card">
-                <div class="card-header {{if and (eq $e.VerdictName 0) ($status.Compiled)}}bg-success{{else}}bg-danger{{end}}"><span class="fas fa-{{if and (eq $e.VerdictName 0) ($status.Compiled)}}check{{else}}times{{end}}"></span> {{$ind}} - {{if $status.Compiled}}{{verdict $e.VerdictName | Tr}}{{else}}{{Tr "Compilation error"}}{{end}}</div>
+                <div class="card-header {{if and (eq $e.VerdictName 0) ($status.Compiled)}}bg-success{{else}}bg-danger{{end}}"><span class="fas fa-{{if and (eq $e.VerdictName 0) ($status.Compiled)}}check{{else}}times{{end}}"></span> {{$ind}} - {{if $status.Compiled}}{{(verdict $e.VerdictName).String | Tr}}{{else}}{{Tr "Compilation error"}}{{end}}</div>
                 <div class="card-body">
                     <span class="fas fa-hdd"></span> {{Tr "Memory"}}: {{$e.MemoryUsed}}KiB <br><span class="fas fa-clock"></span> {{Tr "Time"}}: {{$e.TimeSpent}}<br><br>
                     {{Tr "Program's output"}}:
