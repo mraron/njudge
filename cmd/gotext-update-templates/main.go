@@ -82,7 +82,6 @@ func (config Config) Run() error {
 			if _, err := t.Parse(string(file), "", "", trees); err != nil {
 				return err
 			}
-			// this ignores nested nodes, like *parse.RangeNode
 
 			var dfs func(parse.Node)
 			dfs = func(node parse.Node) {

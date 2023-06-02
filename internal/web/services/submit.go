@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/mraron/njudge/internal/web/domain/problem"
 	"github.com/mraron/njudge/internal/web/domain/submission"
-	"github.com/mraron/njudge/internal/web/extmodels"
 	"github.com/mraron/njudge/internal/web/models"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/volatiletech/sqlboiler/v4/boil"
@@ -63,7 +63,7 @@ func (s *SQLSubmitService) Submit(ctx context.Context, req SubmitRequest) (*subm
 		Language:   req.Language,
 		Source:     req.Source,
 		Status:     "{}",
-		Verdict:    int(extmodels.VERDICT_UP),
+		Verdict:    int(problem.VerdictUP),
 		Submitted:  time.Now(),
 		Private:    false,
 		Started:    false,

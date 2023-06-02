@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/mraron/njudge/internal/web/domain/problem"
+	"github.com/mraron/njudge/pkg/problems"
 	"log"
 	"net/http"
 	"strconv"
@@ -11,7 +13,6 @@ import (
 	"time"
 
 	"github.com/mraron/njudge/internal/judge"
-	"github.com/mraron/njudge/internal/web/extmodels"
 	"github.com/mraron/njudge/internal/web/helpers/config"
 	"github.com/mraron/njudge/internal/web/models"
 
@@ -102,14 +103,14 @@ func (s *Server) runServer() {
 		if st.Done {
 			verdict := st.Status.Feedback[0].Verdict()
 			if !st.Status.Compiled {
-				verdict = extmodels.VERDICT_CE
+				verdict = problems.VerdictName(problem.VerdictCE)
 			}
 
 			if _, err := s.DB.Exec("UPDATE submissions SET verdict=$1, status=$2, ontest=NULL, judged=$3, score=$5 WHERE id=$4", verdict, st.Status, time.Now(), id, st.Status.Feedback[0].Score()); err != nil {
 				return err
 			}
 		} else {
-			if _, err := s.DB.Exec("UPDATE submissions SET ontest=$1, status=$2, verdict=$3 WHERE id=$4", st.Test, st.Status, extmodels.VERDICT_RU, id); err != nil {
+			if _, err := s.DB.Exec("UPDATE submissions SET ontest=$1, status=$2, verdict=$3 WHERE id=$4", st.Test, st.Status, problem.VerdictRU, id); err != nil {
 				log.Print("can't realtime update status", err)
 			}
 		}

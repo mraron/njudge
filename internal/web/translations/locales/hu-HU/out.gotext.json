@@ -2,6 +2,66 @@
     "language": "hu-HU",
     "messages": [
         {
+            "id": "Accepted",
+            "message": "Accepted",
+            "translation": "Elfogadva"
+        },
+        {
+            "id": "Wrong answer",
+            "message": "Wrong answer",
+            "translation": "Hibás válasz"
+        },
+        {
+            "id": "Runtime error",
+            "message": "Runtime error",
+            "translation": "Futási hiba"
+        },
+        {
+            "id": "Time limit exceeded",
+            "message": "Time limit exceeded",
+            "translation": "Időlimit túllépés"
+        },
+        {
+            "id": "Memory limit exceeded",
+            "message": "Memory limit exceeded",
+            "translation": "Memórialimit túllépés"
+        },
+        {
+            "id": "Internal error",
+            "message": "Internal error",
+            "translation": "Belső hiba"
+        },
+        {
+            "id": "Didn't run",
+            "message": "Didn't run",
+            "translation": "Nem futott"
+        },
+        {
+            "id": "Partially correct",
+            "message": "Partially correct",
+            "translation": "Részben helyes"
+        },
+        {
+            "id": "Presentation error",
+            "message": "Presentation error",
+            "translation": "Prezentációs hiba"
+        },
+        {
+            "id": "Compilation error",
+            "message": "Compilation error",
+            "translation": "Forditási hiba"
+        },
+        {
+            "id": "Running",
+            "message": "Running",
+            "translation": "Fut"
+        },
+        {
+            "id": "Uploaded",
+            "message": "Uploaded",
+            "translation": "Feltöltve"
+        },
+        {
             "id": "Submission #{ID}",
             "message": "Submission #{ID}",
             "translation": "Beküldés #{ID}",
@@ -295,6 +355,286 @@
             "id": "language",
             "message": "language",
             "translation": "nyelv"
+        },
+        {
+            "id": "%s on test %d",
+            "message": "%s on test %d",
+            "translation": "%s a(z) %d. teszteseten"
+        },
+        {
+            "id": "on test %s",
+            "message": "on test %s",
+            "translation": "a(z) %d. tesztesten"
+        },
+        {
+            "id": "Date",
+            "message": "Date",
+            "translation": "Dátum"
+        },
+        {
+            "id": "User",
+            "message": "User",
+            "translation": "Felhasználó"
+        },
+        {
+            "id": "Problem",
+            "message": "Problem",
+            "translation": "Feladat"
+        },
+        {
+            "id": "Language",
+            "message": "Language",
+            "translation": "Nyelv"
+        },
+        {
+            "id": "Verdict",
+            "message": "Verdict",
+            "translation": "Verdikt"
+        },
+        {
+            "id": "Time",
+            "message": "Time",
+            "translation": "Idő"
+        },
+        {
+            "id": "Memory",
+            "message": "Memory",
+            "translation": "Memória"
+        },
+        {
+            "id": "Filter",
+            "message": "Filter",
+            "translation": "Szűrés"
+        },
+        {
+            "id": "Title",
+            "message": "Title",
+            "translation": "Cím"
+        },
+        {
+            "id": "Category",
+            "message": "Category",
+            "translation": "Kategória"
+        },
+        {
+            "id": "Tags",
+            "message": "Tags",
+            "translation": "Tagek"
+        },
+        {
+            "id": "Clear",
+            "message": "Clear",
+            "translation": "Töröl"
+        },
+        {
+            "id": "Identifier",
+            "message": "Identifier",
+            "translation": "Azonosító"
+        },
+        {
+            "id": "Solvers",
+            "message": "Solvers",
+            "translation": "Megoldók"
+        },
+        {
+            "id": "Statement",
+            "message": "Statement",
+            "translation": "Leírás"
+        },
+        {
+            "id": "Submit",
+            "message": "Submit",
+            "translation": "Beküld"
+        },
+        {
+            "id": "all",
+            "message": "all",
+            "translation": "összes"
+        },
+        {
+            "id": "accepted",
+            "message": "accepted",
+            "translation": "elfogadott"
+        },
+        {
+            "id": "Ranklist",
+            "message": "Ranklist",
+            "translation": "Eredmények"
+        },
+        {
+            "id": "Add a tag to problem %q",
+            "message": "Add a tag to problem %q",
+            "translation": "Tag hozzáadása a %q feladathoz"
+        },
+        {
+            "id": "Cancel",
+            "message": "Cancel",
+            "translation": "Mégse"
+        },
+        {
+            "id": "Add",
+            "message": "Add",
+            "translation": "Hozzáad"
+        },
+        {
+            "id": "Information",
+            "message": "Information",
+            "translation": "Információk"
+        },
+        {
+            "id": "Time limit",
+            "message": "Time limit",
+            "translation": "Időlimit"
+        },
+        {
+            "id": "Memory limit",
+            "message": "Memory limit",
+            "translation": "Memórialimit"
+        },
+        {
+            "id": "Task type",
+            "message": "Task type",
+            "translation": "Típus"
+        },
+        {
+            "id": "Submit solution",
+            "message": "Submit solution",
+            "translation": "Megoldás beküldése"
+        },
+        {
+            "id": "Last submissions",
+            "message": "Last submissions",
+            "translation": "Utolsó beküldések"
+        },
+        {
+            "id": "Attachments",
+            "message": "Attachments",
+            "translation": "Mellékletek"
+        },
+        {
+            "id": "File",
+            "message": "File",
+            "translation": "Fájl"
+        },
+        {
+            "id": "Name",
+            "message": "Name",
+            "translation": "Név"
+        },
+        {
+            "id": "Points",
+            "message": "Points",
+            "translation": "Pontok"
+        },
+        {
+            "id": "Code",
+            "message": "Code",
+            "translation": "Kód"
+        },
+        {
+            "id": "Rejudge",
+            "message": "Rejudge",
+            "translation": "Újraértékel"
+        },
+        {
+            "id": "Program's output",
+            "message": "Program's output",
+            "translation": "Program kimenete"
+        },
+        {
+            "id": "Expected output",
+            "message": "Expected output",
+            "translation": "Elvárt kimenet"
+        },
+        {
+            "id": "Checker output",
+            "message": "Checker output",
+            "translation": "Ellenőrző kimenet"
+        },
+        {
+            "id": "Subtask",
+            "message": "Subtask",
+            "translation": "Részfeladat"
+        },
+        {
+            "id": "Sum",
+            "message": "Sum",
+            "translation": "Összpont"
+        },
+        {
+            "id": "Test",
+            "message": "Test",
+            "translation": "Teszt"
+        },
+        {
+            "id": "We found the following problems",
+            "message": "We found the following problems",
+            "translation": "A következő problémákat találtuk"
+        },
+        {
+            "id": "Nickname",
+            "message": "Nickname",
+            "translation": "Felhasználónév"
+        },
+        {
+            "id": "Password",
+            "message": "Password",
+            "translation": "Jelszó"
+        },
+        {
+            "id": "Settings",
+            "message": "Settings",
+            "translation": "Beállítások"
+        },
+        {
+            "id": "Solved problems",
+            "message": "Solved problems",
+            "translation": "Megoldott feladatok"
+        },
+        {
+            "id": "Attempted problems",
+            "message": "Attempted problems",
+            "translation": "Megpróbált feladatok"
+        },
+        {
+            "id": "Old password",
+            "message": "Old password",
+            "translation": "Régi jelszó"
+        },
+        {
+            "id": "New password",
+            "message": "New password",
+            "translation": "Új jelszó"
+        },
+        {
+            "id": "New password again",
+            "message": "New password again",
+            "translation": "Új jelszó mégegyszer"
+        },
+        {
+            "id": "Change",
+            "message": "Change",
+            "translation": "Változtat"
+        },
+        {
+            "id": "Show tags for unsolved problems",
+            "message": "Show tags for unsolved problems",
+            "translation": "Mutasd a megoldatlan feladatok tag-jeit"
+        },
+        {
+            "id": "Save",
+            "message": "Save",
+            "translation": "Ment"
+        },
+        {
+            "id": "Password again",
+            "message": "Password again",
+            "translation": "Jelszó mégegyszer"
+        },
+        {
+            "id": "Email",
+            "message": "Email",
+            "translation": "Email"
         }
     ]
 }

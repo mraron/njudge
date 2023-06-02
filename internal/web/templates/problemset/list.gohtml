@@ -8,7 +8,7 @@
         <div class="card-header" id="filterHeading">
             <h2 class="mb-0">
                 <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#filter" aria-expanded="true" aria-controls="filterAccordion">
-                    <i class="fas fa-filter"></i> Szűrés
+                    <i class="fas fa-filter"></i> {{Tr "Filter"}}
                 </button>
             </h2>
         </div>
@@ -17,11 +17,11 @@
             <div class="card-body">
             <form action="" method="get">
                 <div class="form-group">
-                    <label for="titleFilter">Cím</label>
+                    <label for="titleFilter">{{Tr "Title"}}</label>
                     <input name="title" value="{{.Data.TitleFilter}}" class="form-control" id="titleFilter">
                 </div>
                 <div class="form-group">
-                    <label for="categoryFilter">Kategória</label>
+                    <label for="categoryFilter">{{Tr "Category"}}</label>
                     <select name="category" class="custom-select" id="categoryFilter">
                     {{range $i := .Data.CategoryFilterOptions}}
                     <option value="{{$i.Value}}"{{if $i.Selected}} selected{{end}}>{{$i.Name}}</option>
@@ -29,11 +29,11 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="tagsFilter">Tagek</label>
+                    <label for="tagsFilter">{{Tr "Tags"}}</label>
                     <input name="tags" value="{{.Data.TagsFilter}}" class="form-control" id="tagsFilter">
                 </div>
-                <button type="submit" class="btn btn-primary">Szűr</button>
-                {{if .Data.Filtered}}<a class="btn btn-danger" href="">Töröl</a>{{end}}
+                <button type="submit" class="btn btn-primary">{{Tr "Filter"}}</button>
+                {{if .Data.Filtered}}<a class="btn btn-danger" href="">{{Tr "Clear"}}</a>{{end}}
             </form>
             </div>
         </div>
@@ -62,11 +62,12 @@ var tagify = new Tagify(input, {
         <thead>
             <tr>
                 <th scope="col"></th>
-                <th scope="col">Azonosító</th>
-                <th scope="col">Cím</th>
-                <th scope="col">Kategória</th>
-                <th scope="col">Tagek</th>
-                <th scope="col"><a href="{{.Data.SolverSorter.Href}}">{{if eq .Data.SolverSorter.Order ""}}<i class="fas fa-sort"></i>{{else}}{{if eq .Data.SolverSorter.Order "ASC"}}<i class="fas fa-sort-down"></i>{{else}}<i class="fas fa-sort-up"></i>{{end}}{{end}} Megoldók</a></th>
+                <th scope="col">{{Tr "Identifier"}}</th>
+                <th scope="col">{{Tr "Title"}}</th>
+                <th scope="col">{{Tr "Category"}}</th>
+                <th scope="col">{{Tr "Tags"}}</th>
+                <th scope="col"><a href="{{.Data.SolverSorter.Href}}">{{if eq .Data.SolverSorter.Order ""}}<i class="fas fa-sort"></i>{{else}}{{if eq .Data.SolverSorter.Order "ASC"}}<i class="fas fa-sort-down"></i>{{else}}<i class="fas fa-sort-up"></i>{{end}}{{end}}
+                    {{Tr "Solvers"}}</a></th>
             </tr>
         </thead>
         <tbody>
@@ -74,7 +75,7 @@ var tagify = new Tagify(input, {
             <tr>
                 <td class="text-center">{{if eq $i.SolvedStatus 3}}<i class="fas fa-check text-success"></i>{{end}}{{if eq $i.SolvedStatus 1}}<i class="fas fa-times text-danger"></i>{{end}}</td>
                 <td>{{$i.Name}}</td>
-                <td><a href="{{$i.Name}}/">{{(translateContent "hungarian" $i.Titles).String}}</a></td>
+                <td><a href="{{$i.Name}}/">{{(get "translator").TranslateContent $i.Titles}}</a></td>
                 <td>{{if $i.CategoryLink.Text}}<a href="{{$i.CategoryLink.Href}}">{{$i.CategoryLink.Text}}</a>{{end}}</td>
                 <td>
                 {{range $tag := $i.Tags}}

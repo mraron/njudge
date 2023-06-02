@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/mraron/njudge/internal/web/domain/problem"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/helpers/roles"
@@ -135,6 +136,7 @@ func statelessFuncs(store problems.Store, db *sql.DB, store2 partials.Store) tem
 		"commitHash": func() string {
 			return commitHash
 		},
+		"verdict": problem.VerdictFromProblemsVerdictName,
 	}
 }
 

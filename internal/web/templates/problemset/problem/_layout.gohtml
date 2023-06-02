@@ -1,20 +1,20 @@
 {{define "problem_menu"}}
     <ul class="nav nav-tabs">
         <li class="nav-item">
-            <a class="nav-link{{if eq . "problem"}} active{{end}}" href="./problem">Leírás</a>
+            <a class="nav-link{{if eq . "problem"}} active{{end}}" href="./problem">{{Tr "Statement"}}</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link{{if eq . "submit"}} active{{end}}" href="./submit">Beküld</a>
+            <a class="nav-link{{if eq . "submit"}} active{{end}}" href="./submit">{{Tr "Submit"}}</a>
         </li>
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle{{if eq . "status"}} active{{end}}" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Beküldések</a>
+            <a class="nav-link dropdown-toggle{{if eq . "status"}} active{{end}}" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{Tr "Submissions"}}</a>
             <div class="dropdown-menu">
-                <a class="dropdown-item" href="./status">Összes</a>
-                <a class="dropdown-item" href="./status?ac=1">Elfogadott</a>
+                <a class="dropdown-item" href="./status">{{Tr "all"}}</a>
+                <a class="dropdown-item" href="./status?ac=1">{{Tr "accepted"}}</a>
             </div>
         </li>
         <li class="nav-item">
-            <a class="nav-link{{if eq . "ranklist"}} active{{end}}" href="./ranklist">Eredmények</a>
+            <a class="nav-link{{if eq . "ranklist"}} active{{end}}" href="./ranklist">{{Tr "Ranklist"}}</a>
         </li>
     </ul>
     <br>

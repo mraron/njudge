@@ -53,7 +53,7 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 				elem := TreeNode{
 					ID:           id,
 					Type:         "problem",
-					Name:         i18n.TranslateContent("hungarian", problemStore.MustGet(p.Problem).Titles()).String(),
+					Name:         tr.TranslateContent(problemStore.MustGet(p.Problem).Titles()).String(),
 					Link:         c.Echo().Reverse("getProblemMain", p.Problemset, p.Problem),
 					Children:     make([]TreeNode, 0),
 					SolvedStatus: -1,

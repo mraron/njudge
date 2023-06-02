@@ -40,7 +40,7 @@ func New(cfg config.Server, problemStore problems.Store, db *sql.DB, partialsSto
 	}
 
 	if err := renderer.Update(); err != nil {
-		panic(err)
+		log.Println("template parsing error:", err)
 	}
 
 	if cfg.Mode == "development" {
@@ -78,7 +78,14 @@ func (t *Renderer) startWatcher() {
 		}
 	}()
 
-	err = watcher.Add(t.cfg.TemplatesDir)
+	err = fs.WalkDir(os.DirFS(t.cfg.TemplatesDir), ".", func(path string, d fs.DirEntry, err error) error {
+		if d.IsDir() {
+			if err := watcher.Add(filepath.Join(t.cfg.TemplatesDir, path)); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 	if err != nil {
 		panic(err)
 	}
@@ -104,10 +111,19 @@ func (t *Renderer) Update() error {
 			if strings.HasPrefix(info.Name(), "_") {
 				layoutFiles = append(layoutFiles, path)
 			} else {
-				t.templates[path] = template.Must(template.New(info.Name()).
+				tmpl, err := template.New(info.Name()).
 					Funcs(contextFuncs(nil)).
 					Funcs(statelessFuncs(t.problemStore, t.db, t.partialsStore)).
-					ParseFS(usedFS, append(layoutFiles, path)...))
+					ParseFS(usedFS, append(layoutFiles, path)...)
+
+				if err != nil {
+					t.templates[path] = template.Must(template.New(info.Name()).Funcs(template.FuncMap{
+						"error": err.Error,
+					}).Parse(`<h2>parse error</h2> <pre><code>{{error}}</code></pre>`))
+					return err
+				} else {
+					t.templates[path] = tmpl
+				}
 			}
 		}
 
