@@ -401,6 +401,27 @@
             "fuzzy": true
         },
         {
+            "id": "Wrong old password.",
+            "message": "Wrong old password.",
+            "translation": "Wrong old password.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "It's required to give a new password.",
+            "message": "It's required to give a new password.",
+            "translation": "It's required to give a new password.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "The two given passwords doesn't match.",
+            "message": "The two given passwords doesn't match.",
+            "translation": "The two given passwords doesn't match.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Home",
             "message": "Home",
             "translation": "Home",

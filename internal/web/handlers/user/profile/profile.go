@@ -1,6 +1,8 @@
 package profile
 
 import (
+	"github.com/volatiletech/sqlboiler/v4/boil"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 
 	"github.com/jmoiron/sqlx"
@@ -105,7 +107,71 @@ func GetSettings(DB *sqlx.DB) echo.HandlerFunc {
 }
 
 func PostSettingsChangePassword(DB *sqlx.DB) echo.HandlerFunc {
+	type request struct {
+		PasswordOld  string `form:"passwordOld"`
+		PasswordNew1 string `form:"passwordNew1"`
+		PasswordNew2 string `form:"passwordNew2"`
+	}
 	return func(c echo.Context) error {
+		tr := c.Get("translator").(i18n.Translator)
+		u := c.Get("user").(*models.User)
+
+		data := request{}
+		if err := c.Bind(&data); err != nil {
+			return err
+		}
+
+		if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(data.PasswordOld)); err != nil {
+			helpers.SetFlash(c, "ChangePassword", tr.Translate("Wrong old password."))
+			return c.Redirect(http.StatusFound, "../")
+		}
+
+		if len(data.PasswordNew1) == 0 {
+			helpers.SetFlash(c, "ChangePassword", tr.Translate("It's required to give a new password."))
+			return c.Redirect(http.StatusFound, "../")
+		}
+
+		if data.PasswordNew1 != data.PasswordNew2 {
+			helpers.SetFlash(c, "ChangePassword", tr.Translate("The two given passwords doesn't match."))
+			return c.Redirect(http.StatusFound, "../")
+		}
+
+		res, err := bcrypt.GenerateFromPassword([]byte(data.PasswordNew1), bcrypt.DefaultCost)
+		if err != nil {
+			return err
+		}
+
+		u.Password = string(res)
+		if _, err = u.Update(c.Request().Context(), DB, boil.Whitelist(models.UserColumns.Password)); err != nil {
+			return err
+		}
+
+		return c.Redirect(http.StatusFound, "../")
+	}
+}
+
+func PostSettingsMisc(DB *sqlx.DB) echo.HandlerFunc {
+	type request struct {
+		ShowTagsForUnsolved string `form:"showTagsForUnsolved"`
+
+		ShowTagsForUnsolvedBool bool
+	}
+	return func(c echo.Context) error {
+		u := c.Get("user").(*models.User)
+
+		data := request{}
+		if err := c.Bind(&data); err != nil {
+			return err
+		}
+		if data.ShowTagsForUnsolved == "true" {
+			data.ShowTagsForUnsolvedBool = true
+		}
+
+		u.ShowUnsolvedTags = data.ShowTagsForUnsolvedBool
+		if _, err := u.Update(c.Request().Context(), DB, boil.Whitelist(models.UserColumns.ShowUnsolvedTags)); err != nil {
+			return err
+		}
+
 		return c.Redirect(http.StatusFound, "../")
 	}
 }

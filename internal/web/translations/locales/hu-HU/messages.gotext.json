@@ -317,6 +317,21 @@
             ]
         },
         {
+            "id": "Wrong old password.",
+            "message": "Wrong old password.",
+            "translation": "Helytelen régi jelszó."
+        },
+        {
+            "id": "It's required to give a new password.",
+            "message": "It's required to give a new password.",
+            "translation": "Egy új jelszót meg kell adnod."
+        },
+        {
+            "id": "The two given passwords doesn't match.",
+            "message": "The two given passwords doesn't match.",
+            "translation": "A két megadott jelszó nem egyezik meg."
+        },
+        {
             "id": "Home",
             "message": "Home",
             "translation": "Főoldal"

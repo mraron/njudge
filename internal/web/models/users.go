@@ -24,72 +24,79 @@ import (
 
 // User is an object representing the database table.
 type User struct {
-	ID            int          `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Name          string       `boil:"name" json:"name" toml:"name" yaml:"name"`
-	Password      string       `boil:"password" json:"password" toml:"password" yaml:"password"`
-	Email         string       `boil:"email" json:"email" toml:"email" yaml:"email"`
-	ActivationKey null.String  `boil:"activation_key" json:"activation_key,omitempty" toml:"activation_key" yaml:"activation_key,omitempty"`
-	Role          string       `boil:"role" json:"role" toml:"role" yaml:"role"`
-	Points        null.Float32 `boil:"points" json:"points,omitempty" toml:"points" yaml:"points,omitempty"`
+	ID               int          `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Name             string       `boil:"name" json:"name" toml:"name" yaml:"name"`
+	Password         string       `boil:"password" json:"password" toml:"password" yaml:"password"`
+	Email            string       `boil:"email" json:"email" toml:"email" yaml:"email"`
+	ActivationKey    null.String  `boil:"activation_key" json:"activation_key,omitempty" toml:"activation_key" yaml:"activation_key,omitempty"`
+	Role             string       `boil:"role" json:"role" toml:"role" yaml:"role"`
+	Points           null.Float32 `boil:"points" json:"points,omitempty" toml:"points" yaml:"points,omitempty"`
+	ShowUnsolvedTags bool         `boil:"show_unsolved_tags" json:"show_unsolved_tags" toml:"show_unsolved_tags" yaml:"show_unsolved_tags"`
 
 	R *userR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var UserColumns = struct {
-	ID            string
-	Name          string
-	Password      string
-	Email         string
-	ActivationKey string
-	Role          string
-	Points        string
+	ID               string
+	Name             string
+	Password         string
+	Email            string
+	ActivationKey    string
+	Role             string
+	Points           string
+	ShowUnsolvedTags string
 }{
-	ID:            "id",
-	Name:          "name",
-	Password:      "password",
-	Email:         "email",
-	ActivationKey: "activation_key",
-	Role:          "role",
-	Points:        "points",
+	ID:               "id",
+	Name:             "name",
+	Password:         "password",
+	Email:            "email",
+	ActivationKey:    "activation_key",
+	Role:             "role",
+	Points:           "points",
+	ShowUnsolvedTags: "show_unsolved_tags",
 }
 
 var UserTableColumns = struct {
-	ID            string
-	Name          string
-	Password      string
-	Email         string
-	ActivationKey string
-	Role          string
-	Points        string
+	ID               string
+	Name             string
+	Password         string
+	Email            string
+	ActivationKey    string
+	Role             string
+	Points           string
+	ShowUnsolvedTags string
 }{
-	ID:            "users.id",
-	Name:          "users.name",
-	Password:      "users.password",
-	Email:         "users.email",
-	ActivationKey: "users.activation_key",
-	Role:          "users.role",
-	Points:        "users.points",
+	ID:               "users.id",
+	Name:             "users.name",
+	Password:         "users.password",
+	Email:            "users.email",
+	ActivationKey:    "users.activation_key",
+	Role:             "users.role",
+	Points:           "users.points",
+	ShowUnsolvedTags: "users.show_unsolved_tags",
 }
 
 // Generated where
 
 var UserWhere = struct {
-	ID            whereHelperint
-	Name          whereHelperstring
-	Password      whereHelperstring
-	Email         whereHelperstring
-	ActivationKey whereHelpernull_String
-	Role          whereHelperstring
-	Points        whereHelpernull_Float32
+	ID               whereHelperint
+	Name             whereHelperstring
+	Password         whereHelperstring
+	Email            whereHelperstring
+	ActivationKey    whereHelpernull_String
+	Role             whereHelperstring
+	Points           whereHelpernull_Float32
+	ShowUnsolvedTags whereHelperbool
 }{
-	ID:            whereHelperint{field: "\"users\".\"id\""},
-	Name:          whereHelperstring{field: "\"users\".\"name\""},
-	Password:      whereHelperstring{field: "\"users\".\"password\""},
-	Email:         whereHelperstring{field: "\"users\".\"email\""},
-	ActivationKey: whereHelpernull_String{field: "\"users\".\"activation_key\""},
-	Role:          whereHelperstring{field: "\"users\".\"role\""},
-	Points:        whereHelpernull_Float32{field: "\"users\".\"points\""},
+	ID:               whereHelperint{field: "\"users\".\"id\""},
+	Name:             whereHelperstring{field: "\"users\".\"name\""},
+	Password:         whereHelperstring{field: "\"users\".\"password\""},
+	Email:            whereHelperstring{field: "\"users\".\"email\""},
+	ActivationKey:    whereHelpernull_String{field: "\"users\".\"activation_key\""},
+	Role:             whereHelperstring{field: "\"users\".\"role\""},
+	Points:           whereHelpernull_Float32{field: "\"users\".\"points\""},
+	ShowUnsolvedTags: whereHelperbool{field: "\"users\".\"show_unsolved_tags\""},
 }
 
 // UserRels is where relationship names are stored.
@@ -130,9 +137,9 @@ func (r *userR) GetSubmissions() SubmissionSlice {
 type userL struct{}
 
 var (
-	userAllColumns            = []string{"id", "name", "password", "email", "activation_key", "role", "points"}
+	userAllColumns            = []string{"id", "name", "password", "email", "activation_key", "role", "points", "show_unsolved_tags"}
 	userColumnsWithoutDefault = []string{"name", "password", "email", "role"}
-	userColumnsWithDefault    = []string{"id", "activation_key", "points"}
+	userColumnsWithDefault    = []string{"id", "activation_key", "points", "show_unsolved_tags"}
 	userPrimaryKeyColumns     = []string{"id"}
 	userGeneratedColumns      = []string{}
 )

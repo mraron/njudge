@@ -56,6 +56,7 @@
             <div class="col-6">{{divide .Data.Problem.MemoryLimit 1048576}} MiB</div>
             {{end}}
             {{$solvedStatus := .Data.SolvedStatus}}
+            {{if or (not logged) (or (eq $solvedStatus 3) user.ShowUnsolvedTags)}}
             {{if or .Data.Tags (eq $solvedStatus 3)}}
             <div class="col-6">{{Tr "Tags"}}:</div>
             <div class="col-6">
@@ -64,6 +65,7 @@
             <span class="badge badge-secondary"><a href="#" class="text-reset text-decoration-none" data-toggle="modal" data-target="#tagModal">+</a></span>
             {{end}}
             </div>
+            {{end}}
             {{end}}
             <div class="col-6">{{Tr "Task type"}}:</div>
             <div class="col-6">{{.Data.Problem.GetTaskType.Name}}</div>

@@ -1,0 +1,1 @@
+alter table users drop if exists show_unsolved_tags;

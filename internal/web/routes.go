@@ -77,7 +77,8 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 
 	prs := pr.Group("/:name/settings", user.RequireLoginMiddleware(), profile.PrivateMiddleware())
 	prs.GET("/", profile.GetSettings(s.DB))
-	prs.POST("/change_password/", profile.PostSettingsChangePassword(s.DB), user.RequireLoginMiddleware(), user.RequireLoginMiddleware())
+	prs.POST("/change_password/", profile.PostSettingsChangePassword(s.DB))
+	prs.POST("/misc/", profile.PostSettingsMisc(s.DB))
 
 	v1 := e.Group("/api/v1")
 
