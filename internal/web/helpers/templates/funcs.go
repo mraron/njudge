@@ -19,7 +19,6 @@ import (
 	"golang.org/x/text/message"
 	"html/template"
 	"math"
-	"runtime/debug"
 	"strings"
 	"time"
 )
@@ -133,21 +132,6 @@ func statelessFuncs(store problems.Store, db *sql.DB, store2 partials.Store) tem
 		"contextTODO": func() context.Context {
 			return context.TODO()
 		},
-		"commitHash": func() string {
-			return commitHash
-		},
 		"verdict": problem.VerdictFromProblemsVerdictName,
-	}
-}
-
-var commitHash = ""
-
-func init() {
-	if info, ok := debug.ReadBuildInfo(); ok {
-		for _, setting := range info.Settings {
-			if setting.Key == "vcs.revision" {
-				commitHash = setting.Value[:6]
-			}
-		}
 	}
 }
