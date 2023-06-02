@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Updating language and problem list every 20 second.
+
 ## [0.1.0] - 2023-06-02
 
 ### Added

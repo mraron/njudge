@@ -213,12 +213,14 @@ func (s *HTTPServer) runUpdate() {
 	}()
 
 	go func() {
-		s.statusMutex.Lock()
-		s.status.LanguageList, _ = s.Enqueuer.SupportedLanguages()
-		s.status.ProblemList, _ = s.Enqueuer.SupportedProblems()
-		s.statusMutex.Unlock()
+		for {
+			s.statusMutex.Lock()
+			s.status.LanguageList, _ = s.Enqueuer.SupportedLanguages()
+			s.status.ProblemList, _ = s.Enqueuer.SupportedProblems()
+			s.statusMutex.Unlock()
 
-		time.Sleep(20 * time.Second)
+			time.Sleep(20 * time.Second)
+		}
 	}()
 
 	for {
