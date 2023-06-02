@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"github.com/golang-migrate/migrate/v4/source/iofs"
+	"github.com/mraron/njudge/internal/migrations"
 	"github.com/mraron/njudge/internal/web"
 	"github.com/mraron/njudge/internal/web/helpers/config"
 	"log"
@@ -46,7 +48,12 @@ var MigrateCmd = &cobra.Command{
 			return err
 		}
 
-		m, err := migrate.NewWithDatabaseInstance("file://migrations", "postgres", driver)
+		d, err := iofs.New(migrations.FS, ".")
+		if err != nil {
+			return err
+		}
+
+		m, err := migrate.NewWithInstance("iofs", d, "postgres", driver)
 		if err != nil {
 			return err
 		}
