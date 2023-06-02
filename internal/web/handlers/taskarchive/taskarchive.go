@@ -1,6 +1,8 @@
 package taskarchive
 
 import (
+	"github.com/volatiletech/null/v8"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"net/http"
 
 	"github.com/mraron/njudge/internal/web/domain/problem"
@@ -11,7 +13,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/pkg/problems"
-	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 type TaskArchive struct {
@@ -33,7 +34,7 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 
 		u := c.Get("user").(*models.User)
 
-		lst, err := models.ProblemCategories(Where("parent_id IS NULL")).All(c.Request().Context(), DB)
+		lst, err := models.ProblemCategories(models.ProblemCategoryWhere.ParentID.IsNull()).All(c.Request().Context(), DB)
 		if err != nil {
 			return err
 		}
@@ -44,7 +45,10 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 		id := 1000
 
 		dfs = func(root *models.ProblemCategory, tree *TreeNode) error {
-			problemList, err := models.ProblemRels(Where("category_id = ?", root.ID), OrderBy("problem")).All(c.Request().Context(), DB)
+			problemList, err := models.ProblemRels(models.ProblemRelWhere.CategoryID.EQ(null.Int{
+				Int:   root.ID,
+				Valid: true,
+			}), qm.OrderBy("problem")).All(c.Request().Context(), DB)
 			if err != nil {
 				return err
 			}
@@ -71,23 +75,26 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 				id++
 			}
 
-			subCategories, err := models.ProblemCategories(Where("parent_id = ?", root.ID), OrderBy("name")).All(c.Request().Context(), DB)
+			subCategories, err := models.ProblemCategories(models.ProblemCategoryWhere.ParentID.EQ(null.Int{
+				Int:   root.ID,
+				Valid: true,
+			}), qm.OrderBy("name")).All(c.Request().Context(), DB)
+
 			if err != nil {
 				return err
 			}
 
 			for _, cat := range subCategories {
-				akt := TreeNode{
+				tree.Children = append(tree.Children, TreeNode{
 					ID:           cat.ID,
 					Type:         "category",
 					Name:         cat.Name,
 					Link:         "",
 					Children:     make([]TreeNode, 0),
 					SolvedStatus: -1,
-				}
+				})
 
-				tree.Children = append(tree.Children, akt)
-				if err := dfs(cat, &akt); err != nil {
+				if err := dfs(cat, &tree.Children[len(tree.Children)-1]); err != nil {
 					return err
 				}
 			}
