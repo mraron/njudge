@@ -10,6 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Updating language and problem list every 20 second.
 - Task archive only displaying the toplevel categories.
+- Tr template.Funcs's arguments
+- testset.FirstNonAC
+
+### Changed
+- testlib checker to only support quitp type partial scoring
+- polygon config to not generate html by default from the problem-properties.json
+- toString template func to be smarter
+
+### Added
+- logging in case of callback failure in judge
 
 ## [0.1.0] - 2023-06-02
 
