@@ -271,7 +271,10 @@ func (s *HTTPServer) postJudge(c echo.Context) error {
 		}
 		go func() {
 			for resp := range res {
-				callback.Callback(resp)
+				err := callback.Callback(resp)
+				if err != nil {
+					s.logger.Error("error calling back", zap.Error(err))
+				}
 			}
 		}()
 
