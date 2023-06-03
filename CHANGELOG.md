@@ -7,19 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-- Updating language and problem list every 20 second.
-- Task archive only displaying the toplevel categories.
-- Tr template.Funcs's arguments
-- testset.FirstNonAC
+### Added
+- logging in case of callback failure in judge
 
 ### Changed
 - testlib checker to only support quitp type partial scoring
 - polygon config to not generate html by default from the problem-properties.json
 - toString template func to be smarter
+- Moved MemoryLimit and TimeLimit to the Problem interface, since they're not used in the evaluation process: only the status skeleton matters.
 
-### Added
-- logging in case of callback failure in judge
+### Fixed
+- Updating language and problem list every 20 second.
+- Task archive only displaying the toplevel categories.
+- Tr template.Funcs's arguments
+- testset.FirstNonAC
+- problem_yaml: set memory and time limit correctly
 
 ## [0.1.0] - 2023-06-02
 
