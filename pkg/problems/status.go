@@ -214,10 +214,12 @@ func (ts Testset) MaxScore() (res float64) {
 }
 
 func (ts Testset) FirstNonAC() int {
+	until := 0
 	for _, g := range ts.Groups {
 		if g.FirstNonAC() != -1 {
-			return g.FirstNonAC()
+			return g.FirstNonAC() + until
 		}
+		until += len(g.Testcases)
 	}
 
 	return -1

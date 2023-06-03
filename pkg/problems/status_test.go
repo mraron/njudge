@@ -270,3 +270,151 @@ func TestTestset_Testcases(t *testing.T) {
 		})
 	}
 }
+
+func TestTestset_FirstNonAC(t *testing.T) {
+	type fields struct {
+		Name   string
+		Groups []Group
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   int
+	}{
+		{
+			name: "all AC",
+			fields: fields{
+				Name: "testset",
+				Groups: []Group{
+					{
+						Name:    "subtask1",
+						Scoring: ScoringGroup,
+						Testcases: []Testcase{
+							{VerdictName: VerdictAC},
+							{VerdictName: VerdictAC},
+							{VerdictName: VerdictAC},
+							{VerdictName: VerdictAC},
+						},
+						Dependencies: nil,
+					},
+					{
+						Name:    "subtask2",
+						Scoring: ScoringGroup,
+						Testcases: []Testcase{
+							{VerdictName: VerdictAC},
+							{VerdictName: VerdictAC},
+							{VerdictName: VerdictAC},
+							{VerdictName: VerdictAC},
+						},
+						Dependencies: nil,
+					},
+				},
+			},
+			want: -1,
+		},
+		{
+			name: "WA in first",
+			fields: fields{
+				Name: "testset",
+				Groups: []Group{
+					{
+						Name:    "subtask1",
+						Scoring: ScoringGroup,
+						Testcases: []Testcase{
+							{VerdictName: VerdictAC},
+							{VerdictName: VerdictAC},
+							{VerdictName: VerdictWA},
+							{VerdictName: VerdictAC},
+						},
+						Dependencies: nil,
+					},
+					{
+						Name:    "subtask2",
+						Scoring: ScoringGroup,
+						Testcases: []Testcase{
+							{VerdictName: VerdictAC},
+							{VerdictName: VerdictAC},
+							{VerdictName: VerdictAC},
+							{VerdictName: VerdictAC},
+						},
+						Dependencies: nil,
+					},
+				},
+			},
+			want: 3,
+		},
+		{
+			name: "WA in second",
+			fields: fields{
+				Name: "testset",
+				Groups: []Group{
+					{
+						Name:    "subtask1",
+						Scoring: ScoringGroup,
+						Testcases: []Testcase{
+							{VerdictName: VerdictAC},
+							{VerdictName: VerdictAC},
+							{VerdictName: VerdictAC},
+							{VerdictName: VerdictAC},
+						},
+						Dependencies: nil,
+					},
+					{
+						Name:    "subtask2",
+						Scoring: ScoringGroup,
+						Testcases: []Testcase{
+							{VerdictName: VerdictAC},
+							{VerdictName: VerdictAC},
+							{VerdictName: VerdictWA},
+							{VerdictName: VerdictAC},
+						},
+						Dependencies: nil,
+					},
+				},
+			},
+			want: 7,
+		},
+		{
+			name: "WA in both",
+			fields: fields{
+				Name: "testset",
+				Groups: []Group{
+					{
+						Name:    "subtask1",
+						Scoring: ScoringGroup,
+						Testcases: []Testcase{
+							{VerdictName: VerdictAC},
+							{VerdictName: VerdictWA},
+							{VerdictName: VerdictAC},
+							{VerdictName: VerdictAC},
+						},
+						Dependencies: nil,
+					},
+					{
+						Name:    "subtask2",
+						Scoring: ScoringGroup,
+						Testcases: []Testcase{
+							{VerdictName: VerdictAC},
+							{VerdictName: VerdictAC},
+							{VerdictName: VerdictWA},
+							{VerdictName: VerdictAC},
+						},
+						Dependencies: nil,
+					},
+				},
+			},
+			want: 2,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ts := Testset{
+				Name:   tt.fields.Name,
+				Groups: tt.fields.Groups,
+			}
+			if got := ts.FirstNonAC(); got != tt.want {
+				t.Errorf("FirstNonAC() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
