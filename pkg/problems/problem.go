@@ -15,6 +15,8 @@ type Problem interface {
 	Name() string
 	Titles() Contents
 	Statements() Contents
+	MemoryLimit() int
+	TimeLimit() int
 
 	Attachments() Attachments
 	Tags() []string
@@ -23,8 +25,6 @@ type Problem interface {
 }
 
 type Judgeable interface {
-	MemoryLimit() int
-	TimeLimit() int
 	Checker() Checker
 	InputOutputFiles() (string, string)
 	Languages() []language.Language
