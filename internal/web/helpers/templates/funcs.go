@@ -56,8 +56,8 @@ func contextFuncs(c echo.Context) template.FuncMap {
 		"csrf": func() string {
 			return c.Get(middleware.DefaultCSRFConfig.ContextKey).(string)
 		},
-		"Tr": func(key message.Reference, args ...string) string {
-			return c.Get(i18n.TranslatorContextKey).(i18n.Translator).Translate(key, args)
+		"Tr": func(key message.Reference, args ...interface{}) string {
+			return c.Get(i18n.TranslatorContextKey).(i18n.Translator).Translate(key, args...)
 		},
 	}
 }
