@@ -19,6 +19,7 @@ import (
 	"golang.org/x/text/message"
 	"html/template"
 	"math"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -99,8 +100,15 @@ func statelessFuncs(store problems.Store, db *sql.DB, store2 partials.Store) tem
 		"divide": func(a, b int) int {
 			return a / b
 		},
-		"toString": func(b []byte) string {
-			return string(b)
+		"toString": func(b interface{}) string {
+			switch b := b.(type) {
+			case []byte:
+				return string(b)
+			case int:
+				return strconv.Itoa(b)
+			}
+
+			return ""
 		},
 		"gravatarHash": func(user *models.User) string {
 			return fmt.Sprintf("%x", md5.Sum([]byte(strings.ToLower(strings.TrimSpace(user.Email)))))
