@@ -1,7 +1,9 @@
 package problem_yaml_test
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/config/problem_yaml"
@@ -186,4 +188,13 @@ func TestParsing(t *testing.T) {
 	if tc := sk.Feedback[0].IndexTestcase(56); tc.InputPath != "tests/56.in" {
 		t.Error(tc)
 	}
+
+	assert.Equal(t, sk.Feedback[0].Testcases()[0].TimeLimit, 1000*time.Millisecond)
+	assert.Equal(t, sk.Feedback[0].Testcases()[0].MemoryLimit, 100*1024*1024)
+	assert.Equal(t, sk.Feedback[0].Testcases()[0].Group, "base")
+	assert.Equal(t, sk.Feedback[0].Testcases()[0].InputPath, "tests/1.in")
+	assert.Equal(t, sk.Feedback[0].Testcases()[0].AnswerPath, "tests/1.out")
+	assert.Equal(t, sk.Feedback[0].Testcases()[0].Index, 1)
+	assert.Equal(t, sk.Feedback[0].Testcases()[0].MaxScore, 0.0)
+	assert.Equal(t, sk.Feedback[0].Testcases()[0].Testset, "")
 }

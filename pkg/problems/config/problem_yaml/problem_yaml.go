@@ -2,15 +2,15 @@ package problem_yaml
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
-
 	"github.com/gomarkdown/markdown"
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/checker"
 	"github.com/spf13/afero"
 	"gopkg.in/yaml.v3"
+	"os"
+	"path/filepath"
+	"time"
 )
 
 type Title struct {
@@ -156,6 +156,10 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 
 			ans.Feedback[0].Groups[0].Testcases = append(ans.Feedback[0].Groups[0].Testcases, tc)
 		}
+
+		ans.Feedback[0].SetTimeLimit(time.Duration(p.TimeLimit()) * time.Millisecond)
+		ans.Feedback[0].SetMemoryLimit(p.MemoryLimit())
+
 	} else {
 		ans.Feedback[0].Groups = make([]problems.Group, len(p.Tests.Subtasks))
 		globalIdx := 0
@@ -193,6 +197,9 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 				globalIdx++
 			}
 		}
+
+		ans.Feedback[0].SetTimeLimit(time.Duration(p.TimeLimit()) * time.Millisecond)
+		ans.Feedback[0].SetMemoryLimit(p.MemoryLimit())
 	}
 
 	return &ans, nil
