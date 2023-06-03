@@ -99,6 +99,10 @@ func (ts Testset) Testset(path string) problems.Testset {
 			testcase.TimeLimit = time.Duration(ts.TimeLimit) * time.Millisecond
 			testcase.MemoryLimit = ts.MemoryLimit
 
+			if group.Scoring == problems.ScoringMin {
+				testcase.MaxScore = grp.Points
+			}
+
 			group.Testcases = append(group.Testcases, testcase)
 
 			idx++

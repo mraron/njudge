@@ -43,14 +43,13 @@ func (t Testlib) Check(tc *problems.Testcase) error {
 					tc.VerdictName = problems.VerdictWA
 				} else if status.ExitStatus() == 2 {
 					tc.VerdictName = problems.VerdictPE
-				} else if status.ExitStatus() == 7 {
+				} else if status.ExitStatus() == 7 { //only support quitp
 					tc.VerdictName = problems.VerdictPC
 
 					rel := 0
 					fmt.Sscanf(output.String(), "points %d", &rel)
-					rel -= 16
 
-					tc.Score = float64(rel) / (200.0 * tc.MaxScore)
+					tc.Score = float64(rel) / 100.0 * tc.MaxScore
 				} else { //3 -> fail
 					tc.VerdictName = problems.VerdictXX
 				}

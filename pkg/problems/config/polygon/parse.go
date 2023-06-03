@@ -21,8 +21,15 @@ func CompileBinaries(compile bool) Option {
 	}
 }
 
+func DontGenHTML() Option {
+	return func(c *config) {
+		c.disableHTMLGen = true
+	}
+}
+
 type config struct {
 	compileBinaries bool
+	disableHTMLGen  bool
 }
 
 func newConfig() *config {
@@ -60,28 +67,30 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 					continue
 				}
 
-				jsonStmt, err := ParseJSONStatement(fs, filepath.Join(path, "statements", dir.Name()))
-				if err != nil {
-					return nil, err
+				if !cfg.disableHTMLGen {
+					jsonStmt, err := ParseJSONStatement(fs, filepath.Join(path, "statements", dir.Name()))
+					if err != nil {
+						return nil, err
+					}
+
+					if jsonStmt == nil {
+						continue
+					}
+
+					// problem-properties.json might be outdated. problem.xml should take priority
+					jsonStmt.InputFile, jsonStmt.OutputFile = p.InputOutputFiles()
+					jsonStmt.TimeLimit = p.TimeLimit()
+					jsonStmt.MemoryLimit = p.MemoryLimit()
+
+					p.JSONStatementList = append(p.JSONStatementList, *jsonStmt)
+
+					contents, err := jsonStmt.Html()
+					if err != nil {
+						return nil, err
+					}
+
+					p.GeneratedStatementList = append(p.GeneratedStatementList, problems.BytesData{Loc: dir.Name(), Val: contents, Typ: "text/html"})
 				}
-
-				if jsonStmt == nil {
-					continue
-				}
-
-				// problem-properties.json might be outdated. problem.xml should take priority
-				jsonStmt.InputFile, jsonStmt.OutputFile = p.InputOutputFiles()
-				jsonStmt.TimeLimit = p.TimeLimit()
-				jsonStmt.MemoryLimit = p.MemoryLimit()
-
-				p.JSONStatementList = append(p.JSONStatementList, *jsonStmt)
-
-				contents, err := jsonStmt.Html()
-				if err != nil {
-					return nil, err
-				}
-
-				p.GeneratedStatementList = append(p.GeneratedStatementList, problems.BytesData{Loc: dir.Name(), Val: contents, Typ: "text/html"})
 			}
 		}
 
@@ -138,7 +147,7 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 }
 
 func init() {
-	parser, identifier := ParserAndIdentifier(CompileBinaries(true))
+	parser, identifier := ParserAndIdentifier(CompileBinaries(true), DontGenHTML())
 	if err := problems.RegisterConfigType("polygon", parser, identifier); err != nil {
 		panic(err)
 	}
