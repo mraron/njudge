@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - logging in case of callback failure in judge
+- Auto compilation for cpp checkers in problem.yaml config type
 
 ### Changed
 - testlib checker to only support quitp type partial scoring

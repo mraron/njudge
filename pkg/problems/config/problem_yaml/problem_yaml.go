@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"github.com/gomarkdown/markdown"
 	"github.com/mraron/njudge/pkg/language"
+	"github.com/mraron/njudge/pkg/language/langs/cpp"
+	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/checker"
 	"github.com/spf13/afero"
 	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -297,6 +300,15 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 			}
 
 			p.GeneratedStatementList[ind] = problems.BytesData{Loc: val.Language, Val: contents, Typ: val.Type}
+		}
+
+		if strings.HasSuffix(p.Tests.Checker.Path, ".cpp") {
+			binaryName := strings.TrimSuffix(p.Tests.Checker.Path, filepath.Ext(p.Tests.Checker.Path))
+			if err := cpp.AutoCompile(fs, sandbox.NewDummy(), path, filepath.Join(path, p.Tests.Checker.Path), filepath.Join(path, binaryName)); err != nil {
+				return nil, err
+			}
+
+			p.Tests.Checker.Path = binaryName
 		}
 
 		return p, nil
