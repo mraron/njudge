@@ -367,6 +367,16 @@ func parseGen(r io.Reader) (int, [][2]interface{}, error) {
 	return inputCount, subtasks, nil
 }
 
+func primaryLanguageToLocale(primaryLanguage string) string {
+	switch primaryLanguage {
+	case "hu":
+		return "hungarian"
+	case "en":
+		return "english"
+	}
+	return "hungarian"
+}
+
 func parser(fs afero.Fs, path string) (problems.Problem, error) {
 	p := Problem{
 		Path:              path,
@@ -408,7 +418,7 @@ func parser(fs afero.Fs, path string) (problems.Problem, error) {
 	}
 
 	p.StatementList = make(problems.Contents, 0)
-	p.StatementList = append(p.StatementList, problems.BytesData{Loc: "hungarian", Val: statementPDF, Typ: "application/pdf"})
+	p.StatementList = append(p.StatementList, problems.BytesData{Loc: primaryLanguageToLocale(p.PrimaryLanguage), Val: statementPDF, Typ: "application/pdf"})
 
 	exists := func(path string) bool {
 		if _, err := fs.Stat(path); errors.Is(err, os.ErrNotExist) {
