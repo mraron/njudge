@@ -58,6 +58,7 @@ type Problem struct {
 	AttachmentInfo []Attachment `yaml:"attachments"`
 
 	Tests struct {
+		TaskType      string    `yaml:"task_type"`
 		InputFile     string    `yaml:"input_file"`
 		OutputFile    string    `yaml:"output_file"`
 		MemoryLimit   int       `yaml:"memory_limit"`
@@ -103,6 +104,10 @@ func (p Problem) InputOutputFiles() (string, string) {
 }
 
 func (p Problem) Languages() []language.Language {
+	if p.Tests.TaskType == "outputonly" {
+		return []language.Language{language.DefaultStore.Get("zip")}
+	}
+
 	return language.StoreAllExcept(language.DefaultStore, []string{"zip"})
 }
 
@@ -153,6 +158,9 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 			if tc.AnswerPath, err = getIthIO("output", i, p.Tests.OutputPattern, -1, "", p.Tests.OutputList); err != nil {
 				return nil, err
 			}
+			if p.Tests.TaskType == "outputonly" {
+				tc.OutputPath = filepath.Base(tc.AnswerPath)
+			}
 
 			tc.Index = i + 1
 			tc.Group = "base"
@@ -185,6 +193,9 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 				}
 				if tc.AnswerPath, err = getIthIO("output", i, p.Tests.Subtasks[s].OutputPattern, globalIdx, p.Tests.OutputPattern, p.Tests.Subtasks[s].OutputList); err != nil {
 					return nil, err
+				}
+				if p.Tests.TaskType == "outputonly" {
+					tc.OutputPath = filepath.Base(tc.AnswerPath)
 				}
 
 				if ans.Feedback[0].Groups[s].Scoring == problems.ScoringSum {
@@ -225,7 +236,12 @@ func (p Problem) Files() []problems.File {
 }
 
 func (p Problem) GetTaskType() problems.TaskType {
-	tt, err := problems.GetTaskType("batch")
+	tasktype := "batch"
+	if p.Tests.TaskType != "" {
+		tasktype = p.Tests.TaskType
+	}
+
+	tt, err := problems.GetTaskType(tasktype)
 	if err != nil {
 		panic(err)
 	}

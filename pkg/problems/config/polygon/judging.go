@@ -151,11 +151,18 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 		return nil, err
 	}
 
+	feedback := []problems.Testset{testset.Testset(p.Path)}
+	if p.TaskType == "outputonly" {
+		for _, tc := range feedback[0].Testcases() {
+			tc.OutputPath = filepath.Base(tc.AnswerPath)
+		}
+	}
+
 	return &problems.Status{
 		Compiled:       false,
 		CompilerOutput: "status skeleton",
 		FeedbackType:   problems.FeedbackFromString(p.FeedbackType),
-		Feedback:       []problems.Testset{testset.Testset(p.Path)},
+		Feedback:       feedback,
 	}, nil
 }
 

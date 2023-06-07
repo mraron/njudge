@@ -122,7 +122,11 @@ func (p Problem) Tags() (lst []string) {
 	return
 }
 
-func (Problem) Languages() []language.Language {
+func (p Problem) Languages() []language.Language {
+	if p.TaskType == "outputonly" {
+		return []language.Language{language.DefaultStore.Get("zip")}
+	}
+
 	return language.StoreAllExcept(language.DefaultStore, []string{"zip"})
 }
 

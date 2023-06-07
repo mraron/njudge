@@ -46,7 +46,7 @@ func New() OutputOnly {
 				}
 				defer f.Close()
 
-				conts, err = ioutil.ReadAll(f)
+				conts, err = io.ReadAll(f)
 				if err != nil {
 					err = multierr.Combine(err, f.Close())
 					break
@@ -63,7 +63,7 @@ func New() OutputOnly {
 	}
 
 	oo.Batch.CheckFailF = func(rc *batch.RunContext, s language.Status, g *problems.Group, t *problems.Testcase) error {
-		t.VerdictName = problems.VerdictDR
+		t.VerdictName = problems.VerdictPE
 		return nil
 	}
 
