@@ -1,6 +1,9 @@
 package task_yaml
 
 import (
+	"github.com/mraron/njudge/pkg/problems"
+	"github.com/spf13/afero"
+	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
 )
@@ -164,7 +167,7 @@ func TestStatusSkeleton(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	
+
 	if len(st.Feedback[0].Testcases()) != 17 {
 		t.Error("wrong no of tests")
 	}
@@ -188,12 +191,12 @@ func TestStatusSkeleton(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	
+
 	if len(st.Feedback[0].Testcases()) != 9 {
 		t.Error("wrong no of tests")
 	}
 
-	inputs := []string{"1","2","2","3","4","2","3","4","5"}
+	inputs := []string{"1", "2", "2", "3", "4", "2", "3", "4", "5"}
 	for ind, tc := range st.Feedback[0].Testcases() {
 		if tc.InputPath != inputs[ind] {
 			t.Errorf("%s != %s input path", tc.InputPath, inputs[ind])
@@ -203,4 +206,49 @@ func TestStatusSkeleton(t *testing.T) {
 	if st.Feedback[0].MaxScore() != 102.0 {
 		t.Error("wrong max score")
 	}
+}
+
+func TestStatusSkeletonSum(t *testing.T) {
+	taskYAML := `# General info
+name: bigoutput
+title: Bigus outputus
+
+# Technical info
+memory_limit: 64
+time_limit: 0.5
+infile: ""
+outfile: ""
+
+# Other stuff
+n_input: 10
+token_mode: disabled
+public_testcases: all
+feedback_level: full
+primary_language: "hu"`
+	memFS := afero.NewMemMapFs()
+	if err := afero.WriteFile(memFS, "task.yaml", []byte(taskYAML), 0666); err != nil {
+		t.Fatal(err)
+	}
+	if err := memFS.Mkdir("statement", 0666); err != nil {
+		t.Fatal(err)
+	}
+	if err := afero.WriteFile(memFS, "statement/statement.pdf", []byte("this is a pdf"), 0666); err != nil {
+		t.Fatal(err)
+	}
+
+	p, err := Parser(memFS, "./")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	st, err := p.StatusSkeleton("")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, tc := range st.Feedback[0].Testcases() {
+		assert.Equal(t, tc.MaxScore, 10.0)
+	}
+	assert.Equal(t, len(st.Feedback[0].Groups), 1)
+	assert.Equal(t, st.Feedback[0].Groups[0].Scoring, problems.ScoringSum)
 }

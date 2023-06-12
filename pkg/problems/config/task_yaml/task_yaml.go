@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -150,7 +149,13 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	testsLeft := make([][2]string, 0)
 	testIndices := make([]int, 0)
 	advanceTests := func() {
-		if val, ok := p.ScoreTypeParameters[subtask][1].(int); ok {
+		if p.ScoreTypeParameters == nil {
+			for i := 0; i < p.InputCount; i++ {
+				testsLeft = append(testsLeft, [2]string{fmt.Sprintf(p.InputPathPattern, ind), fmt.Sprintf(p.AnswerPathPattern, ind)})
+				testIndices = append(testIndices, ind)
+				ind++
+			}
+		} else if val, ok := p.ScoreTypeParameters[subtask][1].(int); ok {
 			for i := 0; i < val; i++ {
 				testsLeft = append(testsLeft, [2]string{fmt.Sprintf(p.InputPathPattern, ind), fmt.Sprintf(p.AnswerPathPattern, ind)})
 				testIndices = append(testIndices, ind)
@@ -169,7 +174,14 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	}
 	advanceTests()
 
-	subtasks := make([]string, len(p.ScoreTypeParameters))
+	subtaskCount := len(p.ScoreTypeParameters)
+	isSum := false
+	if subtaskCount == 0 {
+		subtaskCount = 1
+		isSum = true
+	}
+
+	subtasks := make([]string, subtaskCount)
 	idx := 0
 	for len(testsLeft) > 0 {
 		tc := problems.Testcase{}
@@ -188,9 +200,14 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 		subtasks[subtask] = "subtask" + strconv.Itoa(subtask+1)
 		tc.Group = "subtask" + strconv.Itoa(subtask+1)
 
-		if len(testsLeft) == 1 {
-			tc.MaxScore = float64(p.ScoreTypeParameters[subtask][0].(int))
+		if isSum {
+			tc.MaxScore = 100.0 / float64(p.InputCount)
+		}
 
+		if len(testsLeft) == 1 {
+			if !isSum {
+				tc.MaxScore = float64(p.ScoreTypeParameters[subtask][0].(int))
+			}
 			subtask++
 			testsLeft = testsLeft[1:]
 			testIndices = testIndices[1:]
@@ -215,7 +232,12 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 		group := &testset.Groups[len(testset.Groups)-1]
 
 		group.Name = subtask
-		group.Scoring = problems.ScoringGroup
+		if isSum {
+			group.Scoring = problems.ScoringSum
+		} else {
+			group.Scoring = problems.ScoringGroup
+		}
+
 		group.Testcases = append(group.Testcases, tcByGroup[subtask]...)
 	}
 
@@ -377,7 +399,7 @@ func primaryLanguageToLocale(primaryLanguage string) string {
 	return "hungarian"
 }
 
-func parser(fs afero.Fs, path string) (problems.Problem, error) {
+func Parser(fs afero.Fs, path string) (problems.Problem, error) {
 	p := Problem{
 		Path:              path,
 		InputPathPattern:  filepath.Join(path, "input", "input%d.txt"),
@@ -396,7 +418,7 @@ func parser(fs afero.Fs, path string) (problems.Problem, error) {
 		return nil, err
 	}
 
-	statementPDF, err := ioutil.ReadFile(filepath.Join(path, "statement", "statement.pdf"))
+	statementPDF, err := afero.ReadFile(fs, filepath.Join(path, "statement", "statement.pdf"))
 	if err != nil {
 		return nil, err
 	}
@@ -468,7 +490,7 @@ func parser(fs afero.Fs, path string) (problems.Problem, error) {
 		}
 
 		var files []os.FileInfo
-		files, err = ioutil.ReadDir(solPath)
+		files, err = afero.ReadDir(fs, solPath)
 		if err != nil {
 			return nil, err
 		}
@@ -501,14 +523,14 @@ func parser(fs afero.Fs, path string) (problems.Problem, error) {
 
 	attPath := filepath.Join(path, "att")
 	if exists(attPath) {
-		files, err := ioutil.ReadDir(filepath.Join(path, "att"))
+		files, err := afero.ReadDir(fs, filepath.Join(path, "att"))
 		if err != nil {
 			return nil, err
 		}
 
 		for _, file := range files {
 			if !file.IsDir() {
-				cont, err := ioutil.ReadFile(filepath.Join(path, "att", file.Name()))
+				cont, err := afero.ReadFile(fs, filepath.Join(path, "att", file.Name()))
 				if err != nil {
 					return nil, err
 				}
@@ -521,11 +543,11 @@ func parser(fs afero.Fs, path string) (problems.Problem, error) {
 	return p, nil
 }
 
-func identifier(fs afero.Fs, path string) bool {
+func Identifier(fs afero.Fs, path string) bool {
 	_, err := fs.Stat(filepath.Join(path, "task.yaml"))
 	return !os.IsNotExist(err)
 }
 
 func init() {
-	problems.RegisterConfigType("task_yaml", parser, identifier)
+	problems.RegisterConfigType("task_yaml", Parser, Identifier)
 }
