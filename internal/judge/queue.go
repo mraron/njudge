@@ -98,14 +98,15 @@ func (j *Queue) Run() {
 		}
 	}
 
-	for {
-		w := j.workerProvider.Get()
-		sub := <-j.queue
+	for sub := range j.queue {
+		sub := sub
+		go func() {
+			w := j.workerProvider.Get()
+			if err := judge(w, sub); err != nil {
+				j.logger.Error("judging error", zap.Error(err))
+			}
 
-		if err := judge(w, sub); err != nil {
-			j.logger.Error("judging error", zap.Error(err))
-		}
-
-		j.workerProvider.Put(w)
+			j.workerProvider.Put(w)
+		}()
 	}
 }
