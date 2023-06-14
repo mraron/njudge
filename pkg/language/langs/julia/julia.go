@@ -2,7 +2,6 @@ package julia
 
 import (
 	"io"
-	"os"
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
@@ -37,7 +36,7 @@ func (julia) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, 
 		return stat, err
 	}
 
-	if st, err := s.Env().SetMaxProcesses(100).TimeLimit(tl).MemoryLimit(ml/1024).Stdin(stdin).Stdout(stdout).Stderr(os.Stderr).WorkingDirectory(s.Pwd()).Run("/usr/local/bin/julia a.out", true); err != nil {
+	if st, err := s.Env().SetMaxProcesses(100).TimeLimit(tl).MemoryLimit(ml/1024).Stdin(stdin).Stdout(stdout).WorkingDirectory(s.Pwd()).Run("/usr/local/bin/julia a.out", true); err != nil {
 		return st, err
 	} else {
 		stat = st

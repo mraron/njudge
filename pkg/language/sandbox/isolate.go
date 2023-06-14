@@ -3,7 +3,9 @@ package sandbox
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
+	"go.uber.org/multierr"
 	"io"
 	"log"
 	"os"
@@ -24,7 +26,7 @@ func getEnv(key, fallback string) string {
 	return fallback
 }
 
-var ISOLATE_ROOT = getEnv("ISOLATE_ROOT", "/var/local/lib/isolate/")
+var IsolateRoot = getEnv("ISOLATE_ROOT", "/var/local/lib/isolate/")
 
 type Isolate struct {
 	id   int
@@ -48,8 +50,8 @@ func (s *Isolate) Id() string {
 	return "isolate" + strconv.Itoa(s.id)
 }
 
-func (s Isolate) Pwd() string {
-	return filepath.Join(ISOLATE_ROOT, strconv.Itoa(s.id), "box")
+func (s *Isolate) Pwd() string {
+	return filepath.Join(IsolateRoot, strconv.Itoa(s.id), "box")
 }
 
 func (s *Isolate) GetFile(name string) (io.Reader, error) {
@@ -88,7 +90,7 @@ func (s *Isolate) Init(l *log.Logger) error {
 	return s.init()
 }
 
-func (s Isolate) getPathToFile(name string) string {
+func (s *Isolate) getPathToFile(name string) string {
 	return filepath.Join(s.Pwd(), name)
 }
 
@@ -96,7 +98,9 @@ func (s *Isolate) CreateFile(name string, r io.Reader) error {
 	filename := s.getPathToFile(name)
 	s.logger.Print("Creating file ", filename)
 
-	syscall.Unlink(filename)
+	if err := syscall.Unlink(filename); err != nil && !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
 
 	f, err := os.Create(filename)
 	if err != nil {
@@ -106,8 +110,7 @@ func (s *Isolate) CreateFile(name string, r io.Reader) error {
 
 	if _, err := io.Copy(f, r); err != nil {
 		s.logger.Print("Error occurred while populating it with its content: ", err)
-		f.Close()
-		return err
+		return multierr.Combine(err, f.Close())
 	}
 
 	return f.Close()
@@ -116,7 +119,7 @@ func (s *Isolate) CreateFile(name string, r io.Reader) error {
 func (s *Isolate) MakeExecutable(name string) error {
 	filename := s.getPathToFile(name)
 
-	err := os.Chmod(filename, 0777)
+	err := os.Chmod(filename, 0755)
 	s.logger.Print("Making executable: ", filename, " error: ", err)
 
 	return err
@@ -201,46 +204,41 @@ func (s *Isolate) WorkingDirectory(wd string) language.Sandbox {
 	return s
 }
 
-func (s *Isolate) Run(prg string, needStatus bool) (language.Status, error) {
+func (s *Isolate) Run(args string, needStatus bool) (language.Status, error) {
 	var (
-		err      error
-		f        *os.File
-		cmd      *exec.Cmd
-		str      string
-		st       int
-		metafile = "/tmp/metafile" + strconv.Itoa(s.id)
+		cmd *exec.Cmd
+		err error
+
+		metafile     *os.File
+		metafileName = "/tmp/metafile" + strconv.Itoa(s.id)
 	)
 
 	s.MapDir("/etc/alternatives", "/etc/alternatives", []string{}, true)
 	s.MapDir("/languages", "/languages", []string{"maybe"}, true)
-
-	defer s.ClearArguments()
-
-	splt := strings.Split(prg, " ")
-
-	s.argv = append([]string{"--cg", "--cg-timing", "-b", strconv.Itoa(s.id), "-M", metafile}, s.argv...)
+	splitted := strings.Split(args, " ")
+	s.argv = append([]string{"--cg", "--cg-timing", "-b", strconv.Itoa(s.id), "-M", metafileName}, s.argv...)
 	s.argv = append(s.argv, "--run", "--")
-	s.argv = append(s.argv, splt...)
-	stderr := &bytes.Buffer{}
+	s.argv = append(s.argv, splitted...)
+	defer s.ClearArguments()
 
 	s.logger.Print("Running isolate with args ", s.argv)
 
-	cmd = exec.Command("isolate", s.argv...)
+	pb := NewPrefixBuffer(s.stderr, 2048)
 
+	cmd = exec.Command("isolate", s.argv...)
 	cmd.Stdin = s.stdin
 	cmd.Stdout = s.stdout
-	cmd.Stderr = stderr
+	cmd.Stderr = pb
 	cmd.Dir = s.wdir
 
 	if err = cmd.Run(); err != nil {
 		s.logger.Print("Command exited with non-zero exit code: ", err)
 
 		if !needStatus {
-			s.stderr.Write(stderr.Bytes())
 			return s.st, err
 		}
 
-		str, st = stderr.String(), -1
+		str, st := string(pb.Prefix()), -1
 		if strings.Contains(str, "Caught fatal signal") {
 			fmt.Sscanf(str, "Caught fatal signal %d", &st)
 		} else if strings.Contains(str, "Exited with error status") {
@@ -256,13 +254,9 @@ func (s *Isolate) Run(prg string, needStatus bool) (language.Status, error) {
 		}
 	} else {
 		s.logger.Print("Command exited successfully")
-		s.logger.Print("stderr of process: ", stderr.String())
+		s.logger.Printf("stderr of process: %q", string(pb.Prefix()))
 
 		s.st.Verdict = language.VerdictOK
-	}
-
-	if s.stderr != nil {
-		s.stderr.Write([]byte(str))
 	}
 
 	if !needStatus {
@@ -271,17 +265,17 @@ func (s *Isolate) Run(prg string, needStatus bool) (language.Status, error) {
 
 	memorySum := 0
 
-	if f, err = os.Open(metafile); err != nil {
+	if metafile, err = os.Open(metafileName); err != nil {
 		s.st.Verdict = language.VerdictXX
-		s.logger.Print("Can't open metafile ", metafile, " error is: ", err)
+		s.logger.Print("Can't open metafile ", metafileName, " error is: ", err)
 
 		return s.st, err
 	}
-	defer f.Close()
+	defer metafile.Close()
 
-	s.logger.Print("Ok now, getting status")
+	s.logger.Print("Parsing metafile")
 
-	sc := bufio.NewScanner(f)
+	sc := bufio.NewScanner(metafile)
 	for sc.Scan() {
 		s.logger.Print(sc.Text())
 
@@ -303,8 +297,14 @@ func (s *Isolate) Run(prg string, needStatus bool) (language.Status, error) {
 		}
 	}
 
+	if err = sc.Err(); err != nil {
+		s.st.Verdict = language.VerdictXX
+		s.logger.Print("Error scanning metafile", err)
+
+		return s.st, err
+	}
+
 	s.logger.Print("Calculated memory usage ", memorySum, "KiB")
-	s.logger.Print("===============")
 	s.st.Memory = memorySum
 
 	return s.st, nil

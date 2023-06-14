@@ -3,13 +3,10 @@ package cpp
 import (
 	"bytes"
 	"io"
-	"io/ioutil"
-	"os/exec"
 	"strings"
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
-	"go.uber.org/multierr"
 )
 
 type Cpp struct {
@@ -28,32 +25,6 @@ func (c Cpp) Name() string {
 
 func (c Cpp) DefaultFileName() string {
 	return "main.cpp"
-}
-
-func (c Cpp) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) error {
-	temp, err := ioutil.TempFile("/tmp", "cpptempfile")
-	if err != nil {
-		return err
-	}
-
-	cmd := exec.Command("g++", "-std="+c.ver, "-x", "c++", "-O2", "-o", "/proc/self/fd/1", "-")
-
-	cmd.Stdin = r
-	cmd.Stdout = temp
-	cmd.Stderr = e
-
-	cmd.Dir = wd
-
-	copyTemp := func() error {
-		_, err := io.Copy(w, temp)
-		return err
-	}
-
-	return multierr.Combine(
-		cmd.Run(),
-		copyTemp(),
-		temp.Close(),
-	)
 }
 
 func (c Cpp) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
