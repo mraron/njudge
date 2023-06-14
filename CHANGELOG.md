@@ -10,12 +10,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - logging in case of callback failure in judge
 - Auto compilation for cpp checkers in problem.yaml config type
+- Support for outputonly tasks in polygon and problem_yaml config types (2cdd17)
+- Support for empty task_type_parameters in task_yaml (defaulting to sum subtask with evenly distributed points) (e5f5a4)
 
 ### Changed
 - testlib checker to only support quitp type partial scoring
 - polygon config to not generate html by default from the problem-properties.json
 - toString template func to be smarter
 - Moved MemoryLimit and TimeLimit to the Problem interface, since they're not used in the evaluation process: only the status skeleton matters.
+- Optimize judge Dockerfile (5347e1)
+- In outputonly tasktype if the file is not found in the zip, then the verdict is now VerdictDR (2cdd17)
+- task_yaml: properly set locale from primary_language (033f1a)
+- Optimized stderr capturing in isolate sandbox and added tests (bc0560)
 
 ### Fixed
 - Updating language and problem list every 20 second.
@@ -23,6 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tr template.Funcs's arguments
 - testset.FirstNonAC
 - problem_yaml: set memory and time limit correctly
+- Clear filter button on the problemset list page (eb7896)
+- Judge didn't spawn new gorutines for the workers (923f67) 
 
 ## [0.1.0] - 2023-06-02
 
