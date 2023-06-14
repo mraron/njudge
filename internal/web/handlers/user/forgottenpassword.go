@@ -1,0 +1,167 @@
+package user
+
+import (
+	"bytes"
+	"database/sql"
+	"errors"
+	"github.com/jmoiron/sqlx"
+	"github.com/labstack/echo/v4"
+	"github.com/mraron/njudge/internal/web/domain/email"
+	"github.com/mraron/njudge/internal/web/helpers"
+	"github.com/mraron/njudge/internal/web/helpers/config"
+	"github.com/mraron/njudge/internal/web/helpers/i18n"
+	"github.com/mraron/njudge/internal/web/models"
+	"github.com/mraron/njudge/internal/web/services"
+	"github.com/volatiletech/sqlboiler/v4/boil"
+	"go.uber.org/multierr"
+	"net/http"
+	"time"
+)
+
+func GetForgottenPassword() echo.HandlerFunc {
+	return func(c echo.Context) error {
+
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
+
+		if u := c.Get("user").(*models.User); u != nil {
+			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
+		}
+
+		helpers.DeleteFlash(c, "ForgottenPasswordMessage")
+
+		return c.Render(http.StatusOK, "user/forgotten_password", nil)
+	}
+}
+
+func PostForgottenPassword(cfg config.Server, DB *sqlx.DB, mailService services.MailService) echo.HandlerFunc {
+	type request struct {
+		Email string `form:"email"`
+	}
+	return func(c echo.Context) error {
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
+
+		if u := c.Get("user").(*models.User); u != nil {
+			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
+		}
+
+		data := request{}
+		if err := c.Bind(&data); err != nil {
+			return err
+		}
+
+		u, err := models.Users(models.UserWhere.Email.EQ(data.Email)).One(c.Request().Context(), DB)
+		if err != nil && !errors.Is(err, sql.ErrNoRows) {
+			return err
+		}
+		if err == nil {
+			fpkey, err := models.ForgottenPasswordKeys(models.ForgottenPasswordKeyWhere.UserID.EQ(u.ID)).One(c.Request().Context(), DB)
+			if err != nil && !errors.Is(err, sql.ErrNoRows) {
+				return err
+			}
+			if err != nil || (err == nil && time.Now().After(fpkey.Valid)) {
+				if err == nil {
+					if _, err := fpkey.Delete(c.Request().Context(), DB); err != nil {
+						return err
+					}
+				}
+
+				key := models.ForgottenPasswordKey{
+					UserID: u.ID,
+					Key:    helpers.GenerateActivationKey(32),
+					Valid:  time.Now().Add(1 * time.Hour),
+				}
+
+				tx, err := DB.Begin()
+				if err != nil {
+					return err
+				}
+
+				m := email.Mail{}
+				m.Recipients = []string{u.Email}
+				m.Subject = tr.Translate("Password reset")
+
+				message := &bytes.Buffer{}
+				if err := c.Echo().Renderer.Render(message, "mail/forgotten_password", struct {
+					Name string
+					URL  string
+					Key  string
+				}{
+					u.Name,
+					cfg.Url,
+					key.Key,
+				}, nil); err != nil {
+					return multierr.Combine(tx.Rollback(), err)
+				}
+				m.Message = message.String()
+
+				if err := mailService.Send(c.Request().Context(), m); err != nil {
+					return multierr.Combine(tx.Rollback(), err)
+				}
+
+				if err := key.Insert(c.Request().Context(), tx, boil.Infer()); err != nil {
+					return multierr.Combine(tx.Rollback(), err)
+				}
+				if err := tx.Commit(); err != nil {
+					return err
+				}
+			}
+		}
+
+		helpers.SetFlash(c, "ForgottenPasswordMessage", tr.Translate("An email with further instructions was sent to the given address (if it's registered in our system)."))
+
+		return c.Redirect(http.StatusFound, c.Echo().Reverse("GetForgottenPassword"))
+	}
+}
+
+func GetForgottenPasswordForm(DB *sqlx.DB) echo.HandlerFunc {
+	type request struct {
+		Name string `param:"name"`
+		Key  string `param:"key"`
+	}
+
+	return func(c echo.Context) error {
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
+
+		if u := c.Get("user").(*models.User); u != nil {
+			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
+		}
+
+		data := request{}
+		if err := c.Bind(&data); err != nil {
+			return err
+		}
+
+		//@TODO validate
+
+		return c.Render(http.StatusOK, "user/forgotten_password_form", struct {
+			Name string
+			Key  string
+		}{data.Name, data.Key})
+	}
+}
+
+func PostForgottenPasswordForm(DB *sqlx.DB) echo.HandlerFunc {
+	type request struct {
+		Password1 string `form:"password1"`
+		Password2 string `form:"password1"`
+
+		Name string `form:"name"`
+		Key  string `form:"key"`
+	}
+	return func(c echo.Context) error {
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
+
+		if u := c.Get("user").(*models.User); u != nil {
+			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
+		}
+
+		data := request{}
+		if err := c.Bind(&data); err != nil {
+			return err
+		}
+
+		//@TODO validate and reset password
+
+		return c.Redirect(http.StatusFound, c.Echo().Reverse("GetForgottenPasswordForm", data.Name, data.Key))
+	}
+}
