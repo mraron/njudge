@@ -48,6 +48,7 @@
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
                         <a class="dropdown-item" href="/user/profile/{{(user).Name}}/">{{Tr "Profile"}}</a>
+                        <a class="dropdown-item" href="/user/profile/{{(user).Name}}/settings/">{{Tr "Settings"}}</a>
                         {{if canView (user).Role "admin_panel"}}
                             <a class="dropdown-item" href="/admin">{{Tr "Admin"}}</a>
                         {{end}}
