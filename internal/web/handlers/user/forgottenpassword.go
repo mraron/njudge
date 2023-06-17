@@ -14,6 +14,7 @@ import (
 	"github.com/mraron/njudge/internal/web/services"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"go.uber.org/multierr"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
 )
@@ -71,7 +72,7 @@ func PostForgottenPassword(cfg config.Server, DB *sqlx.DB, mailService services.
 					Valid:  time.Now().Add(1 * time.Hour),
 				}
 
-				tx, err := DB.Begin()
+				tx, err := DB.BeginTx(c.Request().Context(), nil)
 				if err != nil {
 					return err
 				}
@@ -131,7 +132,7 @@ func GetForgottenPasswordForm(DB *sqlx.DB) echo.HandlerFunc {
 			return err
 		}
 
-		//@TODO validate
+		helpers.DeleteFlash(c, "ForgottenPasswordFormMessage")
 
 		return c.Render(http.StatusOK, "user/forgotten_password_form", struct {
 			Name string
@@ -160,7 +161,57 @@ func PostForgottenPasswordForm(DB *sqlx.DB) echo.HandlerFunc {
 			return err
 		}
 
-		//@TODO validate and reset password
+		u, err := models.Users(models.UserWhere.Name.EQ(data.Name)).One(c.Request().Context(), DB)
+		if err != nil {
+			return err
+		}
+
+		key, err := models.ForgottenPasswordKeys(models.ForgottenPasswordKeyWhere.UserID.EQ(u.ID)).One(c.Request().Context(), DB)
+		if err != nil || key.Key != data.Key || key.Valid.Before(time.Now()) {
+			helpers.SetFlash(c, "ForgottenPasswordFormMessage", tr.Translate("Invalid key provided."))
+		} else {
+			if data.Password1 != data.Password2 {
+				helpers.SetFlash(c, "ForgottenPasswordFormMessage", tr.Translate("The two passwords don't match."))
+			} else {
+				password, err := bcrypt.GenerateFromPassword([]byte(data.Password2), bcrypt.DefaultCost)
+				if err != nil {
+					return err
+				}
+
+				tx := func() (ret error) {
+					var tx *sql.Tx
+					defer func() {
+						if res := recover(); res != nil {
+							ret = multierr.Combine(err, tx.Rollback())
+						} else {
+							ret = tx.Commit()
+						}
+					}()
+
+					tx, err := DB.BeginTx(c.Request().Context(), nil)
+					if err != nil {
+						panic(err)
+					}
+
+					u.Password = string(password)
+					if _, err = u.Update(c.Request().Context(), tx, boil.Whitelist(models.UserColumns.Password)); err != nil {
+						panic(err)
+					}
+
+					if _, err = key.Delete(c.Request().Context(), tx); err != nil {
+						panic(err)
+					}
+
+					return
+				}
+
+				if err := tx(); err == nil {
+					helpers.SetFlash(c, "ForgottenPasswordFormMessage", tr.Translate("Password changed succesfully! You can login with your new password."))
+				} else {
+					return err
+				}
+			}
+		}
 
 		return c.Redirect(http.StatusFound, c.Echo().Reverse("GetForgottenPasswordForm", data.Name, data.Key))
 	}
