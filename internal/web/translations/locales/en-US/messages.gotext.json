@@ -231,6 +231,41 @@
             "fuzzy": true
         },
         {
+            "id": "Password reset",
+            "message": "Password reset",
+            "translation": "Password reset",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "An email with further instructions was sent to the given address (if it's registered in our system).",
+            "message": "An email with further instructions was sent to the given address (if it's registered in our system).",
+            "translation": "An email with further instructions was sent to the given address (if it's registered in our system).",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Invalid key provided.",
+            "message": "Invalid key provided.",
+            "translation": "Invalid key provided.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "The two passwords don't match.",
+            "message": "The two passwords don't match.",
+            "translation": "The two passwords don't match.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Password changed succesfully! You can login with your new password.",
+            "message": "Password changed succesfully! You can login with your new password.",
+            "translation": "Password changed succesfully! You can login with your new password.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": [
                 "alreadyLoggedInMessage",
                 "You're already logged in..."
@@ -332,13 +367,6 @@
             "fuzzy": true
         },
         {
-            "id": "The two passwords don't match.",
-            "message": "The two passwords don't match.",
-            "translation": "The two passwords don't match.",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
             "id": "Activate your account",
             "message": "Activate your account",
             "translation": "Activate your account",
@@ -432,6 +460,13 @@
             "id": "Profile",
             "message": "Profile",
             "translation": "Profile",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Settings",
+            "message": "Settings",
+            "translation": "Settings",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -772,16 +807,16 @@
             "fuzzy": true
         },
         {
-            "id": "We found the following problems",
-            "message": "We found the following problems",
-            "translation": "We found the following problems",
+            "id": "Email",
+            "message": "Email",
+            "translation": "Email",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
         {
-            "id": "Nickname",
-            "message": "Nickname",
-            "translation": "Nickname",
+            "id": "Reset password",
+            "message": "Reset password",
+            "translation": "Reset password",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -793,9 +828,23 @@
             "fuzzy": true
         },
         {
-            "id": "Settings",
-            "message": "Settings",
-            "translation": "Settings",
+            "id": "Password again",
+            "message": "Password again",
+            "translation": "Password again",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "We found the following problems",
+            "message": "We found the following problems",
+            "translation": "We found the following problems",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Nickname",
+            "message": "Nickname",
+            "translation": "Nickname",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -852,20 +901,6 @@
             "id": "Save",
             "message": "Save",
             "translation": "Save",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Password again",
-            "message": "Password again",
-            "translation": "Password again",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Email",
-            "message": "Email",
-            "translation": "Email",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         }
