@@ -71,6 +71,11 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	u.GET("/activate", user.GetActivateInfo())
 	u.GET("/activate/:name/:key", user.Activate(s.DB))
 
+	u.GET("/forgotten_password", user.GetForgottenPassword()).Name = "GetForgottenPassword"
+	u.POST("/forgotten_password", user.PostForgottenPassword(s.Server, s.DB, s.MailService))
+	u.GET("/forgotten_password_form/:name/:key", user.GetForgottenPasswordForm(s.DB)).Name = "GetForgottenPasswordForm"
+	u.POST("/forgotten_password_form", user.PostForgottenPasswordForm(s.DB)).Name = "PostForgottenPasswordForm"
+
 	pr := u.Group("/profile", profile.SetProfileMiddleware(s.DB))
 	pr.GET("/:name/", profile.GetProfile(s.DB))
 	pr.GET("/:name/submissions/", profile.GetSubmissions(services.NewSQLStatusPageService(s.DB.DB)))

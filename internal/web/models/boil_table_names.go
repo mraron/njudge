@@ -4,21 +4,23 @@
 package models
 
 var TableNames = struct {
-	Judges            string
-	Partials          string
-	ProblemCategories string
-	ProblemRels       string
-	ProblemTags       string
-	Submissions       string
-	Tags              string
-	Users             string
+	ForgottenPasswordKeys string
+	Judges                string
+	Partials              string
+	ProblemCategories     string
+	ProblemRels           string
+	ProblemTags           string
+	Submissions           string
+	Tags                  string
+	Users                 string
 }{
-	Judges:            "judges",
-	Partials:          "partials",
-	ProblemCategories: "problem_categories",
-	ProblemRels:       "problem_rels",
-	ProblemTags:       "problem_tags",
-	Submissions:       "submissions",
-	Tags:              "tags",
-	Users:             "users",
+	ForgottenPasswordKeys: "forgotten_password_keys",
+	Judges:                "judges",
+	Partials:              "partials",
+	ProblemCategories:     "problem_categories",
+	ProblemRels:           "problem_rels",
+	ProblemTags:           "problem_tags",
+	Submissions:           "submissions",
+	Tags:                  "tags",
+	Users:                 "users",
 }

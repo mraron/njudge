@@ -189,6 +189,31 @@
             "translation": "Archívum"
         },
         {
+            "id": "Password reset",
+            "message": "Password reset",
+            "translation": "Elfelejtett jelszó"
+        },
+        {
+            "id": "An email with further instructions was sent to the given address (if it's registered in our system).",
+            "message": "An email with further instructions was sent to the given address (if it's registered in our system).",
+            "translation": "Megküldtük a szükséges további intézkedéseket a megadott email címre (ha regisztrálva van a rendszerünkben)."
+        },
+        {
+            "id": "Invalid key provided.",
+            "message": "Invalid key provided.",
+            "translation": "Helytelen kulcs."
+        },
+        {
+            "id": "The two passwords don't match.",
+            "message": "The two passwords don't match.",
+            "translation": "A két megadott jelszó nem egyezik meg."
+        },
+        {
+            "id": "Password changed succesfully! You can login with your new password.",
+            "message": "Password changed succesfully! You can login with your new password.",
+            "translation": "Jelszó sikeresen megváltoztatva! Beléphetsz az új jelszavaddal."
+        },
+        {
             "id": [
                 "alreadyLoggedInMessage",
                 "You're already logged in..."
@@ -260,11 +285,6 @@
             "id": "The nickname can only consist of alphanumeric characters: letters (including non-latin characters such as 'á' or 'ű') and digits.",
             "message": "The nickname can only consist of alphanumeric characters: letters (including non-latin characters such as 'á' or 'ű') and digits.",
             "translation": "A név csak alfanumerikus karakterekből állhat, azaz: betűkből (beleértve a nem latin karaktereket is, pl. 'á' vagy 'ű') és számjegyekből."
-        },
-        {
-            "id": "The two passwords don't match.",
-            "message": "The two passwords don't match.",
-            "translation": "A két megadott jelszó nem egyezik meg."
         },
         {
             "id": "Activate your account",
@@ -340,6 +360,11 @@
             "id": "Profile",
             "message": "Profile",
             "translation": "Profil"
+        },
+        {
+            "id": "Settings",
+            "message": "Settings",
+            "translation": "Beállítások"
         },
         {
             "id": "Admin",
@@ -582,6 +607,26 @@
             "translation": "Teszt"
         },
         {
+            "id": "Email",
+            "message": "Email",
+            "translation": "Email"
+        },
+        {
+            "id": "Reset password",
+            "message": "Reset password",
+            "translation": "Jelszó megváltoztatása"
+        },
+        {
+            "id": "Password",
+            "message": "Password",
+            "translation": "Jelszó"
+        },
+        {
+            "id": "Password again",
+            "message": "Password again",
+            "translation": "Jelszó mégegyszer"
+        },
+        {
             "id": "We found the following problems",
             "message": "We found the following problems",
             "translation": "A következő problémákat találtuk"
@@ -590,16 +635,6 @@
             "id": "Nickname",
             "message": "Nickname",
             "translation": "Felhasználónév"
-        },
-        {
-            "id": "Password",
-            "message": "Password",
-            "translation": "Jelszó"
-        },
-        {
-            "id": "Settings",
-            "message": "Settings",
-            "translation": "Beállítások"
         },
         {
             "id": "Solved problems",
@@ -640,16 +675,6 @@
             "id": "Save",
             "message": "Save",
             "translation": "Ment"
-        },
-        {
-            "id": "Password again",
-            "message": "Password again",
-            "translation": "Jelszó mégegyszer"
-        },
-        {
-            "id": "Email",
-            "message": "Email",
-            "translation": "Email"
         }
     ]
 }
