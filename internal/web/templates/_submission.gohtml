@@ -9,7 +9,7 @@
                 {{Tr "Compilation error"}}
             {{else}}
                 {{$testset := (index $status.Feedback 0)}}
-                <span class="text-info">{{$tc := $testset.FirstNonAC}}{{ $verdict := (verdict (($testset.IndexTestcase $tc).VerdictName)) }}{{Tr "%s on test %d" (Tr $verdict) $tc}}</span>
+                <span class="text-info">{{$tc := $testset.FirstNonAC}}{{ $verdict := (verdict (($testset.IndexTestcase $tc).VerdictName)) }}{{Tr "%s on test %d" (Tr $verdict.String) $tc}}</span>
             {{end}}
         {{end}}
     {{else}}
