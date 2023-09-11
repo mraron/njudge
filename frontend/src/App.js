@@ -17,8 +17,8 @@ import ProblemStatement from './pages/Problem/ProblemStatement';
 import ProblemSubmit from './pages/Problem/ProblemSubmit';
 import ProblemSubmissions from './pages/Problem/ProblemSubmissions';
 import Login from './pages/Auth/Login';
-import ProblemResults from './pages/Problem/ProblemResults';
 import Register from './pages/Auth/Register';
+import ProblemRankings from "./pages/Problem/ProblemRankings";
 import './index.css';
 
 function App() {
@@ -43,11 +43,11 @@ function App() {
 					<Route path="/user/profile/submissions/" element={<Profile />} />
 					<Route path="/user/profile/settings/" element={<Profile />} />
 					<Route path="*" element={<NotFound />} />
-					<Route path="/problemset/main/:task/" element={<Problem />} >
-						<Route path="/problemset/main/:task/" element={<ProblemStatement />} />
-						<Route path="/problemset/main/:task/submit/" element={<ProblemSubmit />} />
-						<Route path="/problemset/main/:task/status/" element={<ProblemSubmissions />} />
-						<Route path="/problemset/main/:task/ranklist/" element={<ProblemResults />} />
+					<Route path="/problemset/main/task/" element={<Problem />} >
+						<Route path="/problemset/main/task/" element={<ProblemStatement />} />
+						<Route path="/problemset/main/task/submit/" element={<ProblemSubmit />} />
+						<Route path="/problemset/main/task/status/" element={<ProblemSubmissions />} />
+						<Route path="/problemset/main/task/ranklist/" element={<ProblemRankings />} />
 					</Route>
 					<Route path="/user/login" element={<Login />} />
 					<Route path="/user/register" element={<Register />} />

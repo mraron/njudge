@@ -1,6 +1,7 @@
 import Rankings from "../../components/Result";
 import SVGTitleComponent from '../../svg/SVGTitleComponent';
 import { SVGResults } from "../../svg/SVGs";
+import Pagination from "../../components/Pagination";
 
 function ProblemRankings() {
     const titleComponent = <SVGTitleComponent svg={<SVGResults />} title="Eredmények" />
@@ -13,7 +14,12 @@ function ProblemRankings() {
         ["gonterarmin", "2 / 50", "5669"],
     ]
     return (
-        <Rankings data={data} titleComponent={titleComponent} emphasize={false} />
+        <div>
+            <div className="mb-2">
+                <Rankings data={data} titleComponent={titleComponent} emphasize={false} />
+            </div>
+            <Pagination current={20} last={50} />
+        </div>
     )
 }
 

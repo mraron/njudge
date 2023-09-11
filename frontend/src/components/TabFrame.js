@@ -14,7 +14,8 @@ function Tab({ isSelected, name, route }) {
 function TabFrame({ routes, children }) {
 	const location = useLocation()
 	const selected = routes.map(pair => trimRoute(pair[1])).indexOf(trimRoute(location.pathname));
-    const tabs = routes.map((pair, index) => <Tab isSelected={index === selected} name={pair[0]} route={pair[1]} />)
+    const tabs = routes.map((pair, index) =>
+        <Tab isSelected={index === selected} name={pair[0]} route={pair[1]} key={index} />)
     return (
         <div className="w-full">
             <ul className="hidden sm:flex mb-2">
