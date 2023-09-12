@@ -1,10 +1,12 @@
 package web
 
 import (
-	"github.com/labstack/echo/v4/middleware"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
+	"net/http"
 	"strings"
 	"time"
+
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/mraron/njudge/internal/web/helpers/i18n"
 
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/web/extmodels"
@@ -85,7 +87,22 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	prs.POST("/change_password/", profile.PostSettingsChangePassword(s.DB))
 	prs.POST("/misc/", profile.PostSettingsMisc(s.DB))
 
-	v1 := e.Group("/api/v1")
+	apiGroup := e.Group("/api")
+
+	v2 := apiGroup.Group("/v2")
+	v2.GET("/archive", func(c echo.Context) error {
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
+
+		u := c.Get("user").(*models.User)
+
+		ta, err := taskarchive.MakeTaskArchive(c, tr, s.DB, s.ProblemStore, u)
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, ta)
+	})
+
+	v1 := apiGroup.Group("/v1")
 
 	problemRelDataProvider := api.ProblemRelDataProvider{DB: s.DB.DB}
 	v1.GET("/problem_rels", api.GetList[models.ProblemRel](problemRelDataProvider))
