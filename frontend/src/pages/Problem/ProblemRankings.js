@@ -1,4 +1,4 @@
-import Rankings from "../../components/Result";
+import Rankings from "../../components/Rankings";
 import SVGTitleComponent from '../../svg/SVGTitleComponent';
 import { SVGResults } from "../../svg/SVGs";
 import Pagination from "../../components/Pagination";

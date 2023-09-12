@@ -1,0 +1,84 @@
+import RoundedTable from "./RoundedTable";
+import { SVGCorrectSimple, SVGSpinner, SVGWrongSimple} from "../svg/SVGs";
+
+function TestCase({ index, numCases, testCase, group, isLastGroup, isLastCase }) {
+    const bottomBorderCase = isLastGroup && isLastCase? "border-b-0": ""
+    const bottomBorderGroup = isLastGroup? "border-b-0": ""
+    return (
+        <tr>
+            {index === 0 && <>
+                <td className={`padding-td-default border border-t-0 border-divide-col text-center ${bottomBorderGroup}`} rowSpan={numCases}>
+                    <div className="flex flex-col justify-center">
+                        <div className="flex items-center justify-center mb-2">
+                            {group["failed"] && <SVGWrongSimple cls="w-7 h-7 text-red-500" />}
+                            {!group["failed"] && group["completed"] && <SVGCorrectSimple cls="w-7 h-7 text-indigo-500" />}
+                            {!group["failed"] && !group["completed"] && <SVGSpinner cls="w-7 h-7" />}
+                        </div>
+                        {group["name"]}
+                    </div>
+                </td>
+                <td className={`padding-td-default border border-t-0 border-divide-col text-center ${bottomBorderGroup}`} rowSpan={numCases}>
+                    {`${group["score"]} / ${group["maxScore"]}`}
+                </td>
+            </>}
+            <td className={`padding-td-default border border-t-0 border-divide-col ${bottomBorderCase}`}>{testCase["index"]}</td>
+            {group["scoring"] !== 1 &&
+                <td className={`padding-td-default border border-t-0 border-divide-col ${bottomBorderCase}`} colSpan={2}>
+                    <div className="flex">
+                        <SVGSpinner cls="mr-2 w-6 h-6" />
+                        {testCase["verdictName"]}
+                    </div>
+                </td>
+            }
+            {group["scoring"] === 1 && <>
+                <td className={`padding-td-default border border-t-0 border-divide-col ${bottomBorderCase}`}>
+                    <div className="flex items-center">
+                        <SVGWrongSimple cls="mr-2 w-6 h-6 text-red-500" />
+                        <span>{testCase["verdictName"]}</span>
+                    </div>
+                </td>
+                <td className={`padding-td-default border border-t-0 border-divide-col ${bottomBorderCase}`}>{testCase["score"]} / {testCase["maxScore"]}</td>
+            </>}
+            <td className={`padding-td-default border border-t-0 border-divide-col ${bottomBorderCase}`}>{testCase["timeSpent"]}</td>
+            <td className={`padding-td-default border border-t-0 border-r-0 border-divide-col ${bottomBorderCase}`}>{testCase["memoryUsed"]}</td>
+        </tr>
+    )
+}
+
+function TestGroup({ group, isLast }) {
+    const testCases = group["testCases"]
+    const testCaseContents = testCases.map((testCase, index) =>
+        <TestCase index={index} numCases={testCases.length} testCase={testCase} group={group} key={index} isLastGroup={isLast} isLastCase={index === testCases.length - 1} />
+    )
+    return (
+        <>
+            {testCaseContents}
+        </>
+    )
+}
+function SubmissionTable({ submission }) {
+    const testSet = submission["testSets"][0]
+    const groups = testSet["groups"]
+    const groupContents = groups.map((group, index) =>
+        <TestGroup group={group} isLast={index === groups.length - 1} key={index} />
+    )
+    return (
+        <RoundedTable>
+            <thead className="bg-grey-800">
+                <tr className="divide-x divide-default">
+                    <th className="padding-td-default">Részfeladat</th>
+                    <th className="padding-td-default">Összpont</th>
+                    <th className="padding-td-default">Teszt</th>
+                    <th className="padding-td-default" colSpan={2}>Verdikt</th>
+                    <th className="padding-td-default">Idő</th>
+                    <th className="padding-td-default">Memória</th>
+                </tr>
+            </thead>
+            <tbody>
+                {groupContents}
+            </tbody>
+        </RoundedTable>
+    )
+}
+
+export default SubmissionTable

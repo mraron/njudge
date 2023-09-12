@@ -1,4 +1,5 @@
 import RoundedTable from './RoundedTable';
+import {SVGCorrectSimple, SVGWrong, SVGWrongSimple} from "../svg/SVGs";
 
 function Submission({ id, date, user, problem, lang, verdict, time, mem }) {
     return (
@@ -18,8 +19,12 @@ function Submission({ id, date, user, problem, lang, verdict, time, mem }) {
             <td className="padding-td-default">
                 {lang}
             </td>
-            <td className={`padding-td-default ${problem.includes("a")? "text-red-400": "text-indigo-300"}`}>
-                {verdict}
+            <td className="padding-td-default">
+                <div className="flex items-center">
+                    {problem.includes("a") && <SVGWrongSimple cls="w-5 h-5 text-red-500 mr-2 shrink-0" />}
+                    {!problem.includes("a") && <SVGCorrectSimple cls="w-5 h-5 text-indigo-500 mr-2 shrink-0"/>}
+                    <span className="whitespace-nowrap">{verdict}</span>
+                </div>
             </td>
             <td className="padding-td-default">
                 {time}

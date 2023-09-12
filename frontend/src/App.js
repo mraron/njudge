@@ -19,6 +19,7 @@ import ProblemSubmissions from './pages/Problem/ProblemSubmissions';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import ProblemRankings from "./pages/Problem/ProblemRankings";
+import Submission from "./pages/Submission";
 import './index.css';
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
 					<Route path="/archive/" element={<Archive />} />
 					<Route path="/problemset/status/" element={<Submissions />} />
 					<Route path="/problemset/main/" element={<Problems />} />
+					<Route path="/submission/" element={<Submission />} />
 					<Route path="/user/profile/" element={<Profile />} >
 						<Route path="/user/profile/" element={<ProfileMain />} />
 						<Route path="/user/profile/submissions/" element={<ProfileSubmissions />} />
@@ -42,7 +44,6 @@ function App() {
 					</Route>
 					<Route path="/user/profile/submissions/" element={<Profile />} />
 					<Route path="/user/profile/settings/" element={<Profile />} />
-					<Route path="*" element={<NotFound />} />
 					<Route path="/problemset/main/task/" element={<Problem />} >
 						<Route path="/problemset/main/task/" element={<ProblemStatement />} />
 						<Route path="/problemset/main/task/submit/" element={<ProblemSubmit />} />
@@ -51,6 +52,7 @@ function App() {
 					</Route>
 					<Route path="/user/login" element={<Login />} />
 					<Route path="/user/register" element={<Register />} />
+					<Route path="*" element={<NotFound />} />
 				</Routes>
 			</Router>
         </div>

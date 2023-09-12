@@ -297,3 +297,19 @@ export function SVGCode({ cls }) {
         </svg>
     )
 }
+
+export function SVGWrongSimple({ cls }) {
+    return (
+        <svg className={`${cls} fill-current`} fill="#000000" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <path d="M114,100l49-49a9.9,9.9,0,0,0-14-14L100,86,51,37A9.9,9.9,0,0,0,37,51l49,49L37,149a9.9,9.9,0,0,0,14,14l49-49,49,49a9.9,9.9,0,0,0,14-14Z"/>
+        </svg>
+    )
+}
+
+export function SVGCorrectSimple({ cls }) {
+    return (
+        <svg className={`${cls}`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path className="stroke-current" d="M4 12.6111L8.92308 17.5L20 6.5" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+    )
+}

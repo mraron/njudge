@@ -14,6 +14,10 @@
     @apply border-grey-675
 }
 
+.border-divide-col {
+    @apply border-grey-700
+}
+
 .divide-default {
     @apply divide-grey-700
 }
