@@ -1,4 +1,6 @@
 import SubmissionTable from "../components/SubmissionTable";
+import SubmissionsTable from "../components/SubmissionsTable";
+import Editor from "@monaco-editor/react";
 
 function Submission() {
     const submission = {
@@ -190,6 +192,18 @@ function Submission() {
             <div className="w-full flex justify-center">
                 <div className="flex justify-center w-full max-w-7xl">
                     <div className="w-full px-4">
+                        <div className="mb-3">
+                            <SubmissionsTable submissions={[["5740", "2023-09-11, 23:56:55", "lalala", "Tom és Jerry", "cpp17", "Időlimit túllépés 0 / 100", "15.0653 ms", "4608 Kib"]]} />
+                        </div>
+                        <div className="mb-3">
+                            <Editor className="border-1 border-default" height="60vh" theme="vs-dark" defaultLanguage="cpp" options={{domReadOnly: true, readOnly: true}}
+                                value={`#include <iostream>
+using namespace std;
+
+int main() {
+    cout << "Hello world" << endl;
+}`} />
+                        </div>
                         <SubmissionTable submission={submission}/>
                     </div>
                 </div>
