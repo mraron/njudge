@@ -5,6 +5,7 @@ import TagDropdown from './TagDropdown';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import DropdownFrame from "./DropdownFrame";
+import queryString from "query-string";
 
 function ProblemFilter() {
     const [title, setTitle] = useState("");
@@ -23,11 +24,12 @@ function ProblemFilter() {
         setTags(tags);
     };
     const handleSubmit = () => {
-        const queryTitle = encodeURIComponent(title);
-        const queryCategory = encodeURIComponent(category[0]);
-        const queryTags = encodeURIComponent(tags.join(','));
-        const queryString = `?title=${queryTitle}&category=${queryCategory}&tags=${queryTags}`;
-        navigate(`${location.pathname}${queryString}`);
+        const qString = queryString.stringify({
+            title: title,
+            tags: tags.join(","),
+            category: category
+        })
+        navigate(`${location.pathname}?${qString}`);
     };
     return (
         <div className="w-full">

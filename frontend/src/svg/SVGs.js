@@ -120,10 +120,10 @@ export function SVGNotFound() {
     )
 }
 
-export function SVGStatistics() {
+export function SVGStatistics({ cls }) {
     return (
-        <svg fill="#000000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" 
-            className="w-6 h-6 mr-2 fill-white" viewBox="0 0 100 100" enableBackground="new 0 0 100 100" xmlSpace="preserve">
+        <svg className={`${cls} fill-current`} fill="#000000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
+            viewBox="0 0 100 100" enableBackground="new 0 0 100 100" xmlSpace="preserve">
             <path d="M46.05,60.163H31.923c-0.836,0-1.513,0.677-1.513,1.513v21.934c0,0.836,0.677,1.513,1.513,1.513H46.05
                 c0.836,0,1.512-0.677,1.512-1.513V61.675C47.562,60.839,46.885,60.163,46.05,60.163z"/>
             <path d="M68.077,14.878H53.95c-0.836,0-1.513,0.677-1.513,1.513v67.218c0,0.836,0.677,1.513,1.513,1.513h14.127

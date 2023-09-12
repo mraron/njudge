@@ -33,7 +33,7 @@ export function ProfileFrame({ src, username, rating }) {
 }
 
 export function ProfileData({ rating, score,  solved }) {
-    const titleComponent = <SVGTitleComponent svg={<SVGStatistics />} title="Statisztikák" />
+    const titleComponent = <SVGTitleComponent svg={<SVGStatistics cls="w-6 h-6 mr-2" />} title="Statisztikák" />
     return (
         <MapData data={[
             ["Értékelés", `${rating}`],

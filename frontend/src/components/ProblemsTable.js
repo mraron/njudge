@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { SVGAvatar } from '../svg/SVGs';
+import queryString from 'query-string';
 
 function Problem({ id, title, category, tagTitles, solved }) {
     const tags = tagTitles.map((tagName, index) =>
@@ -44,10 +45,11 @@ function ProblemsTable() {
         ["NT21_Atvagas", "Átvágás", "Nemes Tihamér", ["dinamikus programozás", "matematika"], "5"],
         ["NT23_Vilagnaptar", "Világnaptár (45 pont)", "Nemes Tihamér", ["mohó", "adatszerkezetek"], "4"],
     ]);
-    useEffect(() =>
+    useEffect(() => {
+        const parsed = queryString.parse(location.search, {arrayFormat: 'comma'})
         setProblems(prevProblems => prevProblems.concat([
-            [location.search, "Világnaptár (45 pont)", "Nemes Tihamér", ["mohó", "adatszerkezetek"], "4"]
-        ])), [location.search]);
+            [parsed.tags, "Világnaptár (45 pont)", "Nemes Tihamér", ["mohó", "adatszerkezetek"], "4"]
+        ]))}, [location.search])
 
     const problemElems = problems.map((item, index) => 
         <Problem id={item[0]} title={item[1]} category={item[2]} tagTitles={item[3]} solved={item[4]} key={index} />

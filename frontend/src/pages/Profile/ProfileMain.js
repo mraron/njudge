@@ -1,11 +1,11 @@
 import { ProfileData, ProfileFrame } from "../../components/ProfileSidebar";
 import TagListFrame from "../../components/TagListFrame";
 import SVGTitleComponent from "../../svg/SVGTitleComponent";
-import { SVGCorrect, SVGWrong } from "../../svg/SVGs";
+import {SVGCorrect, SVGCorrectSimple, SVGWrong, SVGWrongSimple} from "../../svg/SVGs";
 
 function ProfileMain() {
-    const titleComponentCorrect = <SVGTitleComponent svg={<SVGCorrect cls="w-6 h-6 mr-2" />} title="Megoldott feladatok" />
-    const titleComponentWrong = <SVGTitleComponent svg={<SVGWrong cls="w-6 h-6 mr-2" />} title="Megpróbált feladatok" />
+    const titleComponentCorrect = <SVGTitleComponent svg={<SVGCorrectSimple cls="w-6 h-6 text-indigo-500 mr-2" />} title="Megoldott feladatok" />
+    const titleComponentWrong = <SVGTitleComponent svg={<SVGWrongSimple cls="w-6 h-6 text-red-500 mr-2" />} title="Megpróbált feladatok" />
     return (
         <div className="flex flex-col sm:flex-row w-full items-start">
             <div className="w-full sm:w-80 mb-3 shrink-0">
