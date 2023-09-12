@@ -39,11 +39,11 @@ export function SVGAttachment() {
     )
 }
 
-export function DropdownListArrow({ isOpen, hovered }) {
+export function DropdownListArrow({ isOpen }) {
     return (
-        <svg fill="#000000" className={`w-2 h-2 mr-2 ${hovered? "fill-indigo-300": "fill-white"} ${isOpen? "rotate-90": ""} transition-all duration-100 shrink-0`} version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" 
-            viewBox="0 0 490 490" xmlSpace="preserve">
-            <path d="M15.541,490V0l458.917,245.009L15.541,490z"/>
+        <svg className={`w-4 h-4 mr-2 fill-current ${isOpen? "rotate-90": ""} transition-all duration-100 shrink-0`} viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+            <rect width="48" height="48" fill="none"/>
+            <path d="M19.5,37.4l11.9-12a1.9,1.9,0,0,0,0-2.8l-11.9-12A2,2,0,0,0,16,12h0V36h0a2,2,0,0,0,3.5,1.4Z"/>
         </svg>
     )
 }

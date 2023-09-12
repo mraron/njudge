@@ -9,7 +9,7 @@ function DropdownList({ tree }) {
     const children = tree["children"]? tree["children"].map((child, index) => 
         <li className="mt-2" key={index}><DropdownList tree={child} /></li>
     ): []
-    const arrow = tree["children"] && <DropdownListArrow isOpen={isOpen} hovered={hovered} />
+    const arrow = tree["children"] && <DropdownListArrow isOpen={isOpen} />
     const innerNode = 
         <a className="w-fit flex items-center cursor-pointer hover:text-indigo-300 font-medium transition-all duration-100" onMouseOver={() => setHovered(true)} onMouseLeave={() => setHovered(false)} onClick={() => setOpen(!isOpen)} >
             {arrow}{tree["title"]}
