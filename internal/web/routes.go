@@ -34,10 +34,12 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	e.Use(user.SetUserMiddleware(s.DB))
 	e.Use(helpers.ClearTemporaryFlashes())
 
-	e.GET("/", handlers.GetHome())
+	//e.GET("/", handlers.GetHome())
+	e.Static("/", "frontend/build")
+
 	e.GET("/page/:page", handlers.GetPage(partials.NewCached(s.DB.DB, 30*time.Second)))
 
-	e.Static("/static", "static")
+	//e.Static("/static", "static")
 
 	e.GET("/submission/:id", handlers.GetSubmission(services.NewSQLSubmission(s.DB.DB))).Name = "getSubmission"
 	e.GET("/submission/rejudge/:id", handlers.RejudgeSubmission(services.NewSQLSubmission(s.DB.DB)), user.RequireLoginMiddleware()).Name = "rejudgeSubmission"
