@@ -34,10 +34,10 @@ function TestCase({ index, numCases, testCase, group, isLastGroup, isLastCase })
                 <td className={`padding-td-default border border-t-0 border-divide-col ${bottomBorderCase}`}>
                     <div className="flex items-center">
                         <SVGWrongSimple cls="mr-2 w-6 h-6 text-red-500" />
-                        <span>{testCase["verdictName"]}</span>
+                        <span className="whitespace-nowrap">{testCase["verdictName"]}</span>
                     </div>
                 </td>
-                <td className={`padding-td-default border border-t-0 border-divide-col ${bottomBorderCase}`}>{testCase["score"]} / {testCase["maxScore"]}</td>
+                <td className={`padding-td-default border border-t-0 border-divide-col whitespace-nowrap ${bottomBorderCase}`}>{testCase["score"]} / {testCase["maxScore"]}</td>
             </>}
             <td className={`padding-td-default border border-t-0 border-divide-col ${bottomBorderCase}`}>{testCase["timeSpent"]}</td>
             <td className={`padding-td-default border border-t-0 border-r-0 border-divide-col ${bottomBorderCase}`}>{testCase["memoryUsed"]}</td>
