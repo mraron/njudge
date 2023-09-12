@@ -31,13 +31,13 @@
 }
 
 .text-table {
-    font-size: 0.92rem; /* 14px */
-    line-height: 1.25rem; /* 20px */
+    font-size: 0.92rem;
+    line-height: 1.25rem;
 }
 
 .text-label {
-    font-size: 0.92rem; /* 14px */
-    line-height: 1.25rem; /* 20px */
+    font-size: 0.92rem;
+    line-height: 1.25rem;
 }
 
 .checkmark:checked {
@@ -55,4 +55,8 @@
 
 html {
     color-scheme: dark;
+}
+
+pre {
+    font-family: 'JetBrains Mono', monospace;
 }

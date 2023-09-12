@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import Checkbox from "../../components/Checkbox";
 import RoundedFrame from "../../components/RoundedFrame";
-import TextBox, { getSVGInputComponent } from "../../components/TextBox"
+import TextBox, { SVGInputComponent } from "../../components/TextBox"
 import { SVGChange, SVGConfirm, SVGLock, SVGSettings } from "../../svg/SVGs";
 import SVGTitleComponent from "../../svg/SVGTitleComponent";
 
@@ -20,13 +20,13 @@ function PasswordChangeFrame() {
         <RoundedFrame titleComponent={titleComponent}>
             <div className="flex flex-col px-6 py-5 sm:px-10 sm:py-8 w-full">
                 <div className="mb-4 w-full">
-                    <TextBox id="oldPassword" label="Régi jelszó" type="password" initText={oldPw} onChange={handleChangeOldPw} inputComponent={getSVGInputComponent(<SVGLock cls="w-4 h-4" />)} />
+                    <TextBox id="oldPassword" label="Régi jelszó" type="password" initText={oldPw} onChange={handleChangeOldPw} inputComponent={SVGInputComponent(<SVGLock cls="w-4 h-4" />)} />
                 </div>
                 <div className="mb-4 w-full">
-                    <TextBox id="newPassword" label="Új jelszó" type="password" initText={newPw} onChange={handleChangeNewPw} inputComponent={getSVGInputComponent(<SVGLock cls="w-4 h-4" />)} />
+                    <TextBox id="newPassword" label="Új jelszó" type="password" initText={newPw} onChange={handleChangeNewPw} inputComponent={SVGInputComponent(<SVGLock cls="w-4 h-4" />)} />
                 </div>
                 <div className="mb-6 w-full">
-                    <TextBox id="newPasswordConfirm" label="Új jelszó megerősítése" type="password" initText={newPwConfirm} onChange={handleChangeNewPwConfirm} inputComponent={getSVGInputComponent(<SVGConfirm cls="w-5 h-5" />)} />
+                    <TextBox id="newPasswordConfirm" label="Új jelszó megerősítése" type="password" initText={newPwConfirm} onChange={handleChangeNewPwConfirm} inputComponent={SVGInputComponent(<SVGConfirm cls="w-5 h-5" />)} />
                 </div>
                 <div className="flex justify-center">
                     <button className="btn-indigo w-32">Mentés</button>

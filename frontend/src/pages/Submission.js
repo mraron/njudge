@@ -196,7 +196,7 @@ function Submission() {
                             <SubmissionsTable submissions={[["5740", "2023-09-11, 23:56:55", "lalala", "Tom és Jerry", "cpp17", "Időlimit túllépés 0 / 100", "15.0653 ms", "4608 Kib"]]} />
                         </div>
                         <div className="mb-3">
-                            <Editor className="border-1 border-default" height="60vh" theme="vs-dark" defaultLanguage="cpp" options={{domReadOnly: true, readOnly: true}}
+                            <Editor className="border-1 border-default" height="60vh" theme="vs-dark" defaultLanguage="cpp" options={{domReadOnly: true, readOnly: true, fontFamily: 'JetBrains Mono'}}
                                 value={`#include <iostream>
 using namespace std;
 

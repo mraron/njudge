@@ -1,5 +1,5 @@
 import RoundedFrame from '../../components/RoundedFrame';
-import TextBox, { getSVGInputComponent } from '../../components/TextBox';
+import TextBox, { SVGInputComponent } from '../../components/TextBox';
 import { SVGAvatar, SVGConfirm, SVGLock, SVGMail } from '../../svg/SVGs';
 import SVGTitleComponent from '../../svg/SVGTitleComponent';
 
@@ -9,16 +9,16 @@ function RegisterFrame() {
         <RoundedFrame titleComponent={titleComponent}>
             <div className="px-10 pt-8 pb-6 border-b border-default">
                 <div className="mb-4 relative">
-                    <TextBox id="username" label="Felhasználónév" inputComponent={getSVGInputComponent(<SVGAvatar cls="w-4 h-4" />)} />
+                    <TextBox id="username" label="Felhasználónév" inputComponent={SVGInputComponent(<SVGAvatar cls="w-4 h-4" />)} />
                 </div>
-                <TextBox id="email" label="E-mail cím" inputComponent={getSVGInputComponent(<SVGMail cls="w-4 h-4" />)} />
+                <TextBox id="email" label="E-mail cím" inputComponent={SVGInputComponent(<SVGMail cls="w-4 h-4" />)} />
             </div>
             <div className="px-10 pt-4 pb-8">
                 <div className="mb-4">
-                    <TextBox id="password" label="Jelszó" inputComponent={getSVGInputComponent(<SVGLock cls="w-4 h-4" />)} type="password" />
+                    <TextBox id="password" label="Jelszó" inputComponent={SVGInputComponent(<SVGLock cls="w-4 h-4" />)} type="password" />
                 </div>
                 <div className="mb-6">
-                    <TextBox id="passwordConfirm" label="Jelszó megerősítése" inputComponent={getSVGInputComponent(<SVGConfirm cls="w-5 h-5" />)} type="password" />
+                    <TextBox id="passwordConfirm" label="Jelszó megerősítése" inputComponent={SVGInputComponent(<SVGConfirm cls="w-5 h-5" />)} type="password" />
                 </div>
                 <div className="flex justify-center">
                     <button className="btn-indigo w-40">Regisztráció</button>

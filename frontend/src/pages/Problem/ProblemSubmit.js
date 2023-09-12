@@ -19,7 +19,7 @@ function ProblemSubmit() {
             <div className="mb-4">
                 <SubmitControlsFrame />
             </div>
-            <Editor className="border-1 border-default" height="60vh" theme="vs-dark" defaultLanguage="cpp" />
+            <Editor className="border-1 border-default" height="60vh" theme="vs-dark" defaultLanguage="cpp" options={{fontFamily: 'JetBrains Mono'}} />
         </div>
     )
 }

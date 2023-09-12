@@ -8,20 +8,23 @@ export function BasicInputComponent({ id, initText, type, focused, onChange, onF
     )
 }
 
-export function getSVGInputComponent(svg) {
-    function SVGInputComponent({ id, initText, type, focused, onChange, onFocus, onBlur }) {
+export function SVGInputComponent(svg) {
+    return function({ id, initText, type, focused, onChange, onFocus, onBlur }) {
         return (
             <div className="flex w-full">
-                <div className={`flex items-center justify-center ${focused? "bg-grey-650 border-grey-575" : "bg-grey-750 border-grey-650"} mt-1 border-1 px-2 py-1 w-10 transition duration-200`}>
+                <div
+                    className={`flex items-center justify-center ${focused ? "bg-grey-650 border-grey-575" : "bg-grey-750 border-grey-650"} mt-1 border-1 px-2 py-1 w-10 transition duration-200`}>
                     {svg}
                 </div>
-                <div className={`border-1 border-b-0 border-l-0 ${focused? "border-grey-575": "border-grey-650"} mt-1 w-full`}>
-                    <input autoComplete="off" id={id} value={initText} type={type} onChange={onChange} onFocus={onFocus} onBlur={onBlur} className="py-1.5 px-2 bg-grey-850 border-b-2 border-default w-full focus:border-indigo-600 outline-none transition-all duration-200" />
+                <div
+                    className={`border-1 border-b-0 border-l-0 ${focused ? "border-grey-575" : "border-grey-650"} mt-1 w-full`}>
+                    <input autoComplete="off" id={id} value={initText} type={type} onChange={onChange} onFocus={onFocus}
+                           onBlur={onBlur}
+                           className="py-1.5 px-2 bg-grey-850 border-b-2 border-default w-full focus:border-indigo-600 outline-none transition-all duration-200"/>
                 </div>
             </div>
         )
     }
-    return SVGInputComponent
 }
 
 function TextBox({ id, label, type, initText, inputComponent: InputComponent, onChange, onFocus, onBlur }) {
