@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import {matchPath, useLocation, useNavigate} from "react-router-dom";
 import { SVGDropdownMenuArrow } from "../svg/SVGs";
-import { trimRoute } from "../util/route";
+import {findRouteIndex} from "../util/RouteUtil";
 
 function DropdownItem({ name, onClick }) {
     return (
@@ -71,21 +71,17 @@ function DropdownMenu({ initSelected, itemNames, button: Button, onChange }) {
     )
 }
 
-export function DropdownRoutes({ button: Button, routes }) {
+export function DropdownRoutes({ routes, routePatterns, routeLabels, button: Button }) {
     const navigate = useNavigate();
 	const location = useLocation();
-	const [selected, setSelected] = useState(routes.map(pair => trimRoute(pair[1])).indexOf(trimRoute(location.pathname)));
-
-    useEffect(() => {
-        setSelected(routes.map(pair => trimRoute(pair[1])).indexOf(trimRoute(location.pathname)))
-    }, [location])
+	const selected = findRouteIndex(routePatterns, location.pathname)
     const handleChange = (index) => {
-        if (index !== -1) {
-            navigate(routes[index][1])
+        if (index !== -1 && !matchPath(routes[index], location.pathname)) {
+            navigate(routes[index])
         }
     }
     return (
-        <DropdownMenu initSelected={selected} button={Button} itemNames={routes.map(pair => pair[0])} onChange={handleChange} />
+        <DropdownMenu initSelected={selected} button={Button} itemNames={routeLabels} onChange={handleChange} />
     )
 }
 

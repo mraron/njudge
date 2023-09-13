@@ -1,28 +1,28 @@
  
-import { Link, useLocation } from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 import { DropdownRoutes } from './DropdownMenu';
-import { trimRoute } from '../util/route';
+import {findRouteIndex} from '../util/RouteUtil';
 
-function Tab({ isSelected, name, route }) {
+function Tab({ isSelected, label, route }) {
     return (
         <Link className={`block rounded-md px-4 py-2 ${isSelected? "bg-grey-800": "hover:bg-grey-850"} mr-1.5`} to={route}>
-            {name}
+            {label}
         </Link>
     )
 }
 
-function TabFrame({ routes, children }) {
+function TabFrame({ routes, routeLabels, routePatterns, children }) {
 	const location = useLocation()
-	const selected = routes.map(pair => trimRoute(pair[1])).indexOf(trimRoute(location.pathname));
-    const tabs = routes.map((pair, index) =>
-        <Tab isSelected={index === selected} name={pair[0]} route={pair[1]} key={index} />)
+    const selected = findRouteIndex(routePatterns, location.pathname)
+    const tabsContent = routes.map((item, index) =>
+        <Tab isSelected={index === selected} label={routeLabels[index]} route={item} key={index} />)
     return (
         <div className="w-full">
             <ul className="hidden sm:flex mb-2">
-                {tabs}
+                {tabsContent}
             </ul>
             <div className="block sm:hidden mb-2">
-                <DropdownRoutes label="Profil" routes={routes} />
+                <DropdownRoutes label="Profil" routes={routes} routePatterns={routePatterns} routeLabels={routeLabels} />
             </div>
             <div>
                 {children}

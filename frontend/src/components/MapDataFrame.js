@@ -1,6 +1,6 @@
 import RoundedTable from './RoundedTable'
 
-function MapData({ data, title, titleComponent }) {
+function MapDataFrame({ data, title, titleComponent }) {
     const rows = data.map((pair, index) =>     
         <tr className="divide-x divide-grey-700" key={index}>
             <td className="padding-td-default bg-grey-800 font-medium align-top">{pair[0]}</td>
@@ -16,4 +16,4 @@ function MapData({ data, title, titleComponent }) {
     );
 }
 
-export default MapData;
+export default MapDataFrame;

@@ -5,6 +5,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      animation: {
+        'spin-slow': 'spin 2s linear infinite'
+      },
       borderWidth: {
         "1": "1px",
         "3": "3px"

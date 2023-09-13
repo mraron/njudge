@@ -1,44 +1,48 @@
 import RoundedTable from './RoundedTable';
-import {SVGCorrectSimple, SVGWrong, SVGWrongSimple} from "../svg/SVGs";
+import { SVGCorrectSimple, SVGSpinner, SVGWrongSimple } from "../svg/SVGs";
+import { Link } from "react-router-dom";
+import {routeMap} from "../config/RouteConfig"
 
-function Submission({ id, date, user, problem, lang, verdict, time, mem }) {
+function Submission({ submission }) {
+    const {id, date, user, problem, lang, verdict, verdictType, time, memory} = submission
     return (
         <tr className={"divide-x divide-default"}>
             <td className="padding-td-default">
-                <span className="link">{id}</span>
+                <Link className="link" to={routeMap.submission.replace(":id", submission.id)}>{id}</Link>
             </td>
             <td className="padding-td-default">
                 {date}
             </td>
             <td className="padding-td-default">
-                <span className="link">{user}</span>
+                <Link className="link" to={routeMap.submission.replace(":user", submission.user)}>{user}</Link>
             </td>
             <td className="padding-td-default">
-                <span className="link">{problem}</span>
+                <Link className="link" to={problem.link}>{problem.label}</Link>
             </td>
             <td className="padding-td-default">
                 {lang}
             </td>
             <td className="padding-td-default">
                 <div className="flex items-center">
-                    {problem.includes("a") && <SVGWrongSimple cls="w-5 h-5 text-red-500 mr-2 shrink-0" />}
-                    {!problem.includes("a") && <SVGCorrectSimple cls="w-5 h-5 text-indigo-500 mr-2 shrink-0"/>}
+                    {verdictType === 0 && <SVGSpinner cls="w-5 h-5 mr-2 shrink-0" />}
+                    {verdictType === 1 && <SVGWrongSimple cls="w-5 h-5 text-red-500 mr-2 shrink-0" />}
+                    {verdictType === 2 && <SVGCorrectSimple cls="w-5 h-5 text-indigo-500 mr-2 shrink-0"/>}
                     <span className="whitespace-nowrap">{verdict}</span>
                 </div>
             </td>
             <td className="padding-td-default">
-                {time}
+                {time} ms
             </td>
             <td className="padding-td-default">
-                {mem}
+                {memory} KiB
             </td>
         </tr>
     );
 }
 
 function SubmissionsTable({ submissions }) {
-    const submissionElems = submissions.map((item, index) =>
-        <Submission id={item[0]} date={item[1]} user={item[2]} problem={item[3]} lang={item[4]} verdict={item[5]} time={item[6]} mem={item[7]} key={index} />
+    const submissionsContent = submissions.map((item, index) =>
+        <Submission submission={item} key={index} />
     );
     return (
         <RoundedTable>
@@ -55,7 +59,7 @@ function SubmissionsTable({ submissions }) {
                 </tr>
             </thead>
             <tbody className="divide-y divide-default">
-                {submissionElems}
+                {submissionsContent}
             </tbody>
         </RoundedTable>
     );

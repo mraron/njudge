@@ -1,5 +1,5 @@
 import React from 'react';
-import MapData from './MapData';
+import MapDataFrame from './MapDataFrame';
 import { SVGDots, SVGRecent, SVGStatistics } from '../svg/SVGs';
 import RoundedFrame from './RoundedFrame';
 import SVGTitleComponent from '../svg/SVGTitleComponent';
@@ -35,7 +35,7 @@ export function ProfileFrame({ src, username, rating }) {
 export function ProfileData({ rating, score,  solved }) {
     const titleComponent = <SVGTitleComponent svg={<SVGStatistics cls="w-6 h-6 mr-2" />} title="Statisztikák" />
     return (
-        <MapData data={[
+        <MapDataFrame data={[
             ["Értékelés", `${rating}`],
             ["Pontszám", `${score}`],
             ["Megoldott feladatok", `${solved}`]

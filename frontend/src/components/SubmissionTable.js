@@ -25,15 +25,15 @@ function TestCase({ index, numCases, testCase, group, isLastGroup, isLastCase })
             {group["scoring"] !== 1 &&
                 <td className={`padding-td-default border border-t-0 border-divide-col ${bottomBorderCase}`} colSpan={2}>
                     <div className="flex">
-                        <SVGSpinner cls="mr-2 w-6 h-6" />
-                        {testCase["verdictName"]}
+                        <SVGSpinner cls="mr-2 w-5 h-5" />
+                        <span className="whitespace-nowrap">{testCase["verdictName"]}</span>
                     </div>
                 </td>
             }
             {group["scoring"] === 1 && <>
                 <td className={`padding-td-default border border-t-0 border-divide-col ${bottomBorderCase}`}>
                     <div className="flex items-center">
-                        <SVGWrongSimple cls="mr-2 w-6 h-6 text-red-500" />
+                        <SVGWrongSimple cls="mr-2 w-5 h-5 text-red-500" />
                         <span className="whitespace-nowrap">{testCase["verdictName"]}</span>
                     </div>
                 </td>

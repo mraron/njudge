@@ -1,4 +1,4 @@
-import MapData from '../../components/MapData';
+import MapDataFrame from '../../components/MapDataFrame';
 import DropdownMenu from '../../components/DropdownMenu';
 import RoundedFrame from '../../components/RoundedFrame';
 import SVGTitleComponent from '../../svg/SVGTitleComponent';
@@ -20,7 +20,7 @@ function ProblemInfo() {
     const titleComponent = <SVGTitleComponent svg={<SVGInformation />} title="Információk" />
 
     return (
-        <MapData titleComponent={titleComponent} data={[
+        <MapDataFrame titleComponent={titleComponent} data={[
             ["Azonosító", "OKTV23_Szivarvanyszamok"],
             ["Cím", "Az óvodai lét elviselhetetlen könnyűsége"],
             ["Időlimit", "300 ms"],

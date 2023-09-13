@@ -2,6 +2,10 @@ import SubmissionsTable from "../../components/SubmissionsTable";
 import Checkbox from "../../components/Checkbox"
 import RoundedFrame from "../../components/RoundedFrame";
 import Pagination from "../../components/Pagination";
+import {useParams} from "react-router-dom";
+import {useEffect, useState} from "react";
+import PageLoadingAnimation from "../../components/PageLoadingAnimation";
+import ProfileSideBar from "../../components/ProfileSidebar";
 
 function SubmissionFilterFrame() {
     return (
@@ -17,21 +21,30 @@ function SubmissionFilterFrame() {
 }
 
 function ProblemSubmissions() {
-    const submissions = [
-        ["5669", "2023-09-06, 14:23:42", "gonterarmin", "Áruszállítás üres szakaszai", "cpp17", "Hibás válasz 2/50", "381 ms", "21320 KiB"],
-        ["5669", "2023-09-06, 14:23:42", "gonterarmin", "Tom és Jerry2 (60)", "cpp17", "Hibás válasz 50/50", "381 ms", "21320 KiB"],
-        ["5669", "2023-09-06, 14:23:42", "gonterarmin", "Kaktuszgráf", "cpp17", "Hibás válasz 60/60", "381 ms", "21320 KiB"],
-        ["5669", "2023-09-06, 14:23:42", "gonterarmin", "Kaktuszgráf", "cpp17", "Hibás válasz 2/50", "381 ms", "21320 KiB"],
-    ];
+    const {problem} = useParams()
+    const [data, setData] = useState(null)
+
+    useEffect(() => {
+        fetch(`/api/v2/problemset/main/${problem}/submissions`)
+            .then(res => res.json())
+            .then(data => setData(data))
+    }, []);
+    let pageContent = <PageLoadingAnimation/>;
+    if (data) {
+        pageContent =
+            <>
+                <div className="mb-3">
+                    <SubmissionFilterFrame />
+                </div>
+                <div className="mb-2">
+                    <SubmissionsTable submissions={data.submissions} />
+                </div>
+                <Pagination current={1000} last={2000} />
+            </>
+    }
     return (
-        <div>
-            <div className="mb-3">
-                <SubmissionFilterFrame />
-            </div>
-            <div className="mb-2">
-                <SubmissionsTable submissions={submissions} />
-            </div>
-            <Pagination current={1000} last={2000} />
+        <div className="relative">
+            {pageContent}
         </div>
     )
 }

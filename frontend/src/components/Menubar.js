@@ -1,27 +1,45 @@
-import { Link, useLocation } from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 import { useState } from 'react';
 import { DropdownRoutes } from './DropdownMenu';
 import { SVGClose, SVGDropdownMenuArrow, SVGHamburger } from '../svg/SVGs';
-import { trimRoute } from '../util/route';
+import {findRouteIndex} from '../util/RouteUtil';
+import {routeMap} from "../config/RouteConfig";
 
-const routes = [
-    ["Főoldal", "/"], 
-    ["Versenyek", "/contests/"], 
-    ["Archívum", "/archive/"], 
-    ["Beküldések", "/problemset/status/"], 
-    ["Feladatok", "/problemset/main/"], 
-    ["Tudnivalók", "/info/"]];
-
-const profileRoutes = [
-    ["Profil", "/user/profile/"],
-    ["Kilépés", "/"],
+const menuRoutes = [
+    routeMap.main,
+    routeMap.contests,
+    routeMap.archive,
+    routeMap.submissions,
+    routeMap.problems,
+    routeMap.info
+]
+const menuRouteLabels = [
+    "Főoldal",
+    "Versenyek",
+    "Archívum",
+    "Beküldések",
+    "Feladatok",
+    "Tudnivalók"
 ]
 
-function MenuOption({ name, route, selected, horizontal, onClick }) {
+const profileRoutes = [
+    routeMap.profile.replace(":user", "dbence"),
+    routeMap.main
+]
+const profileRoutePatterns = [
+    routeMap.profile,
+    routeMap.main
+]
+const profileRouteLabels = [
+    "Profil",
+    "Kilépés"
+]
+
+function MenuOption({ label, route, selected, horizontal, onClick }) {
     return (
         <li>
             <Link onClick={onClick} className={`flex items-center h-full px-4 ${horizontal? "border-b-3 pt-1": "border-l-3 p-3"} ${selected? "border-indigo-500 bg-grey-775": "border-transparent hover:bg-grey-800"}`} to={route}>
-                {name}
+                {label}
             </Link>
         </li>
     )
@@ -41,7 +59,7 @@ function ProfileDropdownButton({ isOpen, onClick }) {
 function ProfileSettings() {
     return (
         <div className="flex">
-            <DropdownRoutes button={ProfileDropdownButton} routes={profileRoutes} />
+            <DropdownRoutes button={ProfileDropdownButton} routes={profileRoutes} routePatterns={profileRoutePatterns} routeLabels={profileRouteLabels} />
             <div className="px-4 flex items-center justify-center border-1 border-l-0 border-grey-675 rounded-tr-md rounded-br-md">
                 <button className="px-2 bg-grey-725 rounded-md mr-1">hu</button>
                 <button className="px-2 hover:bg-grey-800 rounded-md">en</button>
@@ -51,9 +69,9 @@ function ProfileSettings() {
 }
 
 function MenuSideBar({ selected, isOpen, onClose }) {
-    const menuOptions = routes.map((item, index) => {
+    const menuOptions = menuRoutes.map((item, index) => {
         return (
-            <MenuOption name={item[0]} route={item[1]} selected={index === selected} horizontal={false} key={index} onClick={onClose} />
+            <MenuOption label={menuRouteLabels[index]} route={item} selected={index === selected} horizontal={false} key={index} onClick={onClose} />
         );
     });
     return (
@@ -76,9 +94,9 @@ function MenuSideBar({ selected, isOpen, onClose }) {
 }
 
 function MenuTopBar({ selected, onOpen }) {
-    const menuOptions = routes.map((item, index) => {
+    const menuOptions = menuRoutes.map((item, index) => {
         return (
-            <MenuOption name={item[0]} route={item[1]} selected={index === selected} horizontal={true} key={index} />
+            <MenuOption label={menuRouteLabels[index]} route={item} selected={index === selected} horizontal={true} key={index} />
         );
     });
     return (
@@ -105,8 +123,7 @@ function MenuTopBar({ selected, onOpen }) {
 
 function Menubar() {
 	const location = useLocation();
-	const selected = routes.map(pair => trimRoute(pair[1])).indexOf(trimRoute(location.pathname));
-    
+	const selected = findRouteIndex(menuRoutes, location.pathname)
     const [isOpen, setOpen] = useState(false);
     const handleClose = () => {
         setOpen(false);
