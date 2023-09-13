@@ -1,7 +1,25 @@
 import ProfileSideBar from '../components/ProfileSidebar'
 import DropdownListFrame from '../components/DropdownListFrame'
+import {useEffect, useState} from "react";
+
+function Category({ title, children }) {
+    return (
+        <div className="mb-3">
+            <DropdownListFrame title={title} tree={{"children": children}} />
+        </div>
+    )
+}
 
 function Archive() {
+    const [data, setData] = useState(null)
+    useEffect(() => {
+        fetch("/api/v2/archive")
+            .then(res => res.json())
+            .then(data => setData(data))
+    }, []);
+    const categoriesContent = data? data["categories"].map((category, index) =>
+        <Category title={category.title} children={category.children} index={index} />
+    ): null
     return (
         <div className="w-full flex justify-center">
             <div className="flex justify-center w-full max-w-7xl">
@@ -12,90 +30,7 @@ function Archive() {
                         score="2550"/>
                 </div>
                 <div className="w-full px-4 lg:pl-3">
-                    <div className="mb-3">
-                        <DropdownListFrame title="Nemes Tihamér 1. kategória" tree={{
-                            "children":
-                            [
-                                {
-                                    "title": "Nemes Tihamér 1. kategória",
-                                    "children": 
-                                    [
-                                        {
-                                            "title": "2020 2. forduló",
-                                            "children": [
-                                                {"title": "Kövek (100)"},
-                                                {"title": "Micimackó (40)"},
-                                                {"title": "Morze (60)"},
-                                                {"title": "Völgy (100)"}
-                                            ]
-                                        },
-                                        {
-                                            "title": "2020 3. forduló",
-                                            "children": [
-                                                {"title": "Kövek (100)"},
-                                                {"title": "Micimackó (40)"},
-                                                {"title": "Morze (60)"},
-                                                {"title": "Völgy (100)"}
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]}}/>
-                    </div>
-                    <div className="mb-3">
-                        <DropdownListFrame title="OKTV" tree={{
-                            "children":
-                            [
-                                {
-                                    "title": "2020",
-                                    "children": 
-                                    [
-                                        {
-                                            "title": "2020 2. forduló",
-                                            "children": [
-                                                {"title": "Bürokrácia (40)"},
-                                                {"title": "Gyros (30)"},
-                                                {"title": "JardaT"},
-                                                {"title": "Jegesmedve (50)"},
-                                                {"title": "Múzeumi őrök"},
-                                                {"title": "Tom és Jerry2 (60)"},
-                                                {"title": "Utazás (40)"}
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]}}/>
-                        </div>
-                        <div className="mb-3">
-                            <DropdownListFrame title="Nemes Tihamér 1. kategória" tree={{
-                                "children":
-                                [
-                                    {
-                                        "title": "Nemes Tihamér 1. kategória",
-                                        "children": 
-                                        [
-                                            {
-                                                "title": "2020 2. forduló",
-                                                "children": [
-                                                    {"title": "Kövek (100)"},
-                                                    {"title": "Micimackó (40)"},
-                                                    {"title": "Morze (60)"},
-                                                    {"title": "Völgy (100)"}
-                                                ]
-                                            },
-                                            {
-                                                "title": "2020 3. forduló",
-                                                "children": [
-                                                    {"title": "Kövek (100)"},
-                                                    {"title": "Micimackó (40)"},
-                                                    {"title": "Morze (60)"},
-                                                    {"title": "Völgy (100)"}
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                ]}}/>
-                        </div>
+                    {categoriesContent}
                 </div>
             </div>
         </div>
