@@ -3,15 +3,6 @@ import DropdownListFrame from '../components/DropdownListFrame'
 import {useEffect, useState} from "react";
 import PageLoadingAnimation from "../components/PageLoadingAnimation";
 
-function Category({ category }) {
-    const {title, children} = category
-    return (
-        <div className="mb-3">
-            <DropdownListFrame title={title} tree={{"children": children}} />
-        </div>
-    )
-}
-
 function Archive() {
     const [data, setData] = useState(null)
 
@@ -23,7 +14,9 @@ function Archive() {
     let pageContent = <PageLoadingAnimation/>;
     if (data) {
         const categoriesContent = data.categories.map((item, index) =>
-            <Category category={item} index={index} />
+            <div className="mb-3">
+                <DropdownListFrame title={item.title} tree={{"children": item.children}} />
+            </div>
         )
         pageContent =
             <div className="flex justify-center w-full max-w-7xl">
