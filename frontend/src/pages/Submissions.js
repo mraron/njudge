@@ -1,20 +1,15 @@
 import Pagination from '../components/Pagination';
 import ProfileSideBar from '../components/ProfileSidebar'
 import SubmissionsTable from '../components/SubmissionsTable';
-import {useEffect, useState} from "react";
-import PageLoadingAnimation from "../components/PageLoadingAnimation";
+import {matchPath} from "react-router-dom";
+import {routeMap} from "../config/RouteConfig";
 
-function Submissions() {
-    const [data, setData] = useState(null)
-
-    useEffect(() => {
-        fetch("/api/v2/problemset/status")
-            .then(res => res.json())
-            .then(data => setData(data))
-    }, []);
-    let pageContent = <PageLoadingAnimation/>;
-    if (data) {
-        pageContent =
+function Submissions({ data }) {
+    if (!data || !matchPath(routeMap.submissions, data.route)) {
+        return <></>
+    }
+    return (
+        <div className="relative w-full flex justify-center">
             <div className="flex justify-center w-full max-w-7xl">
                 <div className="ml-0 lg:ml-4">
                     <ProfileSideBar
@@ -24,15 +19,11 @@ function Submissions() {
                 </div>
                 <div className="w-full px-4 lg:pl-3 overflow-x-auto">
                     <div className="mb-2">
-                        <SubmissionsTable submissions={data.submissions} />
+                        <SubmissionsTable submissions={data.submissions}/>
                     </div>
-                    <Pagination current={1000} last={2000} />
+                    <Pagination paginationData={data.paginationData}/>
                 </div>
             </div>
-    }
-    return (
-        <div className="relative w-full flex justify-center">
-            {pageContent}
         </div>
     );
 }

@@ -2,7 +2,9 @@ import {SVGSpinner} from "../svg/SVGs";
 
 function PageLoadingAnimation() {
     return (
-        <SVGSpinner cls="w-12 h-12 absolute left-1/2 top-40" />
+        <div className="flex justify-center">
+            <SVGSpinner cls="w-12 h-12 mx-12 my-16" />
+        </div>
     )
 }
 

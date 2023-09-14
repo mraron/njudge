@@ -3,7 +3,8 @@ import RoundedFrame from "./RoundedFrame"
 import {useLocation, useNavigate} from "react-router-dom";
 import queryString from "query-string";
 
-function Pagination({ current, last }) {
+function Pagination({ paginationData }) {
+    const {currentPage, lastPage} = paginationData
     const location = useLocation()
     const navigate = useNavigate()
     const setPage = (page) => {
@@ -21,20 +22,12 @@ function Pagination({ current, last }) {
                 <button className={`${cls} border-r-0 rounded-l-md`} onClick={() => setPage(1)}>
                     <SVGDoubleLeftArrow cls="w-4 h-4" />
                 </button>
-                {current >= 2 &&
-                    <button className={`${cls} border-r-0`} onClick={() => setPage(current - 1)}>
-                        <SVGLeftArrow cls="w-3 h-3" />
-                    </button>}
-                {current >= 3 && <button className={`${cls} hidden lg:block border-r-0`} onClick={() => setPage(current - 2)}>{current - 2}</button>}
-                {current >= 2 && <button className={`${cls} border-r-0`} onClick={() => setPage(current - 1)}>{current - 1}</button>}
-                <button className="px-3 py-1.5 text-sm font-medium bg-indigo-600 border-indigo-600 hover:bg-indigo-500 hover:border-indigo-500 transition duration-200 text-center">{current}</button>
-                {current <= last - 1 && <button className={`${cls} border-l-0`} onClick={() => setPage(current + 1)}>{current + 1}</button>}
-                {current <= last - 2 && <button className={`${cls} hidden lg:block border-l-0`} onClick={() => setPage(current + 2)}>{current + 2}</button>}
-                {current <= last - 1 &&
-                    <button className={`${cls} border-l-0`} onClick={() => setPage(current + 1)}>
-                        <SVGLeftArrow cls="w-3 h-3 rotate-180" />
-                    </button>}
-                <button className={`${cls} border-l-0 rounded-r-md`} onClick={() => setPage(last)}>
+                {currentPage >= 3 && <button className={`${cls} hidden lg:block border-r-0`} onClick={() => setPage(currentPage - 2)}>{currentPage - 2}</button>}
+                {currentPage >= 2 && <button className={`${cls} border-r-0`} onClick={() => setPage(currentPage - 1)}>{currentPage - 1}</button>}
+                <button className="px-3 py-1.5 text-sm font-medium bg-indigo-600 border-indigo-600 hover:bg-indigo-500 hover:border-indigo-500 transition duration-200 text-center">{currentPage}</button>
+                {currentPage <= lastPage - 1 && <button className={`${cls} border-l-0`} onClick={() => setPage(currentPage + 1)}>{currentPage + 1}</button>}
+                {currentPage <= lastPage - 2 && <button className={`${cls} hidden lg:block border-l-0`} onClick={() => setPage(currentPage + 2)}>{currentPage + 2}</button>}
+                <button className={`${cls} border-l-0 rounded-r-md`} onClick={() => setPage(lastPage)}>
                     <SVGDoubleLeftArrow cls="w-4 h-4 rotate-180" />
                 </button>
             </div>

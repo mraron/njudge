@@ -1,24 +1,19 @@
 import ProfileSideBar from '../components/ProfileSidebar'
 import DropdownListFrame from '../components/DropdownListFrame'
-import {useEffect, useState} from "react";
-import PageLoadingAnimation from "../components/PageLoadingAnimation";
+import {matchPath} from "react-router-dom";
+import {routeMap} from "../config/RouteConfig";
 
-function Archive() {
-    const [data, setData] = useState(null)
-
-    useEffect(() => {
-        fetch("/api/v2/archive")
-            .then(res => res.json())
-            .then(data => setData(data))
-    }, []);
-    let pageContent = <PageLoadingAnimation/>;
-    if (data) {
-        const categoriesContent = data.categories.map((item, index) =>
-            <div className="mb-3" key={index}>
-                <DropdownListFrame title={item.title} tree={{"children": item.children}} />
-            </div>
-        )
-        pageContent =
+function Archive({ data }) {
+    if (!data || !matchPath(routeMap.archive, data.route)) {
+        return <></>
+    }
+    const categoriesContent = data.categories.map((item, index) =>
+        <div className="mb-3" key={index}>
+            <DropdownListFrame title={item.title} tree={{"children": item.children}} />
+        </div>
+    )
+    return (
+        <div className="relative w-full flex justify-center">
             <div className="flex justify-center w-full max-w-7xl">
                 <div className="ml-0 lg:ml-4">
                     <ProfileSideBar
@@ -30,10 +25,6 @@ function Archive() {
                     {categoriesContent}
                 </div>
             </div>
-    }
-    return (
-        <div className="relative w-full flex justify-center">
-            {pageContent}
         </div>
     );
 }

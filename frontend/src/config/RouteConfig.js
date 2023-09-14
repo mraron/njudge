@@ -2,7 +2,7 @@ export const routeMap = {
     "main":                     "/",
     "contests":                 "/contests/",
     "info":                     "/info/",
-    "archive":                  "/archive",
+    "archive":                  "/archive/",
     "submissions":              "/problemset/status/",
     "problems":                 "/problemset/main/",
     "submission":               "/submission/:id/",

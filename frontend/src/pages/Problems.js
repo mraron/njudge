@@ -1,22 +1,18 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import { ProblemFilterFrame } from '../components/ProblemFilter';
 import ProblemsTable from '../components/ProblemsTable'
 import ProfileSideBar from '../components/ProfileSidebar'
 import Pagination from '../components/Pagination';
 import '../index.css';
-import PageLoadingAnimation from "../components/PageLoadingAnimation";
+import {matchPath} from "react-router-dom";
+import {routeMap} from "../config/RouteConfig";
 
-function Problems() {
-    const [data, setData] = useState(null)
-
-    useEffect(() => {
-        fetch("/api/v2/problemset/main")
-            .then(res => res.json())
-            .then(data => setData(data))
-    }, []);
-    let pageContent = <PageLoadingAnimation/>;
-    if (data) {
-        pageContent =
+function Problems({ data }) {
+    if (!data || !matchPath(routeMap.problems, data.route)) {
+        return <></>
+    }
+    return (
+        <div className="relative w-full flex justify-center">
             <div className="flex justify-center w-full max-w-7xl">
                 <div className="ml-0 lg:ml-4">
                     <ProfileSideBar
@@ -32,14 +28,10 @@ function Problems() {
                         <div className="mb-2">
                             <ProblemsTable problems={data.problems} />
                         </div>
-                        <Pagination current={1} last={2000} />
+                        <Pagination paginationData={data.paginationData} />
                     </div>
                 </div>
             </div>
-    }
-    return (
-        <div className="relative w-full flex justify-center">
-            {pageContent}
         </div>
     );
 }

@@ -2,10 +2,12 @@ import SubmissionsTable from "../../components/SubmissionsTable";
 import Checkbox from "../../components/Checkbox"
 import RoundedFrame from "../../components/RoundedFrame";
 import Pagination from "../../components/Pagination";
-import {useParams} from "react-router-dom";
+import {matchPath, useLocation, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import PageLoadingAnimation from "../../components/PageLoadingAnimation";
 import ProfileSideBar from "../../components/ProfileSidebar";
+import {updatePageData} from "../../util/UpdatePageData";
+import {routeMap} from "../../config/RouteConfig";
 
 function SubmissionFilterFrame() {
     return (
@@ -20,31 +22,19 @@ function SubmissionFilterFrame() {
     )
 }
 
-function ProblemSubmissions() {
-    const {problem} = useParams()
-    const [data, setData] = useState(null)
-
-    useEffect(() => {
-        fetch(`/api/v2/problemset/main/${problem}/submissions`)
-            .then(res => res.json())
-            .then(data => setData(data))
-    }, []);
-    let pageContent = <PageLoadingAnimation/>;
-    if (data) {
-        pageContent =
-            <>
-                <div className="mb-2">
-                    <SubmissionFilterFrame />
-                </div>
-                <div className="mb-2">
-                    <SubmissionsTable submissions={data.submissions} />
-                </div>
-                <Pagination current={1000} last={2000} />
-            </>
+function ProblemSubmissions({ data }) {
+    if (!data || !matchPath(routeMap.problemSubmissions, data.route)) {
+        return <></>
     }
     return (
         <div className="relative">
-            {pageContent}
+            <div className="mb-2">
+                <SubmissionFilterFrame />
+            </div>
+            <div className="mb-2">
+                <SubmissionsTable submissions={data.submissions} />
+            </div>
+            <Pagination paginationData={data.paginationData} />
         </div>
     )
 }

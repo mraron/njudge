@@ -1,21 +1,17 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import ProfileSideBar from '../components/ProfileSidebar'
 import PostFrame from '../components/PostFrame'
 import { SVGSpinner } from '../svg/SVGs';
 import '../index.css';
-import PageLoadingAnimation from "../components/PageLoadingAnimation";
+import {matchPath} from "react-router-dom";
+import {routeMap} from "../config/RouteConfig";
 
-function Main() {
-    const [data, setData] = useState(null)
-
-    useEffect(() => {
-        fetch("/api/v2/")
-            .then(res => res.json())
-            .then(data => setData(data))
-    }, []);
-    let pageContent = <PageLoadingAnimation/>;
-    if (data) {
-        pageContent =
+function Main({ data }) {
+    if (!data || !matchPath(routeMap.main, data.route)) {
+        return <></>
+    }
+    return (
+        <div className="relative w-full flex justify-center">
             <div className="flex justify-center w-full max-w-7xl">
                 <SVGSpinner cls="hidden w-16 h-16 absolute top-1/2 left-1/2"/>
                 <div className="ml-0 lg:ml-4">
@@ -28,10 +24,6 @@ function Main() {
                     <PostFrame posts={data.posts} />
                 </div>
             </div>
-    }
-    return (
-        <div className="relative w-full flex justify-center">
-            {pageContent}
         </div>
     );
 }

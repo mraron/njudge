@@ -3,7 +3,7 @@ import { useState } from "react";
 import Checkbox from "../../components/Checkbox";
 import RoundedFrame from "../../components/RoundedFrame";
 import TextBox from "../../components/TextBox"
-import {SVGChange, SVGConfirm, SVGCorrectSimple, SVGLock, SVGSettings} from "../../svg/SVGs";
+import {SVGChange, SVGSettings} from "../../svg/SVGs";
 import SVGTitleComponent from "../../svg/SVGTitleComponent";
 
 function PasswordChangeFrame() {
