@@ -1,5 +1,5 @@
 import RoundedFrame from '../../components/RoundedFrame';
-import TextBox, { SVGInputComponent } from '../../components/TextBox';
+import TextBox from '../../components/TextBox';
 import { SVGAvatar, SVGGoogle, SVGLock } from '../../svg/SVGs';
 import SVGTitleComponent from '../../svg/SVGTitleComponent';
 
@@ -9,10 +9,10 @@ function LoginFrame() {
         <RoundedFrame titleComponent={titleComponent}>
             <div className="px-10 py-8">
                 <div className="mb-4">
-                    <TextBox id="userName" label="Felhasználónév" inputComponent={SVGInputComponent(<SVGAvatar cls="w-4 h-4" />)} />
+                    <TextBox id="userName" label="Felhasználónév" />
                 </div>
                 <div className="mb-6">
-                    <TextBox id="password" label="Jelszó" type="password" inputComponent={SVGInputComponent(<SVGLock cls="w-4 h-4" />)} />
+                    <TextBox id="password" label="Jelszó" type="password" />
                 </div>
                 <div className="flex justify-center mb-2">
                     <button className="btn-indigo mr-2 w-1/2">Belépés</button>

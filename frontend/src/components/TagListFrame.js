@@ -10,7 +10,7 @@ function Tag({ tagName }) {
 
 function TagListFrame({ title, titleComponent, tagNames }) {
     const tags = tagNames.map((tagName, index) =>
-        <div className="flex m-1">
+        <div className="flex m-1" key={index}>
             <Tag tagName={tagName} key={index} />
         </div>
     )

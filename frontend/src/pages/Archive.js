@@ -14,7 +14,7 @@ function Archive() {
     let pageContent = <PageLoadingAnimation/>;
     if (data) {
         const categoriesContent = data.categories.map((item, index) =>
-            <div className="mb-3">
+            <div className="mb-3" key={index}>
                 <DropdownListFrame title={item.title} tree={{"children": item.children}} />
             </div>
         )

@@ -11,13 +11,11 @@ function DropdownList({ tree }) {
     ): []
     const arrow = <DropdownListArrow isOpen={isOpen} />
     const innerNode = 
-        <a className="w-fit flex items-center cursor-pointer hover:text-indigo-300 font-medium transition-all duration-100" onClick={() => setOpen(!isOpen)} >
+        <span className="w-fit flex items-center cursor-pointer hover:text-indigo-300 font-medium transition-all duration-100" onClick={() => setOpen(!isOpen)} >
             {arrow}{tree["title"]}
-        </a>
-    const leafNode = 
-        <a className="w-fit flex items-center cursor-pointer hover:text-indigo-300 transition-all duration-100">
-            <Link to={tree["link"]}>{tree["title"]}</Link>
-        </a>
+        </span>
+    const leafNode =
+        <Link to={tree["link"]} className="w-fit flex items-center cursor-pointer hover:text-indigo-300 transition-all duration-100">{tree["title"]}</Link>
     const isLeaf = !tree["children"] || tree["children"].length === 0
         
     return (
