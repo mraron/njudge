@@ -17,19 +17,11 @@ function ProfileSubmissions() {
     let pageContent = <PageLoadingAnimation/>;
     if (data) {
         pageContent =
-            <div className="flex justify-center w-full max-w-7xl">
-                <div className="ml-0 lg:ml-4">
-                    <ProfileSideBar
-                        src="https://st3.depositphotos.com/6672868/13701/v/450/depositphotos_137014128-stock-illustration-user-profile-icon.jpg"
-                        username="dbence"
-                        score="2550"/>
+            <div className="flex flex-col w-full">
+                <div className="mb-2">
+                    <SubmissionsTable submissions={data.submissions} />
                 </div>
-                <div className="w-full px-4 lg:pl-3 overflow-x-auto">
-                    <div className="mb-2">
-                        <SubmissionsTable submissions={data.submissions} />
-                    </div>
-                    <Pagination current={1000} last={2000} />
-                </div>
+                <Pagination current={1000} last={2000} />
             </div>
     }
     return (

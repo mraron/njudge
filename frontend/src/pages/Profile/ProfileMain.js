@@ -4,7 +4,7 @@ import SVGTitleComponent from "../../svg/SVGTitleComponent";
 import {SVGCorrect, SVGCorrectSimple, SVGWrong, SVGWrongSimple} from "../../svg/SVGs";
 
 function ProfileMain() {
-    const titleComponentCorrect = <SVGTitleComponent svg={<SVGCorrectSimple cls="w-6 h-6 text-indigo-500 mr-2" />} title="Megoldott feladatok" />
+    const titleComponentCorrect = <SVGTitleComponent svg={<SVGCorrectSimple cls="w-6 h-6 text-green-500 mr-2" />} title="Megoldott feladatok" />
     const titleComponentWrong = <SVGTitleComponent svg={<SVGWrongSimple cls="w-6 h-6 text-red-500 mr-2" />} title="Megpróbált feladatok" />
     return (
         <div className="flex flex-col sm:flex-row w-full items-start">

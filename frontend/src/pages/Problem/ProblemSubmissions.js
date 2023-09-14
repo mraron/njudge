@@ -33,7 +33,7 @@ function ProblemSubmissions() {
     if (data) {
         pageContent =
             <>
-                <div className="mb-3">
+                <div className="mb-2">
                     <SubmissionFilterFrame />
                 </div>
                 <div className="mb-2">

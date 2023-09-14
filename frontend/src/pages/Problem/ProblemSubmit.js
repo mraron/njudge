@@ -16,7 +16,7 @@ function SubmitControlsFrame() {
 function ProblemSubmit() {
     return (
         <div className="flex flex-col">
-            <div className="mb-4">
+            <div className="mb-2">
                 <SubmitControlsFrame />
             </div>
             <Editor className="border-1 border-default" height="60vh" theme="vs-dark" defaultLanguage="cpp" options={{fontFamily: 'JetBrains Mono'}} />

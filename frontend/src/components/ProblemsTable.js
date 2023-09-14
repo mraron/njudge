@@ -1,13 +1,15 @@
 import RoundedTable from './RoundedTable';
-import { useLocation } from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { SVGAvatar } from '../svg/SVGs';
 import queryString from 'query-string';
+import {routeMap} from "../config/RouteConfig";
 
-function Problem({ id, title, category, tagTitles, solved }) {
-    const tags = tagTitles.map((tagName, index) =>
-        <span className="tag" key={index}>{tagName}</span>
+function Problem({ problem }) {
+    const {id, title, category, tags, numSolved} = problem
+    const tagsContent = tags.map((item, index) =>
+        <span className="tag" key={index}>{item}</span>
     );
     return (
         <tr className={"divide-x divide-default"}>
@@ -15,44 +17,29 @@ function Problem({ id, title, category, tagTitles, solved }) {
                 {id}
             </td>
             <td className="padding-td-default">
-                <span className="link">{title}</span>
+                <Link className="link" to={routeMap.problem.replace(":problem", id)}>{title}</Link>
             </td>
             <td className="padding-td-default">
-                <span className="link">{category}</span>
+                <Link className="link" to={category.link}>{category.label}</Link>
             </td>
             <td className="padding-td-default">
                 <div className="flex flex-wrap">
-                    {tags}
+                    {tagsContent}
                 </div>
             </td>
             <td className="padding-td-default">
-                <div className="text-indigo-200 hover:text-indigo-100 underline flex items-center cursor-pointer">
-                    <span className="mr-1">
-                        <SVGAvatar cls="w-4 h-4" />
-                    </span>
-                    <span>{solved}</span>
-                </div>
+                <Link className="link flex items-center" to={`${routeMap.problemSubmissions.replace(":problem", id)}?ac=1`}>
+                    <SVGAvatar cls="w-4 h-4 mr-1" />
+                    <span>{numSolved}</span>
+                </Link>
             </td>
         </tr>
     );
 }
 
-function ProblemsTable() {
-    const location = useLocation();
-    const [problems, setProblems] = useState([
-        ["NT21_Atvagas", "Átvágás", "Nemes Tihamér", ["mohó", "matematika"], "7"],
-        ["NT23_Vilagnaptar", "Világnaptár (45 pont)", "Nemes Tihamér", ["mohó", "adatszerkezetek"], "7"],
-        ["NT21_Atvagas", "Átvágás", "Nemes Tihamér", ["dinamikus programozás", "matematika"], "5"],
-        ["NT23_Vilagnaptar", "Világnaptár (45 pont)", "Nemes Tihamér", ["mohó", "adatszerkezetek"], "4"],
-    ]);
-    useEffect(() => {
-        const parsed = queryString.parse(location.search, {arrayFormat: 'comma'})
-        setProblems(prevProblems => prevProblems.concat([
-            [parsed.tags, "Világnaptár (45 pont)", "Nemes Tihamér", ["mohó", "adatszerkezetek"], "4"]
-        ]))}, [location.search])
-
-    const problemElems = problems.map((item, index) => 
-        <Problem id={item[0]} title={item[1]} category={item[2]} tagTitles={item[3]} solved={item[4]} key={index} />
+function ProblemsTable({ problems }) {
+    const problemsContent = problems.map((item, index) =>
+        <Problem problem={item} key={index} />
     );
     return (
         <RoundedTable>
@@ -66,7 +53,7 @@ function ProblemsTable() {
                 </tr>
             </thead>
             <tbody className="divide-y divide-default">
-                {problemElems}
+                {problemsContent}
             </tbody>
         </RoundedTable>
     );
