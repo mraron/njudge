@@ -16,7 +16,7 @@ function ProblemRanklist() {
     return (
         <div>
             <div className="mb-2">
-                <Rankings data={data} titleComponent={titleComponent} emphasize={false} />
+                <Rankings data={data} titleComponent={titleComponent} />
             </div>
             <Pagination paginationData={{currentPage: 1, lastPage: 200}} />
         </div>

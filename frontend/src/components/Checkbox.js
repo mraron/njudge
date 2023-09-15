@@ -1,7 +1,15 @@
+import {useState} from "react";
+import {SVGCheckmark} from "../svg/SVGs";
+
 function Checkbox({ id, label }) {
+    const [checked, setChecked] = useState(false)
+    const [hovered, setHovered] = useState(false)
     return (
-        <label htmlFor={id} className="flex items-start max-w-fit">
-            <input id={id} className="appearance-none bg-grey-850 text-white border-1 border-default rounded w-5 h-5 shrink-0 checked:bg-indigo-600 checked:border-indigo-600 checkmark hover:bg-grey-800 hover:border-grey-600 checked:hover:bg-indigo-500 checked:hover:border-indigo-500 transition duration-200" type="checkbox" />
+        <label htmlFor={id} className="flex items-start justify-center max-w-fit" onMouseOver={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+            <div className={`flex border items-center justify-center ${checked? `border-transparent ${hovered? "bg-indigo-500": "bg-indigo-600"}`: `${hovered? "bg-grey-800": "bg-grey-850"} border-default`} w-5 h-5 rounded-sm transition duration-200`}>
+                <SVGCheckmark cls={`w-3.5 h-3.5 ${checked? "opacity-100": "opacity-0"} transition duration-200`} />
+                <input id={id} onChange={(event) => setChecked(event.target.checked)} className={`appearance-none`} type="checkbox" />
+            </div>
             <span className="text-label ml-3">{label}</span>
         </label>
     )

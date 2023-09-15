@@ -1,5 +1,5 @@
 import {Link, useLocation} from 'react-router-dom';
-import { useState } from 'react';
+import {useEffect, useRef, useState} from 'react';
 import { DropdownRoutes } from './DropdownMenu';
 import { SVGClose, SVGDropdownMenuArrow, SVGHamburger } from '../svg/SVGs';
 import {findRouteIndex} from '../util/RouteUtil';
@@ -69,13 +69,26 @@ function ProfileSettings() {
 }
 
 function MenuSideBar({ selected, isOpen, onClose }) {
+    const menuRef = useRef(null)
     const menuOptions = menuRoutes.map((item, index) => {
         return (
             <MenuOption label={menuRouteLabels[index]} route={item} selected={index === selected} horizontal={false} key={index} onClick={onClose} />
         );
     });
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target) && event.target.id !== "hamburgerButton" && !event.target.closest("#hamburgerButton")) {
+                onClose()
+            }
+        };
+        document.addEventListener('click', handleClickOutside);
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, []);
+
     return (
-        <aside className={`z-20 h-full overflow-hidden lg:hidden fixed right-0 bg-grey-825 border-l-1 border-default ${isOpen? "w-72 opacity-100": "w-0 opacity-0"} ease-in-out transition-all duration-200`}>
+        <aside ref={menuRef} className={`z-20 h-full overflow-hidden lg:hidden fixed right-0 bg-grey-825 border-l-1 border-default ${isOpen? "w-72 opacity-100": "w-0 opacity-0"} ease-in-out transition-all duration-200`}>
             <div className="p-3">
                 <button className="rounded-full p-3 hover:bg-grey-800 transition duration-200" onClick={onClose}>
                     <SVGClose size="w-4 h-4" />
@@ -112,7 +125,7 @@ function MenuTopBar({ selected, onOpen }) {
                     </div>
                 </div>
                 <div className="lg:hidden mx-4">
-                    <button className="rounded-full p-2 hover:bg-grey-800 transition duration-200" onClick={onOpen}>
+                    <button id="hamburgerButton" className="rounded-full p-2 hover:bg-grey-800 transition duration-200" onClick={() => onOpen(this)}>
                         <SVGHamburger />
                     </button>
                 </div>
