@@ -2,7 +2,7 @@ import SubmissionsTable from "../../components/SubmissionsTable";
 import Checkbox from "../../components/Checkbox"
 import RoundedFrame from "../../components/RoundedFrame";
 import Pagination from "../../components/Pagination";
-import {matchPath} from "react-router-dom";
+import {matchPath, useOutletContext} from "react-router-dom";
 import {routeMap} from "../../config/RouteConfig";
 
 function SubmissionFilterFrame() {
@@ -18,7 +18,8 @@ function SubmissionFilterFrame() {
     )
 }
 
-function ProblemSubmissions({ data }) {
+function ProblemSubmissions() {
+    const data = useOutletContext()
     if (!data || !matchPath(routeMap.problemSubmissions, data.route)) {
         return <></>
     }

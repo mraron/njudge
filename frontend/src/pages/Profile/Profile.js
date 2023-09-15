@@ -2,9 +2,9 @@ import TabFrame from '../../components/TabFrame'
 import {Outlet, useLocation, useParams} from 'react-router-dom';
 import React, {useEffect, useState} from "react";
 import {updatePageData} from "../../util/UpdatePageData";
-import PageLoadingAnimation from "../../components/PageLoadingAnimation";
 import FadeIn from "../../components/FadeIn";
 import {routeMap} from "../../config/RouteConfig";
+import PageLoadingAnimation from "../../components/PageLoadingAnimation";
 
 const routeLabels = [
     "Profil",
@@ -16,10 +16,7 @@ const routePatterns = [
     routeMap.profileSubmissions,
     routeMap.profileSettings
 ]
-
-const routesToFetch = [
-    routeMap.profileSubmissions
-]
+const routesToFetch = routePatterns
 
 function Profile() {
     const {user} = useParams()
@@ -27,13 +24,15 @@ function Profile() {
     const [data, setData] = useState(null)
     const [loadingCount, setLoadingCount] = useState(0)
     const routes = routePatterns.map(item => item.replace(":user", user))
+    const abortController = new AbortController();
 
     useEffect(() => {
         let isMounted = true
-        updatePageData(location, routesToFetch, setData, setLoadingCount, () => isMounted)
+        updatePageData(location, routesToFetch, abortController, setData, setLoadingCount, () => isMounted)
 
         return () => {
             isMounted = false
+            abortController.abort()
         }
     }, [location]);
 

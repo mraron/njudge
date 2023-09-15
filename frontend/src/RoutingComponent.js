@@ -27,6 +27,8 @@ import {routeMap} from "./config/RouteConfig";
 
 const routesToFetch = [
     routeMap.main,
+    routeMap.info,
+    routeMap.contests,
     routeMap.archive,
     routeMap.submissions,
     routeMap.problems,
@@ -54,7 +56,7 @@ function RoutingComponent() {
     let pageContent = null
     if (loadingCount === 0)
         pageContent =
-            <Routes location={location} key={location.pathname}>
+            <Routes key={location.pathname}>
                 <Route path={routeMap.main} element={<FadeIn>
                     <Main data={data} />
                 </FadeIn>}  />
@@ -82,34 +84,16 @@ function RoutingComponent() {
                 <Route path={routeMap.register} element={<FadeIn>
                     <Register data={data} />
                 </FadeIn>} />
-                <Route path={routeMap.profile} element={<FadeIn>
-                    <Profile />
-                </FadeIn>} >
-                    <Route path={routeMap.profile} element={<FadeIn>
-                        <ProfileMain />
-                    </FadeIn>} />
-                    <Route path={routeMap.profileSubmissions} element={<FadeIn>
-                        <ProfileSubmissions />
-                    </FadeIn>} />
-                    <Route path={routeMap.profileSettings} element={<FadeIn>
-                        <ProfileSettings />
-                    </FadeIn>} />
+                <Route path={routeMap.profile} element={<Profile />} >
+                    <Route path={routeMap.profile} element={<ProfileMain />} />
+                    <Route path={routeMap.profileSubmissions} element={<ProfileSubmissions />} />
+                    <Route path={routeMap.profileSettings} element={<ProfileSettings />} />
                 </Route>
-                <Route path={routeMap.problem} element={<FadeIn>
-                    <Problem />
-                </FadeIn>} >
-                    <Route path={routeMap.problem} element={<FadeIn>
-                        <ProblemStatement />
-                    </FadeIn>} />
-                    <Route path={routeMap.problemSubmit} element={<FadeIn>
-                        <ProblemSubmit />
-                    </FadeIn>} />
-                    <Route path={routeMap.problemSubmissions} element={<FadeIn>
-                        <ProblemSubmissions />
-                    </FadeIn>} />
-                    <Route path={routeMap.problemRanklist} element={<FadeIn>
-                        <ProblemRanklist />
-                    </FadeIn>} />
+                <Route path={routeMap.problem} element={<Problem />} >
+                    <Route path={routeMap.problem} element={<ProblemStatement />} />
+                    <Route path={routeMap.problemSubmit} element={<ProblemSubmit />} />
+                    <Route path={routeMap.problemSubmissions} element={<ProblemSubmissions />} />
+                    <Route path={routeMap.problemRanklist} element={<ProblemRanklist />} />
                 </Route>
                 <Route path="*" element={<FadeIn>
                     <NotFound />
