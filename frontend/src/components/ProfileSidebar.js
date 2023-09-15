@@ -48,10 +48,10 @@ function SubmissionsFrame({titleComponent, submissions}) {
     const rows = submissions.map((item, index) =>
         <tr className="divide-x divide-default" key={index}>
             <td className="padding-td-default">
-                <Link className="link" to={routeMap.submission.replace(":id", item.id)}>{item.date}</Link>
+                <Link className="link" to={routeMap.submission.replace(":id", item.id)}>{item.id}</Link>
             </td>
             <td className="padding-td-default">
-                {item.id}
+                {item.date}
             </td>
         </tr>
     )
