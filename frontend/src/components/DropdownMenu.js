@@ -1,9 +1,9 @@
-import { useRef, useState, useEffect } from "react";
+import {useEffect, useRef, useState} from "react";
 import {matchPath, useLocation, useNavigate} from "react-router-dom";
-import { SVGDropdownMenuArrow } from "../svg/SVGs";
+import {SVGDropdownMenuArrow} from "../svg/SVGs";
 import {findRouteIndex} from "../util/RouteUtil";
 
-function DropdownItem({ name, onClick }) {
+function DropdownItem({name, onClick}) {
     return (
         <li className="cursor-pointer px-4 py-3 flex items-center hover:bg-grey-800 border-grey-750" onClick={onClick}>
             {name}
@@ -11,28 +11,29 @@ function DropdownItem({ name, onClick }) {
     );
 }
 
-function DefaultDropdownButton({ label, isOpen, onClick }) {
+function DefaultDropdownButton({label, isOpen, onClick}) {
     return (
-        <button className={`w-full rounded-md px-3 py-2 border-1 flex items-center justify-between ${isOpen? "bg-grey-750 hover:bg-grey-700 border-grey-650": "bg-grey-825 hover:bg-grey-775 border-default"} transition duration-150`} onClick={onClick}>
+        <button
+            className={`w-full rounded-md px-3 py-2 border-1 flex items-center justify-between ${isOpen ? "bg-grey-750 hover:bg-grey-700 border-grey-650" : "bg-grey-825 hover:bg-grey-775 border-default"} transition duration-150`}
+            onClick={onClick}>
             {label}
-            <SVGDropdownMenuArrow isOpen={isOpen} />
+            <SVGDropdownMenuArrow isOpen={isOpen}/>
         </button>
     )
 }
 
-function DropdownMenu({ initSelected, itemNames, button: Button, onChange }) {
+function DropdownMenu({initSelected, itemNames, button: Button, onChange}) {
     const [selected, setSelected] = useState(initSelected);
     const [isOpen, setOpen] = useState(false);
-
     const dropdownRef = useRef(null);
-    const items = itemNames.map((itemName, index) => 
+    const items = itemNames.map((itemName, index) =>
         <DropdownItem index={index} name={itemName} key={index} onClick={() => {
             if (onChange) {
                 onChange(index);
             }
             setOpen(false);
             setSelected(index);
-        }} />
+        }}/>
     );
     useEffect(() => {
         setSelected(initSelected || -1)
@@ -54,13 +55,14 @@ function DropdownMenu({ initSelected, itemNames, button: Button, onChange }) {
         return () => {
             document.removeEventListener('click', handleClickOutside);
         };
-      }, []);
+    }, []);
 
     Button = Button || DefaultDropdownButton;
     return (
         <div className="relative w-full" ref={dropdownRef}>
-            <Button label={itemNames[selected === -1? 0: selected]} isOpen={isOpen} onClick={() => setOpen(!isOpen)} />
-            <div className={`z-10 absolute overflow-hidden top-12 inset-x-0 ${isOpen? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'} transition-all duration-150`}>
+            <Button label={itemNames[selected === -1 ? 0 : selected]} isOpen={isOpen} onClick={() => setOpen(!isOpen)}/>
+            <div
+                className={`z-10 absolute overflow-hidden top-12 inset-x-0 ${isOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'} transition-all duration-150`}>
                 <div className={`rounded-md max-h-60 overflow-y-auto border-default border-1`}>
                     <ul className={`divide-y divide-default bg-grey-875 rounded-md`}>
                         {items}
@@ -71,17 +73,17 @@ function DropdownMenu({ initSelected, itemNames, button: Button, onChange }) {
     )
 }
 
-export function DropdownRoutes({ routes, routePatterns, routeLabels, button: Button }) {
+export function DropdownRoutes({routes, routePatterns, routeLabels, button: Button}) {
     const navigate = useNavigate();
-	const location = useLocation();
-	const selected = findRouteIndex(routePatterns, location.pathname)
+    const location = useLocation();
+    const selected = findRouteIndex(routePatterns, location.pathname)
     const handleChange = (index) => {
         if (index !== -1 && !matchPath(routes[index], location.pathname)) {
             navigate(routes[index])
         }
     }
     return (
-        <DropdownMenu initSelected={selected} button={Button} itemNames={routeLabels} onChange={handleChange} />
+        <DropdownMenu initSelected={selected} button={Button} itemNames={routeLabels} onChange={handleChange}/>
     )
 }
 

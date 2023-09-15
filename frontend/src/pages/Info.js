@@ -2,8 +2,10 @@ import ProfileSideBar from '../components/ProfileSidebar'
 import {SVGCode, SVGCopy} from "../svg/SVGs";
 import SVGTitleComponent from "../svg/SVGTitleComponent";
 import RoundedTable from "../components/RoundedTable";
+import React from "react";
+import checkData from "../util/CheckData";
 
-function CompilerOption({ lang, command }) {
+function CompilerOption({lang, command}) {
     return (
         <tr className={`divide-x divide-default `}>
             <td className="padding-td-default whitespace-nowrap">
@@ -11,8 +13,12 @@ function CompilerOption({ lang, command }) {
             </td>
             <td className="padding-td-default text-white">
                 <div className="flex items-center">
-                    <button className="p-2 mr-2 rounded-md border-1 bg-grey-800 border-grey-725 hover:bg-grey-775 transition duration-200" onClick={() => {navigator.clipboard.writeText(command)}}>
-                        <SVGCopy />
+                    <button
+                        className="p-2 mr-2 rounded-md border-1 bg-grey-800 border-grey-725 hover:bg-grey-775 transition duration-200"
+                        onClick={() => {
+                            navigator.clipboard.writeText(command)
+                        }}>
+                        <SVGCopy/>
                     </button>
                     <div className="flex items-center px-3 py-2 border-1 border-grey-725 rounded-md bg-grey-875">
                         <pre>{command}</pre>
@@ -34,9 +40,9 @@ function InfoTable() {
         ["Python3", "/usr/bin/python3 main.py"]
     ];
     const compilerOptionElems = compilerOptions.map((item, index) =>
-        <CompilerOption lang={item[0]} command={item[1]} key={index} />
+        <CompilerOption lang={item[0]} command={item[1]} key={index}/>
     );
-    const titleComponent = <SVGTitleComponent title="Fordítási, futtatási opciók" svg={<SVGCode cls="w-7 h-7 mr-2" />} />
+    const titleComponent = <SVGTitleComponent title="Fordítási, futtatási opciók" svg={<SVGCode cls="w-7 h-7 mr-2"/>}/>
     return (
         <RoundedTable titleComponent={titleComponent}>
             <tbody className="divide-y divide-default text-sm">
@@ -45,18 +51,19 @@ function InfoTable() {
         </RoundedTable>
     );
 }
-function Info() {
+
+function Info({data}) {
+    if (!checkData(data)) {
+        return
+    }
     return (
         <div className="w-full flex justify-center">
             <div className="flex justify-center w-full max-w-7xl">
                 <div className="ml-0 lg:ml-4">
-                    <ProfileSideBar 
-                        src="https://st3.depositphotos.com/6672868/13701/v/450/depositphotos_137014128-stock-illustration-user-profile-icon.jpg" 
-                        username="dbence"
-                        score="2550"/>
+                    <ProfileSideBar profileData={data.profileData}/>
                 </div>
                 <div className="w-full px-4 lg:pl-3 overflow-x-auto">
-                    <InfoTable />
+                    <InfoTable/>
                 </div>
             </div>
         </div>

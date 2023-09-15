@@ -193,16 +193,18 @@ function Submission() {
                 <div className="flex justify-center w-full max-w-7xl">
                     <div className="w-full px-4">
                         <div className="mb-3">
-                            <SubmissionsTable submissions={[]} />
+                            <SubmissionsTable submissions={[]}/>
                         </div>
                         <div className="mb-3">
-                            <Editor className="border-1 border-default" height="60vh" theme="vs-dark" defaultLanguage="cpp" options={{domReadOnly: true, readOnly: true, fontFamily: 'JetBrains Mono'}}
-                                value={`#include <iostream>
+                            <Editor className="border-1 border-default" height="60vh" theme="vs-dark"
+                                    defaultLanguage="cpp"
+                                    options={{domReadOnly: true, readOnly: true, fontFamily: 'JetBrains Mono'}}
+                                    value={`#include <iostream>
 using namespace std;
 
 int main() {
     cout << "Hello world" << endl;
-}`} />
+}`}/>
                         </div>
                         <SubmissionTable submission={submission}/>
                     </div>

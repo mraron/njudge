@@ -38,22 +38,22 @@ function Profile() {
 
     let pageContent = null
     if (loadingCount === 0) {
-        pageContent = <FadeIn><Outlet context={data} /></FadeIn>
+        pageContent = <FadeIn><Outlet context={data}/></FadeIn>
     }
-	return (
+    return (
         <div className="flex justify-center">
             <div className="w-full max-w-7xl">
                 <div className="w-full px-4">
                     <TabFrame routes={routes} routePatterns={routePatterns} routeLabels={routeLabels}>
                         <div className="relative w-full">
-                            <PageLoadingAnimation isVisible={loadingCount !== 0} />
+                            <PageLoadingAnimation isVisible={loadingCount !== 0}/>
                             {pageContent}
                         </div>
                     </TabFrame>
                 </div>
             </div>
         </div>
-	);
+    );
 }
 
 export default Profile;

@@ -1,17 +1,18 @@
 import RoundedFrame from "./RoundedFrame";
 
-function Tag({ tagName }) {
+function Tag({tagName}) {
     return (
-        <span className="w-28 text-center truncate whitespace-nowrap cursor-pointer text-sm px-2 py-1 border-1 rounded bg-grey-725 hover:bg-indigo-600 border-grey-650 hover:border-indigo-500 transition-all duration-200">
+        <span
+            className="w-28 text-center truncate whitespace-nowrap cursor-pointer text-sm px-2 py-1 border-1 rounded bg-grey-725 hover:bg-indigo-600 border-grey-650 hover:border-indigo-500 transition-all duration-200">
             {tagName}
         </span>
     )
 }
 
-function TagListFrame({ title, titleComponent, tagNames }) {
+function TagListFrame({title, titleComponent, tagNames}) {
     const tags = tagNames.map((tagName, index) =>
         <div className="flex m-1" key={index}>
-            <Tag tagName={tagName} key={index} />
+            <Tag tagName={tagName} key={index}/>
         </div>
     )
     return (

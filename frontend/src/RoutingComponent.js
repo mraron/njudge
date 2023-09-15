@@ -58,55 +58,55 @@ function RoutingComponent() {
         pageContent =
             <Routes key={location.pathname}>
                 <Route path={routeMap.main} element={<FadeIn>
-                    <Main data={data} />
-                </FadeIn>}  />
+                    <Main data={data}/>
+                </FadeIn>}/>
                 <Route path={routeMap.contests} element={<FadeIn>
-                    <Contests data={data} />
-                </FadeIn>} />
+                    <Contests data={data}/>
+                </FadeIn>}/>
                 <Route path={routeMap.info} element={<FadeIn>
-                    <Info data={data} />
-                </FadeIn>} />
+                    <Info data={data}/>
+                </FadeIn>}/>
                 <Route path={routeMap.archive} element={<FadeIn>
-                    <Archive data={data} />
-                </FadeIn>} />
+                    <Archive data={data}/>
+                </FadeIn>}/>
                 <Route path={routeMap.submissions} element={<FadeIn>
-                    <Submissions data={data} />
-                </FadeIn>} />
+                    <Submissions data={data}/>
+                </FadeIn>}/>
                 <Route path={routeMap.problems} element={<FadeIn>
-                    <Problems data={data} />
-                </FadeIn>} />
+                    <Problems data={data}/>
+                </FadeIn>}/>
                 <Route path={routeMap.submission} element={<FadeIn>
-                    <Submission data={data} />
-                </FadeIn>} />
+                    <Submission data={data}/>
+                </FadeIn>}/>
                 <Route path={routeMap.login} element={<FadeIn>
-                    <Login data={data} />
-                </FadeIn>} />
+                    <Login data={data}/>
+                </FadeIn>}/>
                 <Route path={routeMap.register} element={<FadeIn>
-                    <Register data={data} />
-                </FadeIn>} />
-                <Route path={routeMap.profile} element={<Profile />} >
-                    <Route path={routeMap.profile} element={<ProfileMain />} />
-                    <Route path={routeMap.profileSubmissions} element={<ProfileSubmissions />} />
-                    <Route path={routeMap.profileSettings} element={<ProfileSettings />} />
+                    <Register data={data}/>
+                </FadeIn>}/>
+                <Route path={routeMap.profile} element={<Profile/>}>
+                    <Route path={routeMap.profile} element={<ProfileMain/>}/>
+                    <Route path={routeMap.profileSubmissions} element={<ProfileSubmissions/>}/>
+                    <Route path={routeMap.profileSettings} element={<ProfileSettings/>}/>
                 </Route>
-                <Route path={routeMap.problem} element={<Problem />} >
-                    <Route path={routeMap.problem} element={<ProblemStatement />} />
-                    <Route path={routeMap.problemSubmit} element={<ProblemSubmit />} />
-                    <Route path={routeMap.problemSubmissions} element={<ProblemSubmissions />} />
-                    <Route path={routeMap.problemRanklist} element={<ProblemRanklist />} />
+                <Route path={routeMap.problem} element={<Problem/>}>
+                    <Route path={routeMap.problem} element={<ProblemStatement/>}/>
+                    <Route path={routeMap.problemSubmit} element={<ProblemSubmit/>}/>
+                    <Route path={routeMap.problemSubmissions} element={<ProblemSubmissions/>}/>
+                    <Route path={routeMap.problemRanklist} element={<ProblemRanklist/>}/>
                 </Route>
                 <Route path="*" element={<FadeIn>
-                    <NotFound />
-                </FadeIn>} />
+                    <NotFound/>
+                </FadeIn>}/>
             </Routes>
 
     return (
         <>
             <div className="pb-20">
-                <Menubar />
+                <Menubar/>
             </div>
             <div className="relative w-full">
-                <PageLoadingAnimation isVisible={loadingCount !== 0} />
+                <PageLoadingAnimation isVisible={loadingCount !== 0}/>
                 {pageContent}
             </div>
         </>

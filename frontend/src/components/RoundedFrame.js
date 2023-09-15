@@ -1,4 +1,4 @@
-function RoundedFrame({ children, title, titleComponent }) {
+function RoundedFrame({children, title, titleComponent}) {
     return (
         <div className="bg-grey-800 border-1 rounded-md flex flex-col border-default w-full">
             <div className="flex flex-col">

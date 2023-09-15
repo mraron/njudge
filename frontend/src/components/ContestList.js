@@ -24,11 +24,11 @@ function ContestFrame({name, date, active}) {
     )
 }
 
-function ContestList({ contestData }) {
+function ContestList({contestData}) {
     const contestItems = contestData.map((data, index) => {
         return (
             <div className="mb-3" key={index}>
-                <ContestFrame name={data[0]} date={data[1]} active={data[2]} />
+                <ContestFrame name={data[0]} date={data[1]} active={data[2]}/>
             </div>
         );
     });

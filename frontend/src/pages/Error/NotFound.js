@@ -1,6 +1,6 @@
 import RoundedFrame from "../../components/RoundedFrame";
-import { Link } from "react-router-dom";
-import { SVGNotFound } from "../../svg/SVGs";
+import {Link} from "react-router-dom";
+import {SVGNotFound} from "../../svg/SVGs";
 
 function NotFoundFrame() {
     return (
@@ -8,7 +8,7 @@ function NotFoundFrame() {
             <div className="px-10 py-8 flex flex-col relative justify-between">
                 <p className="z-10">A keresett oldal nem található. Győződj meg róla, hogy a megadott link helyes.</p>
                 <div className="flex justify-center absolute inset-0">
-                    <SVGNotFound />
+                    <SVGNotFound/>
                 </div>
                 <div className="flex justify-center mt-8">
                     <Link className="z-10 w-60 btn-indigo text-center" to="/">Vissza a főoldalra</Link>
@@ -22,7 +22,7 @@ function NotFound() {
     return (
         <div className="w-full flex justify-center">
             <div className="flex justify-center w-full max-w-md px-4">
-                <NotFoundFrame />
+                <NotFoundFrame/>
             </div>
         </div>
     )

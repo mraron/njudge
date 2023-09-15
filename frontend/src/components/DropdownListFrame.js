@@ -1,7 +1,7 @@
 import DropdownList from "./DropdownList";
 import RoundedFrame from "./RoundedFrame";
 
-function DropdownListFrame({ title, tree }) {
+function DropdownListFrame({title, tree}) {
     return (
         <RoundedFrame title={title}>
             <div className="rounded-md overflow-hidden">
@@ -11,7 +11,7 @@ function DropdownListFrame({ title, tree }) {
             </div>
         </RoundedFrame>
     );
-    
+
 }
 
 export default DropdownListFrame;

@@ -2,11 +2,11 @@ import MapDataFrame from '../../components/MapDataFrame';
 import DropdownMenu from '../../components/DropdownMenu';
 import RoundedFrame from '../../components/RoundedFrame';
 import SVGTitleComponent from '../../svg/SVGTitleComponent';
-import { SVGAttachmentFile, SVGAttachmentDescription, SVGInformation, SVGSubmit, SVGAttachment } from '../../svg/SVGs';
+import {SVGAttachment, SVGAttachmentDescription, SVGAttachmentFile, SVGInformation, SVGSubmit} from '../../svg/SVGs';
 
 const attachmentSVGs = {
-    "file":         <SVGAttachmentFile />,
-    "description":  <SVGAttachmentDescription />
+    "file": <SVGAttachmentFile/>,
+    "description": <SVGAttachmentDescription/>
 }
 
 function ProblemInfo() {
@@ -17,7 +17,7 @@ function ProblemInfo() {
                 <span className="tag" key={index}>{tagName}</span>)}
         </div>
 
-    const titleComponent = <SVGTitleComponent svg={<SVGInformation />} title="Információk" />
+    const titleComponent = <SVGTitleComponent svg={<SVGInformation/>} title="Információk"/>
 
     return (
         <MapDataFrame titleComponent={titleComponent} data={[
@@ -27,18 +27,18 @@ function ProblemInfo() {
             ["Memórialimit", "31 MiB"],
             ["Címkék", tags],
             ["Típus", "batch"]
-        ]} />
+        ]}/>
     )
 }
 
 function ProblemSubmit() {
-    const titleComponent = <SVGTitleComponent svg={<SVGSubmit />} title="Megoldás beküldése" />
+    const titleComponent = <SVGTitleComponent svg={<SVGSubmit/>} title="Megoldás beküldése"/>
     return (
         <RoundedFrame titleComponent={titleComponent}>
             <div className="px-6 py-5">
                 <div className="flex flex-col">
                     <div className="mb-4">
-                        <DropdownMenu itemNames={["C++ 11", "C++ 14", "C++ 17", "Go", "Java", "Python 3"]} />
+                        <DropdownMenu itemNames={["C++ 11", "C++ 14", "C++ 17", "Go", "Java", "Python 3"]}/>
                     </div>
                     <div className="mb-2 mx-1 text-label">
                         Nincs kiválasztva fájl.
@@ -60,15 +60,16 @@ function ProblemAttachments() {
         ["hungarian", "description"]
     ];
     const attachmentElems = attachments.map((pair, index) => {
-        const type = pair[1] === "file"? "Fájl": (pair[1] === "description"? "Leírás": "Csatolmány");
+        const type = pair[1] === "file" ? "Fájl" : (pair[1] === "description" ? "Leírás" : "Csatolmány");
         return (
-            <li key={index} className="flex items-center cursor-pointer text-indigo-200 hover:text-indigo-100 transition duration-200">
+            <li key={index}
+                className="flex items-center cursor-pointer text-indigo-200 hover:text-indigo-100 transition duration-200">
                 {attachmentSVGs[pair[1]]}
                 <span className="underline">{type} ({pair[0]})</span>
             </li>
         )
     });
-    const titleComponent = <SVGTitleComponent svg={<SVGAttachment />} title="Mellékletek" />
+    const titleComponent = <SVGTitleComponent svg={<SVGAttachment/>} title="Mellékletek"/>
     return (
         <RoundedFrame titleComponent={titleComponent}>
             <div className="px-6 py-5">
@@ -84,19 +85,20 @@ function ProblemStatement() {
     return (
         <div className="flex flex-col lg:flex-row">
             <div className="w-full mb-3">
-                <object data="/assets/statement.pdf" type="application/pdf" width="100%" className="h-[36rem] lg:h-[52rem]">
+                <object data="/assets/statement.pdf" type="application/pdf" width="100%"
+                        className="h-[36rem] lg:h-[52rem]">
 
                 </object>
             </div>
             <div className="w-full lg:w-96 mb-3 lg:ml-3 shrink-0">
                 <div className="mb-3">
-                    <ProblemInfo />
+                    <ProblemInfo/>
                 </div>
                 <div className="mb-3">
-                    <ProblemSubmit />
+                    <ProblemSubmit/>
                 </div>
                 <div className="mb-3">
-                    <ProblemAttachments />
+                    <ProblemAttachments/>
                 </div>
             </div>
         </div>

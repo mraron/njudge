@@ -1,22 +1,21 @@
 import Pagination from "../../components/Pagination";
 import SubmissionsTable from "../../components/SubmissionsTable";
-import {matchPath, useOutletContext} from "react-router-dom";
-import {routeMap} from "../../config/RouteConfig";
+import {useOutletContext} from "react-router-dom";
 import React from "react";
+import checkData from "../../util/CheckData";
 
 function ProfileSubmissions() {
     const data = useOutletContext()
-    if (!data || data.processed) {
-        return <></>
+    if (!checkData(data)) {
+        return
     }
-    data.processed = true
     return (
         <div className="relative">
             <div className="flex flex-col w-full">
                 <div className="mb-2">
-                    <SubmissionsTable submissions={data.submissions} />
+                    <SubmissionsTable submissions={data.submissions}/>
                 </div>
-                <Pagination paginationData={data.paginationData} />
+                <Pagination paginationData={data.paginationData}/>
             </div>
         </div>
     );

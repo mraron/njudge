@@ -1,7 +1,7 @@
 import {Link, useLocation} from 'react-router-dom';
 import {useEffect, useRef, useState} from 'react';
-import { DropdownRoutes } from './DropdownMenu';
-import { SVGClose, SVGDropdownMenuArrow, SVGHamburger } from '../svg/SVGs';
+import {DropdownRoutes} from './DropdownMenu';
+import {SVGClose, SVGDropdownMenuArrow, SVGHamburger} from '../svg/SVGs';
 import {findRouteIndex} from '../util/RouteUtil';
 import {routeMap} from "../config/RouteConfig";
 
@@ -35,23 +35,27 @@ const profileRouteLabels = [
     "Kilépés"
 ]
 
-function MenuOption({ label, route, selected, horizontal, onClick }) {
+function MenuOption({label, route, selected, horizontal, onClick}) {
     return (
         <li>
-            <Link onClick={onClick} className={`flex items-center h-full px-4 ${horizontal? "border-b-3 pt-1": "border-l-3 p-3"} ${selected? "border-indigo-500 bg-grey-775": "border-transparent hover:bg-grey-800"}`} to={route}>
+            <Link onClick={onClick}
+                  className={`flex items-center h-full px-4 ${horizontal ? "border-b-3 pt-1" : "border-l-3 p-3"} ${selected ? "border-indigo-500 bg-grey-775" : "border-transparent hover:bg-grey-800"}`}
+                  to={route}>
                 {label}
             </Link>
         </li>
     )
 }
 
-function ProfileDropdownButton({ isOpen, onClick }) {
+function ProfileDropdownButton({isOpen, onClick}) {
     return (
-        <button className={`border-1 border-grey-675 rounded-tl-md rounded-bl-md flex items-center justify-between px-3 py-2 min-w-32 w-full h-full ${isOpen? "bg-grey-750 hover:bg-grey-700": "hover:bg-grey-800"}`} onClick={onClick}>
+        <button
+            className={`border-1 border-grey-675 rounded-tl-md rounded-bl-md flex items-center justify-between px-3 py-2 min-w-32 w-full h-full ${isOpen ? "bg-grey-750 hover:bg-grey-700" : "hover:bg-grey-800"}`}
+            onClick={onClick}>
             <span className="flex items-center">
                 <span>Profil</span>
             </span>
-            <SVGDropdownMenuArrow isOpen={isOpen} />
+            <SVGDropdownMenuArrow isOpen={isOpen}/>
         </button>
     );
 }
@@ -59,8 +63,10 @@ function ProfileDropdownButton({ isOpen, onClick }) {
 function ProfileSettings() {
     return (
         <div className="flex">
-            <DropdownRoutes button={ProfileDropdownButton} routes={profileRoutes} routePatterns={profileRoutePatterns} routeLabels={profileRouteLabels} />
-            <div className="px-4 flex items-center justify-center border-1 border-l-0 border-grey-675 rounded-tr-md rounded-br-md">
+            <DropdownRoutes button={ProfileDropdownButton} routes={profileRoutes} routePatterns={profileRoutePatterns}
+                            routeLabels={profileRouteLabels}/>
+            <div
+                className="px-4 flex items-center justify-center border-1 border-l-0 border-grey-675 rounded-tr-md rounded-br-md">
                 <button className="px-2 bg-grey-725 rounded-md mr-1">hu</button>
                 <button className="px-2 hover:bg-grey-800 rounded-md">en</button>
             </div>
@@ -68,11 +74,12 @@ function ProfileSettings() {
     );
 }
 
-function MenuSideBar({ selected, isOpen, onClose }) {
+function MenuSideBar({selected, isOpen, onClose}) {
     const menuRef = useRef(null)
     const menuOptions = menuRoutes.map((item, index) => {
         return (
-            <MenuOption label={menuRouteLabels[index]} route={item} selected={index === selected} horizontal={false} key={index} onClick={onClose} />
+            <MenuOption label={menuRouteLabels[index]} route={item} selected={index === selected} horizontal={false}
+                        key={index} onClick={onClose}/>
         );
     });
     useEffect(() => {
@@ -88,15 +95,16 @@ function MenuSideBar({ selected, isOpen, onClose }) {
     }, []);
 
     return (
-        <aside ref={menuRef} className={`z-20 h-full overflow-hidden lg:hidden fixed right-0 bg-grey-825 border-l-1 border-default ${isOpen? "w-72 opacity-100": "w-0 opacity-0"} ease-in-out transition-all duration-200`}>
+        <aside ref={menuRef}
+               className={`z-20 h-full overflow-hidden lg:hidden fixed right-0 bg-grey-825 border-l-1 border-default ${isOpen ? "w-72 opacity-100" : "w-0 opacity-0"} ease-in-out transition-all duration-200`}>
             <div className="p-3">
                 <button className="rounded-full p-3 hover:bg-grey-800 transition duration-200" onClick={onClose}>
-                    <SVGClose size="w-4 h-4" />
+                    <SVGClose size="w-4 h-4"/>
                 </button>
             </div>
             <div className="flex flex-col justify-center">
                 <div className="mx-4 mb-4">
-                    <ProfileSettings />
+                    <ProfileSettings/>
                 </div>
                 <ol className="divide-y divide-default border-t border-b border-grey-750">
                     {menuOptions}
@@ -106,10 +114,11 @@ function MenuSideBar({ selected, isOpen, onClose }) {
     );
 }
 
-function MenuTopBar({ selected, onOpen }) {
+function MenuTopBar({selected, onOpen}) {
     const menuOptions = menuRoutes.map((item, index) => {
         return (
-            <MenuOption label={menuRouteLabels[index]} route={item} selected={index === selected} horizontal={true} key={index} />
+            <MenuOption label={menuRouteLabels[index]} route={item} selected={index === selected} horizontal={true}
+                        key={index}/>
         );
     });
     return (
@@ -121,12 +130,13 @@ function MenuTopBar({ selected, onOpen }) {
                         {menuOptions}
                     </ol>
                     <div className="w-full hidden lg:flex justify-end mx-4 my-2">
-                        <ProfileSettings />
+                        <ProfileSettings/>
                     </div>
                 </div>
                 <div className="lg:hidden mx-4">
-                    <button id="hamburgerButton" className="rounded-full p-2 hover:bg-grey-800 transition duration-200" onClick={() => onOpen(this)}>
-                        <SVGHamburger />
+                    <button id="hamburgerButton" className="rounded-full p-2 hover:bg-grey-800 transition duration-200"
+                            onClick={() => onOpen(this)}>
+                        <SVGHamburger/>
                     </button>
                 </div>
             </div>
@@ -135,8 +145,8 @@ function MenuTopBar({ selected, onOpen }) {
 }
 
 function Menubar() {
-	const location = useLocation();
-	const selected = findRouteIndex(menuRoutes, location.pathname)
+    const location = useLocation();
+    const selected = findRouteIndex(menuRoutes, location.pathname)
     const [isOpen, setOpen] = useState(false);
     const handleClose = () => {
         setOpen(false);
@@ -147,7 +157,7 @@ function Menubar() {
     return (
         <div>
             <MenuTopBar selected={selected} onOpen={handleOpen}></MenuTopBar>
-            <MenuSideBar selected={selected} isOpen={isOpen} onClose={handleClose} />
+            <MenuSideBar selected={selected} isOpen={isOpen} onClose={handleClose}/>
         </div>
     );
 }

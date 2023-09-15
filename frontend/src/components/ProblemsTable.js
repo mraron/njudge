@@ -1,9 +1,6 @@
 import RoundedTable from './RoundedTable';
-import {Link, useLocation} from 'react-router-dom';
-import { useEffect } from 'react';
-import { useState } from 'react';
-import { SVGAvatar } from '../svg/SVGs';
-import queryString from 'query-string';
+import {Link} from 'react-router-dom';
+import {SVGAvatar} from '../svg/SVGs';
 import {routeMap} from "../config/RouteConfig";
 
 function Problem(data) {
@@ -28,8 +25,9 @@ function Problem(data) {
                 </div>
             </td>
             <td className="padding-td-default">
-                <Link className="link flex items-center" to={`${routeMap.problemSubmissions.replace(":problem", problem)}?ac=1`}>
-                    <SVGAvatar cls="w-4 h-4 mr-1" />
+                <Link className="link flex items-center"
+                      to={`${routeMap.problemSubmissions.replace(":problem", problem)}?ac=1`}>
+                    <SVGAvatar cls="w-4 h-4 mr-1"/>
                     <span>{solverCount}</span>
                 </Link>
             </td>
@@ -37,23 +35,23 @@ function Problem(data) {
     );
 }
 
-function ProblemsTable({ problems }) {
+function ProblemsTable({problems}) {
     const problemsContent = problems.map((item, index) =>
-        <Problem problem={item} key={index} />
+        <Problem problem={item} key={index}/>
     );
     return (
         <RoundedTable>
             <thead className="bg-grey-800">
-                <tr className="divide-x divide-default">
-                    <th className="padding-td-default">Azonosító</th>
-                    <th className="padding-td-default">Feladatcím</th>
-                    <th className="padding-td-default">Kategória</th>
-                    <th className="padding-td-default">Címkék</th>
-                    <th className="padding-td-default">Megoldók</th>
-                </tr>
+            <tr className="divide-x divide-default">
+                <th className="padding-td-default">Azonosító</th>
+                <th className="padding-td-default">Feladatcím</th>
+                <th className="padding-td-default">Kategória</th>
+                <th className="padding-td-default">Címkék</th>
+                <th className="padding-td-default">Megoldók</th>
+            </tr>
             </thead>
             <tbody className="divide-y divide-default">
-                {problemsContent}
+            {problemsContent}
             </tbody>
         </RoundedTable>
     );

@@ -4,13 +4,13 @@ import RoutingComponent from "./RoutingComponent";
 import './index.css';
 
 function App() {
-	return (
+    return (
         <div className="text-white h-full min-h-screen pb-4">
-			<Router>
-				<RoutingComponent />
-			</Router>
+            <Router>
+                <RoutingComponent/>
+            </Router>
         </div>
-	);
+    );
 }
-  
+
 export default App;
