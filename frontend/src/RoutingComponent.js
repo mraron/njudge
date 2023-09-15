@@ -16,12 +16,24 @@ import Problem from "./pages/Problem/Problem";
 import ProblemStatement from "./pages/Problem/ProblemStatement";
 import ProblemSubmit from "./pages/Problem/ProblemSubmit";
 import ProblemSubmissions from "./pages/Problem/ProblemSubmissions";
-import ProblemRanklist from "./pages/Problem/ProblemRankings";
+import ProblemRanklist from "./pages/Problem/ProblemRanklist";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import NotFound from "./pages/Error/NotFound";
 import PageLoadingAnimation from "./components/PageLoadingAnimation";
+import {updatePageData} from "./util/UpdatePageData";
+import FadeIn from "./components/FadeIn";
 import {routeMap} from "./config/RouteConfig";
+
+const routesToFetch = [
+    routeMap.main,
+    routeMap.archive,
+    routeMap.submissions,
+    routeMap.problems,
+    routeMap.submission,
+    routeMap.login,
+    routeMap.register
+]
 
 function RoutingComponent() {
     const location = useLocation()
@@ -29,43 +41,77 @@ function RoutingComponent() {
     const [loadingCount, setLoadingCount] = useState(0)
 
     useEffect(() => {
-        setLoadingCount(arg => arg + 1)
-        fetch(`/api/v2${location.pathname}${location.search}`)
-            .then(res => res.json())
-            .then(data => {
-                setData(data)
-                setLoadingCount(arg => arg - 1)
-            })
-            .catch((error) => {
-                console.error('Network error:', error);
-                setLoadingCount((count) => count - 1);
-            });
+        let isMounted = true
+        updatePageData(location, routesToFetch, setData, setLoadingCount, () => isMounted)
+
+        return () => {
+            isMounted = false
+        }
     }, [location]);
-    let pageContent = <PageLoadingAnimation />
-    if (loadingCount === 0 && data) {
+
+    let pageContent = null
+    if (loadingCount === 0) {
         pageContent =
             <Routes>
-                <Route path={routeMap.main} element={<Main data={data} />}  />
-                <Route path={routeMap.contests} element={<Contests data={data} />} />
-                <Route path={routeMap.info} element={<Info data={data} />} />
-                <Route path={routeMap.archive} element={<Archive data={data} />} />
-                <Route path={routeMap.submissions} element={<Submissions data={data} />} />
-                <Route path={routeMap.problems} element={<Problems data={data} />} />
-                <Route path={routeMap.submission} element={<Submission data={data} />} />
-                <Route path={routeMap.profile} element={<Profile data={data} />} >
-                    <Route path={routeMap.profile} element={<ProfileMain data={data} />} />
-                    <Route path={routeMap.profileSubmissions} element={<ProfileSubmissions data={data} />} />
-                    <Route path={routeMap.profileSettings} element={<ProfileSettings data={data} />} />
+                <Route path={routeMap.main} element={<FadeIn>
+                    <Main data={data} />
+                </FadeIn>}  />
+                <Route path={routeMap.contests} element={<FadeIn>
+                    <Contests data={data} />
+                </FadeIn>} />
+                <Route path={routeMap.info} element={<FadeIn>
+                    <Info data={data} />
+                </FadeIn>} />
+                <Route path={routeMap.archive} element={<FadeIn>
+                    <Archive data={data} />
+                </FadeIn>} />
+                <Route path={routeMap.submissions} element={<FadeIn>
+                    <Submissions data={data} />
+                </FadeIn>} />
+                <Route path={routeMap.problems} element={<FadeIn>
+                    <Problems data={data} />
+                </FadeIn>} />
+                <Route path={routeMap.submission} element={<FadeIn>
+                    <Submission data={data} />
+                </FadeIn>} />
+                <Route path={routeMap.login} element={<FadeIn>
+                    <Login data={data} />
+                </FadeIn>} />
+                <Route path={routeMap.register} element={<FadeIn>
+                    <Register data={data} />
+                </FadeIn>} />
+                <Route path={routeMap.profile} element={<FadeIn>
+                    <Profile />
+                </FadeIn>} >
+                    <Route path={routeMap.profile} element={<FadeIn>
+                        <ProfileMain />
+                    </FadeIn>} />
+                    <Route path={routeMap.profileSubmissions} element={<FadeIn>
+                        <ProfileSubmissions />
+                    </FadeIn>} />
+                    <Route path={routeMap.profileSettings} element={<FadeIn>
+                        <ProfileSettings />
+                    </FadeIn>} />
                 </Route>
-                <Route path={routeMap.problem} element={<Problem data={data} />} >
-                    <Route path={routeMap.problem} element={<ProblemStatement data={data} />} />
-                    <Route path={routeMap.problemSubmit} element={<ProblemSubmit data={data} />} />
-                    <Route path={routeMap.problemSubmissions} element={<ProblemSubmissions data={data} />} />
-                    <Route path={routeMap.problemRanklist} element={<ProblemRanklist data={data} />} />
+                <Route path={routeMap.problem} element={<FadeIn>
+                    <Problem />
+                </FadeIn>} >
+                    <Route path={routeMap.problem} element={<FadeIn>
+                        <ProblemStatement />
+                    </FadeIn>} />
+                    <Route path={routeMap.problemSubmit} element={<FadeIn>
+                        <ProblemSubmit />
+                    </FadeIn>} />
+                    <Route path={routeMap.problemSubmissions} element={<FadeIn>
+                        <ProblemSubmissions />
+                    </FadeIn>} />
+                    <Route path={routeMap.problemRanklist} element={<FadeIn>
+                        <ProblemRanklist />
+                    </FadeIn>} />
                 </Route>
-                <Route path={routeMap.login} element={<Login data={data} />} />
-                <Route path={routeMap.register} element={<Register data={data} />} />
-                <Route path="*" element={<NotFound data={data} />} />
+                <Route path="*" element={<FadeIn>
+                    <NotFound />
+                </FadeIn>} />
             </Routes>
     }
     return (
@@ -73,6 +119,7 @@ function RoutingComponent() {
             <div className="pb-20">
                 <Menubar />
             </div>
+            <PageLoadingAnimation isVisible={loadingCount !== 0} />
             {pageContent}
         </>
     )

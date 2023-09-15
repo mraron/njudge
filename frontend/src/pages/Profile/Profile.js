@@ -1,6 +1,10 @@
 import TabFrame from '../../components/TabFrame'
-import {Outlet, useParams} from 'react-router-dom';
+import {Outlet, useLocation, useParams} from 'react-router-dom';
 import {routeMap} from "../../config/RouteConfig";
+import React, {useEffect, useState} from "react";
+import {findRouteIndex} from "../../util/RouteUtil";
+import {updatePageData} from "../../util/UpdatePageData";
+import PageLoadingAnimation from "../../components/PageLoadingAnimation";
 
 const routeLabels = [
     "Profil",
@@ -13,20 +17,35 @@ const routePatterns = [
     routeMap.profileSettings
 ]
 
+const routesToFetch = routePatterns
+
 function Profile() {
     const {user} = useParams()
+    const location = useLocation()
+    const [data, setData] = useState(null)
+    const [loadingCount, setLoadingCount] = useState(0)
     const routes = routePatterns.map(item => item.replace(":user", user))
+
+    useEffect(() => {
+        const fullPath = location.pathname + location.search
+        if (findRouteIndex(routesToFetch, location.pathname) !== -1) {
+            updatePageData(fullPath, setData, setLoadingCount)
+        }
+    }, [location]);
+
+    let pageContent =  <PageLoadingAnimation />
+    if (loadingCount === 0 && data) {
+        pageContent = <Outlet data={data} />
+    }
 	return (
-        <div className="text-white">
-            <div className="w-full flex justify-center">
-                <div className="flex justify-center w-full max-w-7xl">
-                    <div className="w-full px-4">
-                        <TabFrame routes={routes} routePatterns={routePatterns} routeLabels={routeLabels}>
-                            <div className="w-full">
-                                <Outlet />
-                            </div>
-                        </TabFrame>
-                    </div>
+        <div className="flex justify-center">
+            <div className="w-full max-w-7xl">
+                <div className="w-full px-4">
+                    <TabFrame routes={routes} routePatterns={routePatterns} routeLabels={routeLabels}>
+                        <div className="w-full">
+                            {pageContent}
+                        </div>
+                    </TabFrame>
                 </div>
             </div>
         </div>

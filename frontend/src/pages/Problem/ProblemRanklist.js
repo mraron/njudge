@@ -3,7 +3,7 @@ import SVGTitleComponent from '../../svg/SVGTitleComponent';
 import { SVGResults } from "../../svg/SVGs";
 import Pagination from "../../components/Pagination";
 
-function ProblemRankings() {
+function ProblemRanklist() {
     const titleComponent = <SVGTitleComponent svg={<SVGResults />} title="Eredmények" />
     const data = [
         ["dbence", "50 / 50", "5669"],
@@ -23,4 +23,4 @@ function ProblemRankings() {
     )
 }
 
-export default ProblemRankings;
+export default ProblemRanklist;

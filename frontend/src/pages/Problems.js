@@ -8,9 +8,10 @@ import {matchPath} from "react-router-dom";
 import {routeMap} from "../config/RouteConfig";
 
 function Problems({ data }) {
-    if (!data || !matchPath(routeMap.problems, data.route)) {
+    if (!data || data.processed) {
         return <></>
     }
+    data.processed = true
     return (
         <div className="relative w-full flex justify-center">
             <div className="flex justify-center w-full max-w-7xl">

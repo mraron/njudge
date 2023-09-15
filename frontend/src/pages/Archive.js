@@ -4,9 +4,10 @@ import {matchPath} from "react-router-dom";
 import {routeMap} from "../config/RouteConfig";
 
 function Archive({ data }) {
-    if (!data || !matchPath(routeMap.archive, data.route)) {
+    if (!data || data.processed) {
         return <></>
     }
+    data.processed = true
     const categoriesContent = data.categories.map((item, index) =>
         <div className="mb-3" key={index}>
             <DropdownListFrame title={item.title} tree={{"children": item.children}} />
