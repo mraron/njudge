@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 import Checkbox from "../../components/Checkbox";
 import RoundedFrame from "../../components/RoundedFrame";
 import TextBox from "../../components/TextBox"

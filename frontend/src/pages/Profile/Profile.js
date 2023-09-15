@@ -1,10 +1,10 @@
 import TabFrame from '../../components/TabFrame'
 import {Outlet, useLocation, useParams} from 'react-router-dom';
-import {routeMap} from "../../config/RouteConfig";
 import React, {useEffect, useState} from "react";
-import {findRouteIndex} from "../../util/RouteUtil";
 import {updatePageData} from "../../util/UpdatePageData";
 import PageLoadingAnimation from "../../components/PageLoadingAnimation";
+import FadeIn from "../../components/FadeIn";
+import {routeMap} from "../../config/RouteConfig";
 
 const routeLabels = [
     "Profil",
@@ -17,7 +17,9 @@ const routePatterns = [
     routeMap.profileSettings
 ]
 
-const routesToFetch = routePatterns
+const routesToFetch = [
+    routeMap.profileSubmissions
+]
 
 function Profile() {
     const {user} = useParams()
@@ -27,22 +29,25 @@ function Profile() {
     const routes = routePatterns.map(item => item.replace(":user", user))
 
     useEffect(() => {
-        const fullPath = location.pathname + location.search
-        if (findRouteIndex(routesToFetch, location.pathname) !== -1) {
-            updatePageData(fullPath, setData, setLoadingCount)
+        let isMounted = true
+        updatePageData(location, routesToFetch, setData, setLoadingCount, () => isMounted)
+
+        return () => {
+            isMounted = false
         }
     }, [location]);
 
-    let pageContent =  <PageLoadingAnimation />
-    if (loadingCount === 0 && data) {
-        pageContent = <Outlet data={data} />
+    let pageContent = null
+    if (loadingCount === 0) {
+        pageContent = <FadeIn><Outlet context={data} /></FadeIn>
     }
 	return (
         <div className="flex justify-center">
             <div className="w-full max-w-7xl">
                 <div className="w-full px-4">
                     <TabFrame routes={routes} routePatterns={routePatterns} routeLabels={routeLabels}>
-                        <div className="w-full">
+                        <div className="relative w-full">
+                            <PageLoadingAnimation isVisible={loadingCount !== 0} />
                             {pageContent}
                         </div>
                     </TabFrame>

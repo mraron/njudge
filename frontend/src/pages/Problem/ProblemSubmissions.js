@@ -2,11 +2,7 @@ import SubmissionsTable from "../../components/SubmissionsTable";
 import Checkbox from "../../components/Checkbox"
 import RoundedFrame from "../../components/RoundedFrame";
 import Pagination from "../../components/Pagination";
-import {matchPath, useLocation, useParams} from "react-router-dom";
-import {useEffect, useState} from "react";
-import PageLoadingAnimation from "../../components/PageLoadingAnimation";
-import ProfileSideBar from "../../components/ProfileSidebar";
-import {updatePageData} from "../../util/UpdatePageData";
+import {matchPath} from "react-router-dom";
 import {routeMap} from "../../config/RouteConfig";
 
 function SubmissionFilterFrame() {

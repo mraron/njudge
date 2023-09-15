@@ -39,20 +39,22 @@ function RoutingComponent() {
     const location = useLocation()
     const [data, setData] = useState(null)
     const [loadingCount, setLoadingCount] = useState(0)
+    const abortController = new AbortController();
 
     useEffect(() => {
         let isMounted = true
-        updatePageData(location, routesToFetch, setData, setLoadingCount, () => isMounted)
+        updatePageData(location, routesToFetch, abortController, setData, setLoadingCount, () => isMounted)
 
         return () => {
             isMounted = false
+            abortController.abort()
         }
     }, [location]);
 
     let pageContent = null
-    if (loadingCount === 0) {
+    if (loadingCount === 0)
         pageContent =
-            <Routes>
+            <Routes location={location} key={location.pathname}>
                 <Route path={routeMap.main} element={<FadeIn>
                     <Main data={data} />
                 </FadeIn>}  />
@@ -113,14 +115,16 @@ function RoutingComponent() {
                     <NotFound />
                 </FadeIn>} />
             </Routes>
-    }
+
     return (
         <>
             <div className="pb-20">
                 <Menubar />
             </div>
-            <PageLoadingAnimation isVisible={loadingCount !== 0} />
-            {pageContent}
+            <div className="relative w-full">
+                <PageLoadingAnimation isVisible={loadingCount !== 0} />
+                {pageContent}
+            </div>
         </>
     )
 }

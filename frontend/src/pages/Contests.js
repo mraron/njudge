@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import ProfileSideBar from '../components/ProfileSidebar'
 import ContestList from '../components/ContestList'
 import '../index.css';

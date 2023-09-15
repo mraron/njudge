@@ -2,7 +2,6 @@ import TabFrame from '../../components/TabFrame'
 import {Outlet, useParams} from 'react-router-dom';
 import {routeMap} from "../../config/RouteConfig";
 
-
 const routeLabels = [
     "Leírás",
     "Beküld",
