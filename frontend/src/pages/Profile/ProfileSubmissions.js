@@ -1,12 +1,15 @@
 import Pagination from "../../components/Pagination";
 import SubmissionsTable from "../../components/SubmissionsTable";
-import {matchPath} from "react-router-dom";
+import {matchPath, useOutletContext} from "react-router-dom";
 import {routeMap} from "../../config/RouteConfig";
+import React from "react";
 
-function ProfileSubmissions({ data }) {
-    if (!data || !matchPath(routeMap.profileSubmissions, data.route)) {
+function ProfileSubmissions() {
+    const data = useOutletContext()
+    if (!data || data.processed) {
         return <></>
     }
+    data.processed = true
     return (
         <div className="relative">
             <div className="flex flex-col w-full">

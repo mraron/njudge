@@ -1,7 +1,7 @@
 import { ProfileData, ProfileFrame } from "../../components/ProfileSidebar";
 import TagListFrame from "../../components/TagListFrame";
 import SVGTitleComponent from "../../svg/SVGTitleComponent";
-import {SVGCorrect, SVGCorrectSimple, SVGWrong, SVGWrongSimple} from "../../svg/SVGs";
+import {SVGCorrectSimple, SVGWrongSimple} from "../../svg/SVGs";
 
 function ProfileMain() {
     const titleComponentCorrect = <SVGTitleComponent svg={<SVGCorrectSimple cls="w-6 h-6 text-green-500 mr-2" />} title="Megoldott feladatok" />

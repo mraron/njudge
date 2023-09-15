@@ -1,9 +1,9 @@
 import TabFrame from '../../components/TabFrame'
 import {Outlet, useLocation, useParams} from 'react-router-dom';
-import {routeMap} from "../../config/RouteConfig";
 import React, {useEffect, useState} from "react";
-import {findRouteIndex} from "../../util/RouteUtil";
 import {updatePageData} from "../../util/UpdatePageData";
+import FadeIn from "../../components/FadeIn";
+import {routeMap} from "../../config/RouteConfig";
 import PageLoadingAnimation from "../../components/PageLoadingAnimation";
 
 const routeLabels = [
@@ -16,7 +16,6 @@ const routePatterns = [
     routeMap.profileSubmissions,
     routeMap.profileSettings
 ]
-
 const routesToFetch = routePatterns
 
 function Profile() {
@@ -25,24 +24,29 @@ function Profile() {
     const [data, setData] = useState(null)
     const [loadingCount, setLoadingCount] = useState(0)
     const routes = routePatterns.map(item => item.replace(":user", user))
+    const abortController = new AbortController();
 
     useEffect(() => {
-        const fullPath = location.pathname + location.search
-        if (findRouteIndex(routesToFetch, location.pathname) !== -1) {
-            updatePageData(fullPath, setData, setLoadingCount)
+        let isMounted = true
+        updatePageData(location, routesToFetch, abortController, setData, setLoadingCount, () => isMounted)
+
+        return () => {
+            isMounted = false
+            abortController.abort()
         }
     }, [location]);
 
-    let pageContent =  <PageLoadingAnimation />
-    if (loadingCount === 0 && data) {
-        pageContent = <Outlet data={data} />
+    let pageContent = null
+    if (loadingCount === 0) {
+        pageContent = <FadeIn><Outlet context={data} /></FadeIn>
     }
 	return (
         <div className="flex justify-center">
             <div className="w-full max-w-7xl">
                 <div className="w-full px-4">
                     <TabFrame routes={routes} routePatterns={routePatterns} routeLabels={routeLabels}>
-                        <div className="w-full">
+                        <div className="relative w-full">
+                            <PageLoadingAnimation isVisible={loadingCount !== 0} />
                             {pageContent}
                         </div>
                     </TabFrame>
