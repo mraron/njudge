@@ -6,21 +6,21 @@ import { SVGAvatar } from '../svg/SVGs';
 import queryString from 'query-string';
 import {routeMap} from "../config/RouteConfig";
 
-function Problem({ problem }) {
-    const {id, title, category, tags, numSolved} = problem
+function Problem(data) {
+    const {problem, title, category, tags, solverCount} = data.problem
     const tagsContent = tags.map((item, index) =>
         <span className="tag" key={index}>{item}</span>
     );
     return (
         <tr className={"divide-x divide-default"}>
             <td className="padding-td-default">
-                {id}
+                {problem}
             </td>
             <td className="padding-td-default">
-                <Link className="link" to={routeMap.problem.replace(":problem", id)}>{title}</Link>
+                <Link className="link" to={routeMap.problem.replace(":problem", problem)}>{title}</Link>
             </td>
             <td className="padding-td-default">
-                <Link className="link" to={category.link}>{category.label}</Link>
+                <Link className="link" to={category.href}>{category.text}</Link>
             </td>
             <td className="padding-td-default">
                 <div className="flex flex-wrap">
@@ -28,9 +28,9 @@ function Problem({ problem }) {
                 </div>
             </td>
             <td className="padding-td-default">
-                <Link className="link flex items-center" to={`${routeMap.problemSubmissions.replace(":problem", id)}?ac=1`}>
+                <Link className="link flex items-center" to={`${routeMap.problemSubmissions.replace(":problem", problem)}?ac=1`}>
                     <SVGAvatar cls="w-4 h-4 mr-1" />
-                    <span>{numSolved}</span>
+                    <span>{solverCount}</span>
                 </Link>
             </td>
         </tr>
