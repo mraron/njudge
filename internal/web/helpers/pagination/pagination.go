@@ -8,10 +8,11 @@ import (
 )
 
 type Data struct {
-	Page      int    `query:"_page"`
-	PerPage   int    `query:"_perPage"`
-	SortDir   string `query:"_sortDir"`
-	SortField string `query:"_sortField"`
+	Page      int    `query:"_page" json:"page"`
+	PerPage   int    `query:"_perPage" json:"perPage"`
+	LastPage  int    `json:"lastPage"`
+	SortDir   string `query:"_sortDir" json:"sortDir"`
+	SortField string `query:"_sortField" json:"sortField"`
 }
 
 func Parse(c echo.Context) (*Data, error) {
@@ -53,7 +54,7 @@ func Links(page, perPage int, cnt int64, qu url.Values) ([]Link, error) {
 		pages[len(pages)-1].Url = "?" + qu.Encode()
 	}
 
-	if page > len(pages) {
+	if cnt > 0 && page >= len(pages)-1 {
 		return nil, errors.New("no such page")
 	}
 

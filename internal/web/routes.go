@@ -1,7 +1,6 @@
 package web
 
 import (
-	"net/http"
 	"strings"
 	"time"
 
@@ -34,16 +33,14 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	e.Use(user.SetUserMiddleware(s.DB))
 	e.Use(helpers.ClearTemporaryFlashes())
 
-	//e.GET("/", handlers.GetHome())
-	e.Static("/", "frontend/build")
+	e.GET("/", handlers.GetHome())
 
 	e.GET("/page/:page", handlers.GetPage(partials.NewCached(s.DB.DB, 30*time.Second)))
 
-	//e.Static("/static", "static")
+	e.Static("/static", "static")
 
 	e.GET("/submission/:id", handlers.GetSubmission(services.NewSQLSubmission(s.DB.DB))).Name = "getSubmission"
 	e.GET("/submission/rejudge/:id", handlers.RejudgeSubmission(services.NewSQLSubmission(s.DB.DB)), user.RequireLoginMiddleware()).Name = "rejudgeSubmission"
-	e.GET("/task_archive", taskarchive.Get(s.DB, s.ProblemStore))
 
 	ps := e.Group("/problemset", problemset.SetNameMiddleware())
 	ps.GET("/:name/", problemset.GetProblemList(s.DB, services.NewSQLProblemListService(s.DB.DB, s.ProblemStore, services.NewSQLProblem(s.DB.DB, s.ProblemStore)), services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
@@ -91,20 +88,16 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 
 	apiGroup := e.Group("/api")
 
-	v2 := apiGroup.Group("/v2")
-	v2.GET("/archive", func(c echo.Context) error {
-		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
+	{
+		v2 := apiGroup.Group("/v2")
+		v2.GET("/archive/", taskarchive.Get(s.DB, s.ProblemStore))
 
-		u := c.Get("user").(*models.User)
+		ps := v2.Group("/problemset", problemset.SetNameMiddleware())
+		ps.GET("/:name/", problemset.GetProblemList(s.DB, services.NewSQLProblemListService(s.DB.DB, s.ProblemStore, services.NewSQLProblem(s.DB.DB, s.ProblemStore)), services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
 
-		ta, err := taskarchive.MakeTaskArchive(c, tr, s.DB, s.ProblemStore, u)
-		if err != nil {
-			return err
-		}
-		return c.JSON(http.StatusOK, ta)
-	})
+	}
 
-	v1 := apiGroup.Group("/v1")
+	v1 := apiGroup.Group("/api/v1")
 
 	problemRelDataProvider := api.ProblemRelDataProvider{DB: s.DB.DB}
 	v1.GET("/problem_rels", api.GetList[models.ProblemRel](problemRelDataProvider))

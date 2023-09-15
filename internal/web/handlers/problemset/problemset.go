@@ -24,15 +24,20 @@ type CategoryFilterOption struct {
 	Selected bool
 }
 
-type StatProblem struct {
-	problem.Problem
-	problem.StatsData
+type ProblemsetRow struct {
+	ID           int                  `json:"id"`
+	Problem      string               `json:"problem"`
+	Title        string               `json:"title"`
+	Category     ui.Link              `json:"category"`
+	Tags         []string             `json:"tags"`
+	SolverCount  int                  `json:"solverCount"`
+	SolvedStatus problem.SolvedStatus `json:"solvedStatus"`
 }
 
 type ProblemList struct {
-	Pages        []pagination.Link
-	Problems     []StatProblem
-	SolverSorter ui.SortColumn
+	PaginationData pagination.Data `json:"paginationData"`
+	Problems       []ProblemsetRow `json:"problems"`
+	SolverSorter   ui.SortColumn
 
 	Filtered bool
 
@@ -72,14 +77,15 @@ func GetProblemList(DB *sqlx.DB, problemListService services.ProblemListService,
 			data.Order = "ASC"
 		}
 
+		paginationData := pagination.Data{
+			Page:      data.Page,
+			PerPage:   20,
+			SortDir:   data.Order,
+			SortField: data.By,
+		}
 		listRequest := services.ProblemListRequest{
-			Problemset: data.Problemset,
-			Pagination: pagination.Data{
-				Page:      data.Page,
-				PerPage:   20,
-				SortDir:   data.Order,
-				SortField: data.By,
-			},
+			Problemset:  data.Problemset,
+			Pagination:  paginationData,
 			TitleFilter: data.TitleFilter,
 			GETData:     c.Request().URL.Query(),
 		}
@@ -100,9 +106,11 @@ func GetProblemList(DB *sqlx.DB, problemListService services.ProblemListService,
 		if err != nil {
 			return err
 		}
+		paginationData.LastPage = len(problemList.Pages) - 2
 
 		result := ProblemList{
-			Pages: problemList.Pages,
+			PaginationData: paginationData,
+			Problems:       []ProblemsetRow{},
 		}
 		for ind := range problemList.Problems {
 			p, err := problemRepo.Get(c.Request().Context(), problemList.Problems[ind].ID)
@@ -114,9 +122,14 @@ func GetProblemList(DB *sqlx.DB, problemListService services.ProblemListService,
 				return err
 			}
 
-			result.Problems = append(result.Problems, StatProblem{
-				Problem:   *p,
-				StatsData: *stat,
+			result.Problems = append(result.Problems, ProblemsetRow{
+				ID:           p.ProblemRel.ID,
+				Problem:      p.ProblemRel.Problem,
+				Title:        tr.TranslateContent(p.Titles()).String(),
+				Category:     stat.CategoryLink,
+				Tags:         stat.Tags.ToStringSlice(),
+				SolverCount:  stat.SolverCount,
+				SolvedStatus: stat.SolvedStatus,
 			})
 		}
 
@@ -199,8 +212,7 @@ func GetProblemList(DB *sqlx.DB, problemListService services.ProblemListService,
 			return result.CategoryFilterOptions[i].Name < result.CategoryFilterOptions[j].Name
 		})
 
-		c.Set("title", tr.Translate("Problems"))
-		return c.Render(http.StatusOK, "problemset/list", result)
+		return c.JSON(http.StatusOK, result)
 	}
 }
 

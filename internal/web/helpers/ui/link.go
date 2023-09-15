@@ -9,8 +9,8 @@ import (
 )
 
 type Link struct {
-	Text string
-	Href string
+	Text string `json:"text"`
+	Href string `json:"href"`
 }
 
 func TopCategoryLink(ctx context.Context, db *sql.DB, categoryID int) (Link, error) {
@@ -18,8 +18,6 @@ func TopCategoryLink(ctx context.Context, db *sql.DB, categoryID int) (Link, err
 		category *models.ProblemCategory
 		err      error
 	)
-
-	orig := categoryID
 
 	for {
 		category, err = models.ProblemCategories(qm.Where("id = ?", categoryID)).One(ctx, db)
@@ -35,6 +33,6 @@ func TopCategoryLink(ctx context.Context, db *sql.DB, categoryID int) (Link, err
 
 	return Link{
 		Text: category.Name,
-		Href: "/task_archive#category" + strconv.Itoa(orig),
+		Href: "?category=" + strconv.Itoa(category.ID),
 	}, nil
 }

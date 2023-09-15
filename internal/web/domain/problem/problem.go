@@ -65,6 +65,6 @@ type StatsData struct {
 	LastLanguage string
 	CategoryLink ui.Link
 	CategoryID   int
-	Tags         []Tag
+	Tags         Tags
 	Submissions  []submission.Submission
 }

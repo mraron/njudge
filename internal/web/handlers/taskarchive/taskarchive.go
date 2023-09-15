@@ -122,12 +122,10 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 
 		u := c.Get("user").(*models.User)
 
-		taskArchive, err := MakeTaskArchive(c, tr, DB, problemStore, u)
-		if err != err {
+		ta, err := MakeTaskArchive(c, tr, DB, problemStore, u)
+		if err != nil {
 			return err
 		}
-
-		c.Set("title", tr.Translate("Archive"))
-		return c.Render(http.StatusOK, "task_archive.gohtml", taskArchive)
+		return c.JSON(http.StatusOK, ta)
 	}
 }
