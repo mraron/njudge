@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {SVGCheckmark} from "../svg/SVGs";
+import {SVGCheckmark} from "../../svg/SVGs";
 
 function Checkbox({id, label, initChecked, onChange}) {
     const [checked, setChecked] = useState(initChecked)

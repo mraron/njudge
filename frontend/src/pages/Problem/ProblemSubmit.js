@@ -1,6 +1,6 @@
 import Editor from '@monaco-editor/react';
-import RoundedFrame from "../../components/RoundedFrame";
-import DropdownMenu from "../../components/DropdownMenu";
+import RoundedFrame from "../../components/container/RoundedFrame";
+import DropdownMenu from "../../components/input/DropdownMenu";
 
 function SubmitControlsFrame() {
     return (

@@ -1,6 +1,6 @@
-import MapDataFrame from '../../components/MapDataFrame';
-import DropdownMenu from '../../components/DropdownMenu';
-import RoundedFrame from '../../components/RoundedFrame';
+import MapDataFrame from '../../components/container/MapDataFrame';
+import DropdownMenu from '../../components/input/DropdownMenu';
+import RoundedFrame from '../../components/container/RoundedFrame';
 import SVGTitleComponent from '../../svg/SVGTitleComponent';
 import {SVGAttachment, SVGAttachmentDescription, SVGAttachmentFile, SVGInformation, SVGSubmit} from '../../svg/SVGs';
 import {Link, useOutletContext} from "react-router-dom";

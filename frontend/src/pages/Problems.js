@@ -1,8 +1,8 @@
 import React from 'react';
-import {ProblemFilterFrame} from '../components/ProblemFilter';
-import ProblemsTable from '../components/ProblemsTable'
-import ProfileSideBar from '../components/ProfileSidebar'
-import Pagination from '../components/Pagination';
+import {ProblemFilterFrame} from '../components/concrete/other/ProblemFilter';
+import ProblemsTable from '../components/concrete/table/ProblemsTable'
+import ProfileSideBar from '../components/concrete/other/ProfileSidebar'
+import Pagination from '../components/util/Pagination';
 import '../index.css';
 import checkData from "../util/CheckData";
 

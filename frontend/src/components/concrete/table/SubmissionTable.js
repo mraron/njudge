@@ -1,5 +1,5 @@
-import RoundedTable from "./RoundedTable";
-import {SVGCorrectSimple, SVGSpinner, SVGWrongSimple} from "../svg/SVGs";
+import RoundedTable from "../../container/RoundedTable";
+import {SVGCorrectSimple, SVGSpinner, SVGWrongSimple} from "../../../svg/SVGs";
 
 function TestCase({index, numCases, testCase, group, isLastGroup, isLastCase}) {
     const bottomBorderCase = isLastGroup && isLastCase ? "border-b-0" : ""

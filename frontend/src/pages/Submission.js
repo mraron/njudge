@@ -1,5 +1,5 @@
-import SubmissionTable from "../components/SubmissionTable";
-import SubmissionsTable from "../components/SubmissionsTable";
+import SubmissionTable from "../components/concrete/table/SubmissionTable";
+import SubmissionsTable from "../components/concrete/table/SubmissionsTable";
 import Editor from "@monaco-editor/react";
 import checkData from "../util/CheckData";
 import {useOutletContext} from "react-router-dom";

@@ -1,10 +1,10 @@
-import TabFrame from '../../components/TabFrame'
+import TabFrame from '../../components/container/TabFrame'
 import {Outlet, useLocation, useParams} from 'react-router-dom';
 import React, {useEffect, useState} from "react";
 import {updatePageData} from "../../util/UpdatePageData";
-import FadeIn from "../../components/FadeIn";
+import FadeIn from "../../components/util/FadeIn";
 import {routeMap} from "../../config/RouteConfig";
-import PageLoadingAnimation from "../../components/PageLoadingAnimation";
+import PageLoadingAnimation from "../../components/util/PageLoadingAnimation";
 
 const routeLabels = [
     "Profil",

@@ -1,9 +1,9 @@
 import React from 'react';
-import MapDataFrame from './MapDataFrame';
-import {SVGRecent, SVGStatistics} from '../svg/SVGs';
-import SVGTitleComponent from '../svg/SVGTitleComponent';
-import RoundedTable from './RoundedTable';
-import {routeMap} from "../config/RouteConfig";
+import MapDataFrame from '../../container/MapDataFrame';
+import {SVGRecent, SVGStatistics} from '../../../svg/SVGs';
+import SVGTitleComponent from '../../../svg/SVGTitleComponent';
+import RoundedTable from '../../container/RoundedTable';
+import {routeMap} from "../../../config/RouteConfig";
 import {Link} from "react-router-dom";
 
 function ProfilePicture({src}) {

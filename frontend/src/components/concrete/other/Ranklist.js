@@ -1,6 +1,6 @@
-import RoundedTable from './RoundedTable'
-import {SVGCorrectSimple, SVGWrongSimple} from "../svg/SVGs";
-import {routeMap} from "../config/RouteConfig";
+import RoundedTable from '../../container/RoundedTable'
+import {SVGCorrectSimple, SVGWrongSimple} from "../../../svg/SVGs";
+import {routeMap} from "../../../config/RouteConfig";
 import {Link} from "react-router-dom";
 
 function RanklistRow({result, maxScore}) {

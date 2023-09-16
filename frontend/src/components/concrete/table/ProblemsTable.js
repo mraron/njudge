@@ -1,7 +1,7 @@
-import RoundedTable from './RoundedTable';
+import RoundedTable from '../../container/RoundedTable';
 import {Link} from 'react-router-dom';
-import {SVGAvatar} from '../svg/SVGs';
-import {routeMap} from "../config/RouteConfig";
+import {SVGAvatar} from '../../../svg/SVGs';
+import {routeMap} from "../../../config/RouteConfig";
 
 function Problem(data) {
     const {problem, title, category, tags, solverCount} = data.problem

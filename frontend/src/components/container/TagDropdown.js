@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import TextBoxDropdown from './TextBoxDropdown';
-import {SVGClose} from '../svg/SVGs';
+import TextBoxDropdown from '../input/TextBoxDropdown';
+import {SVGClose} from '../../svg/SVGs';
 
 function Tag({title, onClick}) {
     const [hovered, setHovered] = useState(false);

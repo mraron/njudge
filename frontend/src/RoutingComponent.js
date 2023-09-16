@@ -1,6 +1,6 @@
 import {Route, Routes, useLocation} from "react-router-dom";
 import React, {useEffect, useState} from "react";
-import Menubar from "./components/Menubar";
+import Menubar from "./components/concrete/other/Menubar";
 import Main from "./pages/Main";
 import Contests from "./pages/Contests";
 import Info from "./pages/Info";
@@ -20,9 +20,9 @@ import ProblemRanklist from "./pages/Problem/ProblemRanklist";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import NotFound from "./pages/Error/NotFound";
-import PageLoadingAnimation from "./components/PageLoadingAnimation";
+import PageLoadingAnimation from "./components/util/PageLoadingAnimation";
 import {updatePageData} from "./util/UpdatePageData";
-import FadeIn from "./components/FadeIn";
+import FadeIn from "./components/util/FadeIn";
 import {routeMap} from "./config/RouteConfig";
 
 const routesToFetch = [

@@ -1,4 +1,4 @@
-import RoundedFrame from "../../components/RoundedFrame";
+import RoundedFrame from "../../components/container/RoundedFrame";
 import {Link} from "react-router-dom";
 import {SVGNotFound} from "../../svg/SVGs";
 

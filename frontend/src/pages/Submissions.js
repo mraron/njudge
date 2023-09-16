@@ -1,6 +1,6 @@
-import Pagination from '../components/Pagination';
-import ProfileSideBar from '../components/ProfileSidebar'
-import SubmissionsTable from '../components/SubmissionsTable';
+import Pagination from '../components/util/Pagination';
+import ProfileSideBar from '../components/concrete/other/ProfileSidebar'
+import SubmissionsTable from '../components/concrete/table/SubmissionsTable';
 import React from "react";
 import checkData from "../util/CheckData";
 

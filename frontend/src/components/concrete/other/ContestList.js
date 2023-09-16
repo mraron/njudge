@@ -1,4 +1,4 @@
-import RoundedFrame from './RoundedFrame'
+import RoundedFrame from '../../container/RoundedFrame'
 
 function ContestFrame({name, date, active}) {
     const buttons = [

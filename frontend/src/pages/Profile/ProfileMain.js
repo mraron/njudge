@@ -1,5 +1,5 @@
-import {ProfileDataFrame, ProfilePictureFrame} from "../../components/ProfileSidebar";
-import TagListFrame from "../../components/TagListFrame";
+import {ProfileDataFrame, ProfilePictureFrame} from "../../components/concrete/other/ProfileSidebar";
+import TagListFrame from "../../components/container/TagListFrame";
 import SVGTitleComponent from "../../svg/SVGTitleComponent";
 import {SVGCorrectSimple, SVGWrongSimple} from "../../svg/SVGs";
 import {useOutletContext} from "react-router-dom";

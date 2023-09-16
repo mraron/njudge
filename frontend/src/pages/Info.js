@@ -1,7 +1,7 @@
-import ProfileSideBar from '../components/ProfileSidebar'
+import ProfileSideBar from '../components/concrete/other/ProfileSidebar'
 import {SVGCode, SVGCopy} from "../svg/SVGs";
 import SVGTitleComponent from "../svg/SVGTitleComponent";
-import RoundedTable from "../components/RoundedTable";
+import RoundedTable from "../components/container/RoundedTable";
 import React from "react";
 import checkData from "../util/CheckData";
 

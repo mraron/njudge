@@ -1,5 +1,5 @@
-import ProfileSideBar from '../components/ProfileSidebar'
-import DropdownListFrame from '../components/DropdownListFrame'
+import ProfileSideBar from '../components/concrete/other/ProfileSidebar'
+import DropdownListFrame from '../components/container/DropdownListFrame'
 import React from "react";
 import checkData from "../util/CheckData";
 

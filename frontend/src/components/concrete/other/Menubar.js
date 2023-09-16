@@ -1,9 +1,9 @@
 import {Link, useLocation} from 'react-router-dom';
 import {useEffect, useRef, useState} from 'react';
-import {DropdownRoutes} from './DropdownMenu';
-import {SVGClose, SVGDropdownMenuArrow, SVGHamburger} from '../svg/SVGs';
-import {findRouteIndex} from '../util/FindRouteIndex';
-import {routeMap} from "../config/RouteConfig";
+import {DropdownRoutes} from '../../input/DropdownMenu';
+import {SVGClose, SVGDropdownMenuArrow, SVGHamburger} from '../../../svg/SVGs';
+import {findRouteIndex} from '../../../util/FindRouteIndex';
+import {routeMap} from "../../../config/RouteConfig";
 
 const menuRoutes = [
     routeMap.main,

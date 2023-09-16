@@ -1,5 +1,5 @@
 import {useState} from "react"
-import {DropdownListArrow} from "../svg/SVGs";
+import {DropdownListArrow} from "../../svg/SVGs";
 import {Link} from "react-router-dom";
 
 function DropdownList({tree}) {

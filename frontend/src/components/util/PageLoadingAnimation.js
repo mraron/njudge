@@ -1,4 +1,4 @@
-import {SVGSpinner} from "../svg/SVGs";
+import {SVGSpinner} from "../../svg/SVGs";
 import {AnimatePresence, motion} from "framer-motion";
 
 function PageLoadingAnimation({isVisible}) {

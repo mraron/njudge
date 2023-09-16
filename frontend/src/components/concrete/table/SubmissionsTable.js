@@ -1,7 +1,7 @@
-import RoundedTable from './RoundedTable';
-import {SVGCorrectSimple, SVGSpinner, SVGWrongSimple} from "../svg/SVGs";
+import RoundedTable from '../../container/RoundedTable';
+import {SVGCorrectSimple, SVGSpinner, SVGWrongSimple} from "../../../svg/SVGs";
 import {Link} from "react-router-dom";
-import {routeMap} from "../config/RouteConfig"
+import {routeMap} from "../../../config/RouteConfig"
 
 function Submission({submission}) {
     const {id, date, user, problem, lang, verdict, verdictType, time, memory} = submission

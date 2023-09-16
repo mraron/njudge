@@ -1,7 +1,7 @@
-import SubmissionsTable from "../../components/SubmissionsTable";
-import Checkbox from "../../components/Checkbox"
-import RoundedFrame from "../../components/RoundedFrame";
-import Pagination from "../../components/Pagination";
+import SubmissionsTable from "../../components/concrete/table/SubmissionsTable";
+import Checkbox from "../../components/input/Checkbox"
+import RoundedFrame from "../../components/container/RoundedFrame";
+import Pagination from "../../components/util/Pagination";
 import {useLocation, useNavigate, useOutletContext} from "react-router-dom";
 import checkData from "../../util/CheckData";
 import UpdateQueryString from "../../util/UpdateQueryString";

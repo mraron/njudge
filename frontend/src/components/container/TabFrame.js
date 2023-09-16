@@ -1,6 +1,6 @@
 import {Link, useLocation} from 'react-router-dom';
-import {DropdownRoutes} from './DropdownMenu';
-import {findRouteIndex} from '../util/FindRouteIndex';
+import {DropdownRoutes} from '../input/DropdownMenu';
+import {findRouteIndex} from '../../util/FindRouteIndex';
 
 function Tab({isSelected, label, route}) {
     return (

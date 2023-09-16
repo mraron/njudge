@@ -1,7 +1,7 @@
 import {useState} from "react";
-import Checkbox from "../../components/Checkbox";
-import RoundedFrame from "../../components/RoundedFrame";
-import TextBox from "../../components/TextBox"
+import Checkbox from "../../components/input/Checkbox";
+import RoundedFrame from "../../components/container/RoundedFrame";
+import TextBox from "../../components/input/TextBox"
 import {SVGLock, SVGSettings} from "../../svg/SVGs";
 import SVGTitleComponent from "../../svg/SVGTitleComponent";
 

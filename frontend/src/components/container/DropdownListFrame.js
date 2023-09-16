@@ -1,4 +1,4 @@
-import DropdownList from "./DropdownList";
+import DropdownList from "../util/DropdownList";
 import RoundedFrame from "./RoundedFrame";
 
 function DropdownListFrame({title, tree}) {

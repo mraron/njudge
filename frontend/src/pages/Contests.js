@@ -1,6 +1,6 @@
 import React from 'react';
-import ProfileSideBar from '../components/ProfileSidebar'
-import ContestList from '../components/ContestList'
+import ProfileSideBar from '../components/concrete/other/ProfileSidebar'
+import ContestList from '../components/concrete/other/ContestList'
 import '../index.css';
 import checkData from "../util/CheckData";
 

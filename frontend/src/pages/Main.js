@@ -1,6 +1,6 @@
 import React from 'react';
-import ProfileSideBar from '../components/ProfileSidebar'
-import PostFrame from '../components/PostFrame'
+import ProfileSideBar from '../components/concrete/other/ProfileSidebar'
+import PostFrame from '../components/container/PostFrame'
 import {SVGSpinner} from '../svg/SVGs';
 import '../index.css';
 import checkData from "../util/CheckData";

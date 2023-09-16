@@ -1,5 +1,5 @@
-import RoundedFrame from '../../components/RoundedFrame';
-import TextBox from '../../components/TextBox';
+import RoundedFrame from '../../components/container/RoundedFrame';
+import TextBox from '../../components/input/TextBox';
 import {SVGAvatar} from '../../svg/SVGs';
 import SVGTitleComponent from '../../svg/SVGTitleComponent';
 

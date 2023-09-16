@@ -1,7 +1,7 @@
-import Ranklist from "../../components/Ranklist";
+import Ranklist from "../../components/concrete/other/Ranklist";
 import SVGTitleComponent from '../../svg/SVGTitleComponent';
 import {SVGResults} from "../../svg/SVGs";
-import Pagination from "../../components/Pagination";
+import Pagination from "../../components/util/Pagination";
 import {useOutletContext} from "react-router-dom";
 import checkData from "../../util/CheckData";
 

@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
-import TextBox from './TextBox';
-import TextBoxDropdown from './TextBoxDropdown';
-import TagDropdown from './TagDropdown';
+import TextBox from '../../input/TextBox';
+import TextBoxDropdown from '../../input/TextBoxDropdown';
+import TagDropdown from '../../container/TagDropdown';
 import {useLocation, useNavigate} from 'react-router-dom';
-import DropdownFrame from "./DropdownFrame";
+import DropdownFrame from "../../container/DropdownFrame";
 import queryString from "query-string";
 
 function ProblemFilter() {
