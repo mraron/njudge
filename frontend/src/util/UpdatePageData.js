@@ -1,4 +1,4 @@
-import {findRouteIndex} from "./RouteUtil";
+import {findRouteIndex} from "./FindRouteIndex";
 
 export async function updatePageData(location, routesToFetch, abortController, setData, setLoadingCount, isMounted) {
     const fullPath = location.pathname + location.search

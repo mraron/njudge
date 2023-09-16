@@ -14,7 +14,7 @@ function Submission({submission}) {
                 {date}
             </td>
             <td className="padding-td-default">
-                <Link className="link" to={routeMap.submission.replace(":user", submission.user)}>{user}</Link>
+                <Link className="link" to={routeMap.profile.replace(":user", submission.user)}>{user}</Link>
             </td>
             <td className="padding-td-default">
                 <Link className="link" to={problem.link}>{problem.label}</Link>
