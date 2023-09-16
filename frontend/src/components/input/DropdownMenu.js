@@ -62,7 +62,7 @@ function DropdownMenu({initSelected, itemNames, button: Button, onChange}) {
         <div className="relative w-full" ref={dropdownRef}>
             <Button label={itemNames[selected === -1 ? 0 : selected]} isOpen={isOpen} onClick={() => setOpen(!isOpen)}/>
             <div
-                className={`z-10 absolute overflow-hidden top-12 inset-x-0 ${isOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'} transition-all duration-150`}>
+                className={`z-10 absolute overflow-hidden top-12 inset-x-0 ${isOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'} transition-all duration-[250ms]`}>
                 <div className={`rounded-md max-h-60 overflow-y-auto border-default border-1`}>
                     <ul className={`divide-y divide-default bg-grey-875 rounded-md`}>
                         {items}

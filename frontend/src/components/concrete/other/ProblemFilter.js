@@ -26,7 +26,7 @@ function ProblemFilter() {
         const qString = queryString.stringify({
             title: title,
             tags: tags.join(","),
-            category: category
+            category: category[0]
         })
         navigate(`${location.pathname}?${qString}`);
     };

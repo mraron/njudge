@@ -1,23 +1,35 @@
 import ProfileSideBar from '../components/concrete/other/ProfileSidebar'
-import {SVGCheckmark, SVGCode, SVGCopy, SVGCorrect, SVGCorrectSimple} from "../svg/SVGs";
+import {SVGCode, SVGCopy, SVGCorrectSimple} from "../svg/SVGs";
 import SVGTitleComponent from "../svg/SVGTitleComponent";
 import RoundedTable from "../components/container/RoundedTable";
 import checkData from "../util/CheckData";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 
 function CopyButton({ command }) {
     const [isCopied, setCopied] = useState(false)
+    const [isMouseOver, setMouseOver] = useState(false)
+
+    useEffect(() => {
+        if (isMouseOver) {
+            setCopied(true)
+        }
+    }, [isCopied])
     const handleClick = () => {
         navigator.clipboard.writeText(command)
         setCopied(true)
-        setTimeout(() => setCopied(false), 5000)
+    }
+    const handleMouseLeave = () => {
+        setTimeout(() => {
+            setCopied(false)
+        }, 5000)
+        setMouseOver(false)
     }
     return (
         <button
             className="h-9 w-9 mr-2 rounded-md border-1 bg-grey-800 border-grey-725 hover:bg-grey-775 transition duration-200 relative"
-            onClick={handleClick}>
+            onClick={handleClick} onMouseLeave={handleMouseLeave} onMouseOver={() => setMouseOver(true)}>
             <SVGCopy cls={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 ${isCopied? "opacity-0": "opacity-100"} transition duration-[300ms]`} />
-            <SVGCorrectSimple cls={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-5 h-5 text-indigo-500 ${isCopied ? "opacity-100" : "opacity-0"} transition duration-[360ms]`} />
+            <SVGCorrectSimple cls={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-5 h-5 text-indigo-500 ${isCopied? "opacity-100" : "opacity-0"} transition duration-[360ms]`} />
         </button>
     )
 }

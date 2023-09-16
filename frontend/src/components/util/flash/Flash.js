@@ -26,8 +26,8 @@ function FlashContainer() {
 
     const pushMessage = (message, type) => {
         setMessages(prevMessages => [...prevMessages,
-            <motion.div key={prevMessages.length} initial={{scaleX: 0.2, opacity: 0.2}} animate={{scaleX: 1, opacity: 1, transition: {duration: 0.2}}}
-                        exit={{scaleX: 0.2, opacity: 0.2, transition: {duration: 0.2}}}>
+            <motion.div key={prevMessages.length} initial={{scaleX: 0.5, opacity: 0.2}} animate={{scaleX: 1, opacity: 1, transition: {duration: 0.2}}}
+                        exit={{scaleX: 0.5, opacity: 0.2, transition: {duration: 0.2}}}>
                 <FlashMessage message={message} type={type} onClose={popMessage} />
             </motion.div>
         ])
