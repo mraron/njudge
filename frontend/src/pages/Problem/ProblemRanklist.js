@@ -1,24 +1,22 @@
-import Rankings from "../../components/Rankings";
+import Ranklist from "../../components/Ranklist";
 import SVGTitleComponent from '../../svg/SVGTitleComponent';
 import {SVGResults} from "../../svg/SVGs";
 import Pagination from "../../components/Pagination";
+import {useOutletContext} from "react-router-dom";
+import checkData from "../../util/CheckData";
 
 function ProblemRanklist() {
+    const data = useOutletContext()
+    if (!checkData(data)) {
+        return
+    }
     const titleComponent = <SVGTitleComponent svg={<SVGResults/>} title="Eredmények"/>
-    const data = [
-        ["dbence", "50 / 50", "5669"],
-        ["dbence", "50 / 50", "5669"],
-        ["vpeti", "48 / 50", "5669"],
-        ["vpeti", "48 / 50", "5669"],
-        ["gonterarmin", "2 / 50", "5669"],
-        ["gonterarmin", "2 / 50", "5669"],
-    ]
     return (
         <div>
             <div className="mb-2">
-                <Rankings data={data} titleComponent={titleComponent}/>
+                <Ranklist ranklist={data.ranklist} titleComponent={titleComponent}/>
             </div>
-            <Pagination paginationData={{currentPage: 1, lastPage: 200}}/>
+            <Pagination paginationData={data.paginationData}/>
         </div>
     )
 }

@@ -296,11 +296,11 @@ export function SVGLeftArrow({cls}) {
     )
 }
 
-export function SVGDoubleLeftArrow({cls}) {
+export function SVGDoubleRightArrow({cls}) {
     return (
-        <svg className={`${cls} fill-current`} viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg">
-            <path className="fill-current"
-                  d="M 11 3.2910156 L 10.646484 3.6464844 L 4.2910156 10 L 10.646484 16.353516 L 11 16.708984 L 11.708984 16 L 11.353516 15.646484 L 5.7089844 10 L 11.353516 4.3535156 L 11.708984 4 L 11 3.2910156 z M 15 3.2910156 L 14.646484 3.6464844 L 8.2910156 10 L 14.646484 16.353516 L 15 16.708984 L 15.708984 16 L 15.353516 15.646484 L 9.7089844 10 L 15.353516 4.3535156 L 15.708984 4 L 15 3.2910156 z "/>
+        <svg className={`${cls}`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path className="fill-current" fillRule="evenodd" clipRule="evenodd" d="M12.293 7.293a1 1 0 0 1 1.414 0l4 4a1 1 0 0 1 0 1.414l-4 4a1 1 0 0 1-1.414-1.414L15.586 12l-3.293-3.293a1 1 0 0 1 0-1.414Z" fill="#000000"/>
+            <path className="fill-current" fillRule="evenodd" clipRule="evenodd" d="M6.293 7.293a1 1 0 0 1 1.414 0l4 4a1 1 0 0 1 0 1.414l-4 4a1 1 0 0 1-1.414-1.414L9.586 12 6.293 8.707a1 1 0 0 1 0-1.414Z" fill="#000000"/>
         </svg>
     )
 }

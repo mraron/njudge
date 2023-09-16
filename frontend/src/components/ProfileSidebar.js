@@ -51,7 +51,7 @@ function SubmissionsFrame({titleComponent, submissions}) {
                 <Link className="link" to={routeMap.submission.replace(":id", item.id)}>{item.id}</Link>
             </td>
             <td className="padding-td-default">
-                {item.date}
+                <Link className="link" to={routeMap.problem.replace(":problem", item.problem)}>{item.problem}</Link>
             </td>
         </tr>
     )

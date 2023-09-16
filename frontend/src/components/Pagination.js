@@ -1,4 +1,4 @@
-import {SVGDoubleLeftArrow} from "../svg/SVGs"
+import {SVGDoubleRightArrow} from "../svg/SVGs"
 import RoundedFrame from "./RoundedFrame"
 import {useLocation, useNavigate} from "react-router-dom";
 import queryString from "query-string";
@@ -20,7 +20,7 @@ function Pagination({paginationData}) {
         <RoundedFrame>
             <div className="flex justify-center p-3 overflow-x-auto">
                 <button className={`${cls} border-r-0 rounded-l-md`} onClick={() => setPage(1)}>
-                    <SVGDoubleLeftArrow cls="w-4 h-4"/>
+                    <SVGDoubleRightArrow cls="w-[1.32rem] h-[1.32rem] rotate-180"/>
                 </button>
                 {currentPage >= 3 && <button className={`${cls} hidden lg:block border-r-0`}
                                              onClick={() => setPage(currentPage - 2)}>{currentPage - 2}</button>}
@@ -33,7 +33,7 @@ function Pagination({paginationData}) {
                 {currentPage <= lastPage - 2 && <button className={`${cls} hidden lg:block border-l-0`}
                                                         onClick={() => setPage(currentPage + 2)}>{currentPage + 2}</button>}
                 <button className={`${cls} border-l-0 rounded-r-md`} onClick={() => setPage(lastPage)}>
-                    <SVGDoubleLeftArrow cls="w-4 h-4 rotate-180"/>
+                    <SVGDoubleRightArrow cls="w-[1.32rem] h-[1.32rem] rotate-0"/>
                 </button>
             </div>
         </RoundedFrame>

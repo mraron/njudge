@@ -62,8 +62,8 @@ function TestGroup({group, isLast}) {
     )
 }
 
-function SubmissionTable({submission}) {
-    const testSet = submission["testSets"][0]
+function SubmissionTable({status}) {
+    const testSet = status["testSets"][0]
     const groups = testSet["groups"]
     const groupContents = groups.map((group, index) =>
         <TestGroup group={group} isLast={index === groups.length - 1} key={index}/>

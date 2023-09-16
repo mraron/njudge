@@ -5,9 +5,9 @@ import DropdownMenu from "../../components/DropdownMenu";
 function SubmitControlsFrame() {
     return (
         <RoundedFrame>
-            <div className="px-8 py-6 flex">
+            <div className="px-4 py-3 sm:px-6 sm:py-5 flex">
                 <DropdownMenu itemNames={["C++ 11", "C++ 14", "C++ 17", "Go", "Java", "Python 3"]}/>
-                <button className="ml-2 btn-indigo">Beküldés</button>
+                <button className="ml-3 btn-indigo">Beküldés</button>
             </div>
         </RoundedFrame>
     )

@@ -2,7 +2,7 @@ import {useState} from "react";
 import Checkbox from "../../components/Checkbox";
 import RoundedFrame from "../../components/RoundedFrame";
 import TextBox from "../../components/TextBox"
-import {SVGSettings} from "../../svg/SVGs";
+import {SVGLock, SVGSettings} from "../../svg/SVGs";
 import SVGTitleComponent from "../../svg/SVGTitleComponent";
 
 function PasswordChangeFrame() {
@@ -12,7 +12,7 @@ function PasswordChangeFrame() {
     const handleChangeOldPw = (newText) => setOldPw(newText);
     const handleChangeNewPw = (newText) => setNewPw(newText);
     const handleChangeNewPwConfirm = (newText) => setNewPwConfirm(newText);
-    const titleComponent = <SVGTitleComponent svg={<SVGSettings cls="w-5 h-5 mr-2"/>} title="Jelszóváltoztatás"/>
+    const titleComponent = <SVGTitleComponent svg={<SVGLock cls="w-5 h-5 mr-2"/>} title="Jelszóváltoztatás"/>
 
     return (
         <RoundedFrame titleComponent={titleComponent}>

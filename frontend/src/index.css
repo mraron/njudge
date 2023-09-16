@@ -50,7 +50,7 @@
 }
 
 .link {
-    @apply text-indigo-200 cursor-pointer underline hover:text-indigo-100 transition duration-200
+    @apply text-indigo-200 cursor-pointer underline underline-offset-2 hover:text-white transition duration-200
 }
 
 html {
