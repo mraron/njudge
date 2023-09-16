@@ -14,6 +14,7 @@ function TextBoxDropdown({id, label, itemNames, fillSelected, initText, initSele
     const [focused, setFocused] = useState(false);
     const [selected, setSelected] = useState(initSelected || -1);
     const [text, setText] = useState(initText || "");
+
     useEffect(() => {
         if (onChange) onChange(selected, text)
     }, [selected, text]);

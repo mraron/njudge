@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import TextBoxDropdown from '../input/TextBoxDropdown';
+import TextBoxDropdown from './TextBoxDropdown';
 import {SVGClose} from '../../svg/SVGs';
 
 function Tag({title, onClick}) {
@@ -14,34 +14,34 @@ function Tag({title, onClick}) {
             {title}
             <span className={`ml-3 rounded-full p-1 hover:bg-red-800 transition-all duration-200`}
                   onMouseOver={() => setHovered(true)} onMouseLeave={() => setHovered(false)} onClick={handleClick}>
-                <SVGClose size={"h-2 w-2"}/>
+                <SVGClose cls="h-2 w-2"/>
             </span>
         </span>
     );
 }
 
 function TagDropdown({id, label, itemNames, initTags, onChange}) {
-    const [tagTitles, setTagTitles] = useState(initTags || []);
-    useEffect(() => onChange(tagTitles), [onChange, tagTitles]);
+    const [tags, setTags] = useState(initTags || []);
+    useEffect(() => onChange(tags), [onChange, tags]);
 
-    const tags = tagTitles.map((title, index) => {
+    const tagsContent = tags.map((title, index) => {
         const handleRemoveTag = () => {
-            setTagTitles(prevTitles => prevTitles.filter(tagTitle => tagTitle !== title));
+            setTags(prevTitles => prevTitles.filter(tagTitle => tagTitle !== title));
         };
         return (
             <Tag title={title} onClick={handleRemoveTag} key={index}/>
         );
     });
     const handleAddTag = (selected, title) => {
-        setTagTitles(prevTitles => prevTitles.includes(title) ? prevTitles : prevTitles.concat([title]));
+        setTags(prevTitles => prevTitles.includes(title) ? prevTitles : [...prevTitles, title]);
     };
     return (
         <div>
             <TextBoxDropdown id={id} label={label}
-                             itemNames={itemNames.filter(itemName => !tagTitles.includes(itemName))}
+                             itemNames={itemNames.filter(itemName => !tags.includes(itemName))}
                              onClick={handleAddTag}/>
-            <div className={`${tags.length > 0 ? "mt-2" : ""} flex flex-wrap`}>
-                {tags}
+            <div className={`${tagsContent.length > 0 ? "mt-2" : ""} flex flex-wrap`}>
+                {tagsContent}
             </div>
         </div>
     )

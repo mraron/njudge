@@ -18,12 +18,10 @@ export function SVGAttachmentDescription() {
     )
 }
 
-export function SVGInformation() {
+export function SVGInformation({ cls }) {
     return (
-        <svg className="w-6 h-6 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path className="fill-white" clipRule="evenodd"
-                  d="m12 3.75c-4.55635 0-8.25 3.69365-8.25 8.25 0 4.5563 3.69365 8.25 8.25 8.25 4.5563 0 8.25-3.6937 8.25-8.25 0-4.55635-3.6937-8.25-8.25-8.25zm-9.75 8.25c0-5.38478 4.36522-9.75 9.75-9.75 5.3848 0 9.75 4.36522 9.75 9.75 0 5.3848-4.3652 9.75-9.75 9.75-5.38478 0-9.75-4.3652-9.75-9.75zm9.75-.75c.4142 0 .75.3358.75.75v3.5c0 .4142-.3358.75-.75.75s-.75-.3358-.75-.75v-3.5c0-.4142.3358-.75.75-.75zm0-3.25c-.5523 0-1 .44772-1 1s.4477 1 1 1h.01c.5523 0 1-.44772 1-1s-.4477-1-1-1z"
-                  fill="#000000" fillRule="evenodd"/>
+        <svg className={`${cls}`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path className="stroke-current" d="M12 11V16M12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21ZM12.0498 8V8.1L11.9502 8.1002V8H12.0498Z" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
     )
 }
@@ -106,9 +104,9 @@ export function SVGHamburger() {
     )
 }
 
-export function SVGClose({size}) {
+export function SVGClose({ cls }) {
     return (
-        <svg style={{pointerEvents: "none"}} fill="#000000" className={`${size} fill-white`} version="1.1"
+        <svg style={{pointerEvents: "none"}} fill="#000000" className={`${cls} fill-current`} version="1.1"
              xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 460.775 460.775"
              xmlSpace="preserve">
             <path d="M285.08,230.397L456.218,59.27c6.076-6.077,6.076-15.911,0-21.986L423.511,4.565c-2.913-2.911-6.866-4.55-10.992-4.55
@@ -343,11 +341,13 @@ export function SVGSettings({cls}) {
 
 export function SVGWrong({cls}) {
     return (
-        <svg fill="#000000" className={`${cls} fill-current`} viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <path
-                d="M100,15a85,85,0,1,0,85,85A84.93,84.93,0,0,0,100,15Zm0,150a65,65,0,1,1,65-65A64.87,64.87,0,0,1,100,165Z"/>
-            <path
-                d="M128.5,74a9.67,9.67,0,0,0-14,0L100,88.5l-14-14a9.9,9.9,0,0,0-14,14l14,14-14,14a9.9,9.9,0,0,0,14,14l14-14,14,14a9.9,9.9,0,0,0,14-14l-14-14,14-14A10.77,10.77,0,0,0,128.5,74Z"/>
+        <svg className={`${cls}`} viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
+            <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+                <rect fillRule="nonzero" x="0" y="0" width="24" height="24" />
+                <circle className="stroke-current" stroke="#0C0310" strokeWidth="2" strokeLinecap="round" cx="12" cy="12" r="9" />
+                <line className="stroke-current" x1="14.1213" y1="9.87866" x2="9.8787" y2="14.1213" stroke="#0C0310" strokeWidth="2" strokeLinecap="round" />
+                <line className="stroke-current" x1="9.87866" y1="9.87866" x2="14.1213" y2="14.1213" stroke="#0C0310" strokeWidth="2" strokeLinecap="round" />
+            </g>
         </svg>
     )
 }

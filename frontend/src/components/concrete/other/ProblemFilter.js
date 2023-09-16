@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import TextBox from '../../input/TextBox';
 import TextBoxDropdown from '../../input/TextBoxDropdown';
-import TagDropdown from '../../container/TagDropdown';
+import TagDropdown from '../../input/TagDropdown';
 import {useLocation, useNavigate} from 'react-router-dom';
 import DropdownFrame from "../../container/DropdownFrame";
 import queryString from "query-string";

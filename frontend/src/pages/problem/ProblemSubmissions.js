@@ -11,10 +11,10 @@ function SubmissionFilterFrame() {
     const location = useLocation()
     const navigate = useNavigate()
     const handleCheckboxFullClicked = (checked) => {
-        UpdateQueryString(location, navigate, "ac", checked? 1: 0)
+        UpdateQueryString(location, navigate, "ac", checked? 1: 0, ["ac", "own"])
     }
     const handleCheckboxOwnClicked = (checked) => {
-        UpdateQueryString(location, navigate, "own", checked? 1: 0)
+        UpdateQueryString(location, navigate, "own", checked? 1: 0, ["ac", "own"])
     }
     const qData = queryString.parse(location.search)
     const accepted = qData["ac"] === "1"

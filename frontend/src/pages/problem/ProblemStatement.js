@@ -13,7 +13,7 @@ function ProblemInfo({info}) {
                 <span className="tag" key={index}>{tagName}</span>)}
         </div>
 
-    const titleComponent = <SVGTitleComponent svg={<SVGInformation/>} title="Információk"/>
+    const titleComponent = <SVGTitleComponent svg={<SVGInformation cls="w-6 h-6 mr-2" />} title="Információk"/>
     return (
         <MapDataFrame titleComponent={titleComponent} data={[
             ["Azonosító",       info.id],

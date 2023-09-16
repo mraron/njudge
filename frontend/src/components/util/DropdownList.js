@@ -9,12 +9,11 @@ function DropdownList({tree}) {
     const children = tree["children"] ? tree["children"].map((child, index) =>
         <li className="mt-2" key={index}><DropdownList tree={child}/></li>
     ) : []
-    const arrow = <DropdownListArrow isOpen={isOpen}/>
     const innerNode =
         <span
             className="w-fit flex items-center cursor-pointer hover:text-indigo-300 font-medium transition-all duration-100"
             onClick={() => setOpen(!isOpen)}>
-            {arrow}{tree["title"]}
+            {<DropdownListArrow isOpen={isOpen}/>}{tree["title"]}
         </span>
     const leafNode =
         <Link to={tree["link"]}
