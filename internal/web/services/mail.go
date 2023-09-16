@@ -55,8 +55,8 @@ func (s SendgridMailService) Send(ctx context.Context, m email.Mail) error {
 	from := mail.NewEmail(s.SenderName, s.SenderAddress)
 	to := mail.NewEmail("", m.Recipients[0])
 
-	plainTextContent := m.Message
-	htmlContent := StripHTMLRegex(m.Message)
+	htmlContent := m.Message
+	plainTextContent := StripHTMLRegex(m.Message)
 	message := mail.NewSingleEmail(from, m.Subject, to, plainTextContent, htmlContent)
 
 	client := sendgrid.NewSendClient(s.APIKey)
