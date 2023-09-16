@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {BrowserRouter as Router} from 'react-router-dom';
 import RoutingComponent from "./RoutingComponent";
 import FlashContainer from "./components/util/flash/Flash";

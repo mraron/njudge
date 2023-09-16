@@ -1,9 +1,26 @@
 import ProfileSideBar from '../components/concrete/other/ProfileSidebar'
-import {SVGCode, SVGCopy} from "../svg/SVGs";
+import {SVGCheckmark, SVGCode, SVGCopy, SVGCorrect, SVGCorrectSimple} from "../svg/SVGs";
 import SVGTitleComponent from "../svg/SVGTitleComponent";
 import RoundedTable from "../components/container/RoundedTable";
-import React from "react";
 import checkData from "../util/CheckData";
+import React, {useState} from "react";
+
+function CopyButton({ command }) {
+    const [isCopied, setCopied] = useState(false)
+    const handleClick = () => {
+        navigator.clipboard.writeText(command)
+        setCopied(true)
+        setTimeout(() => setCopied(false), 5000)
+    }
+    return (
+        <button
+            className="h-9 w-9 mr-2 rounded-md border-1 bg-grey-800 border-grey-725 hover:bg-grey-775 transition duration-200 relative"
+            onClick={handleClick}>
+            <SVGCopy cls={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 ${isCopied? "opacity-0": "opacity-100"} transition duration-[300ms]`} />
+            <SVGCorrectSimple cls={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-5 h-5 text-indigo-500 ${isCopied ? "opacity-100" : "opacity-0"} transition duration-[360ms]`} />
+        </button>
+    )
+}
 
 function CompilerOption({lang, command}) {
     return (
@@ -13,13 +30,7 @@ function CompilerOption({lang, command}) {
             </td>
             <td className="padding-td-default text-white">
                 <div className="flex items-center">
-                    <button
-                        className="p-2 mr-2 rounded-md border-1 bg-grey-800 border-grey-725 hover:bg-grey-775 transition duration-200"
-                        onClick={() => {
-                            navigator.clipboard.writeText(command)
-                        }}>
-                        <SVGCopy/>
-                    </button>
+                    <CopyButton command={command} />
                     <div className="flex items-center px-3 py-2 border-1 border-grey-725 rounded-md bg-grey-875">
                         <pre>{command}</pre>
                     </div>
@@ -31,13 +42,13 @@ function CompilerOption({lang, command}) {
 
 function InfoTable() {
     const compilerOptions = [
-        ["C++ (11 / 14 / 17)", "g++ -std=c++<verzió> -O2 -static -DONLINE_JUDGE main.cpp"],
-        ["C#", "/usr/bin/mcs -out:main.exe -optimize+ main.cs"],
-        ["Go", "/usr/bin/gccgo main.go"],
-        ["Java", "/usr/bin/javac main.java"],
-        ["Pascal", "/usr/bin/fpc -Mobjfpc -O2 -Xss main.pas"],
-        ["PyPy3", "/usr/bin/pypy3 main.py"],
-        ["Python3", "/usr/bin/python3 main.py"]
+        ["C++ (11 / 14 / 17)",  "g++ -std=c++<verzió> -O2 -static -DONLINE_JUDGE main.cpp"],
+        ["C#",                  "/usr/bin/mcs -out:main.exe -optimize+ main.cs"],
+        ["Go",                  "/usr/bin/gccgo main.go"],
+        ["Java",                "/usr/bin/javac main.java"],
+        ["Pascal",              "/usr/bin/fpc -Mobjfpc -O2 -Xss main.pas"],
+        ["PyPy3",               "/usr/bin/pypy3 main.py"],
+        ["Python3",             "/usr/bin/python3 main.py"]
     ];
     const compilerOptionElems = compilerOptions.map((item, index) =>
         <CompilerOption lang={item[0]} command={item[1]} key={index}/>
