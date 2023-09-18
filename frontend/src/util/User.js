@@ -23,6 +23,14 @@ export async function login(username, password) {
     }
 }
 
+export function logout() {
+    if (Cookies.get("authToken")) {
+        Cookies.remove("authToken")
+        return true
+    }
+    return false
+}
+
 export async function authenticate() {
     try {
         const response = await fetch("/api/v2/user/auth/")

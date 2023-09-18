@@ -7,11 +7,8 @@ import checkData from "../../util/CheckData";
 
 function ProblemRanklist() {
     const data = useOutletContext()
-    const location = useLocation()
-    if (!data || !matchPath(data.route, location.pathname)) {
-        return
-    }
     const titleComponent = <SVGTitleComponent svg={<SVGResults/>} title="Eredmények"/>
+
     return (
         <div>
             <div className="mb-2">

@@ -1,4 +1,4 @@
-import {Route, Routes, useLocation} from "react-router-dom";
+import {matchPath, Route, Routes, useLocation} from "react-router-dom";
 import React, {useContext, useEffect, useState} from "react";
 import Menubar from "./components/concrete/other/Menubar";
 import Main from "./pages/Main";
@@ -26,10 +26,11 @@ import FadeIn from "./components/util/FadeIn";
 import {routeMap} from "./config/RouteConfig";
 import UserContext from "./contexts/user/UserContext";
 import {authenticate} from "./util/User";
+import {findRouteIndex} from "./util/FindRouteIndex";
+import Logout from "./pages/auth/Logout";
 
 const routesToFetch = [
     routeMap.main,
-    routeMap.info,
     routeMap.contests,
     routeMap.archive,
     routeMap.submissions,
@@ -63,7 +64,7 @@ function RoutingComponent() {
     }, [location]);
 
     let pageContent = null
-    if (loadingCount === 0)
+    if (loadingCount === 0 && (findRouteIndex(routesToFetch, location.pathname) === -1 || data && matchPath(data.route, location.pathname))) {
         pageContent =
             <Routes key={location.pathname}>
                 <Route path={routeMap.main} element={<FadeIn>
@@ -93,6 +94,7 @@ function RoutingComponent() {
                 <Route path={routeMap.register} element={<FadeIn>
                     <Register data={data}/>
                 </FadeIn>}/>
+                <Route path={routeMap.logout} element={<Logout/>}/>
                 <Route path={routeMap.profile} element={<Profile/>}>
                     <Route path={routeMap.profile} element={<ProfileMain/>}/>
                     <Route path={routeMap.profileSubmissions} element={<ProfileSubmissions/>}/>
@@ -108,7 +110,7 @@ function RoutingComponent() {
                     <NotFound/>
                 </FadeIn>}/>
             </Routes>
-
+    }
     return (
         <div className="relative w-full">
             <PageLoadingAnimation isVisible={loadingCount !== 0}/>

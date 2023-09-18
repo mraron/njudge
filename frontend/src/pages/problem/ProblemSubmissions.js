@@ -33,10 +33,7 @@ function SubmissionFilterFrame() {
 
 function ProblemSubmissions() {
     const data = useOutletContext()
-    const location = useLocation()
-    if (!data || !matchPath(data.route, location.pathname)) {
-        return
-    }
+
     return (
         <div className="relative">
             <div className="mb-2">

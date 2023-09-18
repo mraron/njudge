@@ -5,11 +5,7 @@ import React from "react";
 
 function ProfileSubmissions() {
     const data = useOutletContext()
-    const location = useLocation()
 
-    if (!data || !matchPath(data.route, location.pathname)) {
-        return
-    }
     return (
         <div className="relative">
             <div className="flex flex-col w-full">

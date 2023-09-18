@@ -6,10 +6,6 @@ import {login} from "../util/User";
 import {matchPath, useLocation} from "react-router-dom";
 
 function Archive({data}) {
-    const location = useLocation()
-    if (!data || !matchPath(data.route, location.pathname)) {
-        return
-    }
     login("dbence", "abcd1234").then(resp => {
         window.flash(resp.message, resp.success? "success": "failure")
     })

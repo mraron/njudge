@@ -74,11 +74,7 @@ function InfoTable() {
     );
 }
 
-function Info({data}) {
-    const location = useLocation()
-    if (!data || !matchPath(data.route, location.pathname)) {
-        return
-    }
+function Info() {
     authenticate().then(resp => {
         window.flash(resp? "Sikeres azonosítás!": "Az azonosítás sikertelen.", resp? "success": "failure")
         console.log(JSON.stringify(resp))

@@ -7,10 +7,6 @@ import checkData from "../util/CheckData";
 import {matchPath, useLocation} from "react-router-dom";
 
 function Main({data}) {
-    const location = useLocation()
-    if (!data || !matchPath(data.route, location.pathname)) {
-        return
-    }
     return (
         <div className="relative w-full flex justify-center">
             <div className="flex justify-center w-full max-w-7xl">

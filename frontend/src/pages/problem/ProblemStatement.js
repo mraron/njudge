@@ -75,10 +75,7 @@ function ProblemAttachments({attachments}) {
 
 function ProblemStatement() {
     const data = useOutletContext()
-    const location = useLocation()
-    if (!data || !matchPath(data.route, location.pathname)) {
-        return
-    }
+
     return (
         <div className="flex flex-col lg:flex-row">
             <div className="w-full mb-3">

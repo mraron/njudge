@@ -5,10 +5,6 @@ import checkData from "../util/CheckData";
 import {matchPath, useLocation, useOutletContext} from "react-router-dom";
 
 function Submission({ data }) {
-    const location = useLocation()
-    if (!data || !matchPath(data.route, location.pathname)) {
-        return
-    }
     return (
         <div className="text-white">
             <div className="w-full flex justify-center">

@@ -7,13 +7,6 @@ import UserContext from "../contexts/user/UserContext";
 import {matchPath, useLocation} from "react-router-dom";
 
 function Contests({data}) {
-    const {userData, isLoggedIn} = useContext(UserContext)
-    const location = useLocation()
-    if (!data || !matchPath(data.route, location.pathname)) {
-        return
-    }
-    console.log(JSON.stringify(userData))
-    console.log(isLoggedIn)
     return (
         <div className="w-full flex justify-center">
             <div className="flex justify-center w-full max-w-7xl">

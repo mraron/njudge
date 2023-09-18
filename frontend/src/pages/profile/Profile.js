@@ -1,11 +1,12 @@
 import TabFrame from '../../components/container/TabFrame'
-import {Outlet, useLocation, useParams} from 'react-router-dom';
+import {matchPath, Outlet, useLocation, useParams} from 'react-router-dom';
 import React, {useContext, useEffect, useState} from "react";
 import {updateData, updatePageData} from "../../util/UpdateData";
 import FadeIn from "../../components/util/FadeIn";
 import {routeMap} from "../../config/RouteConfig";
 import PageLoadingAnimation from "../../components/util/PageLoadingAnimation";
 import UserContext from "../../contexts/user/UserContext";
+import {findRouteIndex} from "../../util/FindRouteIndex";
 
 function Profile() {
     let routeLabels = [
@@ -45,7 +46,7 @@ function Profile() {
         routePatterns.pop()
     }
     let pageContent = null
-    if (loadingCount === 0) {
+    if (loadingCount === 0 && (findRouteIndex(routesToFetch, location.pathname) === -1 || data && matchPath(data.route, location.pathname))) {
         pageContent = <FadeIn><Outlet context={data}/></FadeIn>
     }
     return (

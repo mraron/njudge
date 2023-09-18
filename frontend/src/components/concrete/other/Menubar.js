@@ -71,7 +71,7 @@ function ProfileSettings() {
     if (isLoggedIn) {
         profileRoutes = [
             routeMap.profile.replace(":user", userData.username),
-            routeMap.main
+            routeMap.logout
         ]
     }
     const loginStr = isLoggedIn? "loggedIn": "loggedOut"

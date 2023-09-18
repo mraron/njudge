@@ -1,11 +1,12 @@
 import TabFrame from '../../components/container/TabFrame'
-import {Outlet, useLocation, useParams} from 'react-router-dom';
+import {matchPath, Outlet, useLocation, useParams} from 'react-router-dom';
 import React, {useContext, useEffect, useState} from "react";
 import {updateData, updatePageData} from "../../util/UpdateData";
 import FadeIn from "../../components/util/FadeIn";
 import PageLoadingAnimation from "../../components/util/PageLoadingAnimation";
 import {routeMap} from "../../config/RouteConfig";
 import UserContext from "../../contexts/user/UserContext";
+import {findRouteIndex} from "../../util/FindRouteIndex";
 
 const routeLabels = [
     "Leírás",
@@ -19,7 +20,11 @@ const routePatterns = [
     routeMap.problemSubmissions,
     routeMap.problemRanklist
 ]
-const routesToFetch = routePatterns
+const routesToFetch = [
+    routeMap.problem,
+    routeMap.problemSubmissions,
+    routeMap.problemRanklist
+]
 
 function Problem() {
     const {problem} = useParams()
@@ -40,7 +45,7 @@ function Problem() {
     }, [location]);
 
     let pageContent = null
-    if (loadingCount === 0) {
+    if (loadingCount === 0 && (findRouteIndex(routesToFetch, location.pathname) === -1 || data && matchPath(data.route, location.pathname))) {
         pageContent = <FadeIn><Outlet context={data}/></FadeIn>
     }
     return (

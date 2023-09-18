@@ -40,12 +40,6 @@ function DropdownMenu({initSelected, itemNames, button: Button, onChange}) {
     }, [initSelected])
 
     useEffect(() => {
-        if (onChange) {
-            onChange(selected);
-        }
-    }, [selected])
-
-    useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setOpen(false);
