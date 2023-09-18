@@ -2,7 +2,7 @@ import SubmissionsTable from "../../components/concrete/table/SubmissionsTable";
 import Checkbox from "../../components/input/Checkbox"
 import RoundedFrame from "../../components/container/RoundedFrame";
 import Pagination from "../../components/util/Pagination";
-import {useLocation, useNavigate, useOutletContext} from "react-router-dom";
+import {matchPath, useLocation, useNavigate, useOutletContext} from "react-router-dom";
 import checkData from "../../util/CheckData";
 import UpdateQueryString from "../../util/UpdateQueryString";
 import queryString from "query-string";
@@ -33,7 +33,8 @@ function SubmissionFilterFrame() {
 
 function ProblemSubmissions() {
     const data = useOutletContext()
-    if (!checkData(data)) {
+    const location = useLocation()
+    if (!data || !matchPath(data.route, location.pathname)) {
         return
     }
     return (

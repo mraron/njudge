@@ -1,12 +1,13 @@
 import Pagination from "../../components/util/Pagination";
 import SubmissionsTable from "../../components/concrete/table/SubmissionsTable";
-import {useOutletContext} from "react-router-dom";
+import {matchPath, useLocation, useOutletContext} from "react-router-dom";
 import React from "react";
-import checkData from "../../util/CheckData";
 
 function ProfileSubmissions() {
     const data = useOutletContext()
-    if (!checkData(data)) {
+    const location = useLocation()
+
+    if (!data || !matchPath(data.route, location.pathname)) {
         return
     }
     return (

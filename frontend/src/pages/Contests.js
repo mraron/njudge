@@ -1,18 +1,24 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import ProfileSideBar from '../components/concrete/other/ProfileSidebar'
 import ContestList from '../components/concrete/other/ContestList'
 import '../index.css';
 import checkData from "../util/CheckData";
+import UserContext from "../contexts/user/UserContext";
+import {matchPath, useLocation} from "react-router-dom";
 
 function Contests({data}) {
-    if (!checkData(data)) {
+    const {userData, isLoggedIn} = useContext(UserContext)
+    const location = useLocation()
+    if (!data || !matchPath(data.route, location.pathname)) {
         return
     }
+    console.log(JSON.stringify(userData))
+    console.log(isLoggedIn)
     return (
         <div className="w-full flex justify-center">
             <div className="flex justify-center w-full max-w-7xl">
                 <div className="ml-0 lg:ml-4">
-                    <ProfileSideBar profileData={data.profileData}/>
+                    <ProfileSideBar/>
                 </div>
                 <div className="w-full px-4 lg:pl-3">
                     <ContestList contestData={[

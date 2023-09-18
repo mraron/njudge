@@ -73,10 +73,10 @@ function DropdownMenu({initSelected, itemNames, button: Button, onChange}) {
     )
 }
 
-export function DropdownRoutes({routes, routePatterns, routeLabels, button: Button}) {
+export function DropdownRoutes({routes, routeLabels, button: Button}) {
     const navigate = useNavigate();
     const location = useLocation();
-    const selected = findRouteIndex(routePatterns, location.pathname)
+    const selected = findRouteIndex(routes, location.pathname)
     const handleChange = (index) => {
         if (index !== -1 && !matchPath(routes[index], location.pathname)) {
             navigate(routes[index])

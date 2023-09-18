@@ -1,9 +1,8 @@
-function checkData(data) {
-    if (!data || data.processed) {
-        return false
-    }
-    data.processed = true
-    return true
+import {matchPath} from "react-router-dom";
+
+function checkData(data, pathname) {
+    return matchPath(data.route, pathname);
+
 }
 
 export default checkData

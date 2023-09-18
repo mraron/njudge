@@ -13,6 +13,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "framer-motion": "^10.16.4",
+    "js-cookie": "^3.0.5",
     "lodash": "^4.17.21",
     "lodash-contrib": "^4.1200.1",
     "monaco-themes": "^0.4.4",

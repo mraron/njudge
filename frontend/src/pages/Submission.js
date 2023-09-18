@@ -2,10 +2,11 @@ import SubmissionTable from "../components/concrete/table/SubmissionTable";
 import SubmissionsTable from "../components/concrete/table/SubmissionsTable";
 import Editor from "@monaco-editor/react";
 import checkData from "../util/CheckData";
-import {useOutletContext} from "react-router-dom";
+import {matchPath, useLocation, useOutletContext} from "react-router-dom";
 
 function Submission({ data }) {
-    if (!checkData(data)) {
+    const location = useLocation()
+    if (!data || !matchPath(data.route, location.pathname)) {
         return
     }
     return (

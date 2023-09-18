@@ -26,8 +26,8 @@ function FlashContainer() {
 
     const pushMessage = (message, type) => {
         setMessages(prevMessages => [...prevMessages,
-            <motion.div key={prevMessages.length} initial={{scaleX: 0.5, opacity: 0.2}} animate={{scaleX: 1, opacity: 1, transition: {duration: 0.2}}}
-                        exit={{scaleX: 0.5, opacity: 0.2, transition: {duration: 0.2}}}>
+            <motion.div key={prevMessages.length} initial={{scaleX: 0.36, opacity: 0.01}} animate={{scaleX: 1, opacity: 1, transition: {duration: 0.12, ease: "linear"}}}
+                        exit={{scaleX: 0.36, opacity: 0.01, transition: {duration: 0.12, ease: "linear"}}}>
                 <FlashMessage message={message} type={type} onClose={popMessage} />
             </motion.div>
         ])
@@ -42,10 +42,10 @@ function FlashContainer() {
         return () => {
             FlashEvent.removeAllListeners()
         }
-    })
+    }, [])
     return (
         <>
-            <div className="fixed bottom-2 left-2 right-2 flex justify-center">
+            <div className="z-10 fixed bottom-2 left-2 right-2 flex justify-center">
                 <div className={`relative w-full max-w-7xl px-2`}>
                     <AnimatePresence>
                         {messages}

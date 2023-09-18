@@ -1,10 +1,11 @@
 import TabFrame from '../../components/container/TabFrame'
 import {Outlet, useLocation, useParams} from 'react-router-dom';
-import React, {useEffect, useState} from "react";
-import {updatePageData} from "../../util/UpdatePageData";
+import React, {useContext, useEffect, useState} from "react";
+import {updateData, updatePageData} from "../../util/UpdateData";
 import FadeIn from "../../components/util/FadeIn";
 import PageLoadingAnimation from "../../components/util/PageLoadingAnimation";
 import {routeMap} from "../../config/RouteConfig";
+import UserContext from "../../contexts/user/UserContext";
 
 const routeLabels = [
     "Leírás",

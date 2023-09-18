@@ -1,25 +1,29 @@
 import TabFrame from '../../components/container/TabFrame'
 import {Outlet, useLocation, useParams} from 'react-router-dom';
-import React, {useEffect, useState} from "react";
-import {updatePageData} from "../../util/UpdatePageData";
+import React, {useContext, useEffect, useState} from "react";
+import {updateData, updatePageData} from "../../util/UpdateData";
 import FadeIn from "../../components/util/FadeIn";
 import {routeMap} from "../../config/RouteConfig";
 import PageLoadingAnimation from "../../components/util/PageLoadingAnimation";
-
-const routeLabels = [
-    "Profil",
-    "Beküldések",
-    "Beállítások"
-]
-const routePatterns = [
-    routeMap.profile,
-    routeMap.profileSubmissions,
-    routeMap.profileSettings
-]
-const routesToFetch = routePatterns
+import UserContext from "../../contexts/user/UserContext";
 
 function Profile() {
+    let routeLabels = [
+        "Profil",
+        "Beküldések",
+        "Beállítások"
+    ]
+    let routePatterns = [
+        routeMap.profile,
+        routeMap.profileSubmissions,
+        routeMap.profileSettings
+    ]
+    const routesToFetch = [
+        routeMap.profile,
+        routeMap.profileSubmissions
+    ]
     const {user} = useParams()
+    const {userData, isLoggedIn} = useContext(UserContext)
     const location = useLocation()
     const [data, setData] = useState(null)
     const [loadingCount, setLoadingCount] = useState(0)
@@ -36,6 +40,10 @@ function Profile() {
         }
     }, [location]);
 
+    if (!isLoggedIn || userData.username !== user) {
+        routeLabels.pop()
+        routePatterns.pop()
+    }
     let pageContent = null
     if (loadingCount === 0) {
         pageContent = <FadeIn><Outlet context={data}/></FadeIn>

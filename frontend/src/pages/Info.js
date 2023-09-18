@@ -3,31 +3,30 @@ import {SVGCode, SVGCopy, SVGCorrectSimple} from "../svg/SVGs";
 import SVGTitleComponent from "../svg/SVGTitleComponent";
 import RoundedTable from "../components/container/RoundedTable";
 import checkData from "../util/CheckData";
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
+import {authenticate} from "../util/User";
+import {matchPath, useLocation} from "react-router-dom";
 
 function CopyButton({ command }) {
     const [isCopied, setCopied] = useState(false)
-    const [isMouseOver, setMouseOver] = useState(false)
-
-    useEffect(() => {
-        if (isMouseOver) {
-            setCopied(true)
-        }
-    }, [isCopied])
-    const handleClick = () => {
+    const [isPending, setPending] = useState(false)
+    const handleClick = ()=> {
         navigator.clipboard.writeText(command)
         setCopied(true)
     }
     const handleMouseLeave = () => {
-        setTimeout(() => {
-            setCopied(false)
-        }, 5000)
-        setMouseOver(false)
+        if (!isPending) {
+            setPending(true)
+            setTimeout(() => {
+                setCopied(false)
+                setPending(false)
+            }, 5000)
+        }
     }
     return (
         <button
             className="h-9 w-9 mr-2 rounded-md border-1 bg-grey-800 border-grey-725 hover:bg-grey-775 transition duration-200 relative"
-            onClick={handleClick} onMouseLeave={handleMouseLeave} onMouseOver={() => setMouseOver(true)}>
+            onClick={handleClick} onMouseLeave={handleMouseLeave}>
             <SVGCopy cls={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 ${isCopied? "opacity-0": "opacity-100"} transition duration-[300ms]`} />
             <SVGCorrectSimple cls={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-5 h-5 text-indigo-500 ${isCopied? "opacity-100" : "opacity-0"} transition duration-[360ms]`} />
         </button>
@@ -76,14 +75,19 @@ function InfoTable() {
 }
 
 function Info({data}) {
-    if (!checkData(data)) {
+    const location = useLocation()
+    if (!data || !matchPath(data.route, location.pathname)) {
         return
     }
+    authenticate().then(resp => {
+        window.flash(resp? "Sikeres azonosítás!": "Az azonosítás sikertelen.", resp? "success": "failure")
+        console.log(JSON.stringify(resp))
+    })
     return (
         <div className="w-full flex justify-center">
             <div className="flex justify-center w-full max-w-7xl">
                 <div className="ml-0 lg:ml-4">
-                    <ProfileSideBar profileData={data.profileData}/>
+                    <ProfileSideBar/>
                 </div>
                 <div className="w-full px-4 lg:pl-3 overflow-x-auto">
                     <InfoTable/>

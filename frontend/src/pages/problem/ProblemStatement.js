@@ -3,7 +3,7 @@ import DropdownMenu from '../../components/input/DropdownMenu';
 import RoundedFrame from '../../components/container/RoundedFrame';
 import SVGTitleComponent from '../../svg/SVGTitleComponent';
 import {SVGAttachment, SVGAttachmentDescription, SVGAttachmentFile, SVGInformation, SVGSubmit} from '../../svg/SVGs';
-import {Link, useOutletContext} from "react-router-dom";
+import {Link, matchPath, useLocation, useOutletContext} from "react-router-dom";
 import checkData from "../../util/CheckData";
 
 function ProblemInfo({info}) {
@@ -75,7 +75,8 @@ function ProblemAttachments({attachments}) {
 
 function ProblemStatement() {
     const data = useOutletContext()
-    if (!checkData(data)) {
+    const location = useLocation()
+    if (!data || !matchPath(data.route, location.pathname)) {
         return
     }
     return (

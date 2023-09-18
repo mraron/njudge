@@ -1,9 +1,11 @@
-import {useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import Checkbox from "../../components/input/Checkbox";
 import RoundedFrame from "../../components/container/RoundedFrame";
 import TextBox from "../../components/input/TextBox"
 import {SVGLock, SVGSettings} from "../../svg/SVGs";
 import SVGTitleComponent from "../../svg/SVGTitleComponent";
+import {useParams, useNavigate} from "react-router-dom";
+import UserContext from "../../contexts/user/UserContext";
 
 function PasswordChangeFrame() {
     const [oldPw, setOldPw] = useState("");
@@ -57,7 +59,21 @@ function OtherSettingsFrame() {
 }
 
 function ProfileSettings() {
+    const navigate = useNavigate()
+    const [isVisible, setVisible] = useState(false)
+    const {user} = useParams()
+    const {userData, isLoggedIn} = useContext(UserContext)
+
+    useEffect(() => {
+        if (!isLoggedIn || userData.username !== user) {
+            navigate("/")
+            window.flash("Nincs jogosultságod ehhez a művelethez.", "failure")
+        } else {
+            setVisible(true)
+        }
+    })
     return (
+        isVisible &&
         <div className="flex flex-col lg:flex-row w-full items-start">
             <div className="w-full lg:w-96 mb-3 shrink-0">
                 <PasswordChangeFrame/>

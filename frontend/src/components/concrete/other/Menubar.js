@@ -1,9 +1,10 @@
 import {Link, useLocation} from 'react-router-dom';
-import {useEffect, useRef, useState} from 'react';
+import {useContext, useEffect, useRef, useState} from 'react';
 import {DropdownRoutes} from '../../input/DropdownMenu';
 import {SVGClose, SVGDropdownMenuArrow, SVGHamburger} from '../../../svg/SVGs';
 import {findRouteIndex} from '../../../util/FindRouteIndex';
 import {routeMap} from "../../../config/RouteConfig";
+import UserContext from "../../../contexts/user/UserContext";
 
 const menuRoutes = [
     routeMap.main,
@@ -22,18 +23,16 @@ const menuRouteLabels = [
     "Tudnivalók"
 ]
 
-const profileRoutes = [
-    routeMap.profile.replace(":user", "dbence"),
-    routeMap.main
-]
-const profileRoutePatterns = [
-    routeMap.profile,
-    routeMap.main
-]
-const profileRouteLabels = [
-    "Profil",
-    "Kilépés"
-]
+const profileRouteLabels = {
+    "loggedIn": [
+        "Profil",
+        "Kilépés"
+    ],
+    "loggedOut": [
+        "Belépés",
+        "Regisztráció"
+    ]
+}
 
 function MenuOption({label, route, selected, horizontal, onClick}) {
     return (
@@ -47,24 +46,38 @@ function MenuOption({label, route, selected, horizontal, onClick}) {
     )
 }
 
-function ProfileDropdownButton({isOpen, onClick}) {
-    return (
-        <button
-            className={`border-1 border-grey-675 rounded-tl-md rounded-bl-md flex items-center justify-between px-3 py-2 min-w-32 w-full h-full ${isOpen ? "bg-grey-750 hover:bg-grey-700" : "hover:bg-grey-800"}`}
-            onClick={onClick}>
+function getProfileDropdownButton(isLoggedIn) {
+    function ProfileDropdownButton({isOpen, onClick}) {
+        return (
+            <button
+                className={`border-1 border-grey-675 rounded-tl-md rounded-bl-md flex items-center justify-between px-3 py-2 min-w-32 w-full h-full ${isOpen ? "bg-grey-750 hover:bg-grey-700" : "hover:bg-grey-800"}`}
+                onClick={onClick}>
             <span className="flex items-center">
-                <span>Profil</span>
+                <span>{isLoggedIn? "Profil": "Belépés"}</span>
             </span>
-            <SVGDropdownMenuArrow isOpen={isOpen}/>
-        </button>
-    );
+                <SVGDropdownMenuArrow isOpen={isOpen}/>
+            </button>
+        );
+    }
+    return ProfileDropdownButton
 }
 
 function ProfileSettings() {
+    const {userData, isLoggedIn} = useContext(UserContext)
+    let profileRoutes = [
+        routeMap.login,
+        routeMap.register
+    ]
+    if (isLoggedIn) {
+        profileRoutes = [
+            routeMap.profile.replace(":user", userData.username),
+            routeMap.main
+        ]
+    }
+    const loginStr = isLoggedIn? "loggedIn": "loggedOut"
     return (
         <div className="flex">
-            <DropdownRoutes button={ProfileDropdownButton} routes={profileRoutes} routePatterns={profileRoutePatterns}
-                            routeLabels={profileRouteLabels}/>
+            <DropdownRoutes button={getProfileDropdownButton(isLoggedIn)} routes={profileRoutes} routeLabels={profileRouteLabels[loginStr]}/>
             <div
                 className="px-4 flex items-center justify-center border-1 border-l-0 border-grey-675 rounded-tr-md rounded-br-md">
                 <button className="px-2 bg-grey-725 rounded-md mr-1">hu</button>
@@ -96,10 +109,10 @@ function MenuSideBar({selected, isOpen, onClose}) {
 
     return (
         <aside ref={menuRef}
-               className={`z-20 h-full overflow-hidden lg:hidden fixed right-0 bg-grey-825 border-l-1 border-default ${isOpen ? "w-72 opacity-100" : "w-0 opacity-0"} ease-in-out transition-all duration-200`}>
+               className={`z-20 h-full overflow-y-auto lg:hidden fixed right-0 bg-grey-825 border-l-1 border-default ${isOpen ? "w-72 opacity-100" : "w-0 opacity-0"} ease-in-out transition-all duration-200`}>
             <div className="p-3">
                 <button className="rounded-full p-3 hover:bg-grey-800 transition duration-200" onClick={onClose}>
-                    <SVGClose size="w-4 h-4"/>
+                    <SVGClose cls="w-4 h-4"/>
                 </button>
             </div>
             <div className="flex flex-col justify-center">
@@ -145,6 +158,7 @@ function MenuTopBar({selected, onOpen}) {
 }
 
 function Menubar() {
+    const {isLoggedIn} = useContext(UserContext)
     const location = useLocation();
     const selected = findRouteIndex(menuRoutes, location.pathname)
     const [isOpen, setOpen] = useState(false);
@@ -155,6 +169,7 @@ function Menubar() {
         setOpen(true);
     };
     return (
+        isLoggedIn !== null &&
         <div>
             <MenuTopBar selected={selected} onOpen={handleOpen}></MenuTopBar>
             <MenuSideBar selected={selected} isOpen={isOpen} onClose={handleClose}/>

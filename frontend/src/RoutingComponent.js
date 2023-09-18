@@ -1,5 +1,5 @@
 import {Route, Routes, useLocation} from "react-router-dom";
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import Menubar from "./components/concrete/other/Menubar";
 import Main from "./pages/Main";
 import Contests from "./pages/Contests";
@@ -21,9 +21,11 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import NotFound from "./pages/error/NotFound";
 import PageLoadingAnimation from "./components/util/PageLoadingAnimation";
-import {updatePageData} from "./util/UpdatePageData";
+import {updateData} from "./util/UpdateData";
 import FadeIn from "./components/util/FadeIn";
 import {routeMap} from "./config/RouteConfig";
+import UserContext from "./contexts/user/UserContext";
+import {authenticate} from "./util/User";
 
 const routesToFetch = [
     routeMap.main,
@@ -32,12 +34,11 @@ const routesToFetch = [
     routeMap.archive,
     routeMap.submissions,
     routeMap.problems,
-    routeMap.submission,
-    routeMap.login,
-    routeMap.register
+    routeMap.submission
 ]
 
 function RoutingComponent() {
+    const {setUserData, setLoggedIn} = useContext(UserContext)
     const location = useLocation()
     const [data, setData] = useState(null)
     const [loadingCount, setLoadingCount] = useState(0)
@@ -45,8 +46,16 @@ function RoutingComponent() {
 
     useEffect(() => {
         let isMounted = true
-        updatePageData(location, routesToFetch, abortController, setData, setLoadingCount, () => isMounted)
-
+        updateData(
+            location,
+            routesToFetch,
+            abortController,
+            setData,
+            setLoadingCount,
+            setUserData,
+            setLoggedIn,
+            () => isMounted
+        )
         return () => {
             isMounted = false
             abortController.abort()
@@ -101,15 +110,10 @@ function RoutingComponent() {
             </Routes>
 
     return (
-        <>
-            <div className="pb-20">
-                <Menubar/>
-            </div>
-            <div className="relative w-full">
-                <PageLoadingAnimation isVisible={loadingCount !== 0}/>
-                {pageContent}
-            </div>
-        </>
+        <div className="relative w-full">
+            <PageLoadingAnimation isVisible={loadingCount !== 0}/>
+            {pageContent}
+        </div>
     )
 }
 
