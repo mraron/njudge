@@ -4,7 +4,7 @@ import SVGTitleComponent from "../svg/SVGTitleComponent";
 import RoundedTable from "../components/container/RoundedTable";
 import checkData from "../util/CheckData";
 import React, {useState} from "react";
-import {authenticate} from "../util/User";
+import {authenticate} from "../util/Auth";
 import {matchPath, useLocation} from "react-router-dom";
 
 function CopyButton({ command }) {
@@ -75,10 +75,6 @@ function InfoTable() {
 }
 
 function Info() {
-    authenticate().then(resp => {
-        window.flash(resp? "Sikeres azonosítás!": "Az azonosítás sikertelen.", resp? "success": "failure")
-        console.log(JSON.stringify(resp))
-    })
     return (
         <div className="w-full flex justify-center">
             <div className="flex justify-center w-full max-w-7xl">

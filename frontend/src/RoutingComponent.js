@@ -25,7 +25,7 @@ import {updateData} from "./util/UpdateData";
 import FadeIn from "./components/util/FadeIn";
 import {routeMap} from "./config/RouteConfig";
 import UserContext from "./contexts/user/UserContext";
-import {authenticate} from "./util/User";
+import {authenticate} from "./util/Auth";
 import {findRouteIndex} from "./util/FindRouteIndex";
 import Logout from "./pages/auth/Logout";
 
@@ -96,12 +96,12 @@ function RoutingComponent() {
                 </FadeIn>}/>
                 <Route path={routeMap.logout} element={<Logout/>}/>
                 <Route path={routeMap.profile} element={<Profile/>}>
-                    <Route path={routeMap.profile} element={<ProfileMain/>}/>
+                    <Route index element={<ProfileMain/>}/>
                     <Route path={routeMap.profileSubmissions} element={<ProfileSubmissions/>}/>
                     <Route path={routeMap.profileSettings} element={<ProfileSettings/>}/>
                 </Route>
                 <Route path={routeMap.problem} element={<Problem/>}>
-                    <Route path={routeMap.problem} element={<ProblemStatement/>}/>
+                    <Route index element={<ProblemStatement/>}/>
                     <Route path={routeMap.problemSubmit} element={<ProblemSubmit/>}/>
                     <Route path={routeMap.problemSubmissions} element={<ProblemSubmissions/>}/>
                     <Route path={routeMap.problemRanklist} element={<ProblemRanklist/>}/>

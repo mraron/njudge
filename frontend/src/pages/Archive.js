@@ -2,13 +2,10 @@ import ProfileSideBar from '../components/concrete/other/ProfileSidebar'
 import DropdownListFrame from '../components/container/DropdownListFrame'
 import checkData from "../util/CheckData";
 import React from "react";
-import {login} from "../util/User";
+import {login} from "../util/Auth";
 import {matchPath, useLocation} from "react-router-dom";
 
 function Archive({data}) {
-    login("dbence", "abcd1234").then(resp => {
-        window.flash(resp.message, resp.success? "success": "failure")
-    })
     const categoriesContent = data.categories.map((item, index) =>
         <div className="mb-3" key={index}>
             <DropdownListFrame title={item.title} tree={{"children": item.children}}/>

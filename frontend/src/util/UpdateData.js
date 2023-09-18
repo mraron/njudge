@@ -1,5 +1,5 @@
 import {findRouteIndex} from "./FindRouteIndex";
-import {authenticate} from "./User";
+import {authenticate} from "./Auth";
 
 export async function updatePageData(location,
                                      routesToFetch,

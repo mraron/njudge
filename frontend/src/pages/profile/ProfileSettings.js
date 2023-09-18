@@ -6,6 +6,7 @@ import {SVGLock, SVGSettings} from "../../svg/SVGs";
 import SVGTitleComponent from "../../svg/SVGTitleComponent";
 import {useParams, useNavigate} from "react-router-dom";
 import UserContext from "../../contexts/user/UserContext";
+import {routeMap} from "../../config/RouteConfig";
 
 function PasswordChangeFrame() {
     const [oldPw, setOldPw] = useState("");
@@ -66,7 +67,7 @@ function ProfileSettings() {
 
     useEffect(() => {
         if (!isLoggedIn || userData.username !== user) {
-            navigate("/")
+            navigate(routeMap.main)
             window.flash("Nincs jogosultságod ehhez a művelethez.", "failure")
         } else {
             setVisible(true)

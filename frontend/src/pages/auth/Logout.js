@@ -1,6 +1,7 @@
 import {useNavigate} from "react-router-dom";
-import {logout} from "../../util/User";
+import {logout} from "../../util/Auth";
 import {useEffect} from "react";
+import {routeMap} from "../../config/RouteConfig";
 
 function Logout() {
     const navigate = useNavigate()
@@ -11,7 +12,7 @@ function Logout() {
         } else {
             window.flash("Nem vagy belépve.", "failure")
         }
-        navigate("/")
+        navigate(routeMap.main)
     }, [])
     return (
         <></>
