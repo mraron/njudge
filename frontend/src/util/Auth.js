@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 export async function login(username, password) {
     const requestOptions = {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
             username: username,
             password: password
@@ -16,9 +16,9 @@ export async function login(username, password) {
             return {success: false, message: data.error}
         }
         console.log(data.authToken)
-        Cookies.set("authToken", data.authToken, { expires: 7, secure: true })
+        Cookies.set("authToken", data.authToken, {expires: 7, secure: true})
         return {success: true, message: "A bejelentkezés sikeres."}
-    } catch(error) {
+    } catch (error) {
         console.error(error)
     }
 }

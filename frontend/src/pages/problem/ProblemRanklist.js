@@ -2,8 +2,7 @@ import Ranklist from "../../components/concrete/other/Ranklist";
 import SVGTitleComponent from '../../svg/SVGTitleComponent';
 import {SVGResults} from "../../svg/SVGs";
 import Pagination from "../../components/util/Pagination";
-import {matchPath, useLocation, useOutletContext} from "react-router-dom";
-import checkData from "../../util/CheckData";
+import {useOutletContext} from "react-router-dom";
 
 function ProblemRanklist() {
     const data = useOutletContext()

@@ -18,10 +18,12 @@ export function SVGAttachmentDescription() {
     )
 }
 
-export function SVGInformation({ cls }) {
+export function SVGInformation({cls}) {
     return (
         <svg className={`${cls}`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path className="stroke-current" d="M12 11V16M12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21ZM12.0498 8V8.1L11.9502 8.1002V8H12.0498Z" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path className="stroke-current"
+                  d="M12 11V16M12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21ZM12.0498 8V8.1L11.9502 8.1002V8H12.0498Z"
+                  stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
     )
 }
@@ -65,7 +67,7 @@ export function SVGDropdownMenuArrow({isOpen}) {
     )
 }
 
-export function SVGCopy({ cls }) {
+export function SVGCopy({cls}) {
     return (
         <svg className={`${cls}`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path className="fill-current" fillRule="evenodd" clipRule="evenodd"
@@ -104,7 +106,7 @@ export function SVGHamburger() {
     )
 }
 
-export function SVGClose({ cls }) {
+export function SVGClose({cls}) {
     return (
         <svg style={{pointerEvents: "none"}} fill="#000000" className={`${cls} fill-current`} version="1.1"
              xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 460.775 460.775"
@@ -297,8 +299,12 @@ export function SVGLeftArrow({cls}) {
 export function SVGDoubleRightArrow({cls}) {
     return (
         <svg className={`${cls}`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path className="fill-current" fillRule="evenodd" clipRule="evenodd" d="M12.293 7.293a1 1 0 0 1 1.414 0l4 4a1 1 0 0 1 0 1.414l-4 4a1 1 0 0 1-1.414-1.414L15.586 12l-3.293-3.293a1 1 0 0 1 0-1.414Z" fill="#000000"/>
-            <path className="fill-current" fillRule="evenodd" clipRule="evenodd" d="M6.293 7.293a1 1 0 0 1 1.414 0l4 4a1 1 0 0 1 0 1.414l-4 4a1 1 0 0 1-1.414-1.414L9.586 12 6.293 8.707a1 1 0 0 1 0-1.414Z" fill="#000000"/>
+            <path className="fill-current" fillRule="evenodd" clipRule="evenodd"
+                  d="M12.293 7.293a1 1 0 0 1 1.414 0l4 4a1 1 0 0 1 0 1.414l-4 4a1 1 0 0 1-1.414-1.414L15.586 12l-3.293-3.293a1 1 0 0 1 0-1.414Z"
+                  fill="#000000"/>
+            <path className="fill-current" fillRule="evenodd" clipRule="evenodd"
+                  d="M6.293 7.293a1 1 0 0 1 1.414 0l4 4a1 1 0 0 1 0 1.414l-4 4a1 1 0 0 1-1.414-1.414L9.586 12 6.293 8.707a1 1 0 0 1 0-1.414Z"
+                  fill="#000000"/>
         </svg>
     )
 }
@@ -341,12 +347,16 @@ export function SVGSettings({cls}) {
 
 export function SVGWrong({cls}) {
     return (
-        <svg className={`${cls}`} viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
+        <svg className={`${cls}`} viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg"
+             xmlnsXlink="http://www.w3.org/1999/xlink">
             <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-                <rect fillRule="nonzero" x="0" y="0" width="24" height="24" />
-                <circle className="stroke-current" stroke="#0C0310" strokeWidth="2" strokeLinecap="round" cx="12" cy="12" r="9" />
-                <line className="stroke-current" x1="14.1213" y1="9.87866" x2="9.8787" y2="14.1213" stroke="#0C0310" strokeWidth="2" strokeLinecap="round" />
-                <line className="stroke-current" x1="9.87866" y1="9.87866" x2="14.1213" y2="14.1213" stroke="#0C0310" strokeWidth="2" strokeLinecap="round" />
+                <rect fillRule="nonzero" x="0" y="0" width="24" height="24"/>
+                <circle className="stroke-current" stroke="#0C0310" strokeWidth="2" strokeLinecap="round" cx="12"
+                        cy="12" r="9"/>
+                <line className="stroke-current" x1="14.1213" y1="9.87866" x2="9.8787" y2="14.1213" stroke="#0C0310"
+                      strokeWidth="2" strokeLinecap="round"/>
+                <line className="stroke-current" x1="9.87866" y1="9.87866" x2="14.1213" y2="14.1213" stroke="#0C0310"
+                      strokeWidth="2" strokeLinecap="round"/>
             </g>
         </svg>
     )

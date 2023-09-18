@@ -4,7 +4,7 @@ import RoundedFrame from "../../components/container/RoundedFrame";
 import TextBox from "../../components/input/TextBox"
 import {SVGLock, SVGSettings} from "../../svg/SVGs";
 import SVGTitleComponent from "../../svg/SVGTitleComponent";
-import {useParams, useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import UserContext from "../../contexts/user/UserContext";
 import {routeMap} from "../../config/RouteConfig";
 
@@ -72,7 +72,7 @@ function ProfileSettings() {
         } else {
             setVisible(true)
         }
-    })
+    }, [])
     return (
         isVisible &&
         <div className="flex flex-col lg:flex-row w-full items-start">

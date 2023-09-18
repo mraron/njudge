@@ -42,8 +42,10 @@ export function updateData(location,
                            isMounted) {
 
     authenticate().then(resp => {
-        setUserData(resp)
-        setLoggedIn(resp != null)
+        if (resp !== undefined) {
+            setUserData(resp)
+            setLoggedIn(resp !== null)
+        }
     }).then(() => {
         updatePageData(location, routesToFetch, abortController, setData, setLoadingCount, isMounted)
     })

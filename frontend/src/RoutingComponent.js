@@ -1,6 +1,5 @@
 import {matchPath, Route, Routes, useLocation} from "react-router-dom";
 import React, {useContext, useEffect, useState} from "react";
-import Menubar from "./components/concrete/other/Menubar";
 import Main from "./pages/Main";
 import Contests from "./pages/Contests";
 import Info from "./pages/Info";
@@ -25,7 +24,6 @@ import {updateData} from "./util/UpdateData";
 import FadeIn from "./components/util/FadeIn";
 import {routeMap} from "./config/RouteConfig";
 import UserContext from "./contexts/user/UserContext";
-import {authenticate} from "./util/Auth";
 import {findRouteIndex} from "./util/FindRouteIndex";
 import Logout from "./pages/auth/Logout";
 
@@ -39,7 +37,7 @@ const routesToFetch = [
 ]
 
 function RoutingComponent() {
-    const {setUserData, setLoggedIn} = useContext(UserContext)
+    const {isLoggedIn, setUserData, setLoggedIn} = useContext(UserContext)
     const location = useLocation()
     const [data, setData] = useState(null)
     const [loadingCount, setLoadingCount] = useState(0)
@@ -64,7 +62,8 @@ function RoutingComponent() {
     }, [location]);
 
     let pageContent = null
-    if (loadingCount === 0 && (findRouteIndex(routesToFetch, location.pathname) === -1 || data && matchPath(data.route, location.pathname))) {
+    if (isLoggedIn != null && loadingCount === 0 &&
+        (findRouteIndex(routesToFetch, location.pathname) === -1 || data && matchPath(data.route, location.pathname))) {
         pageContent =
             <Routes key={location.pathname}>
                 <Route path={routeMap.main} element={<FadeIn>

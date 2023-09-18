@@ -3,30 +3,37 @@ import TextBox from '../../components/input/TextBox';
 import {SVGAvatar, SVGGoogle} from '../../svg/SVGs';
 import SVGTitleComponent from '../../svg/SVGTitleComponent';
 import {login} from "../../util/Auth";
-import {useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {useContext, useState} from "react";
+import {Navigate, useNavigate} from "react-router-dom";
 import {routeMap} from "../../config/RouteConfig";
+import UserContext from "../../contexts/user/UserContext";
 
 function LoginFrame() {
+    const {userData, isLoggedIn} = useContext(UserContext)
     const navigate = useNavigate()
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
     const titleComponent = <SVGTitleComponent svg={<SVGAvatar cls="w-[1.1rem] h-[1.1rem] mr-2"/>} title="Belépés"/>
     const handleLogin = () => {
         login(username, password).then(resp => {
-            window.flash(resp.message, resp.success? "success": "failure")
+            window.flash(resp.message, resp.success ? "success" : "failure")
         }).then(() => {
             navigate(routeMap.main)
         })
+    }
+    if (isLoggedIn) {
+        return <Navigate to={routeMap.profile.replace(":user", encodeURIComponent(userData.username))}/>
     }
     return (
         <RoundedFrame titleComponent={titleComponent}>
             <div className="px-10 py-8">
                 <div className="mb-4">
-                    <TextBox id="userName" label="Felhasználónév" initText={username} onChange={(newText) => setUsername(newText)} />
+                    <TextBox id="userName" label="Felhasználónév" initText={username}
+                             onChange={(newText) => setUsername(newText)}/>
                 </div>
                 <div className="mb-6">
-                    <TextBox id="password" label="Jelszó" initText={password} type="password" onChange={(newText) => setPassword(newText)}/>
+                    <TextBox id="password" label="Jelszó" initText={password} type="password"
+                             onChange={(newText) => setPassword(newText)}/>
                 </div>
                 <div className="flex justify-center mb-2">
                     <button className="btn-indigo mr-2 w-1/2" onClick={handleLogin}>Belépés</button>

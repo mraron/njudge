@@ -1,9 +1,6 @@
 import ProfileSideBar from '../components/concrete/other/ProfileSidebar'
 import DropdownListFrame from '../components/container/DropdownListFrame'
-import checkData from "../util/CheckData";
 import React from "react";
-import {login} from "../util/Auth";
-import {matchPath, useLocation} from "react-router-dom";
 
 function Archive({data}) {
     const categoriesContent = data.categories.map((item, index) =>

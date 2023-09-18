@@ -22,7 +22,7 @@ function Pagination({paginationData}) {
                 {currentPage >= 2 && <button className={`${cls} border-r-0`}
                                              onClick={() => handlePageChanged(currentPage - 1)}>{currentPage - 1}</button>}
                 <button
-                    className="px-3 py-1.5 text-sm font-medium bg-indigo-600 border-indigo-600 hover:bg-indigo-500 hover:border-indigo-500 transition duration-200 text-center">{currentPage}</button>
+                    className="px-3 py-1.5 text-sm bg-grey-700 border-1 border-grey-600 hover:border-grey-550 hover:bg-grey-650 transition duration-200 text-center">{currentPage}</button>
                 {currentPage <= lastPage - 1 && <button className={`${cls} border-l-0`}
                                                         onClick={() => handlePageChanged(currentPage + 1)}>{currentPage + 1}</button>}
                 {currentPage <= lastPage - 2 && <button className={`${cls} hidden lg:block border-l-0`}

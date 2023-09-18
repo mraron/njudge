@@ -3,8 +3,7 @@ import DropdownMenu from '../../components/input/DropdownMenu';
 import RoundedFrame from '../../components/container/RoundedFrame';
 import SVGTitleComponent from '../../svg/SVGTitleComponent';
 import {SVGAttachment, SVGAttachmentDescription, SVGAttachmentFile, SVGInformation, SVGSubmit} from '../../svg/SVGs';
-import {Link, matchPath, useLocation, useOutletContext} from "react-router-dom";
-import checkData from "../../util/CheckData";
+import {Link, useOutletContext} from "react-router-dom";
 
 function ProblemInfo({info}) {
     const tagsContent =
@@ -13,15 +12,15 @@ function ProblemInfo({info}) {
                 <span className="tag" key={index}>{tagName}</span>)}
         </div>
 
-    const titleComponent = <SVGTitleComponent svg={<SVGInformation cls="w-6 h-6 mr-2" />} title="Információk"/>
+    const titleComponent = <SVGTitleComponent svg={<SVGInformation cls="w-6 h-6 mr-2"/>} title="Információk"/>
     return (
         <MapDataFrame titleComponent={titleComponent} data={[
-            ["Azonosító",       info.id],
-            ["Cím",             info.title],
-            ["Időlimit",        `${info.timeLimit} ms`],
-            ["Memórialimit",    `${info.memoryLimit} MiB`],
-            ["Címkék",          tagsContent],
-            ["Típus",           info.type]
+            ["Azonosító", info.id],
+            ["Cím", info.title],
+            ["Időlimit", `${info.timeLimit} ms`],
+            ["Memórialimit", `${info.memoryLimit} MiB`],
+            ["Címkék", tagsContent],
+            ["Típus", info.type]
         ]}/>
     )
 }
@@ -85,13 +84,13 @@ function ProblemStatement() {
             </div>
             <div className="w-full lg:w-96 mb-3 lg:ml-3 shrink-0">
                 <div className="mb-3">
-                    <ProblemInfo info={data.info} />
+                    <ProblemInfo info={data.info}/>
                 </div>
                 <div className="mb-3">
-                    <ProblemSubmit />
+                    <ProblemSubmit/>
                 </div>
                 <div className="mb-3">
-                    <ProblemAttachments attachments={data.attachments} />
+                    <ProblemAttachments attachments={data.attachments}/>
                 </div>
             </div>
         </div>

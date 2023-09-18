@@ -1,7 +1,7 @@
 import UserContext from "./UserContext";
 import {useState} from "react";
 
-function UserProvider({ children }) {
+function UserProvider({children}) {
     const [userData, setUserData] = useState(null)
     const [isLoggedIn, setLoggedIn] = useState(null)
 

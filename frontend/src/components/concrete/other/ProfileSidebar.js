@@ -7,21 +7,21 @@ import {routeMap} from "../../../config/RouteConfig";
 import {Link} from "react-router-dom";
 import UserContext from "../../../contexts/user/UserContext";
 
-function ProfilePicture({src}) {
-    return (
-        <img alt="avatar" className="object-contain border-1 border-default" src={src}/>
-    );
-}
-
 export function ProfilePictureFrame({userData}) {
+    const profileRoute = routeMap.profile.replace(":user", encodeURIComponent(userData.username))
     return (
         <div className="flex flex-col items-center">
             <div className="flex flex-col items-center p-8 pb-4 border-1 border-default rounded-md bg-grey-825 w-full">
-                <ProfilePicture src={userData.pictureSrc}/>
+                <Link to={profileRoute}>
+                    <img alt="avatar"
+                         className="object-contain border-1 border-default hover:border-grey-450 transition duration-200"
+                         src={userData.pictureSrc}/>
+                </Link>
                 <div className="flex justify-center items-center w-full">
-                    <span className="mt-2 text-md font-medium truncate">
-                        <a href="#">{userData.username}</a>
-                    </span>
+                    <Link className="mt-2 text-md font-medium truncate hover:text-indigo-200 transition duration-200"
+                          to={profileRoute}>
+                        {userData.username}
+                    </Link>
                     <span className="mt-2 text-2xl font-semibold text-indigo-500 mx-2">
                         &#8226;
                     </span>

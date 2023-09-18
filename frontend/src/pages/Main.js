@@ -3,8 +3,6 @@ import ProfileSideBar from '../components/concrete/other/ProfileSidebar'
 import PostFrame from '../components/container/PostFrame'
 import {SVGSpinner} from '../svg/SVGs';
 import '../index.css';
-import checkData from "../util/CheckData";
-import {matchPath, useLocation} from "react-router-dom";
 
 function Main({data}) {
     return (

@@ -14,7 +14,8 @@ function RanklistRow({result, maxScore}) {
                 <div className="flex items-center">
                     {accepted && <SVGCorrectSimple cls="w-5 h-5 text-green-500 mr-2"/>}
                     {!accepted && <SVGWrongSimple cls="w-5 h-5 text-red-500 mr-2"/>}
-                    <Link className="link whitespace-nowrap" to={routeMap.submission.replace(":id", submissionID)}>{score} / {maxScore}</Link>
+                    <Link className="link whitespace-nowrap"
+                          to={routeMap.submission.replace(":id", submissionID)}>{score} / {maxScore}</Link>
                 </div>
             </td>
         </tr>
@@ -22,7 +23,8 @@ function RanklistRow({result, maxScore}) {
 }
 
 function Ranklist({ranklist, title, titleComponent}) {
-    const rows = ranklist.results.map((item, index) => <RanklistRow result={item} maxScore={ranklist.maxScore} key={index}/>)
+    const rows = ranklist.results.map((item, index) => <RanklistRow result={item} maxScore={ranklist.maxScore}
+                                                                    key={index}/>)
     return (
         <RoundedTable title={title} titleComponent={titleComponent}>
             <tbody className="divide-y divide-default bg-grey-850">

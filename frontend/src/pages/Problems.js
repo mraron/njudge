@@ -4,8 +4,6 @@ import ProblemsTable from '../components/concrete/table/ProblemsTable'
 import ProfileSideBar from '../components/concrete/other/ProfileSidebar'
 import Pagination from '../components/util/Pagination';
 import '../index.css';
-import checkData from "../util/CheckData";
-import {matchPath, useLocation} from "react-router-dom";
 
 function Problems({data}) {
     return (

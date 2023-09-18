@@ -5,6 +5,7 @@ import {SVGClose, SVGDropdownMenuArrow, SVGHamburger} from '../../../svg/SVGs';
 import {findRouteIndex} from '../../../util/FindRouteIndex';
 import {routeMap} from "../../../config/RouteConfig";
 import UserContext from "../../../contexts/user/UserContext";
+import LanguageContext from "../../../contexts/language/LanguageContext";
 
 const menuRoutes = [
     routeMap.main,
@@ -15,13 +16,31 @@ const menuRoutes = [
     routeMap.info
 ]
 const menuRouteLabels = [
-    "Főoldal",
-    "Versenyek",
-    "Archívum",
-    "Beküldések",
-    "Feladatok",
-    "Tudnivalók"
+    "Home",
+    "Contests",
+    "Archive",
+    "Submissions",
+    "Problems",
+    "Information"
 ]
+const translate = {
+    "hu": {
+        "Home": "Főoldal",
+        "Contests": "Versenyek",
+        "Archive": "Archívum",
+        "Submissions": "Beküldések",
+        "Problems": "Feladatok",
+        "Information": "Tudnivalók",
+    },
+    "en": {
+        "Home": "Home",
+        "Contests": "Contests",
+        "Archive": "Archive",
+        "Submissions": "Submissions",
+        "Problems": "Problems",
+        "Information": "Information",
+    }
+}
 
 const profileRouteLabels = {
     "loggedIn": [
@@ -38,7 +57,7 @@ function MenuOption({label, route, selected, horizontal, onClick}) {
     return (
         <li>
             <Link onClick={onClick}
-                  className={`flex items-center h-full px-4 ${horizontal ? "border-b-3 pt-1" : "border-l-3 p-3"} ${selected ? "border-indigo-500 bg-grey-775" : "border-transparent hover:bg-grey-800"}`}
+                  className={`flex items-center h-full px-4 ${horizontal ? "border-b-3 pt-1" : "border-l-3 p-3"} ${selected ? "border-indigo-600 bg-grey-775" : "border-transparent hover:bg-grey-800"}`}
                   to={route}>
                 {label}
             </Link>
@@ -50,48 +69,53 @@ function getProfileDropdownButton(isLoggedIn) {
     function ProfileDropdownButton({isOpen, onClick}) {
         return (
             <button
-                className={`border-1 border-grey-675 rounded-tl-md rounded-bl-md flex items-center justify-between px-3 py-2 min-w-32 w-full h-full ${isOpen ? "bg-grey-750 hover:bg-grey-700" : "hover:bg-grey-800"}`}
+                className={`border-1 border-grey-675 rounded-tl-md rounded-bl-md flex items-center justify-between px-3 py-2 w-full h-full ${isOpen ? "bg-grey-750 hover:bg-grey-700" : "hover:bg-grey-800"}`}
                 onClick={onClick}>
-            <span className="flex items-center">
-                <span>{isLoggedIn? "Profil": "Belépés"}</span>
-            </span>
+                <span className="text-left">
+                    {isLoggedIn ? "Profil" : "Belépés"}
+                </span>
                 <SVGDropdownMenuArrow isOpen={isOpen}/>
             </button>
         );
     }
+
     return ProfileDropdownButton
 }
 
 function ProfileSettings() {
     const {userData, isLoggedIn} = useContext(UserContext)
+    const {language, storeLanguage} = useContext(LanguageContext)
+    const loginStr = isLoggedIn ? "loggedIn" : "loggedOut"
+
     let profileRoutes = [
         routeMap.login,
         routeMap.register
     ]
     if (isLoggedIn) {
         profileRoutes = [
-            routeMap.profile.replace(":user", userData.username),
+            routeMap.profile.replace(":user", encodeURIComponent(userData.username)),
             routeMap.logout
         ]
     }
-    const loginStr = isLoggedIn? "loggedIn": "loggedOut"
     return (
         <div className="flex">
-            <DropdownRoutes button={getProfileDropdownButton(isLoggedIn)} routes={profileRoutes} routeLabels={profileRouteLabels[loginStr]}/>
+            <DropdownRoutes button={getProfileDropdownButton(isLoggedIn)} routes={profileRoutes}
+                            routeLabels={profileRouteLabels[loginStr]}/>
             <div
-                className="px-4 flex items-center justify-center border-1 border-l-0 border-grey-675 rounded-tr-md rounded-br-md">
-                <button className="px-2 bg-grey-725 rounded-md mr-1">hu</button>
-                <button className="px-2 hover:bg-grey-800 rounded-md">en</button>
+                className="px-3 flex items-center justify-center border-1 border-l-0 border-grey-675 rounded-tr-md rounded-br-md">
+                <button className={`px-2 ${language === "hu"? "bg-grey-725": "hover:bg-grey-775"} rounded mr-1`} onClick={() => storeLanguage("hu")}>hu</button>
+                <button className={`px-2 ${language === "en"? "bg-grey-725": "hover:bg-grey-775"} rounded`} onClick={() => storeLanguage("en")}>en</button>
             </div>
         </div>
     );
 }
 
 function MenuSideBar({selected, isOpen, onClose}) {
+    const {language} = useContext(LanguageContext)
     const menuRef = useRef(null)
     const menuOptions = menuRoutes.map((item, index) => {
         return (
-            <MenuOption label={menuRouteLabels[index]} route={item} selected={index === selected} horizontal={false}
+            <MenuOption label={translate[language][menuRouteLabels[index]]} route={item} selected={index === selected} horizontal={false}
                         key={index} onClick={onClose}/>
         );
     });
@@ -128,9 +152,10 @@ function MenuSideBar({selected, isOpen, onClose}) {
 }
 
 function MenuTopBar({selected, onOpen}) {
+    const {language} = useContext(LanguageContext)
     const menuOptions = menuRoutes.map((item, index) => {
         return (
-            <MenuOption label={menuRouteLabels[index]} route={item} selected={index === selected} horizontal={true}
+            <MenuOption label={translate[language][menuRouteLabels[index]]} route={item} selected={index === selected} horizontal={true}
                         key={index}/>
         );
     });
@@ -143,7 +168,9 @@ function MenuTopBar({selected, onOpen}) {
                         {menuOptions}
                     </ol>
                     <div className="w-full hidden lg:flex justify-end mx-4 my-2">
-                        <ProfileSettings/>
+                        <div className="w-60">
+                            <ProfileSettings/>
+                        </div>
                     </div>
                 </div>
                 <div className="lg:hidden mx-4">
@@ -168,6 +195,9 @@ function Menubar() {
     const handleOpen = () => {
         setOpen(true);
     };
+    if (isLoggedIn !== null) {
+        console.log(isLoggedIn)
+    }
     return (
         isLoggedIn !== null &&
         <div>

@@ -1,10 +1,8 @@
 import SubmissionTable from "../components/concrete/table/SubmissionTable";
 import SubmissionsTable from "../components/concrete/table/SubmissionsTable";
 import Editor from "@monaco-editor/react";
-import checkData from "../util/CheckData";
-import {matchPath, useLocation, useOutletContext} from "react-router-dom";
 
-function Submission({ data }) {
+function Submission({data}) {
     return (
         <div className="text-white">
             <div className="w-full flex justify-center">

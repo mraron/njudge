@@ -1,11 +1,10 @@
 import TabFrame from '../../components/container/TabFrame'
 import {matchPath, Outlet, useLocation, useParams} from 'react-router-dom';
-import React, {useContext, useEffect, useState} from "react";
-import {updateData, updatePageData} from "../../util/UpdateData";
+import React, {useEffect, useState} from "react";
+import {updatePageData} from "../../util/UpdateData";
 import FadeIn from "../../components/util/FadeIn";
 import PageLoadingAnimation from "../../components/util/PageLoadingAnimation";
 import {routeMap} from "../../config/RouteConfig";
-import UserContext from "../../contexts/user/UserContext";
 import {findRouteIndex} from "../../util/FindRouteIndex";
 
 const routeLabels = [

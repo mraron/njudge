@@ -1,10 +1,7 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import ProfileSideBar from '../components/concrete/other/ProfileSidebar'
 import ContestList from '../components/concrete/other/ContestList'
 import '../index.css';
-import checkData from "../util/CheckData";
-import UserContext from "../contexts/user/UserContext";
-import {matchPath, useLocation} from "react-router-dom";
 
 function Contests({data}) {
     return (

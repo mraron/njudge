@@ -1,9 +1,14 @@
-import {ProfilePictureFrame, ProfileDataFrame} from "../../components/concrete/other/ProfileSidebar";
-import TagListFrame from "../../components/container/TagListFrame";
+import {ProfileDataFrame, ProfilePictureFrame} from "../../components/concrete/other/ProfileSidebar";
+import TagListFrame, {LinkTag} from "../../components/container/TagListFrame";
 import SVGTitleComponent from "../../svg/SVGTitleComponent";
 import {SVGCorrectSimple, SVGWrongSimple} from "../../svg/SVGs";
-import {matchPath, useLocation, useOutletContext} from "react-router-dom";
+import {useOutletContext} from "react-router-dom";
 import React from "react";
+import {routeMap} from "../../config/RouteConfig";
+
+const makeProblemLink = (problem) => {
+    return {"text": problem, "href": routeMap.problem.replace(":problem", problem)}
+}
 
 function ProfileMain() {
     const data = useOutletContext()
@@ -22,10 +27,12 @@ function ProfileMain() {
             </div>
             <div className="w-full mb-3 sm:ml-3">
                 <div className="mb-3">
-                    <TagListFrame titleComponent={titleComponentCorrect} tagNames={data.solved}/>
+                    <TagListFrame titleComponent={titleComponentCorrect} tags={data.solved.map(makeProblemLink)}
+                                  tag={LinkTag}/>
                 </div>
                 <div className="mb-3">
-                    <TagListFrame titleComponent={titleComponentWrong} tagNames={data.unsolved}/>
+                    <TagListFrame titleComponent={titleComponentWrong} tags={data.unsolved.map(makeProblemLink)}
+                                  tag={LinkTag}/>
                 </div>
             </div>
         </div>

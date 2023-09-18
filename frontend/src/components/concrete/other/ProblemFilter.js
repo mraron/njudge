@@ -30,6 +30,9 @@ function ProblemFilter() {
         })
         navigate(`${location.pathname}?${qString}`);
     };
+    const handleReset = () => {
+        navigate(location.pathname)
+    }
     return (
         <div className="w-full">
             <div className="mb-4">
@@ -54,7 +57,7 @@ function ProblemFilter() {
             </div>
             <div className="flex justify-center">
                 <button className="mr-1 btn-indigo w-32" onClick={handleSubmit}>Keres</button>
-                <button className="ml-1 btn-gray w-32">Visszaállít</button>
+                <button className="ml-1 btn-gray w-32" onClick={handleReset}>Visszaállít</button>
             </div>
         </div>
     )

@@ -1,25 +1,36 @@
 import RoundedFrame from "./RoundedFrame";
+import {Link} from "react-router-dom";
 
-function Tag({tagName}) {
+export function DefaultTag({data}) {
     return (
         <span
-            className="w-28 text-center truncate whitespace-nowrap cursor-pointer text-sm px-2 py-1 border-1 rounded bg-grey-725 hover:bg-indigo-600 border-grey-650 hover:border-indigo-500 transition-all duration-200">
-            {tagName}
+            className="w-28 tag text-center">
+            {data}
         </span>
     )
 }
 
-function TagListFrame({title, titleComponent, tagNames}) {
-    const tags = tagNames.map((tagName, index) =>
+export function LinkTag({data}) {
+    return (
+        <Link to={data.href}
+              className="w-28 text-center truncate whitespace-nowrap cursor-pointer text-sm px-2 py-1 border-1 rounded bg-grey-725 hover:bg-indigo-600 hover:border-transparent border-grey-650 transition-all duration-200">
+            {data.text}
+        </Link>
+    )
+}
+
+function TagListFrame({title, titleComponent, tag: Tag, tags}) {
+    Tag ||= DefaultTag
+    const tagsContent = tags.map((item, index) =>
         <div className="flex m-1" key={index}>
-            <Tag tagName={tagName} key={index}/>
+            <Tag data={item} key={index}/>
         </div>
     )
     return (
         <RoundedFrame title={title} titleComponent={titleComponent}>
             <div className="flex flex-col w-full overflow-x-auto rounded-md">
                 <div className="flex flex-wrap p-4 bg-grey-850">
-                    {tags}
+                    {tagsContent}
                 </div>
             </div>
         </RoundedFrame>

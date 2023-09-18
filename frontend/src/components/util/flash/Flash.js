@@ -3,18 +3,18 @@ import {useEffect, useState} from "react";
 import FlashEvent from "./FlashEvent";
 import {AnimatePresence, motion} from "framer-motion";
 
-function FlashMessage({ message, type, onClose }) {
+function FlashMessage({message, type, onClose}) {
     return (
         <div className="absolute bottom-0 left-0 right-0 bg-grey-850 border-1 rounded-md flex border-default w-full">
             <div className="w-full p-6 flex justify-between">
                 <div className="flex items-center">
-                    {type === "success" && <SVGCorrect cls="w-7 h-7 text-green-500 mr-3" />}
-                    {type === "failure" && <SVGWrong cls="w-7 h-7 text-red-500 mr-3" />}
-                    {type === "info" && <SVGInformation cls="w-7 h-7 text-indigo-500 mr-3" />}
+                    {type === "success" && <SVGCorrect cls="w-7 h-7 text-green-500 mr-3"/>}
+                    {type === "failure" && <SVGWrong cls="w-7 h-7 text-red-500 mr-3"/>}
+                    {type === "info" && <SVGInformation cls="w-7 h-7 text-indigo-500 mr-3"/>}
                     <span>{message}</span>
                 </div>
                 <button className="rounded-full p-3 hover:bg-grey-800 transition duration-200" onClick={onClose}>
-                    <SVGClose cls="w-4 h-4 text-white" />
+                    <SVGClose cls="w-4 h-4 text-white"/>
                 </button>
             </div>
         </div>
@@ -26,9 +26,10 @@ function FlashContainer() {
 
     const pushMessage = (message, type) => {
         setMessages(prevMessages => [...prevMessages,
-            <motion.div key={prevMessages.length} initial={{scaleX: 0.36, opacity: 0.01}} animate={{scaleX: 1, opacity: 1, transition: {duration: 0.12, ease: "linear"}}}
-                        exit={{scaleX: 0.36, opacity: 0.01, transition: {duration: 0.12, ease: "linear"}}}>
-                <FlashMessage message={message} type={type} onClose={popMessage} />
+            <motion.div key={prevMessages.length} initial={{scaleX: 0.36, opacity: 0.01}}
+                        animate={{scaleX: 1, opacity: 1, transition: {duration: 0.16, ease: "linear"}}}
+                        exit={{scaleX: 0.36, opacity: 0.01, transition: {duration: 0.16, ease: "linear"}}}>
+                <FlashMessage message={message} type={type} onClose={popMessage}/>
             </motion.div>
         ])
     }
