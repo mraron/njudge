@@ -10,27 +10,29 @@ import {useTranslation} from "react-i18next";
 
 function RegisterFrame() {
     const {t} = useTranslation()
-    const titleComponent = <SVGTitleComponent svg={<SVGAvatar cls="w-[1.1rem] h-[1.1rem] mr-2"/>}
+    const titleComponent = <SVGTitleComponent svg={<SVGAvatar cls="w-5 h-5 mr-2"/>}
                                               title={t("register.register")}/>
     return (
         <RoundedFrame titleComponent={titleComponent}>
-            <div className="px-10 pt-8 pb-6 border-b border-default">
-                <div className="mb-4 relative">
-                    <TextBox id="username" label={t("register.username")}/>
+            <form method="POST">
+                <div className="px-10 pt-8 pb-6 border-b border-default">
+                    <div className="mb-4 relative">
+                        <TextBox id="username" label={t("register.username")}/>
+                    </div>
+                    <TextBox id="email" label={t("register.email")}/>
                 </div>
-                <TextBox id="email" label={t("register.email")}/>
-            </div>
-            <div className="px-10 pt-4 pb-8">
-                <div className="mb-4">
-                    <TextBox id="password" label={t("register.password")}/>
+                <div className="px-10 pt-4 pb-8">
+                    <div className="mb-4">
+                        <TextBox id="password" label={t("register.password")}/>
+                    </div>
+                    <div className="mb-6">
+                        <TextBox id="passwordConfirm" label={t("register.confirm_password")}/>
+                    </div>
+                    <div className="flex justify-center">
+                        <button type="submit" className="btn-indigo w-40">{t("register.register")}</button>
+                    </div>
                 </div>
-                <div className="mb-6">
-                    <TextBox id="passwordConfirm" label={t("register.confirm_password")}/>
-                </div>
-                <div className="flex justify-center">
-                    <button className="btn-indigo w-40">{t("register.register")}</button>
-                </div>
-            </div>
+            </form>
         </RoundedFrame>
     )
 }

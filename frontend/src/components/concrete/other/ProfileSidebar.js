@@ -7,12 +7,13 @@ import {routeMap} from "../../../config/RouteConfig";
 import {Link} from "react-router-dom";
 import UserContext from "../../../contexts/user/UserContext";
 import {useTranslation} from "react-i18next";
+import RoundedFrame from "../../container/RoundedFrame";
 
 export function ProfilePictureFrame({userData}) {
     const profileRoute = routeMap.profile.replace(":user", encodeURIComponent(userData.username))
     return (
-        <div className="flex flex-col items-center">
-            <div className="flex flex-col items-center p-8 pb-4 border-1 border-default rounded-md bg-grey-825 w-full">
+        <RoundedFrame>
+            <div className="flex flex-col items-center p-8 pb-4">
                 <Link to={profileRoute}>
                     <img alt="avatar"
                          className="object-contain border-1 border-default hover:border-grey-450 transition duration-200"
@@ -31,7 +32,7 @@ export function ProfilePictureFrame({userData}) {
                     </span>
                 </div>
             </div>
-        </div>
+        </RoundedFrame>
     );
 }
 
