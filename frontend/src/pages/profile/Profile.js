@@ -8,9 +8,9 @@ import {useTranslation} from "react-i18next";
 function Profile() {
     const {t} = useTranslation()
     let routeLabels = [
-        t("profile.profile"),
-        t("profile.submissions"),
-        t("profile.settings")
+        "profile.profile",
+        "profile.submissions",
+        "profile.settings"
     ]
     let routePatterns = [
         routeMap.profile,
@@ -29,7 +29,7 @@ function Profile() {
         <div className="flex justify-center">
             <div className="w-full max-w-7xl">
                 <div className="w-full px-4">
-                    <TabFrame routes={routes} routePatterns={routePatterns} routeLabels={routeLabels}>
+                    <TabFrame routes={routes} routePatterns={routePatterns} routeLabels={routeLabels.map(t)}>
                         <div className="relative w-full">
                             <Outlet/>
                         </div>

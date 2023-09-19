@@ -73,7 +73,7 @@ function ProfileSettings({ data }) {
 
     useEffect(() => {
         if (!isLoggedIn || userData.username !== user) {
-            navigate(routeMap.main)
+            navigate(routeMap.home)
             window.flash(t("flash.no_permission"), "failure")
         } else {
             setVisible(true)

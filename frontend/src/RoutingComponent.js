@@ -1,6 +1,6 @@
-import {matchPath, Route, Routes, useLocation} from "react-router-dom";
-import React, {useContext, useEffect, useLayoutEffect, useState} from "react";
-import Main from "./pages/Main";
+import React, {useEffect} from "react";
+import {Route, Routes, useLocation} from "react-router-dom";
+import Home from "./pages/Home";
 import Contests from "./pages/Contests";
 import Info from "./pages/Info";
 import Archive from "./pages/Archive";
@@ -19,30 +19,52 @@ import ProblemRanklist from "./pages/problem/ProblemRanklist";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import NotFound from "./pages/error/NotFound";
-import PageLoadingAnimation from "./components/util/PageLoadingAnimation";
-import {updateData} from "./util/updateData";
 import FadeIn from "./components/util/FadeIn";
-import {routeMap} from "./config/RouteConfig";
-import UserContext from "./contexts/user/UserContext";
-import {findRouteIndex} from "./util/findRouteIndex";
 import Logout from "./pages/auth/Logout";
 import UpdatePage from "./pages/wrappers/UpdatedPage";
+import {findRouteIndex} from "./util/findRouteIndex";
+import {useTranslation} from "react-i18next";
+import extractParams from "./util/extractParams";
+import {routeMap} from "./config/RouteConfig";
 
-const routesToFetch = [
-    routeMap.main,
-    routeMap.contests,
-    routeMap.archive,
-    routeMap.submissions,
-    routeMap.problems,
-    routeMap.submission
-]
+const titles = {
+    [routeMap.home]:                "home.page_title",
+    [routeMap.contests]:            "contests.page_title",
+    [routeMap.archive]:             "archive.page_title",
+    [routeMap.submissions]:         "submissions.page_title",
+    [routeMap.problems]:            "problems.page_title",
+    [routeMap.info]:                "info.page_title",
+    [routeMap.login]:               "login.page_title",
+    [routeMap.register]:            "register.page_title",
+    [routeMap.profile]:             "profile_main.page_title",
+    [routeMap.profileSubmissions]:  "profile_submissions.page_title",
+    [routeMap.profileSettings]:     "profile_settings.page_title",
+    [routeMap.problem]:             "problem_statement.page_title",
+    [routeMap.problemSubmit]:       "problem_submit.page_title",
+    [routeMap.problemSubmissions]:  "problem_submissions.page_title",
+    [routeMap.problemRanklist]:     "problem_ranklist.page_title",
+    [routeMap.submission]:          "submission.page_title"
+}
+const routes = Object.keys(titles)
 
 function RoutingComponent() {
+    const {i18n, t} = useTranslation()
     const location = useLocation()
+
+    useEffect(() => {
+        const routeIndex = findRouteIndex(routes, location.pathname)
+        if (routeIndex !== -1) {
+            const params = extractParams(location.pathname, routes[routeIndex])
+            document.title = t(titles[routes[routeIndex]], {params})
+        } else {
+            document.title = "njudge"
+        }
+    }, [location, i18n.language]);
+
     return (
         <div className="w-full">
             <Routes>
-                <Route path={routeMap.main} element={<UpdatePage key={location.key} page={Main} />}/>
+                <Route path={routeMap.home} element={<UpdatePage key={location.key} page={Home} />}/>
                 <Route path={routeMap.contests} element={<UpdatePage key={location.key} page={Contests} />}/>
                 <Route path={routeMap.info} element={<UpdatePage key={location.key} page={Info} />}/>
                 <Route path={routeMap.archive} element={<UpdatePage key={location.key} page={Archive} />}/>
@@ -52,12 +74,12 @@ function RoutingComponent() {
                 <Route path={routeMap.login} element={<UpdatePage key={location.key} page={Login} />}/>
                 <Route path={routeMap.register} element={<UpdatePage key={location.key} page={Register} />}/>
                 <Route path={routeMap.logout} element={<UpdatePage key={location.key} page={Logout} />}/>
-                <Route path={routeMap.profile} element={<FadeIn><Profile /></FadeIn>}>
+                <Route path={routeMap.profile} element={<Profile />}>
                     <Route index element={<UpdatePage key={location.key} page={ProfileMain} />}/>
                     <Route path={routeMap.profileSubmissions} element={<UpdatePage key={location.key} page={ProfileSubmissions}/>}/>
                     <Route path={routeMap.profileSettings} element={<UpdatePage key={location.key} page={ProfileSettings}/>}/>
                 </Route>
-                <Route path={routeMap.problem} element={<FadeIn><Problem /></FadeIn>}>
+                <Route path={routeMap.problem} element={<Problem />}>
                     <Route index element={<UpdatePage key={location.key} page={ProblemStatement} />}/>
                     <Route path={routeMap.problemSubmit} element={<UpdatePage key={location.key} page={ProblemSubmit} />}/>
                     <Route path={routeMap.problemSubmissions} element={<UpdatePage key={location.key} page={ProblemSubmissions} />}/>

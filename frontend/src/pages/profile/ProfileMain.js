@@ -2,7 +2,6 @@ import {ProfileDataFrame, ProfilePictureFrame} from "../../components/concrete/o
 import TagListFrame, {LinkTag} from "../../components/container/TagListFrame";
 import SVGTitleComponent from "../../svg/SVGTitleComponent";
 import {SVGCorrectSimple, SVGWrongSimple} from "../../svg/SVGs";
-import {useOutletContext} from "react-router-dom";
 import React from "react";
 import {routeMap} from "../../config/RouteConfig";
 import {useTranslation} from "react-i18next";

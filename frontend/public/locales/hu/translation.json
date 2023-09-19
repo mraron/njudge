@@ -1,4 +1,43 @@
 {
+	"home": {
+		"page_title": "njudge"
+	},
+	"contests": {
+		"page_title": "Versenyek :: njudge",
+		"view": "Megtekintés",
+		"register": "Regisztráció"
+	},
+	"archive": {
+		"page_title": "Archívum :: njudge"
+	},
+	"submissions": {
+		"page_title": "Beküldések :: njudge"
+	},
+	"problems": {
+		"page_title": "Feladatok :: njudge"
+	},
+	"info": {
+		"page_title": "Tudnivalók :: njudge",
+		"successful_copy": "A szöveg a vágólapra lett másolva.",
+		"compiler_options": "Fordítási és futtatási opciók"
+	},
+	"login": {
+		"page_title": "Belépés :: njudge",
+		"login": "Belépés",
+		"username": "Felhasználónév",
+		"password": "Jelszó"
+	},
+	"register": {
+		"page_title": "Regisztráció :: njudge",
+		"register": "Regisztráció",
+		"username": "Felhasználónév",
+		"email": "E-mail cím",
+		"password": "Jelszó",
+		"confirm_password": "Jelszó megerősítése"
+	},
+	"submission": {
+		"page_title": "Beküldés #{{params.id}} :: njudge"
+	},
 	"flash": {
 		"no_permission": "Nincs jogosultságod végrehajtani ezt a műveletet.",
 		"successful_logout": "Sikeres kijelentkezés.",
@@ -24,13 +63,6 @@
 		"score": "Pontszám",
 		"num_solved": "Megoldott feladatok"
 	},
-	"info": {
-		"compiler_options": "Fordítási és futtatási opciók"
-	},
-	"contests": {
-		"view": "Megtekintés",
-		"register": "Regisztráció"
-	},
 	"problems_table": {
 		"id": "ID",
 		"title": "Cím",
@@ -55,16 +87,29 @@
 		"time": "Idő",
 		"memory": "Memória"
 	},
+	"submission_table": {
+		"subtask": "Részfeladat",
+		"total": "Összpont",
+		"test": "Teszt",
+		"verdict": "Verdikt",
+		"time": "Idő",
+		"memory": "Memória"
+	},
 	"profile": {
 		"profile": "Profil",
 		"submissions": "Beküldések",
 		"settings": "Beállítások"
 	},
 	"profile_main": {
+		"page_title": "{{params.user}} profilja :: njudge",
 		"solved_problems": "Megoldott feladatok",
 		"unsolved_problems": "Megpróbált feladatok"
 	},
+	"profile_submissions": {
+		"page_title": "{{params.user}} beküldései :: njudge"
+	},
 	"profile_settings": {
+		"page_title": "Beállítások :: njudge",
 		"password_change": "Jelszóváltoztatás",
 		"other_settings": "Egyéb beállítások",
 		"old_password": "Régi jelszó",
@@ -81,6 +126,7 @@
 		"ranklist": "Eredmények"
 	},
 	"problem_statement": {
+		"page_title": "Leírás – {{params.problem}} :: njudge",
 		"file": "Fájl",
 		"statement": "Leírás",
 		"attachment": "Csatolmány",
@@ -98,25 +144,16 @@
 		"type": "Típus"
 	},
 	"problem_submit": {
+		"page_title": "Beküld – {{params.problem}} :: njudge",
 		"submit": "Beküld"
 	},
 	"problem_submissions": {
+		"page_title": "Beküldések – {{params.problem}} :: njudge",
 		"full_solutions": "Teljes megoldások",
 		"own_solutions": "Saját megoldásaim"
 	},
 	"problem_ranklist": {
+		"page_title": "Eredmények – {{params.problem}} :: njudge",
 		"ranklist": "Eredmények"
-	},
-	"login": {
-		"login": "Belépés",
-		"username": "Felhasználónév",
-		"password": "Jelszó"
-	},
-	"register": {
-		"register": "Regisztráció",
-		"username": "Felhasználónév",
-		"email": "E-mail cím",
-		"password": "Jelszó",
-		"confirm_password": "Jelszó megerősítése"
 	}
 }

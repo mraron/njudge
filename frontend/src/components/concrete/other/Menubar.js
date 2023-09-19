@@ -8,7 +8,7 @@ import UserContext from "../../../contexts/user/UserContext";
 import {useTranslation} from "react-i18next";
 
 const menuRoutes = [
-    routeMap.main,
+    routeMap.home,
     routeMap.contests,
     routeMap.archive,
     routeMap.submissions,
@@ -105,7 +105,6 @@ function MenuSideBar({selected, isOpen, onClose}) {
                         key={index} onClick={onClose}/>
         );
     });
-    console.log(i18n.languages)
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (menuRef.current && !menuRef.current.contains(event.target) && event.target.id !== "hamburgerButton" && !event.target.closest("#hamburgerButton")) {
@@ -182,9 +181,6 @@ function Menubar() {
     const handleOpen = () => {
         setOpen(true);
     };
-    if (isLoggedIn !== null) {
-        console.log(isLoggedIn)
-    }
     return (
         isLoggedIn !== null &&
         <div>

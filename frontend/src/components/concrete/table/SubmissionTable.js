@@ -1,5 +1,7 @@
 import RoundedTable from "../../container/RoundedTable";
 import {SVGCorrectSimple, SVGSpinner, SVGWrongSimple} from "../../../svg/SVGs";
+import {useState} from "react";
+import {useTranslation} from "react-i18next";
 
 function TestCase({index, numCases, testCase, group, isLastGroup, isLastCase}) {
     const bottomBorderCase = isLastGroup && isLastCase ? "border-b-0" : ""
@@ -63,6 +65,7 @@ function TestGroup({group, isLast}) {
 }
 
 function SubmissionTable({status}) {
+    const {t} = useTranslation()
     const testSet = status["testSets"][0]
     const groups = testSet["groups"]
     const groupContents = groups.map((group, index) =>
@@ -72,12 +75,12 @@ function SubmissionTable({status}) {
         <RoundedTable>
             <thead className="bg-grey-800">
             <tr className="divide-x divide-default">
-                <th className="padding-td-default">Részfeladat</th>
-                <th className="padding-td-default">Összpont</th>
-                <th className="padding-td-default">Teszt</th>
-                <th className="padding-td-default" colSpan={2}>Verdikt</th>
-                <th className="padding-td-default">Idő</th>
-                <th className="padding-td-default">Memória</th>
+                <th className="padding-td-default">{t("submission_table.subtask")}</th>
+                <th className="padding-td-default">{t("submission_table.total")}</th>
+                <th className="padding-td-default">{t("submission_table.test")}</th>
+                <th className="padding-td-default" colSpan={2}>{t("submission_table.verdict")}</th>
+                <th className="padding-td-default">{t("submission_table.time")}</th>
+                <th className="padding-td-default">{t("submission_table.memory")}</th>
             </tr>
             </thead>
             <tbody>

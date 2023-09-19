@@ -1,4 +1,43 @@
 {
+	"home": {
+		"page_title": "njudge"
+	},
+	"contests": {
+		"page_title": "Contests :: njudge",
+		"view": "View",
+		"register": "Register"
+	},
+	"archive": {
+		"page_title": "Archive :: njudge"
+	},
+	"submissions": {
+		"page_title": "Submissions :: njudge"
+	},
+	"problems": {
+		"page_title": "Problems :: njudge"
+	},
+	"info": {
+		"page_title": "Info :: njudge",
+		"successful_copy": "The text has been copied to the clipboard.",
+		"compiler_options": "Compilation and execution options"
+	},
+	"login": {
+		"page_title": "Login :: njudge",
+		"login": "Login",
+		"username": "Username",
+		"password": "Password"
+	},
+	"register": {
+		"page_title": "Register :: njudge",
+		"register": "Register",
+		"username": "Username",
+		"email": "E-mail address",
+		"password": "Password",
+		"confirm_password": "Confirm password"
+	},
+	"submission": {
+		"page_title": "Submission #{{params.id}} :: njudge"
+	},
 	"flash": {
 		"no_permission": "You have no permission to perform this operation.",
 		"successful_logout": "Successful logout.",
@@ -24,13 +63,6 @@
 		"score": "Score",
 		"num_solved": "Solved problems"
 	},
-	"info": {
-		"compiler_options": "Compilation and execution options"
-	},
-	"contests": {
-		"view": "View",
-		"register": "Register"
-	},
 	"problems_table": {
 		"id": "ID",
 		"title": "Title",
@@ -55,16 +87,29 @@
 		"time": "Time",
 		"memory": "Memory"
 	},
+	"submission_table": {
+		"subtask": "Subtask",
+		"total": "Total",
+		"test": "Test",
+		"verdict": "Verdict",
+		"time": "Time",
+		"memory": "Memory"
+	},
 	"profile": {
 		"profile": "Profile",
 		"submissions": "Submissions",
 		"settings": "Settings"
 	},
 	"profile_main": {
+		"page_title": "{{params.user}}'s profile :: njudge",
 		"solved_problems": "Solved problems",
 		"unsolved_problems": "Unsolved problems"
 	},
+	"profile_submissions": {
+		"page_title": "{{params.user}}'s submissions :: njudge"
+	},
 	"profile_settings": {
+		"page_title": "Settings :: njudge",
 		"password_change": "Change password",
 		"other_settings": "Other settings",
 		"old_password": "Old password",
@@ -81,6 +126,7 @@
 		"ranklist": "Ranklist"
 	},
 	"problem_statement": {
+		"page_title": "Statement – {{params.problem}} :: njudge",
 		"file": "File",
 		"statement": "Statement",
 		"attachment": "Attachment",
@@ -98,25 +144,16 @@
 		"type": "Type"
 	},
 	"problem_submit": {
+		"page_title": "Submit – {{params.problem}} :: njudge",
 		"submit": "Submit"
 	},
 	"problem_submissions": {
+		"page_title": "Submissions – {{params.problem}} :: njudge",
 		"full_solutions": "Full solutions",
 		"own_solutions": "Own solutions"
 	},
 	"problem_ranklist": {
+		"page_title": "Ranklist – {{params.problem}} :: njudge",
 		"ranklist": "Ranklist"
-	},
-	"login": {
-		"login": "Login",
-		"username": "Username",
-		"password": "Password"
-	},
-	"register": {
-		"register": "Register",
-		"username": "Username",
-		"email": "E-mail address",
-		"password": "Password",
-		"confirm_password": "Confirm password"
 	}
 }

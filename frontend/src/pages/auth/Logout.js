@@ -14,7 +14,7 @@ function Logout() {
         } else {
             window.flash(t("flash.not_logged_in"), "failure")
         }
-        navigate(routeMap.main)
+        navigate(routeMap.home)
     }, [])
     return (
         <></>

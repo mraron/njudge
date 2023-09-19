@@ -4,7 +4,7 @@ import PostFrame from '../components/container/PostFrame'
 import {SVGSpinner} from '../svg/SVGs';
 import '../index.css';
 
-function Main({data}) {
+function Home({data}) {
     return (
         <div className="relative w-full flex justify-center">
             <div className="flex justify-center w-full max-w-7xl">
@@ -20,4 +20,4 @@ function Main({data}) {
     );
 }
 
-export default Main;
+export default Home;

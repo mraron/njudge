@@ -3,7 +3,7 @@ import DropdownMenu from '../../components/input/DropdownMenu';
 import RoundedFrame from '../../components/container/RoundedFrame';
 import SVGTitleComponent from '../../svg/SVGTitleComponent';
 import {SVGAttachment, SVGAttachmentDescription, SVGAttachmentFile, SVGInformation, SVGSubmit} from '../../svg/SVGs';
-import {Link, useOutletContext} from "react-router-dom";
+import {Link} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 
 function ProblemInfo({info}) {

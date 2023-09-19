@@ -20,8 +20,9 @@ function LoginFrame() {
     const handleLogin = () => {
         login(username, password).then(resp => {
             window.flash(resp.message, resp.success ? "success" : "failure")
-        }).then(() => {
-            navigate(routeMap.main)
+            if (resp.success) {
+                navigate(routeMap.home)
+            }
         })
     }
     if (isLoggedIn) {

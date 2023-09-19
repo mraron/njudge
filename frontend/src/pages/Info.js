@@ -5,35 +5,12 @@ import RoundedTable from "../components/container/RoundedTable";
 import React, {useState} from "react";
 import {useTranslation} from "react-i18next";
 
-function CopyButton({command}) {
-    const [isCopied, setCopied] = useState(false)
-    const [isPending, setPending] = useState(false)
-    const handleClick = () => {
-        navigator.clipboard.writeText(command)
-        setCopied(true)
-    }
-    const handleMouseLeave = () => {
-        if (!isPending) {
-            setPending(true)
-            setTimeout(() => {
-                setCopied(false)
-                setPending(false)
-            }, 5000)
-        }
-    }
-    return (
-        <button
-            className="h-9 w-9 mr-2 rounded-md border-1 bg-grey-800 border-grey-725 hover:bg-grey-775 transition duration-200 relative"
-            onClick={handleClick} onMouseLeave={handleMouseLeave}>
-            <SVGCopy
-                cls={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 ${isCopied ? "opacity-0" : "opacity-100"} transition duration-[300ms]`}/>
-            <SVGCorrectSimple
-                cls={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-5 h-5 text-indigo-500 ${isCopied ? "opacity-100" : "opacity-0"} transition duration-[360ms]`}/>
-        </button>
-    )
-}
-
 function CompilerOption({lang, command}) {
+    const {t} = useTranslation()
+    const handleCopy = () => {
+        navigator.clipboard.writeText(command)
+        window.flash(t("info.successful_copy"), "success")
+    }
     return (
         <tr className={`divide-x divide-default `}>
             <td className="padding-td-default whitespace-nowrap">
@@ -41,7 +18,12 @@ function CompilerOption({lang, command}) {
             </td>
             <td className="padding-td-default text-white">
                 <div className="flex items-center">
-                    <CopyButton command={command}/>
+                    <button
+                        className="h-9 w-9 mr-2 rounded-md border-1 bg-grey-800 border-grey-725 hover:bg-grey-775 transition duration-200 relative"
+                        onClick={handleCopy}>
+                        <SVGCopy
+                            cls={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 `}/>
+                    </button>
                     <div className="flex items-center px-3 py-2 border-1 border-grey-725 rounded-md bg-grey-875">
                         <pre>{command}</pre>
                     </div>

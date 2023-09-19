@@ -2,8 +2,8 @@ import React, {useContext, useEffect, useState} from "react";
 import {useLocation} from 'react-router-dom';
 import {updateData} from "../../util/updateData";
 import PageLoadingAnimation from "../../components/util/PageLoadingAnimation";
-import FadeIn from "../../components/util/FadeIn";
 import UserContext from "../../contexts/user/UserContext";
+import {AnimatePresence, motion} from "framer-motion";
 
 function UpdatePage({ page: Page }) {
     const {setUserData, setLoggedIn} = useContext(UserContext)
@@ -30,8 +30,13 @@ function UpdatePage({ page: Page }) {
     return (
         <div className="relative w-full">
             <PageLoadingAnimation isVisible={isLoading} />
+            <AnimatePresence>
             {!isLoading &&
-                <FadeIn><Page isLoading={isLoading} data={passedData} /></FadeIn>}
+                <motion.div initial={{opacity: 0.6}} animate={{opacity: 1, transition: {duration: 0.25}}}
+                            exit={{opacity: 0.6, transition: {duration: 0.25}}}>
+                    <Page isLoading={isLoading} data={passedData} />
+                </motion.div>}
+            </AnimatePresence>
         </div>
     );
 }

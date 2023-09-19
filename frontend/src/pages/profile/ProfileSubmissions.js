@@ -1,6 +1,5 @@
 import Pagination from "../../components/util/Pagination";
 import SubmissionsTable from "../../components/concrete/table/SubmissionsTable";
-import {useOutletContext} from "react-router-dom";
 import React from "react";
 
 function ProfileSubmissions({ data }) {
