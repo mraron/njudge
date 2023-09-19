@@ -63,7 +63,7 @@ function RoutingComponent() {
                     <Route path={routeMap.problemSubmissions} element={<UpdatePage key={location.key} page={ProblemSubmissions} />}/>
                     <Route path={routeMap.problemRanklist} element={<UpdatePage key={location.key} page={ProblemRanklist} />}/>
                 </Route>
-                <Route path="*" element={<NotFound/>}/>
+                <Route path="*" element={<UpdatePage page={NotFound} />}/>
             </Routes>
         </div>
     )

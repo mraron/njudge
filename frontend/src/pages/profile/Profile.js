@@ -3,12 +3,14 @@ import TabFrame from '../../components/container/TabFrame'
 import {Outlet, useParams} from 'react-router-dom';
 import {routeMap} from "../../config/RouteConfig";
 import UserContext from "../../contexts/user/UserContext";
+import {useTranslation} from "react-i18next";
 
-function Profile({ data }) {
+function Profile() {
+    const {t} = useTranslation()
     let routeLabels = [
-        "Profil",
-        "Beküldések",
-        "Beállítások"
+        t("profile.profile"),
+        t("profile.submissions"),
+        t("profile.settings")
     ]
     let routePatterns = [
         routeMap.profile,

@@ -4,8 +4,8 @@ function RoundedTable({children, title, titleComponent}) {
     return (
         <RoundedFrame title={title} titleComponent={titleComponent}>
             <div
-                className={`flex flex-col w-full overflow-x-auto ${title || titleComponent ? "rounded-bl-md rounded-br-md" : "rounded-md"} text-table`}>
-                <table className="table-fixed divide-y divide-indigo-600 bg-grey-850 border-collapse">
+                className={`w-full overflow-x-auto ${title || titleComponent ? "rounded-bl-md rounded-br-md" : "rounded-md"}`}>
+                <table className="w-full divide-y divide-indigo-600 bg-grey-850 border-collapse text-table">
                     {children}
                 </table>
             </div>

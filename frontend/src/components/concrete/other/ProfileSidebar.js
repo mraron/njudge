@@ -70,7 +70,7 @@ function SubmissionsFrame({titleComponent, submissions}) {
 function ProfileSideBar() {
     const {t} = useTranslation()
     const {userData, isLoggedIn} = useContext(UserContext)
-    const titleComponent = <SVGTitleComponent svg={<SVGRecent/>} title={t("profile_sidebar.last_submissions")}/>
+    const titleComponent = <SVGTitleComponent svg={<SVGRecent cls="w-6 h-6 mr-2" />} title={t("profile_sidebar.last_submissions")}/>
     return (
         isLoggedIn &&
         <div className="w-full hidden lg:flex justify-center">

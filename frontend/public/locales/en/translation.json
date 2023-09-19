@@ -1,4 +1,9 @@
 {
+	"flash": {
+		"no_permission": "You have no permission to perform this operation.",
+		"successful_logout": "Successful logout.",
+		"not_logged_in": "You are not logged in"
+	},
 	"menubar":
 	{
 		"home": "Home",
@@ -49,5 +54,69 @@
 		"verdict": "Verdict",
 		"time": "Time",
 		"memory": "Memory"
+	},
+	"profile": {
+		"profile": "Profile",
+		"submissions": "Submissions",
+		"settings": "Settings"
+	},
+	"profile_main": {
+		"solved_problems": "Solved problems",
+		"unsolved_problems": "Unsolved problems"
+	},
+	"profile_settings": {
+		"password_change": "Change password",
+		"other_settings": "Other settings",
+		"old_password": "Old password",
+		"new_password": "New password",
+		"confirm_password": "Confirm password",
+		"save": "Save",
+		"unsolved_tags": "Show tags for unsolved problems",
+		"hide_solved": "Hide solved problems"
+	},
+	"problem": {
+		"statement": "Statement",
+		"submit": "Submit",
+		"submissions": "Submissions",
+		"ranklist": "Ranklist"
+	},
+	"problem_statement": {
+		"file": "File",
+		"statement": "Statement",
+		"attachment": "Attachment",
+		"attachments": "Attachments",
+		"submit_solution": "Submit solution",
+		"no_file_selected": "No file selected",
+		"choose": "Choose",
+		"submit": "Submit",
+		"information": "Information",
+		"id": "ID",
+		"title": "Title",
+		"time_limit": "Time limit",
+		"memory_limit": "Memory limit",
+		"tags": "Tags",
+		"type": "Type"
+	},
+	"problem_submit": {
+		"submit": "Submit"
+	},
+	"problem_submissions": {
+		"full_solutions": "Full solutions",
+		"own_solutions": "Own solutions"
+	},
+	"problem_ranklist": {
+		"ranklist": "Ranklist"
+	},
+	"login": {
+		"login": "Login",
+		"username": "Username",
+		"password": "Password"
+	},
+	"register": {
+		"register": "Register",
+		"username": "Username",
+		"email": "E-mail address",
+		"password": "Password",
+		"confirm_password": "Confirm password"
 	}
 }

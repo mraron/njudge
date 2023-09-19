@@ -1,4 +1,9 @@
 {
+	"flash": {
+		"no_permission": "Nincs jogosultságod végrehajtani ezt a műveletet.",
+		"successful_logout": "Sikeres kijelentkezés.",
+		"not_logged_in": "Nem vagy belépve"
+	},
 	"menubar":
 	{
 		"home": "Főoldal",
@@ -49,5 +54,69 @@
 		"verdict": "Verdikt",
 		"time": "Idő",
 		"memory": "Memória"
+	},
+	"profile": {
+		"profile": "Profil",
+		"submissions": "Beküldések",
+		"settings": "Beállítások"
+	},
+	"profile_main": {
+		"solved_problems": "Megoldott feladatok",
+		"unsolved_problems": "Megpróbált feladatok"
+	},
+	"profile_settings": {
+		"password_change": "Jelszóváltoztatás",
+		"other_settings": "Egyéb beállítások",
+		"old_password": "Régi jelszó",
+		"new_password": "Új jelszó",
+		"confirm_password": "Jelszó megerősítése",
+		"save": "Mentés",
+		"unsolved_tags": "Megoldatlan feladatok címkéinek mutatása",
+		"hide_solved": "Megoldott feladatok elrejtése"
+	},
+	"problem": {
+		"statement": "Leírás",
+		"submit": "Beküld",
+		"submissions": "Beküldések",
+		"ranklist": "Eredmények"
+	},
+	"problem_statement": {
+		"file": "Fájl",
+		"statement": "Leírás",
+		"attachment": "Csatolmány",
+		"attachments": "Mellékletek",
+		"submit_solution": "Megoldás beküldése",
+		"no_file_selected": "Nincs kiválasztva fájl",
+		"choose": "Tallózás",
+		"submit": "Beküld",
+		"information": "Információk",
+		"id": "ID",
+		"title": "Cím",
+		"time_limit": "Időlimit",
+		"memory_limit": "Memórialimit",
+		"tags": "Címkék",
+		"type": "Típus"
+	},
+	"problem_submit": {
+		"submit": "Beküld"
+	},
+	"problem_submissions": {
+		"full_solutions": "Teljes megoldások",
+		"own_solutions": "Saját megoldásaim"
+	},
+	"problem_ranklist": {
+		"ranklist": "Eredmények"
+	},
+	"login": {
+		"login": "Belépés",
+		"username": "Felhasználónév",
+		"password": "Jelszó"
+	},
+	"register": {
+		"register": "Regisztráció",
+		"username": "Felhasználónév",
+		"email": "E-mail cím",
+		"password": "Jelszó",
+		"confirm_password": "Jelszó megerősítése"
 	}
 }

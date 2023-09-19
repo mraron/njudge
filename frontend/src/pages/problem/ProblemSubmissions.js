@@ -5,8 +5,10 @@ import Pagination from "../../components/util/Pagination";
 import {useLocation, useNavigate, useOutletContext} from "react-router-dom";
 import UpdateQueryString from "../../util/updateQueryString";
 import queryString from "query-string";
+import {useTranslation} from "react-i18next";
 
 function SubmissionFilterFrame() {
+    const {t} = useTranslation()
     const location = useLocation()
     const navigate = useNavigate()
     const handleCheckboxFullClicked = (checked) => {
@@ -22,17 +24,15 @@ function SubmissionFilterFrame() {
         <RoundedFrame>
             <div className="px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between">
                 <div className="mb-2 sm:mb-0">
-                    <Checkbox label="Teljes megoldások" onChange={handleCheckboxFullClicked} initChecked={accepted}/>
+                    <Checkbox label={t("problem_submissions.full_solutions")} onChange={handleCheckboxFullClicked} initChecked={accepted}/>
                 </div>
-                <Checkbox label="Saját beküldéseim" onChange={handleCheckboxOwnClicked} initChecked={own}/>
+                <Checkbox label={t("problem_submissions.own_solutions")} onChange={handleCheckboxOwnClicked} initChecked={own}/>
             </div>
         </RoundedFrame>
     )
 }
 
-function ProblemSubmissions() {
-    const data = useOutletContext()
-
+function ProblemSubmissions({ data }) {
     return (
         <div className="relative">
             <div className="mb-2">

@@ -4,29 +4,31 @@ import RoundedFrame from '../../components/container/RoundedFrame';
 import SVGTitleComponent from '../../svg/SVGTitleComponent';
 import {SVGAttachment, SVGAttachmentDescription, SVGAttachmentFile, SVGInformation, SVGSubmit} from '../../svg/SVGs';
 import {Link, useOutletContext} from "react-router-dom";
+import {useTranslation} from "react-i18next";
 
 function ProblemInfo({info}) {
+    const {t} = useTranslation()
     const tagsContent =
         <div className="flex flex-wrap">
-            {info.tags.map((tagName, index) =>
-                <span className="tag" key={index}>{tagName}</span>)}
+            {info.tags.map((tagName, index) => <span className="tag" key={index}>{tagName}</span>)}
         </div>
 
-    const titleComponent = <SVGTitleComponent svg={<SVGInformation cls="w-6 h-6 mr-2"/>} title="Információk"/>
+    const titleComponent = <SVGTitleComponent svg={<SVGInformation cls="w-6 h-6 mr-2"/>} title={t("problem_statement.information")}/>
     return (
-        <MapDataFrame titleComponent={titleComponent} data={[
-            ["Azonosító", info.id],
-            ["Cím", info.title],
-            ["Időlimit", `${info.timeLimit} ms`],
-            ["Memórialimit", `${info.memoryLimit} MiB`],
-            ["Címkék", tagsContent],
-            ["Típus", info.type]
+        <MapDataFrame maxDataWidth={'200px'} titleComponent={titleComponent} data={[
+            [t("problem_statement.id"), info.id],
+            [t("problem_statement.title"), info.title],
+            [t("problem_statement.time_limit"), `${info.timeLimit} ms`],
+            [t("problem_statement.memory_limit"), `${info.memoryLimit} MiB`],
+            [t("problem_statement.tags"), tagsContent],
+            [t("problem_statement.type"), info.type]
         ]}/>
     )
 }
 
 function ProblemSubmit() {
-    const titleComponent = <SVGTitleComponent svg={<SVGSubmit/>} title="Megoldás beküldése"/>
+    const {t} = useTranslation()
+    const titleComponent = <SVGTitleComponent svg={<SVGSubmit/>} title={t("problem_statement.submit_solution")}/>
     return (
         <RoundedFrame titleComponent={titleComponent}>
             <div className="px-6 py-5">
@@ -35,11 +37,11 @@ function ProblemSubmit() {
                         <DropdownMenu itemNames={["C++ 11", "C++ 14", "C++ 17", "Go", "Java", "Python 3"]}/>
                     </div>
                     <div className="mb-2 mx-1 text-label">
-                        Nincs kiválasztva fájl.
+                        {t("problem_statement.no_file_selected")}
                     </div>
                     <div className="flex justify-center">
-                        <button className="btn-gray w-1/2">Tallózás</button>
-                        <button className="ml-2 btn-indigo w-1/2">Beküldés</button>
+                        <button className="btn-gray w-1/2">{t("problem_statement.choose")}</button>
+                        <button className="ml-2 btn-indigo w-1/2">{t("problem_statement.submit")}</button>
                     </div>
                 </div>
             </div>
@@ -48,19 +50,25 @@ function ProblemSubmit() {
 }
 
 function ProblemAttachments({attachments}) {
+    const {t} = useTranslation()
     const attachmentsContent = attachments.map((item, index) => {
-        const typeLabel = item.type === "file" ? "Fájl" : (item.type === "statement" ? "Leírás" : "Csatolmány");
+        const labels = {
+            "file":         t("problem_statement.file"),
+            "statement":    t("problem_statement.statement"),
+            "attachment":   t("problem_statement.attachment")
+        }
+        const typeLabel = labels[item.type]
         return (
             <li key={index}>
                 <Link className="link no-underline flex items-start my-0.5" to={item.href}>
-                    {item.type === "file" && <SVGAttachmentFile/>}
-                    {item.type === "statement" && <SVGAttachmentDescription/>}
-                    <span className="underline">{typeLabel} ({item.name})</span>
+                    {item.type === "file"       && <SVGAttachmentFile cls="w-5 h-5 mr-2 shrink-0"/>}
+                    {item.type === "statement"  && <SVGAttachmentDescription cls="w-5 h-5 mr-2 shrink-0"/>}
+                    <span className="underline truncate">{typeLabel} ({item.name})</span>
                 </Link>
             </li>
         )
     });
-    const titleComponent = <SVGTitleComponent svg={<SVGAttachment/>} title="Mellékletek"/>
+    const titleComponent = <SVGTitleComponent svg={<SVGAttachment/>} title={t("problem_statement.attachments")}/>
     return (
         <RoundedFrame titleComponent={titleComponent}>
             <div className="px-6 py-5">
@@ -72,9 +80,7 @@ function ProblemAttachments({attachments}) {
     )
 }
 
-function ProblemStatement() {
-    const data = useOutletContext()
-
+function ProblemStatement({ data }) {
     return (
         <div className="flex flex-col lg:flex-row">
             <div className="w-full mb-3">

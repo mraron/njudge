@@ -5,16 +5,18 @@ import {SVGCorrectSimple, SVGWrongSimple} from "../../svg/SVGs";
 import {useOutletContext} from "react-router-dom";
 import React from "react";
 import {routeMap} from "../../config/RouteConfig";
+import {useTranslation} from "react-i18next";
 
 const makeProblemLink = (problem) => {
     return {"text": problem, "href": routeMap.problem.replace(":problem", problem)}
 }
 
 function ProfileMain({ data }) {
+    const {t} = useTranslation()
     const titleComponentCorrect = <SVGTitleComponent svg={<SVGCorrectSimple cls="w-6 h-6 text-green-500 mr-2"/>}
-                                                     title="Megoldott feladatok"/>
+                                                     title={t("profile_main.solved_problems")}/>
     const titleComponentWrong = <SVGTitleComponent svg={<SVGWrongSimple cls="w-6 h-6 text-red-500 mr-2"/>}
-                                                   title="Megpróbált feladatok"/>
+                                                   title={t("profile_main.unsolved_problems")}/>
 
     return (
         <div className="flex flex-col sm:flex-row w-full items-start">
