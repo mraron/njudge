@@ -1,11 +1,11 @@
 import TabFrame from '../../components/container/TabFrame'
 import {matchPath, Outlet, useLocation, useParams} from 'react-router-dom';
-import React, {useEffect, useState} from "react";
-import {updatePageData} from "../../util/UpdateData";
+import React, {useEffect, useLayoutEffect, useState} from "react";
+import {updatePageData} from "../../util/updateData";
 import FadeIn from "../../components/util/FadeIn";
 import PageLoadingAnimation from "../../components/util/PageLoadingAnimation";
 import {routeMap} from "../../config/RouteConfig";
-import {findRouteIndex} from "../../util/FindRouteIndex";
+import {findRouteIndex} from "../../util/findRouteIndex";
 
 const routeLabels = [
     "Leírás",
@@ -29,14 +29,19 @@ function Problem() {
     const {problem} = useParams()
     const location = useLocation()
     const [data, setData] = useState(null)
-    const [loadingCount, setLoadingCount] = useState(0)
+    const [isLoading, setLoading] = useState(false)
     const routes = routePatterns.map(item => item.replace(":problem", problem))
     const abortController = new AbortController();
 
+    useLayoutEffect(() => {
+        setLoading(true)
+    }, [location]);
+
     useEffect(() => {
         let isMounted = true
-        updatePageData(location, routesToFetch, abortController, setData, setLoadingCount, () => isMounted)
-
+        updatePageData(location, routesToFetch, abortController, setData, () => isMounted).then(() =>
+            setLoading(false)
+        )
         return () => {
             isMounted = false
             abortController.abort()
@@ -44,7 +49,7 @@ function Problem() {
     }, [location]);
 
     let pageContent = null
-    if (loadingCount === 0 && (findRouteIndex(routesToFetch, location.pathname) === -1 || data && matchPath(data.route, location.pathname))) {
+    if (findRouteIndex(routesToFetch, location.pathname) === -1 || !isLoading && data && matchPath(data.route, location.pathname)) {
         pageContent = <FadeIn><Outlet context={data}/></FadeIn>
     }
     return (
@@ -53,7 +58,7 @@ function Problem() {
                 <div className="w-full px-4">
                     <TabFrame routes={routes} routeLabels={routeLabels} routePatterns={routePatterns}>
                         <div className="relative w-full">
-                            <PageLoadingAnimation isVisible={loadingCount !== 0}/>
+                            <PageLoadingAnimation isVisible={isLoading}/>
                             {pageContent}
                         </div>
                     </TabFrame>

@@ -2,7 +2,7 @@ import RoundedFrame from '../../components/container/RoundedFrame';
 import TextBox from '../../components/input/TextBox';
 import {SVGAvatar, SVGGoogle} from '../../svg/SVGs';
 import SVGTitleComponent from '../../svg/SVGTitleComponent';
-import {login} from "../../util/Auth";
+import {login} from "../../util/auth";
 import {useContext, useState} from "react";
 import {Navigate, useNavigate} from "react-router-dom";
 import {routeMap} from "../../config/RouteConfig";

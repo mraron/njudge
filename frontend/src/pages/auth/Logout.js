@@ -1,5 +1,5 @@
 import {useNavigate} from "react-router-dom";
-import {logout} from "../../util/Auth";
+import {logout} from "../../util/auth";
 import {useEffect} from "react";
 import {routeMap} from "../../config/RouteConfig";
 

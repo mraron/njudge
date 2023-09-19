@@ -1,12 +1,14 @@
 import RoundedFrame from '../../container/RoundedFrame'
+import {useTranslation} from "react-i18next";
 
 function ContestFrame({name, date, active}) {
+    const {t} = useTranslation()
     const buttons = [
-        <button className="btn-gray mr-1" key={0}>Megtekintés</button>
+        <button className="btn-gray mr-1" key={0}>{t("contests.view")}</button>
     ]
     if (active) {
         buttons.push(
-            <button className="btn-indigo ml-1" key={buttons.length}>Regisztráció</button>
+            <button className="btn-indigo ml-1" key={buttons.length}>{t("contests.register")}</button>
         )
     }
     return (

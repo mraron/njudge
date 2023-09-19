@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 .btn-indigo {
-    @apply text-sm font-medium px-6 py-2.5 bg-indigo-600 rounded-md hover:bg-indigo-500 transition duration-200 text-center
+    @apply text-sm font-medium px-6 py-2 bg-indigo-600 rounded-md hover:bg-indigo-500 transition duration-200 text-center
 }
 
 .btn-gray {
-    @apply text-sm font-medium px-6 py-2.5 bg-grey-725 rounded-md hover:bg-grey-700 transition duration-200 border border-default hover:border-grey-625 text-center
+    @apply text-sm font-medium px-6 py-2 bg-grey-725 rounded-md hover:bg-grey-700 transition duration-200 border border-default hover:border-grey-625 text-center
 }
 
 .border-default {
@@ -50,7 +50,7 @@
 }
 
 .link {
-    @apply text-indigo-200 cursor-pointer underline underline-offset-2 hover:text-white transition duration-200
+    @apply text-white cursor-pointer underline underline-offset-2 hover:text-indigo-200 transition duration-200
 }
 
 html {

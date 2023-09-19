@@ -1,16 +1,14 @@
-import {findRouteIndex} from "./FindRouteIndex";
-import {authenticate} from "./Auth";
+import {findRouteIndex} from "./findRouteIndex";
+import {authenticate} from "./auth";
 
 export async function updatePageData(location,
                                      routesToFetch,
                                      abortController,
                                      setData,
-                                     setLoadingCount,
                                      isMounted) {
 
     const fetchedRouteIndex = findRouteIndex(routesToFetch, location.pathname)
     if (fetchedRouteIndex !== -1) {
-        setLoadingCount(arg => arg + 1)
         try {
             const fullPath = location.pathname + location.search
             const response = await fetch(`/api/v2${fullPath}`, {signal: abortController.signal})
@@ -26,27 +24,22 @@ export async function updatePageData(location,
             }
         } catch (error) {
             console.error(error)
-        } finally {
-            setLoadingCount(arg => arg - 1)
         }
     }
 }
 
-export function updateData(location,
+export async function updateData(location,
                            routesToFetch,
                            abortController,
                            setData,
-                           setLoadingCount,
                            setUserData,
                            setLoggedIn,
                            isMounted) {
 
-    authenticate().then(resp => {
-        if (resp !== undefined) {
-            setUserData(resp)
-            setLoggedIn(resp !== null)
-        }
-    }).then(() => {
-        updatePageData(location, routesToFetch, abortController, setData, setLoadingCount, isMounted)
-    })
+    const response = await authenticate()
+    if (response !== undefined) {
+        setUserData(response)
+        setLoggedIn(response !== null)
+    }
+    await updatePageData(location, routesToFetch, abortController, setData, isMounted)
 }

@@ -1,0 +1,53 @@
+{
+	"menubar":
+	{
+		"home": "Home",
+		"contests": "Contests",
+		"archive": "Archive",
+		"submissions": "Submissions",
+		"problems": "Problems",
+		"information": "Information",
+		"profile": "Profile",
+		"logout": "Logout",
+		"login": "Login",
+		"register": "Register"
+	},
+	"profile_sidebar": {
+		"stats": "Statistics",
+		"last_submissions": "Last submissions",
+		"rating": "Rating",
+		"score": "Score",
+		"num_solved": "Solved problems"
+	},
+	"info": {
+		"compiler_options": "Compilation and execution options"
+	},
+	"contests": {
+		"view": "View",
+		"register": "Register"
+	},
+	"problems_table": {
+		"id": "ID",
+		"title": "Title",
+		"category": "Category",
+		"tags": "Tags",
+		"solved": "Solved"
+	},
+	"problem_filter": {
+		"title": "Title",
+		"tags": "Tags",
+		"category": "Category",
+		"search": "Search",
+		"reset": "Reset"
+	},
+	"submissions_table": {
+		"id": "ID",
+		"date": "Date",
+		"user": "User",
+		"problem": "Problem",
+		"language": "Language",
+		"verdict": "Verdict",
+		"time": "Time",
+		"memory": "Memory"
+	}
+}

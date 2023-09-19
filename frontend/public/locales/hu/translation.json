@@ -1,0 +1,53 @@
+{
+	"menubar":
+	{
+		"home": "Főoldal",
+		"contests": "Versenyek",
+		"archive": "Archívum",
+		"submissions": "Beküldések",
+		"problems": "Feladatok",
+		"information": "Információ",
+		"profile": "Profil",
+		"logout": "Kilépés",
+		"login": "Belépés",
+		"register": "Regisztráció"
+	},
+	"profile_sidebar": {
+		"stats": "Statisztikák",
+		"last_submissions": "Utolsó beküldések",
+		"rating": "Értékelés",
+		"score": "Pontszám",
+		"num_solved": "Megoldott feladatok"
+	},
+	"info": {
+		"compiler_options": "Fordítási és futtatási opciók"
+	},
+	"contests": {
+		"view": "Megtekintés",
+		"register": "Regisztráció"
+	},
+	"problems_table": {
+		"id": "ID",
+		"title": "Cím",
+		"category": "Kategória",
+		"tags": "Címkék",
+		"solved": "Megoldók"
+	},
+	"problem_filter": {
+		"title": "Cím",
+		"tags": "Címkék",
+		"category": "Kategória",
+		"search": "Keres",
+		"reset": "Visszaállít"
+	},
+	"submissions_table": {
+		"id": "ID",
+		"date": "Dátum",
+		"user": "Felhasználó",
+		"problem": "Feladat",
+		"language": "Nyelv",
+		"verdict": "Verdikt",
+		"time": "Idő",
+		"memory": "Memória"
+	}
+}

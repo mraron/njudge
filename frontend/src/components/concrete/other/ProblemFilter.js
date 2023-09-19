@@ -5,8 +5,10 @@ import TagDropdown from '../../input/TagDropdown';
 import {useLocation, useNavigate} from 'react-router-dom';
 import DropdownFrame from "../../container/DropdownFrame";
 import queryString from "query-string";
+import {useTranslation} from "react-i18next";
 
 function ProblemFilter() {
+    const {t} = useTranslation()
     const [title, setTitle] = useState("");
     const [tags, setTags] = useState([]);
     const [category, setCategory] = useState([-1, ""]);
@@ -36,10 +38,10 @@ function ProblemFilter() {
     return (
         <div className="w-full">
             <div className="mb-4">
-                <TextBox id="filterTitle" label="Feladatcím" initText={title} onChange={handleTitleChange}/>
+                <TextBox id="filterTitle" label={t("problem_filter.title")} initText={title} onChange={handleTitleChange}/>
             </div>
             <div className="mb-4">
-                <TagDropdown id="filterTags" label="Címkék" fillSelected={false} itemNames={[
+                <TagDropdown id="filterTags" label={t("problem_filter.tags")} fillSelected={false} itemNames={[
                     "matematika",
                     "mohó",
                     "dinamikus programozás",
@@ -47,7 +49,7 @@ function ProblemFilter() {
                 ]} initTags={tags} onChange={handleTagsChange}/>
             </div>
             <div className="mb-5">
-                <TextBoxDropdown id="filterCategory" label="Kategória" initText={category[1]} initSelected={category[0]}
+                <TextBoxDropdown id="filterCategory" label={t("problem_filter.category")} initText={category[1]} initSelected={category[0]}
                                  fillSelected={true} itemNames={[
                     "IOI-CEOI Válogató 2023",
                     "IOI-CEOI Válogató 2023 − 1. forduló",
@@ -56,8 +58,8 @@ function ProblemFilter() {
                 ]} onChange={handleCategoryChange}/>
             </div>
             <div className="flex justify-center">
-                <button className="mr-1 btn-indigo w-32" onClick={handleSubmit}>Keres</button>
-                <button className="ml-1 btn-gray w-32" onClick={handleReset}>Visszaállít</button>
+                <button className="mr-1 btn-indigo w-32" onClick={handleSubmit}>{t("problem_filter.search")}</button>
+                <button className="ml-1 btn-gray w-32" onClick={handleReset}>{t("problem_filter.reset")}</button>
             </div>
         </div>
     )

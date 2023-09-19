@@ -2,6 +2,7 @@ import RoundedTable from '../../container/RoundedTable';
 import {Link} from 'react-router-dom';
 import {SVGAvatar} from '../../../svg/SVGs';
 import {routeMap} from "../../../config/RouteConfig";
+import {useTranslation} from "react-i18next";
 
 function Problem(data) {
     const {problem, title, category, tags, solverCount} = data.problem
@@ -36,6 +37,7 @@ function Problem(data) {
 }
 
 function ProblemsTable({problems}) {
+    const {t} = useTranslation()
     const problemsContent = problems.map((item, index) =>
         <Problem problem={item} key={index}/>
     );
@@ -43,15 +45,15 @@ function ProblemsTable({problems}) {
         <RoundedTable>
             <thead className="bg-grey-800">
             <tr className="divide-x divide-default">
-                <th className="padding-td-default">Azonosító</th>
-                <th className="padding-td-default">Feladatcím</th>
-                <th className="padding-td-default">Kategória</th>
-                <th className="padding-td-default">Címkék</th>
-                <th className="padding-td-default">Megoldók</th>
+                <th className="padding-td-default">{t("problems_table.id")}</th>
+                <th className="padding-td-default">{t("problems_table.title")}</th>
+                <th className="padding-td-default">{t("problems_table.category")}</th>
+                <th className="padding-td-default">{t("problems_table.tags")}</th>
+                <th className="padding-td-default">{t("problems_table.solved")}</th>
             </tr>
             </thead>
             <tbody className="divide-y divide-default">
-            {problemsContent}
+                {problemsContent}
             </tbody>
         </RoundedTable>
     );

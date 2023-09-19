@@ -3,6 +3,7 @@ import {SVGCode, SVGCopy, SVGCorrectSimple} from "../svg/SVGs";
 import SVGTitleComponent from "../svg/SVGTitleComponent";
 import RoundedTable from "../components/container/RoundedTable";
 import React, {useState} from "react";
+import {useTranslation} from "react-i18next";
 
 function CopyButton({command}) {
     const [isCopied, setCopied] = useState(false)
@@ -51,6 +52,7 @@ function CompilerOption({lang, command}) {
 }
 
 function InfoTable() {
+    const {t} = useTranslation()
     const compilerOptions = [
         ["C++ (11 / 14 / 17)", "g++ -std=c++<verzió> -O2 -static -DONLINE_JUDGE main.cpp"],
         ["C#", "/usr/bin/mcs -out:main.exe -optimize+ main.cs"],
@@ -63,7 +65,7 @@ function InfoTable() {
     const compilerOptionElems = compilerOptions.map((item, index) =>
         <CompilerOption lang={item[0]} command={item[1]} key={index}/>
     );
-    const titleComponent = <SVGTitleComponent title="Fordítási, futtatási opciók" svg={<SVGCode cls="w-7 h-7 mr-2"/>}/>
+    const titleComponent = <SVGTitleComponent title={t("info.compiler_options")} svg={<SVGCode cls="w-7 h-7 mr-2"/>}/>
     return (
         <RoundedTable titleComponent={titleComponent}>
             <tbody className="divide-y divide-default text-sm">

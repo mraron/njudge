@@ -1,7 +1,7 @@
 import {SVGDoubleRightArrow} from "../../svg/SVGs"
 import RoundedFrame from "../container/RoundedFrame"
 import {useLocation, useNavigate} from "react-router-dom";
-import UpdateQueryString from "../../util/UpdateQueryString";
+import UpdateQueryString from "../../util/updateQueryString";
 
 function Pagination({paginationData}) {
     const {currentPage, lastPage} = paginationData

@@ -2,6 +2,7 @@ import RoundedTable from '../../container/RoundedTable';
 import {SVGCorrectSimple, SVGSpinner, SVGWrongSimple} from "../../../svg/SVGs";
 import {Link} from "react-router-dom";
 import {routeMap} from "../../../config/RouteConfig"
+import {useTranslation} from "react-i18next";
 
 function Submission({submission}) {
     const {id, date, user, problem, lang, verdict, verdictType, time, memory} = submission
@@ -41,6 +42,7 @@ function Submission({submission}) {
 }
 
 function SubmissionsTable({submissions}) {
+    const {t} = useTranslation()
     const submissionsContent = submissions.map((item, index) =>
         <Submission submission={item} key={index}/>
     );
@@ -48,14 +50,14 @@ function SubmissionsTable({submissions}) {
         <RoundedTable>
             <thead className="bg-grey-800">
             <tr className="divide-x divide-default">
-                <th className="padding-td-default">ID</th>
-                <th className="padding-td-default">Dátum</th>
-                <th className="padding-td-default">Felhasználó</th>
-                <th className="padding-td-default">Feladat</th>
-                <th className="padding-td-default">Nyelv</th>
-                <th className="padding-td-default">Verdikt</th>
-                <th className="padding-td-default">Idő</th>
-                <th className="padding-td-default">Memória</th>
+                <th className="padding-td-default">{t("submissions_table.id")}</th>
+                <th className="padding-td-default">{t("submissions_table.date")}</th>
+                <th className="padding-td-default">{t("submissions_table.user")}</th>
+                <th className="padding-td-default">{t("submissions_table.problem")}</th>
+                <th className="padding-td-default">{t("submissions_table.language")}</th>
+                <th className="padding-td-default">{t("submissions_table.verdict")}</th>
+                <th className="padding-td-default">{t("submissions_table.time")}</th>
+                <th className="padding-td-default">{t("submissions_table.memory")}</th>
             </tr>
             </thead>
             <tbody className="divide-y divide-default">

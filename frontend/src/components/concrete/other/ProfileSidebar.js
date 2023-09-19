@@ -6,6 +6,7 @@ import RoundedTable from '../../container/RoundedTable';
 import {routeMap} from "../../../config/RouteConfig";
 import {Link} from "react-router-dom";
 import UserContext from "../../../contexts/user/UserContext";
+import {useTranslation} from "react-i18next";
 
 export function ProfilePictureFrame({userData}) {
     const profileRoute = routeMap.profile.replace(":user", encodeURIComponent(userData.username))
@@ -35,12 +36,13 @@ export function ProfilePictureFrame({userData}) {
 }
 
 export function ProfileDataFrame({userData}) {
-    const titleComponent = <SVGTitleComponent svg={<SVGStatistics cls="w-6 h-6 mr-2"/>} title="Statisztikák"/>
+    const {t} = useTranslation()
+    const titleComponent = <SVGTitleComponent svg={<SVGStatistics cls="w-6 h-6 mr-2"/>} title={t("profile_sidebar.stats")}/>
     return (
         <MapDataFrame data={[
-            ["Értékelés", `${userData.rating}`],
-            ["Pontszám", `${userData.score}`],
-            ["Megoldott feladatok", `${userData.numSolved}`]
+            [t("profile_sidebar.rating"), `${userData.rating}`],
+            [t("profile_sidebar.score"), `${userData.score}`],
+            [t("profile_sidebar.num_solved"), `${userData.numSolved}`]
         ]} titleComponent={titleComponent}/>
     );
 }
@@ -66,8 +68,9 @@ function SubmissionsFrame({titleComponent, submissions}) {
 }
 
 function ProfileSideBar() {
+    const {t} = useTranslation()
     const {userData, isLoggedIn} = useContext(UserContext)
-    const titleComponent = <SVGTitleComponent svg={<SVGRecent/>} title="Utolsó beküldések"/>
+    const titleComponent = <SVGTitleComponent svg={<SVGRecent/>} title={t("profile_sidebar.last_submissions")}/>
     return (
         isLoggedIn &&
         <div className="w-full hidden lg:flex justify-center">

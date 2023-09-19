@@ -2,10 +2,10 @@ import {Link, useLocation} from 'react-router-dom';
 import {useContext, useEffect, useRef, useState} from 'react';
 import {DropdownRoutes} from '../../input/DropdownMenu';
 import {SVGClose, SVGDropdownMenuArrow, SVGHamburger} from '../../../svg/SVGs';
-import {findRouteIndex} from '../../../util/FindRouteIndex';
+import {findRouteIndex} from '../../../util/findRouteIndex';
 import {routeMap} from "../../../config/RouteConfig";
 import UserContext from "../../../contexts/user/UserContext";
-import LanguageContext from "../../../contexts/language/LanguageContext";
+import {useTranslation} from "react-i18next";
 
 const menuRoutes = [
     routeMap.main,
@@ -16,40 +16,21 @@ const menuRoutes = [
     routeMap.info
 ]
 const menuRouteLabels = [
-    "Home",
-    "Contests",
-    "Archive",
-    "Submissions",
-    "Problems",
-    "Information"
+    "menubar.home",
+    "menubar.contests",
+    "menubar.archive",
+    "menubar.submissions",
+    "menubar.problems",
+    "menubar.information"
 ]
-const translate = {
-    "hu": {
-        "Home": "Főoldal",
-        "Contests": "Versenyek",
-        "Archive": "Archívum",
-        "Submissions": "Beküldések",
-        "Problems": "Feladatok",
-        "Information": "Tudnivalók",
-    },
-    "en": {
-        "Home": "Home",
-        "Contests": "Contests",
-        "Archive": "Archive",
-        "Submissions": "Submissions",
-        "Problems": "Problems",
-        "Information": "Information",
-    }
-}
-
 const profileRouteLabels = {
     "loggedIn": [
-        "Profil",
-        "Kilépés"
+        "menubar.profile",
+        "menubar.logout"
     ],
     "loggedOut": [
-        "Belépés",
-        "Regisztráció"
+        "menubar.login",
+        "menubar.register"
     ]
 }
 
@@ -67,12 +48,13 @@ function MenuOption({label, route, selected, horizontal, onClick}) {
 
 function getProfileDropdownButton(isLoggedIn) {
     function ProfileDropdownButton({isOpen, onClick}) {
+        const {t} = useTranslation()
         return (
             <button
                 className={`border-1 border-grey-675 rounded-tl-md rounded-bl-md flex items-center justify-between px-3 py-2 w-full h-full ${isOpen ? "bg-grey-750 hover:bg-grey-700" : "hover:bg-grey-800"}`}
                 onClick={onClick}>
                 <span className="text-left">
-                    {isLoggedIn ? "Profil" : "Belépés"}
+                    {isLoggedIn ? t("menubar.profile") : t("menubar.login")}
                 </span>
                 <SVGDropdownMenuArrow isOpen={isOpen}/>
             </button>
@@ -84,7 +66,7 @@ function getProfileDropdownButton(isLoggedIn) {
 
 function ProfileSettings() {
     const {userData, isLoggedIn} = useContext(UserContext)
-    const {language, storeLanguage} = useContext(LanguageContext)
+    const {t, i18n} = useTranslation()
     const loginStr = isLoggedIn ? "loggedIn" : "loggedOut"
 
     let profileRoutes = [
@@ -100,25 +82,30 @@ function ProfileSettings() {
     return (
         <div className="flex">
             <DropdownRoutes button={getProfileDropdownButton(isLoggedIn)} routes={profileRoutes}
-                            routeLabels={profileRouteLabels[loginStr]}/>
+                            routeLabels={profileRouteLabels[loginStr].map(t)}/>
             <div
                 className="px-3 flex items-center justify-center border-1 border-l-0 border-grey-675 rounded-tr-md rounded-br-md">
-                <button className={`px-2 ${language === "hu"? "bg-grey-725": "hover:bg-grey-775"} rounded mr-1`} onClick={() => storeLanguage("hu")}>hu</button>
-                <button className={`px-2 ${language === "en"? "bg-grey-725": "hover:bg-grey-775"} rounded`} onClick={() => storeLanguage("en")}>en</button>
+                <button className={`px-2 ${i18n.resolvedLanguage === "hu"? "bg-grey-725": "hover:bg-grey-775"} rounded mr-1`} onClick={() => i18n.changeLanguage("hu")}>
+                    hu
+                </button>
+                <button className={`px-2 ${i18n.resolvedLanguage === "en"? "bg-grey-725": "hover:bg-grey-775"} rounded`} onClick={() => i18n.changeLanguage("en")}>
+                    en
+                </button>
             </div>
         </div>
     );
 }
 
 function MenuSideBar({selected, isOpen, onClose}) {
-    const {language} = useContext(LanguageContext)
+    const {t, i18n} = useTranslation()
     const menuRef = useRef(null)
     const menuOptions = menuRoutes.map((item, index) => {
         return (
-            <MenuOption label={translate[language][menuRouteLabels[index]]} route={item} selected={index === selected} horizontal={false}
+            <MenuOption label={t(menuRouteLabels[index])} route={item} selected={index === selected} horizontal={false}
                         key={index} onClick={onClose}/>
         );
     });
+    console.log(i18n.languages)
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (menuRef.current && !menuRef.current.contains(event.target) && event.target.id !== "hamburgerButton" && !event.target.closest("#hamburgerButton")) {
@@ -152,10 +139,10 @@ function MenuSideBar({selected, isOpen, onClose}) {
 }
 
 function MenuTopBar({selected, onOpen}) {
-    const {language} = useContext(LanguageContext)
+    const {t} = useTranslation()
     const menuOptions = menuRoutes.map((item, index) => {
         return (
-            <MenuOption label={translate[language][menuRouteLabels[index]]} route={item} selected={index === selected} horizontal={true}
+            <MenuOption label={t(menuRouteLabels[index])} route={item} selected={index === selected} horizontal={true}
                         key={index}/>
         );
     });

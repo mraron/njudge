@@ -52,7 +52,7 @@ function ProblemAttachments({attachments}) {
         const typeLabel = item.type === "file" ? "Fájl" : (item.type === "statement" ? "Leírás" : "Csatolmány");
         return (
             <li key={index}>
-                <Link className="link no-underline flex items-start" to={item.href}>
+                <Link className="link no-underline flex items-start my-0.5" to={item.href}>
                     {item.type === "file" && <SVGAttachmentFile/>}
                     {item.type === "statement" && <SVGAttachmentDescription/>}
                     <span className="underline">{typeLabel} ({item.name})</span>

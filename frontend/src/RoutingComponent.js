@@ -1,5 +1,5 @@
 import {matchPath, Route, Routes, useLocation} from "react-router-dom";
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useLayoutEffect, useState} from "react";
 import Main from "./pages/Main";
 import Contests from "./pages/Contests";
 import Info from "./pages/Info";
@@ -20,11 +20,11 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import NotFound from "./pages/error/NotFound";
 import PageLoadingAnimation from "./components/util/PageLoadingAnimation";
-import {updateData} from "./util/UpdateData";
+import {updateData} from "./util/updateData";
 import FadeIn from "./components/util/FadeIn";
 import {routeMap} from "./config/RouteConfig";
 import UserContext from "./contexts/user/UserContext";
-import {findRouteIndex} from "./util/FindRouteIndex";
+import {findRouteIndex} from "./util/findRouteIndex";
 import Logout from "./pages/auth/Logout";
 
 const routesToFetch = [
@@ -37,11 +37,15 @@ const routesToFetch = [
 ]
 
 function RoutingComponent() {
-    const {isLoggedIn, setUserData, setLoggedIn} = useContext(UserContext)
+    const {setUserData, setLoggedIn} = useContext(UserContext)
     const location = useLocation()
     const [data, setData] = useState(null)
-    const [loadingCount, setLoadingCount] = useState(0)
+    const [isLoading, setLoading] = useState(false)
     const abortController = new AbortController();
+
+    useLayoutEffect(() => {
+        setLoading(true)
+    }, [location]);
 
     useEffect(() => {
         let isMounted = true
@@ -50,10 +54,11 @@ function RoutingComponent() {
             routesToFetch,
             abortController,
             setData,
-            setLoadingCount,
             setUserData,
             setLoggedIn,
             () => isMounted
+        ).then(() =>
+            setLoading(false)
         )
         return () => {
             isMounted = false
@@ -62,8 +67,7 @@ function RoutingComponent() {
     }, [location]);
 
     let pageContent = null
-    if (isLoggedIn != null && loadingCount === 0 &&
-        (findRouteIndex(routesToFetch, location.pathname) === -1 || data && matchPath(data.route, location.pathname))) {
+    if (findRouteIndex(routesToFetch, location.pathname) === -1 || !isLoading && data && matchPath(data.route, location.pathname)) {
         pageContent =
             <Routes key={location.pathname}>
                 <Route path={routeMap.main} element={<FadeIn>
@@ -112,7 +116,7 @@ function RoutingComponent() {
     }
     return (
         <div className="relative w-full">
-            <PageLoadingAnimation isVisible={loadingCount !== 0}/>
+            <PageLoadingAnimation isVisible={isLoading}/>
             {pageContent}
         </div>
     )
