@@ -1,6 +1,7 @@
 import ProfileSideBar from '../components/concrete/other/ProfileSidebar'
 import DropdownListFrame from '../components/container/DropdownListFrame'
-import React from "react";
+import React, {useEffect} from "react";
+import {updateData} from "../util/updateData";
 
 function Archive({data}) {
     const categoriesContent = data.categories.map((item, index) =>

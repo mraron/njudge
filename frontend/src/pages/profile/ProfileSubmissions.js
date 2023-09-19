@@ -3,9 +3,7 @@ import SubmissionsTable from "../../components/concrete/table/SubmissionsTable";
 import {useOutletContext} from "react-router-dom";
 import React from "react";
 
-function ProfileSubmissions() {
-    const data = useOutletContext()
-
+function ProfileSubmissions({ data }) {
     return (
         <div className="relative">
             <div className="flex flex-col w-full">

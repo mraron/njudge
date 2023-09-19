@@ -10,8 +10,7 @@ const makeProblemLink = (problem) => {
     return {"text": problem, "href": routeMap.problem.replace(":problem", problem)}
 }
 
-function ProfileMain() {
-    const data = useOutletContext()
+function ProfileMain({ data }) {
     const titleComponentCorrect = <SVGTitleComponent svg={<SVGCorrectSimple cls="w-6 h-6 text-green-500 mr-2"/>}
                                                      title="Megoldott feladatok"/>
     const titleComponentWrong = <SVGTitleComponent svg={<SVGWrongSimple cls="w-6 h-6 text-red-500 mr-2"/>}

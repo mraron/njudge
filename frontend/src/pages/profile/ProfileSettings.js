@@ -59,7 +59,7 @@ function OtherSettingsFrame() {
     )
 }
 
-function ProfileSettings() {
+function ProfileSettings({ data }) {
     const navigate = useNavigate()
     const [isVisible, setVisible] = useState(false)
     const {user} = useParams()

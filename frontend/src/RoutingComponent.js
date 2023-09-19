@@ -26,6 +26,7 @@ import {routeMap} from "./config/RouteConfig";
 import UserContext from "./contexts/user/UserContext";
 import {findRouteIndex} from "./util/findRouteIndex";
 import Logout from "./pages/auth/Logout";
+import UpdatePage from "./pages/wrappers/UpdatedPage";
 
 const routesToFetch = [
     routeMap.main,
@@ -37,87 +38,33 @@ const routesToFetch = [
 ]
 
 function RoutingComponent() {
-    const {setUserData, setLoggedIn} = useContext(UserContext)
     const location = useLocation()
-    const [data, setData] = useState(null)
-    const [isLoading, setLoading] = useState(false)
-    const abortController = new AbortController();
-
-    useLayoutEffect(() => {
-        setLoading(true)
-    }, [location]);
-
-    useEffect(() => {
-        let isMounted = true
-        updateData(
-            location,
-            routesToFetch,
-            abortController,
-            setData,
-            setUserData,
-            setLoggedIn,
-            () => isMounted
-        ).then(() =>
-            setLoading(false)
-        )
-        return () => {
-            isMounted = false
-            abortController.abort()
-        }
-    }, [location]);
-
-    let pageContent = null
-    if (findRouteIndex(routesToFetch, location.pathname) === -1 || !isLoading && data && matchPath(data.route, location.pathname)) {
-        pageContent =
-            <Routes key={location.pathname}>
-                <Route path={routeMap.main} element={<FadeIn>
-                    <Main data={data}/>
-                </FadeIn>}/>
-                <Route path={routeMap.contests} element={<FadeIn>
-                    <Contests data={data}/>
-                </FadeIn>}/>
-                <Route path={routeMap.info} element={<FadeIn>
-                    <Info data={data}/>
-                </FadeIn>}/>
-                <Route path={routeMap.archive} element={<FadeIn>
-                    <Archive data={data}/>
-                </FadeIn>}/>
-                <Route path={routeMap.submissions} element={<FadeIn>
-                    <Submissions data={data}/>
-                </FadeIn>}/>
-                <Route path={routeMap.problems} element={<FadeIn>
-                    <Problems data={data}/>
-                </FadeIn>}/>
-                <Route path={routeMap.submission} element={<FadeIn>
-                    <Submission data={data}/>
-                </FadeIn>}/>
-                <Route path={routeMap.login} element={<FadeIn>
-                    <Login data={data}/>
-                </FadeIn>}/>
-                <Route path={routeMap.register} element={<FadeIn>
-                    <Register data={data}/>
-                </FadeIn>}/>
-                <Route path={routeMap.logout} element={<Logout/>}/>
-                <Route path={routeMap.profile} element={<Profile/>}>
-                    <Route index element={<ProfileMain/>}/>
-                    <Route path={routeMap.profileSubmissions} element={<ProfileSubmissions/>}/>
-                    <Route path={routeMap.profileSettings} element={<ProfileSettings/>}/>
-                </Route>
-                <Route path={routeMap.problem} element={<Problem/>}>
-                    <Route index element={<ProblemStatement/>}/>
-                    <Route path={routeMap.problemSubmit} element={<ProblemSubmit/>}/>
-                    <Route path={routeMap.problemSubmissions} element={<ProblemSubmissions/>}/>
-                    <Route path={routeMap.problemRanklist} element={<ProblemRanklist/>}/>
-                </Route>
-                <Route path="*" element={<FadeIn>
-                    <NotFound/>
-                </FadeIn>}/>
-            </Routes>
-    }
     return (
-        <div className="relative w-full">
-            <PageLoadingAnimation isVisible={isLoading}/>
-            {pageContent}
+        <div className="w-full">
+            <Routes>
+                <Route path={routeMap.main} element={<UpdatePage key={location.key} page={Main} />}/>
+                <Route path={routeMap.contests} element={<UpdatePage key={location.key} page={Contests} />}/>
+                <Route path={routeMap.info} element={<UpdatePage key={location.key} page={Info} />}/>
+                <Route path={routeMap.archive} element={<UpdatePage key={location.key} page={Archive} />}/>
+                <Route path={routeMap.submissions} element={<UpdatePage key={location.key} page={Submissions} />}/>
+                <Route path={routeMap.problems} element={<UpdatePage key={location.key} page={Problems} />}/>
+                <Route path={routeMap.submission} element={<UpdatePage key={location.key} page={Submission} />}/>
+                <Route path={routeMap.login} element={<UpdatePage key={location.key} page={Login} />}/>
+                <Route path={routeMap.register} element={<UpdatePage key={location.key} page={Register} />}/>
+                <Route path={routeMap.logout} element={<UpdatePage key={location.key} page={Logout} />}/>
+                <Route path={routeMap.profile} element={<FadeIn><Profile /></FadeIn>}>
+                    <Route index element={<UpdatePage key={location.key} page={ProfileMain} />}/>
+                    <Route path={routeMap.profileSubmissions} element={<UpdatePage key={location.key} page={ProfileSubmissions}/>}/>
+                    <Route path={routeMap.profileSettings} element={<UpdatePage key={location.key} page={ProfileSettings}/>}/>
+                </Route>
+                <Route path={routeMap.problem} element={<FadeIn><Problem /></FadeIn>}>
+                    <Route index element={<UpdatePage key={location.key} page={ProblemStatement} />}/>
+                    <Route path={routeMap.problemSubmit} element={<UpdatePage key={location.key} page={ProblemSubmit} />}/>
+                    <Route path={routeMap.problemSubmissions} element={<UpdatePage key={location.key} page={ProblemSubmissions} />}/>
+                    <Route path={routeMap.problemRanklist} element={<UpdatePage key={location.key} page={ProblemRanklist} />}/>
+                </Route>
+                <Route path="*" element={<NotFound/>}/>
+            </Routes>
         </div>
     )
 }
