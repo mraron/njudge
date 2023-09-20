@@ -24,8 +24,8 @@ function CompilerOption({lang, command}) {
                         <SVGCopy
                             cls={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 `}/>
                     </button>
-                    <div className="flex items-center px-3 py-2 border-1 border-grey-725 rounded-md bg-grey-875">
-                        <pre>{command}</pre>
+                    <div className="w-full flex items-center px-3 py-2 border-1 border-grey-725 rounded-md bg-grey-875 font-mono">
+                        {command}
                     </div>
                 </div>
             </td>

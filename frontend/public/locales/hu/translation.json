@@ -102,7 +102,10 @@
 		"test": "Teszt",
 		"verdict": "Verdikt",
 		"time": "Idő",
-		"memory": "Memória"
+		"memory": "Memória",
+		"output": "Kimenet",
+		"expected_output": "Elvárt kimenet",
+		"checker_output": "Ellenőrző kimenet"
 	},
 	"profile": {
 		"profile": "Profil",

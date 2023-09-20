@@ -102,7 +102,10 @@
 		"test": "Test",
 		"verdict": "Verdict",
 		"time": "Time",
-		"memory": "Memory"
+		"memory": "Memory",
+		"output": "Output",
+		"expected_output": "Expected output",
+		"checker_output": "Checker's output"
 	},
 	"profile": {
 		"profile": "Profile",
