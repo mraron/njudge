@@ -46,7 +46,10 @@
 		"unsuccessful_submission": "A beküldés nem sikerült.",
 		"successful_submission": "Sikeres beküldés.",
 		"unsuccessful_login": "A bejelentkezés nem sikerült.",
-		"successful_login": "Sikeres bejelentkezés."
+		"successful_login": "Sikeres bejelentkezés.",
+		"successful_registration": "Sikeres regisztráció. Az ellenőrző linket elküldtük az e-mail címedre.",
+		"unsuccessful_verification": "Az ellenőrzés nem sikerült.",
+		"successful_verification": "Sikeres ellenőrzés."
 	},
 	"menubar":
 	{

@@ -15,5 +15,6 @@ export const routeMap = {
     "problemRanklist":          "/problemset/main/:problem/ranklist/",
     "login":                    "/user/login/",
     "register":                 "/user/register/",
+    "verify":                   "/user/verify/:token/",
     "logout":                   "/user/logout/"
 }

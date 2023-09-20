@@ -11,7 +11,6 @@ import {useTranslation} from "react-i18next";
 
 function LoginFrame() {
     const {t} = useTranslation()
-    const {userData, isLoggedIn} = useContext(UserContext)
     const navigate = useNavigate()
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
@@ -28,20 +27,17 @@ function LoginFrame() {
             }
         })
     }
-    if (isLoggedIn) {
-        return <Navigate to={routeMap.profile.replace(":user", encodeURIComponent(userData.username))}/>
-    }
     return (
         <RoundedFrame titleComponent={titleComponent}>
             <form method="POST">
                 <div className="px-10 py-8">
                     <div className="mb-4">
                         <TextBox id="userName" label={t("login.username")} initText={username}
-                                 onChange={(newText) => setUsername(newText)}/>
+                                 onChange={setUsername}/>
                     </div>
                     <div className="mb-6">
                         <TextBox id="password" label={t("login.password")} initText={password} type="password"
-                                 onChange={(newText) => setPassword(newText)}/>
+                                 onChange={setPassword}/>
                     </div>
                     <div className="flex justify-center mb-2">
                         <button type="submit" className="btn-indigo mr-2 w-1/2" onClick={handleLogin}>
@@ -63,6 +59,10 @@ function LoginFrame() {
 }
 
 function Login() {
+    const {userData, isLoggedIn} = useContext(UserContext)
+    if (isLoggedIn) {
+        return <Navigate to={routeMap.profile.replace(":user", encodeURIComponent(userData.username))}/>
+    }
     return (
         <div className="text-white">
             <div className="w-full flex justify-center">

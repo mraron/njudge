@@ -12,14 +12,44 @@ export async function login(username, password) {
     try {
         const response = await fetch("/api/v2/user/auth/login/", requestOptions)
         const data = await response.json()
+        const result = {...data, success: response.ok}
         if (!response.ok) {
-            return {success: false, message: data.error}
+            return result
         }
         Cookies.set("authToken", data.authToken, {expires: 7, secure: true})
-        return {success: true, message: ""}
+        return result
     } catch (error) {
         console.error(error)
     }
+}
+
+export async function register(username, email, password, passwordConfirm) {
+    const requestOptions = {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            username: username,
+            email: email,
+            password: password,
+            passwordConfirm: passwordConfirm
+        })
+    }
+    try {
+        const response = await fetch("/api/v2/user/auth/register/", requestOptions)
+        const data = await response.json()
+        const result = {...data, success: response.ok}
+        if (!response.ok) {
+            return result
+        }
+        return result
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+export async function verify(token) {
+    const response = await fetch(`/api/v2/user/auth/verify/${token}/`)
+    return response.ok
 }
 
 export function logout() {

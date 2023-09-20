@@ -46,7 +46,10 @@
 		"unsuccessful_submission": "The submission was unsuccessful.",
 		"successful_submission": "Successful submission.",
 		"unsuccessful_login": "The login was unsuccessful.",
-		"successful_login": "Successful login."
+		"successful_login": "Successful login.",
+		"successful_registration": "Successful registration. The verification link has been sent to your e-mail address.",
+		"unsuccessful_verification": "The verification was unsuccessful.",
+		"successful_verification": "Successful verification."
 	},
 	"menubar":
 	{

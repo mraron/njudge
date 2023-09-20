@@ -25,6 +25,7 @@ import {findRouteIndex} from "./util/findRouteIndex";
 import {useTranslation} from "react-i18next";
 import extractParams from "./util/extractParams";
 import {routeMap} from "./config/RouteConfig";
+import Verify from "./pages/auth/Verify";
 
 const titles = {
     [routeMap.home]:                "home.page_title",
@@ -72,6 +73,7 @@ function RoutingComponent() {
                 <Route path={routeMap.submission} element={<UpdatePage key={location.key} page={Submission} />}/>
                 <Route path={routeMap.login} element={<UpdatePage key={location.key} page={Login} />}/>
                 <Route path={routeMap.register} element={<UpdatePage key={location.key} page={Register} />}/>
+                <Route path={routeMap.verify} element={<UpdatePage key={location.key} page={Verify} />}/>
                 <Route path={routeMap.logout} element={<UpdatePage key={location.key} page={Logout} />}/>
                 <Route path={routeMap.profile} element={<Profile />}>
                     <Route index element={<UpdatePage key={location.key} page={ProfileMain} />}/>

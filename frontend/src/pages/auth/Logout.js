@@ -1,11 +1,10 @@
-import {useNavigate} from "react-router-dom";
+import {Navigate, useNavigate} from "react-router-dom";
 import {logout} from "../../util/auth";
 import {useEffect} from "react";
 import {routeMap} from "../../config/RouteConfig";
 import {useTranslation} from "react-i18next";
 
 function Logout() {
-    const {t} = useTranslation()
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -14,10 +13,9 @@ function Logout() {
         } else {
             window.flash("flash.not_logged_in", "failure")
         }
-        navigate(routeMap.home)
     }, [])
     return (
-        <></>
+        <Navigate to={routeMap.home} />
     )
 }
 
