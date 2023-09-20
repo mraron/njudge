@@ -49,7 +49,13 @@ export async function register(username, email, password, passwordConfirm) {
 
 export async function verify(token) {
     const response = await fetch(`/api/v2/user/auth/verify/${token}/`)
-    return response.ok
+    const data = await response.json()
+    const result = {...data, success: response.ok}
+    if (!response.ok) {
+        return result
+    }
+    Cookies.set("authToken", data.authToken, {expires: 7, secure: true})
+    return result
 }
 
 export function logout() {
