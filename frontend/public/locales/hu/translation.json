@@ -49,7 +49,8 @@
 		"successful_login": "Sikeres bejelentkezés.",
 		"successful_registration": "Sikeres regisztráció. Az ellenőrző linket elküldtük az e-mail címedre.",
 		"unsuccessful_verification": "Az ellenőrzés nem sikerült.",
-		"successful_verification": "Sikeres ellenőrzés."
+		"successful_verification": "Sikeres ellenőrzés.",
+		"passwords_mismatch": "A jelszavak nem egyeznek."
 	},
 	"menubar":
 	{

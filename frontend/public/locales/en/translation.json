@@ -49,7 +49,8 @@
 		"successful_login": "Successful login.",
 		"successful_registration": "Successful registration. The verification link has been sent to your e-mail address.",
 		"unsuccessful_verification": "The verification was unsuccessful.",
-		"successful_verification": "Successful verification."
+		"successful_verification": "Successful verification.",
+		"passwords_mismatch": "The passwords do not match."
 	},
 	"menubar":
 	{
