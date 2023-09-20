@@ -87,7 +87,7 @@ function TestCase_0({testCase, index}) {
         ["submission_table.checker_output", testCase.checkerOutput],
     ].map(item =>
         <tr className="divide-x divide-default">
-            <td className="padding-td-default whitespace-nowrap sm:w-52">{t(item[0])}</td>
+            <td className="padding-td-default whitespace-nowrap w-48">{t(item[0])}</td>
             <td>
                 <div className="flex py-2 px-3">
                     <CopyableCode text={item[1]}/>
