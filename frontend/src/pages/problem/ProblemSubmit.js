@@ -36,10 +36,10 @@ function ProblemSubmit({ data }) {
     const handleSubmit = () => {
         submitSolution({problem: problem, language: languages[langIndex], submissionCode: submissionCode}).then(ok => {
             if (ok) {
-                window.flash(t("flash.successful_submission"), "success")
+                window.flash("flash.successful_submission", "success")
                 navigate(routeMap.problemSubmissions.replace(":problem", problem))
             } else {
-                window.flash(t("flash.unsuccessful_submission"), "failure")
+                window.flash("flash.unsuccessful_submission", "failure")
             }
         })
     }

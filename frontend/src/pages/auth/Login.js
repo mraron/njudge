@@ -21,9 +21,11 @@ function LoginFrame() {
         event.preventDefault()
         login(username, password).then(resp => {
             if (resp.success) {
+                window.flash("flash.successful_login", "success")
                 navigate(routeMap.home)
+            } else {
+                window.flash("flash.unsuccessful_login", "failure")
             }
-            window.flash(resp.message, resp.success ? "success" : "failure")
         })
     }
     if (isLoggedIn) {

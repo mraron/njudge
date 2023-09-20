@@ -43,15 +43,15 @@ function ProblemSubmit() {
     }
     const handleSubmit = () => {
         if (!file) {
-            window.flash(t("flash.must_choose_file"), "failure")
+            window.flash("flash.must_choose_file", "failure")
             return
         }
         submitSolution({problem: problem, language: languages[langIndex], file: file}).then(ok => {
             if (ok) {
-                window.flash(t("flash.successful_submission"), "success")
+                window.flash("flash.successful_submission", "success")
                 navigate(routeMap.problemSubmissions.replace(":problem", problem))
             } else {
-                window.flash(t("flash.unsuccessful_submission"), "failure")
+                window.flash("flash.unsuccessful_submission", "failure")
             }
         })
     }

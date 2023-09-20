@@ -10,9 +10,9 @@ function Logout() {
 
     useEffect(() => {
         if (logout()) {
-            window.flash(t("flash.successful_logout"), "success")
+            window.flash("flash.successful_logout", "success")
         } else {
-            window.flash(t("flash.not_logged_in"), "failure")
+            window.flash("flash.not_logged_in", "failure")
         }
         navigate(routeMap.home)
     }, [])

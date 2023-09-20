@@ -9,7 +9,7 @@ function CompilerOption({lang, command}) {
     const {t} = useTranslation()
     const handleCopy = () => {
         navigator.clipboard.writeText(command)
-        window.flash(t("info.successful_copy"), "success")
+        window.flash("info.successful_copy", "success")
     }
     return (
         <tr className={`divide-x divide-default `}>
