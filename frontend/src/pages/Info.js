@@ -4,9 +4,9 @@ import SVGTitleComponent from "../svg/SVGTitleComponent";
 import RoundedTable from "../components/container/RoundedTable";
 import React, {useState} from "react";
 import {useTranslation} from "react-i18next";
+import CopyableCode from "../components/util/CopyableCode";
 
 function CompilerOption({lang, command}) {
-    const {t} = useTranslation()
     const handleCopy = () => {
         navigator.clipboard.writeText(command)
         window.flash("info.successful_copy", "success")
@@ -18,15 +18,7 @@ function CompilerOption({lang, command}) {
             </td>
             <td className="padding-td-default text-white">
                 <div className="flex items-center">
-                    <button
-                        className="h-9 w-9 mr-2 rounded-md border-1 bg-grey-800 border-grey-725 hover:bg-grey-775 transition duration-200 relative"
-                        onClick={handleCopy} aria-label="Copy">
-                        <SVGCopy
-                            cls={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 `}/>
-                    </button>
-                    <div className="w-full flex items-center px-3 py-2 border-1 border-grey-725 rounded-md bg-grey-875 font-mono">
-                        {command}
-                    </div>
+                    <CopyableCode text={command}/>
                 </div>
             </td>
         </tr>

@@ -4,6 +4,7 @@ import React, {useState} from "react";
 import {useTranslation} from "react-i18next";
 import RoundedFrame from "../../container/RoundedFrame";
 import MapDataFrame from "../../container/MapDataFrame";
+import CopyableCode from "../../util/CopyableCode";
 
 function TestCase_1_3({index, numCases, testCase, group, isLastGroup, isLastCase}) {
     const bottomBorderCase = isLastGroup && isLastCase ? "border-b-0" : ""
@@ -79,6 +80,21 @@ function TestCase_0({testCase, index}) {
             <span className="mx-2">–</span>
             <span>{testCase.verdictName}</span>
         </div>
+
+    const outputRows = [
+        ["submission_table.output", testCase.output],
+        ["submission_table.expected_output", testCase.expectedOutput],
+        ["submission_table.checker_output", testCase.checkerOutput],
+    ].map(item =>
+        <tr className="divide-x divide-default">
+            <td className="padding-td-default whitespace-nowrap sm:w-52">{t(item[0])}</td>
+            <td>
+                <div className="flex py-2 px-3">
+                    <CopyableCode text={item[1]}/>
+                </div>
+            </td>
+        </tr>
+    )
     return (
         <RoundedFrame titleComponent={titleComponent}>
             <div className="py-3 px-5 flex justify-between border-b border-default">
@@ -96,54 +112,7 @@ function TestCase_0({testCase, index}) {
             <div className="overflow-x-auto">
                 <table className="w-full text-table bg-grey-850 rounded-b-md">
                     <tbody className="divide-y divide-default">
-                        <tr className="divide-x divide-default">
-                            <td className="padding-td-default whitespace-nowrap sm:w-52">{t("submission_table.output")}</td>
-                            <td className="font-mono">
-                                <div className="flex py-2 px-3 items-center">
-                                    <button
-                                        className="h-9 w-9 mr-2 rounded-md border-1 bg-grey-800 border-grey-725 hover:bg-grey-775 transition duration-200 relative"
-                                        aria-label="Copy">
-                                        <SVGCopy
-                                            cls={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 `}/>
-                                    </button>
-                                    <div className="w-full flex items-center px-3 py-2 border-1 border-grey-725 rounded-md bg-grey-875 font-mono">
-                                        {testCase.output}
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr className="divide-x divide-default">
-                            <td className="padding-td-default whitespace-nowrap sm:w-52">{t("submission_table.expected_output")}</td>
-                            <td className="font-mono">
-                                <div className="flex py-2 px-3 items-center">
-                                    <button
-                                        className="h-9 w-9 mr-2 rounded-md border-1 bg-grey-800 border-grey-725 hover:bg-grey-775 transition duration-200 relative"
-                                        aria-label="Copy">
-                                        <SVGCopy
-                                            cls={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 `}/>
-                                    </button>
-                                    <div className="w-full flex items-center px-3 py-2 border-1 border-grey-725 rounded-md bg-grey-875 font-mono">
-                                        {testCase.expectedOutput}
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr className="divide-x divide-default">
-                            <td className="padding-td-default whitespace-nowrap sm:w-52">{t("submission_table.checker_output")}</td>
-                            <td className="font-mono">
-                                <div className="flex py-2 px-3 items-center">
-                                    <button
-                                        className="h-9 w-9 mr-2 rounded-md border-1 bg-grey-800 border-grey-725 hover:bg-grey-775 transition duration-200 relative"
-                                        aria-label="Copy">
-                                        <SVGCopy
-                                            cls={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 `}/>
-                                    </button>
-                                    <div className="w-full flex items-center px-3 py-2 border-1 border-grey-725 rounded-md bg-grey-875 font-mono">
-                                        {testCase.checkerOutput}
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
+                        {outputRows}
                     </tbody>
                 </table>
             </div>
