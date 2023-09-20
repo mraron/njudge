@@ -41,7 +41,10 @@
 	"flash": {
 		"no_permission": "Nincs jogosultságod végrehajtani ezt a műveletet.",
 		"successful_logout": "Sikeres kijelentkezés.",
-		"not_logged_in": "Nem vagy belépve"
+		"not_logged_in": "Nem vagy belépve",
+		"must_choose_file": "Először ki kell választanod egy fájlt.",
+		"unsuccessful_submission": "A beküldés nem sikerült.",
+		"successful_submission": "Sikeres beküldés."
 	},
 	"menubar":
 	{

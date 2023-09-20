@@ -26,9 +26,9 @@ function Problem(data) {
                 </div>
             </td>
             <td className="padding-td-default">
-                <Link className="link flex items-center"
+                <Link className="link flex items-center justify-center"
                       to={`${routeMap.problemSubmissions.replace(":problem", problem)}?ac=1`}>
-                    <SVGAvatar cls="w-4 h-4 mr-1"/>
+                    <SVGAvatar cls="w-[1.1rem] h-[1.1rem] mr-1"/>
                     <span>{solverCount}</span>
                 </Link>
             </td>

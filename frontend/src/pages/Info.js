@@ -20,7 +20,7 @@ function CompilerOption({lang, command}) {
                 <div className="flex items-center">
                     <button
                         className="h-9 w-9 mr-2 rounded-md border-1 bg-grey-800 border-grey-725 hover:bg-grey-775 transition duration-200 relative"
-                        onClick={handleCopy}>
+                        onClick={handleCopy} aria-label="Copy">
                         <SVGCopy
                             cls={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 `}/>
                     </button>

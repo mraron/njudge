@@ -41,7 +41,10 @@
 	"flash": {
 		"no_permission": "You have no permission to perform this operation.",
 		"successful_logout": "Successful logout.",
-		"not_logged_in": "You are not logged in"
+		"not_logged_in": "You are not logged in",
+		"must_choose_file": "You have to choose a file first.",
+		"unsuccessful_submission": "The submission was unsuccessful.",
+		"successful_submission": "Successful submission."
 	},
 	"menubar":
 	{

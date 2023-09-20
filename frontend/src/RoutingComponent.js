@@ -19,7 +19,6 @@ import ProblemRanklist from "./pages/problem/ProblemRanklist";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import NotFound from "./pages/error/NotFound";
-import FadeIn from "./components/util/FadeIn";
 import Logout from "./pages/auth/Logout";
 import UpdatePage from "./pages/wrappers/UpdatedPage";
 import {findRouteIndex} from "./util/findRouteIndex";

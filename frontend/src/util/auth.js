@@ -16,7 +16,7 @@ export async function login(username, password) {
             return {success: false, message: data.error}
         }
         Cookies.set("authToken", data.authToken, {expires: 7, secure: true})
-        return {success: true, message: "A bejelentkezés sikeres."}
+        return {success: true, message: ""}
     } catch (error) {
         console.error(error)
     }

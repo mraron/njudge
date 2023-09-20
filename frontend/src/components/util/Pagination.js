@@ -14,7 +14,7 @@ function Pagination({paginationData}) {
     return (
         <RoundedFrame>
             <div className="flex justify-center p-3 overflow-x-auto">
-                <button className={`${cls} border-r-0 rounded-l-md`} onClick={() => handlePageChanged(1)}>
+                <button aria-label="First" className={`${cls} border-r-0 rounded-l-md`} onClick={() => handlePageChanged(1)}>
                     <SVGDoubleRightArrow cls="w-[1.32rem] h-[1.32rem] rotate-180"/>
                 </button>
                 {currentPage >= 3 && <button className={`${cls} hidden lg:block border-r-0`}
@@ -27,7 +27,7 @@ function Pagination({paginationData}) {
                                                         onClick={() => handlePageChanged(currentPage + 1)}>{currentPage + 1}</button>}
                 {currentPage <= lastPage - 2 && <button className={`${cls} hidden lg:block border-l-0`}
                                                         onClick={() => handlePageChanged(currentPage + 2)}>{currentPage + 2}</button>}
-                <button className={`${cls} border-l-0 rounded-r-md`} onClick={() => handlePageChanged(lastPage)}>
+                <button aria-label="Last" className={`${cls} border-l-0 rounded-r-md`} onClick={() => handlePageChanged(lastPage)}>
                     <SVGDoubleRightArrow cls="w-[1.32rem] h-[1.32rem] rotate-0"/>
                 </button>
             </div>

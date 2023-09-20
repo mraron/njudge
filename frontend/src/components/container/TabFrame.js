@@ -14,9 +14,9 @@ function TabFrame({routes, routeLabels, routePatterns, children}) {
     const location = useLocation()
     const selected = findRouteIndex(routePatterns, location.pathname)
     const tabsContent = routes.map((item, index) =>
-        <div className="mr-1.5" key={index}>
+        <li className="mr-1.5" key={index}>
             <Tab isSelected={index === selected} label={routeLabels[index]} route={item} key={index}/>
-        </div>
+        </li>
     )
     return (
         <div className="w-full">
