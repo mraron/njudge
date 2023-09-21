@@ -5,7 +5,7 @@ import {routeMap} from "../../../config/RouteConfig"
 import {useTranslation} from "react-i18next";
 
 function Submission({submission}) {
-    const {id, date, user, problem, lang, verdict, verdictType, time, memory} = submission
+    const {id, date, user, problem, language, verdict, verdictType, time, memory} = submission
     return (
         <tr className={"divide-x divide-default"}>
             <td className="padding-td-default">
@@ -21,7 +21,7 @@ function Submission({submission}) {
                 <Link className="link" to={problem.link}>{problem.label}</Link>
             </td>
             <td className="padding-td-default">
-                {lang}
+                {language}
             </td>
             <td className="padding-td-default">
                 <div className="flex items-center">
