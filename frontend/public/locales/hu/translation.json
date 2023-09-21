@@ -50,7 +50,10 @@
 		"successful_registration": "Sikeres regisztráció. Az ellenőrző linket elküldtük az e-mail címedre.",
 		"unsuccessful_verification": "Az ellenőrzés nem sikerült.",
 		"successful_verification": "Sikeres ellenőrzés.",
-		"passwords_mismatch": "A jelszavak nem egyeznek."
+		"password_mismatch": "A jelszavak nem egyeznek.",
+		"successful_settings_save": "A beállítások mentése sikeres volt.",
+		"unsuccessful_settings_save": "A beállítások mentése nem sikerült.",
+		"successful_password_change": "A jelszóváltoztatás sikeres volt."
 	},
 	"menubar":
 	{
@@ -128,7 +131,7 @@
 		"new_password": "Új jelszó",
 		"confirm_password": "Jelszó megerősítése",
 		"save": "Mentés",
-		"unsolved_tags": "Megoldatlan feladatok címkéinek mutatása",
+		"show_unsolved": "Megoldatlan feladatok címkéinek mutatása",
 		"hide_solved": "Megoldott feladatok elrejtése"
 	},
 	"problem": {

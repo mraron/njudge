@@ -50,7 +50,10 @@
 		"successful_registration": "Successful registration. The verification link has been sent to your e-mail address.",
 		"unsuccessful_verification": "The verification was unsuccessful.",
 		"successful_verification": "Successful verification.",
-		"passwords_mismatch": "The passwords do not match."
+		"password_mismatch": "The passwords do not match.",
+		"successful_settings_save": "The settings have been saved successfully.",
+		"unsuccessful_settings_save": "The settings couldn't be saved.",
+		"successful_password_change": "The password has been changed successfully."
 	},
 	"menubar":
 	{
@@ -128,7 +131,7 @@
 		"new_password": "New password",
 		"confirm_password": "Confirm password",
 		"save": "Save",
-		"unsolved_tags": "Show tags for unsolved problems",
+		"show_unsolved": "Show tags for unsolved problems",
 		"hide_solved": "Hide solved problems"
 	},
 	"problem": {

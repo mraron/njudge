@@ -12,7 +12,7 @@ async function submitSolution({problem, language, file, submissionCode}) {
         method: 'POST',
         body: formData
     }
-    const response = await fetch("/problemset/main/submit/", requestOptions)
+    const response = await fetch("/api/v2/problemset/main/submit/", requestOptions)
     return response.ok
 }
 
