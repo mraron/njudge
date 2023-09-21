@@ -120,9 +120,8 @@ function TestCase_0({testCase, index}) {
     )
 }
 
-function SubmissionTable_0({testSet}) {
-    const {t} = useTranslation()
-    const testCases = testSet.testCases
+function SubmissionTable_0({status}) {
+    const testCases = status.groups[0].testCases
     const testCasesContent = testCases.map((testCase, index) =>
         <div className="mb-3">
             <TestCase_0 testCase={testCase} index={index} key={index}/>
@@ -135,9 +134,9 @@ function SubmissionTable_0({testSet}) {
     )
 }
 
-function SubmissionTable_1_3({testSet}) {
+function SubmissionTable_1_3({status}) {
     const {t} = useTranslation()
-    const groups = testSet.groups
+    const groups = status.groups
     const groupsContent = groups.map((group, index) =>
         <TestGroup group={group} isLast={index === groups.length - 1} key={index}/>
     )
@@ -161,14 +160,14 @@ function SubmissionTable_1_3({testSet}) {
 }
 
 function SubmissionTable({status}) {
-    const testSet = status.testSets[0]
     if (status.feedbackType === 0) {
         return (
-            <SubmissionTable_0 testSet={testSet} />
+            <SubmissionTable_0 status={status} />
         )
-    } else {
+    }
+    if ([1, 3].includes(status.feedbackType)) {
         return (
-            <SubmissionTable_1_3 testSet={testSet} />
+            <SubmissionTable_1_3 status={status} />
         )
     }
 }
