@@ -11,12 +11,12 @@ function Submission({data}) {
                         <div className="mb-3">
                             <SubmissionsTable submissions={[data.summary]}/>
                         </div>
-                        <div className="mb-3">
+                        {data.language !== "zip" && <div className="mb-3">
                             <Editor className="border-1 border-default" height="60vh" theme="vs-dark"
                                     defaultLanguage="cpp"
                                     options={{domReadOnly: true, readOnly: true, fontFamily: 'JetBrains Mono'}}
                                     value={data.summary.code}/>
-                        </div>
+                        </div>}
                         <SubmissionTable status={data.status}/>
                     </div>
                 </div>
