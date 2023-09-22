@@ -2,12 +2,20 @@ import MapDataFrame from '../../components/container/MapDataFrame';
 import DropdownMenu from '../../components/input/DropdownMenu';
 import RoundedFrame from '../../components/container/RoundedFrame';
 import SVGTitleComponent from '../../svg/SVGTitleComponent';
-import {SVGAttachment, SVGAttachmentDescription, SVGAttachmentFile, SVGInformation, SVGSubmit} from '../../svg/SVGs';
+import {
+    SVGAttachment,
+    SVGAttachmentDescription,
+    SVGAttachmentFile, SVGCorrectSimple,
+    SVGInformation, SVGPartiallyCorrect,
+    SVGRecent, SVGSpinner,
+    SVGSubmit, SVGWrongSimple
+} from '../../svg/SVGs';
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {useTranslation} from "react-i18next";
-import {useState} from "react";
+import React, {useState} from "react";
 import submitSolution from "../../util/submitSolution";
 import {routeMap} from "../../config/RouteConfig";
+import RoundedTable from "../../components/container/RoundedTable";
 
 const languages = ["cpp11", "cpp14", "cpp17", "go", "java", "python3"]
 
@@ -81,6 +89,36 @@ function ProblemSubmit() {
     )
 }
 
+function ProblemLastSubmissions({submissions, maxScore}) {
+    const titleComponent = <SVGTitleComponent svg={<SVGRecent cls="w-6 h-6 mr-2 fill-current" />} title="Utolsó beküldések" />
+    const rows = submissions.map((item, index) =>
+        <tr className="divide-x divide-default" key={index}>
+            <td className="padding-td-default w-0">
+                <Link className="link" to={routeMap.submission.replace(":id", item.id)}>{item.id}</Link>
+            </td>
+            <td className="padding-td-default" style={{maxWidth: 100}}>
+                <div className="flex items-center">
+                    {item.verdictType === 0 && <SVGSpinner cls="w-5 h-5 mr-2 shrink-0"/>}
+                    {item.verdictType === 1 && <SVGWrongSimple cls="w-5 h-5 text-red-500 mr-2 shrink-0"/>}
+                    {item.verdictType === 2 && <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-500 mr-2 shrink-0"/>}
+                    {item.verdictType === 3 && <SVGCorrectSimple cls="w-5 h-5 text-green-500 mr-2 shrink-0"/>}
+                    <span className="truncate">{item.verdictName}</span>
+                </div>
+            </td>
+            <td className="padding-td-default w-0 text-center">
+                <span className="whitespace-nowrap">{item.score} / {maxScore}</span>
+            </td>
+        </tr>
+    )
+    return (
+        <RoundedTable titleComponent={titleComponent}>
+            <tbody className="divide-y divide-default">
+                {rows}
+            </tbody>
+        </RoundedTable>
+    )
+}
+
 function ProblemAttachments({attachments}) {
     const {t} = useTranslation()
     const attachmentsContent = attachments.map((item, index) => {
@@ -117,7 +155,7 @@ function ProblemStatement({ data }) {
         <div className="flex flex-col lg:flex-row">
             <div className="w-full mb-3">
                 <object data="/assets/statement.pdf" type="application/pdf" width="100%"
-                        className="h-[36rem] lg:h-[52rem]">
+                        className="h-[36rem] lg:h-[60rem]">
                 </object>
             </div>
             <div className="w-full lg:w-96 mb-3 lg:ml-3 shrink-0">
@@ -127,6 +165,10 @@ function ProblemStatement({ data }) {
                 <div className="mb-3">
                     <ProblemSubmit/>
                 </div>
+                {data.lastSubmissions && data.lastSubmissions.length > 0 &&
+                    <div className="mb-3">
+                        <ProblemLastSubmissions submissions={data.lastSubmissions} maxScore={data.info.maxScore}/>
+                    </div>}
                 <div className="mb-3">
                     <ProblemAttachments attachments={data.attachments}/>
                 </div>

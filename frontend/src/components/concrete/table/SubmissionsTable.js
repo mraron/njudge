@@ -3,12 +3,13 @@ import {SVGCorrectSimple, SVGPartiallyCorrect, SVGSpinner, SVGWrongSimple} from 
 import {Link} from "react-router-dom";
 import {routeMap} from "../../../config/RouteConfig"
 import {useTranslation} from "react-i18next";
+import React from "react";
 
 function Submission({submission}) {
-    const {id, date, user, problem, language, verdict, verdictType, time, memory} = submission
+    const {id, date, user, problem, language, verdictName, verdictType, score, maxScore, time, memory} = submission
     return (
         <tr className={"divide-x divide-default"}>
-            <td className="padding-td-default">
+            <td className="padding-td-default w-0">
                 <Link className="link" to={routeMap.submission.replace(":id", submission.id)}>{id}</Link>
             </td>
             <td className="padding-td-default">
@@ -29,8 +30,11 @@ function Submission({submission}) {
                     {verdictType === 1 && <SVGWrongSimple cls="w-5 h-5 text-red-500 mr-2 shrink-0"/>}
                     {verdictType === 2 && <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-500 mr-2 shrink-0"/>}
                     {verdictType === 3 && <SVGCorrectSimple cls="w-5 h-5 text-green-500 mr-2 shrink-0"/>}
-                    <span className="whitespace-nowrap">{verdict}</span>
+                    <span className="whitespace-nowrap">{verdictName}</span>
                 </div>
+            </td>
+            <td className="padding-td-default w-0 text-center">
+                <span className="whitespace-nowrap">{score} / {maxScore}</span>
             </td>
             <td className="padding-td-default">
                 {time} ms
@@ -56,7 +60,7 @@ function SubmissionsTable({submissions}) {
                     <th className="padding-td-default">{t("submissions_table.user")}</th>
                     <th className="padding-td-default">{t("submissions_table.problem")}</th>
                     <th className="padding-td-default">{t("submissions_table.language")}</th>
-                    <th className="padding-td-default">{t("submissions_table.verdict")}</th>
+                    <th className="padding-td-default" colSpan={2}>{t("submissions_table.verdict")}</th>
                     <th className="padding-td-default">{t("submissions_table.time")}</th>
                     <th className="padding-td-default">{t("submissions_table.memory")}</th>
                 </tr>
