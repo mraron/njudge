@@ -165,8 +165,8 @@
 	},
 	"problem_submissions": {
 		"page_title": "Submissions – {{params.problem}} :: njudge",
-		"full_solutions": "Full solutions",
-		"own_solutions": "Own solutions"
+		"full_solutions": "Only full solutions",
+		"own_solutions": "Only my solutions"
 	},
 	"problem_ranklist": {
 		"page_title": "Ranklist – {{params.problem}} :: njudge",

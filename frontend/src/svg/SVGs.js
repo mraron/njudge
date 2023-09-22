@@ -119,14 +119,13 @@ export function SVGClose({cls}) {
 export function SVGDropdownFilterArrow({isOpen}) {
     return (
         <svg
-            className={`${isOpen ? "rotate-180" : "rotate-0"} text-white h-10 w-16 text-sm font-medium transition duration-150`}
+            className={`${isOpen ? "rotate-180" : "rotate-0"} text-white h-[1.85rem] text-sm font-medium transition duration-150`}
             viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M7 10L12 15L17 10" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round"
                   strokeLinejoin="round"/>
         </svg>
     )
 }
-
 export function SVGNotFound() {
     return (
         <svg className="w-80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

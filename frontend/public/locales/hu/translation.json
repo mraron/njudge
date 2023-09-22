@@ -165,8 +165,8 @@
 	},
 	"problem_submissions": {
 		"page_title": "Beküldések – {{params.problem}} :: njudge",
-		"full_solutions": "Teljes megoldások",
-		"own_solutions": "Saját megoldásaim"
+		"full_solutions": "Csak teljes megoldások",
+		"own_solutions": "Csak a saját megoldásaim"
 	},
 	"problem_ranklist": {
 		"page_title": "Eredmények – {{params.problem}} :: njudge",
