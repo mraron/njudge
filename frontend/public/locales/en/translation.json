@@ -174,5 +174,11 @@
 	"problem_ranklist": {
 		"page_title": "Ranklist – {{params.problem}} :: njudge",
 		"ranklist": "Ranklist"
+	},
+	"solved_status": {
+		"not_tried": "Not tried yet",
+		"correct": "Solved",
+		"wrong": "Unsolved",
+		"partially_correct": "Partially solved"
 	}
 }

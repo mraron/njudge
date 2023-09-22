@@ -174,5 +174,11 @@
 	"problem_ranklist": {
 		"page_title": "Eredmények – {{params.problem}} :: njudge",
 		"ranklist": "Eredmények"
+	},
+	"solved_status": {
+		"not_tried": "Nem próbáltad",
+		"correct": "Megoldottad",
+		"wrong": "Megpróbáltad",
+		"partially_correct": "Részlegesen megoldottad"
 	}
 }

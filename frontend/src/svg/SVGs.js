@@ -365,18 +365,20 @@ export function SVGCode({cls}) {
     )
 }
 
-export function SVGWrongSimple({cls}) {
+export function SVGWrongSimple({cls, title}) {
     return (
         <svg className={`${cls} fill-current`} fill="#000000" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <title>{title}</title>
             <path
                 d="M114,100l49-49a9.9,9.9,0,0,0-14-14L100,86,51,37A9.9,9.9,0,0,0,37,51l49,49L37,149a9.9,9.9,0,0,0,14,14l49-49,49,49a9.9,9.9,0,0,0,14-14Z"/>
         </svg>
     )
 }
 
-export function SVGCorrectSimple({cls}) {
+export function SVGCorrectSimple({cls, title}) {
     return (
         <svg className={`${cls}`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <title>{title}</title>
             <path className="stroke-current" d="M4 12.6111L8.92308 17.5L20 6.5" stroke="#000000" strokeWidth="2"
                   strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
@@ -423,13 +425,35 @@ export function SVGCheckmark({cls}) {
     )
 }
 
-export function SVGPartiallyCorrect({cls}) {
+export function SVGPartiallyCorrect({cls, title}) {
     return (
         <svg className={`${cls}`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <title>{title}</title>
             <g clipPath="url(#clip0_949_23339)">
                 <path className="fill-current" d="M17.5821 6.95711C17.9726 6.56658 17.9726 5.93342 17.5821 5.54289C17.1916 5.15237 16.5584 5.15237 16.1679 5.54289L5.54545 16.1653L1.70711 12.327C1.31658 11.9365 0.683417 11.9365 0.292893 12.327C-0.0976311 12.7175 -0.097631 13.3507 0.292893 13.7412L4.83835 18.2866C5.22887 18.6772 5.86204 18.6772 6.25256 18.2866L17.5821 6.95711Z" fill="#000000"/>
                 <path className="fill-current" d="M23.5821 6.95711C23.9726 6.56658 23.9726 5.93342 23.5821 5.54289C23.1915 5.15237 22.5584 5.15237 22.1678 5.54289L10.8383 16.8724C10.4478 17.263 10.4478 17.8961 10.8383 18.2866C11.2288 18.6772 11.862 18.6772 12.2525 18.2866L23.5821 6.95711Z" fill="#000000"/>
             </g>
+        </svg>
+    )
+}
+
+export function SVGDotsSmall({cls, title}) {
+    return (
+        <svg className={`${cls} stroke-current`} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="miter">
+            <title>{title}</title>
+            <line x1="5.99" y1="12" x2="6" y2="12" strokeLinecap="round" strokeWidth="2" />
+            <line x1="11.99" y1="12" x2="12" y2="12" strokeLinecap="round" strokeWidth="2" />
+            <line x1="17.99" y1="12" x2="18" y2="12" strokeLinecap="round" strokeWidth="2" />
+        </svg>
+    )
+}
+
+export function SVGDash({cls}) {
+    return (
+        <svg className={`${cls}`} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path className="fill-current" d="M2 9.5C2 9.22386 2.22386 9 2.5 9H17.5C17.7761 9 18 9.22386 18 9.5C18 9.77614 17.7761 10 17.5 10H2.5C2.22386 10 2 9.77614 2 9.5Z" fill="#212121">
+                <title>Not tried yet</title>
+            </path>
         </svg>
     )
 }
