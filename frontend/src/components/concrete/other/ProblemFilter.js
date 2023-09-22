@@ -26,10 +26,10 @@ function ProblemFilter() {
         setTags(tags);
     };
     const handleSubmit = () => {
-        updateQueryString(location, navigate, ["title", "tags", "category"], [title, tags.join(","), category[0]], ["title", "tags", "category"])
+        updateQueryString(location, navigate, ["title", "tags", "category"], [title, tags.join(","), category[0]], ["title", "tags", "category"], null)
     };
     const handleReset = () => {
-        navigate(location.pathname)
+        updateQueryString(location, navigate, [], [], null, ["title", "tags", "category"])
     }
     return (
         <div className="w-full">

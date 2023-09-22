@@ -1,6 +1,6 @@
 import RoundedTable from '../../container/RoundedTable';
 import {Link} from 'react-router-dom';
-import {SVGAvatar, SVGCorrectSimple, SVGWrong, SVGWrongSimple} from '../../../svg/SVGs';
+import {SVGAvatar, SVGCorrectSimple, SVGPartiallyCorrect, SVGWrong, SVGWrongSimple} from '../../../svg/SVGs';
 import {routeMap} from "../../../config/RouteConfig";
 import {useTranslation} from "react-i18next";
 
@@ -14,7 +14,7 @@ function Problem(data) {
             <td className="padding-td-default">
                 <div className="flex items-center justify-center">
                     {solvedStatus === 1 && <SVGWrongSimple cls="w-5 h-5 text-red-500 shrink-0" />}
-                    {solvedStatus === 2 && <SVGCorrectSimple cls="w-5 h-5 text-indigo-500 shrink-0" />}
+                    {solvedStatus === 2 && <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-500 shrink-0" />}
                     {solvedStatus === 3 && <SVGCorrectSimple cls="w-5 h-5 text-green-500 shrink-0" />}
                 </div>
             </td>

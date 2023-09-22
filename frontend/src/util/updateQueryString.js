@@ -1,6 +1,6 @@
 import queryString from "query-string";
 
-function UpdateQueryString(location, navigate, args, values, validArgs) {
+function UpdateQueryString(location, navigate, args, values, validArgs, invalidArgs) {
     const qString = location.search
     const qData = queryString.parse(qString)
 
@@ -10,6 +10,9 @@ function UpdateQueryString(location, navigate, args, values, validArgs) {
     let urlNew = `${location.pathname}?${queryString.stringify(qData)}`
     if (validArgs) {
         urlNew = queryString.pick(urlNew, validArgs)
+    }
+    if (invalidArgs) {
+        urlNew = queryString.exclude(urlNew, invalidArgs)
     }
     return navigate(urlNew)
 }

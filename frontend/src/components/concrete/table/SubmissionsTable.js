@@ -1,5 +1,5 @@
 import RoundedTable from '../../container/RoundedTable';
-import {SVGCorrectSimple, SVGSpinner, SVGWrongSimple} from "../../../svg/SVGs";
+import {SVGCorrectSimple, SVGPartiallyCorrect, SVGSpinner, SVGWrongSimple} from "../../../svg/SVGs";
 import {Link} from "react-router-dom";
 import {routeMap} from "../../../config/RouteConfig"
 import {useTranslation} from "react-i18next";
@@ -27,7 +27,7 @@ function Submission({submission}) {
                 <div className="flex items-center">
                     {verdictType === 0 && <SVGSpinner cls="w-5 h-5 mr-2 shrink-0"/>}
                     {verdictType === 1 && <SVGWrongSimple cls="w-5 h-5 text-red-500 mr-2 shrink-0"/>}
-                    {verdictType === 2 && <SVGCorrectSimple cls="w-5 h-5 text-indigo-500 mr-2 shrink-0"/>}
+                    {verdictType === 2 && <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-500 mr-2 shrink-0"/>}
                     {verdictType === 3 && <SVGCorrectSimple cls="w-5 h-5 text-green-500 mr-2 shrink-0"/>}
                     <span className="whitespace-nowrap">{verdict}</span>
                 </div>

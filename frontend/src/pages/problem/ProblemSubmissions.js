@@ -8,6 +8,7 @@ import {useTranslation} from "react-i18next";
 import DropdownFrame from "../../components/container/DropdownFrame";
 import queryString from "query-string";
 import UserContext from "../../contexts/user/UserContext";
+import updateQueryString from "../../util/updateQueryString";
 
 function SubmissionFilterFrame() {
     const {t} = useTranslation()
@@ -20,10 +21,10 @@ function SubmissionFilterFrame() {
     const [onlyOwn, setOnlyOwn] = useState(qData["own"] === "1")
 
     const handleReset = () => {
-        navigate(location.pathname)
+        updateQueryString(location, navigate, [], [], null, ["ac", "own"])
     }
     const handleSubmit = () => {
-        UpdateQueryString(location, navigate, ["ac", "own"], [onlyAC? 1: 0, onlyOwn? 1: 0], ["ac", "own"])
+        UpdateQueryString(location, navigate, ["ac", "own"], [onlyAC? 1: 0, onlyOwn? 1: 0], ["ac", "own"], null)
     }
     return (
         <DropdownFrame title={t("problem_submissions.filter")}>
