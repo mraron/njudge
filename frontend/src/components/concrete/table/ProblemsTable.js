@@ -1,16 +1,23 @@
 import RoundedTable from '../../container/RoundedTable';
 import {Link} from 'react-router-dom';
-import {SVGAvatar} from '../../../svg/SVGs';
+import {SVGAvatar, SVGCorrectSimple, SVGPartiallyCorrect, SVGWrong, SVGWrongSimple} from '../../../svg/SVGs';
 import {routeMap} from "../../../config/RouteConfig";
 import {useTranslation} from "react-i18next";
 
 function Problem(data) {
-    const {problem, title, category, tags, solverCount} = data.problem
+    const {problem, solvedStatus, title, category, tags, solverCount} = data.problem
     const tagsContent = tags.map((item, index) =>
         <span className="tag" key={index}>{item}</span>
     );
     return (
         <tr className={"divide-x divide-default"}>
+            <td className="padding-td-default w-0">
+                <div className="flex items-center justify-center">
+                    {solvedStatus === 1 && <SVGWrongSimple cls="w-5 h-5 text-red-500 shrink-0" />}
+                    {solvedStatus === 2 && <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-500 shrink-0" />}
+                    {solvedStatus === 3 && <SVGCorrectSimple cls="w-5 h-5 text-green-500 shrink-0" />}
+                </div>
+            </td>
             <td className="padding-td-default">
                 {problem}
             </td>
@@ -44,13 +51,13 @@ function ProblemsTable({problems}) {
     return (
         <RoundedTable>
             <thead className="bg-grey-800">
-            <tr className="divide-x divide-default">
-                <th className="padding-td-default">{t("problems_table.id")}</th>
-                <th className="padding-td-default">{t("problems_table.title")}</th>
-                <th className="padding-td-default">{t("problems_table.category")}</th>
-                <th className="padding-td-default">{t("problems_table.tags")}</th>
-                <th className="padding-td-default">{t("problems_table.solved")}</th>
-            </tr>
+                <tr className="divide-x divide-default">
+                    <th className="padding-td-default" colSpan={2}>{t("problems_table.id")}</th>
+                    <th className="padding-td-default">{t("problems_table.title")}</th>
+                    <th className="padding-td-default">{t("problems_table.category")}</th>
+                    <th className="padding-td-default">{t("problems_table.tags")}</th>
+                    <th className="padding-td-default">{t("problems_table.solved")}</th>
+                </tr>
             </thead>
             <tbody className="divide-y divide-default">
                 {problemsContent}

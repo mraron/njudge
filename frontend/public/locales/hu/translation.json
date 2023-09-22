@@ -67,7 +67,8 @@
 		"profile": "Profil",
 		"logout": "Kilépés",
 		"login": "Belépés",
-		"register": "Regisztráció"
+		"register": "Regisztráció",
+		"admin": "Admin"
 	},
 	"profile_sidebar": {
 		"stats": "Statisztikák",
@@ -84,6 +85,7 @@
 		"solved": "Megoldók"
 	},
 	"problem_filter": {
+		"filter": "Szűrés",
 		"title": "Cím",
 		"tags": "Címkék",
 		"category": "Kategória",
@@ -164,9 +166,10 @@
 		"submit": "Beküld"
 	},
 	"problem_submissions": {
+		"filter": "Szűrés",
 		"page_title": "Beküldések – {{params.problem}} :: njudge",
-		"full_solutions": "Teljes megoldások",
-		"own_solutions": "Saját megoldásaim"
+		"full_solutions": "Csak teljes megoldások",
+		"own_solutions": "Csak a saját megoldásaim"
 	},
 	"problem_ranklist": {
 		"page_title": "Eredmények – {{params.problem}} :: njudge",

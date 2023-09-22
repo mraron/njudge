@@ -6,6 +6,7 @@ import {useLocation, useNavigate} from 'react-router-dom';
 import DropdownFrame from "../../container/DropdownFrame";
 import queryString from "query-string";
 import {useTranslation} from "react-i18next";
+import updateQueryString from "../../../util/updateQueryString";
 
 function ProblemFilter() {
     const {t} = useTranslation()
@@ -25,15 +26,10 @@ function ProblemFilter() {
         setTags(tags);
     };
     const handleSubmit = () => {
-        const qString = queryString.stringify({
-            title: title,
-            tags: tags.join(","),
-            category: category[0]
-        })
-        navigate(`${location.pathname}?${qString}`);
+        updateQueryString(location, navigate, ["title", "tags", "category"], [title, tags.join(","), category[0]], ["title", "tags", "category"], null)
     };
     const handleReset = () => {
-        navigate(location.pathname)
+        updateQueryString(location, navigate, [], [], null, ["title", "tags", "category"])
     }
     return (
         <div className="w-full">
@@ -66,9 +62,10 @@ function ProblemFilter() {
 }
 
 export function ProblemFilterFrame() {
+    const {t} = useTranslation()
     return (
-        <DropdownFrame>
-            <div className="px-8 py-6 border-t border-default">
+        <DropdownFrame title={t("problem_filter.filter")}>
+            <div className="px-8 py-6">
                 <ProblemFilter/>
             </div>
         </DropdownFrame>

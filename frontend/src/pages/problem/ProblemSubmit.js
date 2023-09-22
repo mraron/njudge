@@ -25,7 +25,6 @@ function SubmitControlsFrame({onLanguageChanged, onSubmit}) {
 }
 
 function ProblemSubmit({ data }) {
-    const {t} = useTranslation()
     const {problem} = useParams()
     const [langIndex, setLangIndex] = useState(0)
     const [submissionCode, setSubmissionCode] = useState("")

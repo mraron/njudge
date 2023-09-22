@@ -47,7 +47,7 @@ export function SVGAttachment() {
     )
 }
 
-export function DropdownListArrow({isOpen}) {
+export function SVGDropdownListArrow({isOpen}) {
     return (
         <svg className={`w-4 h-4 mr-1 fill-current ${isOpen ? "rotate-90" : ""} transition-all duration-100 shrink-0`}
              viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
@@ -119,14 +119,13 @@ export function SVGClose({cls}) {
 export function SVGDropdownFilterArrow({isOpen}) {
     return (
         <svg
-            className={`${isOpen ? "rotate-180" : "rotate-0"} text-white h-10 w-16 text-sm font-medium transition duration-150`}
+            className={`${isOpen ? "rotate-180" : "rotate-0"} text-white h-[1.85rem] text-sm font-medium transition duration-150`}
             viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M7 10L12 15L17 10" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round"
                   strokeLinejoin="round"/>
         </svg>
     )
 }
-
 export function SVGNotFound() {
     return (
         <svg className="w-80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -420,6 +419,17 @@ export function SVGCheckmark({cls}) {
             <path className="fill-current" d="M39.04,7.604l-2.398-1.93c-1.182-0.95-1.869-0.939-2.881,0.311L16.332,27.494l-8.111-6.739
                 c-1.119-0.94-1.819-0.89-2.739,0.26l-1.851,2.41c-0.939,1.182-0.819,1.853,0.291,2.78l11.56,9.562c1.19,1,1.86,0.897,2.78-0.222
                 l21.079-25.061C40.331,9.294,40.271,8.583,39.04,7.604z"/>
+        </svg>
+    )
+}
+
+export function SVGPartiallyCorrect({cls}) {
+    return (
+        <svg className={`${cls}`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clipPath="url(#clip0_949_23339)">
+                <path className="fill-current" d="M17.5821 6.95711C17.9726 6.56658 17.9726 5.93342 17.5821 5.54289C17.1916 5.15237 16.5584 5.15237 16.1679 5.54289L5.54545 16.1653L1.70711 12.327C1.31658 11.9365 0.683417 11.9365 0.292893 12.327C-0.0976311 12.7175 -0.097631 13.3507 0.292893 13.7412L4.83835 18.2866C5.22887 18.6772 5.86204 18.6772 6.25256 18.2866L17.5821 6.95711Z" fill="#000000"/>
+                <path className="fill-current" d="M23.5821 6.95711C23.9726 6.56658 23.9726 5.93342 23.5821 5.54289C23.1915 5.15237 22.5584 5.15237 22.1678 5.54289L10.8383 16.8724C10.4478 17.263 10.4478 17.8961 10.8383 18.2866C11.2288 18.6772 11.862 18.6772 12.2525 18.2866L23.5821 6.95711Z" fill="#000000"/>
+            </g>
         </svg>
     )
 }

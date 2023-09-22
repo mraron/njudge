@@ -42,6 +42,10 @@
     @apply py-3 px-5
 }
 
+th {
+    @apply font-medium
+}
+
 .text-table {
     font-size: 0.92rem;
     line-height: 1.25rem;
@@ -55,6 +59,10 @@
 .text-dropdown-list {
     font-size: 0.95rem;
     line-height: 1.3rem;
+}
+
+.text-dropdown-frame {
+    font-size: 0.98rem;
 }
 
 .tag {

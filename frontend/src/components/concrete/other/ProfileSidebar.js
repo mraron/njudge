@@ -44,7 +44,7 @@ export function ProfileDataFrame({userData}) {
             [t("profile_sidebar.rating"), `${userData.rating}`],
             [t("profile_sidebar.score"), `${userData.score}`],
             [t("profile_sidebar.num_solved"), `${userData.numSolved}`]
-        ]} titleComponent={titleComponent}/>
+        ]} titleComponent={titleComponent} labelColWidth="14rem"/>
     );
 }
 
