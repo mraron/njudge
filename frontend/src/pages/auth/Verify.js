@@ -18,7 +18,7 @@ function Verify() {
         })
     }, [])
     return (
-        <Navigate to={routeMap.home} />
+        <Navigate to={routeMap.home}/>
     )
 }
 

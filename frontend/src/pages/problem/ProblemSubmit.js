@@ -15,7 +15,8 @@ function SubmitControlsFrame({onLanguageChanged, onSubmit}) {
     return (
         <RoundedFrame>
             <div className="px-4 py-3 sm:px-6 sm:py-5 flex">
-                <DropdownMenu itemNames={["C++ 11", "C++ 14", "C++ 17", "Go", "Java", "Python 3"]} onChange={onLanguageChanged}/>
+                <DropdownMenu itemNames={["C++ 11", "C++ 14", "C++ 17", "Go", "Java", "Python 3"]}
+                              onChange={onLanguageChanged}/>
                 <button className="ml-3 btn-indigo padding-btn-default" onClick={onSubmit}>
                     {t("problem_submit.submit")}
                 </button>
@@ -24,7 +25,7 @@ function SubmitControlsFrame({onLanguageChanged, onSubmit}) {
     )
 }
 
-function ProblemSubmit({ data }) {
+function ProblemSubmit({data}) {
     const {problem} = useParams()
     const [langIndex, setLangIndex] = useState(0)
     const [submissionCode, setSubmissionCode] = useState("")
@@ -47,7 +48,8 @@ function ProblemSubmit({ data }) {
             <div className="mb-2">
                 <SubmitControlsFrame onSubmit={handleSubmit} onLanguageChanged={handleLanguageChanged}/>
             </div>
-            <MonacoEditor className="border-1 border-default" height="60vh" theme="vs-dark" language={langCodes[langIndex]}
+            <MonacoEditor className="border-1 border-default" height="60vh" theme="vs-dark"
+                          language={langCodes[langIndex]}
                           options={{fontFamily: 'JetBrains Mono'}} onChange={setSubmissionCode}/>
         </div>
     )

@@ -2,7 +2,7 @@ import Pagination from "../../components/util/Pagination";
 import SubmissionsTable from "../../components/concrete/table/SubmissionsTable";
 import React from "react";
 
-function ProfileSubmissions({ data }) {
+function ProfileSubmissions({data}) {
     return (
         <div className="relative">
             <div className="flex flex-col w-full">

@@ -18,8 +18,8 @@ function DropdownList({tree, leaf: Leaf}) {
     const children = tree.children ? tree.children.map((child, index) =>
         <li className="mt-2" key={index}><DropdownList tree={child} leaf={Leaf}/></li>
     ) : []
-    const innerNode = <DropdownElem isOpen={isOpen} text={tree.title} onClick={() => setOpen(!isOpen)} />
-    const leafNode = <Leaf data={tree} />
+    const innerNode = <DropdownElem isOpen={isOpen} text={tree.title} onClick={() => setOpen(!isOpen)}/>
+    const leafNode = <Leaf data={tree}/>
     const isLeaf = !tree.children || tree.children.length === 0
 
     return (

@@ -38,7 +38,8 @@ export function ProfilePictureFrame({userData}) {
 
 export function ProfileDataFrame({userData}) {
     const {t} = useTranslation()
-    const titleComponent = <SVGTitleComponent svg={<SVGStatistics cls="w-6 h-6 mr-2"/>} title={t("profile_sidebar.stats")}/>
+    const titleComponent = <SVGTitleComponent svg={<SVGStatistics cls="w-6 h-6 mr-2"/>}
+                                              title={t("profile_sidebar.stats")}/>
     return (
         <MapDataFrame data={[
             [t("profile_sidebar.rating"), `${userData.rating}`],
@@ -71,7 +72,8 @@ function SubmissionsFrame({titleComponent, submissions}) {
 function ProfileSideBar() {
     const {t} = useTranslation()
     const {userData, isLoggedIn} = useContext(UserContext)
-    const titleComponent = <SVGTitleComponent svg={<SVGRecent cls="w-6 h-6 mr-2" />} title={t("profile_sidebar.last_submissions")}/>
+    const titleComponent = <SVGTitleComponent svg={<SVGRecent cls="w-6 h-6 mr-2"/>}
+                                              title={t("profile_sidebar.last_submissions")}/>
     return (
         isLoggedIn &&
         <div className="w-full hidden lg:flex justify-center">

@@ -9,9 +9,9 @@ function ProblemLeaf({data}) {
         <Link className="w-fit flex items-center cursor-pointer hover:text-indigo-300 transition-all duration-100"
               to={data.link}>
             <div className="w-5 mr-2">
-                {data.solvedStatus === 1 && <SVGWrongSimple cls="w-5 h-5 text-red-500 shrink-0" />}
-                {data.solvedStatus === 2 && <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-500 shrink-0" />}
-                {data.solvedStatus === 3 && <SVGCorrectSimple cls="w-5 h-5 text-green-500 shrink-0" />}
+                {data.solvedStatus === 1 && <SVGWrongSimple cls="w-5 h-5 text-red-500 shrink-0"/>}
+                {data.solvedStatus === 2 && <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-500 shrink-0"/>}
+                {data.solvedStatus === 3 && <SVGCorrectSimple cls="w-5 h-5 text-green-500 shrink-0"/>}
             </div>
             <span>{data.title}</span>
         </Link>

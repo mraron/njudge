@@ -10,7 +10,7 @@ const makeProblemLink = (problem) => {
     return {"text": problem, "href": routeMap.problem.replace(":problem", problem)}
 }
 
-function ProfileMain({ data }) {
+function ProfileMain({data}) {
     const {t} = useTranslation()
     const titleComponentCorrect = <SVGTitleComponent svg={<SVGCorrectSimple cls="w-6 h-6 text-green-500 mr-2"/>}
                                                      title={t("profile_main.solved_problems")}/>

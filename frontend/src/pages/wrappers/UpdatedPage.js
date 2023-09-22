@@ -5,7 +5,7 @@ import PageLoadingAnimation from "../../components/util/PageLoadingAnimation";
 import UserContext from "../../contexts/user/UserContext";
 import {AnimatePresence, motion} from "framer-motion";
 
-function UpdatePage({ page: Page }) {
+function UpdatePage({page: Page}) {
     const {setUserData, setLoggedIn} = useContext(UserContext)
     const location = useLocation()
     const [data, setData] = useState(null)
@@ -29,13 +29,13 @@ function UpdatePage({ page: Page }) {
     }
     return (
         <div className="relative w-full">
-            <PageLoadingAnimation isVisible={isLoading} />
+            <PageLoadingAnimation isVisible={isLoading}/>
             <AnimatePresence>
-            {!isLoading &&
-                <motion.div initial={{opacity: 0.6}} animate={{opacity: 1, transition: {duration: 0.25}}}
-                            exit={{opacity: 0.6, transition: {duration: 0.25}}}>
-                    <Page isLoading={isLoading} data={passedData} />
-                </motion.div>}
+                {!isLoading &&
+                    <motion.div initial={{opacity: 0.6}} animate={{opacity: 1, transition: {duration: 0.25}}}
+                                exit={{opacity: 0.6, transition: {duration: 0.25}}}>
+                        <Page isLoading={isLoading} data={passedData}/>
+                    </motion.div>}
             </AnimatePresence>
         </div>
     );

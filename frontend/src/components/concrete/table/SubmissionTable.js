@@ -1,15 +1,6 @@
 import RoundedTable from "../../container/RoundedTable";
-import {
-    SVGClock,
-    SVGCopy,
-    SVGCorrectSimple,
-    SVGHDD,
-    SVGPartiallyCorrect,
-    SVGSpinner,
-    SVGWrong,
-    SVGWrongSimple
-} from "../../../svg/SVGs";
-import React, {useState} from "react";
+import {SVGClock, SVGCorrectSimple, SVGHDD, SVGPartiallyCorrect, SVGSpinner, SVGWrongSimple} from "../../../svg/SVGs";
+import React from "react";
 import {useTranslation} from "react-i18next";
 import RoundedFrame from "../../container/RoundedFrame";
 import CopyableCode from "../../util/copy/CopyableCode";
@@ -44,7 +35,8 @@ function TestCase_1_3({index, numCases, testCase, group, isLastGroup, isLastCase
                     <div className="flex">
                         {testCase.verdictType === 0 && <SVGSpinner cls="w-5 h-5 mr-2 shrink-0"/>}
                         {testCase.verdictType === 1 && <SVGWrongSimple cls="w-5 h-5 text-red-500 mr-2 shrink-0"/>}
-                        {testCase.verdictType === 2 && <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-500 mr-2 shrink-0"/>}
+                        {testCase.verdictType === 2 &&
+                            <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-500 mr-2 shrink-0"/>}
                         {testCase.verdictType === 3 && <SVGCorrectSimple cls="w-5 h-5 text-green-500 mr-2 shrink-0"/>}
                         <span className="whitespace-nowrap">{testCase.verdictName}</span>
                     </div>
@@ -69,7 +61,7 @@ function TestGroup({group, isLast}) {
     const testCases = group.testCases
     const testCasesContent = testCases.map((testCase, index) =>
         <TestCase_1_3 index={index} numCases={testCases.length} testCase={testCase} group={group} key={index}
-                  isLastGroup={isLast} isLastCase={index === testCases.length - 1}/>
+                      isLastGroup={isLast} isLastCase={index === testCases.length - 1}/>
     )
     return (
         <>
@@ -120,7 +112,7 @@ function TestCase_0({testCase, index}) {
             <div className="overflow-x-auto">
                 <table className="w-full text-table bg-grey-850 rounded-b-md">
                     <tbody className="divide-y divide-default">
-                        {outputRows}
+                    {outputRows}
                     </tbody>
                 </table>
             </div>
@@ -151,17 +143,17 @@ function SubmissionTable_1_3({status}) {
     return (
         <RoundedTable>
             <thead className="bg-grey-800">
-                <tr className="divide-x divide-default">
-                    <th className="padding-td-default">{t("submission_table.subtask")}</th>
-                    <th className="padding-td-default">{t("submission_table.total")}</th>
-                    <th className="padding-td-default">{t("submission_table.test")}</th>
-                    <th className="padding-td-default" colSpan={2}>{t("submission_table.verdict")}</th>
-                    <th className="padding-td-default">{t("submission_table.time")}</th>
-                    <th className="padding-td-default">{t("submission_table.memory")}</th>
-                </tr>
+            <tr className="divide-x divide-default">
+                <th className="padding-td-default">{t("submission_table.subtask")}</th>
+                <th className="padding-td-default">{t("submission_table.total")}</th>
+                <th className="padding-td-default">{t("submission_table.test")}</th>
+                <th className="padding-td-default" colSpan={2}>{t("submission_table.verdict")}</th>
+                <th className="padding-td-default">{t("submission_table.time")}</th>
+                <th className="padding-td-default">{t("submission_table.memory")}</th>
+            </tr>
             </thead>
             <tbody>
-                {groupsContent}
+            {groupsContent}
             </tbody>
         </RoundedTable>
     )
@@ -170,12 +162,12 @@ function SubmissionTable_1_3({status}) {
 function SubmissionTable({status}) {
     if (status.feedbackType === 0) {
         return (
-            <SubmissionTable_0 status={status} />
+            <SubmissionTable_0 status={status}/>
         )
     }
     if ([1, 3].includes(status.feedbackType)) {
         return (
-            <SubmissionTable_1_3 status={status} />
+            <SubmissionTable_1_3 status={status}/>
         )
     }
 }

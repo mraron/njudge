@@ -1,10 +1,9 @@
 import ProfileSideBar from '../components/concrete/other/ProfileSidebar'
-import {SVGCode, SVGCopy, SVGCorrectSimple} from "../svg/SVGs";
+import {SVGCode} from "../svg/SVGs";
 import SVGTitleComponent from "../svg/SVGTitleComponent";
 import RoundedTable from "../components/container/RoundedTable";
-import React, {useState} from "react";
+import React from "react";
 import {useTranslation} from "react-i18next";
-import CopyableCode from "../components/util/copy/CopyableCode";
 import CopyableCommand from "../components/util/copy/CopyableCommand";
 
 function CompilerOption({lang, command}) {

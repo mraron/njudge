@@ -57,9 +57,9 @@ export function SVGDropdownListArrow({isOpen}) {
     )
 }
 
-export function SVGDropdownMenuArrow({isOpen}) {
+export function SVGDropdownMenuArrow({cls, isOpen}) {
     return (
-        <svg className={`w-6 h-6 ml-4 ${isOpen ? "rotate-180" : ""} text-white transition-all duration-150`}
+        <svg className={`${cls} w-6 h-6 ml-4 ${isOpen ? "rotate-180" : ""} text-white transition-all duration-150`}
              viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M7 10L12 15L17 10" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round"
                   strokeLinejoin="round"/>
@@ -126,6 +126,7 @@ export function SVGDropdownFilterArrow({isOpen}) {
         </svg>
     )
 }
+
 export function SVGNotFound() {
     return (
         <svg className="w-80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -160,7 +161,9 @@ export function SVGStatistics({cls}) {
 export function SVGRecent({cls}) {
     return (
         <svg className={`${cls}`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path className="fill-current" fillRule="evenodd" clipRule="evenodd" d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2s10 4.477 10 10zm-4.581 3.324a1 1 0 0 0-.525-1.313L13 12.341V6.5a1 1 0 0 0-2 0v6.17c0 .6.357 1.143.909 1.379l4.197 1.8a1 1 0 0 0 1.313-.525z" fill="#000000"/>
+            <path className="fill-current" fillRule="evenodd" clipRule="evenodd"
+                  d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2s10 4.477 10 10zm-4.581 3.324a1 1 0 0 0-.525-1.313L13 12.341V6.5a1 1 0 0 0-2 0v6.17c0 .6.357 1.143.909 1.379l4.197 1.8a1 1 0 0 0 1.313-.525z"
+                  fill="#000000"/>
         </svg>
     )
 }
@@ -225,7 +228,9 @@ export function SVGLogin() {
 export function SVGLock({cls}) {
     return (
         <svg className={`${cls}`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path className="fill-current" d="M9.52513 4.52513C10.1815 3.86875 11.0717 3.5 12 3.5C12.9283 3.5 13.8185 3.86875 14.4749 4.52513C14.7873 4.83751 15.0344 5.20276 15.2078 5.59999L15.4078 6.05825C15.6287 6.56443 16.2181 6.79568 16.7243 6.57477L17.6408 6.17478C18.147 5.95387 18.3783 5.36445 18.1574 4.85827L17.9574 4.40001C17.6355 3.66243 17.1763 2.98389 16.5962 2.40381C15.3772 1.18482 13.7239 0.5 12 0.5C10.2761 0.5 8.62279 1.18482 7.40381 2.40381C6.18482 3.62279 5.5 5.27609 5.5 7V10H5C3.34315 10 2 11.3431 2 13V20C2 21.6569 3.34315 23 5 23H19C20.6569 23 22 21.6569 22 20V13C22 11.3431 20.6569 10 19 10H8.5V7C8.5 6.07174 8.86875 5.1815 9.52513 4.52513Z" fill="#000000"/>
+            <path className="fill-current"
+                  d="M9.52513 4.52513C10.1815 3.86875 11.0717 3.5 12 3.5C12.9283 3.5 13.8185 3.86875 14.4749 4.52513C14.7873 4.83751 15.0344 5.20276 15.2078 5.59999L15.4078 6.05825C15.6287 6.56443 16.2181 6.79568 16.7243 6.57477L17.6408 6.17478C18.147 5.95387 18.3783 5.36445 18.1574 4.85827L17.9574 4.40001C17.6355 3.66243 17.1763 2.98389 16.5962 2.40381C15.3772 1.18482 13.7239 0.5 12 0.5C10.2761 0.5 8.62279 1.18482 7.40381 2.40381C6.18482 3.62279 5.5 5.27609 5.5 7V10H5C3.34315 10 2 11.3431 2 13V20C2 21.6569 3.34315 23 5 23H19C20.6569 23 22 21.6569 22 20V13C22 11.3431 20.6569 10 19 10H8.5V7C8.5 6.07174 8.86875 5.1815 9.52513 4.52513Z"
+                  fill="#000000"/>
         </svg>
     )
 }
@@ -387,8 +392,9 @@ export function SVGCorrectSimple({cls, title}) {
 
 export function SVGHDD({cls}) {
     return (
-        <svg className={`${cls}`} version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
-            viewBox="0 0 512 512"  xmlSpace="preserve">
+        <svg className={`${cls}`} version="1.1" xmlns="http://www.w3.org/2000/svg"
+             xmlnsXlink="http://www.w3.org/1999/xlink"
+             viewBox="0 0 512 512" xmlSpace="preserve">
             <path className="fill-current" d="M481.798,203.986l-85.257-69.984c-15.802-12.967-35.629-20.067-56.089-20.067H256h-84.457
                 c-20.452,0-40.28,7.1-56.085,20.067l-85.258,69.984C11.938,217.201,0.012,238.638,0,262.916v62.38
                 c0.016,40.199,32.579,72.762,72.77,72.77H256h183.23c40.191-0.008,72.762-32.571,72.77-72.77v-62.38
@@ -407,8 +413,12 @@ export function SVGHDD({cls}) {
 export function SVGClock({cls}) {
     return (
         <svg className={`${cls}`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path className="fill-current" d="M23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12C1 5.92487 5.92487 1 12 1C18.0751 1 23 5.92487 23 12ZM3.00683 12C3.00683 16.9668 7.03321 20.9932 12 20.9932C16.9668 20.9932 20.9932 16.9668 20.9932 12C20.9932 7.03321 16.9668 3.00683 12 3.00683C7.03321 3.00683 3.00683 7.03321 3.00683 12Z" fill="#0F0F0F"/>
-            <path className="fill-current" d="M12 5C11.4477 5 11 5.44771 11 6V12.4667C11 12.4667 11 12.7274 11.1267 12.9235C11.2115 13.0898 11.3437 13.2343 11.5174 13.3346L16.1372 16.0019C16.6155 16.278 17.2271 16.1141 17.5032 15.6358C17.7793 15.1575 17.6155 14.5459 17.1372 14.2698L13 11.8812V6C13 5.44772 12.5523 5 12 5Z" fill="#0F0F0F"/>
+            <path className="fill-current"
+                  d="M23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12C1 5.92487 5.92487 1 12 1C18.0751 1 23 5.92487 23 12ZM3.00683 12C3.00683 16.9668 7.03321 20.9932 12 20.9932C16.9668 20.9932 20.9932 16.9668 20.9932 12C20.9932 7.03321 16.9668 3.00683 12 3.00683C7.03321 3.00683 3.00683 7.03321 3.00683 12Z"
+                  fill="#0F0F0F"/>
+            <path className="fill-current"
+                  d="M12 5C11.4477 5 11 5.44771 11 6V12.4667C11 12.4667 11 12.7274 11.1267 12.9235C11.2115 13.0898 11.3437 13.2343 11.5174 13.3346L16.1372 16.0019C16.6155 16.278 17.2271 16.1141 17.5032 15.6358C17.7793 15.1575 17.6155 14.5459 17.1372 14.2698L13 11.8812V6C13 5.44772 12.5523 5 12 5Z"
+                  fill="#0F0F0F"/>
         </svg>
     )
 }
@@ -430,8 +440,12 @@ export function SVGPartiallyCorrect({cls, title}) {
         <svg className={`${cls}`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <title>{title}</title>
             <g clipPath="url(#clip0_949_23339)">
-                <path className="fill-current" d="M17.5821 6.95711C17.9726 6.56658 17.9726 5.93342 17.5821 5.54289C17.1916 5.15237 16.5584 5.15237 16.1679 5.54289L5.54545 16.1653L1.70711 12.327C1.31658 11.9365 0.683417 11.9365 0.292893 12.327C-0.0976311 12.7175 -0.097631 13.3507 0.292893 13.7412L4.83835 18.2866C5.22887 18.6772 5.86204 18.6772 6.25256 18.2866L17.5821 6.95711Z" fill="#000000"/>
-                <path className="fill-current" d="M23.5821 6.95711C23.9726 6.56658 23.9726 5.93342 23.5821 5.54289C23.1915 5.15237 22.5584 5.15237 22.1678 5.54289L10.8383 16.8724C10.4478 17.263 10.4478 17.8961 10.8383 18.2866C11.2288 18.6772 11.862 18.6772 12.2525 18.2866L23.5821 6.95711Z" fill="#000000"/>
+                <path className="fill-current"
+                      d="M17.5821 6.95711C17.9726 6.56658 17.9726 5.93342 17.5821 5.54289C17.1916 5.15237 16.5584 5.15237 16.1679 5.54289L5.54545 16.1653L1.70711 12.327C1.31658 11.9365 0.683417 11.9365 0.292893 12.327C-0.0976311 12.7175 -0.097631 13.3507 0.292893 13.7412L4.83835 18.2866C5.22887 18.6772 5.86204 18.6772 6.25256 18.2866L17.5821 6.95711Z"
+                      fill="#000000"/>
+                <path className="fill-current"
+                      d="M23.5821 6.95711C23.9726 6.56658 23.9726 5.93342 23.5821 5.54289C23.1915 5.15237 22.5584 5.15237 22.1678 5.54289L10.8383 16.8724C10.4478 17.263 10.4478 17.8961 10.8383 18.2866C11.2288 18.6772 11.862 18.6772 12.2525 18.2866L23.5821 6.95711Z"
+                      fill="#000000"/>
             </g>
         </svg>
     )
@@ -439,11 +453,12 @@ export function SVGPartiallyCorrect({cls, title}) {
 
 export function SVGDotsSmall({cls, title}) {
     return (
-        <svg className={`${cls} stroke-current`} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="miter">
+        <svg className={`${cls} stroke-current`} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none"
+             stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="miter">
             <title>{title}</title>
-            <line x1="5.99" y1="12" x2="6" y2="12" strokeLinecap="round" strokeWidth="2" />
-            <line x1="11.99" y1="12" x2="12" y2="12" strokeLinecap="round" strokeWidth="2" />
-            <line x1="17.99" y1="12" x2="18" y2="12" strokeLinecap="round" strokeWidth="2" />
+            <line x1="5.99" y1="12" x2="6" y2="12" strokeLinecap="round" strokeWidth="2"/>
+            <line x1="11.99" y1="12" x2="12" y2="12" strokeLinecap="round" strokeWidth="2"/>
+            <line x1="17.99" y1="12" x2="18" y2="12" strokeLinecap="round" strokeWidth="2"/>
         </svg>
     )
 }
@@ -451,9 +466,33 @@ export function SVGDotsSmall({cls, title}) {
 export function SVGDash({cls}) {
     return (
         <svg className={`${cls}`} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path className="fill-current" d="M2 9.5C2 9.22386 2.22386 9 2.5 9H17.5C17.7761 9 18 9.22386 18 9.5C18 9.77614 17.7761 10 17.5 10H2.5C2.22386 10 2 9.77614 2 9.5Z" fill="#212121">
+            <path className="fill-current"
+                  d="M2 9.5C2 9.22386 2.22386 9 2.5 9H17.5C17.7761 9 18 9.22386 18 9.5C18 9.77614 17.7761 10 17.5 10H2.5C2.22386 10 2 9.77614 2 9.5Z"
+                  fill="#212121">
                 <title>Not tried yet</title>
             </path>
+        </svg>
+    )
+}
+
+export function SVGDownload({cls}) {
+    return (
+        <svg className={`${cls}`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path className="fill-current"
+                  d="M16.25 19.75C15.6977 19.75 15.25 20.1977 15.25 20.75V21.75C15.25 22.3023 15.6977 22.75 16.25 22.75H19.75C21.1307 22.75 22.25 21.6307 22.25 20.25V4.25C22.25 2.86929 21.1307 1.75 19.75 1.75H16.25C15.6977 1.75 15.25 2.19772 15.25 2.75V3.75C15.25 4.30228 15.6977 4.75 16.25 4.75H19.25V19.75H16.25Z"
+                  fill="#000000"/>
+            <path className="fill-current"
+                  d="M10.75 16.25C10.75 16.6544 10.9936 17.0191 11.3673 17.1739C11.741 17.3286 12.1711 17.2431 12.4571 16.9571L16.4571 12.9571C16.8476 12.5666 16.8476 11.9334 16.4571 11.5429L12.4571 7.54286C12.1711 7.25687 11.741 7.17131 11.3673 7.32609C10.9936 7.48087 10.75 7.84551 10.75 8.24997V10.75H2.75C2.19771 10.75 1.75 11.1977 1.75 11.75V12.75C1.75 13.3023 2.19772 13.75 2.75 13.75H10.75V16.25Z"
+                  fill="#000000"/>
+        </svg>
+    )
+}
+
+export function SVGView({cls}) {
+    return (
+        <svg className={`${cls}`} viewBox="-3.5 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg">
+            <path className="fill-current"
+                  d="M12.406 13.844c1.188 0 2.156 0.969 2.156 2.156s-0.969 2.125-2.156 2.125-2.125-0.938-2.125-2.125 0.938-2.156 2.125-2.156zM12.406 8.531c7.063 0 12.156 6.625 12.156 6.625 0.344 0.438 0.344 1.219 0 1.656 0 0-5.094 6.625-12.156 6.625s-12.156-6.625-12.156-6.625c-0.344-0.438-0.344-1.219 0-1.656 0 0 5.094-6.625 12.156-6.625zM12.406 21.344c2.938 0 5.344-2.406 5.344-5.344s-2.406-5.344-5.344-5.344-5.344 2.406-5.344 5.344 2.406 5.344 5.344 5.344z"/>
         </svg>
     )
 }

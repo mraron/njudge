@@ -4,7 +4,7 @@ function extractParams(pathname, route) {
     const result = {}
 
     routeSegments
-        .map((item, index) => item.startsWith(":")? index: -1)
+        .map((item, index) => item.startsWith(":") ? index : -1)
         .filter(index => index !== -1)
         .forEach(index => {
             result[routeSegments[index].slice(1)] = decodeURIComponent(pathnameSegments[index])

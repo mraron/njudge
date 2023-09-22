@@ -33,11 +33,13 @@ function PasswordChangeFrame() {
         <RoundedFrame titleComponent={titleComponent}>
             <div className="flex flex-col px-6 py-5 sm:px-10 sm:py-8 w-full">
                 <div className="mb-4 w-full">
-                    <TextBox id="oldPassword" label={t("profile_settings.old_password")} type="password" initText={oldPw}
+                    <TextBox id="oldPassword" label={t("profile_settings.old_password")} type="password"
+                             initText={oldPw}
                              onChange={handleChangeOldPw}/>
                 </div>
                 <div className="mb-4 w-full">
-                    <TextBox id="newPassword" label={t("profile_settings.new_password")} type="password" initText={newPw}
+                    <TextBox id="newPassword" label={t("profile_settings.new_password")} type="password"
+                             initText={newPw}
                              onChange={handleChangeNewPw}/>
                 </div>
                 <div className="mb-6 w-full">
@@ -45,7 +47,8 @@ function PasswordChangeFrame() {
                              initText={newPwConfirm} onChange={handleChangeNewPwConfirm}/>
                 </div>
                 <div className="flex justify-center">
-                    <button className="btn-indigo padding-btn-default w-32" onClick={handleChangePassword}>{t("profile_settings.save")}</button>
+                    <button className="btn-indigo padding-btn-default w-32"
+                            onClick={handleChangePassword}>{t("profile_settings.save")}</button>
                 </div>
             </div>
         </RoundedFrame>
@@ -71,20 +74,23 @@ function OtherSettingsFrame({data}) {
         <RoundedFrame titleComponent={titleComponent}>
             <div className="flex flex-col px-6 py-5 sm:px-10 sm:py-8 w-full">
                 <div className="mb-3">
-                    <Checkbox id={"showUnsolved"} label={t("profile_settings.show_unsolved")} initChecked={showUnsolved} onChange={setShowUnsolved}/>
+                    <Checkbox id={"showUnsolved"} label={t("profile_settings.show_unsolved")} initChecked={showUnsolved}
+                              onChange={setShowUnsolved}/>
                 </div>
                 <div className="mb-6">
-                    <Checkbox id={"hideSolved"} label={t("profile_settings.hide_solved")} initChecked={hideSolved} onChange={setHideSolved}/>
+                    <Checkbox id={"hideSolved"} label={t("profile_settings.hide_solved")} initChecked={hideSolved}
+                              onChange={setHideSolved}/>
                 </div>
                 <div className="flex justify-center">
-                    <button className="btn-indigo padding-btn-default w-32" onClick={handleSaveSettings}>{t("profile_settings.save")}</button>
+                    <button className="btn-indigo padding-btn-default w-32"
+                            onClick={handleSaveSettings}>{t("profile_settings.save")}</button>
                 </div>
             </div>
         </RoundedFrame>
     )
 }
 
-function ProfileSettings({ data }) {
+function ProfileSettings({data}) {
     const {t} = useTranslation()
     const navigate = useNavigate()
     const [isVisible, setVisible] = useState(false)

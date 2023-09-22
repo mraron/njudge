@@ -1,14 +1,6 @@
 import RoundedTable from '../../container/RoundedTable';
 import {Link} from 'react-router-dom';
-import {
-    SVGAvatar,
-    SVGCorrectSimple,
-    SVGDash,
-    SVGDots, SVGDotsSmall,
-    SVGPartiallyCorrect,
-    SVGWrong,
-    SVGWrongSimple
-} from '../../../svg/SVGs';
+import {SVGAvatar, SVGCorrectSimple, SVGDotsSmall, SVGPartiallyCorrect, SVGWrongSimple} from '../../../svg/SVGs';
 import {routeMap} from "../../../config/RouteConfig";
 import {useTranslation} from "react-i18next";
 import {useContext} from "react";
@@ -26,10 +18,14 @@ function Problem(data) {
             {isLoggedIn &&
                 <td className="padding-td-default w-0">
                     <div className="flex items-center justify-center">
-                        {solvedStatus === 0 && <SVGDotsSmall cls="w-5 h-5 text-grey-300 shrink-0" title={t("solved_status.not_tried")} />}
-                        {solvedStatus === 1 && <SVGWrongSimple cls="w-5 h-5 text-red-500 shrink-0" title={t("solved_status.wrong")} />}
-                        {solvedStatus === 2 && <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-500 shrink-0" title={t("solved_status.partially_correct")} />}
-                        {solvedStatus === 3 && <SVGCorrectSimple cls="w-5 h-5 text-green-500 shrink-0" title={t("solved_status.correct")} />}
+                        {solvedStatus === 0 &&
+                            <SVGDotsSmall cls="w-5 h-5 text-grey-300 shrink-0" title={t("solved_status.not_tried")}/>}
+                        {solvedStatus === 1 &&
+                            <SVGWrongSimple cls="w-5 h-5 text-red-500 shrink-0" title={t("solved_status.wrong")}/>}
+                        {solvedStatus === 2 && <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-500 shrink-0"
+                                                                    title={t("solved_status.partially_correct")}/>}
+                        {solvedStatus === 3 && <SVGCorrectSimple cls="w-5 h-5 text-green-500 shrink-0"
+                                                                 title={t("solved_status.correct")}/>}
                     </div>
                 </td>}
             <td className="padding-td-default">
@@ -66,16 +62,16 @@ function ProblemsTable({problems}) {
     return (
         <RoundedTable>
             <thead className="bg-grey-800">
-                <tr className="divide-x divide-default">
-                    <th className="padding-td-default" colSpan={isLoggedIn? 2: 1}>{t("problems_table.id")}</th>
-                    <th className="padding-td-default">{t("problems_table.title")}</th>
-                    <th className="padding-td-default">{t("problems_table.category")}</th>
-                    <th className="padding-td-default">{t("problems_table.tags")}</th>
-                    <th className="padding-td-default">{t("problems_table.solved")}</th>
-                </tr>
+            <tr className="divide-x divide-default">
+                <th className="padding-td-default" colSpan={isLoggedIn ? 2 : 1}>{t("problems_table.id")}</th>
+                <th className="padding-td-default">{t("problems_table.title")}</th>
+                <th className="padding-td-default">{t("problems_table.category")}</th>
+                <th className="padding-td-default">{t("problems_table.tags")}</th>
+                <th className="padding-td-default">{t("problems_table.solved")}</th>
+            </tr>
             </thead>
             <tbody className="divide-y divide-default">
-                {problemsContent}
+            {problemsContent}
             </tbody>
         </RoundedTable>
     );

@@ -86,10 +86,14 @@ function ProfileSettings() {
                             routeLabels={profileRouteLabels.map(t)}/>
             <div
                 className="px-3 flex items-center justify-center border-1 border-l-0 border-grey-675 rounded-tr-md rounded-br-md">
-                <button className={`px-2 ${i18n.resolvedLanguage === "hu"? "bg-grey-725": "hover:bg-grey-775"} rounded mr-1`} onClick={() => i18n.changeLanguage("hu")}>
+                <button
+                    className={`px-2 ${i18n.resolvedLanguage === "hu" ? "bg-grey-725" : "hover:bg-grey-775"} rounded mr-1`}
+                    onClick={() => i18n.changeLanguage("hu")}>
                     hu
                 </button>
-                <button className={`px-2 ${i18n.resolvedLanguage === "en"? "bg-grey-725": "hover:bg-grey-775"} rounded`} onClick={() => i18n.changeLanguage("en")}>
+                <button
+                    className={`px-2 ${i18n.resolvedLanguage === "en" ? "bg-grey-725" : "hover:bg-grey-775"} rounded`}
+                    onClick={() => i18n.changeLanguage("en")}>
                     en
                 </button>
             </div>
@@ -122,7 +126,8 @@ function MenuSideBar({selected, isOpen, onClose}) {
         <aside ref={menuRef}
                className={`z-20 h-full overflow-y-auto lg:hidden fixed right-0 bg-grey-825 border-l-1 border-default ${isOpen ? "w-72 opacity-100" : "w-0 opacity-0"} ease-in-out transition-all duration-200`}>
             <div className="p-3">
-                <button aria-label="Close menu" className="rounded-full p-3 hover:bg-grey-800 transition duration-200" onClick={onClose}>
+                <button aria-label="Close menu" className="rounded-full p-3 hover:bg-grey-800 transition duration-200"
+                        onClick={onClose}>
                     <SVGClose cls="w-4 h-4"/>
                 </button>
             </div>
@@ -161,7 +166,8 @@ function MenuTopBar({selected, onOpen}) {
                     </div>
                 </div>
                 <div className="lg:hidden mx-4">
-                    <button id="hamburgerButton" aria-label="Open menu" className="rounded-full p-2 hover:bg-grey-800 transition duration-200"
+                    <button id="hamburgerButton" aria-label="Open menu"
+                            className="rounded-full p-2 hover:bg-grey-800 transition duration-200"
                             onClick={() => onOpen(this)}>
                         <SVGHamburger/>
                     </button>

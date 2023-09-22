@@ -6,7 +6,7 @@ import {findRouteIndex} from "../../util/findRouteIndex";
 function DropdownItem({name, onClick}) {
     return (
         <li className="cursor-pointer px-4 py-3 flex items-center hover:bg-grey-800 border-grey-750" onClick={onClick}>
-            {name}
+            <span className="truncate">{name}</span>
         </li>
     );
 }
@@ -16,8 +16,8 @@ function DefaultDropdownButton({label, isOpen, onClick}) {
         <button
             className={`w-full rounded-md px-3 py-2 border-1 flex items-center justify-between ${isOpen ? "bg-grey-750 hover:bg-grey-700 border-grey-650" : "bg-grey-825 hover:bg-grey-775 border-default"} transition duration-150`}
             onClick={onClick}>
-            {label}
-            <SVGDropdownMenuArrow isOpen={isOpen}/>
+            <span className="overflow-ellipsis overflow-hidden">{label}</span>
+            <SVGDropdownMenuArrow isOpen={isOpen} cls="shrink-0"/>
         </button>
     )
 }

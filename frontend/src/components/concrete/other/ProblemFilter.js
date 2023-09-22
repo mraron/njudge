@@ -4,7 +4,6 @@ import TextBoxDropdown from '../../input/TextBoxDropdown';
 import TagDropdown from '../../input/TagDropdown';
 import {useLocation, useNavigate} from 'react-router-dom';
 import DropdownFrame from "../../container/DropdownFrame";
-import queryString from "query-string";
 import {useTranslation} from "react-i18next";
 import updateQueryString from "../../../util/updateQueryString";
 
@@ -34,7 +33,8 @@ function ProblemFilter() {
     return (
         <div className="w-full">
             <div className="mb-4">
-                <TextBox id="filterTitle" label={t("problem_filter.title")} initText={title} onChange={handleTitleChange}/>
+                <TextBox id="filterTitle" label={t("problem_filter.title")} initText={title}
+                         onChange={handleTitleChange}/>
             </div>
             <div className="mb-4">
                 <TagDropdown id="filterTags" label={t("problem_filter.tags")} fillSelected={false} itemNames={[
@@ -45,7 +45,8 @@ function ProblemFilter() {
                 ]} initTags={tags} onChange={handleTagsChange}/>
             </div>
             <div className="mb-5">
-                <TextBoxDropdown id="filterCategory" label={t("problem_filter.category")} initText={category[1]} initSelected={category[0]}
+                <TextBoxDropdown id="filterCategory" label={t("problem_filter.category")} initText={category[1]}
+                                 initSelected={category[0]}
                                  fillSelected={true} itemNames={[
                     "IOI-CEOI Válogató 2023",
                     "IOI-CEOI Válogató 2023 − 1. forduló",
@@ -54,8 +55,10 @@ function ProblemFilter() {
                 ]} onChange={handleCategoryChange}/>
             </div>
             <div className="flex justify-center">
-                <button className="mr-1 btn-indigo padding-btn-default w-32" onClick={handleSubmit}>{t("problem_filter.search")}</button>
-                <button className="ml-1 btn-gray padding-btn-default w-32" onClick={handleReset}>{t("problem_filter.reset")}</button>
+                <button className="mr-1 btn-indigo padding-btn-default w-32"
+                        onClick={handleSubmit}>{t("problem_filter.search")}</button>
+                <button className="ml-1 btn-gray padding-btn-default w-32"
+                        onClick={handleReset}>{t("problem_filter.reset")}</button>
             </div>
         </div>
     )

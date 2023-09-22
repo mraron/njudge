@@ -5,10 +5,15 @@ import SVGTitleComponent from '../../svg/SVGTitleComponent';
 import {
     SVGAttachment,
     SVGAttachmentDescription,
-    SVGAttachmentFile, SVGCorrectSimple,
-    SVGInformation, SVGPartiallyCorrect,
-    SVGRecent, SVGSpinner,
-    SVGSubmit, SVGWrongSimple
+    SVGAttachmentFile,
+    SVGCorrectSimple,
+    SVGInformation,
+    SVGPartiallyCorrect,
+    SVGRecent,
+    SVGSpinner,
+    SVGSubmit,
+    SVGView,
+    SVGWrongSimple
 } from '../../svg/SVGs';
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {useTranslation} from "react-i18next";
@@ -26,7 +31,8 @@ function ProblemInfo({info}) {
             {info.tags.map((tagName, index) => <span className="tag" key={index}>{tagName}</span>)}
         </div>
 
-    const titleComponent = <SVGTitleComponent svg={<SVGInformation cls="w-6 h-6 mr-2"/>} title={t("problem_statement.information")}/>
+    const titleComponent = <SVGTitleComponent svg={<SVGInformation cls="w-6 h-6 mr-2"/>}
+                                              title={t("problem_statement.information")}/>
     return (
         <MapDataFrame titleComponent={titleComponent} data={[
             [t("problem_statement.id"), info.id],
@@ -71,17 +77,20 @@ function ProblemSubmit() {
             <div className="px-6 py-5">
                 <div className="flex flex-col">
                     <div className="mb-4">
-                        <DropdownMenu itemNames={["C++ 11", "C++ 14", "C++ 17", "Go", "Java", "Python 3"]} onChange={handleLanguageChanged}/>
+                        <DropdownMenu itemNames={["C++ 11", "C++ 14", "C++ 17", "Go", "Java", "Python 3"]}
+                                      onChange={handleLanguageChanged}/>
                     </div>
                     <span className="mb-2 mx-1 text-label break-words">
-                        {file? file.name: t("problem_statement.no_file_selected")}
+                        {file ? file.name : t("problem_statement.no_file_selected")}
                     </span>
                     <div className="flex justify-center">
-                        <button className="btn-gray padding-btn-default w-1/2" onClick={() => document.getElementById("uploadFile").click()}>
+                        <button className="btn-gray padding-btn-default w-1/2"
+                                onClick={() => document.getElementById("uploadFile").click()}>
                             <span>{t("problem_statement.choose")}</span>
-                            <input id="uploadFile" className="hidden" type="file" onChange={handleFileUploaded} />
+                            <input id="uploadFile" className="hidden" type="file" onChange={handleFileUploaded}/>
                         </button>
-                        <button className="ml-2 btn-indigo padding-btn-default w-1/2" onClick={handleSubmit}>{t("problem_statement.submit")}</button>
+                        <button className="ml-2 btn-indigo padding-btn-default w-1/2"
+                                onClick={handleSubmit}>{t("problem_statement.submit")}</button>
                     </div>
                 </div>
             </div>
@@ -90,7 +99,9 @@ function ProblemSubmit() {
 }
 
 function ProblemLastSubmissions({submissions, maxScore}) {
-    const titleComponent = <SVGTitleComponent svg={<SVGRecent cls="w-6 h-6 mr-2 fill-current" />} title="Utolsó beküldések" />
+    const {t} = useTranslation()
+    const titleComponent = <SVGTitleComponent svg={<SVGRecent cls="w-6 h-6 mr-2 fill-current"/>}
+                                              title={t("problem_statement.last_submissions")}/>
     const rows = submissions.map((item, index) =>
         <tr className="divide-x divide-default" key={index}>
             <td className="padding-td-default w-0">
@@ -113,7 +124,7 @@ function ProblemLastSubmissions({submissions, maxScore}) {
     return (
         <RoundedTable titleComponent={titleComponent}>
             <tbody className="divide-y divide-default">
-                {rows}
+            {rows}
             </tbody>
         </RoundedTable>
     )
@@ -123,16 +134,16 @@ function ProblemAttachments({attachments}) {
     const {t} = useTranslation()
     const attachmentsContent = attachments.map((item, index) => {
         const labels = {
-            "file":         t("problem_statement.file"),
-            "statement":    t("problem_statement.statement"),
-            "attachment":   t("problem_statement.attachment")
+            "file": t("problem_statement.file"),
+            "statement": t("problem_statement.statement"),
+            "attachment": t("problem_statement.attachment")
         }
         const typeLabel = labels[item.type]
         return (
             <li key={index}>
                 <Link className="link no-underline flex items-start my-0.5" to={item.href}>
-                    {item.type === "file"       && <SVGAttachmentFile cls="w-5 h-5 mr-2 shrink-0"/>}
-                    {item.type === "statement"  && <SVGAttachmentDescription cls="w-5 h-5 mr-2 shrink-0"/>}
+                    {item.type === "file" && <SVGAttachmentFile cls="w-5 h-5 mr-2 shrink-0"/>}
+                    {item.type === "statement" && <SVGAttachmentDescription cls="w-5 h-5 mr-2 shrink-0"/>}
                     <span className="underline truncate">{typeLabel} ({item.name})</span>
                 </Link>
             </li>
@@ -150,13 +161,33 @@ function ProblemAttachments({attachments}) {
     )
 }
 
-function ProblemStatement({ data }) {
+function ProblemStatement({data}) {
     return (
         <div className="flex flex-col lg:flex-row">
-            <div className="w-full mb-3">
-                <object data="/assets/statement.pdf" type="application/pdf" width="100%"
-                        className="h-[36rem] lg:h-[60rem]">
-                </object>
+            <div className="w-full flex flex-col">
+                <div className="w-full mb-2">
+                    <RoundedFrame>
+                        <div className="w-full px-4 py-3 sm:px-6 sm:py-5 flex">
+                            <div className="w-full mr-2">
+                                <DropdownMenu itemNames={["Hungarian (Tom és Jerry)", "English (Tom and Jerry)"]}/>
+                            </div>
+                            <a className="rounded-full btn-gray py-2 px-4 flex justify-center items-center"
+                               href={data.statementSrc} target="_blank">
+                                <SVGView cls="w-[1.4rem] h-[1.4rem]"/>
+                            </a>
+                        </div>
+                    </RoundedFrame>
+                </div>
+                <div className="w-full mb-3">
+                    {data.statementType === "pdf" &&
+                        <object data={data.statementSrc} type="application/pdf" width="100%"
+                                className="h-[36rem] lg:h-[52rem]">
+                        </object>}
+                    {data.statementType === "html" &&
+                        <iframe src={data.statementSrc} width="100%"
+                                className="h-[36rem] lg:h-[52rem]">
+                        </iframe>}
+                </div>
             </div>
             <div className="w-full lg:w-96 mb-3 lg:ml-3 shrink-0">
                 <div className="mb-3">

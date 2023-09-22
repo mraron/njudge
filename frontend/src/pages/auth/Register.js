@@ -34,16 +34,19 @@ function RegisterFrame() {
             <form method="POST">
                 <div className="px-10 pt-8 pb-6 border-b border-default">
                     <div className="mb-4 relative">
-                        <TextBox id="username" label={t("register.username")} initText={username} onChange={setUsername} />
+                        <TextBox id="username" label={t("register.username")} initText={username}
+                                 onChange={setUsername}/>
                     </div>
                     <TextBox id="email" label={t("register.email")} initText={email} onChange={setEmail}/>
                 </div>
                 <div className="px-10 pt-4 pb-8">
                     <div className="mb-4">
-                        <TextBox id="password" label={t("register.password")} type="password" initText={password} onChange={setPassword}/>
+                        <TextBox id="password" label={t("register.password")} type="password" initText={password}
+                                 onChange={setPassword}/>
                     </div>
                     <div className="mb-6">
-                        <TextBox id="passwordConfirm" label={t("register.confirm_password")} type="password" initText={passwordConfirm} onChange={setPasswordConfirm}/>
+                        <TextBox id="passwordConfirm" label={t("register.confirm_password")} type="password"
+                                 initText={passwordConfirm} onChange={setPasswordConfirm}/>
                     </div>
                     <div className="flex justify-center">
                         <button type="submit" className="btn-indigo padding-btn-default w-40" onClick={handleRegister}>

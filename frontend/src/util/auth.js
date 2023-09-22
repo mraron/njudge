@@ -52,7 +52,7 @@ export async function logout() {
     try {
         const response = await fetch("/api/v2/user/auth/logout/")
         return response.ok
-    } catch(error) {
+    } catch (error) {
         console.error(error)
         return false
     }

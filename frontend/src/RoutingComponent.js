@@ -29,22 +29,22 @@ import Verify from "./pages/auth/Verify";
 import Admin from "./pages/auth/Admin";
 
 const titles = {
-    [routeMap.home]:                "home.page_title",
-    [routeMap.contests]:            "contests.page_title",
-    [routeMap.archive]:             "archive.page_title",
-    [routeMap.submissions]:         "submissions.page_title",
-    [routeMap.problems]:            "problems.page_title",
-    [routeMap.info]:                "info.page_title",
-    [routeMap.login]:               "login.page_title",
-    [routeMap.register]:            "register.page_title",
-    [routeMap.profile]:             "profile_main.page_title",
-    [routeMap.profileSubmissions]:  "profile_submissions.page_title",
-    [routeMap.profileSettings]:     "profile_settings.page_title",
-    [routeMap.problem]:             "problem_statement.page_title",
-    [routeMap.problemSubmit]:       "problem_submit.page_title",
-    [routeMap.problemSubmissions]:  "problem_submissions.page_title",
-    [routeMap.problemRanklist]:     "problem_ranklist.page_title",
-    [routeMap.submission]:          "submission.page_title"
+    [routeMap.home]: "home.page_title",
+    [routeMap.contests]: "contests.page_title",
+    [routeMap.archive]: "archive.page_title",
+    [routeMap.submissions]: "submissions.page_title",
+    [routeMap.problems]: "problems.page_title",
+    [routeMap.info]: "info.page_title",
+    [routeMap.login]: "login.page_title",
+    [routeMap.register]: "register.page_title",
+    [routeMap.profile]: "profile_main.page_title",
+    [routeMap.profileSubmissions]: "profile_submissions.page_title",
+    [routeMap.profileSettings]: "profile_settings.page_title",
+    [routeMap.problem]: "problem_statement.page_title",
+    [routeMap.problemSubmit]: "problem_submit.page_title",
+    [routeMap.problemSubmissions]: "problem_submissions.page_title",
+    [routeMap.problemRanklist]: "problem_ranklist.page_title",
+    [routeMap.submission]: "submission.page_title"
 }
 const routes = Object.keys(titles)
 
@@ -65,30 +65,35 @@ function RoutingComponent() {
     return (
         <div className="w-full">
             <Routes>
-                <Route path={routeMap.home} element={<UpdatePage key={location.key} page={Home} />}/>
-                <Route path={routeMap.contests} element={<UpdatePage key={location.key} page={Contests} />}/>
-                <Route path={routeMap.info} element={<UpdatePage key={location.key} page={Info} />}/>
-                <Route path={routeMap.archive} element={<UpdatePage key={location.key} page={Archive} />}/>
-                <Route path={routeMap.submissions} element={<UpdatePage key={location.key} page={Submissions} />}/>
-                <Route path={routeMap.problems} element={<UpdatePage key={location.key} page={Problems} />}/>
-                <Route path={routeMap.submission} element={<UpdatePage key={location.key} page={Submission} />}/>
-                <Route path={routeMap.login} element={<UpdatePage key={location.key} page={Login} />}/>
-                <Route path={routeMap.register} element={<UpdatePage key={location.key} page={Register} />}/>
-                <Route path={routeMap.verify} element={<UpdatePage key={location.key} page={Verify} />}/>
-                <Route path={routeMap.logout} element={<UpdatePage key={location.key} page={Logout} />}/>
-                <Route path={routeMap.admin} element={<UpdatePage key={location.key} page={Admin} />}/>
-                <Route path={routeMap.profile} element={<Profile />}>
-                    <Route index element={<UpdatePage key={location.key} page={ProfileMain} />}/>
-                    <Route path={routeMap.profileSubmissions} element={<UpdatePage key={location.key} page={ProfileSubmissions}/>}/>
-                    <Route path={routeMap.profileSettings} element={<UpdatePage key={location.key} page={ProfileSettings}/>}/>
+                <Route path={routeMap.home} element={<UpdatePage key={location.key} page={Home}/>}/>
+                <Route path={routeMap.contests} element={<UpdatePage key={location.key} page={Contests}/>}/>
+                <Route path={routeMap.info} element={<UpdatePage key={location.key} page={Info}/>}/>
+                <Route path={routeMap.archive} element={<UpdatePage key={location.key} page={Archive}/>}/>
+                <Route path={routeMap.submissions} element={<UpdatePage key={location.key} page={Submissions}/>}/>
+                <Route path={routeMap.problems} element={<UpdatePage key={location.key} page={Problems}/>}/>
+                <Route path={routeMap.submission} element={<UpdatePage key={location.key} page={Submission}/>}/>
+                <Route path={routeMap.login} element={<UpdatePage key={location.key} page={Login}/>}/>
+                <Route path={routeMap.register} element={<UpdatePage key={location.key} page={Register}/>}/>
+                <Route path={routeMap.verify} element={<UpdatePage key={location.key} page={Verify}/>}/>
+                <Route path={routeMap.logout} element={<UpdatePage key={location.key} page={Logout}/>}/>
+                <Route path={routeMap.admin} element={<UpdatePage key={location.key} page={Admin}/>}/>
+                <Route path={routeMap.profile} element={<Profile/>}>
+                    <Route index element={<UpdatePage key={location.key} page={ProfileMain}/>}/>
+                    <Route path={routeMap.profileSubmissions}
+                           element={<UpdatePage key={location.key} page={ProfileSubmissions}/>}/>
+                    <Route path={routeMap.profileSettings}
+                           element={<UpdatePage key={location.key} page={ProfileSettings}/>}/>
                 </Route>
-                <Route path={routeMap.problem} element={<Problem />}>
-                    <Route index element={<UpdatePage key={location.key} page={ProblemStatement} />}/>
-                    <Route path={routeMap.problemSubmit} element={<UpdatePage key={location.key} page={ProblemSubmit} />}/>
-                    <Route path={routeMap.problemSubmissions} element={<UpdatePage key={location.key} page={ProblemSubmissions} />}/>
-                    <Route path={routeMap.problemRanklist} element={<UpdatePage key={location.key} page={ProblemRanklist} />}/>
+                <Route path={routeMap.problem} element={<Problem/>}>
+                    <Route index element={<UpdatePage key={location.key} page={ProblemStatement}/>}/>
+                    <Route path={routeMap.problemSubmit}
+                           element={<UpdatePage key={location.key} page={ProblemSubmit}/>}/>
+                    <Route path={routeMap.problemSubmissions}
+                           element={<UpdatePage key={location.key} page={ProblemSubmissions}/>}/>
+                    <Route path={routeMap.problemRanklist}
+                           element={<UpdatePage key={location.key} page={ProblemRanklist}/>}/>
                 </Route>
-                <Route path="*" element={<UpdatePage page={NotFound} />}/>
+                <Route path="*" element={<UpdatePage page={NotFound}/>}/>
             </Routes>
         </div>
     )

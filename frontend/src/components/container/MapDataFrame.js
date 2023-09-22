@@ -3,7 +3,8 @@ import RoundedTable from './RoundedTable'
 function MapDataFrame({data, title, titleComponent, labelColWidth}) {
     const rows = data.map((pair, index) =>
         <tr className="divide-x divide-default" key={index}>
-            <td className="padding-td-default bg-grey-800 font-medium align-top whitespace-nowrap" style={{width: labelColWidth || "0"}}>
+            <td className="padding-td-default bg-grey-800 font-medium whitespace-nowrap"
+                style={{width: labelColWidth || "0"}}>
                 {pair[0]}
             </td>
             <td className="padding-td-default bg-grey-825 break-words" style={{maxWidth: 0}}>
@@ -14,7 +15,7 @@ function MapDataFrame({data, title, titleComponent, labelColWidth}) {
     return (
         <RoundedTable title={title} titleComponent={titleComponent}>
             <tbody className="divide-y divide-default">
-                {rows}
+            {rows}
             </tbody>
         </RoundedTable>
     );

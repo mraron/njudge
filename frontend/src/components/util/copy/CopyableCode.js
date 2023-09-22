@@ -11,7 +11,7 @@ function CopyableCode({text, maxHeight, titleComponent, cls}) {
                     {text}
                 </pre>
                 <div className="absolute top-2.5 right-2.5 opacity-75 hover:opacity-100 transition duration-200">
-                    <CopyButton text={text} />
+                    <CopyButton text={text}/>
                 </div>
             </div>
         </RoundedFrame>

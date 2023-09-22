@@ -7,14 +7,14 @@ import {SVGWrongSimple} from "../svg/SVGs";
 import Editor from "@monaco-editor/react";
 import {useContext} from "react";
 import UserContext from "../contexts/user/UserContext";
-import RoundedFrame from "../components/container/RoundedFrame";
 import DropdownFrame from "../components/container/DropdownFrame";
 
 
 function CompileErrorFrame({message}) {
     const {t} = useTranslation()
     const titleComponent =
-        <SVGTitleComponent title={t("submission.compilation_error")} svg={<SVGWrongSimple cls="w-6 h-6 mr-2 text-red-500" />} />
+        <SVGTitleComponent title={t("submission.compilation_error")}
+                           svg={<SVGWrongSimple cls="w-6 h-6 mr-2 text-red-500"/>}/>
 
     return (
         <CopyableCode text={message} titleComponent={titleComponent} maxHeight="16rem"/>
@@ -47,7 +47,7 @@ function Submission({data}) {
                                         options={{domReadOnly: true, readOnly: true, fontFamily: 'JetBrains Mono'}}
                                         value={data.summary.code}/>
                             </div>}
-                        {data.summary.compileError && <CompileErrorFrame message={data.summary.compileErrorMessage} />}
+                        {data.summary.compileError && <CompileErrorFrame message={data.summary.compileErrorMessage}/>}
                         {!data.summary.compileError && <SubmissionTable status={data.status}/>}
                     </div>
                 </div>
