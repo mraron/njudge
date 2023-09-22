@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useContext, useState} from "react";
 import SubmissionsTable from "../../components/concrete/table/SubmissionsTable";
 import Checkbox from "../../components/input/Checkbox"
 import Pagination from "../../components/util/Pagination";
@@ -7,9 +7,11 @@ import UpdateQueryString from "../../util/updateQueryString";
 import {useTranslation} from "react-i18next";
 import DropdownFrame from "../../components/container/DropdownFrame";
 import queryString from "query-string";
+import UserContext from "../../contexts/user/UserContext";
 
 function SubmissionFilterFrame() {
     const {t} = useTranslation()
+    const {isLoggedIn} = useContext(UserContext)
     const location = useLocation()
     const navigate = useNavigate()
 
@@ -26,11 +28,11 @@ function SubmissionFilterFrame() {
     return (
         <DropdownFrame title="Szűrés">
             <div className="px-8 py-6 flex flex-col">
-                <div className="mb-3">
-                    <Checkbox label={t("problem_submissions.full_solutions")} onChange={setOnlyAC} initChecked={onlyAC}/>
-                </div>
-                <div className="mb-5">
+                {isLoggedIn && <div className="mb-3">
                     <Checkbox label={t("problem_submissions.own_solutions")} onChange={setOnlyOwn} initChecked={onlyOwn}/>
+                </div>}
+                <div className="mb-5">
+                    <Checkbox label={t("problem_submissions.full_solutions")} onChange={setOnlyAC} initChecked={onlyAC}/>
                 </div>
                 <div className="flex justify-center">
                     <button className="mr-1 btn-indigo padding-btn-default w-32" onClick={handleSubmit}>{t("problem_filter.search")}</button>
