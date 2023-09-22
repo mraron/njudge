@@ -2,13 +2,10 @@ package problemset
 
 import (
 	"bytes"
-	"io"
-	"mime"
-	"net/http"
-	"path/filepath"
-	"sort"
-	"strconv"
-
+	"context"
+	"database/sql"
+	"errors"
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/web/domain/problem"
@@ -19,20 +16,92 @@ import (
 	"github.com/mraron/njudge/internal/web/services"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/volatiletech/sqlboiler/v4/queries"
+	"io"
+	"mime"
+	"net/http"
+	"path/filepath"
+	"strconv"
 )
 
-func GetProblem() echo.HandlerFunc {
+type ProblemInfo struct {
+	ID          string   `json:"id"`
+	Title       string   `json:"title"`
+	TimeLimit   string   `json:"timeLimit"`
+	MemoryLimit string   `json:"memoryLimit"`
+	Tags        []string `json:"tags"`
+	Type        string   `json:"type"`
+}
+
+func ProblemInfoFromProblem(ctx context.Context, DB *sql.DB, tr i18n.Translator, prob problem.Problem) (*ProblemInfo, error) {
+	tags, err := prob.ProblemRel.ProblemProblemTags().All(ctx, DB)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+
+	lst := make([]string, 0)
+	for _, tag := range tags {
+		if t, err := tag.Tag().One(ctx, DB); err != nil {
+			return nil, err
+		} else {
+			lst = append(lst, t.Name)
+		}
+	}
+
+	return &ProblemInfo{
+		ID:          prob.ProblemRel.Problem,
+		Title:       tr.TranslateContent(prob.Titles()).String(),
+		TimeLimit:   fmt.Sprintf("%d", prob.TimeLimit()),
+		MemoryLimit: fmt.Sprintf("%d", prob.MemoryLimit()/1024/1024),
+		Tags:        lst,
+		Type:        prob.GetTaskType().Name(),
+	}, nil
+}
+
+type ProblemAttachment struct {
+	Type string `json:"type"`
+	Name string `json:"name"`
+	Href string `json:"href"`
+}
+
+func ProblemAttachmentsFromProblem(tr i18n.Translator, prob problem.Problem) []ProblemAttachment {
+	res := make([]ProblemAttachment, 0)
+	for _, pdf := range prob.Problem.Statements().FilterByType(problems.DataTypePDF) {
+		res = append(res, ProblemAttachment{
+			Type: "statement",
+			Name: pdf.Locale(),
+			Href: "#",
+		})
+	}
+	for _, elem := range prob.Attachments() {
+		res = append(res, ProblemAttachment{
+			Type: "file",
+			Name: elem.Name(),
+			Href: "#",
+		})
+	}
+	return res
+}
+
+func GetProblem(DB *sqlx.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 		prob := c.Get("problem").(problem.Problem)
-		stats := c.Get("problemStats").(problem.StatsData)
+		//stats := c.Get("problemStats").(problem.StatsData)
 
-		c.Set("title", tr.Translate("Statement - %s (%s)", tr.TranslateContent(prob.Titles()).String(), prob.Name()))
+		pinfo, err := ProblemInfoFromProblem(c.Request().Context(), DB.DB, tr, prob)
+		if err != nil {
+			return err
+		}
 
-		return c.Render(http.StatusOK, "problemset/problem/problem", struct {
-			problem.Problem
-			problem.StatsData
-		}{Problem: prob, StatsData: stats})
+		pattachs := ProblemAttachmentsFromProblem(tr, prob)
+
+		return c.JSON(http.StatusOK, struct {
+			Info        ProblemInfo         `json:"info"`
+			Attachments []ProblemAttachment `json:"attachments"`
+		}{
+			*pinfo,
+			pattachs,
+		})
 	}
 }
 
@@ -96,29 +165,106 @@ func GetProblemAttachment() echo.HandlerFunc {
 	}
 }
 
+type ProblemRanklistResult struct {
+	Username     string  `json:"username"`
+	Score        float64 `json:"score"`
+	SubmissionID int     `json:"submissionID"`
+	Accepted     bool    `json:"accepted"`
+}
+
+type ProblemRanklist struct {
+	MaxScore float64                 `json:"maxScore"`
+	Results  []ProblemRanklistResult `json:"results"`
+}
+
+func ProblemRanklistFromSubmissions(ctx context.Context, DB *sql.DB, prob problem.Problem, subs []*models.Submission) (*ProblemRanklist, error) {
+	testset, err := prob.StatusSkeleton("")
+	if err != nil {
+		return nil, err
+	}
+
+	results := make([]ProblemRanklistResult, len(subs))
+	for i := range subs {
+		user, err := subs[i].User().One(ctx, DB)
+		if err != nil {
+			return nil, err
+		}
+
+		results[i] = ProblemRanklistResult{
+			Username:     user.Name,
+			Score:        float64(subs[i].Score.Float32),
+			SubmissionID: subs[i].ID,
+			Accepted:     subs[i].Verdict == 0,
+		}
+	}
+
+	res := &ProblemRanklist{
+		MaxScore: testset.Feedback[0].MaxScore(),
+		Results:  results,
+	}
+
+	return res, nil
+}
+
 func GetProblemRanklist(DB *sqlx.DB) echo.HandlerFunc {
+	var (
+		queryTemplate = `SELECT DISTINCT ON (s1.user_id) s1.* FROM
+                                        (SELECT s1.user_id, MAX(s1.score) as score FROM submissions s1 WHERE problemset=$1 AND problem=$2 GROUP BY s1.user_id) s2
+                                        INNER JOIN submissions s1 ON s1.user_id=s2.user_id AND s1.score=s2.score AND s1.problemset=$1 AND s1.problem=$2`
+		queryAll   = fmt.Sprintf("SELECT * FROM (%s) t ORDER BY t.score DESC LIMIT $3 OFFSET $4", queryTemplate)
+		queryCount = fmt.Sprintf("SELECT COUNT(*) FROM (%s) t", queryTemplate)
+	)
+
+	type request struct {
+		Page int `query:"page"`
+	}
+
 	return func(c echo.Context) error {
-		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
+		data := request{}
+		if err := c.Bind(&data); err != nil {
+			return err
+		}
 
 		problemset, problemName := c.Param("name"), c.Param("problem")
 		prob := c.Get("problem").(problem.Problem)
 
-		sbs := make([]*models.Submission, 0)
+		if data.Page <= 0 {
+			data.Page = 1
+		}
 
-		//@TODO something better?
-		if err := queries.Raw("SELECT DISTINCT ON (s1.user_id) s1.* FROM (SELECT s1.user_id, MAX(s1.score) as score FROM submissions s1 WHERE problemset=$1 AND problem=$2 GROUP BY s1.user_id) s2 INNER JOIN submissions s1 ON s1.user_id=s2.user_id AND s1.score=s2.score AND s1.problemset=$1 AND s1.problem=$2", problemset, problemName).Bind(c.Request().Context(), DB, &sbs); err != nil {
+		cnt := 0
+		row := queries.Raw(queryCount, problemset, problemName).QueryRowContext(c.Request().Context(), DB)
+		if err := row.Scan(&cnt); err != nil {
 			return err
 		}
 
-		sort.Slice(sbs, func(i, j int) bool {
-			return sbs[i].Score.Float32 > sbs[j].Score.Float32
-		})
+		perPage := 20
+		pages := (cnt + perPage - 1) / perPage
+		if data.Page > pages {
+			data.Page = pages
+		}
 
-		c.Set("title", tr.Translate("Results - %s (%s)", tr.TranslateContent(prob.Titles()).String(), prob.Name()))
-		return c.Render(http.StatusOK, "problemset/problem/ranklist", struct {
-			Problem     problem.Problem
-			Submissions []*models.Submission
-		}{prob, sbs})
+		sbs := make([]*models.Submission, 0)
+		if err := queries.Raw(queryAll, problemset, problemName, perPage, (data.Page-1)*perPage).Bind(c.Request().Context(), DB, &sbs); err != nil {
+			return err
+		}
+
+		ranklist, err := ProblemRanklistFromSubmissions(c.Request().Context(), DB.DB, prob, sbs)
+		if err != nil {
+			return err
+		}
+
+		return c.JSON(http.StatusOK, struct {
+			Ranklist       ProblemRanklist `json:"ranklist"`
+			PaginationData pagination.Data `json:"paginationData"`
+		}{
+			Ranklist: *ranklist,
+			PaginationData: pagination.Data{
+				Page:     data.Page,
+				PerPage:  perPage,
+				LastPage: pages,
+			},
+		})
 	}
 }
 
@@ -137,19 +283,17 @@ func GetProblemSubmit() echo.HandlerFunc {
 	}
 }
 
-func GetProblemStatus(statusPageService services.StatusPageService) echo.HandlerFunc {
+func GetProblemStatus(DB *sqlx.DB, problemStore problems.Store, statusPageService services.StatusPageService) echo.HandlerFunc {
 	type request struct {
-		AC     string `query:"ac"`
-		UserID int    `query:"user_id"`
-		Page   int    `query:"page"`
+		AC   string `query:"ac"`
+		Own  bool   `query:"own"`
+		Page int    `query:"page"`
 
 		Problemset string `param:"name"`
 		Problem    string `param:"problem"`
 	}
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
-
-		prob := c.Get("problem").(problem.Problem)
 
 		data := request{}
 		if err := c.Bind(&data); err != nil {
@@ -169,9 +313,10 @@ func GetProblemStatus(statusPageService services.StatusPageService) echo.Handler
 			},
 			Problemset: data.Problemset,
 			Problem:    data.Problem,
+		}
 
-			UserID:    0,
-			GETValues: c.Request().URL.Query(),
+		if user := c.Get("user").(*models.User); data.Own && user != nil {
+			statusReq.UserID = user.ID
 		}
 
 		if data.AC == "1" {
@@ -184,8 +329,19 @@ func GetProblemStatus(statusPageService services.StatusPageService) echo.Handler
 			return err
 		}
 
-		c.Set("title", tr.Translate("Submissions - %s (%s)", tr.TranslateContent(prob.Titles()).String(), prob.Name()))
-		return c.Render(http.StatusOK, "problemset/problem/status", statusPage)
+		statusRows := make([]*StatusRow, len(statusPage.Submissions))
+		for i := range statusPage.Submissions {
+			sub := &statusPage.Submissions[i]
+			if statusRows[i], err = StatusRowFromSubmission(c.Request().Context(), DB.DB,
+				problemStore, tr, sub); err != nil {
+				return err
+			}
+		}
+
+		return c.JSON(http.StatusOK, struct {
+			PaginationData pagination.Data `json:"paginationData"`
+			Submissions    []*StatusRow    `json:"submissions"`
+		}{statusPage.PaginationData, statusRows})
 	}
 }
 

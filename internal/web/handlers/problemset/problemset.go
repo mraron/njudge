@@ -1,11 +1,16 @@
 package problemset
 
 import (
+	"context"
+	"database/sql"
+	"fmt"
+	"github.com/mraron/njudge/internal/web/domain/submission"
 	"io"
 	"net/http"
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
@@ -216,7 +221,59 @@ func GetProblemList(DB *sqlx.DB, problemListService services.ProblemListService,
 	}
 }
 
-func GetStatus(statusPageService services.StatusPageService) echo.HandlerFunc {
+type StatusRow struct {
+	Id          int                 `json:"id"`
+	Date        string              `json:"date"`
+	User        string              `json:"user"`
+	Problem     ui.Link             `json:"problem"`
+	Lang        string              `json:"language"`
+	Verdict     string              `json:"verdict"`
+	VerdictType problem.VerdictType `json:"verdictType"`
+	Time        string              `json:"time"`
+	Memory      string              `json:"memory"`
+}
+
+func StatusRowFromSubmission(ctx context.Context, DB *sql.DB, problemStore problems.Store, tr i18n.Translator, sub *submission.Submission) (*StatusRow, error) {
+	user, err := sub.User().One(ctx, DB)
+	if err != nil {
+		return nil, err
+	}
+
+	verdict := problem.Verdict(sub.Verdict)
+
+	status := &problems.Status{}
+	if err := status.Scan(sub.Status); err != nil {
+		return nil, err
+	}
+
+	prob, err := problemStore.Get(sub.Problem)
+	res := &StatusRow{
+		Id:   sub.ID,
+		Date: sub.Submitted.String(),
+		User: user.Name,
+		Problem: ui.Link{
+			Text: tr.TranslateContent(prob.Titles()).String(),
+			Href: fmt.Sprintf("/problemset/%s/%s/",
+				sub.Problemset,
+				sub.Problem),
+		},
+		Lang:        sub.Language,
+		Verdict:     verdict.Translate(tr),
+		VerdictType: verdict.VerdictType(),
+	}
+
+	if len(status.Feedback) > 0 {
+		res.Time = strconv.Itoa(int(status.Feedback[0].MaxTimeSpent() / time.Millisecond))
+		res.Memory = strconv.Itoa(status.Feedback[0].MaxMemoryUsage())
+		if status.FeedbackType == problems.FeedbackIOI || status.FeedbackType == problems.FeedbackLazyIOI {
+			res.Verdict += fmt.Sprintf(" %.2f / %.2f", status.Feedback[0].Score(), status.Feedback[0].MaxScore())
+		}
+	}
+
+	return res, nil
+}
+
+func GetStatus(DB *sqlx.DB, problemStore problems.Store, statusPageService services.StatusPageService) echo.HandlerFunc {
 	type request struct {
 		AC         string `query:"ac"`
 		UserID     int    `query:"user_id"`
@@ -246,7 +303,6 @@ func GetStatus(statusPageService services.StatusPageService) echo.HandlerFunc {
 			Problemset: data.Problemset,
 			Problem:    data.Problem,
 			UserID:     data.UserID,
-			GETValues:  c.Request().URL.Query(),
 		}
 
 		if data.AC == "1" {
@@ -259,8 +315,19 @@ func GetStatus(statusPageService services.StatusPageService) echo.HandlerFunc {
 			return err
 		}
 
-		c.Set("title", tr.Translate("Submissions"))
-		return c.Render(http.StatusOK, "status.gohtml", statusPage)
+		statusRows := make([]*StatusRow, len(statusPage.Submissions))
+		for i := range statusPage.Submissions {
+			sub := &statusPage.Submissions[i]
+			if statusRows[i], err = StatusRowFromSubmission(c.Request().Context(), DB.DB,
+				problemStore, tr, sub); err != nil {
+				return err
+			}
+		}
+
+		return c.JSON(http.StatusOK, struct {
+			PaginationData pagination.Data `json:"paginationData"`
+			Submissions    []*StatusRow    `json:"submissions"`
+		}{statusPage.PaginationData, statusRows})
 	}
 }
 

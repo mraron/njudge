@@ -37,27 +37,31 @@ var alreadyLoggedInMessage = "You're already logged in..."
 type Authenticator func(c echo.Context) (*models.User, error)
 
 func loginUserHandler(auth Authenticator) echo.HandlerFunc {
+	type loginResponse struct {
+		Error string `json:"error"`
+	}
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		if u := c.Get("user").(*models.User); u != nil {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
+			return c.JSON(http.StatusOK, loginResponse{})
 		}
 
 		user, err := auth(c)
 		if err != nil {
 			if errors.Is(err, LoginError) {
-				helpers.SetFlash(c, "LoginMessage", err.(LoginErrorWithMessage).TranslatedMessage)
-				return c.Redirect(http.StatusFound, c.Echo().Reverse("getUserLogin"))
+				return c.JSON(http.StatusUnauthorized, loginResponse{
+					Error: err.(LoginErrorWithMessage).TranslatedMessage,
+				})
 			} else {
 				return err
 			}
 		}
-		defer helpers.DeleteFlash(c, "LoginRedirect")
 
 		if user.ActivationKey.Valid {
-			helpers.SetFlash(c, "LoginMessage", tr.Translate("The account is not activated. Check your emails!"))
-			return c.Redirect(http.StatusFound, "/user/login")
+			return c.JSON(http.StatusUnauthorized, loginResponse{
+				Error: tr.Translate("The account is not activated. Check your emails!"),
+			})
 		}
 
 		storage, _ := session.Get("user", c)
@@ -69,13 +73,7 @@ func loginUserHandler(auth Authenticator) echo.HandlerFunc {
 
 		c.Set("user", user)
 
-		to := "/"
-		if val, ok := helpers.GetFlash(c, "LoginRedirect").(string); ok {
-			to = val
-		}
-
-		helpers.SetFlash(c, "TopMessage", tr.Translate("Successful login!"))
-		return c.Redirect(http.StatusFound, to)
+		return c.JSON(http.StatusOK, loginResponse{})
 	}
 }
 
@@ -114,8 +112,8 @@ func GetLogin() echo.HandlerFunc {
 
 func PostLogin(DB *sqlx.DB) echo.HandlerFunc {
 	type request struct {
-		Name     string `form:"name"`
-		Password string `form:"password"`
+		Name     string `json:"username"`
+		Password string `json:"password"`
 	}
 
 	return loginUserHandler(func(c echo.Context) (*models.User, error) {
@@ -165,9 +163,8 @@ func OAuthCallback(DB *sqlx.DB) echo.HandlerFunc {
 
 func Logout() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 		if u := c.Get("user").(*models.User); u == nil {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate("Can't logout if you've not logged in."))
+			return c.String(http.StatusUnauthorized, "")
 		}
 
 		storage, _ := session.Get("user", c)
@@ -178,6 +175,6 @@ func Logout() echo.HandlerFunc {
 			return err
 		}
 
-		return c.Redirect(http.StatusFound, "/")
+		return c.String(http.StatusOK, "")
 	}
 }

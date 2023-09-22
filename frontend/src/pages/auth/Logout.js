@@ -6,17 +6,14 @@ import {useTranslation} from "react-i18next";
 
 function Logout() {
     const navigate = useNavigate()
-
-    useEffect(() => {
-        if (logout()) {
+    logout().then((result) => {
+        if (result) {
             window.flash("flash.successful_logout", "success")
+            navigate(routeMap.home)
         } else {
             window.flash("flash.not_logged_in", "failure")
         }
-    }, [])
-    return (
-        <Navigate to={routeMap.home} />
-    )
+    })
 }
 
 export default Logout

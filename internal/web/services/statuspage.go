@@ -8,7 +8,6 @@ import (
 	"github.com/mraron/njudge/internal/web/models"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"net/url"
 )
 
 type StatusPageRequest struct {
@@ -18,7 +17,6 @@ type StatusPageRequest struct {
 	Problem    string
 	Verdict    *problems.VerdictName
 	UserID     int
-	GETValues  url.Values
 }
 
 type StatusPageService interface {
@@ -64,10 +62,7 @@ func (s SQLStatusPageService) GetStatusPage(ctx context.Context, req StatusPageR
 		return nil, err
 	}
 
-	pages, err := pagination.LinksWithCountLimit(req.Pagination.Page, req.Pagination.PerPage, cnt, req.GETValues, 6)
-	if err != nil {
-		return nil, err
-	}
+	req.Pagination.LastPage = (int(cnt) + req.Pagination.PerPage - 1) / req.Pagination.PerPage
 
 	var submissions []submission.Submission
 	for ind := range sbs {
@@ -75,8 +70,7 @@ func (s SQLStatusPageService) GetStatusPage(ctx context.Context, req StatusPageR
 	}
 
 	return &submission.StatusPage{
-		req.Pagination.Page,
-		pages,
-		submissions,
+		PaginationData: req.Pagination,
+		Submissions:    submissions,
 	}, nil
 }

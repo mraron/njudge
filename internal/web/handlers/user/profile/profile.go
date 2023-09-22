@@ -78,8 +78,7 @@ func GetSubmissions(statusPageService services.StatusPageService) echo.HandlerFu
 				SortDir:   "DESC",
 				SortField: "id",
 			},
-			UserID:    u.ID,
-			GETValues: c.Request().URL.Query(),
+			UserID: u.ID,
 		}
 
 		statusPage, err := statusPageService.GetStatusPage(c.Request().Context(), statusReq)
