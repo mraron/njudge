@@ -67,7 +67,8 @@
 		"profile": "Profil",
 		"logout": "Kilépés",
 		"login": "Belépés",
-		"register": "Regisztráció"
+		"register": "Regisztráció",
+		"admin": "Admin"
 	},
 	"profile_sidebar": {
 		"stats": "Statisztikák",

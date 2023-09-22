@@ -11,7 +11,7 @@ function Problem(data) {
     );
     return (
         <tr className={"divide-x divide-default"}>
-            <td className="padding-td-default">
+            <td className="padding-td-default w-0">
                 <div className="flex items-center justify-center">
                     {solvedStatus === 1 && <SVGWrongSimple cls="w-5 h-5 text-red-500 shrink-0" />}
                     {solvedStatus === 2 && <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-500 shrink-0" />}

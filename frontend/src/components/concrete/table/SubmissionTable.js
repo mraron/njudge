@@ -151,14 +151,14 @@ function SubmissionTable_1_3({status}) {
     return (
         <RoundedTable>
             <thead className="bg-grey-800">
-            <tr className="divide-x divide-default">
-                <th className="padding-td-default">{t("submission_table.subtask")}</th>
-                <th className="padding-td-default">{t("submission_table.total")}</th>
-                <th className="padding-td-default">{t("submission_table.test")}</th>
-                <th className="padding-td-default" colSpan={2}>{t("submission_table.verdict")}</th>
-                <th className="padding-td-default">{t("submission_table.time")}</th>
-                <th className="padding-td-default">{t("submission_table.memory")}</th>
-            </tr>
+                <tr className="divide-x divide-default">
+                    <th className="padding-td-default">{t("submission_table.subtask")}</th>
+                    <th className="padding-td-default">{t("submission_table.total")}</th>
+                    <th className="padding-td-default">{t("submission_table.test")}</th>
+                    <th className="padding-td-default" colSpan={2}>{t("submission_table.verdict")}</th>
+                    <th className="padding-td-default">{t("submission_table.time")}</th>
+                    <th className="padding-td-default">{t("submission_table.memory")}</th>
+                </tr>
             </thead>
             <tbody>
                 {groupsContent}

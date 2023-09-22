@@ -42,6 +42,10 @@
     @apply py-3 px-5
 }
 
+th {
+    @apply font-medium
+}
+
 .text-table {
     font-size: 0.92rem;
     line-height: 1.25rem;

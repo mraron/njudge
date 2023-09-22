@@ -23,16 +23,6 @@ const menuRouteLabels = [
     "menubar.problems",
     "menubar.information"
 ]
-const profileRouteLabels = {
-    "loggedIn": [
-        "menubar.profile",
-        "menubar.logout"
-    ],
-    "loggedOut": [
-        "menubar.login",
-        "menubar.register"
-    ]
-}
 
 function MenuOption({label, route, selected, horizontal, onClick}) {
     return (
@@ -67,22 +57,33 @@ function getProfileDropdownButton(isLoggedIn) {
 function ProfileSettings() {
     const {userData, isLoggedIn} = useContext(UserContext)
     const {t, i18n} = useTranslation()
-    const loginStr = isLoggedIn ? "loggedIn" : "loggedOut"
 
     let profileRoutes = [
         routeMap.login,
         routeMap.register
+    ]
+    let profileRouteLabels = [
+        "menubar.login",
+        "menubar.register"
     ]
     if (isLoggedIn) {
         profileRoutes = [
             routeMap.profile.replace(":user", encodeURIComponent(userData.username)),
             routeMap.logout
         ]
+        profileRouteLabels = [
+            "menubar.profile",
+            "menubar.logout"
+        ]
+        if (userData.isAdmin) {
+            profileRoutes = profileRoutes.slice(0, 1).concat([routeMap.admin]).concat(profileRoutes.slice(1))
+            profileRouteLabels = profileRouteLabels.slice(0, 1).concat(["menubar.admin"]).concat(profileRouteLabels.slice(1))
+        }
     }
     return (
         <div className="flex">
             <DropdownRoutes button={getProfileDropdownButton(isLoggedIn)} routes={profileRoutes}
-                            routeLabels={profileRouteLabels[loginStr].map(t)}/>
+                            routeLabels={profileRouteLabels.map(t)}/>
             <div
                 className="px-3 flex items-center justify-center border-1 border-l-0 border-grey-675 rounded-tr-md rounded-br-md">
                 <button className={`px-2 ${i18n.resolvedLanguage === "hu"? "bg-grey-725": "hover:bg-grey-775"} rounded mr-1`} onClick={() => i18n.changeLanguage("hu")}>

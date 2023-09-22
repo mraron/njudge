@@ -50,16 +50,16 @@ function SubmissionsTable({submissions}) {
     return (
         <RoundedTable>
             <thead className="bg-grey-800">
-            <tr className="divide-x divide-default">
-                <th className="padding-td-default">{t("submissions_table.id")}</th>
-                <th className="padding-td-default">{t("submissions_table.date")}</th>
-                <th className="padding-td-default">{t("submissions_table.user")}</th>
-                <th className="padding-td-default">{t("submissions_table.problem")}</th>
-                <th className="padding-td-default">{t("submissions_table.language")}</th>
-                <th className="padding-td-default">{t("submissions_table.verdict")}</th>
-                <th className="padding-td-default">{t("submissions_table.time")}</th>
-                <th className="padding-td-default">{t("submissions_table.memory")}</th>
-            </tr>
+                <tr className="divide-x divide-default">
+                    <th className="padding-td-default">{t("submissions_table.id")}</th>
+                    <th className="padding-td-default">{t("submissions_table.date")}</th>
+                    <th className="padding-td-default">{t("submissions_table.user")}</th>
+                    <th className="padding-td-default">{t("submissions_table.problem")}</th>
+                    <th className="padding-td-default">{t("submissions_table.language")}</th>
+                    <th className="padding-td-default">{t("submissions_table.verdict")}</th>
+                    <th className="padding-td-default">{t("submissions_table.time")}</th>
+                    <th className="padding-td-default">{t("submissions_table.memory")}</th>
+                </tr>
             </thead>
             <tbody className="divide-y divide-default">
             {submissionsContent}

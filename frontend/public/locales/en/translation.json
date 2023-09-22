@@ -67,7 +67,8 @@
 		"profile": "Profile",
 		"logout": "Logout",
 		"login": "Login",
-		"register": "Register"
+		"register": "Register",
+		"admin": "Admin"
 	},
 	"profile_sidebar": {
 		"stats": "Statistics",
