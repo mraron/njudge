@@ -1,11 +1,8 @@
 package submission
 
-import (
-	"github.com/mraron/njudge/internal/web/helpers/pagination"
-)
+import "github.com/mraron/njudge/internal/web/helpers/pagination"
 
 type StatusPage struct {
-	CurrentPage int
-	Pages       []pagination.Link
-	Submissions []Submission
+	PaginationData pagination.Data
+	Submissions    []Submission
 }

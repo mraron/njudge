@@ -5,6 +5,14 @@ import (
 	"github.com/mraron/njudge/pkg/problems"
 )
 
+type VerdictType int
+
+const (
+	VerdictTypeRunning VerdictType = iota
+	VerdictTypeWrong
+	VerdictTypeAC
+)
+
 type Verdict int
 
 const (
@@ -56,6 +64,17 @@ func (v Verdict) String() string {
 	}
 
 	return ""
+}
+
+func (v Verdict) VerdictType() VerdictType {
+	if v == VerdictRU || v == VerdictUP {
+		return VerdictTypeRunning
+	}
+	if v == VerdictAC {
+		return VerdictTypeAC
+	}
+
+	return VerdictTypeWrong
 }
 
 func (v Verdict) Translate(t i18n.Translator) string {

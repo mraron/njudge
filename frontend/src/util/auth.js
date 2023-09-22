@@ -12,11 +12,7 @@ export async function login(username, password) {
     try {
         const response = await fetch("/api/v2/user/auth/login/", requestOptions)
         const data = await response.json()
-        const result = {...data, success: response.ok}
-        if (response.ok) {
-            Cookies.set("authToken", data.authToken, {expires: 7, secure: true})
-        }
-        return result
+        return {...data, success: response.ok}
     } catch (error) {
         console.error(error)
     }
@@ -52,12 +48,14 @@ export async function verify(token) {
     return result
 }
 
-export function logout() {
-    if (Cookies.get("authToken")) {
-        Cookies.remove("authToken")
-        return true
+export async function logout() {
+    try {
+        const response = await fetch("/api/v2/user/auth/logout/")
+        return response.ok
+    } catch(error) {
+        console.error(error)
+        return false
     }
-    return false
 }
 
 export async function authenticate() {

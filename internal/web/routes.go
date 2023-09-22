@@ -1,6 +1,7 @@
 package web
 
 import (
+	"net/http"
 	"strings"
 	"time"
 
@@ -39,20 +40,18 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 
 	e.Static("/static", "static")
 
-	e.GET("/submission/:id", handlers.GetSubmission(services.NewSQLSubmission(s.DB.DB))).Name = "getSubmission"
 	e.GET("/submission/rejudge/:id", handlers.RejudgeSubmission(services.NewSQLSubmission(s.DB.DB)), user.RequireLoginMiddleware()).Name = "rejudgeSubmission"
 
 	ps := e.Group("/problemset", problemset.SetNameMiddleware())
 	ps.GET("/:name/", problemset.GetProblemList(s.DB, services.NewSQLProblemListService(s.DB.DB, s.ProblemStore, services.NewSQLProblem(s.DB.DB, s.ProblemStore)), services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
 	ps.POST("/:name/submit", problemset.PostSubmit(services.NewSQLSubmitService(s.DB.DB, s.ProblemStore)), user.RequireLoginMiddleware())
-	ps.GET("/status/", problemset.GetStatus(services.NewSQLStatusPageService(s.DB.DB))).Name = "getProblemsetStatus"
 
 	psProb := ps.Group("/:name/:problem", problemset.RenameProblemMiddleware(s.ProblemStore), problemset.SetProblemMiddleware(services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
-	psProb.GET("/", problemset.GetProblem()).Name = "getProblemMain"
-	psProb.GET("/problem", problemset.GetProblem())
-	psProb.GET("/status", problemset.GetProblemStatus(services.NewSQLStatusPageService(s.DB.DB)))
+	//psProb.GET("/", problemset.GetProblem()).Name = "getProblemMain"
+	////psProb.GET("/problem", problemset.GetProblem())
+	//psProb.GET("/status", problemset.GetProblemStatus(services.NewSQLStatusPageService(s.DB.DB)))
 	psProb.GET("/submit", problemset.GetProblemSubmit())
-	psProb.GET("/ranklist", problemset.GetProblemRanklist(s.DB))
+	//psProb.GET("/ranklist", problemset.GetProblemRanklist(s.DB))
 	psProb.POST("/tags", problemset.PostProblemTag(services.NewSQLTagsService(s.DB.DB)))
 	psProb.GET("/delete_tag/:id", problemset.DeleteProblemTag(services.NewSQLTagsService(s.DB.DB)))
 	psProb.GET("/pdf/:language/", problemset.GetProblemPDF())
@@ -61,12 +60,12 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 
 	u := e.Group("/user")
 
-	u.GET("/auth/callback", user.OAuthCallback(s.DB))
-	u.GET("/auth", user.BeginOAuth())
+	//u.GET("/auth/callback", user.OAuthCallback(s.DB))
+	//u.GET("/auth", user.BeginOAuth())
+	//u.POST("/login", user.PostLogin(s.DB))
+	//u.GET("/logout", user.Logout())
 
-	u.GET("/login", user.GetLogin()).Name = "getUserLogin"
-	u.POST("/login", user.PostLogin(s.DB))
-	u.GET("/logout", user.Logout())
+	//u.GET("/login", user.GetLogin()).Name = "getUserLogin"
 	u.GET("/register", user.GetRegister())
 	u.POST("/register", user.Register(s.Server, s.DB, s.MailService))
 	u.GET("/activate", user.GetActivateInfo())
@@ -92,8 +91,58 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 		v2 := apiGroup.Group("/v2")
 		v2.GET("/archive/", taskarchive.Get(s.DB, s.ProblemStore))
 
+		v2.GET("/", func(c echo.Context) error {
+			type Post struct {
+				Title   string `json:"title"`
+				Content string `json:"content"`
+				Date    string `json:"date"`
+			}
+			return c.JSON(http.StatusOK, struct {
+				Posts []Post `json:"posts"`
+			}{make([]Post, 0)})
+		})
+
+		u := v2.Group("/user")
+		u.GET("/auth/", func(c echo.Context) error {
+			type UserData struct {
+				Username        string                 `json:"username"`
+				PictureSrc      string                 `json:"pictureSrc"`
+				Rating          int                    `json:"rating"`
+				Score           float64                `json:"score"`
+				NumSolved       int                    `json:"numSolved"`
+				LastSubmissions []problemset.StatusRow `json:"lastSubmissions"`
+			}
+
+			u := c.Get("user").(*models.User)
+			var ud *UserData
+			if u != nil {
+				ud = &UserData{
+					Username:        u.Name,
+					PictureSrc:      "/assets/profile.webp",
+					LastSubmissions: []problemset.StatusRow{},
+				}
+			}
+
+			return c.JSON(http.StatusOK, struct {
+				UserData *UserData `json:"userData"`
+			}{ud})
+		})
+
+		u.GET("/auth/callback", user.OAuthCallback(s.DB))
+		u.GET("/auth/google/", user.BeginOAuth())
+		u.POST("/auth/login/", user.PostLogin(s.DB))
+		u.GET("/auth/logout/", user.Logout())
+
 		ps := v2.Group("/problemset", problemset.SetNameMiddleware())
 		ps.GET("/:name/", problemset.GetProblemList(s.DB, services.NewSQLProblemListService(s.DB.DB, s.ProblemStore, services.NewSQLProblem(s.DB.DB, s.ProblemStore)), services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
+		ps.GET("/status/", problemset.GetStatus(s.DB, s.ProblemStore, services.NewSQLStatusPageService(s.DB.DB))).Name = "getProblemsetStatus"
+
+		psProb := ps.Group("/:name/:problem", problemset.SetProblemMiddleware(services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
+		psProb.GET("/", problemset.GetProblem(s.DB))
+		psProb.GET("/submissions/", problemset.GetProblemStatus(s.DB, s.ProblemStore, services.NewSQLStatusPageService(s.DB.DB)))
+		psProb.GET("/ranklist/", problemset.GetProblemRanklist(s.DB))
+
+		v2.GET("/submission/:id/", handlers.GetSubmission(s.DB, s.ProblemStore, services.NewSQLSubmission(s.DB.DB))).Name = "getSubmission"
 
 	}
 

@@ -8,7 +8,7 @@ import (
 )
 
 type Data struct {
-	Page      int    `query:"_page" json:"page"`
+	Page      int    `query:"_page" json:"currentPage"`
 	PerPage   int    `query:"_perPage" json:"perPage"`
 	LastPage  int    `json:"lastPage"`
 	SortDir   string `query:"_sortDir" json:"sortDir"`
