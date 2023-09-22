@@ -90,9 +90,7 @@ function TestCase_0({testCase, index}) {
         <tr className="divide-x divide-default">
             <td className="padding-td-default whitespace-nowrap w-48">{t(item[0])}</td>
             <td style={{maxWidth: 0}}>
-                <div className="flex py-2 px-3">
-                    <CopyableCode text={item[1]} isMultiline={true} maxHeight={"6rem"}/>
-                </div>
+                <CopyableCode cls="border-0 rounded-none" text={item[1]} isMultiline={true} maxHeight={"6rem"}/>
             </td>
         </tr>
     )
