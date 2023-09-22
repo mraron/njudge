@@ -62,8 +62,9 @@ function ProblemFilter() {
 }
 
 export function ProblemFilterFrame() {
+    const {t} = useTranslation()
     return (
-        <DropdownFrame title="Szűrés">
+        <DropdownFrame title={t("problem_filter.filter")}>
             <div className="px-8 py-6">
                 <ProblemFilter/>
             </div>

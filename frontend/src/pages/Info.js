@@ -34,7 +34,7 @@ function InfoTable() {
     const compilerOptionElems = compilerOptions.map((item, index) =>
         <CompilerOption lang={item[0]} command={item[1]} key={index}/>
     );
-    const titleComponent = <SVGTitleComponent title={t("info.compiler_options")} svg={<SVGCode cls="w-7 h-7 mr-2"/>}/>
+    const titleComponent = <SVGTitleComponent title={t("info.compiler_options")} svg={<SVGCode cls="w-8 h-8 mr-2"/>}/>
     return (
         <RoundedTable titleComponent={titleComponent}>
             <tbody className="divide-y divide-default text-sm">

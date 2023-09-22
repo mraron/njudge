@@ -47,7 +47,7 @@ export function SVGAttachment() {
     )
 }
 
-export function DropdownListArrow({isOpen}) {
+export function SVGDropdownListArrow({isOpen}) {
     return (
         <svg className={`w-4 h-4 mr-1 fill-current ${isOpen ? "rotate-90" : ""} transition-all duration-100 shrink-0`}
              viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">

@@ -84,6 +84,7 @@
 		"solved": "Megoldók"
 	},
 	"problem_filter": {
+		"filter": "Szűrés",
 		"title": "Cím",
 		"tags": "Címkék",
 		"category": "Kategória",
@@ -164,6 +165,7 @@
 		"submit": "Beküld"
 	},
 	"problem_submissions": {
+		"filter": "Szűrés",
 		"page_title": "Beküldések – {{params.problem}} :: njudge",
 		"full_solutions": "Csak teljes megoldások",
 		"own_solutions": "Csak a saját megoldásaim"

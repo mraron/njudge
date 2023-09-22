@@ -26,7 +26,7 @@ function SubmissionFilterFrame() {
         UpdateQueryString(location, navigate, ["ac", "own"], [onlyAC? 1: 0, onlyOwn? 1: 0], ["ac", "own"])
     }
     return (
-        <DropdownFrame title="Szűrés">
+        <DropdownFrame title={t("problem_submissions.filter")}>
             <div className="px-8 py-6 flex flex-col">
                 {isLoggedIn && <div className="mb-3">
                     <Checkbox label={t("problem_submissions.own_solutions")} onChange={setOnlyOwn} initChecked={onlyOwn}/>
