@@ -20,7 +20,7 @@ function ProblemInfo({info}) {
 
     const titleComponent = <SVGTitleComponent svg={<SVGInformation cls="w-6 h-6 mr-2"/>} title={t("problem_statement.information")}/>
     return (
-        <MapDataFrame maxDataWidth={'200px'} titleComponent={titleComponent} data={[
+        <MapDataFrame titleComponent={titleComponent} data={[
             [t("problem_statement.id"), info.id],
             [t("problem_statement.title"), info.title],
             [t("problem_statement.time_limit"), `${info.timeLimit} ms`],
@@ -69,11 +69,11 @@ function ProblemSubmit() {
                         {file? file.name: t("problem_statement.no_file_selected")}
                     </span>
                     <div className="flex justify-center">
-                        <button className="btn-gray w-1/2" onClick={() => document.getElementById("uploadFile").click()}>
+                        <button className="btn-gray padding-btn-default w-1/2" onClick={() => document.getElementById("uploadFile").click()}>
                             <span>{t("problem_statement.choose")}</span>
                             <input id="uploadFile" className="hidden" type="file" onChange={handleFileUploaded} />
                         </button>
-                        <button className="ml-2 btn-indigo w-1/2" onClick={handleSubmit}>{t("problem_statement.submit")}</button>
+                        <button className="ml-2 btn-indigo padding-btn-default w-1/2" onClick={handleSubmit}>{t("problem_statement.submit")}</button>
                     </div>
                 </div>
             </div>

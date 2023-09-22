@@ -45,7 +45,7 @@ function PasswordChangeFrame() {
                              initText={newPwConfirm} onChange={handleChangeNewPwConfirm}/>
                 </div>
                 <div className="flex justify-center">
-                    <button className="btn-indigo w-32" onClick={handleChangePassword}>{t("profile_settings.save")}</button>
+                    <button className="btn-indigo padding-btn-default w-32" onClick={handleChangePassword}>{t("profile_settings.save")}</button>
                 </div>
             </div>
         </RoundedFrame>
@@ -77,7 +77,7 @@ function OtherSettingsFrame({data}) {
                     <Checkbox id={"hideSolved"} label={t("profile_settings.hide_solved")} initChecked={hideSolved} onChange={setHideSolved}/>
                 </div>
                 <div className="flex justify-center">
-                    <button className="btn-indigo w-32" onClick={handleSaveSettings}>{t("profile_settings.save")}</button>
+                    <button className="btn-indigo padding-btn-default w-32" onClick={handleSaveSettings}>{t("profile_settings.save")}</button>
                 </div>
             </div>
         </RoundedFrame>

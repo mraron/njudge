@@ -58,8 +58,8 @@ function ProblemFilter() {
                 ]} onChange={handleCategoryChange}/>
             </div>
             <div className="flex justify-center">
-                <button className="mr-1 btn-indigo w-32" onClick={handleSubmit}>{t("problem_filter.search")}</button>
-                <button className="ml-1 btn-gray w-32" onClick={handleReset}>{t("problem_filter.reset")}</button>
+                <button className="mr-1 btn-indigo padding-btn-default w-32" onClick={handleSubmit}>{t("problem_filter.search")}</button>
+                <button className="ml-1 btn-gray padding-btn-default w-32" onClick={handleReset}>{t("problem_filter.reset")}</button>
             </div>
         </div>
     )

@@ -40,10 +40,10 @@ function LoginFrame() {
                                  onChange={setPassword}/>
                     </div>
                     <div className="flex justify-center mb-2">
-                        <button type="submit" className="btn-indigo mr-2 w-1/2" onClick={handleLogin}>
+                        <button type="submit" className="btn-indigo padding-btn-default mr-2 w-1/2" onClick={handleLogin}>
                             {t("login.login")}
                         </button>
-                        <button className="relative btn-gray flex items-center justify-between w-1/2">
+                        <button className="relative btn-gray padding-btn-default flex items-center justify-between w-1/2">
                             <div className="h-full flex items-center absolute left-2.5">
                                 <SVGGoogle/>
                             </div>

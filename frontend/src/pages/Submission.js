@@ -1,6 +1,7 @@
 import SubmissionTable from "../components/concrete/table/SubmissionTable";
 import SubmissionsTable from "../components/concrete/table/SubmissionsTable";
 import Editor from "@monaco-editor/react";
+import CompileErrorFrame from "../components/concrete/other/CompileErrorFrame";
 
 function Submission({data}) {
     return (
@@ -12,12 +13,13 @@ function Submission({data}) {
                             <SubmissionsTable submissions={[data.summary]}/>
                         </div>
                         {data.language !== "zip" && <div className="mb-3">
-                            <Editor className="border-1 border-default" height="60vh" theme="vs-dark"
+                            <Editor className="border-1 border-default" height="40vh" theme="vs-dark"
                                     defaultLanguage="cpp"
                                     options={{domReadOnly: true, readOnly: true, fontFamily: 'JetBrains Mono'}}
                                     value={data.summary.code}/>
                         </div>}
-                        <SubmissionTable status={data.status}/>
+                        {data.summary.compileError && <CompileErrorFrame message={data.summary.compileErrorMessage} />}
+                        {!data.summary.compileError && <SubmissionTable status={data.status}/>}
                     </div>
                 </div>
             </div>

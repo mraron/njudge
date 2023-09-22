@@ -16,7 +16,7 @@ function SubmitControlsFrame({onLanguageChanged, onSubmit}) {
         <RoundedFrame>
             <div className="px-4 py-3 sm:px-6 sm:py-5 flex">
                 <DropdownMenu itemNames={["C++ 11", "C++ 14", "C++ 17", "Go", "Java", "Python 3"]} onChange={onLanguageChanged}/>
-                <button className="ml-3 btn-indigo" onClick={onSubmit}>
+                <button className="ml-3 btn-indigo padding-btn-default" onClick={onSubmit}>
                     {t("problem_submit.submit")}
                 </button>
             </div>

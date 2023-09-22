@@ -46,7 +46,7 @@ function RegisterFrame() {
                         <TextBox id="passwordConfirm" label={t("register.confirm_password")} type="password" initText={passwordConfirm} onChange={setPasswordConfirm}/>
                     </div>
                     <div className="flex justify-center">
-                        <button type="submit" className="btn-indigo w-40" onClick={handleRegister}>
+                        <button type="submit" className="btn-indigo padding-btn-default w-40" onClick={handleRegister}>
                             {t("register.register")}
                         </button>
                     </div>

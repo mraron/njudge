@@ -2,12 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+.padding-btn-default {
+    @apply px-6 py-2
+}
+
+.code-default {
+    @apply bg-grey-875
+}
+
 .btn-indigo {
-    @apply text-sm font-medium px-6 py-2 bg-indigo-600 rounded-md hover:bg-indigo-500 transition duration-200 text-center
+    @apply text-sm font-medium bg-indigo-600 rounded-md hover:bg-indigo-500 transition duration-200 text-center
 }
 
 .btn-gray {
-    @apply text-sm font-medium px-6 py-2 bg-grey-725 rounded-md hover:bg-grey-700 transition duration-200 border border-default hover:border-grey-625 text-center
+    @apply text-sm font-medium bg-grey-725 rounded-md hover:bg-grey-700 transition duration-200 border border-default hover:border-grey-650 text-center
+}
+
+.bg-code {
+    @apply bg-grey-875
 }
 
 .border-default {

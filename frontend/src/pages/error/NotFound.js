@@ -11,7 +11,7 @@ function NotFoundFrame() {
                     <SVGNotFound/>
                 </div>
                 <div className="flex justify-center mt-8">
-                    <Link className="z-10 w-60 btn-indigo text-center" to="/">Vissza a főoldalra</Link>
+                    <Link className="z-10 w-60 btn-indigo padding-btn-default text-center" to="/">Vissza a főoldalra</Link>
                 </div>
             </div>
         </RoundedFrame>

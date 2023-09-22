@@ -4,7 +4,8 @@ import SVGTitleComponent from "../svg/SVGTitleComponent";
 import RoundedTable from "../components/container/RoundedTable";
 import React, {useState} from "react";
 import {useTranslation} from "react-i18next";
-import CopyableCode from "../components/util/CopyableCode";
+import CopyableCode from "../components/util/copy/CopyableCode";
+import CopyableCommand from "../components/util/copy/CopyableCommand";
 
 function CompilerOption({lang, command}) {
     const handleCopy = () => {
@@ -12,14 +13,12 @@ function CompilerOption({lang, command}) {
         window.flash("info.successful_copy", "success")
     }
     return (
-        <tr className={`divide-x divide-default `}>
+        <tr className={`divide-x divide-default`}>
             <td className="padding-td-default whitespace-nowrap">
                 {lang}
             </td>
             <td className="padding-td-default text-white">
-                <div className="flex items-center">
-                    <CopyableCode text={command}/>
-                </div>
+                <CopyableCommand text={command}/>
             </td>
         </tr>
     );
