@@ -1,7 +1,21 @@
 import SubmissionTable from "../components/concrete/table/SubmissionTable";
 import SubmissionsTable from "../components/concrete/table/SubmissionsTable";
+import {useTranslation} from "react-i18next";
+import SVGTitleComponent from "../svg/SVGTitleComponent";
+import CopyableCode from "../components/util/copy/CopyableCode";
+import {SVGWrongSimple} from "../svg/SVGs";
 import Editor from "@monaco-editor/react";
-import CompileErrorFrame from "../components/concrete/other/CompileErrorFrame";
+
+
+function CompileErrorFrame({message}) {
+    const {t} = useTranslation()
+    const titleComponent =
+        <SVGTitleComponent title={t("submission.compilation_error")} svg={<SVGWrongSimple cls="w-6 h-6 mr-2 text-red-500" />} />
+
+    return (
+        <CopyableCode text={message} titleComponent={titleComponent} maxHeight="16rem"/>
+    )
+}
 
 function Submission({data}) {
     return (

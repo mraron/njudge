@@ -8,10 +8,6 @@ import CopyableCode from "../components/util/copy/CopyableCode";
 import CopyableCommand from "../components/util/copy/CopyableCommand";
 
 function CompilerOption({lang, command}) {
-    const handleCopy = () => {
-        navigator.clipboard.writeText(command)
-        window.flash("info.successful_copy", "success")
-    }
     return (
         <tr className={`divide-x divide-default`}>
             <td className="padding-td-default whitespace-nowrap">
@@ -48,7 +44,7 @@ function InfoTable() {
     );
 }
 
-function Info({ data }) {
+function Info({data}) {
     return (
         <div className="w-full flex justify-center">
             <div className="flex justify-center w-full max-w-7xl">

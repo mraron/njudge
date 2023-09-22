@@ -35,7 +35,7 @@ function TestCase_1_3({index, numCases, testCase, group, isLastGroup, isLastCase
                     <div className="flex">
                         {testCase.verdictType === 0 && <SVGSpinner cls="w-5 h-5 mr-2 shrink-0"/>}
                         {testCase.verdictType === 1 && <SVGWrongSimple cls="w-5 h-5 text-red-500 mr-2 shrink-0"/>}
-                        {testCase.verdictType === 2 && <SVGCorrectSimple cls="w-5 h-5 text-yellow-500 mr-2 shrink-0"/>}
+                        {testCase.verdictType === 2 && <SVGCorrectSimple cls="w-5 h-5 text-indigo-500 mr-2 shrink-0"/>}
                         {testCase.verdictType === 3 && <SVGCorrectSimple cls="w-5 h-5 text-green-500 mr-2 shrink-0"/>}
                         <span className="whitespace-nowrap">{testCase.verdictName}</span>
                     </div>
@@ -75,7 +75,7 @@ function TestCase_0({testCase, index}) {
         <div className="py-3 px-5 border-b border-default flex items-center text-table">
             {testCase.verdictType === 0 && <SVGSpinner cls="mr-3 w-6 h-6 shrink-0"/>}
             {testCase.verdictType === 1 && <SVGWrongSimple cls="mr-3 w-6 h-6 text-red-500 shrink-0"/>}
-            {testCase.verdictType === 2 && <SVGCorrectSimple cls="mr-3 w-6 h-6 text-yellow-500 shrink-0"/>}
+            {testCase.verdictType === 2 && <SVGCorrectSimple cls="mr-3 w-6 h-6 text-indigo-500 shrink-0"/>}
             {testCase.verdictType === 3 && <SVGCorrectSimple cls="mr-3 w-6 h-6 text-green-500 shrink-0"/>}
             <span>{index + 1}</span>
             <span className="mx-2">–</span>

@@ -36,6 +36,7 @@
 		"confirm_password": "Confirm password"
 	},
 	"submission": {
+		"compilation_error": "Compilation error",
 		"page_title": "Submission #{{params.id}} :: njudge"
 	},
 	"flash": {

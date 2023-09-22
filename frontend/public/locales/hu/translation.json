@@ -36,6 +36,7 @@
 		"confirm_password": "Jelszó megerősítése"
 	},
 	"submission": {
+		"compilation_error": "Fordítási hiba",
 		"page_title": "Beküldés #{{params.id}} :: njudge"
 	},
 	"flash": {
