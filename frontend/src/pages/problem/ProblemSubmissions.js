@@ -1,13 +1,12 @@
+import React, {useState} from "react";
 import SubmissionsTable from "../../components/concrete/table/SubmissionsTable";
 import Checkbox from "../../components/input/Checkbox"
-import RoundedFrame from "../../components/container/RoundedFrame";
 import Pagination from "../../components/util/Pagination";
 import {useLocation, useNavigate} from "react-router-dom";
 import UpdateQueryString from "../../util/updateQueryString";
-import queryString from "query-string";
 import {useTranslation} from "react-i18next";
 import DropdownFrame from "../../components/container/DropdownFrame";
-import React, {useState} from "react";
+import queryString from "query-string";
 
 function SubmissionFilterFrame() {
     const {t} = useTranslation()

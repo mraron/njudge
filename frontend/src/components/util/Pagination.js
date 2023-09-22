@@ -8,7 +8,7 @@ function Pagination({paginationData}) {
     const location = useLocation()
     const navigate = useNavigate()
     const handlePageChanged = (page) => {
-        UpdateQueryString(location, navigate, "page", page)
+        UpdateQueryString(location, navigate, ["page"], [page])
     }
     const cls = "px-3 py-1.5 text-sm transition duration-200 border-default border hover:bg-grey-750 text-center"
     return (
