@@ -35,7 +35,7 @@ function ProblemInfo({info}) {
             [t("problem_statement.memory_limit"), `${info.memoryLimit} MiB`],
             [t("problem_statement.tags"), tagsContent],
             [t("problem_statement.type"), info.type]
-        ]}/>
+        ]} labelColWidth="9rem"/>
     )
 }
 
