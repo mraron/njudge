@@ -1,7 +1,8 @@
 import { useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { SVGRecent, SVGStatistics } from "../../svg/SVGs";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faClock, faLineChart } from "@fortawesome/free-solid-svg-icons";
 import MapDataFrame from "../../container/MapDataFrame";
 import SVGTitleComponent from "../../svg/SVGTitleComponent";
 import RoundedTable from "../../container/RoundedTable";
@@ -46,7 +47,9 @@ export function ProfileDataFrame({ userData }) {
     const { t } = useTranslation();
     const titleComponent = (
         <SVGTitleComponent
-            svg={<SVGStatistics cls="w-6 h-6 mr-2" />}
+            svg={
+                <FontAwesomeIcon icon={faLineChart} className="w-5 h-5 mr-2" />
+            }
             title={t("profile_sidebar.stats")}
         />
     );
@@ -94,7 +97,7 @@ function ProfileSideBar() {
     const { userData, isLoggedIn } = useContext(UserContext);
     const titleComponent = (
         <SVGTitleComponent
-            svg={<SVGRecent cls="w-6 h-6 mr-2" />}
+            svg={<FontAwesomeIcon icon={faClock} className="w-5 h-5 mr-2" />}
             title={t("profile_sidebar.last_submissions")}
         />
     );

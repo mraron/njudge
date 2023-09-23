@@ -242,7 +242,7 @@ function ProblemStatement({ data }) {
                             <div className="w-full mr-3 min-w-0">
                                 <DropdownMenu
                                     itemNames={[
-                                        "Hungarian (Tom és Jerry) dsadasdadadadsaadsadas",
+                                        "Hungarian (Tom és Jerry)",
                                         "English (Tom and Jerry)",
                                     ]}
                                 />
@@ -261,6 +261,7 @@ function ProblemStatement({ data }) {
                     {data.statementType === "pdf" && (
                         <object
                             data={data.statementSrc}
+                            aria-label="Problem statement"
                             type="application/pdf"
                             width="100%"
                             className="h-[36rem] lg:h-[52rem]"></object>

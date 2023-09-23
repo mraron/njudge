@@ -1,7 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { SVGLock, SVGSettings } from "../../components/svg/SVGs";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCog, faLock } from "@fortawesome/free-solid-svg-icons";
 import Checkbox from "../../components/input/Checkbox";
 import TextBox from "../../components/input/TextBox";
 import SVGTitleComponent from "../../components/svg/SVGTitleComponent";
@@ -20,7 +21,7 @@ function PasswordChangeFrame() {
     const handleChangeNewPwConfirm = (newText) => setNewPwConfirm(newText);
     const titleComponent = (
         <SVGTitleComponent
-            svg={<SVGLock cls="w-5 h-5 mr-2" />}
+            svg={<FontAwesomeIcon icon={faLock} className="w-5 h-5 mr-2" />}
             title={t("profile_settings.password_change")}
         />
     );
@@ -81,7 +82,7 @@ function OtherSettingsFrame({ data }) {
     const [hideSolved, setHideSolved] = useState(data.hideSolved);
     const titleComponent = (
         <SVGTitleComponent
-            svg={<SVGSettings cls="w-5 h-5 mr-2" />}
+            svg={<FontAwesomeIcon icon={faCog} className="w-5 h-5 mr-2" />}
             title={t("profile_settings.other_settings")}
         />
     );

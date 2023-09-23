@@ -70,7 +70,7 @@ function Problem(data) {
             <td className="padding-td-default">
                 <div className="flex flex-wrap">{tagsContent}</div>
             </td>
-            <td className="padding-td-default">
+            <td className="padding-td-default w-0">
                 <Link
                     className="link flex items-center justify-center"
                     to={`${routeMap.problemSubmissions.replace(

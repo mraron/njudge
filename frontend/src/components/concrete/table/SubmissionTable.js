@@ -11,7 +11,7 @@ import {
 import RoundedFrame from "../../container/RoundedFrame";
 import CopyableCode from "../../util/copy/CopyableCode";
 
-function TestCase_1_3({
+function TestCase13({
     index,
     numCases,
     testCase,
@@ -109,7 +109,7 @@ function TestCase_1_3({
 function TestGroup({ group, isLast }) {
     const testCases = group.testCases;
     const testCasesContent = testCases.map((testCase, index) => (
-        <TestCase_1_3
+        <TestCase13
             index={index}
             numCases={testCases.length}
             testCase={testCase}
@@ -122,7 +122,7 @@ function TestGroup({ group, isLast }) {
     return <>{testCasesContent}</>;
 }
 
-function TestCase_0({ testCase, index }) {
+function TestCase0({ testCase, index }) {
     const { t } = useTranslation();
     const titleComponent = (
         <div className="py-3 px-5 border-b border-default flex items-center text-table">
@@ -196,7 +196,7 @@ function SubmissionTable0({ status }) {
     const testCases = status.groups[0].testCases;
     const testCasesContent = testCases.map((testCase, index) => (
         <div className="mb-3">
-            <TestCase_0 testCase={testCase} index={index} key={index} />
+            <TestCase0 testCase={testCase} index={index} key={index} />
         </div>
     ));
     return <>{testCasesContent}</>;

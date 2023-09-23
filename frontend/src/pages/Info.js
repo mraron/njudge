@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { SVGCode } from "../components/svg/SVGs";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCode } from "@fortawesome/free-solid-svg-icons";
 import ProfileSideBar from "../components/concrete/other/ProfileSidebar";
 import SVGTitleComponent from "../components/svg/SVGTitleComponent";
 import RoundedTable from "../components/container/RoundedTable";
@@ -36,7 +37,7 @@ function InfoTable() {
     const titleComponent = (
         <SVGTitleComponent
             title={t("info.compiler_options")}
-            svg={<SVGCode cls="w-8 h-8 mr-2" />}
+            svg={<FontAwesomeIcon icon={faCode} className="w-5 h-5 mr-2" />}
         />
     );
     return (
