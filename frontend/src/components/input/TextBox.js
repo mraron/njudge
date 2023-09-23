@@ -1,9 +1,14 @@
 import { useState } from "react";
 
-function TextBox({ id, label, type, initText, onChange, onFocus, onBlur }) {
-    initText ||= "";
-    type ||= "text";
-
+function TextBox({
+    id,
+    label,
+    type = "",
+    initText = "",
+    onChange,
+    onFocus,
+    onBlur,
+}) {
     const [focused, setFocused] = useState(false);
     const handleChange = (event) => {
         if (onChange) {
@@ -37,8 +42,8 @@ function TextBox({ id, label, type, initText, onChange, onFocus, onBlur }) {
                     } w-full transition duration-200`}>
                     <input
                         id={id}
-                        value={initText}
                         type={type}
+                        value={initText}
                         onChange={handleChange}
                         onFocus={handleFocus}
                         onBlur={handleBlur}

@@ -18,8 +18,7 @@ export function LinkTag({ data }) {
     );
 }
 
-function TagListFrame({ title, titleComponent, tag: Tag, tags }) {
-    Tag ||= DefaultTag;
+function TagListFrame({ title, titleComponent, tag: Tag = DefaultTag, tags }) {
     const tagsContent = tags.map((item, index) => (
         <div className="flex m-1" key={index}>
             <Tag data={item} key={index} />

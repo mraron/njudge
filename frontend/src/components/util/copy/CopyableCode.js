@@ -1,8 +1,7 @@
 import CopyButton from "./CopyButton";
 import RoundedFrame from "../../container/RoundedFrame";
 
-function CopyableCode({ text, maxHeight, titleComponent, cls }) {
-    maxHeight ||= "auto";
+function CopyableCode({ text, maxHeight = "auto", titleComponent, cls }) {
     return (
         <RoundedFrame
             cls={`${cls} overflow-auto`}
