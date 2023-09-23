@@ -25,16 +25,16 @@ export function ProfilePictureFrame({ userData }) {
                         src={userData.pictureSrc}
                     />
                 </Link>
-                <div className="flex justify-center items-center w-full">
+                <div className="mt-2 flex justify-center items-center w-full">
                     <Link
-                        className="mt-2 text-md font-medium truncate hover:text-indigo-200 transition duration-200"
+                        className="text-md font-medium truncate hover:text-indigo-200 transition duration-200"
                         to={profileRoute}>
                         {userData.username}
                     </Link>
-                    <span className="mt-2 text-2xl font-semibold text-indigo-500 mx-2">
+                    <span className="text-2xl font-semibold text-indigo-500 mx-2">
                         &#8226;
                     </span>
-                    <span className="mt-2 text-md truncate">
+                    <span className="text-md truncate">
                         {userData.rating}
                     </span>
                 </div>

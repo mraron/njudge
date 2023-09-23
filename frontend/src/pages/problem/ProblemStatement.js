@@ -29,7 +29,7 @@ function ProblemInfo({ info }) {
         <div className="flex flex-wrap">
             {info.tags.map((tagName, index) => (
                 <span className="tag" key={index}>
-                    {tagName}
+                    {t(tagName)}
                 </span>
             ))}
         </div>

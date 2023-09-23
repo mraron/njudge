@@ -44,7 +44,7 @@ function Submission({ submission }) {
             </td>
             <td className="padding-td-default">
                 <Link className="link" to={problem.href}>
-                    {problem.label}
+                    {problem.text}
                 </Link>
             </td>
             <td className="padding-td-default">{language}</td>

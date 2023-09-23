@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+    .rounded-frame {
+        @apply bg-grey-800 border-1 border-default rounded-md flex w-full
+    }
+}
+
 .padding-btn-default {
     @apply px-6 py-2;
 }
@@ -9,6 +15,10 @@
 .code-default {
     @apply bg-grey-875;
 }
+
+/*.text-white {*/
+/*    @apply text-grey-100*/
+/*}*/
 
 .btn-indigo {
     @apply text-sm font-medium bg-indigo-600 rounded-md hover:bg-indigo-500 transition duration-200 text-center;

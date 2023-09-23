@@ -164,7 +164,7 @@ function TestCase0({ testCase, index }) {
         </tr>
     ));
     return (
-        <RoundedFrame titleComponent={titleComponent}>
+        <RoundedFrame cls="overflow-hidden" titleComponent={titleComponent}>
             <div className="py-3 px-5 flex justify-between border-b border-default">
                 <div className="mr-2 whitespace-nowrap truncate flex items-center">
                     <SVGClock cls="w-5 h-5 mr-2" />
