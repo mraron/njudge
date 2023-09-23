@@ -8,6 +8,7 @@ import Editor from "@monaco-editor/react";
 import {useContext} from "react";
 import UserContext from "../contexts/user/UserContext";
 import DropdownFrame from "../components/container/DropdownFrame";
+import JudgeDataContext from "../contexts/judgeData/JudgeDataContext";
 
 
 function CompileErrorFrame({message}) {
@@ -23,6 +24,8 @@ function CompileErrorFrame({message}) {
 
 function Submission({data}) {
     const {userData} = useContext(UserContext)
+    const {judgeData} = useContext(JudgeDataContext)
+
     return (
         <div className="text-white">
             <div className="w-full flex justify-center">
@@ -43,9 +46,8 @@ function Submission({data}) {
                         {data.language !== "zip" &&
                             <div className="mb-3">
                                 <Editor className="border-1 border-default" height="40vh" theme="vs-dark"
-                                        defaultLanguage="cpp"
                                         options={{domReadOnly: true, readOnly: true, fontFamily: 'JetBrains Mono'}}
-                                        value={data.summary.code}/>
+                                        value={data.summary.code} language={judgeData.highlightCodes[data.summary.language]}/>
                             </div>}
                         {data.summary.compileError && <CompileErrorFrame message={data.summary.compileErrorMessage}/>}
                         {!data.summary.compileError && <SubmissionTable status={data.status}/>}

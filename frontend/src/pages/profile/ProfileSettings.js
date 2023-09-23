@@ -91,7 +91,6 @@ function OtherSettingsFrame({data}) {
 }
 
 function ProfileSettings({data}) {
-    const {t} = useTranslation()
     const navigate = useNavigate()
     const [isVisible, setVisible] = useState(false)
     const {user} = useParams()

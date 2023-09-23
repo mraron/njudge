@@ -3,7 +3,7 @@ import {BrowserRouter as Router} from 'react-router-dom';
 import RoutingComponent from "./RoutingComponent";
 import FlashContainer from "./components/util/flash/Flash";
 import Menubar from "./components/concrete/other/Menubar";
-import {getLanguages, getTags, getVerdicts} from "./util/fetchJudgeData";
+import {getCategories, getHighlightCodes, getLanguages, getTags} from "./util/getJudgeData";
 import FlashEvent from "./components/util/flash/FlashEvent";
 import {AnimatePresence, motion} from "framer-motion";
 import JudgeDataContext from "./contexts/judgeData/JudgeDataContext";
@@ -17,38 +17,50 @@ function App() {
     useEffect(() => {
         const fetchJudgeData = async () => {
             await getLanguages().then(resp => {
-                setJudgeData(prevJudgeData => { return {...prevJudgeData, languages: resp} })
+                if (resp.success) {
+                    setJudgeData(prevJudgeData => {
+                        return {...prevJudgeData, languages: resp.languages}
+                    })
+                }
             })
-            await getVerdicts().then(resp => {
-                setJudgeData(prevJudgeData => { return {...prevJudgeData, verdicts: resp} })
+            await getCategories().then(resp => {
+                if (resp.success) {
+                    setJudgeData(prevJudgeData => {
+                        return {...prevJudgeData, categories: resp.categories}
+                    })
+                }
             })
             await getTags().then(resp => {
-                setJudgeData(prevJudgeData => { return {...prevJudgeData, tags: resp} })
+                if (resp.success) {
+                    setJudgeData(prevJudgeData => {
+                        return {...prevJudgeData, tags: resp.tags}
+                    })
+                }
             })
         }
-        fetchJudgeData()
+        fetchJudgeData().then(
+            setJudgeData(prevJudgeData => {
+                return {...prevJudgeData, highlightCodes: getHighlightCodes()}
+            })
+        )
     }, []);
 
-    useEffect(() => {
-        console.log(JSON.stringify(judgeData))
-    }, [judgeData]);
-
     return (
-        judgeData && judgeData.languages && judgeData.verdicts && judgeData.tags &&
-        <div className="text-white h-full min-h-screen pb-4">
-            <FlashContainer/>
-            <Router>
-                <AnimatePresence>
-                    <motion.div initial={{opacity: 0.6}} animate={{opacity: 1, transition: {duration: 0.25}}}
-                                exit={{opacity: 0.6, transition: {duration: 0.25}}}>
-                        <div className="pb-20">
-                            <Menubar/>
-                        </div>
-                    </motion.div>
-                </AnimatePresence>
-                <RoutingComponent/>
-            </Router>
-        </div>
+        <AnimatePresence>
+            <motion.div initial={{opacity: 0.6}} animate={{opacity: 1, transition: {duration: 0.25}}}
+                        exit={{opacity: 0.6, transition: {duration: 0.25}}}>
+                {!!judgeData && !!judgeData.languages && !!judgeData.languages && !!judgeData.tags &&
+                    <div className="text-white h-full min-h-screen pb-4">
+                        <FlashContainer/>
+                        <Router>
+                            <div className="pb-20">
+                                <Menubar/>
+                            </div>
+                            <RoutingComponent/>
+                        </Router>
+                    </div>}
+            </motion.div>
+        </AnimatePresence>
     );
 }
 

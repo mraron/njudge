@@ -11,7 +11,7 @@ function Problem(data) {
     const {isLoggedIn} = useContext(UserContext)
     const {problem, solvedStatus, title, category, tags, solverCount} = data.problem
     const tagsContent = tags.map((item, index) =>
-        <span className="tag" key={index}>{item}</span>
+        <span className="tag" key={index}>{t(item)}</span>
     );
     return (
         <tr className={"divide-x divide-default"}>

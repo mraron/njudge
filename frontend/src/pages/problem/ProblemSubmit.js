@@ -2,22 +2,21 @@ import MonacoEditor from '@monaco-editor/react';
 import RoundedFrame from "../../components/container/RoundedFrame";
 import DropdownMenu from "../../components/input/DropdownMenu";
 import {useTranslation} from "react-i18next";
-import {useState} from "react";
+import {useContext, useState} from "react";
 import submitSolution from "../../util/submitSolution";
 import {routeMap} from "../../config/RouteConfig";
 import {useNavigate, useParams} from "react-router-dom";
-
-const languages = ["cpp11", "cpp14", "cpp17", "go", "java", "python3"]
-const langCodes = ["cpp", "cpp", "cpp", "go", "java", "python"]
+import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext";
 
 function SubmitControlsFrame({onLanguageChanged, onSubmit}) {
     const {t} = useTranslation()
+    const {judgeData} = useContext(JudgeDataContext)
+
     return (
         <RoundedFrame>
             <div className="px-4 py-3 sm:px-6 sm:py-5 flex">
-                <DropdownMenu itemNames={["C++ 11", "C++ 14", "C++ 17", "Go", "Java", "Python 3"]}
-                              onChange={onLanguageChanged}/>
-                <button className="ml-3 btn-indigo padding-btn-default" onClick={onSubmit}>
+                <DropdownMenu itemNames={judgeData.languages.map(item => item.label)} onChange={onLanguageChanged}/>
+                <button className="ml-3 btn-indigo padding-btn-default w-32" onClick={onSubmit}>
                     {t("problem_submit.submit")}
                 </button>
             </div>
@@ -25,7 +24,8 @@ function SubmitControlsFrame({onLanguageChanged, onSubmit}) {
     )
 }
 
-function ProblemSubmit({data}) {
+function ProblemSubmit() {
+    const {judgeData} = useContext(JudgeDataContext)
     const {problem} = useParams()
     const [langIndex, setLangIndex] = useState(0)
     const [submissionCode, setSubmissionCode] = useState("")
@@ -34,7 +34,11 @@ function ProblemSubmit({data}) {
         setLangIndex(index)
     }
     const handleSubmit = () => {
-        submitSolution({problem: problem, language: languages[langIndex], submissionCode: submissionCode}).then(ok => {
+        submitSolution({
+            problem: problem,
+            language: judgeData.languages[langIndex].id,
+            submissionCode: submissionCode
+        }).then(ok => {
             if (ok) {
                 window.flash("flash.successful_submission", "success")
                 navigate(routeMap.problemSubmissions.replace(":problem", problem))
@@ -49,7 +53,7 @@ function ProblemSubmit({data}) {
                 <SubmitControlsFrame onSubmit={handleSubmit} onLanguageChanged={handleLanguageChanged}/>
             </div>
             <MonacoEditor className="border-1 border-default" height="60vh" theme="vs-dark"
-                          language={langCodes[langIndex]}
+                          language={judgeData.highlightCodes[judgeData.languages[langIndex].id]}
                           options={{fontFamily: 'JetBrains Mono'}} onChange={setSubmissionCode}/>
         </div>
     )

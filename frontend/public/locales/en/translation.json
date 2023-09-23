@@ -56,6 +56,13 @@
 		"unsuccessful_settings_save": "The settings couldn't be saved.",
 		"successful_password_change": "The password has been changed successfully."
 	},
+	"tag": {
+		"dp": "dynamic programming",
+		"greedy": "greedy",
+		"math": "math",
+		"data_structures": "data structures",
+		"graphs": "graphs"
+	},
 	"menubar":
 	{
 		"home": "Home",

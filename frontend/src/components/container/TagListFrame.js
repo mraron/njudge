@@ -1,20 +1,23 @@
 import RoundedFrame from "./RoundedFrame";
+import {useTranslation} from "react-i18next";
 import {Link} from "react-router-dom";
 
 export function DefaultTag({data}) {
+    const {t} = useTranslation()
     return (
         <span
             className="w-28 tag text-center">
-            {data}
+            {t(data)}
         </span>
     )
 }
 
 export function LinkTag({data}) {
+    const {t} = useTranslation()
     return (
         <Link to={data.href}
               className="w-28 text-center truncate whitespace-nowrap cursor-pointer text-sm px-2 py-1 border-1 rounded bg-grey-725 hover:bg-indigo-600 hover:border-transparent border-grey-650 transition-all duration-200">
-            {data.text}
+            {t(data.text)}
         </Link>
     )
 }

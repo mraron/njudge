@@ -15,14 +15,13 @@ import {
     SVGView,
     SVGWrongSimple
 } from '../../svg/SVGs';
-import {Link, useNavigate, useParams} from "react-router-dom";
 import {useTranslation} from "react-i18next";
-import React, {useState} from "react";
+import React, {useContext, useState} from "react";
 import submitSolution from "../../util/submitSolution";
-import {routeMap} from "../../config/RouteConfig";
 import RoundedTable from "../../components/container/RoundedTable";
-
-const languages = ["cpp11", "cpp14", "cpp17", "go", "java", "python3"]
+import {Link, useNavigate, useParams} from "react-router-dom";
+import {routeMap} from "../../config/RouteConfig";
+import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext";
 
 function ProblemInfo({info}) {
     const {t} = useTranslation()
@@ -47,6 +46,7 @@ function ProblemInfo({info}) {
 
 function ProblemSubmit() {
     const {t} = useTranslation()
+    const {judgeData} = useContext(JudgeDataContext)
     const {problem} = useParams()
     const [file, setFile] = useState(null)
     const [langIndex, setLangIndex] = useState(0)
@@ -60,7 +60,7 @@ function ProblemSubmit() {
             window.flash("flash.must_choose_file", "failure")
             return
         }
-        submitSolution({problem: problem, language: languages[langIndex], file: file}).then(ok => {
+        submitSolution({problem: problem, language: judgeData.languages[langIndex].id, file: file}).then(ok => {
             if (ok) {
                 window.flash("flash.successful_submission", "success")
                 navigate(routeMap.problemSubmissions.replace(":problem", problem))
@@ -77,7 +77,7 @@ function ProblemSubmit() {
             <div className="px-6 py-5">
                 <div className="flex flex-col">
                     <div className="mb-4">
-                        <DropdownMenu itemNames={["C++ 11", "C++ 14", "C++ 17", "Go", "Java", "Python 3"]}
+                        <DropdownMenu itemNames={judgeData.languages.map(item => item.label)}
                                       onChange={handleLanguageChanged}/>
                     </div>
                     <span className="mb-2 mx-1 text-label break-words">
@@ -168,10 +168,12 @@ function ProblemStatement({data}) {
                 <div className="w-full mb-2">
                     <RoundedFrame>
                         <div className="w-full px-4 py-3 sm:px-6 sm:py-5 flex">
-                            <div className="w-full mr-3" style={{minWidth: 0}}>
-                                <DropdownMenu itemNames={["Hungarian (Tom és Jerry) dsadasdadadadsaadsadas", "English (Tom and Jerry)"]}/>
+                            <div className="w-full mr-3 min-w-0">
+                                <DropdownMenu
+                                    itemNames={["Hungarian (Tom és Jerry) dsadasdadadadsaadsadas", "English (Tom and Jerry)"]}/>
                             </div>
-                            <a className="btn-gray py-2 px-4 flex justify-center items-center" href={data.statementSrc} target="_blank" style={{minWidth: 0}}>
+                            <a className="btn-gray py-2 px-4 flex justify-center items-center" href={data.statementSrc}
+                               target="_blank" rel="noreferrer">
                                 <SVGView cls="w-[1.4rem] h-[1.4rem]"/>
                             </a>
                         </div>
@@ -183,7 +185,7 @@ function ProblemStatement({data}) {
                                 className="h-[36rem] lg:h-[52rem]">
                         </object>}
                     {data.statementType === "html" &&
-                        <iframe src={data.statementSrc} width="100%"
+                        <iframe src={data.statementSrc} width="100%" title="Problem statement"
                                 className="h-[36rem] lg:h-[52rem]">
                         </iframe>}
                 </div>
