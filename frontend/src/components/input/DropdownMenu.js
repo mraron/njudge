@@ -16,7 +16,7 @@ function DefaultDropdownButton({label, isOpen, onClick}) {
         <button
             className={`w-full rounded-md px-3 py-2 border-1 flex items-center justify-between ${isOpen ? "bg-grey-750 hover:bg-grey-700 border-grey-650" : "bg-grey-825 hover:bg-grey-775 border-default"} transition duration-150`}
             onClick={onClick}>
-            <span className="overflow-ellipsis overflow-hidden">{label}</span>
+            <span className="truncate">{label}</span>
             <SVGDropdownMenuArrow isOpen={isOpen} cls="shrink-0"/>
         </button>
     )

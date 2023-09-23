@@ -168,11 +168,10 @@ function ProblemStatement({data}) {
                 <div className="w-full mb-2">
                     <RoundedFrame>
                         <div className="w-full px-4 py-3 sm:px-6 sm:py-5 flex">
-                            <div className="w-full mr-3">
-                                <DropdownMenu itemNames={["Hungarian (Tom és Jerry)", "English (Tom and Jerry)"]}/>
+                            <div className="w-full mr-3" style={{minWidth: 0}}>
+                                <DropdownMenu itemNames={["Hungarian (Tom és Jerry) dsadasdadadadsaadsadas", "English (Tom and Jerry)"]}/>
                             </div>
-                            <a className="rounded-full btn-gray py-2 px-4 flex justify-center items-center"
-                               href={data.statementSrc} target="_blank">
+                            <a className="btn-gray py-2 px-4 flex justify-center items-center" href={data.statementSrc} target="_blank" style={{minWidth: 0}}>
                                 <SVGView cls="w-[1.4rem] h-[1.4rem]"/>
                             </a>
                         </div>
