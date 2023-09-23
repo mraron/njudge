@@ -1,14 +1,15 @@
-import UserContext from "./JudgeDataContext";
-import {useState} from "react";
+import { useState } from "react";
 
-function JudgeDataProvider({children}) {
-    const [judgeData, setJudgeData] = useState(null)
+import UserContext from "./JudgeDataContext";
+
+function JudgeDataProvider({ children }) {
+    const [judgeData, setJudgeData] = useState(null);
 
     return (
-        <UserContext.Provider value={{judgeData, setJudgeData}}>
+        <UserContext.Provider value={{ judgeData, setJudgeData }}>
             {children}
         </UserContext.Provider>
-    )
+    );
 }
 
-export default JudgeDataProvider
+export default JudgeDataProvider;

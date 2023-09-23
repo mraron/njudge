@@ -1,16 +1,13 @@
 module.exports = {
-    content: [
-        "./src/**/*.{js, jsx, ts, tsx}",
-        "./src/*.html"
-    ],
+    content: ["./src/**/*.{js, jsx, ts, tsx}", "./src/*.html"],
     theme: {
         extend: {
             animation: {
-                'spin-slow': 'spin 2s linear infinite'
+                "spin-slow": "spin 2s linear infinite",
             },
             borderWidth: {
-                "1": "1px",
-                "3": "3px"
+                1: "1px",
+                3: "3px",
             },
             backgroundColor: {
                 "grey-900": "#080808",
@@ -120,7 +117,6 @@ module.exports = {
                 "grey-100": "#e8e8e8",
             },
 
-
             colors: {
                 "grey-900": "#080808",
                 "grey-875": "#0f0f0f",
@@ -155,9 +151,8 @@ module.exports = {
                 "grey-150": "#dadada",
                 "grey-125": "#e1e1e1",
                 "grey-100": "#e8e8e8",
-            }
+            },
         },
     },
     plugins: [],
-}
-
+};

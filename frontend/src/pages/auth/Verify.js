@@ -1,25 +1,23 @@
-import {Navigate, useNavigate, useParams} from "react-router-dom";
-import {useEffect} from "react";
-import {routeMap} from "../../config/RouteConfig";
-import {verify} from "../../util/auth";
+import { useEffect } from "react";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { verify } from "../../util/auth";
+import { routeMap } from "../../config/RouteConfig";
 
 function Verify() {
-    const {token} = useParams()
-    const navigate = useNavigate()
+    const { token } = useParams();
+    const navigate = useNavigate();
 
     useEffect(() => {
-        verify(token).then(ok => {
+        verify(token).then((ok) => {
             if (ok) {
-                window.flash("flash.successful_verification", "success")
+                window.flash("flash.successful_verification", "success");
             } else {
-                window.flash("flash.unsuccessful_verification", "failure")
+                window.flash("flash.unsuccessful_verification", "failure");
             }
-            navigate(routeMap.home)
-        })
-    }, [])
-    return (
-        <Navigate to={routeMap.home}/>
-    )
+            navigate(routeMap.home);
+        });
+    }, []);
+    return <Navigate to={routeMap.home} />;
 }
 
-export default Verify
+export default Verify;

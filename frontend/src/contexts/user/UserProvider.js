@@ -1,15 +1,17 @@
-import UserContext from "./UserContext";
-import {useState} from "react";
+import { useState } from "react";
 
-function UserProvider({children}) {
-    const [userData, setUserData] = useState(null)
-    const [isLoggedIn, setLoggedIn] = useState(null)
+import UserContext from "./UserContext";
+
+function UserProvider({ children }) {
+    const [userData, setUserData] = useState(null);
+    const [isLoggedIn, setLoggedIn] = useState(null);
 
     return (
-        <UserContext.Provider value={{userData, isLoggedIn, setUserData, setLoggedIn}}>
+        <UserContext.Provider
+            value={{ userData, isLoggedIn, setUserData, setLoggedIn }}>
             {children}
         </UserContext.Provider>
-    )
+    );
 }
 
-export default UserProvider
+export default UserProvider;

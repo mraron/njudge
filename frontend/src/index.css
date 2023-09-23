@@ -3,47 +3,47 @@
 @tailwind utilities;
 
 .padding-btn-default {
-    @apply px-6 py-2
+    @apply px-6 py-2;
 }
 
 .code-default {
-    @apply bg-grey-875
+    @apply bg-grey-875;
 }
 
 .btn-indigo {
-    @apply text-sm font-medium bg-indigo-600 rounded-md hover:bg-indigo-500 transition duration-200 text-center
+    @apply text-sm font-medium bg-indigo-600 rounded-md hover:bg-indigo-500 transition duration-200 text-center;
 }
 
 .btn-gray {
-    @apply text-sm font-medium bg-grey-725 rounded-md hover:bg-grey-700 transition duration-200 border border-default hover:border-grey-650 text-center
+    @apply text-sm font-medium bg-grey-725 rounded-md hover:bg-grey-700 transition duration-200 border border-default hover:border-grey-650 text-center;
 }
 
 .bg-code {
-    @apply bg-grey-875
+    @apply bg-grey-875;
 }
 
 .border-default {
-    @apply border-grey-675
+    @apply border-grey-675;
 }
 
 .border-divide-col {
-    @apply border-grey-700
+    @apply border-grey-700;
 }
 
 .divide-default {
-    @apply divide-grey-700
+    @apply divide-grey-700;
 }
 
 .date-label {
-    @apply cursor-pointer text-sm px-2 py-1 bg-grey-725 rounded border-1 border-grey-650 hover:bg-grey-700 shrink-0 transition duration-200
+    @apply cursor-pointer text-sm px-2 py-1 bg-grey-725 rounded border-1 border-grey-650 hover:bg-grey-700 shrink-0 transition duration-200;
 }
 
 .padding-td-default {
-    @apply py-3 px-5
+    @apply py-3 px-5;
 }
 
 th {
-    @apply font-medium
+    @apply font-medium;
 }
 
 .text-table {
@@ -66,11 +66,11 @@ th {
 }
 
 .tag {
-    @apply whitespace-nowrap cursor-pointer text-sm px-2 py-1 border-1 rounded m-1 bg-grey-725 hover:bg-grey-700 border-grey-650 transition-all duration-200 truncate
+    @apply whitespace-nowrap cursor-pointer text-sm px-2 py-1 border-1 rounded m-1 bg-grey-725 hover:bg-grey-700 border-grey-650 transition-all duration-200 truncate;
 }
 
 .link {
-    @apply text-white cursor-pointer underline underline-offset-2 hover:text-indigo-200 transition duration-200
+    @apply text-white cursor-pointer underline underline-offset-2 hover:text-indigo-200 transition duration-200;
 }
 
 html {
@@ -78,7 +78,7 @@ html {
 }
 
 pre {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: "JetBrains Mono", monospace;
 }
 
 .fade-appear,
