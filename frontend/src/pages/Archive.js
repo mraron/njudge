@@ -6,15 +6,16 @@ import {SVGCorrectSimple, SVGPartiallyCorrect, SVGWrongSimple} from "../svg/SVGs
 
 function ProblemLeaf({data}) {
     return (
-        <Link className="w-fit flex items-center cursor-pointer hover:text-indigo-300 transition-all duration-100"
-              to={data.link}>
+        <span className="w-fit flex items-center">
             <div className="w-5 mr-2">
                 {data.solvedStatus === 1 && <SVGWrongSimple cls="w-5 h-5 text-red-500 shrink-0"/>}
                 {data.solvedStatus === 2 && <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-500 shrink-0"/>}
                 {data.solvedStatus === 3 && <SVGCorrectSimple cls="w-5 h-5 text-green-500 shrink-0"/>}
             </div>
-            <span>{data.title}</span>
-        </Link>
+            <Link className="cursor-pointer hover:text-indigo-300 transition-all duration-100" to={data.link}>
+                {data.title}
+            </Link>
+        </span>
     )
 }
 
