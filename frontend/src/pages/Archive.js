@@ -21,9 +21,7 @@ function ProblemLeaf({ data }) {
                     <SVGCorrectSimple cls="w-5 h-5 text-green-500 shrink-0 invert dark:invert-0" />
                 )}
             </div>
-            <Link
-                className="link no-underline"
-                to={data.link}>
+            <Link className="link no-underline" to={data.link}>
                 {data.title}
             </Link>
         </span>

@@ -7,7 +7,7 @@
         @apply bg-grey-800 border border-default rounded-md flex w-full;
     }
     .link {
-        @apply cursor-pointer underline underline-offset-2 hover:text-inv-indigo-800 dark:hover:text-indigo-200 transition duration-200
+        @apply cursor-pointer underline underline-offset-2 hover:text-inv-indigo-800 dark:hover:text-indigo-200 transition duration-200;
     }
     .border-default {
         @apply border-grey-675;
@@ -16,16 +16,16 @@
         @apply border-grey-225;
     }
     .editor {
-        @apply border border-inv-default dark:border-default invert dark:invert-0
+        @apply border border-inv-default dark:border-default invert dark:invert-0;
     }
 }
 
 body {
-    @apply text-color-default invert dark:invert-0
+    @apply text-color-default invert dark:invert-0;
 }
 
 .text-color-default {
-    @apply text-grey-150 dark:text-white
+    @apply text-grey-150 dark:text-white;
 }
 
 .padding-btn-default {
@@ -37,11 +37,11 @@ body {
 }
 
 .text-white {
-    @apply text-grey-125
+    @apply text-grey-125;
 }
 
 .btn-indigo {
-    @apply invert dark:invert-0 text-white text-sm font-medium text-black bg-indigo-600 rounded-md hover:bg-indigo-500 text-center
+    @apply invert dark:invert-0 text-white text-sm font-medium text-black bg-indigo-600 rounded-md hover:bg-indigo-500 text-center;
 }
 
 .btn-gray {

@@ -17,7 +17,9 @@ function CompileErrorFrame({ message }) {
     const titleComponent = (
         <SVGTitleComponent
             title={t("submission.compilation_error")}
-            svg={<SVGWrongSimple cls="w-6 h-6 mr-2 text-red-500 invert dark:invert-0" />}
+            svg={
+                <SVGWrongSimple cls="w-6 h-6 mr-2 text-red-500 invert dark:invert-0" />
+            }
         />
     );
 
@@ -33,7 +35,7 @@ function CompileErrorFrame({ message }) {
 function Submission({ data }) {
     const { userData } = useContext(UserContext);
     const { judgeData } = useContext(JudgeDataContext);
-    const { theme } = useContext(ThemeContext)
+    const { theme } = useContext(ThemeContext);
 
     return (
         <div className="w-full flex justify-center">
@@ -61,7 +63,9 @@ function Submission({ data }) {
                             <Editor
                                 className="editor"
                                 height="40vh"
-                                theme={`${theme === "light"? "vs": "vs-dark"}`}
+                                theme={`${
+                                    theme === "light" ? "vs" : "vs-dark"
+                                }`}
                                 options={{
                                     domReadOnly: true,
                                     readOnly: true,

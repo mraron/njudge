@@ -20,7 +20,9 @@ function Checkbox({ id, label, initChecked, onChange }) {
                 className={`flex border items-center justify-center ${
                     checked
                         ? `invert dark:invert-0 border-transparent ${
-                              hovered ? "dark:bg-indigo-500 bg-indigo-600" : "bg-indigo-600"
+                              hovered
+                                  ? "dark:bg-indigo-500 bg-indigo-600"
+                                  : "bg-indigo-600"
                           }`
                         : `${
                               hovered ? "bg-grey-800" : "bg-grey-850"

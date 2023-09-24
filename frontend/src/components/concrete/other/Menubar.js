@@ -2,7 +2,12 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faClose, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
+import {
+    faBars,
+    faClose,
+    faMoon,
+    faSun,
+} from "@fortawesome/free-solid-svg-icons";
 import { DropdownRoutes } from "../../input/DropdownMenu";
 import { SVGDropdownMenuArrow } from "../../svg/SVGs";
 import { findRouteIndex } from "../../../util/findRouteIndex";
@@ -126,19 +131,24 @@ function ProfileSettings() {
 }
 
 function ThemeButton() {
-    const {theme, changeTheme} = useContext(ThemeContext)
+    const { theme, changeTheme } = useContext(ThemeContext);
     const toggleTheme = () => {
         if (theme === "light") {
-            changeTheme("dark")
+            changeTheme("dark");
         } else {
-            changeTheme("light")
+            changeTheme("light");
         }
-    }
+    };
     return (
-        <button className="h-full cursor-pointer border border-default flex items-center justify-center p-2 rounded-md hover:bg-grey-800 transition duration-200" onClick={toggleTheme}>
-            <FontAwesomeIcon icon={theme === "light"? faMoon: faSun} className="w-6 h-4" />
+        <button
+            className="h-full cursor-pointer border border-default flex items-center justify-center p-2 rounded-md hover:bg-grey-800 transition duration-200"
+            onClick={toggleTheme}>
+            <FontAwesomeIcon
+                icon={theme === "light" ? faMoon : faSun}
+                className="w-6 h-4"
+            />
         </button>
-    )
+    );
 }
 
 function MenuSideBar({ selected, isOpen, onClose }) {
@@ -229,9 +239,17 @@ function MenuTopBar({ selected, isOpen, onToggle }) {
                         aria-label="Open menu"
                         className="flex items-center justify-center p-2 rounded-full hover:bg-grey-800 transition duration-200"
                         onClick={() => onToggle(this)}>
-                        {isOpen?
-                            <FontAwesomeIcon icon={faClose} className="w-5 h-5" /> :
-                            <FontAwesomeIcon icon={faBars} className="w-5 h-5" /> }
+                        {isOpen ? (
+                            <FontAwesomeIcon
+                                icon={faClose}
+                                className="w-5 h-5"
+                            />
+                        ) : (
+                            <FontAwesomeIcon
+                                icon={faBars}
+                                className="w-5 h-5"
+                            />
+                        )}
                     </button>
                 </div>
             </div>
@@ -245,7 +263,7 @@ function Menubar() {
     const selected = findRouteIndex(menuRoutes, location.pathname);
     const [isOpen, setOpen] = useState(false);
     const handleToggle = () => {
-        setOpen(prevOpen => !prevOpen);
+        setOpen((prevOpen) => !prevOpen);
     };
     const handleClose = () => {
         setOpen(false);
@@ -256,7 +274,8 @@ function Menubar() {
                 <MenuTopBar
                     selected={selected}
                     isOpen={isOpen}
-                    onToggle={handleToggle} />
+                    onToggle={handleToggle}
+                />
                 <MenuSideBar
                     selected={selected}
                     isOpen={isOpen}

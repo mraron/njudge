@@ -32,7 +32,7 @@ function SubmitControlsFrame({ onLanguageChanged, onSubmit }) {
 
 function ProblemSubmit() {
     const { judgeData } = useContext(JudgeDataContext);
-    const { theme } = useContext(ThemeContext)
+    const { theme } = useContext(ThemeContext);
     const { problem } = useParams();
     const [langIndex, setLangIndex] = useState(0);
     const [submissionCode, setSubmissionCode] = useState("");
@@ -67,7 +67,7 @@ function ProblemSubmit() {
             <MonacoEditor
                 className="editor"
                 height="60vh"
-                theme={`${theme === "light"? "vs": "vs-dark"}`}
+                theme={`${theme === "light" ? "vs" : "vs-dark"}`}
                 language={
                     judgeData.highlightCodes[judgeData.languages[langIndex].id]
                 }

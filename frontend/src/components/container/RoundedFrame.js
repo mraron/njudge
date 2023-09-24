@@ -1,4 +1,4 @@
-function RoundedFrame({ children, title, titleComponent, cls=null }) {
+function RoundedFrame({ children, title, titleComponent, cls = null }) {
     return (
         <div className={`${cls} rounded-frame`}>
             <div className="w-full flex flex-col">
