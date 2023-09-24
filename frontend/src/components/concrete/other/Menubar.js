@@ -41,7 +41,7 @@ function MenuOption({ label, route, selected, horizontal, onClick }) {
                     horizontal ? "border-b-3 pt-1" : "border-l-3 p-3"
                 } ${
                     selected
-                        ? "border-inv-indigo-600 dark:border-indigo-600 bg-grey-775"
+                        ? "border-inv-indigo-500 dark:border-indigo-600 bg-grey-775"
                         : "border-transparent hover:bg-grey-800"
                 }`}
                 to={route}>
@@ -100,13 +100,13 @@ function ProfileSettings() {
         }
     }
     return (
-        <div className="w-full h-full flex">
+        <div className="w-full flex items-stretch">
             <DropdownRoutes
                 button={getProfileDropdownButton(isLoggedIn)}
                 routes={profileRoutes}
                 routeLabels={profileRouteLabels.map(t)}
             />
-            <div className="px-3 flex items-center justify-center border border-l-0 border-grey-675 rounded-tr-md rounded-br-md">
+            <div className="px-3 flex items-center justify-center border border-l-0 border-grey-675">
                 <button
                     className={`px-2 ${
                         i18n.resolvedLanguage === "hu"
@@ -126,6 +126,9 @@ function ProfileSettings() {
                     en
                 </button>
             </div>
+            <div>
+                <ThemeButton />
+            </div>
         </div>
     );
 }
@@ -141,7 +144,7 @@ function ThemeButton() {
     };
     return (
         <button
-            className="h-full cursor-pointer border border-default flex items-center justify-center p-2 rounded-md hover:bg-grey-800 transition duration-200"
+            className="border border-l-0 border-default p-2 rounded-r-md hover:bg-grey-800 transition duration-200"
             onClick={toggleTheme}>
             <FontAwesomeIcon
                 icon={theme === "light" ? faMoon : faSun}
@@ -191,9 +194,6 @@ function MenuSideBar({ selected, isOpen, onClose }) {
             <div className="flex flex-col justify-center">
                 <div className="w-full flex px-4 mb-4">
                     <ProfileSettings />
-                    <div className="ml-2">
-                        <ThemeButton />
-                    </div>
                 </div>
                 <ol className="divide-y divide-default border-t border-b border-grey-750">
                     {menuOptions}
@@ -224,12 +224,9 @@ function MenuTopBar({ selected, isOpen, onToggle }) {
                         nJudge
                     </Link>
                     <ol className="hidden xl:flex">{menuOptions}</ol>
-                    <div className="w-full hidden xl:flex justify-end items-stretch mx-4 my-2">
-                        <div className="w-60">
+                    <div className="w-full hidden xl:flex justify-end mx-4 my-2">
+                        <div className="w-72">
                             <ProfileSettings />
-                        </div>
-                        <div className="ml-2 h-full">
-                            <ThemeButton />
                         </div>
                     </div>
                 </div>

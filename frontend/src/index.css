@@ -25,7 +25,7 @@ body {
 }
 
 .text-color-default {
-    @apply text-grey-150 dark:text-white;
+    @apply text-grey-200 dark:text-white;
 }
 
 .bg-color-default {

@@ -1,0 +1,192 @@
+{
+    "home": {
+        "page_title": "njudge"
+    },
+    "contests": {
+        "page_title": "Contests :: njudge",
+        "view": "View",
+        "register": "Register"
+    },
+    "archive": {
+        "page_title": "Archive :: njudge"
+    },
+    "submissions": {
+        "page_title": "Submissions :: njudge"
+    },
+    "problems": {
+        "page_title": "Problems :: njudge"
+    },
+    "info": {
+        "page_title": "Info :: njudge",
+        "successful_copy": "The text has been copied to the clipboard.",
+        "compiler_options": "Compilation and execution options"
+    },
+    "login": {
+        "page_title": "Login :: njudge",
+        "login": "Login",
+        "username": "Username",
+        "password": "Password"
+    },
+    "register": {
+        "page_title": "Register :: njudge",
+        "register": "Register",
+        "username": "Username",
+        "email": "E-mail address",
+        "password": "Password",
+        "confirm_password": "Confirm password"
+    },
+    "submission": {
+        "compilation_error": "Compilation error",
+        "page_title": "Submission #{{params.id}} :: njudge"
+    },
+    "flash": {
+        "no_permission": "You have no permission to perform this operation.",
+        "successful_logout": "Successful logout.",
+        "not_logged_in": "You are not logged in.",
+        "must_choose_file": "You have to choose a file first.",
+        "unsuccessful_submission": "The submission was unsuccessful.",
+        "successful_submission": "Successful submission.",
+        "unsuccessful_login": "The login was unsuccessful.",
+        "successful_login": "Successful login.",
+        "successful_registration": "Successful registration. The verification link has been sent to your e-mail address.",
+        "unsuccessful_verification": "The verification was unsuccessful.",
+        "successful_verification": "Successful verification.",
+        "password_mismatch": "The passwords do not match.",
+        "successful_settings_save": "The settings have been saved successfully.",
+        "unsuccessful_settings_save": "The settings couldn't be saved.",
+        "successful_password_change": "The password has been changed successfully."
+    },
+    "tag": {
+        "dp": "dynamic programming",
+        "greedy": "greedy",
+        "math": "math",
+        "divide_and_conquer": "divide and conquer",
+        "data_structures": "data structures",
+        "graphs": "graphs"
+    },
+    "menubar": {
+        "home": "Home",
+        "contests": "Contests",
+        "archive": "Archive",
+        "submissions": "Submissions",
+        "problems": "Problems",
+        "information": "Information",
+        "profile": "Profile",
+        "logout": "Logout",
+        "login": "Login",
+        "register": "Register",
+        "admin": "Admin"
+    },
+    "profile_sidebar": {
+        "stats": "Statistics",
+        "last_submissions": "Last submissions",
+        "rating": "Rating",
+        "score": "Score",
+        "num_solved": "Solved problems"
+    },
+    "problems_table": {
+        "id": "ID",
+        "title": "Title",
+        "category": "Category",
+        "tags": "Tags",
+        "solved": "Solved"
+    },
+    "problem_filter": {
+        "filter": "Filter",
+        "title": "Title",
+        "tags": "Tags",
+        "category": "Category",
+        "search": "Search",
+        "reset": "Reset"
+    },
+    "submissions_table": {
+        "id": "ID",
+        "date": "Date",
+        "user": "User",
+        "problem": "Problem",
+        "language": "Language",
+        "verdict": "Verdict",
+        "time": "Time",
+        "memory": "Memory"
+    },
+    "submission_table": {
+        "subtask": "Subtask",
+        "total": "Total",
+        "test": "Test",
+        "verdict": "Verdict",
+        "time": "Time",
+        "memory": "Memory",
+        "output": "Output",
+        "expected_output": "Expected output",
+        "checker_output": "Checker's output"
+    },
+    "profile": {
+        "profile": "Profile",
+        "submissions": "Submissions",
+        "settings": "Settings"
+    },
+    "profile_main": {
+        "page_title": "{{params.user}}'s profile :: njudge",
+        "solved_problems": "Solved problems",
+        "unsolved_problems": "Unsolved problems"
+    },
+    "profile_submissions": {
+        "page_title": "{{params.user}}'s submissions :: njudge"
+    },
+    "profile_settings": {
+        "page_title": "Settings :: njudge",
+        "password_change": "Change password",
+        "other_settings": "Other settings",
+        "old_password": "Old password",
+        "new_password": "New password",
+        "confirm_password": "Confirm password",
+        "save": "Save",
+        "show_unsolved": "Show tags for unsolved problems",
+        "hide_solved": "Hide solved problems"
+    },
+    "problem": {
+        "statement": "Statement",
+        "submit": "Submit",
+        "submissions": "Submissions",
+        "ranklist": "Ranklist"
+    },
+    "problem_statement": {
+        "page_title": "Statement – {{params.problem}} :: njudge",
+        "file": "File",
+        "statement": "Statement",
+        "attachment": "Attachment",
+        "attachments": "Attachments",
+        "submit_solution": "Submit solution",
+        "no_file_selected": "No file selected",
+        "choose": "Choose",
+        "submit": "Submit",
+        "last_submissions": "Last submissions",
+        "information": "Information",
+        "id": "ID",
+        "title": "Title",
+        "time_limit": "Time limit",
+        "memory_limit": "Memory limit",
+        "tags": "Tags",
+        "type": "Type"
+    },
+    "problem_submit": {
+        "page_title": "Submit – {{params.problem}} :: njudge",
+        "submit": "Submit"
+    },
+    "problem_submissions": {
+        "filter": "Filter",
+        "page_title": "Submissions – {{params.problem}} :: njudge",
+        "full_solutions": "Only full solutions",
+        "own_solutions": "Only my solutions"
+    },
+    "problem_ranklist": {
+        "page_title": "Ranklist – {{params.problem}} :: njudge",
+        "ranklist": "Ranklist"
+    },
+    "solved_status": {
+        "not_tried": "Not tried yet",
+        "correct": "Solved",
+        "wrong": "Unsolved",
+        "partially_correct": "Partially solved"
+    }
+}

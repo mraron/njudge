@@ -1,0 +1,192 @@
+{
+    "home": {
+        "page_title": "njudge"
+    },
+    "contests": {
+        "page_title": "Versenyek :: njudge",
+        "view": "Megtekintés",
+        "register": "Regisztráció"
+    },
+    "archive": {
+        "page_title": "Archívum :: njudge"
+    },
+    "submissions": {
+        "page_title": "Beküldések :: njudge"
+    },
+    "problems": {
+        "page_title": "Feladatok :: njudge"
+    },
+    "info": {
+        "page_title": "Tudnivalók :: njudge",
+        "successful_copy": "A szöveg a vágólapra lett másolva.",
+        "compiler_options": "Fordítási és futtatási opciók"
+    },
+    "login": {
+        "page_title": "Belépés :: njudge",
+        "login": "Belépés",
+        "username": "Felhasználónév",
+        "password": "Jelszó"
+    },
+    "register": {
+        "page_title": "Regisztráció :: njudge",
+        "register": "Regisztráció",
+        "username": "Felhasználónév",
+        "email": "E-mail cím",
+        "password": "Jelszó",
+        "confirm_password": "Jelszó megerősítése"
+    },
+    "submission": {
+        "compilation_error": "Fordítási hiba",
+        "page_title": "Beküldés #{{params.id}} :: njudge"
+    },
+    "flash": {
+        "no_permission": "Nincs jogosultságod végrehajtani ezt a műveletet.",
+        "successful_logout": "Sikeres kijelentkezés.",
+        "not_logged_in": "Nem vagy belépve.",
+        "must_choose_file": "Először ki kell választanod egy fájlt.",
+        "unsuccessful_submission": "A beküldés nem sikerült.",
+        "successful_submission": "Sikeres beküldés.",
+        "unsuccessful_login": "A bejelentkezés nem sikerült.",
+        "successful_login": "Sikeres bejelentkezés.",
+        "successful_registration": "Sikeres regisztráció. Az ellenőrző linket elküldtük az e-mail címedre.",
+        "unsuccessful_verification": "Az ellenőrzés nem sikerült.",
+        "successful_verification": "Sikeres ellenőrzés.",
+        "password_mismatch": "A jelszavak nem egyeznek.",
+        "successful_settings_save": "A beállítások mentése sikeres volt.",
+        "unsuccessful_settings_save": "A beállítások mentése nem sikerült.",
+        "successful_password_change": "A jelszóváltoztatás sikeres volt."
+    },
+    "tag": {
+        "dp": "dinamikus programozás",
+        "greedy": "mohó",
+        "math": "matematika",
+        "divide_and_conquer": "oszd meg és uralkodj",
+        "data_structures": "adatszerkezetek",
+        "graphs": "gráfok"
+    },
+    "menubar": {
+        "home": "Főoldal",
+        "contests": "Versenyek",
+        "archive": "Archívum",
+        "submissions": "Beküldések",
+        "problems": "Feladatok",
+        "information": "Információ",
+        "profile": "Profil",
+        "logout": "Kilépés",
+        "login": "Belépés",
+        "register": "Regisztráció",
+        "admin": "Admin"
+    },
+    "profile_sidebar": {
+        "stats": "Statisztikák",
+        "last_submissions": "Utolsó beküldések",
+        "rating": "Értékelés",
+        "score": "Pontszám",
+        "num_solved": "Megoldott feladatok"
+    },
+    "problems_table": {
+        "id": "ID",
+        "title": "Cím",
+        "category": "Kategória",
+        "tags": "Címkék",
+        "solved": "Megoldók"
+    },
+    "problem_filter": {
+        "filter": "Szűrés",
+        "title": "Cím",
+        "tags": "Címkék",
+        "category": "Kategória",
+        "search": "Keres",
+        "reset": "Visszaállít"
+    },
+    "submissions_table": {
+        "id": "ID",
+        "date": "Dátum",
+        "user": "Felhasználó",
+        "problem": "Feladat",
+        "language": "Nyelv",
+        "verdict": "Verdikt",
+        "time": "Idő",
+        "memory": "Memória"
+    },
+    "submission_table": {
+        "subtask": "Részfeladat",
+        "total": "Összpont",
+        "test": "Teszt",
+        "verdict": "Verdikt",
+        "time": "Idő",
+        "memory": "Memória",
+        "output": "Kimenet",
+        "expected_output": "Elvárt kimenet",
+        "checker_output": "Ellenőrző kimenet"
+    },
+    "profile": {
+        "profile": "Profil",
+        "submissions": "Beküldések",
+        "settings": "Beállítások"
+    },
+    "profile_main": {
+        "page_title": "{{params.user}} profilja :: njudge",
+        "solved_problems": "Megoldott feladatok",
+        "unsolved_problems": "Megpróbált feladatok"
+    },
+    "profile_submissions": {
+        "page_title": "{{params.user}} beküldései :: njudge"
+    },
+    "profile_settings": {
+        "page_title": "Beállítások :: njudge",
+        "password_change": "Jelszóváltoztatás",
+        "other_settings": "Egyéb beállítások",
+        "old_password": "Régi jelszó",
+        "new_password": "Új jelszó",
+        "confirm_password": "Jelszó megerősítése",
+        "save": "Mentés",
+        "show_unsolved": "Megoldatlan feladatok címkéinek mutatása",
+        "hide_solved": "Megoldott feladatok elrejtése"
+    },
+    "problem": {
+        "statement": "Leírás",
+        "submit": "Beküld",
+        "submissions": "Beküldések",
+        "ranklist": "Eredmények"
+    },
+    "problem_statement": {
+        "page_title": "Leírás – {{params.problem}} :: njudge",
+        "file": "Fájl",
+        "statement": "Leírás",
+        "attachment": "Csatolmány",
+        "attachments": "Mellékletek",
+        "submit_solution": "Megoldás beküldése",
+        "no_file_selected": "Nincs kiválasztva fájl",
+        "choose": "Tallózás",
+        "submit": "Beküld",
+        "last_submissions": "Utolsó beküldések",
+        "information": "Információk",
+        "id": "ID",
+        "title": "Cím",
+        "time_limit": "Időlimit",
+        "memory_limit": "Memórialimit",
+        "tags": "Címkék",
+        "type": "Típus"
+    },
+    "problem_submit": {
+        "page_title": "Beküld – {{params.problem}} :: njudge",
+        "submit": "Beküld"
+    },
+    "problem_submissions": {
+        "filter": "Szűrés",
+        "page_title": "Beküldések – {{params.problem}} :: njudge",
+        "full_solutions": "Csak teljes megoldások",
+        "own_solutions": "Csak a saját megoldásaim"
+    },
+    "problem_ranklist": {
+        "page_title": "Eredmények – {{params.problem}} :: njudge",
+        "ranklist": "Eredmények"
+    },
+    "solved_status": {
+        "not_tried": "Nem próbáltad",
+        "correct": "Megoldottad",
+        "wrong": "Megpróbáltad",
+        "partially_correct": "Részlegesen megoldottad"
+    }
+}
