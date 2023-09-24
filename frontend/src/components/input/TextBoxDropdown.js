@@ -16,14 +16,14 @@ function TextBoxDropdown({
     label,
     itemNames,
     fillSelected,
-    initText,
-    initSelected,
+    initText = "",
+    initSelected = -1,
     onChange,
     onClick,
 }) {
     const [focused, setFocused] = useState(false);
-    const [selected, setSelected] = useState(initSelected || -1);
-    const [text, setText] = useState(initText || "");
+    const [selected, setSelected] = useState(initSelected);
+    const [text, setText] = useState(initText);
 
     useEffect(() => {
         if (onChange) onChange(selected, text);

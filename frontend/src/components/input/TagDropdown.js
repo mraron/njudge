@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { SVGClose } from "../svg/SVGs";
 import TextBoxDropdown from "./TextBoxDropdown";
+import _ from "lodash";
 
 function Tag({ title, onClick }) {
     const [hovered, setHovered] = useState(false);
@@ -27,21 +28,25 @@ function Tag({ title, onClick }) {
     );
 }
 
-function TagDropdown({ id, label, itemNames, initTags, onChange }) {
-    const [tags, setTags] = useState(initTags || []);
+function TagDropdown({ id, label, itemNames, initTags = [], onChange }) {
+    const [tags, setTags] = useState(initTags);
     useEffect(() => onChange(tags), [onChange, tags]);
 
-    const tagsContent = tags.map((title, index) => {
+    const tagsContent = tags.map((tag, index) => {
         const handleRemoveTag = () => {
-            setTags((prevTitles) =>
-                prevTitles.filter((tagTitle) => tagTitle !== title),
+            setTags(prevTags =>
+                prevTags.filter(prevTag => prevTag !== tag),
             );
         };
-        return <Tag title={title} onClick={handleRemoveTag} key={index} />;
+        return <Tag title={itemNames[tag]} onClick={handleRemoveTag} key={index} />;
     });
     const handleAddTag = (selected, title) => {
-        setTags((prevTitles) =>
-            prevTitles.includes(title) ? prevTitles : [...prevTitles, title],
+        const remaining = _.range(itemNames.length).filter(
+            index => !tags.includes(index),
+        )
+        const tag = remaining[selected]
+        setTags(prevTags =>
+            prevTags.includes(tag) ? prevTags : [...prevTags, tag],
         );
     };
     return (
@@ -50,7 +55,7 @@ function TagDropdown({ id, label, itemNames, initTags, onChange }) {
                 id={id}
                 label={label}
                 itemNames={itemNames.filter(
-                    (itemName) => !tags.includes(itemName),
+                    (itemName, index) => !tags.includes(index),
                 )}
                 onClick={handleAddTag}
             />

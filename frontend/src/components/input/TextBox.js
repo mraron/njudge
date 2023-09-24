@@ -41,7 +41,7 @@ function TextBox({
                 <div
                     className={`border-b-1 ${
                         focused
-                            ? "border-yellow-500 dark:border-indigo-600"
+                            ? "border-inv-indigo-500 dark:border-indigo-600"
                             : "border-grey-650"
                     } w-full transition duration-200`}>
                     <input

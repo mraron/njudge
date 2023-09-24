@@ -207,7 +207,7 @@ function ProblemAttachment({ type, name, href }) {
                     <SVGAttachmentDescription cls="w-5 h-5 mr-2 shrink-0" />
                 )}
                 <span className="underline truncate">
-                    {type == "statement"
+                    {type === "statement"
                         ? t("problem_statement.statement")
                         : t("problem_statement.file")}
                     &nbsp;({name})
