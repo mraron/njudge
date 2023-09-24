@@ -35,7 +35,7 @@ function Pagination({ paginationData }) {
                         {currentPage - 1}
                     </button>
                 )}
-                <button className="px-3 py-1.5 text-sm bg-grey-700 border-1 border-grey-600 hover:border-grey-550 hover:bg-grey-650 transition duration-200 text-center">
+                <button className="px-3 py-1.5 text-sm bg-grey-700 border border-grey-600 hover:border-grey-550 hover:bg-grey-650 transition duration-200 text-center">
                     {currentPage}
                 </button>
                 {currentPage <= lastPage - 1 && (

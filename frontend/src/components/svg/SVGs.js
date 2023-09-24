@@ -1,4 +1,4 @@
-export function SVGAttachmentFile({ cls }) {
+export function SVGAttachmentFile({ cls=null }) {
     return (
         <svg
             className={`${cls}`}
@@ -17,7 +17,7 @@ export function SVGAttachmentFile({ cls }) {
     );
 }
 
-export function SVGAttachmentDescription({ cls }) {
+export function SVGAttachmentDescription({ cls=null }) {
     return (
         <svg
             className={`${cls}`}
@@ -36,7 +36,7 @@ export function SVGAttachmentDescription({ cls }) {
     );
 }
 
-export function SVGInformation({ cls }) {
+export function SVGInformation({ cls=null }) {
     return (
         <svg
             className={`${cls}`}
@@ -107,7 +107,7 @@ export function SVGDropdownListArrow({ isOpen }) {
     );
 }
 
-export function SVGDropdownMenuArrow({ cls, isOpen }) {
+export function SVGDropdownMenuArrow({ cls=null, isOpen }) {
     return (
         <svg
             className={`${cls} w-6 h-6 ml-4 ${
@@ -127,7 +127,7 @@ export function SVGDropdownMenuArrow({ cls, isOpen }) {
     );
 }
 
-export function SVGCopy({ cls }) {
+export function SVGCopy({ cls=null }) {
     return (
         <svg
             className={`${cls}`}
@@ -150,7 +150,7 @@ export function SVGCopy({ cls }) {
     );
 }
 
-export function SVGAvatar({ cls }) {
+export function SVGAvatar({ cls=null }) {
     return (
         <svg
             className={`${cls} fill-current`}
@@ -186,7 +186,7 @@ export function SVGHamburger() {
     );
 }
 
-export function SVGClose({ cls }) {
+export function SVGClose({ cls=null }) {
     return (
         <svg
             style={{ pointerEvents: "none" }}
@@ -271,7 +271,7 @@ export function SVGNotFound() {
     );
 }
 
-export function SVGStatistics({ cls }) {
+export function SVGStatistics({ cls=null }) {
     return (
         <svg
             className={`${cls} fill-current`}
@@ -302,7 +302,7 @@ export function SVGStatistics({ cls }) {
     );
 }
 
-export function SVGRecent({ cls }) {
+export function SVGRecent({ cls=null }) {
     return (
         <svg
             className={`${cls}`}
@@ -409,7 +409,7 @@ export function SVGLogin() {
     );
 }
 
-export function SVGLock({ cls }) {
+export function SVGLock({ cls=null }) {
     return (
         <svg
             className={`${cls}`}
@@ -425,7 +425,7 @@ export function SVGLock({ cls }) {
     );
 }
 
-export function SVGMail({ cls }) {
+export function SVGMail({ cls=null }) {
     return (
         <svg
             className={`${cls}`}
@@ -457,7 +457,7 @@ export function SVGMail({ cls }) {
     );
 }
 
-export function SVGConfirm({ cls }) {
+export function SVGConfirm({ cls=null }) {
     return (
         <svg
             className={`${cls}`}
@@ -488,10 +488,10 @@ export function SVGConfirm({ cls }) {
     );
 }
 
-export function SVGSpinner({ cls }) {
+export function SVGSpinner({ cls=null }) {
     return (
         <svg
-            className={`${cls} text-grey-675 animate-spin-slow fill-indigo-600`}
+            className={`${cls} text-grey-275 dark:text-grey-625 animate-spin-slow fill-indigo-600`}
             viewBox="-6 -6 112 113"
             fill="none"
             xmlns="http://www.w3.org/2000/svg">
@@ -507,7 +507,7 @@ export function SVGSpinner({ cls }) {
     );
 }
 
-export function SVGLeftArrow({ cls }) {
+export function SVGLeftArrow({ cls=null }) {
     return (
         <svg
             className={`${cls} fill-current`}
@@ -523,7 +523,7 @@ export function SVGLeftArrow({ cls }) {
     );
 }
 
-export function SVGDoubleRightArrow({ cls }) {
+export function SVGDoubleRightArrow({ cls=null }) {
     return (
         <svg
             className={`${cls}`}
@@ -548,7 +548,7 @@ export function SVGDoubleRightArrow({ cls }) {
     );
 }
 
-export function SVGDots({ cls }) {
+export function SVGDots({ cls=null }) {
     return (
         <svg
             className={`${cls}`}
@@ -583,7 +583,7 @@ export function SVGDots({ cls }) {
     );
 }
 
-export function SVGChange({ cls }) {
+export function SVGChange({ cls=null }) {
     return (
         <svg
             fill="#000000"
@@ -595,7 +595,7 @@ export function SVGChange({ cls }) {
     );
 }
 
-export function SVGSettings({ cls }) {
+export function SVGSettings({ cls=null }) {
     return (
         <svg
             className={`${cls} fill-current`}
@@ -610,7 +610,7 @@ export function SVGSettings({ cls }) {
     );
 }
 
-export function SVGWrong({ cls }) {
+export function SVGWrong({ cls=null }) {
     return (
         <svg
             className={`${cls}`}
@@ -654,11 +654,11 @@ export function SVGWrong({ cls }) {
     );
 }
 
-export function SVGCorrect({ cls }) {
+export function SVGCorrect({ cls=null }) {
     return <SVGConfirm cls={cls} />;
 }
 
-export function SVGCode({ cls }) {
+export function SVGCode({ cls=null }) {
     return (
         <svg
             className={`${cls} fill-current`}
@@ -676,7 +676,7 @@ export function SVGCode({ cls }) {
     );
 }
 
-export function SVGWrongSimple({ cls, title }) {
+export function SVGWrongSimple({ cls=null, title }) {
     return (
         <svg
             className={`${cls} fill-current`}
@@ -689,7 +689,7 @@ export function SVGWrongSimple({ cls, title }) {
     );
 }
 
-export function SVGCorrectSimple({ cls, title }) {
+export function SVGCorrectSimple({ cls=null, title }) {
     return (
         <svg
             className={`${cls}`}
@@ -709,7 +709,7 @@ export function SVGCorrectSimple({ cls, title }) {
     );
 }
 
-export function SVGHDD({ cls }) {
+export function SVGHDD({ cls=null }) {
     return (
         <svg
             className={`${cls}`}
@@ -742,7 +742,7 @@ export function SVGHDD({ cls }) {
     );
 }
 
-export function SVGClock({ cls }) {
+export function SVGClock({ cls=null }) {
     return (
         <svg
             className={`${cls}`}
@@ -763,7 +763,7 @@ export function SVGClock({ cls }) {
     );
 }
 
-export function SVGCheckmark({ cls }) {
+export function SVGCheckmark({ cls=null }) {
     return (
         <svg
             className={`${cls}`}
@@ -783,7 +783,7 @@ export function SVGCheckmark({ cls }) {
     );
 }
 
-export function SVGPartiallyCorrect({ cls, title }) {
+export function SVGPartiallyCorrect({ cls=null, title }) {
     return (
         <svg
             className={`${cls}`}
@@ -807,7 +807,7 @@ export function SVGPartiallyCorrect({ cls, title }) {
     );
 }
 
-export function SVGDotsSmall({ cls, title }) {
+export function SVGDotsSmall({ cls=null, title }) {
     return (
         <svg
             className={`${cls} stroke-current`}
@@ -847,7 +847,7 @@ export function SVGDotsSmall({ cls, title }) {
     );
 }
 
-export function SVGDash({ cls }) {
+export function SVGDash({ cls=null }) {
     return (
         <svg
             className={`${cls}`}
@@ -864,7 +864,7 @@ export function SVGDash({ cls }) {
     );
 }
 
-export function SVGDownload({ cls }) {
+export function SVGDownload({ cls=null }) {
     return (
         <svg
             className={`${cls}`}
@@ -885,7 +885,7 @@ export function SVGDownload({ cls }) {
     );
 }
 
-export function SVGView({ cls }) {
+export function SVGView({ cls=null }) {
     return (
         <svg
             className={`${cls}`}

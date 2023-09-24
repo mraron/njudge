@@ -1,11 +1,14 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBars, faClose, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 import { DropdownRoutes } from "../../input/DropdownMenu";
-import { SVGClose, SVGDropdownMenuArrow, SVGHamburger } from "../../svg/SVGs";
+import { SVGDropdownMenuArrow } from "../../svg/SVGs";
 import { findRouteIndex } from "../../../util/findRouteIndex";
 import { routeMap } from "../../../config/RouteConfig";
 import UserContext from "../../../contexts/user/UserContext";
+import ThemeContext from "../../../contexts/theme/ThemeContext";
 
 const menuRoutes = [
     routeMap.home,
@@ -33,7 +36,7 @@ function MenuOption({ label, route, selected, horizontal, onClick }) {
                     horizontal ? "border-b-3 pt-1" : "border-l-3 p-3"
                 } ${
                     selected
-                        ? "border-indigo-600 bg-grey-775"
+                        ? "border-inv-indigo-600 dark:border-indigo-600 bg-grey-775"
                         : "border-transparent hover:bg-grey-800"
                 }`}
                 to={route}>
@@ -48,10 +51,10 @@ function getProfileDropdownButton(isLoggedIn) {
         const { t } = useTranslation();
         return (
             <button
-                className={`border-1 border-grey-675 rounded-tl-md rounded-bl-md flex items-center justify-between px-3 py-2 w-full h-full ${
+                className={`border border-grey-675 rounded-tl-md rounded-bl-md flex items-center justify-between px-3 py-2 w-full h-full ${
                     isOpen
-                        ? "bg-grey-750 hover:bg-grey-700"
-                        : "hover:bg-grey-800"
+                        ? "bg-grey-775 hover:bg-grey-725"
+                        : "bg-grey-850 hover:bg-grey-800"
                 }`}
                 onClick={onClick}>
                 <span className="text-left">
@@ -92,13 +95,13 @@ function ProfileSettings() {
         }
     }
     return (
-        <div className="flex">
+        <div className="w-full h-full flex">
             <DropdownRoutes
                 button={getProfileDropdownButton(isLoggedIn)}
                 routes={profileRoutes}
                 routeLabels={profileRouteLabels.map(t)}
             />
-            <div className="px-3 flex items-center justify-center border-1 border-l-0 border-grey-675 rounded-tr-md rounded-br-md">
+            <div className="px-3 flex items-center justify-center border border-l-0 border-grey-675 rounded-tr-md rounded-br-md">
                 <button
                     className={`px-2 ${
                         i18n.resolvedLanguage === "hu"
@@ -122,8 +125,24 @@ function ProfileSettings() {
     );
 }
 
+function ThemeButton() {
+    const {theme, changeTheme} = useContext(ThemeContext)
+    const toggleTheme = () => {
+        if (theme === "light") {
+            changeTheme("dark")
+        } else {
+            changeTheme("light")
+        }
+    }
+    return (
+        <button className="h-full cursor-pointer border border-default flex items-center justify-center p-2 rounded-md hover:bg-grey-800 transition duration-200" onClick={toggleTheme}>
+            <FontAwesomeIcon icon={theme === "light"? faMoon: faSun} className="w-6 h-4" />
+        </button>
+    )
+}
+
 function MenuSideBar({ selected, isOpen, onClose }) {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const menuRef = useRef(null);
     const menuOptions = menuRoutes.map((item, index) => {
         return (
@@ -133,7 +152,6 @@ function MenuSideBar({ selected, isOpen, onClose }) {
                 selected={index === selected}
                 horizontal={false}
                 key={index}
-                onClick={onClose}
             />
         );
     });
@@ -142,8 +160,8 @@ function MenuSideBar({ selected, isOpen, onClose }) {
             if (
                 menuRef.current &&
                 !menuRef.current.contains(event.target) &&
-                event.target.id !== "hamburgerButton" &&
-                !event.target.closest("#hamburgerButton")
+                event.target.id !== "menuButton" &&
+                !event.target.closest("#menuButton")
             ) {
                 onClose();
             }
@@ -157,20 +175,15 @@ function MenuSideBar({ selected, isOpen, onClose }) {
     return (
         <aside
             ref={menuRef}
-            className={`z-20 h-full overflow-y-auto lg:hidden fixed right-0 bg-grey-825 border-l-1 border-default ${
-                isOpen ? "w-72 opacity-100" : "w-0 opacity-0"
+            className={`z-10 pt-20 h-full overflow-y-auto xl:hidden fixed right-0 bg-grey-825 border-l-1 border-default ${
+                isOpen ? "w-80 opacity-100" : "w-0 opacity-0"
             } ease-in-out transition-all duration-200`}>
-            <div className="p-3">
-                <button
-                    aria-label="Close menu"
-                    className="rounded-full p-3 hover:bg-grey-800 transition duration-200"
-                    onClick={onClose}>
-                    <SVGClose cls="w-4 h-4" />
-                </button>
-            </div>
             <div className="flex flex-col justify-center">
-                <div className="mx-4 mb-4">
+                <div className="w-full flex px-4 mb-4">
                     <ProfileSettings />
+                    <div className="ml-2">
+                        <ThemeButton />
+                    </div>
                 </div>
                 <ol className="divide-y divide-default border-t border-b border-grey-750">
                     {menuOptions}
@@ -180,7 +193,7 @@ function MenuSideBar({ selected, isOpen, onClose }) {
     );
 }
 
-function MenuTopBar({ selected, onOpen }) {
+function MenuTopBar({ selected, isOpen, onToggle }) {
     const { t } = useTranslation();
     const menuOptions = menuRoutes.map((item, index) => {
         return (
@@ -194,26 +207,31 @@ function MenuTopBar({ selected, onOpen }) {
         );
     });
     return (
-        <div className="z-10 flex justify-center bg-grey-825 border-b-1 border-grey-725 fixed w-full top-0">
+        <div className="z-20 flex justify-center bg-grey-825 border-b-1 border-grey-725 fixed w-full top-0">
             <div className="w-full max-w-7xl flex justify-between items-center">
                 <div className="flex w-full">
                     <Link to="/" className="font-semibold text-lg mx-8 my-4">
                         nJudge
                     </Link>
-                    <ol className="hidden lg:flex">{menuOptions}</ol>
-                    <div className="w-full hidden lg:flex justify-end mx-4 my-2">
+                    <ol className="hidden xl:flex">{menuOptions}</ol>
+                    <div className="w-full hidden xl:flex justify-end items-stretch mx-4 my-2">
                         <div className="w-60">
                             <ProfileSettings />
                         </div>
+                        <div className="ml-2 h-full">
+                            <ThemeButton />
+                        </div>
                     </div>
                 </div>
-                <div className="lg:hidden mx-4">
+                <div className="xl:hidden mx-4">
                     <button
-                        id="hamburgerButton"
+                        id="menuButton"
                         aria-label="Open menu"
-                        className="rounded-full p-2 hover:bg-grey-800 transition duration-200"
-                        onClick={() => onOpen(this)}>
-                        <SVGHamburger />
+                        className="flex items-center justify-center p-2 rounded-full hover:bg-grey-800 transition duration-200"
+                        onClick={() => onToggle(this)}>
+                        {isOpen?
+                            <FontAwesomeIcon icon={faClose} className="w-5 h-5" /> :
+                            <FontAwesomeIcon icon={faBars} className="w-5 h-5" /> }
                     </button>
                 </div>
             </div>
@@ -226,18 +244,19 @@ function Menubar() {
     const location = useLocation();
     const selected = findRouteIndex(menuRoutes, location.pathname);
     const [isOpen, setOpen] = useState(false);
+    const handleToggle = () => {
+        setOpen(prevOpen => !prevOpen);
+    };
     const handleClose = () => {
         setOpen(false);
-    };
-    const handleOpen = () => {
-        setOpen(true);
     };
     return (
         isLoggedIn !== null && (
             <div>
                 <MenuTopBar
                     selected={selected}
-                    onOpen={handleOpen}></MenuTopBar>
+                    isOpen={isOpen}
+                    onToggle={handleToggle} />
                 <MenuSideBar
                     selected={selected}
                     isOpen={isOpen}

@@ -1,14 +1,14 @@
 import { useState } from "react";
 
-import UserContext from "./JudgeDataContext";
+import JudgeDataContext from "./JudgeDataContext";
 
 function JudgeDataProvider({ children }) {
     const [judgeData, setJudgeData] = useState(null);
 
     return (
-        <UserContext.Provider value={{ judgeData, setJudgeData }}>
+        <JudgeDataContext.Provider value={{ judgeData, setJudgeData }}>
             {children}
-        </UserContext.Provider>
+        </JudgeDataContext.Provider>
     );
 }
 

@@ -10,7 +10,7 @@ function CompilerOption({ lang, command }) {
     return (
         <tr className={`divide-x divide-default`}>
             <td className="padding-td-default whitespace-nowrap">{lang}</td>
-            <td className="padding-td-default text-white">
+            <td className="padding-td-default">
                 <CopyableCommand text={command} />
             </td>
         </tr>

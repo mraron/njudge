@@ -9,7 +9,7 @@ function MapDataFrame({ data, title, titleComponent, labelColWidth }) {
                 {pair[0]}
             </td>
             <td
-                className="padding-td-default bg-grey-825 break-words"
+                className="padding-td-default bg-grey-850 break-words"
                 style={{ maxWidth: 0 }}>
                 {pair[1]}
             </td>

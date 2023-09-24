@@ -51,16 +51,16 @@ function Submission({ submission }) {
             <td className="padding-td-default">
                 <div className="flex items-center">
                     {verdictType === 0 && (
-                        <SVGSpinner cls="w-5 h-5 mr-2 shrink-0" />
+                        <SVGSpinner cls="w-5 h-5 mr-2 shrink-0 invert dark:invert-0" />
                     )}
                     {verdictType === 1 && (
-                        <SVGWrongSimple cls="w-5 h-5 text-red-500 mr-2 shrink-0" />
+                        <SVGWrongSimple cls="w-5 h-5 text-red-500 mr-2 shrink-0 invert dark:invert-0" />
                     )}
                     {verdictType === 2 && (
-                        <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-500 mr-2 shrink-0" />
+                        <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-500 mr-2 shrink-0 invert dark:invert-0" />
                     )}
                     {verdictType === 3 && (
-                        <SVGCorrectSimple cls="w-5 h-5 text-green-500 mr-2 shrink-0" />
+                        <SVGCorrectSimple cls="w-5 h-5 text-green-500 mr-2 shrink-0 invert dark:invert-0" />
                     )}
                     <span className="whitespace-nowrap">{verdictName}</span>
                 </div>

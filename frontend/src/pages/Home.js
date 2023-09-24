@@ -6,7 +6,6 @@ function Home({ data }) {
     return (
         <div className="relative w-full flex justify-center">
             <div className="flex justify-center w-full max-w-7xl">
-                <SVGSpinner cls="hidden w-16 h-16 absolute top-1/2 left-1/2" />
                 <div className="ml-0 lg:ml-4">
                     <ProfileSideBar />
                 </div>

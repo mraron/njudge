@@ -10,7 +10,7 @@ function Tag({ title, onClick }) {
     };
     return (
         <span
-            className={`whitespace-nowrap flex items-center cursor-pointer text-sm px-2 py-1 border-1 rounded m-1 hover:bg-grey-700 ${
+            className={`whitespace-nowrap flex items-center cursor-pointer text-sm px-2 py-1 border rounded m-1 hover:bg-grey-700 ${
                 hovered
                     ? "hover:bg-red-600 hover:border-red-500"
                     : "bg-grey-725 border-grey-650"

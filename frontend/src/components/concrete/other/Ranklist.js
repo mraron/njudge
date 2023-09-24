@@ -14,10 +14,10 @@ function RanklistRow({ result, maxScore }) {
             </Link>
             <div className="flex">
                 {accepted && (
-                    <SVGCorrectSimple cls="w-5 h-5 text-green-500 mr-2" />
+                    <SVGCorrectSimple cls="w-5 h-5 text-green-500 mr-2 invert dark:invert-0" />
                 )}
                 {!accepted && (
-                    <SVGWrongSimple cls="w-5 h-5 text-red-500 mr-2" />
+                    <SVGWrongSimple cls="w-5 h-5 text-red-500 mr-2 invert dark:invert-0" />
                 )}
                 <Link
                     className="link whitespace-nowrap"

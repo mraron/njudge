@@ -4,8 +4,28 @@
 
 @layer components {
     .rounded-frame {
-        @apply bg-grey-800 border-1 border-default rounded-md flex w-full
+        @apply bg-grey-800 border border-default rounded-md flex w-full;
     }
+    .link {
+        @apply cursor-pointer underline underline-offset-2 hover:text-inv-indigo-800 dark:hover:text-indigo-200 transition duration-200
+    }
+    .border-default {
+        @apply border-grey-675;
+    }
+    .border-inv-default {
+        @apply border-grey-225;
+    }
+    .editor {
+        @apply border border-inv-default dark:border-default invert dark:invert-0
+    }
+}
+
+body {
+    @apply text-color-default invert dark:invert-0
+}
+
+.text-color-default {
+    @apply text-grey-150 dark:text-white
 }
 
 .padding-btn-default {
@@ -16,24 +36,20 @@
     @apply bg-grey-875;
 }
 
-/*.text-white {*/
-/*    @apply text-grey-100*/
-/*}*/
+.text-white {
+    @apply text-grey-125
+}
 
 .btn-indigo {
-    @apply text-sm font-medium bg-indigo-600 rounded-md hover:bg-indigo-500 transition duration-200 text-center;
+    @apply invert dark:invert-0 text-white text-sm font-medium text-black bg-indigo-600 rounded-md hover:bg-indigo-500 text-center
 }
 
 .btn-gray {
-    @apply text-sm font-medium bg-grey-725 rounded-md hover:bg-grey-700 transition duration-200 border border-default hover:border-grey-650 text-center;
+    @apply text-sm dark:font-medium bg-grey-725 rounded-md hover:bg-grey-700 border border-default hover:border-grey-650 text-center;
 }
 
 .bg-code {
     @apply bg-grey-875;
-}
-
-.border-default {
-    @apply border-grey-675;
 }
 
 .border-divide-col {
@@ -45,7 +61,7 @@
 }
 
 .date-label {
-    @apply cursor-pointer text-sm px-2 py-1 bg-grey-725 rounded border-1 border-grey-650 hover:bg-grey-700 shrink-0 transition duration-200;
+    @apply cursor-pointer text-sm px-2 py-1 bg-grey-725 rounded border border-grey-650 hover:bg-grey-700 shrink-0 transition duration-200;
 }
 
 .padding-td-default {
@@ -71,20 +87,12 @@ th {
     line-height: 1.3rem;
 }
 
-.text-dropdown-frame {
-    font-size: 0.98rem;
-}
-
 .tag {
-    @apply whitespace-nowrap cursor-pointer text-sm px-2 py-1 border-1 rounded m-1 bg-grey-725 hover:bg-grey-700 border-grey-650 transition-all duration-200 truncate;
-}
-
-.link {
-    @apply text-white cursor-pointer underline underline-offset-2 hover:text-indigo-200 transition duration-200;
+    @apply whitespace-nowrap cursor-pointer text-sm px-2 py-1 border rounded m-1 bg-grey-725 hover:bg-grey-700 border-grey-650 transition-all duration-200 truncate;
 }
 
 html {
-    color-scheme: dark;
+    color-scheme: light;
 }
 
 pre {

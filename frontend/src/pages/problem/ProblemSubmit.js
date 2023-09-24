@@ -7,6 +7,7 @@ import DropdownMenu from "../../components/input/DropdownMenu";
 import { routeMap } from "../../config/RouteConfig";
 import submitSolution from "../../util/submitSolution";
 import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext";
+import ThemeContext from "../../contexts/theme/ThemeContext";
 
 function SubmitControlsFrame({ onLanguageChanged, onSubmit }) {
     const { t } = useTranslation();
@@ -31,6 +32,7 @@ function SubmitControlsFrame({ onLanguageChanged, onSubmit }) {
 
 function ProblemSubmit() {
     const { judgeData } = useContext(JudgeDataContext);
+    const { theme } = useContext(ThemeContext)
     const { problem } = useParams();
     const [langIndex, setLangIndex] = useState(0);
     const [submissionCode, setSubmissionCode] = useState("");
@@ -63,9 +65,9 @@ function ProblemSubmit() {
                 />
             </div>
             <MonacoEditor
-                className="border-1 border-default"
+                className="editor"
                 height="60vh"
-                theme="vs-dark"
+                theme={`${theme === "light"? "vs": "vs-dark"}`}
                 language={
                     judgeData.highlightCodes[judgeData.languages[langIndex].id]
                 }

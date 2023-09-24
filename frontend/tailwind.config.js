@@ -1,5 +1,6 @@
 module.exports = {
     content: ["./src/**/*.{js, jsx, ts, tsx}", "./src/*.html"],
+    darkMode: "class",
     theme: {
         extend: {
             animation: {
@@ -10,6 +11,17 @@ module.exports = {
                 3: "3px",
             },
             colors: {
+                "inv-indigo-50": "rgb(17, 13, 0)",
+                "inv-indigo-100": "rgb(31, 24, 0)",
+                "inv-indigo-200": "rgb(56, 45, 1)",
+                "inv-indigo-300": "rgb(90, 75, 3)",
+                "inv-indigo-400": "rgb(126, 115, 7)",
+                "inv-indigo-500": "rgb(156, 153, 14)",
+                "inv-indigo-600": "rgb(176, 185, 26)",
+                "inv-indigo-700": "rgb(188, 199, 53)",
+                "inv-indigo-800": "rgb(200, 207, 92)",
+                "inv-indigo-900": "rgb(206, 209, 126)",
+                "inv-indigo-950": "rgb(225, 228, 180)",
                 "grey-900": "#080808",
                 "grey-875": "#0f0f0f",
                 "grey-850": "#161616",

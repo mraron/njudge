@@ -7,12 +7,15 @@ import JudgeDataProvider from "./contexts/judgeData/JudgeDataProvider";
 
 import "./index.css";
 import "./i18n";
+import ThemeProvider from "./contexts/theme/ThemeProvider";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
     <UserProvider>
         <JudgeDataProvider>
-            <App />
+            <ThemeProvider>
+                <App />
+            </ThemeProvider>
         </JudgeDataProvider>
     </UserProvider>,
 );

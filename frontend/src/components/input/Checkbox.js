@@ -19,17 +19,17 @@ function Checkbox({ id, label, initChecked, onChange }) {
             <div
                 className={`flex border items-center justify-center ${
                     checked
-                        ? `border-transparent ${
-                              hovered ? "bg-indigo-500" : "bg-indigo-600"
+                        ? `invert dark:invert-0 border-transparent ${
+                              hovered ? "dark:bg-indigo-500 bg-indigo-600" : "bg-indigo-600"
                           }`
                         : `${
                               hovered ? "bg-grey-800" : "bg-grey-850"
                           } border-default`
-                } w-5 h-5 rounded-sm transition duration-200`}>
+                } w-5 h-5 rounded-sm`}>
                 <SVGCheckmark
                     cls={`w-3.5 h-3.5 ${
                         checked ? "opacity-100" : "opacity-0"
-                    } transition duration-200`}
+                    } transition duration-100`}
                 />
                 <input
                     id={id}

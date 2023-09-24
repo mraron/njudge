@@ -16,10 +16,10 @@ function DropdownItem({ name, onClick }) {
 function DefaultDropdownButton({ label, isOpen, onClick }) {
     return (
         <button
-            className={`w-full rounded-md px-3 py-2 border-1 flex items-center justify-between ${
+            className={`w-full rounded-md px-3 py-2 border flex items-center justify-between ${
                 isOpen
-                    ? "bg-grey-750 hover:bg-grey-700 border-grey-650"
-                    : "bg-grey-825 hover:bg-grey-775 border-default"
+                    ? "bg-grey-770 hover:bg-grey-725 border-grey-650"
+                    : "bg-grey-850 hover:bg-grey-800 border-default"
             } transition duration-150`}
             onClick={onClick}>
             <span className="truncate">{label}</span>
@@ -78,7 +78,7 @@ function DropdownMenu({ initSelected, itemNames, button: Button, onChange }) {
                     isOpen ? "max-h-60 opacity-100" : "max-h-0 opacity-0"
                 } transition-all duration-[250ms]`}>
                 <div
-                    className={`rounded-md max-h-60 overflow-y-auto border-default border-1`}>
+                    className={`rounded-md max-h-60 overflow-y-auto border-default border`}>
                     <ul
                         className={`divide-y divide-default bg-grey-875 rounded-md`}>
                         {items}

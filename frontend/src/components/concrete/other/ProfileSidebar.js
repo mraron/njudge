@@ -18,25 +18,23 @@ export function ProfilePictureFrame({ userData }) {
     return (
         <RoundedFrame>
             <div className="flex flex-col items-center p-8 pb-4">
-                <Link to={profileRoute}>
+                <Link to={profileRoute} className="invert dark:invert-0">
                     <img
                         alt="avatar"
-                        className="object-contain border-1 border-default hover:border-grey-450 transition duration-200"
+                        className="object-contain border border-default hover:border-grey-450 transition duration-200"
                         src={userData.pictureSrc}
                     />
                 </Link>
                 <div className="mt-2 flex justify-center items-center w-full">
                     <Link
-                        className="text-md font-medium truncate hover:text-indigo-200 transition duration-200"
+                        className="link truncate font-medium no-underline"
                         to={profileRoute}>
                         {userData.username}
                     </Link>
-                    <span className="text-2xl font-semibold text-indigo-500 mx-2">
+                    <span className="text-2xl font-semibold text-indigo-500 mx-2 invert dark:invert-0">
                         &#8226;
                     </span>
-                    <span className="text-md truncate">
-                        {userData.rating}
-                    </span>
+                    <span className="truncate">{userData.rating}</span>
                 </div>
             </div>
         </RoundedFrame>

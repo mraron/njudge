@@ -4,7 +4,7 @@ import { SVGDropdownListArrow } from "../svg/SVGs";
 function DropdownElem({ isOpen, text, onClick }) {
     return (
         <span
-            className="w-fit flex items-center cursor-pointer hover:text-indigo-300 font-medium transition-all duration-100"
+            className="w-fit flex link font-medium no-underline"
             onClick={onClick}>
             <SVGDropdownListArrow isOpen={isOpen} />
             {text}

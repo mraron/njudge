@@ -31,13 +31,13 @@ function TestCase13({
                         <div className="flex flex-col justify-center">
                             <div className="flex items-center justify-center mb-2">
                                 {group.failed && (
-                                    <SVGWrongSimple cls="w-7 h-7 text-red-500" />
+                                    <SVGWrongSimple cls="w-7 h-7 text-red-500 invert dark:invert-0" />
                                 )}
                                 {!group.failed && group.completed && (
-                                    <SVGCorrectSimple cls="w-7 h-7 text-indigo-500" />
+                                    <SVGCorrectSimple cls="w-7 h-7 text-indigo-500 invert dark:invert-0" />
                                 )}
                                 {!group.failed && !group.completed && (
-                                    <SVGSpinner cls="w-7 h-7" />
+                                    <SVGSpinner cls="w-7 h-7 invert dark:invert-0" />
                                 )}
                             </div>
                             {group.name}
@@ -60,16 +60,16 @@ function TestCase13({
                     colSpan={2}>
                     <div className="flex">
                         {testCase.verdictType === 0 && (
-                            <SVGSpinner cls="w-5 h-5 mr-2 shrink-0" />
+                            <SVGSpinner cls="w-5 h-5 mr-2 shrink-0 invert dark:invert-0" />
                         )}
                         {testCase.verdictType === 1 && (
-                            <SVGWrongSimple cls="w-5 h-5 text-red-500 mr-2 shrink-0" />
+                            <SVGWrongSimple cls="w-5 h-5 text-red-500 mr-2 shrink-0 invert dark:invert-0" />
                         )}
                         {testCase.verdictType === 2 && (
-                            <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-500 mr-2 shrink-0" />
+                            <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-500 mr-2 shrink-0 invert dark:invert-0" />
                         )}
                         {testCase.verdictType === 3 && (
-                            <SVGCorrectSimple cls="w-5 h-5 text-green-500 mr-2 shrink-0" />
+                            <SVGCorrectSimple cls="w-5 h-5 text-green-500 mr-2 shrink-0 invert dark:invert-0" />
                         )}
                         <span className="whitespace-nowrap">
                             {testCase.verdictName}
@@ -82,7 +82,7 @@ function TestCase13({
                     <td
                         className={`padding-td-default border border-t-0 border-divide-col ${bottomBorderCase}`}>
                         <div className="flex items-center">
-                            <SVGWrongSimple cls="mr-2 w-5 h-5 text-red-500" />
+                            <SVGWrongSimple cls="mr-2 w-5 h-5 text-red-500 invert dark:invert-0" />
                             <span className="whitespace-nowrap">
                                 {testCase.verdictName}
                             </span>
@@ -127,16 +127,16 @@ function TestCase0({ testCase, index }) {
     const titleComponent = (
         <div className="py-3 px-5 border-b border-default flex items-center text-table">
             {testCase.verdictType === 0 && (
-                <SVGSpinner cls="mr-3 w-6 h-6 shrink-0" />
+                <SVGSpinner cls="mr-3 w-6 h-6 shrink-0 invert dark:invert-0" />
             )}
             {testCase.verdictType === 1 && (
-                <SVGWrongSimple cls="mr-3 w-6 h-6 text-red-500 shrink-0" />
+                <SVGWrongSimple cls="mr-3 w-6 h-6 text-red-500 shrink-0 invert dark:invert-0" />
             )}
             {testCase.verdictType === 2 && (
-                <SVGPartiallyCorrect cls="mr-3 w-6 h-6 text-yellow-500 shrink-0" />
+                <SVGPartiallyCorrect cls="mr-3 w-6 h-6 text-yellow-500 shrink-0 invert dark:invert-0" />
             )}
             {testCase.verdictType === 3 && (
-                <SVGCorrectSimple cls="mr-3 w-6 h-6 text-green-500 shrink-0" />
+                <SVGCorrectSimple cls="mr-3 w-6 h-6 text-green-500 shrink-0 invert dark:invert-0" />
             )}
             <span>{index + 1}</span>
             <span className="mx-2">–</span>

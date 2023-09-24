@@ -38,7 +38,11 @@ function ContestList({ contestData }) {
             </div>
         );
     });
-    return <div>{contestItems}</div>;
+    return (
+        <div>
+            {contestItems}
+        </div>
+    )
 }
 
 export default ContestList;

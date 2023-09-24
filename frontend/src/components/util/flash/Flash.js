@@ -7,24 +7,24 @@ import FlashEvent from "./FlashEvent";
 function FlashMessage({ message, type, onClose }) {
     const { t } = useTranslation();
     return (
-        <div className="absolute bottom-0 left-0 right-0 bg-grey-850 border-1 rounded-md flex border-default w-full">
+        <div className="absolute bottom-0 left-0 right-0 bg-grey-850 border rounded-md flex border-default w-full">
             <div className="w-full p-6 flex justify-between">
                 <div className="flex items-center">
                     {type === "success" && (
-                        <SVGCorrect cls="w-7 h-7 text-green-500 mr-3" />
+                        <SVGCorrect cls="w-7 h-7 text-green-500 mr-3 invert dark:invert-0" />
                     )}
                     {type === "failure" && (
-                        <SVGWrong cls="w-7 h-7 text-red-500 mr-3" />
+                        <SVGWrong cls="w-7 h-7 text-red-500 mr-3 invert dark:invert-0" />
                     )}
                     {type === "info" && (
-                        <SVGInformation cls="w-7 h-7 text-indigo-500 mr-3" />
+                        <SVGInformation cls="w-7 h-7 text-indigo-500 mr-3 invert dark:invert-0" />
                     )}
                     <span>{t(message)}</span>
                 </div>
                 <button
                     className="rounded-full p-3 hover:bg-grey-800 transition duration-200"
                     onClick={onClose}>
-                    <SVGClose cls="w-4 h-4 text-white" />
+                    <SVGClose cls="w-4 h-4" />
                 </button>
             </div>
         </div>

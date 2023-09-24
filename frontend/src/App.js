@@ -69,7 +69,7 @@ function App() {
                     !!judgeData.languages &&
                     !!judgeData.languages &&
                     !!judgeData.tags && (
-                        <div className="text-white h-full min-h-screen pb-4">
+                        <div className="h-full min-h-screen pb-4">
                             <FlashContainer />
                             <Router>
                                 <div className="pb-20">

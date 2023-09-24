@@ -81,7 +81,7 @@ function TextBoxDropdown({
                 }`}>
                 <div
                     className={`rounded-sm max-h-60 overflow-y-auto border-default ${
-                        items.length > 0 ? "border-1" : ""
+                        items.length > 0 ? "border" : ""
                     }`}>
                     <ul className={`divide-y divide-default bg-grey-875`}>
                         {items}
