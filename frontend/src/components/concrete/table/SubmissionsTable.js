@@ -48,7 +48,9 @@ function Submission({ submission }) {
                 </Link>
             </td>
             <td className="padding-td-default">{language}</td>
-            <td className="padding-td-default" colSpan={maxScore === 0.0 ? 2 : 1}>
+            <td
+                className="padding-td-default"
+                colSpan={maxScore === 0.0 ? 2 : 1}>
                 <div className="flex items-center">
                     {verdictType === 0 && (
                         <SVGSpinner cls="w-5 h-5 mr-2 shrink-0 invert dark:invert-0" />
@@ -65,7 +67,7 @@ function Submission({ submission }) {
                     <span className="whitespace-nowrap">{verdictName}</span>
                 </div>
             </td>
-            { maxScore !== 0.0 && (
+            {maxScore !== 0.0 && (
                 <td className="padding-td-default w-0 text-center">
                     <span className="whitespace-nowrap">
                         {score} / {maxScore}

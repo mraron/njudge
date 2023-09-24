@@ -193,33 +193,52 @@ function ProblemLastSubmissions({ submissions, maxScore }) {
     );
 }
 
+function ProblemAttachment({ type, name, href }) {
+    const { t } = useTranslation();
+    return (
+        <li>
+            <Link
+                className="link no-underline flex items-start my-0.5"
+                to={href}>
+                {type === "file" && (
+                    <SVGAttachmentFile cls="w-5 h-5 mr-2 shrink-0" />
+                )}
+                {type === "statement" && (
+                    <SVGAttachmentDescription cls="w-5 h-5 mr-2 shrink-0" />
+                )}
+                <span className="underline truncate">
+                    {type == "statement"
+                        ? t("problem_statement.statement")
+                        : t("problem_statement.file")}
+                    &nbsp;({name})
+                </span>
+            </Link>
+        </li>
+    );
+}
+
 function ProblemAttachments({ attachments }) {
     const { t } = useTranslation();
-    const attachmentsContent = attachments.map((item, index) => {
-        const labels = {
-            file: t("problem_statement.file"),
-            statement: t("problem_statement.statement"),
-            attachment: t("problem_statement.attachment"),
-        };
-        const typeLabel = labels[item.type];
-        return (
-            <li key={index}>
-                <Link
-                    className="link no-underline flex items-start my-0.5"
-                    to={item.href}>
-                    {item.type === "file" && (
-                        <SVGAttachmentFile cls="w-5 h-5 mr-2 shrink-0" />
-                    )}
-                    {item.type === "statement" && (
-                        <SVGAttachmentDescription cls="w-5 h-5 mr-2 shrink-0" />
-                    )}
-                    <span className="underline truncate">
-                        {typeLabel} ({item.name})
-                    </span>
-                </Link>
-            </li>
+    console.log(attachments.statements);
+    const attachmentsContent = attachments.statements
+        .map((item, index) => (
+            <ProblemAttachment
+                key={index}
+                type="statement"
+                name={item.name}
+                href={item.href}
+            />
+        ))
+        .concat(
+            attachments.files.map((item, index) => (
+                <ProblemAttachment
+                    key={attachments.statements.length + index}
+                    type="file"
+                    name={item.name}
+                    href={item.href}
+                />
+            )),
         );
-    });
     const titleComponent = (
         <SVGTitleComponent
             svg={<SVGAttachment />}
@@ -237,6 +256,10 @@ function ProblemAttachments({ attachments }) {
 
 function ProblemStatement({ data }) {
     const { theme } = useContext(ThemeContext);
+    const [statementIndex, setStatementIndex] = useState(0);
+    const statementSrc = data.attachments.statements[statementIndex].href;
+    const statementType = data.attachments.statements[statementIndex].type;
+    console.log(statementSrc + " -- " + statementType);
     return (
         <div className="flex flex-col lg:flex-row">
             <div className="w-full flex flex-col">
@@ -249,11 +272,12 @@ function ProblemStatement({ data }) {
                                         "Hungarian (Tom és Jerry)",
                                         "English (Tom and Jerry)",
                                     ]}
+                                    onChange={setStatementIndex}
                                 />
                             </div>
                             <a
                                 className="btn-gray py-2 px-4 flex justify-center items-center"
-                                href={data.statementSrc}
+                                href={statementSrc}
                                 target="_blank"
                                 rel="noreferrer">
                                 <SVGView cls="w-[1.4rem] h-[1.4rem]" />
@@ -262,18 +286,18 @@ function ProblemStatement({ data }) {
                     </RoundedFrame>
                 </div>
                 <div className="w-full mb-3">
-                    {data.statementType === "pdf" && (
+                    {statementType === "pdf" && (
                         <object
                             color-scheme={theme}
-                            data={data.statementSrc}
+                            data={statementSrc}
                             aria-label="Problem statement"
                             type="application/pdf"
                             width="100%"
                             className="h-[36rem] lg:h-[52rem] border border-grey-300 dark:border-grey-600 invert dark:invert-0"></object>
                     )}
-                    {data.statementType === "html" && (
+                    {statementType === "html" && (
                         <iframe
-                            src={data.statementSrc}
+                            src={statementSrc}
                             width="100%"
                             title="Problem statement"
                             className="h-[36rem] lg:h-[52rem] border border-grey-300 dark:border-grey-600 invert dark:invert-0"></iframe>

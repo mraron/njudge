@@ -31,7 +31,13 @@ function ProblemFilter() {
             location,
             navigate,
             ["title", "tags", "category"],
-            [title, tags.join(","), category[0]===-1?-1:judgeData.categories[category[0]].value],
+            [
+                title,
+                tags.join(","),
+                category[0] === -1
+                    ? -1
+                    : judgeData.categories[category[0]].value,
+            ],
             ["title", "tags", "category"],
             null,
         );
@@ -70,7 +76,7 @@ function ProblemFilter() {
                     initText={category[1]}
                     initSelected={category[0]}
                     fillSelected={true}
-                    itemNames={judgeData.categories.map(x => x.label)}
+                    itemNames={judgeData.categories.map((x) => x.label)}
                     onChange={handleCategoryChange}
                 />
             </div>
