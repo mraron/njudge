@@ -8,11 +8,8 @@ import {
     ProfilePictureFrame,
 } from "../../components/concrete/other/ProfileSidebar";
 
-const makeProblemLink = (problem) => {
-    return {
-        text: problem,
-        href: routeMap.problem.replace(":problem", problem),
-    };
+const makeSubmissionLink = (submission) => {
+    return submission;
 };
 
 function ProfileMain({ data }) {
@@ -49,14 +46,14 @@ function ProfileMain({ data }) {
                 <div className="mb-3">
                     <TagListFrame
                         titleComponent={titleComponentCorrect}
-                        tags={data.solved.map(makeProblemLink)}
+                        tags={data.solved.map(makeSubmissionLink)}
                         tag={LinkTag}
                     />
                 </div>
                 <div className="mb-3">
                     <TagListFrame
                         titleComponent={titleComponentWrong}
-                        tags={data.unsolved.map(makeProblemLink)}
+                        tags={data.unsolved.map(makeSubmissionLink)}
                         tag={LinkTag}
                     />
                 </div>

@@ -7,8 +7,6 @@ import (
 	"github.com/mraron/njudge/internal/web/domain/submission"
 	"io"
 	"net/http"
-	"sort"
-	"strconv"
 	"strings"
 	"time"
 
@@ -22,12 +20,6 @@ import (
 	"github.com/mraron/njudge/internal/web/services"
 	"github.com/mraron/njudge/pkg/problems"
 )
-
-type CategoryFilterOption struct {
-	Name     string
-	Value    string
-	Selected bool
-}
 
 type ProblemsetRow struct {
 	ID           int                  `json:"id"`
@@ -46,9 +38,8 @@ type ProblemList struct {
 
 	Filtered bool
 
-	TitleFilter           string
-	TagsFilter            string
-	CategoryFilterOptions []CategoryFilterOption
+	TitleFilter string
+	TagsFilter  string
 }
 
 func GetProblemList(DB *sqlx.DB, problemListService services.ProblemListService, problemRepo problem.Repository, problemStatsService services.ProblemStatsService) echo.HandlerFunc {
@@ -159,63 +150,6 @@ func GetProblemList(DB *sqlx.DB, problemListService services.ProblemListService,
 		result.Filtered = listRequest.IsFiltered()
 		result.TitleFilter = data.TitleFilter
 		result.TagsFilter = data.TagFilter
-		result.CategoryFilterOptions = []CategoryFilterOption{
-			{Name: "-"},
-		}
-
-		emptySelected := false
-		if data.CategoryFilter == -1 {
-			emptySelected = true
-		}
-		result.CategoryFilterOptions = append(result.CategoryFilterOptions, CategoryFilterOption{
-			Name:     tr.Translate("No category"),
-			Value:    "-1",
-			Selected: emptySelected,
-		})
-
-		categories, err := models.ProblemCategories().All(c.Request().Context(), DB)
-		if err != nil {
-			return err
-		}
-
-		par := make(map[int]int)
-		for ind := range categories {
-			if categories[ind].ParentID.Valid {
-				par[categories[ind].ID] = categories[ind].ParentID.Int
-			}
-		}
-
-		categoryNameByID := make(map[int]string)
-		for ind := range categories {
-			categoryNameByID[categories[ind].ID] = categories[ind].Name
-		}
-
-		var getCategoryNameRec func(int) string
-		getCategoryNameRec = func(id int) string {
-			if _, ok := par[id]; !ok {
-				return categoryNameByID[id]
-			} else {
-				return getCategoryNameRec(par[id]) + " -- " + categoryNameByID[id]
-			}
-		}
-
-		for ind := range categories {
-			curr := CategoryFilterOption{
-				Name:     getCategoryNameRec(categories[ind].ID),
-				Value:    strconv.Itoa(categories[ind].ID),
-				Selected: false,
-			}
-
-			if strconv.Itoa(categories[ind].ID) == c.QueryParam("category") {
-				curr.Selected = true
-			}
-
-			result.CategoryFilterOptions = append(result.CategoryFilterOptions, curr)
-		}
-
-		sort.Slice(result.CategoryFilterOptions, func(i, j int) bool {
-			return result.CategoryFilterOptions[i].Name < result.CategoryFilterOptions[j].Name
-		})
 
 		return c.JSON(http.StatusOK, result)
 	}
@@ -227,10 +161,12 @@ type StatusRow struct {
 	User        string              `json:"user"`
 	Problem     ui.Link             `json:"problem"`
 	Lang        string              `json:"language"`
-	Verdict     string              `json:"verdict"`
+	VerdictName string              `json:"verdictName"`
 	VerdictType problem.VerdictType `json:"verdictType"`
-	Time        string              `json:"time"`
-	Memory      string              `json:"memory"`
+	Time        int                 `json:"time"`
+	Memory      int                 `json:"memory"`
+	Score       float64             `json:"score"`
+	MaxScore    float64             `json:"maxScore"`
 }
 
 func StatusRowFromSubmission(ctx context.Context, DB *sql.DB, problemStore problems.Store, tr i18n.Translator, sub *submission.Submission) (*StatusRow, error) {
@@ -258,16 +194,15 @@ func StatusRowFromSubmission(ctx context.Context, DB *sql.DB, problemStore probl
 				sub.Problem),
 		},
 		Lang:        sub.Language,
-		Verdict:     verdict.Translate(tr),
+		VerdictName: verdict.Translate(tr),
 		VerdictType: verdict.VerdictType(),
 	}
 
 	if len(status.Feedback) > 0 {
-		res.Time = strconv.Itoa(int(status.Feedback[0].MaxTimeSpent() / time.Millisecond))
-		res.Memory = strconv.Itoa(status.Feedback[0].MaxMemoryUsage())
-		if status.FeedbackType == problems.FeedbackIOI || status.FeedbackType == problems.FeedbackLazyIOI {
-			res.Verdict += fmt.Sprintf(" %.2f / %.2f", status.Feedback[0].Score(), status.Feedback[0].MaxScore())
-		}
+		res.Time = int(status.Feedback[0].MaxTimeSpent() / time.Millisecond)
+		res.Memory = status.Feedback[0].MaxMemoryUsage()
+		res.Score = status.Feedback[0].Score()
+		res.MaxScore = status.Feedback[0].MaxScore()
 	}
 
 	return res, nil
@@ -348,7 +283,7 @@ func PostSubmit(subService services.SubmitService) echo.HandlerFunc {
 
 		code := data.SubmissionCode
 		if len(code) == 0 {
-			fileHeader, err := c.FormFile("source")
+			fileHeader, err := c.FormFile("file")
 			if err != nil {
 				return err
 			}
@@ -369,7 +304,7 @@ func PostSubmit(subService services.SubmitService) echo.HandlerFunc {
 			}
 		}
 
-		sub, err := subService.Submit(c.Request().Context(), services.SubmitRequest{
+		_, err := subService.Submit(c.Request().Context(), services.SubmitRequest{
 			UserID:     u.ID,
 			Problemset: data.Problemset,
 			Problem:    data.ProblemName,
@@ -380,6 +315,6 @@ func PostSubmit(subService services.SubmitService) echo.HandlerFunc {
 			return err
 		}
 
-		return c.Redirect(http.StatusFound, c.Echo().Reverse("getProblemsetStatus")+"#submission"+strconv.Itoa(sub.ID))
+		return c.String(http.StatusOK, "")
 	}
 }

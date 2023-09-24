@@ -1,7 +1,10 @@
 package web
 
 import (
+	"github.com/mraron/njudge/pkg/language"
 	"net/http"
+	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -44,7 +47,7 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 
 	ps := e.Group("/problemset", problemset.SetNameMiddleware())
 	ps.GET("/:name/", problemset.GetProblemList(s.DB, services.NewSQLProblemListService(s.DB.DB, s.ProblemStore, services.NewSQLProblem(s.DB.DB, s.ProblemStore)), services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
-	ps.POST("/:name/submit", problemset.PostSubmit(services.NewSQLSubmitService(s.DB.DB, s.ProblemStore)), user.RequireLoginMiddleware())
+	//ps.POST("/:name/submit", problemset.PostSubmit(services.NewSQLSubmitService(s.DB.DB, s.ProblemStore)), user.RequireLoginMiddleware())
 
 	psProb := ps.Group("/:name/:problem", problemset.RenameProblemMiddleware(s.ProblemStore), problemset.SetProblemMiddleware(services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
 	//psProb.GET("/", problemset.GetProblem()).Name = "getProblemMain"
@@ -77,7 +80,7 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	u.POST("/forgotten_password_form", user.PostForgottenPasswordForm(s.DB)).Name = "PostForgottenPasswordForm"
 
 	pr := u.Group("/profile", profile.SetProfileMiddleware(s.DB))
-	pr.GET("/:name/", profile.GetProfile(s.DB))
+	//pr.GET("/:name/", profile.GetProfile(s.DB))
 	pr.GET("/:name/submissions/", profile.GetSubmissions(services.NewSQLStatusPageService(s.DB.DB)))
 
 	prs := pr.Group("/:name/settings", user.RequireLoginMiddleware(), profile.PrivateMiddleware())
@@ -103,28 +106,26 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 		})
 
 		u := v2.Group("/user")
+
+		pr := u.Group("/profile", profile.SetProfileMiddleware(s.DB))
+		pr.GET("/:name/", profile.GetProfile(s.DB))
+
 		u.GET("/auth/", func(c echo.Context) error {
-			type UserData struct {
-				Username        string                 `json:"username"`
-				PictureSrc      string                 `json:"pictureSrc"`
-				Rating          int                    `json:"rating"`
-				Score           float64                `json:"score"`
-				NumSolved       int                    `json:"numSolved"`
-				LastSubmissions []problemset.StatusRow `json:"lastSubmissions"`
-			}
 
 			u := c.Get("user").(*models.User)
-			var ud *UserData
+			var (
+				ud  *profile.UserData
+				err error
+			)
 			if u != nil {
-				ud = &UserData{
-					Username:        u.Name,
-					PictureSrc:      "/assets/profile.webp",
-					LastSubmissions: []problemset.StatusRow{},
+				ud, err = profile.UserDataFromUser(u)
+				if err != nil {
+					return err
 				}
 			}
 
 			return c.JSON(http.StatusOK, struct {
-				UserData *UserData `json:"userData"`
+				UserData *profile.UserData `json:"userData"`
 			}{ud})
 		})
 
@@ -135,6 +136,7 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 
 		ps := v2.Group("/problemset", problemset.SetNameMiddleware())
 		ps.GET("/:name/", problemset.GetProblemList(s.DB, services.NewSQLProblemListService(s.DB.DB, s.ProblemStore, services.NewSQLProblem(s.DB.DB, s.ProblemStore)), services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
+		ps.POST("/:name/submit/", problemset.PostSubmit(services.NewSQLSubmitService(s.DB.DB, s.ProblemStore)), user.RequireLoginMiddleware())
 		ps.GET("/status/", problemset.GetStatus(s.DB, s.ProblemStore, services.NewSQLStatusPageService(s.DB.DB))).Name = "getProblemsetStatus"
 
 		psProb := ps.Group("/:name/:problem", problemset.SetProblemMiddleware(services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
@@ -144,6 +146,95 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 
 		v2.GET("/submission/:id/", handlers.GetSubmission(s.DB, s.ProblemStore, services.NewSQLSubmission(s.DB.DB))).Name = "getSubmission"
 
+		data := v2.Group("/data")
+		data.GET("/languages/", func(c echo.Context) error {
+			type Language struct {
+				ID    string `json:"id"`
+				Label string `json:"label"`
+			}
+
+			var res []Language
+
+			for _, lang := range language.DefaultStore.List() {
+				res = append(res, Language{
+					ID:    lang.Id(),
+					Label: lang.Name(),
+				})
+			}
+
+			return c.JSON(http.StatusOK, struct {
+				Languages []Language `json:"languages"`
+			}{res})
+		})
+
+		data.GET("/categories/", func(c echo.Context) error {
+			type CategoryFilterOption struct {
+				Label string `json:"label"`
+				Value string `json:"value"`
+			}
+
+			var res []CategoryFilterOption
+
+			categories, err := models.ProblemCategories().All(c.Request().Context(), s.DB)
+			if err != nil {
+				return err
+			}
+
+			par := make(map[int]int)
+			for ind := range categories {
+				if categories[ind].ParentID.Valid {
+					par[categories[ind].ID] = categories[ind].ParentID.Int
+				}
+			}
+
+			categoryNameByID := make(map[int]string)
+			for ind := range categories {
+				categoryNameByID[categories[ind].ID] = categories[ind].Name
+			}
+
+			var getCategoryNameRec func(int) string
+			getCategoryNameRec = func(id int) string {
+				if _, ok := par[id]; !ok {
+					return categoryNameByID[id]
+				} else {
+					return getCategoryNameRec(par[id]) + " -- " + categoryNameByID[id]
+				}
+			}
+
+			for ind := range categories {
+				curr := CategoryFilterOption{
+					Label: getCategoryNameRec(categories[ind].ID),
+					Value: strconv.Itoa(categories[ind].ID),
+				}
+
+				res = append(res, curr)
+			}
+
+			sort.Slice(res, func(i, j int) bool {
+
+				return res[i].Label < res[j].Label
+			})
+
+			return c.JSON(http.StatusOK, struct {
+				Categories []CategoryFilterOption `json:"categories"`
+			}{res})
+		})
+
+		data.GET("/tags/", func(c echo.Context) error {
+			tags, err := models.Tags().All(c.Request().Context(), s.DB)
+			if err != nil {
+				return err
+			}
+
+			var res []string
+			for _, tag := range tags {
+				res = append(res, tag.Name)
+			}
+
+			return c.JSON(http.StatusOK, struct {
+				Tags []string `json:"tags"`
+			}{res})
+		})
 	}
 
 	v1 := apiGroup.Group("/api/v1")

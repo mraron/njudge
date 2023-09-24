@@ -1,8 +1,13 @@
 package profile
 
 import (
+	"database/sql"
+	"fmt"
+	"github.com/mraron/njudge/internal/web/handlers/problemset"
+	"github.com/mraron/njudge/internal/web/helpers/ui"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/net/context"
 	"net/http"
 
 	"github.com/jmoiron/sqlx"
@@ -16,40 +21,86 @@ import (
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
+type UserData struct {
+	Username        string                 `json:"username"`
+	PictureSrc      string                 `json:"pictureSrc"`
+	Rating          int                    `json:"rating"`
+	Score           float64                `json:"score"`
+	NumSolved       int                    `json:"numSolved"`
+	LastSubmissions []problemset.StatusRow `json:"lastSubmissions"`
+}
+
+func UserDataFromUser(u *models.User) (*UserData, error) {
+	return &UserData{
+		Username:        u.Name,
+		PictureSrc:      "/assets/profile.webp",
+		LastSubmissions: []problemset.StatusRow{},
+	}, nil
+}
+
+type ProfileData struct {
+	UserData UserData  `json:"userData"`
+	Solved   []ui.Link `json:"solved"`
+	Unsolved []ui.Link `json:"unsolved"`
+}
+
+func ProfileDataFromUser(ctx context.Context, DB *sql.DB, u *models.User) (*ProfileData, error) {
+	var (
+		solved, attempted models.SubmissionSlice
+		err               error
+	)
+
+	solved, err = models.Submissions(Select("max(submissions.id) as id, problemset, problem"),
+		Where("user_id = ?", u.ID), Where("verdict = ?", 0),
+		GroupBy("submissions.problemset, submissions.problem"),
+	).All(ctx, DB)
+	if err != nil {
+		return nil, err
+	}
+
+	attempted, err = models.Submissions(Select("max(submissions.id) as id, problemset, problem"),
+		Where("user_id = ?", u.ID), Where("verdict <> ?", 0),
+		Where("not exists(select id from submissions as other where other.user_id = ? and "+
+			"verdict = 0 and other.problem = submissions.problem and other.problemset=submissions.problemset)", u.ID),
+		GroupBy("submissions.problemset, submissions.problem"),
+	).All(ctx, DB)
+	if err != nil {
+		return nil, err
+	}
+
+	toLinks := func(s models.SubmissionSlice) []ui.Link {
+		res := make([]ui.Link, len(s))
+		for i := range res {
+			res[i] = ui.Link{
+				Text: s[i].Problem,
+				Href: fmt.Sprintf("/submission/%d/", s[i].ID),
+			}
+		}
+
+		return res
+	}
+
+	ud, err := UserDataFromUser(u)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ProfileData{
+		UserData: *ud,
+		Solved:   toLinks(solved),
+		Unsolved: toLinks(attempted),
+	}, nil
+}
+
 func GetProfile(DB *sqlx.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
-
 		u := c.Get("profile").(*models.User)
-		var (
-			solved, attempted models.SubmissionSlice
-			err               error
-		)
-
-		solved, err = models.Submissions(Select("max(submissions.id) as id, problemset, problem"),
-			Where("user_id = ?", u.ID), Where("verdict = ?", 0),
-			GroupBy("submissions.problemset, submissions.problem"),
-		).All(c.Request().Context(), DB)
+		pd, err := ProfileDataFromUser(c.Request().Context(), DB.DB, u)
 		if err != nil {
 			return err
 		}
 
-		attempted, err = models.Submissions(Select("max(submissions.id) as id, problemset, problem"),
-			Where("user_id = ?", u.ID), Where("verdict <> ?", 0),
-			Where("not exists(select id from submissions as other where other.user_id = ? and "+
-				"verdict = 0 and other.problem = submissions.problem and other.problemset=submissions.problemset)", u.ID),
-			GroupBy("submissions.problemset, submissions.problem"),
-		).All(c.Request().Context(), DB)
-		if err != nil {
-			return err
-		}
-
-		c.Set("title", tr.Translate("%s's profile", u.Name))
-		return c.Render(http.StatusOK, "user/profile/main", struct {
-			User                       *models.User
-			SolvedProblems             models.SubmissionSlice
-			AttemptedNotSolvedProblems models.SubmissionSlice
-		}{u, solved, attempted})
+		return c.JSON(http.StatusOK, pd)
 	}
 }
 
