@@ -22,6 +22,9 @@ import RoundedTable from "../../components/container/RoundedTable";
 import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext";
 import submitSolution from "../../util/submitSolution";
 import { routeMap } from "../../config/RouteConfig";
+import themeContext from "../../contexts/theme/ThemeContext";
+import UserContext from "../../contexts/user/UserContext";
+import ThemeContext from "../../contexts/theme/ThemeContext";
 
 function ProblemInfo({ info }) {
     const { t } = useTranslation();
@@ -233,6 +236,7 @@ function ProblemAttachments({ attachments }) {
 }
 
 function ProblemStatement({ data }) {
+    const { theme } = useContext(ThemeContext);
     return (
         <div className="flex flex-col lg:flex-row">
             <div className="w-full flex flex-col">
@@ -260,6 +264,7 @@ function ProblemStatement({ data }) {
                 <div className="w-full mb-3">
                     {data.statementType === "pdf" && (
                         <object
+                            color-scheme={theme}
                             data={data.statementSrc}
                             aria-label="Problem statement"
                             type="application/pdf"

@@ -3,10 +3,12 @@ import { useEffect, useState } from "react";
 import ThemeContext from "./ThemeContext";
 
 function ThemeProvider({ children }) {
-    const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+    const [theme, setTheme] = useState(
+        localStorage.getItem("theme") || "light",
+    );
 
     useEffect(() => {
-        changeTheme(theme)
+        changeTheme(theme);
     }, []);
 
     const changeTheme = (newTheme) => {
@@ -16,15 +18,13 @@ function ThemeProvider({ children }) {
         setTheme(newTheme);
 
         const doc = document.documentElement;
-        doc.setAttribute("color-scheme", newTheme);
-
         if (newTheme === "light" && doc.classList.contains("dark")) {
             doc.classList.remove("dark");
         }
         if (newTheme === "dark" && !doc.classList.contains("dark")) {
             doc.classList.add("dark");
         }
-        localStorage.setItem("theme", newTheme)
+        localStorage.setItem("theme", newTheme);
     };
     return (
         <ThemeContext.Provider value={{ theme, changeTheme }}>

@@ -185,9 +185,9 @@ function MenuSideBar({ selected, isOpen, onClose }) {
     return (
         <aside
             ref={menuRef}
-            className={`z-10 pt-20 h-full overflow-y-auto xl:hidden fixed right-0 bg-grey-825 border-l-1 border-default ${
+            className={`h-full z-10 pt-20 overflow-y-auto xl:hidden fixed right-0 bg-grey-825 border-l-1 border-default ${
                 isOpen ? "w-80 opacity-100" : "w-0 opacity-0"
-            } ease-in-out transition-all duration-200`}>
+            } ease-in-out transition-all duration-200 invert dark:invert-0`}>
             <div className="flex flex-col justify-center">
                 <div className="w-full flex px-4 mb-4">
                     <ProfileSettings />
@@ -217,7 +217,7 @@ function MenuTopBar({ selected, isOpen, onToggle }) {
         );
     });
     return (
-        <div className="z-20 flex justify-center bg-grey-825 border-b-1 border-grey-725 fixed w-full top-0">
+        <div className="z-20 flex justify-center bg-grey-825 border-b-1 border-grey-725 fixed w-full top-0 invert dark:invert-0">
             <div className="w-full max-w-7xl flex justify-between items-center">
                 <div className="flex w-full">
                     <Link to="/" className="font-semibold text-lg mx-8 my-4">

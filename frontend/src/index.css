@@ -21,11 +21,15 @@
 }
 
 body {
-    @apply text-color-default invert dark:invert-0;
+    @apply text-color-default bg-color-default;
 }
 
 .text-color-default {
     @apply text-grey-150 dark:text-white;
+}
+
+.bg-color-default {
+    @apply bg-gray-50 dark:bg-grey-900;
 }
 
 .padding-btn-default {
@@ -92,7 +96,7 @@ th {
 }
 
 html {
-    color-scheme: light;
+    color-scheme: dark;
 }
 
 pre {

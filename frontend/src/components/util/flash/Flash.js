@@ -69,9 +69,10 @@ function FlashContainer() {
             FlashEvent.removeAllListeners();
         };
     }, []);
+
     return (
         <>
-            <div className="z-10 fixed bottom-2 left-2 right-2 flex justify-center">
+            <div className="z-10 fixed bottom-2 left-2 right-2 flex justify-center invert dark:invert-0">
                 <div className={`relative w-full max-w-7xl px-2`}>
                     <AnimatePresence>{messages}</AnimatePresence>
                 </div>

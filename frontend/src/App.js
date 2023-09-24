@@ -20,7 +20,7 @@ window.flash = (message, type = "success") =>
     FlashEvent.emit("flash", { message, type });
 
 function App() {
-    const { judgeData, setJudgeData } = useContext(JudgeDataContext);
+    const { judgeData, setJudgeData, allLoaded } = useContext(JudgeDataContext);
 
     useEffect(() => {
         const fetchJudgeData = async () => {
@@ -65,20 +65,19 @@ function App() {
                 initial={{ opacity: 0.6 }}
                 animate={{ opacity: 1, transition: { duration: 0.25 } }}
                 exit={{ opacity: 0.6, transition: { duration: 0.25 } }}>
-                {!!judgeData &&
-                    !!judgeData.languages &&
-                    !!judgeData.languages &&
-                    !!judgeData.tags && (
-                        <div className="h-full min-h-screen pb-4">
-                            <FlashContainer />
-                            <Router>
-                                <div className="pb-20">
-                                    <Menubar />
-                                </div>
+                {allLoaded() && (
+                    <div className="relative h-full min-h-screen pb-4">
+                        <FlashContainer />
+                        <Router>
+                            <div className="pb-20">
+                                <Menubar />
+                            </div>
+                            <div className="invert dark:invert-0">
                                 <RoutingComponent />
-                            </Router>
-                        </div>
-                    )}
+                            </div>
+                        </Router>
+                    </div>
+                )}
             </motion.div>
         </AnimatePresence>
     );
