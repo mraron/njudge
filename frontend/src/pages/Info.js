@@ -8,7 +8,7 @@ import CopyableCommand from "../components/util/copy/CopyableCommand";
 
 function CompilerOption({ lang, command }) {
     return (
-        <tr className={`divide-x divide-default`}>
+        <tr className={`divide-x divide-dividecol`}>
             <td className="padding-td-default whitespace-nowrap">{lang}</td>
             <td className="padding-td-default">
                 <CopyableCommand text={command} />
@@ -42,7 +42,7 @@ function InfoTable() {
     );
     return (
         <RoundedTable titleComponent={titleComponent}>
-            <tbody className="divide-y divide-default text-sm">
+            <tbody className="divide-y divide-dividecol text-sm">
                 {compilerOptionElems}
             </tbody>
         </RoundedTable>

@@ -7,22 +7,22 @@ import FlashEvent from "./FlashEvent";
 function FlashMessage({ message, type, onClose }) {
     const { t } = useTranslation();
     return (
-        <div className="absolute bottom-0 left-0 right-0 bg-grey-850 border rounded-md flex border-default w-full">
+        <div className="absolute bottom-0 left-0 right-0 bg-grey-850 border rounded-md flex border-bordercol w-full">
             <div className="w-full p-6 flex justify-between">
                 <div className="flex items-center">
                     {type === "success" && (
-                        <SVGCorrect cls="w-7 h-7 text-green-500 mr-3 invert dark:invert-0" />
+                        <SVGCorrect cls="w-8 h-8 text-green-600 mr-3" />
                     )}
                     {type === "failure" && (
-                        <SVGWrong cls="w-7 h-7 text-red-500 mr-3 invert dark:invert-0" />
+                        <SVGWrong cls="w-8 h-8 text-red-600 mr-3" />
                     )}
                     {type === "info" && (
-                        <SVGInformation cls="w-7 h-7 text-indigo-500 mr-3 invert dark:invert-0" />
+                        <SVGInformation cls="w-8 h-8 text-indigo-500 mr-3" />
                     )}
                     <span>{t(message)}</span>
                 </div>
                 <button
-                    className="rounded-full p-3 hover:bg-grey-800 transition duration-200"
+                    className="rounded-full p-3 hover:bg-grey-800"
                     onClick={onClose}>
                     <SVGClose cls="w-4 h-4" />
                 </button>
@@ -71,7 +71,7 @@ function FlashContainer() {
     }, []);
 
     return (
-        <div className="z-10 fixed bottom-2 left-2 right-2 flex justify-center invert dark:invert-0">
+        <div className="z-10 fixed bottom-2 left-2 right-2 flex justify-center">
             <div className={`relative w-full max-w-7xl px-2`}>
                 <AnimatePresence>{messages}</AnimatePresence>
             </div>

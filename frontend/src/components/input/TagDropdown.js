@@ -11,14 +11,14 @@ function Tag({ title, onClick }) {
     };
     return (
         <span
-            className={`whitespace-nowrap flex items-center cursor-pointer text-sm px-2 py-1 border rounded m-1 hover:bg-grey-700 ${
+            className={`whitespace-nowrap flex items-center cursor-pointer text-sm px-2 py-1 border border-bordercol rounded m-1 hover:bg-grey-700 ${
                 hovered
-                    ? "hover:bg-red-600 hover:border-red-500"
-                    : "bg-grey-725 border-grey-650"
-            } transition-all duration-200`}>
+                    ? "text-white hover:bg-red-600 hover:border-red-500"
+                    : "bg-grey-725"
+            }`}>
             {title}
             <span
-                className={`ml-3 rounded-full p-1 hover:bg-red-800 transition-all duration-200`}
+                className={`ml-3 rounded-full p-1 hover:bg-red-800`}
                 onMouseOver={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
                 onClick={handleClick}>

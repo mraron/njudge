@@ -7,7 +7,7 @@ function CopyButton({ text }) {
     };
     return (
         <button
-            className={`relative h-9 w-9 bg-grey-775 rounded-md hover:bg-grey-750 transition duration-200 border border-default hover:border-grey-650`}
+            className={`relative h-9 w-9 bg-grey-775 rounded-md hover:bg-grey-750 border border-bordercol`}
             aria-label="Copy"
             onClick={handleCopy}>
             <SVGCopy

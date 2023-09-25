@@ -11,7 +11,7 @@ function Pagination({ paginationData }) {
         UpdateQueryString(location, navigate, ["page"], [page]);
     };
     const cls =
-        "px-3 py-1.5 text-sm transition duration-200 border-default border hover:bg-grey-750 text-center";
+        "px-3 py-1.5 text-sm border-bordercol border hover:bg-grey-750 text-center";
     return (
         <RoundedFrame>
             <div className="flex justify-center p-3 overflow-x-auto">
@@ -35,7 +35,7 @@ function Pagination({ paginationData }) {
                         {currentPage - 1}
                     </button>
                 )}
-                <button className="px-3 py-1.5 text-sm bg-grey-700 border border-grey-600 hover:border-grey-550 hover:bg-grey-650 transition duration-200 text-center">
+                <button className="px-3 py-1.5 text-sm bg-grey-700 border border-grey-600 hover:border-grey-550 hover:bg-grey-650 text-center">
                     {currentPage}
                 </button>
                 {currentPage <= lastPage - 1 && (

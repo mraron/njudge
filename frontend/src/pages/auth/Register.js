@@ -36,7 +36,7 @@ function RegisterFrame() {
     return (
         <RoundedFrame titleComponent={titleComponent}>
             <form method="POST">
-                <div className="px-10 pt-8 pb-6 border-b border-default">
+                <div className="px-10 pt-8 pb-6 border-b border-bordercol">
                     <div className="mb-4 relative">
                         <TextBox
                             id="username"

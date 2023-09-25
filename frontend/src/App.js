@@ -20,7 +20,7 @@ window.flash = (message, type = "success") =>
     FlashEvent.emit("flash", { message, type });
 
 function App() {
-    const { judgeData, setJudgeData, allLoaded } = useContext(JudgeDataContext);
+    const { setJudgeData, allLoaded } = useContext(JudgeDataContext);
 
     useEffect(() => {
         const fetchJudgeData = async () => {
@@ -72,7 +72,7 @@ function App() {
                             <div className="pb-20">
                                 <Menubar />
                             </div>
-                            <div className="invert dark:invert-0">
+                            <div>
                                 <RoutingComponent />
                             </div>
                         </Router>

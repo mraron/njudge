@@ -26,7 +26,7 @@ function Submission({ submission }) {
     } = submission;
     console.log(problem);
     return (
-        <tr className={"divide-x divide-default"}>
+        <tr className={"divide-x divide-dividecol"}>
             <td className="padding-td-default w-0">
                 <Link
                     className="link"
@@ -53,16 +53,16 @@ function Submission({ submission }) {
                 colSpan={maxScore === 0.0 ? 2 : 1}>
                 <div className="flex items-center">
                     {verdictType === 0 && (
-                        <SVGSpinner cls="w-5 h-5 mr-2 shrink-0 invert dark:invert-0" />
+                        <SVGSpinner cls="w-5 h-5 mr-2 shrink-0" />
                     )}
                     {verdictType === 1 && (
-                        <SVGWrongSimple cls="w-5 h-5 text-red-500 mr-2 shrink-0 invert dark:invert-0" />
+                        <SVGWrongSimple cls="w-5 h-5 text-red-600 mr-2 shrink-0" />
                     )}
                     {verdictType === 2 && (
-                        <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-500 mr-2 shrink-0 invert dark:invert-0" />
+                        <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-600 mr-2 shrink-0" />
                     )}
                     {verdictType === 3 && (
-                        <SVGCorrectSimple cls="w-5 h-5 text-green-500 mr-2 shrink-0 invert dark:invert-0" />
+                        <SVGCorrectSimple cls="w-5 h-5 text-green-600 mr-2 shrink-0" />
                     )}
                     <span className="whitespace-nowrap">{verdictName}</span>
                 </div>
@@ -88,7 +88,7 @@ function SubmissionsTable({ submissions }) {
     return (
         <RoundedTable>
             <thead className="bg-grey-800">
-                <tr className="divide-x divide-default">
+                <tr className="divide-x divide-dividecol">
                     <th className="padding-td-default">
                         {t("submissions_table.id")}
                     </th>
@@ -115,7 +115,7 @@ function SubmissionsTable({ submissions }) {
                     </th>
                 </tr>
             </thead>
-            <tbody className="divide-y divide-default">
+            <tbody className="divide-y divide-dividecol">
                 {submissionsContent}
             </tbody>
         </RoundedTable>

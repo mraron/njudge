@@ -12,13 +12,13 @@ function ProblemLeaf({ data }) {
         <span className="w-fit flex items-center">
             <div className="w-5 mr-2">
                 {data.solvedStatus === 1 && (
-                    <SVGWrongSimple cls="w-5 h-5 text-red-500 shrink-0 invert dark:invert-0" />
+                    <SVGWrongSimple cls="w-5 h-5 text-red-600 shrink-0" />
                 )}
                 {data.solvedStatus === 2 && (
-                    <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-500 shrink-0 invert dark:invert-0" />
+                    <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-600 shrink-0" />
                 )}
                 {data.solvedStatus === 3 && (
-                    <SVGCorrectSimple cls="w-5 h-5 text-green-500 shrink-0 invert dark:invert-0" />
+                    <SVGCorrectSimple cls="w-5 h-5 text-green-600 shrink-0" />
                 )}
             </div>
             <Link className="link no-underline" to={data.link}>

@@ -112,7 +112,7 @@ export function SVGDropdownMenuArrow({ cls = null, isOpen }) {
         <svg
             className={`${cls} w-6 h-6 ml-4 ${
                 isOpen ? "rotate-180" : ""
-            } transition-all duration-150`}
+            } transition-all duration-100`}
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg">
@@ -214,7 +214,7 @@ export function SVGDropdownFilterArrow({ isOpen }) {
         <svg
             className={`${
                 isOpen ? "rotate-180" : "rotate-0"
-            } h-[1.85rem] text-sm font-medium transition duration-150`}
+            } h-[1.85rem] text-sm font-medium transition duration-100`}
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg">
@@ -491,7 +491,7 @@ export function SVGConfirm({ cls = null }) {
 export function SVGSpinner({ cls = null }) {
     return (
         <svg
-            className={`${cls} text-grey-275 dark:text-grey-625 animate-spin-slow fill-indigo-600`}
+            className={`${cls} text-grey-625 animate-spin-slow fill-indigo-600`}
             viewBox="-6 -6 112 113"
             fill="none"
             xmlns="http://www.w3.org/2000/svg">

@@ -14,10 +14,10 @@ function RanklistRow({ result, maxScore }) {
             </Link>
             <div className="flex">
                 {accepted && (
-                    <SVGCorrectSimple cls="w-5 h-5 text-green-500 mr-2 invert dark:invert-0" />
+                    <SVGCorrectSimple cls="w-5 h-5 text-green-600 mr-2" />
                 )}
                 {!accepted && (
-                    <SVGWrongSimple cls="w-5 h-5 text-red-500 mr-2 invert dark:invert-0" />
+                    <SVGWrongSimple cls="w-5 h-5 text-red-600 mr-2" />
                 )}
                 <Link
                     className="link whitespace-nowrap"
@@ -38,7 +38,7 @@ function Ranklist({ ranklist, title, titleComponent }) {
             title={title}
             titleComponent={titleComponent}
             cls="overflow-hidden">
-            <div className="divide-y divide-default bg-grey-850">{rows}</div>
+            <div className="divide-y divide-dividecol bg-grey-850">{rows}</div>
         </RoundedFrame>
     );
 }

@@ -18,10 +18,10 @@ export function ProfilePictureFrame({ userData }) {
     return (
         <RoundedFrame>
             <div className="flex flex-col items-center p-8 pb-4">
-                <Link to={profileRoute} className="invert dark:invert-0">
+                <Link to={profileRoute}>
                     <img
                         alt="avatar"
-                        className="object-contain border border-default hover:border-grey-450 transition duration-200"
+                        className="object-contain border border-bordercol hover:border-grey-450"
                         src={userData.pictureSrc}
                     />
                 </Link>
@@ -31,7 +31,7 @@ export function ProfilePictureFrame({ userData }) {
                         to={profileRoute}>
                         {userData.username}
                     </Link>
-                    <span className="text-2xl font-semibold text-indigo-500 mx-2 invert dark:invert-0">
+                    <span className="text-2xl font-semibold text-indigo-500 mx-2">
                         &#8226;
                     </span>
                     <span className="truncate">{userData.rating}</span>
@@ -66,7 +66,7 @@ export function ProfileDataFrame({ userData }) {
 
 function SubmissionsFrame({ titleComponent, submissions }) {
     const rows = submissions.map((item, index) => (
-        <tr className="divide-x divide-default" key={index}>
+        <tr className="divide-x divide-dividecol" key={index}>
             <td className="padding-td-default">
                 <Link
                     className="link"
@@ -85,7 +85,7 @@ function SubmissionsFrame({ titleComponent, submissions }) {
     ));
     return (
         <RoundedTable titleComponent={titleComponent}>
-            <tbody className="divide-y divide-default">{rows}</tbody>
+            <tbody className="divide-y divide-dividecol">{rows}</tbody>
         </RoundedTable>
     );
 }

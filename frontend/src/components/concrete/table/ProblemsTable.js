@@ -23,7 +23,7 @@ function Problem(data) {
         </span>
     ));
     return (
-        <tr className={"divide-x divide-default"}>
+        <tr className={"divide-x divide-dividecol"}>
             {isLoggedIn && (
                 <td className="padding-td-default w-0">
                     <div className="flex items-center justify-center">
@@ -35,19 +35,19 @@ function Problem(data) {
                         )}
                         {solvedStatus === 1 && (
                             <SVGWrongSimple
-                                cls="w-5 h-5 text-red-500 shrink-0 invert dark:invert-0"
+                                cls="w-5 h-5 text-red-600 shrink-0"
                                 title={t("solved_status.wrong")}
                             />
                         )}
                         {solvedStatus === 2 && (
                             <SVGPartiallyCorrect
-                                cls="w-5 h-5 text-yellow-500 shrink-0 invert dark:invert-0"
+                                cls="w-5 h-5 text-yellow-600 shrink-0"
                                 title={t("solved_status.partially_correct")}
                             />
                         )}
                         {solvedStatus === 3 && (
                             <SVGCorrectSimple
-                                cls="w-5 h-5 text-green-500 shrink-0 invert dark:invert-0"
+                                cls="w-5 h-5 text-green-600 shrink-0"
                                 title={t("solved_status.correct")}
                             />
                         )}
@@ -94,7 +94,7 @@ function ProblemsTable({ problems }) {
     return (
         <RoundedTable>
             <thead className="bg-grey-800">
-                <tr className="divide-x divide-default">
+                <tr className="divide-x divide-dividecol">
                     <th
                         className="padding-td-default"
                         colSpan={isLoggedIn ? 2 : 1}>
@@ -114,7 +114,7 @@ function ProblemsTable({ problems }) {
                     </th>
                 </tr>
             </thead>
-            <tbody className="divide-y divide-default">{problemsContent}</tbody>
+            <tbody className="divide-y divide-dividecol">{problemsContent}</tbody>
         </RoundedTable>
     );
 }

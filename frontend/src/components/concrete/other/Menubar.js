@@ -41,7 +41,7 @@ function MenuOption({ label, route, selected, horizontal, onClick }) {
                     horizontal ? "border-b-3 pt-1" : "border-l-3 p-3"
                 } ${
                     selected
-                        ? "border-inv-indigo-500 dark:border-indigo-600 bg-grey-775"
+                        ? "border-indigo-600 bg-grey-775"
                         : "border-transparent hover:bg-grey-800"
                 }`}
                 to={route}>
@@ -56,7 +56,7 @@ function getProfileDropdownButton(isLoggedIn) {
         const { t } = useTranslation();
         return (
             <button
-                className={`border border-grey-675 rounded-tl-md rounded-bl-md flex items-center justify-between px-3 py-2 w-full h-full ${
+                className={`border border-bordercol rounded-tl-md rounded-bl-md flex items-center justify-between px-3 py-2 w-full h-full ${
                     isOpen
                         ? "bg-grey-775 hover:bg-grey-725"
                         : "bg-grey-850 hover:bg-grey-800"
@@ -106,7 +106,7 @@ function ProfileSettings() {
                 routes={profileRoutes}
                 routeLabels={profileRouteLabels.map(t)}
             />
-            <div className="px-3 flex items-center justify-center border border-l-0 border-grey-675">
+            <div className="px-3 flex items-center justify-center border border-l-0 border-bordercol">
                 <button
                     className={`px-2 ${
                         i18n.resolvedLanguage === "hu"
@@ -144,7 +144,7 @@ function ThemeButton() {
     };
     return (
         <button
-            className="border border-l-0 border-default p-2 rounded-r-md hover:bg-grey-800 transition duration-200"
+            className="border border-l-0 border-bordercol p-2 rounded-r-md hover:bg-grey-800"
             onClick={toggleTheme}>
             <FontAwesomeIcon
                 icon={theme === "light" ? faMoon : faSun}
@@ -188,14 +188,14 @@ function MenuSideBar({ selected, isOpen, onClose }) {
     return (
         <aside
             ref={menuRef}
-            className={`h-full z-10 pt-20 overflow-y-auto xl:hidden fixed right-0 bg-grey-825 border-l-1 border-default ${
+            className={`h-full z-10 pt-20 overflow-y-auto xl:hidden fixed right-0 bg-grey-825 border-l-1 border-bordercol ${
                 isOpen ? "w-80 opacity-100" : "w-0 opacity-0"
-            } ease-in-out transition-all duration-200 invert dark:invert-0`}>
+            } ease-in-out transition-width-opacity duration-200`}>
             <div className="flex flex-col justify-center">
                 <div className="w-full flex px-4 mb-4">
                     <ProfileSettings />
                 </div>
-                <ol className="divide-y divide-default border-t border-b border-grey-750">
+                <ol className="divide-y divide-dividecol border-t border-b border-grey-750">
                     {menuOptions}
                 </ol>
             </div>
@@ -217,7 +217,7 @@ function MenuTopBar({ selected, isOpen, onToggle }) {
         );
     });
     return (
-        <div className="z-20 flex justify-center bg-grey-825 border-b-1 border-grey-725 fixed w-full top-0 invert dark:invert-0">
+        <div className="z-20 flex justify-center bg-grey-825 border-b-1 border-grey-750 fixed w-full top-0">
             <div className="w-full max-w-7xl flex justify-between items-center">
                 <div className="flex w-full">
                     <Link to="/" className="font-semibold text-lg mx-8 my-4">
@@ -234,7 +234,7 @@ function MenuTopBar({ selected, isOpen, onToggle }) {
                     <button
                         id="menuButton"
                         aria-label="Open menu"
-                        className="flex items-center justify-center p-2 rounded-full hover:bg-grey-800 transition duration-200"
+                        className="flex items-center justify-center p-2 rounded-full hover:bg-grey-800"
                         onClick={() => onToggle(this)}>
                         {isOpen ? (
                             <FontAwesomeIcon

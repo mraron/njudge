@@ -35,15 +35,15 @@ function TextBox({
             <div
                 className={`border-b-1 ${
                     focused
-                        ? "border-inv-indigo-500 dark:border-indigo-600"
+                        ? "border-indigo-600"
                         : "border-transparent"
-                } w-full mt-1 transition duration-200`}>
+                } w-full mt-1`}>
                 <div
                     className={`border-b-1 ${
                         focused
-                            ? "border-inv-indigo-500 dark:border-indigo-600"
-                            : "border-grey-650"
-                    } w-full transition duration-200`}>
+                            ? "border-indigo-600"
+                            : "border-bordercol"
+                    } w-full`}>
                     <input
                         id={id}
                         type={type}
@@ -53,7 +53,7 @@ function TextBox({
                         onBlur={handleBlur}
                         className={`py-1.5 px-2 bg-grey-850 border border-b-0 ${
                             focused ? "border-grey-575" : "border-grey-650"
-                        } w-full outline-none transition-all duration-200`}
+                        } w-full outline-none`}
                     />
                 </div>
             </div>

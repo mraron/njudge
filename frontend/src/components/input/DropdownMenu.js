@@ -16,11 +16,11 @@ function DropdownItem({ name, onClick }) {
 function DefaultDropdownButton({ label, isOpen, onClick }) {
     return (
         <button
-            className={`w-full rounded-md px-3 py-2 border flex items-center justify-between ${
+            className={`w-full rounded-md px-3 py-2 border flex items-center justify-between border-bordercol ${
                 isOpen
-                    ? "bg-grey-770 hover:bg-grey-725 border-grey-650"
-                    : "bg-grey-850 hover:bg-grey-800 border-default"
-            } transition duration-150`}
+                    ? "bg-grey-775 hover:bg-grey-750"
+                    : "bg-grey-850 hover:bg-grey-825"
+            }`}
             onClick={onClick}>
             <span className="truncate">{label}</span>
             <SVGDropdownMenuArrow isOpen={isOpen} cls="shrink-0" />
@@ -76,11 +76,11 @@ function DropdownMenu({ initSelected, itemNames, button: Button, onChange }) {
             <div
                 className={`z-10 absolute overflow-hidden top-12 inset-x-0 ${
                     isOpen ? "max-h-60 opacity-100" : "max-h-0 opacity-0"
-                } transition-all duration-[250ms]`}>
+                } transition-height-opacity duration-[250ms]`}>
                 <div
-                    className={`rounded-md max-h-60 overflow-y-auto border-default border`}>
+                    className={`rounded-md max-h-60 overflow-y-auto border-bordercol border`}>
                     <ul
-                        className={`divide-y divide-default bg-grey-875 rounded-md`}>
+                        className={`divide-y divide-dividecol bg-grey-875 rounded-md`}>
                         {items}
                     </ul>
                 </div>

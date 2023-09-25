@@ -62,7 +62,8 @@
     },
     "devDependencies": {
         "prettier": "3.0.3",
-        "tailwindcss": "^3.3.3"
+        "tailwindcss": "^3.3.3",
+        "tw-colors": "^3.0.3"
     },
     "proxy": "http://localhost:5555"
 }

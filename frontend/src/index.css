@@ -2,34 +2,97 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    html[data-theme="dark"] {
+        --color-textcol: 232, 232, 232;
+        --color-inputfill: 55, 52, 60;
+        --color-grey-900: 8, 8, 8;
+        --color-grey-875: 15, 15, 15;
+        --color-grey-850: 22, 22, 22;
+        --color-grey-825: 29, 29, 29;
+        --color-grey-800: 36, 36, 36;
+        --color-grey-775: 43, 43, 43;
+        --color-grey-750: 50, 50, 50;
+        --color-grey-725: 57, 57, 57;
+        --color-grey-700: 64, 64, 64;
+        --color-grey-675: 71, 71, 71;
+        --color-grey-650: 78, 78, 78;
+        --color-grey-625: 85, 85, 85;
+        --color-grey-600: 92, 92, 92;
+        --color-grey-575: 99, 99, 99;
+        --color-grey-550: 106, 106, 106;
+        --color-grey-525: 113, 113, 113;
+        --color-grey-500: 120, 120, 120;
+        --color-grey-475: 127, 127, 127;
+        --color-grey-450: 134, 134, 134;
+        --color-grey-425: 141, 141, 141;
+        --color-grey-400: 148, 148, 148;
+        --color-grey-375: 155, 155, 155;
+        --color-grey-350: 162, 162, 162;
+        --color-grey-325: 169, 169, 169;
+        --color-grey-300: 176, 176, 176;
+        --color-grey-275: 183, 183, 183;
+        --color-grey-250: 190, 190, 190;
+        --color-grey-225: 197, 197, 197;
+        --color-grey-200: 204, 204, 204;
+        --color-grey-175: 211, 211, 211;
+        --color-grey-150: 218, 218, 218;
+        --color-grey-125: 225, 225, 225;
+        --color-grey-100: 232, 232, 232;
+        --color-dividecol: var(--color-grey-650);
+        --color-bordercol: var(--color-grey-675);
+    }
+    html[data-theme="light"] {
+        --color-textcol: 59, 59, 59;
+        --color-inputfill: 205, 202, 210;
+        --color-grey-100: 24, 24, 24;
+        --color-grey-125: 31, 31, 31;
+        --color-grey-150: 38, 38, 38;
+        --color-grey-175: 45, 45, 45;
+        --color-grey-200: 52, 52, 52;
+        --color-grey-225: 59, 59, 59;
+        --color-grey-250: 66, 66, 66;
+        --color-grey-275: 73, 73, 73;
+        --color-grey-300: 80, 80, 80;
+        --color-grey-325: 87, 87, 87;
+        --color-grey-350: 94, 94, 94;
+        --color-grey-375: 101, 101, 101;
+        --color-grey-400: 108, 108, 108;
+        --color-grey-425: 115, 115, 115;
+        --color-grey-450: 122, 122, 122;
+        --color-grey-475: 129, 129, 129;
+        --color-grey-500: 136, 136, 136;
+        --color-grey-525: 143, 143, 143;
+        --color-grey-550: 150, 150, 150;
+        --color-grey-575: 157, 157, 157;
+        --color-grey-600: 164, 164, 164;
+        --color-grey-625: 171, 171, 171;
+        --color-grey-650: 178, 178, 178;
+        --color-grey-675: 185, 185, 185;
+        --color-grey-700: 192, 192, 192;
+        --color-grey-725: 199, 199, 199;
+        --color-grey-750: 206, 206, 206;
+        --color-grey-775: 213, 213, 213;
+        --color-grey-800: 220, 220, 220;
+        --color-grey-825: 227, 227, 227;
+        --color-grey-850: 234, 234, 234;
+        --color-grey-875: 241, 241, 241;
+        --color-grey-900: 248, 248, 248;
+        --color-dividecol: var(--color-grey-650);
+        --color-bordercol: var(--color-grey-675);
+    }
+}
+
 @layer components {
     .rounded-frame {
-        @apply bg-grey-800 border border-default rounded-md flex w-full;
+        @apply bg-grey-800 border border-bordercol rounded-md flex w-full;
     }
     .link {
-        @apply cursor-pointer underline underline-offset-2 hover:text-inv-indigo-800 dark:hover:text-indigo-200 transition duration-200;
-    }
-    .border-default {
-        @apply border-grey-675;
-    }
-    .border-inv-default {
-        @apply border-grey-225;
+        @apply cursor-pointer underline underline-offset-2 hover:text-indigo-800 dark:hover:text-indigo-200;
     }
     .editor {
-        @apply border border-inv-default dark:border-default invert dark:invert-0;
+        @apply border border-bordercol;
     }
-}
-
-body {
-    @apply text-color-default bg-color-default;
-}
-
-.text-color-default {
-    @apply text-grey-200 dark:text-white;
-}
-
-.bg-color-default {
-    @apply bg-gray-50 dark:bg-grey-900;
 }
 
 .padding-btn-default {
@@ -40,32 +103,20 @@ body {
     @apply bg-grey-875;
 }
 
-.text-white {
-    @apply text-grey-125;
-}
-
 .btn-indigo {
-    @apply invert dark:invert-0 text-white text-sm font-medium text-black bg-indigo-600 rounded-md hover:bg-indigo-500 text-center;
+    @apply text-white text-sm font-medium bg-indigo-600 rounded-md hover:bg-indigo-500 text-center;
 }
 
 .btn-gray {
-    @apply text-sm dark:font-medium bg-grey-725 rounded-md hover:bg-grey-700 border border-default hover:border-grey-650 text-center;
+    @apply text-sm dark:font-medium bg-grey-725 rounded-md hover:bg-grey-700 border border-bordercol text-center;
 }
 
 .bg-code {
     @apply bg-grey-875;
 }
 
-.border-divide-col {
-    @apply border-grey-700;
-}
-
-.divide-default {
-    @apply divide-grey-700;
-}
-
 .date-label {
-    @apply cursor-pointer text-sm px-2 py-1 bg-grey-725 rounded border border-grey-650 hover:bg-grey-700 shrink-0 transition duration-200;
+    @apply cursor-pointer text-sm px-2 py-1 bg-grey-725 rounded border border-bordercol hover:bg-grey-700 shrink-0;
 }
 
 .padding-td-default {
@@ -92,7 +143,7 @@ th {
 }
 
 .tag {
-    @apply whitespace-nowrap cursor-pointer text-sm px-2 py-1 border rounded m-1 bg-grey-725 hover:bg-grey-700 border-grey-650 transition-all duration-200 truncate;
+    @apply whitespace-nowrap cursor-pointer text-sm px-2 py-1 border rounded m-1 bg-grey-725 hover:bg-grey-700 border-bordercol truncate;
 }
 
 html {
@@ -128,9 +179,9 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px #32303b inset !important;
+    -webkit-box-shadow: 0 0 0 30px rgb(var(--color-inputfill)) inset !important;
 }
 
 input:autofill {
-    background: #32303b; /* or any other */
+    background: rgb(var(--color-inputfill));
 }

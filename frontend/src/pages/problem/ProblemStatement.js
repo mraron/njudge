@@ -154,7 +154,7 @@ function ProblemLastSubmissions({ submissions, maxScore }) {
         />
     );
     const rows = submissions.map((item, index) => (
-        <tr className="divide-x divide-default" key={index}>
+        <tr className="divide-x divide-dividecol" key={index}>
             <td className="padding-td-default w-0">
                 <Link
                     className="link"
@@ -165,16 +165,16 @@ function ProblemLastSubmissions({ submissions, maxScore }) {
             <td className="padding-td-default" style={{ maxWidth: 100 }}>
                 <div className="flex items-center">
                     {item.verdictType === 0 && (
-                        <SVGSpinner cls="w-5 h-5 mr-2 shrink-0 invert dark:invert-0" />
+                        <SVGSpinner cls="w-5 h-5 mr-2 shrink-0" />
                     )}
                     {item.verdictType === 1 && (
-                        <SVGWrongSimple cls="w-5 h-5 text-red-500 mr-2 shrink-0 invert dark:invert-0" />
+                        <SVGWrongSimple cls="w-5 h-5 text-red-600 mr-2 shrink-0" />
                     )}
                     {item.verdictType === 2 && (
-                        <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-500 mr-2 shrink-0 invert dark:invert-0" />
+                        <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-600 mr-2 shrink-0" />
                     )}
                     {item.verdictType === 3 && (
-                        <SVGCorrectSimple cls="w-5 h-5 text-green-500 mr-2 shrink-0 invert dark:invert-0" />
+                        <SVGCorrectSimple cls="w-5 h-5 text-green-600 mr-2 shrink-0" />
                     )}
                     <span className="truncate">{item.verdictName}</span>
                 </div>
@@ -188,7 +188,7 @@ function ProblemLastSubmissions({ submissions, maxScore }) {
     ));
     return (
         <RoundedTable titleComponent={titleComponent}>
-            <tbody className="divide-y divide-default">{rows}</tbody>
+            <tbody className="divide-y divide-dividecol">{rows}</tbody>
         </RoundedTable>
     );
 }
@@ -293,14 +293,14 @@ function ProblemStatement({ data }) {
                             aria-label="Problem statement"
                             type="application/pdf"
                             width="100%"
-                            className="h-[36rem] lg:h-[52rem] border border-grey-300 dark:border-grey-600 invert dark:invert-0"></object>
+                            className="h-[36rem] lg:h-[52rem] border border-grey-600"></object>
                     )}
                     {statementType === "html" && (
                         <iframe
                             src={statementSrc}
                             width="100%"
                             title="Problem statement"
-                            className="h-[36rem] lg:h-[52rem] border border-grey-300 dark:border-grey-600 invert dark:invert-0"></iframe>
+                            className="h-[36rem] lg:h-[52rem] border border-grey-600"></iframe>
                     )}
                 </div>
             </div>

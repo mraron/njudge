@@ -7,7 +7,7 @@ function CopyableCommand({ text }) {
                 <CopyButton text={text} />
             </div>
             <div
-                className={`w-full code-default border border-default rounded-md flex items-center`}>
+                className={`w-full code-default border border-bordercol rounded-md flex items-center`}>
                 <div className="w-full px-3 py-2 font-mono whitespace-nowrap text-sm">
                     {text}
                 </div>
