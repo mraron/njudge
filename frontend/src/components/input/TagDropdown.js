@@ -13,12 +13,12 @@ function Tag({ title, onClick }) {
         <span
             className={`whitespace-nowrap flex items-center cursor-pointer text-sm px-2 py-1 border border-bordercol rounded m-1 hover:bg-grey-700 ${
                 hovered
-                    ? "text-white hover:bg-red-600 hover:border-red-500"
+                    ? "text-white hover:bg-red-500 dark:hover:bg-red-600 hover:border-transparent"
                     : "bg-grey-725"
             }`}>
             {title}
             <span
-                className={`ml-3 rounded-full p-1 hover:bg-red-800`}
+                className={`ml-3 rounded-full p-1 hover:bg-red-700 dark:hover:bg-red-800`}
                 onMouseOver={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
                 onClick={handleClick}>

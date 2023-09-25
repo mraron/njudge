@@ -41,6 +41,7 @@
         --color-grey-100: 232, 232, 232;
         --color-dividecol: var(--color-grey-650);
         --color-bordercol: var(--color-grey-675);
+        --color-codebgcol: var(--color-grey-875);
     }
     html[data-theme="light"] {
         --color-textcol: 59, 59, 59;
@@ -80,6 +81,7 @@
         --color-grey-900: 248, 248, 248;
         --color-dividecol: var(--color-grey-650);
         --color-bordercol: var(--color-grey-675);
+        --color-codebgcol: var(--color-grey-875);
     }
 }
 
@@ -103,20 +105,12 @@
     @apply px-6 py-2;
 }
 
-.code-default {
-    @apply bg-grey-875;
-}
-
 .btn-indigo {
     @apply text-white text-sm font-medium bg-indigo-600 rounded-md hover:bg-indigo-500 text-center;
 }
 
 .btn-gray {
     @apply text-sm dark:font-medium bg-grey-725 rounded-md hover:bg-grey-700 border border-bordercol text-center;
-}
-
-.bg-code {
-    @apply bg-grey-875;
 }
 
 .date-label {

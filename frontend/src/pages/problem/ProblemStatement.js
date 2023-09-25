@@ -268,10 +268,7 @@ function ProblemStatement({ data }) {
                         <div className="w-full px-4 py-3 sm:px-6 sm:py-5 flex">
                             <div className="w-full mr-3 min-w-0">
                                 <DropdownMenu
-                                    itemNames={[
-                                        "Hungarian (Tom és Jerry)",
-                                        "English (Tom and Jerry)",
-                                    ]}
+                                    itemNames={data.attachments.statements.map(item => item.name)}
                                     onChange={setStatementIndex}
                                 />
                             </div>

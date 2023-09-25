@@ -7,7 +7,7 @@ function CopyableCode({ text, maxHeight = "auto", titleComponent, cls }) {
             cls={`${cls} overflow-auto`}
             titleComponent={titleComponent}>
             <div
-                className="relative code-default flex"
+                className="relative bg-codebgcol flex"
                 style={{ minHeight: "3.75rem", maxHeight: maxHeight }}>
                 <pre className="w-full px-4 py-3 overflow-x-auto text-sm">
                     {text}
