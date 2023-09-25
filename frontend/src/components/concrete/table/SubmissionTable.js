@@ -193,8 +193,8 @@ function TestCase0({ testCase, index }) {
 }
 
 function SubmissionTable0({ status }) {
-    const testCases = status.groups[0].testCases;
-    const testCasesContent = testCases.map((testCase, index) => (
+    const testCases = status.groups?.[0].testCases;
+    const testCasesContent = testCases?.map((testCase, index) => (
         <div className="mb-3">
             <TestCase0 testCase={testCase} index={index} key={index} />
         </div>

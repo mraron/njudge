@@ -13,6 +13,7 @@ import UserContext from "../../contexts/user/UserContext";
 
 function PasswordChangeFrame() {
     const { t } = useTranslation();
+    const { user } = useParams();
     const [oldPw, setOldPw] = useState("");
     const [newPw, setNewPw] = useState("");
     const [newPwConfirm, setNewPwConfirm] = useState("");
@@ -26,7 +27,7 @@ function PasswordChangeFrame() {
         />
     );
     const handleChangePassword = async () => {
-        changePassword(oldPw, newPw, newPwConfirm).then((resp) => {
+        changePassword(user, oldPw, newPw, newPwConfirm).then((resp) => {
             if (resp.success) {
                 window.flash("flash.successful_password_change", "success");
             } else {
@@ -78,6 +79,7 @@ function PasswordChangeFrame() {
 
 function OtherSettingsFrame({ data }) {
     const { t } = useTranslation();
+    const { user } = useParams();
     const [showUnsolved, setShowUnsolved] = useState(data.showUnsolved);
     const [hideSolved, setHideSolved] = useState(data.hideSolved);
     const titleComponent = (
@@ -87,7 +89,7 @@ function OtherSettingsFrame({ data }) {
         />
     );
     const handleSaveSettings = async () => {
-        saveSettings(showUnsolved, hideSolved).then((resp) => {
+        saveSettings(user, showUnsolved, hideSolved).then((resp) => {
             if (resp.success) {
                 window.flash(t("flash.successful_settings_save"), "success");
             } else {

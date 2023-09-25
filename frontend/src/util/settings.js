@@ -1,4 +1,4 @@
-export async function saveSettings(showUnsolved, hideSolved) {
+export async function saveSettings(user, showUnsolved, hideSolved) {
     const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -8,14 +8,14 @@ export async function saveSettings(showUnsolved, hideSolved) {
         }),
     };
     const response = await fetch(
-        "/api/v2/user/profile/save_settings/other/",
+        `/api/v2/user/profile/${user}/settings/other/`,
         requestOptions,
     );
     const data = await response.json();
     return { ...data, success: response.ok };
 }
 
-export async function changePassword(oldPw, newPw, newPwConfirm) {
+export async function changePassword(user, oldPw, newPw, newPwConfirm) {
     const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -26,7 +26,7 @@ export async function changePassword(oldPw, newPw, newPwConfirm) {
         }),
     };
     const response = await fetch(
-        "/api/v2/user/profile/save_settings/change_password/",
+        `/api/v2/user/profile/${user}/settings/change_password/`,
         requestOptions,
     );
     const data = await response.json();
