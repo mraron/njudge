@@ -34,15 +34,11 @@ function TextBox({
             </label>
             <div
                 className={`border-b-1 ${
-                    focused
-                        ? "border-indigo-600"
-                        : "border-transparent"
+                    focused ? "border-indigo-600" : "border-transparent"
                 } w-full mt-1`}>
                 <div
                     className={`border-b-1 ${
-                        focused
-                            ? "border-indigo-600"
-                            : "border-bordercol"
+                        focused ? "border-indigo-600" : "border-bordercol"
                     } w-full`}>
                     <input
                         id={id}

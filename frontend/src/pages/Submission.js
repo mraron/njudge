@@ -17,9 +17,7 @@ function CompileErrorFrame({ message }) {
     const titleComponent = (
         <SVGTitleComponent
             title={t("submission.compilation_error")}
-            svg={
-                <SVGWrongSimple cls="w-6 h-6 mr-2 text-red-600" />
-            }
+            svg={<SVGWrongSimple cls="w-6 h-6 mr-2 text-red-600" />}
         />
     );
 

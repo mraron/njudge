@@ -114,7 +114,9 @@ function ProblemsTable({ problems }) {
                     </th>
                 </tr>
             </thead>
-            <tbody className="divide-y divide-dividecol">{problemsContent}</tbody>
+            <tbody className="divide-y divide-dividecol">
+                {problemsContent}
+            </tbody>
         </RoundedTable>
     );
 }

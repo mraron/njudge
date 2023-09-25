@@ -16,15 +16,15 @@ function ThemeProvider({ children }) {
             return;
         }
         setTheme(newTheme);
-        const doc = document.documentElement
+        const doc = document.documentElement;
         if (newTheme !== "light") {
-            doc.classList.remove("light")
+            doc.classList.remove("light");
         }
         if (newTheme !== "dark") {
-            doc.classList.remove("dark")
+            doc.classList.remove("dark");
         }
-        doc.setAttribute("data-theme", newTheme)
-        doc.classList.add(newTheme)
+        doc.setAttribute("data-theme", newTheme);
+        doc.classList.add(newTheme);
         localStorage.setItem("theme", newTheme);
     };
     return (

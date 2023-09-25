@@ -16,17 +16,13 @@ function ProfileMain({ data }) {
     const { t } = useTranslation();
     const titleComponentCorrect = (
         <SVGTitleComponent
-            svg={
-                <SVGCorrectSimple cls="w-6 h-6 text-green-600 mr-2" />
-            }
+            svg={<SVGCorrectSimple cls="w-6 h-6 text-green-600 mr-2" />}
             title={t("profile_main.solved_problems")}
         />
     );
     const titleComponentWrong = (
         <SVGTitleComponent
-            svg={
-                <SVGWrongSimple cls="w-6 h-6 text-red-600 mr-2" />
-            }
+            svg={<SVGWrongSimple cls="w-6 h-6 text-red-600 mr-2" />}
             title={t("profile_main.unsolved_problems")}
         />
     );

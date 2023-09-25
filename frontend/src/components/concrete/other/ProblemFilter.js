@@ -17,25 +17,32 @@ function ProblemFilter() {
     const navigate = useNavigate();
 
     const parseTitle = (title) => {
-        return title? title: ""
-    }
+        return title ? title : "";
+    };
     const parseCategory = (category) => {
         if (category === undefined) {
-            return -1
+            return -1;
         }
-        const categoryInt = parseInt(category)
-        return judgeData.categories.findIndex(item => item.value === categoryInt)
-    }
+        const categoryInt = parseInt(category);
+        return judgeData.categories.findIndex(
+            (item) => item.value === categoryInt,
+        );
+    };
     const parseTags = (tags) => {
         if (tags === undefined) {
-            return []
+            return [];
         }
-        const tokens = tags.split(",").map(parseInt)
-        if (tokens.some(elem => isNaN(elem) || elem <= -1 || elem >= judgeData.tags.length)) {
-            return []
+        const tokens = tags.split(",").map(parseInt);
+        if (
+            tokens.some(
+                (elem) =>
+                    isNaN(elem) || elem <= -1 || elem >= judgeData.tags.length,
+            )
+        ) {
+            return [];
         }
-        return tokens
-    }
+        return tokens;
+    };
     const qData = queryString.parse(location.search);
     const [title, setTitle] = useState(parseTitle(qData.title));
     const [tags, setTags] = useState(parseTags(qData.tags));
@@ -58,9 +65,7 @@ function ProblemFilter() {
             [
                 title,
                 tags.join(","),
-                category === -1
-                    ? -1
-                    : judgeData.categories[category].value,
+                category === -1 ? -1 : judgeData.categories[category].value,
             ],
             ["title", "tags", "category"],
             null,
@@ -97,10 +102,14 @@ function ProblemFilter() {
                 <TextBoxDropdown
                     id="filterCategory"
                     label={t("problem_filter.category")}
-                    initText={category === -1? "": judgeData.categories[category].label}
+                    initText={
+                        category === -1
+                            ? ""
+                            : judgeData.categories[category].label
+                    }
                     initSelected={category}
                     fillSelected={true}
-                    itemNames={judgeData.categories.map(x => x.label)}
+                    itemNames={judgeData.categories.map((x) => x.label)}
                     onChange={handleCategoryChange}
                 />
             </div>

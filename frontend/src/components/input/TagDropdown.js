@@ -34,18 +34,20 @@ function TagDropdown({ id, label, itemNames, initTags = [], onChange }) {
 
     const tagsContent = tags.map((tag, index) => {
         const handleRemoveTag = () => {
-            setTags(prevTags =>
-                prevTags.filter(prevTag => prevTag !== tag),
+            setTags((prevTags) =>
+                prevTags.filter((prevTag) => prevTag !== tag),
             );
         };
-        return <Tag title={itemNames[tag]} onClick={handleRemoveTag} key={index} />;
+        return (
+            <Tag title={itemNames[tag]} onClick={handleRemoveTag} key={index} />
+        );
     });
     const handleAddTag = (selected, title) => {
         const remaining = _.range(itemNames.length).filter(
-            index => !tags.includes(index),
-        )
-        const tag = remaining[selected]
-        setTags(prevTags =>
+            (index) => !tags.includes(index),
+        );
+        const tag = remaining[selected];
+        setTags((prevTags) =>
             prevTags.includes(tag) ? prevTags : [...prevTags, tag],
         );
     };
