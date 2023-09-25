@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/mraron/njudge/internal/web/handlers/problemset"
 	"github.com/mraron/njudge/internal/web/helpers/ui"
+	"github.com/mraron/njudge/pkg/problems"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/net/context"
@@ -12,8 +13,6 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
-	"github.com/mraron/njudge/internal/web/domain/submission"
-	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
 	"github.com/mraron/njudge/internal/web/models"
@@ -104,7 +103,7 @@ func GetProfile(DB *sqlx.DB) echo.HandlerFunc {
 	}
 }
 
-func GetSubmissions(statusPageService services.StatusPageService) echo.HandlerFunc {
+func GetSubmissions(DB *sqlx.DB, problemStore problems.Store, statusPageService services.StatusPageService) echo.HandlerFunc {
 	type request struct {
 		Page int `query:"page"`
 	}
@@ -137,11 +136,19 @@ func GetSubmissions(statusPageService services.StatusPageService) echo.HandlerFu
 			return err
 		}
 
-		c.Set("title", tr.Translate("%s's submissions", u.Name))
-		return c.Render(http.StatusOK, "user/profile/submissions", struct {
-			User       *models.User
-			StatusPage *submission.StatusPage
-		}{u, statusPage})
+		statusRows := make([]*problemset.StatusRow, len(statusPage.Submissions))
+		for i := range statusPage.Submissions {
+			sub := &statusPage.Submissions[i]
+			if statusRows[i], err = problemset.StatusRowFromSubmission(c.Request().Context(), DB.DB,
+				problemStore, tr, sub); err != nil {
+				return err
+			}
+		}
+
+		return c.JSON(http.StatusOK, struct {
+			PaginationData pagination.Data         `json:"paginationData"`
+			Submissions    []*problemset.StatusRow `json:"submissions"`
+		}{statusPage.PaginationData, statusRows})
 	}
 }
 
@@ -149,18 +156,20 @@ func GetSettings(DB *sqlx.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		u := c.Get("user").(*models.User)
 
-		helpers.DeleteFlash(c, "ChangePassword")
-		return c.Render(http.StatusOK, "user/profile/settings", struct {
-			User *models.User
-		}{u})
+		return c.JSON(http.StatusOK, struct {
+			ShowUnsolved bool `json:"showUnsolved"`
+		}{u.ShowUnsolvedTags})
 	}
 }
 
 func PostSettingsChangePassword(DB *sqlx.DB) echo.HandlerFunc {
 	type request struct {
-		PasswordOld  string `form:"passwordOld"`
-		PasswordNew1 string `form:"passwordNew1"`
-		PasswordNew2 string `form:"passwordNew2"`
+		PasswordOld  string `json:"oldPw"`
+		PasswordNew1 string `json:"newPw"`
+		PasswordNew2 string `json:"newPwConfirm"`
+	}
+	type response struct {
+		Message string `json:"message"`
 	}
 	return func(c echo.Context) error {
 		tr := c.Get("translator").(i18n.Translator)
@@ -172,18 +181,21 @@ func PostSettingsChangePassword(DB *sqlx.DB) echo.HandlerFunc {
 		}
 
 		if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(data.PasswordOld)); err != nil {
-			helpers.SetFlash(c, "ChangePassword", tr.Translate("Wrong old password."))
-			return c.Redirect(http.StatusFound, "../")
+			return c.JSON(http.StatusUnprocessableEntity, response{
+				Message: tr.Translate("Wrong old password."),
+			})
 		}
 
 		if len(data.PasswordNew1) == 0 {
-			helpers.SetFlash(c, "ChangePassword", tr.Translate("It's required to give a new password."))
-			return c.Redirect(http.StatusFound, "../")
+			return c.JSON(http.StatusUnprocessableEntity, response{
+				Message: tr.Translate("It's required to give a new password."),
+			})
 		}
 
 		if data.PasswordNew1 != data.PasswordNew2 {
-			helpers.SetFlash(c, "ChangePassword", tr.Translate("The two given passwords doesn't match."))
-			return c.Redirect(http.StatusFound, "../")
+			return c.JSON(http.StatusUnprocessableEntity, response{
+				Message: tr.Translate("The two given passwords doesn't match."),
+			})
 		}
 
 		res, err := bcrypt.GenerateFromPassword([]byte(data.PasswordNew1), bcrypt.DefaultCost)
@@ -196,15 +208,13 @@ func PostSettingsChangePassword(DB *sqlx.DB) echo.HandlerFunc {
 			return err
 		}
 
-		return c.Redirect(http.StatusFound, "../")
+		return c.JSON(http.StatusOK, "")
 	}
 }
 
 func PostSettingsMisc(DB *sqlx.DB) echo.HandlerFunc {
 	type request struct {
-		ShowTagsForUnsolved string `form:"showTagsForUnsolved"`
-
-		ShowTagsForUnsolvedBool bool
+		ShowTagsForUnsolved bool `json:"showUnsolved"`
 	}
 	return func(c echo.Context) error {
 		u := c.Get("user").(*models.User)
@@ -213,11 +223,8 @@ func PostSettingsMisc(DB *sqlx.DB) echo.HandlerFunc {
 		if err := c.Bind(&data); err != nil {
 			return err
 		}
-		if data.ShowTagsForUnsolved == "true" {
-			data.ShowTagsForUnsolvedBool = true
-		}
 
-		u.ShowUnsolvedTags = data.ShowTagsForUnsolvedBool
+		u.ShowUnsolvedTags = data.ShowTagsForUnsolved
 		if _, err := u.Update(c.Request().Context(), DB, boil.Whitelist(models.UserColumns.ShowUnsolvedTags)); err != nil {
 			return err
 		}

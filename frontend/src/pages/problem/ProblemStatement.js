@@ -197,9 +197,9 @@ function ProblemAttachment({ type, name, href }) {
     const { t } = useTranslation();
     return (
         <li>
-            <Link
+            <a
                 className="link no-underline flex items-start my-0.5"
-                to={href}>
+                href={`http://localhost:5555${href}`} download>
                 {type === "file" && (
                     <SVGAttachmentFile cls="w-5 h-5 mr-2 shrink-0" />
                 )}
@@ -212,7 +212,7 @@ function ProblemAttachment({ type, name, href }) {
                         : t("problem_statement.file")}
                     &nbsp;({name})
                 </span>
-            </Link>
+            </a>
         </li>
     );
 }

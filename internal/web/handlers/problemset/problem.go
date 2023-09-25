@@ -63,20 +63,27 @@ type ProblemAttachment struct {
 	Href string `json:"href"`
 }
 
-func ProblemAttachmentsFromProblem(tr i18n.Translator, prob problem.Problem) []ProblemAttachment {
-	res := make([]ProblemAttachment, 0)
+type ProblemAttachmentData struct {
+	Statements []ProblemAttachment `json:"statements"`
+	Files      []ProblemAttachment `json:"files"`
+}
+
+func ProblemAttachmentDataFromProblem(tr i18n.Translator, ps, probName string, prob problem.Problem) ProblemAttachmentData {
+	res := ProblemAttachmentData{
+		Statements: make([]ProblemAttachment, 0),
+		Files:      make([]ProblemAttachment, 0),
+	}
 	for _, pdf := range prob.Problem.Statements().FilterByType(problems.DataTypePDF) {
-		res = append(res, ProblemAttachment{
-			Type: "statement",
+		res.Statements = append(res.Statements, ProblemAttachment{
 			Name: pdf.Locale(),
-			Href: "#",
+			Type: "pdf",
+			Href: fmt.Sprintf("/api/v2/problemset/%s/%s/pdf/%s/", ps, probName, pdf.Locale()),
 		})
 	}
 	for _, elem := range prob.Attachments() {
-		res = append(res, ProblemAttachment{
-			Type: "file",
+		res.Files = append(res.Files, ProblemAttachment{
 			Name: elem.Name(),
-			Href: "#",
+			Href: fmt.Sprintf("/api/v2/problemset/%s/%s/attachment/%s/", ps, probName, elem.Name()),
 		})
 	}
 	return res
@@ -93,14 +100,14 @@ func GetProblem(DB *sqlx.DB) echo.HandlerFunc {
 			return err
 		}
 
-		pattachs := ProblemAttachmentsFromProblem(tr, prob)
+		pdata := ProblemAttachmentDataFromProblem(tr, c.Param("name"), c.Param("problem"), prob)
 
 		return c.JSON(http.StatusOK, struct {
-			Info        ProblemInfo         `json:"info"`
-			Attachments []ProblemAttachment `json:"attachments"`
+			Info        ProblemInfo           `json:"info"`
+			Attachments ProblemAttachmentData `json:"attachments"`
 		}{
 			*pinfo,
-			pattachs,
+			pdata,
 		})
 	}
 }

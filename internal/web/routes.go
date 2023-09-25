@@ -57,8 +57,8 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	//psProb.GET("/ranklist", problemset.GetProblemRanklist(s.DB))
 	psProb.POST("/tags", problemset.PostProblemTag(services.NewSQLTagsService(s.DB.DB)))
 	psProb.GET("/delete_tag/:id", problemset.DeleteProblemTag(services.NewSQLTagsService(s.DB.DB)))
-	psProb.GET("/pdf/:language/", problemset.GetProblemPDF())
-	psProb.GET("/attachment/:attachment/", problemset.GetProblemAttachment())
+	//psProb.GET("/pdf/:language/", problemset.GetProblemPDF())
+	//psProb.GET("/attachment/:attachment/", problemset.GetProblemAttachment())
 	psProb.GET("/:file", problemset.GetProblemFile())
 
 	u := e.Group("/user")
@@ -81,12 +81,12 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 
 	pr := u.Group("/profile", profile.SetProfileMiddleware(s.DB))
 	//pr.GET("/:name/", profile.GetProfile(s.DB))
-	pr.GET("/:name/submissions/", profile.GetSubmissions(services.NewSQLStatusPageService(s.DB.DB)))
+	//pr.GET("/:name/submissions/", profile.GetSubmissions(services.NewSQLStatusPageService(s.DB.DB)))
 
-	prs := pr.Group("/:name/settings", user.RequireLoginMiddleware(), profile.PrivateMiddleware())
-	prs.GET("/", profile.GetSettings(s.DB))
-	prs.POST("/change_password/", profile.PostSettingsChangePassword(s.DB))
-	prs.POST("/misc/", profile.PostSettingsMisc(s.DB))
+	_ = pr.Group("/:name/settings", user.RequireLoginMiddleware(), profile.PrivateMiddleware())
+	//prs.GET("/", profile.GetSettings(s.DB))
+	//prs.POST("/change_password/", profile.PostSettingsChangePassword(s.DB))
+	//prs.POST("/misc/", profile.PostSettingsMisc(s.DB))
 
 	apiGroup := e.Group("/api")
 
@@ -109,6 +109,12 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 
 		pr := u.Group("/profile", profile.SetProfileMiddleware(s.DB))
 		pr.GET("/:name/", profile.GetProfile(s.DB))
+		pr.GET("/:name/submissions/", profile.GetSubmissions(s.DB, s.ProblemStore, services.NewSQLStatusPageService(s.DB.DB)))
+
+		prs := pr.Group("/:name/settings", user.RequireLoginMiddleware(), profile.PrivateMiddleware())
+		prs.GET("/", profile.GetSettings(s.DB))
+		prs.POST("/change_password/", profile.PostSettingsChangePassword(s.DB))
+		prs.POST("/other/", profile.PostSettingsMisc(s.DB))
 
 		u.GET("/auth/", func(c echo.Context) error {
 
@@ -143,6 +149,8 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 		psProb.GET("/", problemset.GetProblem(s.DB))
 		psProb.GET("/submissions/", problemset.GetProblemStatus(s.DB, s.ProblemStore, services.NewSQLStatusPageService(s.DB.DB)))
 		psProb.GET("/ranklist/", problemset.GetProblemRanklist(s.DB))
+		psProb.GET("/pdf/:language/", problemset.GetProblemPDF())
+		psProb.GET("/attachment/:attachment/", problemset.GetProblemAttachment())
 
 		v2.GET("/submission/:id/", handlers.GetSubmission(s.DB, s.ProblemStore, services.NewSQLSubmission(s.DB.DB))).Name = "getSubmission"
 
