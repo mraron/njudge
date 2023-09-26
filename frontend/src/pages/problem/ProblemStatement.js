@@ -189,7 +189,7 @@ function ProblemLastSubmissions({ submissions, maxScore }) {
             <td className="padding-td-default" style={{ maxWidth: 100 }}>
                 <div className="flex items-center">
                     {item.verdictType === 0 && (
-                        <SVGSpinner cls="w-4 h-4 mr-3 shrink-0" />
+                        <SVGSpinner cls="w-4 h-4 shrink-0 mr-3" />
                     )}
                     {item.verdictType === 1 && (
                         <FontAwesomeIcon

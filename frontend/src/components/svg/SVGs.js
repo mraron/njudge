@@ -98,7 +98,7 @@ export function SVGSpinner({ cls = null }) {
     return (
         <svg
             className={`${cls} text-grey-700 animate-spin-slow fill-indigo-600`}
-            viewBox="-6 -6 112 113"
+            viewBox="0 0 100 101"
             fill="none"
             xmlns="http://www.w3.org/2000/svg">
             <path

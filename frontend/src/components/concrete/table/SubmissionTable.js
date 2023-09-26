@@ -38,7 +38,7 @@ function TestCase13({
                                     />
                                 )}
                                 {!group.failed && !group.completed && (
-                                    <SVGSpinner cls="w-7 h-7" />
+                                    <SVGSpinner cls="w-6 h-6" />
                                 )}
                             </div>
                             {group.name}
@@ -61,7 +61,7 @@ function TestCase13({
                     colSpan={2}>
                     <div className="flex">
                         {testCase.verdictType === 0 && (
-                            <SVGSpinner cls="w-5 h-5 mr-2 shrink-0" />
+                            <SVGSpinner cls="w-4 h-4 shrink-0 mr-2" />
                         )}
                         {testCase.verdictType === 1 && (
                             <FontAwesomeIcon
@@ -140,7 +140,7 @@ function TestCase0({ testCase, index }) {
     const titleComponent = (
         <div className="py-3 px-5 border-b border-bordercol flex items-center text-table">
             {testCase.verdictType === 0 && (
-                <SVGSpinner cls="mr-3 w-6 h-6 shrink-0" />
+                <SVGSpinner cls="w-5 h-5 shrink-0 mr-3" />
             )}
             {testCase.verdictType === 1 && (
                 <FontAwesomeIcon
