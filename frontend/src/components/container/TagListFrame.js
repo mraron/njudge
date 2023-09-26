@@ -12,7 +12,7 @@ export function LinkTag({ data }) {
     return (
         <Link
             to={data.href}
-            className="w-28 text-center truncate whitespace-nowrap cursor-pointer text-sm px-2 py-1 border border-bordercol rounded bg-grey-725 hover:bg-indigo-200 hover:border-indigo-300 dark:hover:bg-indigo-600 dark:hover:border-transparent">
+            className="w-28 tag text-center hover:bg-indigo-200 hover:border-indigo-300 dark:hover:bg-indigo-600 dark:hover:border-transparent">
             {t(data.text)}
         </Link>
     );

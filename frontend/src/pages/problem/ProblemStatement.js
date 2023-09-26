@@ -200,13 +200,13 @@ function ProblemLastSubmissions({ submissions, maxScore }) {
                     {item.verdictType === 2 && (
                         <FontAwesomeIcon
                             icon="fa-check"
-                            className="w-4 h-4 highlight-green mr-2"
+                            className="w-4 h-4 highlight-yellow mr-2"
                         />
                     )}
                     {item.verdictType === 3 && (
                         <FontAwesomeIcon
                             icon="fa-check"
-                            className="w-4 h-4 highlight-yellow mr-2"
+                            className="w-4 h-4 highlight-green mr-2"
                         />
                     )}
                     <span className="truncate">{item.verdictName}</span>

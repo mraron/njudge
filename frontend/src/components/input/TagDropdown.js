@@ -18,7 +18,7 @@ function Tag({ title, onClick }) {
             }`}>
             {title}
             <span
-                className={`relative ml-3 rounded-full w-5 h-5 hover:bg-red-700 dark:hover:bg-red-800`}
+                className={`relative ml-3 rounded-full w-[1.1rem] h-[1.1rem] hover:bg-red-700 dark:hover:bg-red-800`}
                 onMouseOver={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
                 onClick={handleClick}>
