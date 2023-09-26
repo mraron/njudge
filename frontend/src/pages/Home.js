@@ -1,4 +1,3 @@
-import { SVGSpinner } from "../components/svg/SVGs";
 import ProfileSideBar from "../components/concrete/other/ProfileSidebar";
 import PostFrame from "../components/container/PostFrame";
 

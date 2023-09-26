@@ -1,15 +1,10 @@
 import { useTranslation } from "react-i18next";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RoundedTable from "../../container/RoundedTable";
-import {
-    SVGClock,
-    SVGCorrectSimple,
-    SVGHDD,
-    SVGPartiallyCorrect,
-    SVGSpinner,
-    SVGWrongSimple,
-} from "../../svg/SVGs";
+import { SVGSpinner } from "../../svg/SVGs";
 import RoundedFrame from "../../container/RoundedFrame";
 import CopyableCode from "../../util/copy/CopyableCode";
+import React from "react";
 
 function TestCase13({
     index,
@@ -31,10 +26,16 @@ function TestCase13({
                         <div className="flex flex-col justify-center">
                             <div className="flex items-center justify-center mb-2">
                                 {group.failed && (
-                                    <SVGWrongSimple cls="w-7 h-7 text-red-600" />
+                                    <FontAwesomeIcon
+                                        icon="fa-xmark"
+                                        className="w-6 h-6 highlight-red"
+                                    />
                                 )}
                                 {!group.failed && group.completed && (
-                                    <SVGCorrectSimple cls="w-7 h-7 text-green-600" />
+                                    <FontAwesomeIcon
+                                        icon="fa-check"
+                                        className="w-6 h-6 highlight-green"
+                                    />
                                 )}
                                 {!group.failed && !group.completed && (
                                     <SVGSpinner cls="w-7 h-7" />
@@ -63,13 +64,22 @@ function TestCase13({
                             <SVGSpinner cls="w-5 h-5 mr-2 shrink-0" />
                         )}
                         {testCase.verdictType === 1 && (
-                            <SVGWrongSimple cls="w-5 h-5 text-red-600 mr-2 shrink-0" />
+                            <FontAwesomeIcon
+                                icon="fa-xmark"
+                                className="w-4 h-4 highlight-red mr-2"
+                            />
                         )}
                         {testCase.verdictType === 2 && (
-                            <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-600 mr-2 shrink-0" />
+                            <FontAwesomeIcon
+                                icon="fa-check"
+                                className="w-4 h-4 highlight-yellow mr-2"
+                            />
                         )}
                         {testCase.verdictType === 3 && (
-                            <SVGCorrectSimple cls="w-5 h-5 text-green-600 mr-2 shrink-0" />
+                            <FontAwesomeIcon
+                                icon="fa-check"
+                                className="w-4 h-4 highlight-green mr-2"
+                            />
                         )}
                         <span className="whitespace-nowrap">
                             {testCase.verdictName}
@@ -82,7 +92,10 @@ function TestCase13({
                     <td
                         className={`padding-td-default border border-t-0 border-dividecol ${bottomBorderCase}`}>
                         <div className="flex items-center">
-                            <SVGWrongSimple cls="mr-2 w-5 h-5 text-red-600" />
+                            <FontAwesomeIcon
+                                icon="fa-xmark"
+                                className="w-4 h-4 highlight-red mr-2"
+                            />
                             <span className="whitespace-nowrap">
                                 {testCase.verdictName}
                             </span>
@@ -130,13 +143,22 @@ function TestCase0({ testCase, index }) {
                 <SVGSpinner cls="mr-3 w-6 h-6 shrink-0" />
             )}
             {testCase.verdictType === 1 && (
-                <SVGWrongSimple cls="mr-3 w-6 h-6 text-red-600 shrink-0" />
+                <FontAwesomeIcon
+                    icon="fa-xmark"
+                    className="w-5 h-5 highlight-red mr-3"
+                />
             )}
             {testCase.verdictType === 2 && (
-                <SVGPartiallyCorrect cls="mr-3 w-6 h-6 text-yellow-600 shrink-0" />
+                <FontAwesomeIcon
+                    icon="fa-check"
+                    className="w-5 h-5 highlight-yellow mr-3"
+                />
             )}
             {testCase.verdictType === 3 && (
-                <SVGCorrectSimple cls="mr-3 w-6 h-6 text-green-600 shrink-0" />
+                <FontAwesomeIcon
+                    icon="fa-check"
+                    className="w-5 h-5 highlight-green mr-3"
+                />
             )}
             <span>{index + 1}</span>
             <span className="mx-2">–</span>
@@ -167,14 +189,20 @@ function TestCase0({ testCase, index }) {
         <RoundedFrame cls="overflow-hidden" titleComponent={titleComponent}>
             <div className="py-3 px-5 flex justify-between border-b border-bordercol">
                 <div className="mr-2 whitespace-nowrap truncate flex items-center">
-                    <SVGClock cls="w-5 h-5 mr-2" />
+                    <FontAwesomeIcon
+                        icon="fa-regular fa-clock"
+                        className="w-4 h-4 mr-2"
+                    />
                     <span className="hidden sm:inline">
                         {t("submission_table.time")}:&nbsp;
                     </span>
                     <span>{testCase.timeSpent}</span>
                 </div>
                 <div className="ml-2 whitespace-nowrap truncate flex items-center">
-                    <SVGHDD cls="w-5 h-5 mr-2" />
+                    <FontAwesomeIcon
+                        icon="fa-regular fa-hdd"
+                        className="w-4 h-4 mr-2"
+                    />
                     <span className="hidden sm:inline">
                         {t("submission_table.memory")}:&nbsp;
                     </span>

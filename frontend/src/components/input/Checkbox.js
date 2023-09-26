@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SVGCheckmark } from "../svg/SVGs";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function Checkbox({ id, label, initChecked, onChange }) {
     const [checked, setChecked] = useState(initChecked);
@@ -26,8 +26,9 @@ function Checkbox({ id, label, initChecked, onChange }) {
                               hovered ? "bg-grey-825" : "bg-grey-850"
                           } border-bordercol`
                 } w-5 h-5 rounded-sm`}>
-                <SVGCheckmark
-                    cls={`w-3.5 h-3.5 text-white ${
+                <FontAwesomeIcon
+                    icon="fa-check"
+                    className={`w-3.5 h-3.5 text-white ${
                         checked ? "opacity-100" : "opacity-0"
                     }`}
                 />

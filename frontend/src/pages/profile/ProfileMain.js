@@ -1,12 +1,11 @@
 import { useTranslation } from "react-i18next";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import SVGTitleComponent from "../../components/svg/SVGTitleComponent";
 import TagListFrame, { LinkTag } from "../../components/container/TagListFrame";
-import { SVGCorrectSimple, SVGWrongSimple } from "../../components/svg/SVGs";
 import {
     ProfileDataFrame,
     ProfilePictureFrame,
 } from "../../components/concrete/other/ProfileSidebar";
-import { routeMap } from "../../config/RouteConfig";
 
 // const makeProblemLink = (problem) => {
 //     return {"text": problem, "href": routeMap.problem.replace(":problem", problem)}
@@ -16,13 +15,23 @@ function ProfileMain({ data }) {
     const { t } = useTranslation();
     const titleComponentCorrect = (
         <SVGTitleComponent
-            svg={<SVGCorrectSimple cls="w-6 h-6 text-green-600 mr-2" />}
+            svg={
+                <FontAwesomeIcon
+                    icon="fa-check"
+                    className="w-5 h-5 highlight-green mr-3"
+                />
+            }
             title={t("profile_main.solved_problems")}
         />
     );
     const titleComponentWrong = (
         <SVGTitleComponent
-            svg={<SVGWrongSimple cls="w-6 h-6 text-red-600 mr-2" />}
+            svg={
+                <FontAwesomeIcon
+                    icon="fa-xmark"
+                    className="w-5 h-5 highlight-red mr-3"
+                />
+            }
             title={t("profile_main.unsolved_problems")}
         />
     );

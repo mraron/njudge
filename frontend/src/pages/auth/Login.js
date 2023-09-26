@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { SVGAvatar, SVGGoogle } from "../../components/svg/SVGs";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RoundedFrame from "../../components/container/RoundedFrame";
 import TextBox from "../../components/input/TextBox";
 import SVGTitleComponent from "../../components/svg/SVGTitleComponent";
@@ -16,7 +16,7 @@ function LoginFrame() {
     const [password, setPassword] = useState("");
     const titleComponent = (
         <SVGTitleComponent
-            svg={<SVGAvatar cls="w-5 h-5 mr-2" />}
+            svg={<FontAwesomeIcon icon="fa-sign-in" className="w-5 h-5 mr-3" />}
             title={t("login.login")}
         />
     );
@@ -59,13 +59,8 @@ function LoginFrame() {
                             onClick={handleLogin}>
                             {t("login.login")}
                         </button>
-                        <button className="relative btn-gray padding-btn-default flex items-center justify-between w-1/2">
-                            <div className="h-full flex items-center absolute left-2.5">
-                                <SVGGoogle />
-                            </div>
-                            <div className="w-full flex justify-center">
-                                <span>Google</span>
-                            </div>
+                        <button className="btn-gray padding-btn-default flex items-center justify-center w-1/2">
+                            Google
                         </button>
                     </div>
                 </div>

@@ -1,14 +1,10 @@
 import RoundedTable from "../../container/RoundedTable";
-import {
-    SVGCorrectSimple,
-    SVGPartiallyCorrect,
-    SVGSpinner,
-    SVGWrongSimple,
-} from "../../svg/SVGs";
+import { SVGSpinner } from "../../svg/SVGs";
 import { Link } from "react-router-dom";
 import { routeMap } from "../../../config/RouteConfig";
 import { useTranslation } from "react-i18next";
 import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function Submission({ submission }) {
     const {
@@ -56,13 +52,22 @@ function Submission({ submission }) {
                         <SVGSpinner cls="w-5 h-5 mr-2 shrink-0" />
                     )}
                     {verdictType === 1 && (
-                        <SVGWrongSimple cls="w-5 h-5 text-red-600 mr-2 shrink-0" />
+                        <FontAwesomeIcon
+                            icon="fa-xmark"
+                            className="w-4 h-4 highlight-red mr-2"
+                        />
                     )}
                     {verdictType === 2 && (
-                        <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-600 mr-2 shrink-0" />
+                        <FontAwesomeIcon
+                            icon="fa-check"
+                            className="w-4 h-4 highlight-yellow mr-2"
+                        />
                     )}
                     {verdictType === 3 && (
-                        <SVGCorrectSimple cls="w-5 h-5 text-green-600 mr-2 shrink-0" />
+                        <FontAwesomeIcon
+                            icon="fa-check"
+                            className="w-4 h-4 highlight-green mr-2"
+                        />
                     )}
                     <span className="whitespace-nowrap">{verdictName}</span>
                 </div>

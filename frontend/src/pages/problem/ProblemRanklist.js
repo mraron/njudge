@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { SVGResults } from "../../components/svg/SVGs";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Ranklist from "../../components/concrete/other/Ranklist";
 import SVGTitleComponent from "../../components/svg/SVGTitleComponent";
 import Pagination from "../../components/util/Pagination";
@@ -8,7 +8,12 @@ function ProblemRanklist({ data }) {
     const { t } = useTranslation();
     const titleComponent = (
         <SVGTitleComponent
-            svg={<SVGResults />}
+            svg={
+                <FontAwesomeIcon
+                    icon="fa-ranking-star"
+                    className="w-5 h-5 mr-2"
+                />
+            }
             title={t("problem_ranklist.ranklist")}
         />
     );

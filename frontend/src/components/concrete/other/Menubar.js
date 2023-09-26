@@ -2,12 +2,6 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-    faBars,
-    faClose,
-    faMoon,
-    faSun,
-} from "@fortawesome/free-solid-svg-icons";
 import { DropdownRoutes } from "../../input/DropdownMenu";
 import { SVGDropdownMenuArrow } from "../../svg/SVGs";
 import { findRouteIndex } from "../../../util/findRouteIndex";
@@ -147,7 +141,7 @@ function ThemeButton() {
             className="border border-l-0 border-bordercol p-2 rounded-r-md hover:bg-grey-800"
             onClick={toggleTheme}>
             <FontAwesomeIcon
-                icon={theme === "light" ? faMoon : faSun}
+                icon={theme === "light" ? "fa-moon" : "fa-sun"}
                 className="w-6 h-4"
             />
         </button>
@@ -238,12 +232,12 @@ function MenuTopBar({ selected, isOpen, onToggle }) {
                         onClick={() => onToggle(this)}>
                         {isOpen ? (
                             <FontAwesomeIcon
-                                icon={faClose}
+                                icon="fa-close"
                                 className="w-5 h-5"
                             />
                         ) : (
                             <FontAwesomeIcon
-                                icon={faBars}
+                                icon="fa-bars"
                                 className="w-5 h-5"
                             />
                         )}

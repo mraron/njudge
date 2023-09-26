@@ -1,14 +1,9 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useContext } from "react";
+import React, { useContext } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { SVGEllipsis } from "../../svg/SVGs";
 import RoundedTable from "../../container/RoundedTable";
-import {
-    SVGAvatar,
-    SVGCorrectSimple,
-    SVGDotsSmall,
-    SVGPartiallyCorrect,
-    SVGWrongSimple,
-} from "../../svg/SVGs";
 import UserContext from "../../../contexts/user/UserContext";
 import { routeMap } from "../../../config/RouteConfig";
 
@@ -28,26 +23,29 @@ function Problem(data) {
                 <td className="padding-td-default w-0">
                     <div className="flex items-center justify-center">
                         {solvedStatus === 0 && (
-                            <SVGDotsSmall
+                            <SVGEllipsis
                                 cls="w-5 h-5 text-grey-300 shrink-0"
                                 title={t("solved_status.not_tried")}
                             />
                         )}
                         {solvedStatus === 1 && (
-                            <SVGWrongSimple
-                                cls="w-5 h-5 text-red-600 shrink-0"
+                            <FontAwesomeIcon
+                                icon="fa-xmark"
+                                className="w-4 h-4 highlight-red"
                                 title={t("solved_status.wrong")}
                             />
                         )}
                         {solvedStatus === 2 && (
-                            <SVGPartiallyCorrect
-                                cls="w-5 h-5 text-yellow-600 shrink-0"
+                            <FontAwesomeIcon
+                                icon="fa-check"
+                                className="w-4 h-4 highlight-yellow"
                                 title={t("solved_status.partially_correct")}
                             />
                         )}
                         {solvedStatus === 3 && (
-                            <SVGCorrectSimple
-                                cls="w-5 h-5 text-green-600 shrink-0"
+                            <FontAwesomeIcon
+                                icon="fa-check"
+                                className="w-4 h-4 highlight-green"
                                 title={t("solved_status.correct")}
                             />
                         )}
@@ -77,7 +75,10 @@ function Problem(data) {
                         ":problem",
                         problem,
                     )}?ac=1`}>
-                    <SVGAvatar cls="w-[1.1rem] h-[1.1rem] mr-1" />
+                    <FontAwesomeIcon
+                        icon="fa-user"
+                        className="w-3.5 h-3.5 mr-1"
+                    />
                     <span>{solverCount}</span>
                 </Link>
             </td>

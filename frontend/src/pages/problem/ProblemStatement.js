@@ -1,34 +1,18 @@
-import { useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
-import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import MapDataFrame from "../../components/container/MapDataFrame";
 import DropdownMenu from "../../components/input/DropdownMenu";
 import RoundedFrame from "../../components/container/RoundedFrame";
 import SVGTitleComponent from "../../components/svg/SVGTitleComponent";
-import {
-    SVGAttachment,
-    SVGAttachmentDescription,
-    SVGAttachmentFile,
-    SVGCorrectSimple,
-    SVGInformation,
-    SVGPartiallyCorrect,
-    SVGRecent,
-    SVGSpinner,
-    SVGSubmit,
-    SVGView,
-    SVGWrongSimple,
-} from "../../components/svg/SVGs";
+import { SVGSpinner, SVGView } from "../../components/svg/SVGs";
 import RoundedTable from "../../components/container/RoundedTable";
+import TagModal from "../../components/container/modal/TagModal";
 import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext";
+import ThemeContext from "../../contexts/theme/ThemeContext";
 import submitSolution from "../../util/submitSolution";
 import { apiRoute, routeMap } from "../../config/RouteConfig";
-import themeContext from "../../contexts/theme/ThemeContext";
-import UserContext from "../../contexts/user/UserContext";
-import ThemeContext from "../../contexts/theme/ThemeContext";
-import TagModal from "../../components/container/modal/TagModal";
 
 function ProblemInfo({ info }) {
     const { t } = useTranslation();
@@ -48,7 +32,11 @@ function ProblemInfo({ info }) {
                         key={info.tags.length}
                         onClick={() => setModalOpen(true)}>
                         <FontAwesomeIcon
-                            icon={theme === "light" ? faPenToSquare : faEdit}
+                            icon={
+                                (theme === "light"
+                                    ? "fa-regular"
+                                    : "fa-solid") + " fa-edit"
+                            }
                             className="w-3 h-3"
                         />
                     </button>
@@ -58,7 +46,7 @@ function ProblemInfo({ info }) {
     );
     const titleComponent = (
         <SVGTitleComponent
-            svg={<SVGInformation cls="w-6 h-6 mr-2" />}
+            svg={<FontAwesomeIcon icon="fa-info" className="w-4 h-4 mr-3" />}
             title={t("problem_statement.information")}
         />
     );
@@ -98,7 +86,12 @@ function ProblemSubmit() {
     const navigate = useNavigate();
     const titleComponent = (
         <SVGTitleComponent
-            svg={<SVGSubmit />}
+            svg={
+                <FontAwesomeIcon
+                    icon="fa-regular fa-paper-plane"
+                    className="w-4 h-4 mr-3"
+                />
+            }
             title={t("problem_statement.submit_solution")}
         />
     );
@@ -175,7 +168,12 @@ function ProblemLastSubmissions({ submissions, maxScore }) {
     const { t } = useTranslation();
     const titleComponent = (
         <SVGTitleComponent
-            svg={<SVGRecent cls="w-6 h-6 mr-2 fill-current" />}
+            svg={
+                <FontAwesomeIcon
+                    icon="fa-regular fa-clock"
+                    className="w-4 h-4 mr-3"
+                />
+            }
             title={t("problem_statement.last_submissions")}
         />
     );
@@ -191,16 +189,25 @@ function ProblemLastSubmissions({ submissions, maxScore }) {
             <td className="padding-td-default" style={{ maxWidth: 100 }}>
                 <div className="flex items-center">
                     {item.verdictType === 0 && (
-                        <SVGSpinner cls="w-5 h-5 mr-2 shrink-0" />
+                        <SVGSpinner cls="w-4 h-4 mr-3 shrink-0" />
                     )}
                     {item.verdictType === 1 && (
-                        <SVGWrongSimple cls="w-5 h-5 text-red-600 mr-2 shrink-0" />
+                        <FontAwesomeIcon
+                            icon="fa-xmark"
+                            className="w-4 h-4 highlight-red mr-2"
+                        />
                     )}
                     {item.verdictType === 2 && (
-                        <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-600 mr-2 shrink-0" />
+                        <FontAwesomeIcon
+                            icon="fa-check"
+                            className="w-4 h-4 highlight-green mr-2"
+                        />
                     )}
                     {item.verdictType === 3 && (
-                        <SVGCorrectSimple cls="w-5 h-5 text-green-600 mr-2 shrink-0" />
+                        <FontAwesomeIcon
+                            icon="fa-check"
+                            className="w-4 h-4 highlight-yellow mr-2"
+                        />
                     )}
                     <span className="truncate">{item.verdictName}</span>
                 </div>
@@ -224,15 +231,21 @@ function ProblemAttachment({ type, name, href }) {
     return (
         <li>
             <a
-                className="link no-underline flex items-start my-0.5"
+                className="link no-underline flex items-center my-0.5"
                 href={apiRoute(href)}
                 download="statement.pdf"
                 target="_blank">
                 {type === "file" && (
-                    <SVGAttachmentFile cls="w-5 h-5 mr-2 shrink-0" />
+                    <FontAwesomeIcon
+                        icon="fa-regular fa-file"
+                        className="w-4 h-4 mr-2"
+                    />
                 )}
                 {type === "statement" && (
-                    <SVGAttachmentDescription cls="w-5 h-5 mr-2 shrink-0" />
+                    <FontAwesomeIcon
+                        icon="fa-regular fa-file-lines"
+                        className="w-4 h-4 mr-2"
+                    />
                 )}
                 <span className="underline truncate">
                     {type === "statement"
@@ -269,7 +282,9 @@ function ProblemAttachments({ attachments }) {
         );
     const titleComponent = (
         <SVGTitleComponent
-            svg={<SVGAttachment />}
+            svg={
+                <FontAwesomeIcon icon="fa-paperclip" className="w-4 h-4 mr-3" />
+            }
             title={t("problem_statement.attachments")}
         />
     );

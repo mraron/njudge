@@ -1,24 +1,30 @@
 import { Link } from "react-router-dom";
 import ProfileSideBar from "../components/concrete/other/ProfileSidebar";
 import DropdownListFrame from "../components/container/DropdownListFrame";
-import {
-    SVGCorrectSimple,
-    SVGPartiallyCorrect,
-    SVGWrongSimple,
-} from "../components/svg/SVGs";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React from "react";
 
 function ProblemLeaf({ data }) {
     return (
         <span className="w-fit flex items-center">
             <div className="w-5 mr-2">
                 {data.solvedStatus === 1 && (
-                    <SVGWrongSimple cls="w-5 h-5 text-red-600 shrink-0" />
+                    <FontAwesomeIcon
+                        icon="fa-xmark"
+                        className="w-4 h-4 highlight-red"
+                    />
                 )}
                 {data.solvedStatus === 2 && (
-                    <SVGPartiallyCorrect cls="w-5 h-5 text-yellow-600 shrink-0" />
+                    <FontAwesomeIcon
+                        icon="fa-check"
+                        className="w-4 h-4 highlight-yellow"
+                    />
                 )}
                 {data.solvedStatus === 3 && (
-                    <SVGCorrectSimple cls="w-5 h-5 text-green-600 shrink-0" />
+                    <FontAwesomeIcon
+                        icon="fa-check"
+                        className="w-4 h-4 highlight-green"
+                    />
                 )}
             </div>
             <Link className="link no-underline" to={data.link}>

@@ -10,7 +10,7 @@ function Modal({ children, isOpen, onClose }) {
                     onClick={onClose}>
                     <button
                         onClick={onClose}
-                        className="flex items-center justify-center absolute top-2 right-2 p-2 rounded-full bg-transparent hover:bg-grey-100 dark:hover:bg-grey-800">
+                        className="flex items-center justify-center absolute top-3 right-3 p-2 rounded-full bg-transparent hover:bg-grey-100 dark:hover:bg-grey-700">
                         <FontAwesomeIcon
                             icon={faClose}
                             className="w-6 h-6 text-white"

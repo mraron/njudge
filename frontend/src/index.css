@@ -112,8 +112,20 @@
     @apply text-white text-sm font-medium bg-indigo-600 rounded-md hover:bg-indigo-500 text-center;
 }
 
+.highlight-green {
+    @apply text-green-600 dark:text-green-500;
+}
+
+.highlight-red {
+    @apply text-red-600 dark:text-red-500;
+}
+
+.highlight-yellow {
+    @apply text-yellow-600 dark:text-yellow-500;
+}
+
 .btn-gray {
-    @apply text-sm dark:font-medium bg-grey-725 rounded-md hover:bg-grey-700 border border-bordercol text-center;
+    @apply text-sm font-medium bg-grey-725 rounded-md hover:bg-grey-700 border border-grey-625 text-center;
 }
 
 .date-label {

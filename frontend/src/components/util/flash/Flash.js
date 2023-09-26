@@ -1,30 +1,33 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AnimatePresence, motion } from "framer-motion";
-import { SVGClose, SVGCorrect, SVGInformation, SVGWrong } from "../../svg/SVGs";
 import FlashEvent from "./FlashEvent";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function FlashMessage({ message, type, onClose }) {
     const { t } = useTranslation();
     return (
         <div className="absolute bottom-0 left-0 right-0 bg-grey-850 border rounded-md flex border-bordercol w-full">
-            <div className="w-full p-6 flex justify-between">
+            <div className="w-full p-6 flex justify-between items-center">
                 <div className="flex items-center">
                     {type === "success" && (
-                        <SVGCorrect cls="w-8 h-8 text-green-600 mr-3" />
+                        <FontAwesomeIcon
+                            icon="fa-regular fa-circle-check"
+                            className="w-7 h-7 highlight-green mr-3"
+                        />
                     )}
                     {type === "failure" && (
-                        <SVGWrong cls="w-8 h-8 text-red-600 mr-3" />
-                    )}
-                    {type === "info" && (
-                        <SVGInformation cls="w-8 h-8 text-indigo-500 mr-3" />
+                        <FontAwesomeIcon
+                            icon="fa-regular fa-circle-xmark"
+                            className="w-7 h-7 highlight-red mr-3"
+                        />
                     )}
                     <span>{t(message)}</span>
                 </div>
                 <button
-                    className="rounded-full p-3 hover:bg-grey-800"
+                    className="flex rounded-full p-3 hover:bg-grey-800"
                     onClick={onClose}>
-                    <SVGClose cls="w-4 h-4" />
+                    <FontAwesomeIcon icon="fa-close" className="w-5 h-5" />
                 </button>
             </div>
         </div>

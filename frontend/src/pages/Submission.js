@@ -1,6 +1,5 @@
 import { useContext } from "react";
 import { useTranslation } from "react-i18next";
-import { SVGWrongSimple } from "../components/svg/SVGs";
 import SubmissionTable from "../components/concrete/table/SubmissionTable";
 import SubmissionsTable from "../components/concrete/table/SubmissionsTable";
 import SVGTitleComponent from "../components/svg/SVGTitleComponent";
@@ -11,16 +10,21 @@ import JudgeDataContext from "../contexts/judgeData/JudgeDataContext";
 import UserContext from "../contexts/user/UserContext";
 import Editor from "@monaco-editor/react";
 import ThemeContext from "../contexts/theme/ThemeContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function CompileErrorFrame({ message }) {
     const { t } = useTranslation();
     const titleComponent = (
         <SVGTitleComponent
             title={t("submission.compilation_error")}
-            svg={<SVGWrongSimple cls="w-6 h-6 mr-2 text-red-600" />}
+            svg={
+                <FontAwesomeIcon
+                    icon="fa-xmark"
+                    className="w-5 h-5 mr-3 text-red-600"
+                />
+            }
         />
     );
-
     return (
         <CopyableCode
             text={message}

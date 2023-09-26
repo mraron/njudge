@@ -1,4 +1,4 @@
-import { SVGCopy } from "../../svg/SVGs";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function CopyButton({ text }) {
     const handleCopy = () => {
@@ -10,8 +10,9 @@ function CopyButton({ text }) {
             className={`relative h-9 w-9 bg-grey-775 rounded-md hover:bg-grey-750 border border-bordercol`}
             aria-label="Copy"
             onClick={handleCopy}>
-            <SVGCopy
-                cls={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4`}
+            <FontAwesomeIcon
+                icon="fa-regular fa-copy"
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5"
             />
         </button>
     );

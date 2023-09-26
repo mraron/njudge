@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { SVGCorrectSimple, SVGWrongSimple } from "../../svg/SVGs";
 import { routeMap } from "../../../config/RouteConfig";
 import RoundedFrame from "../../container/RoundedFrame";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React from "react";
 
 function RanklistRow({ result, maxScore }) {
     const { username, score, submissionID, accepted } = result;
@@ -14,10 +15,16 @@ function RanklistRow({ result, maxScore }) {
             </Link>
             <div className="flex">
                 {accepted && (
-                    <SVGCorrectSimple cls="w-5 h-5 text-green-600 mr-2" />
+                    <FontAwesomeIcon
+                        icon="fa-check"
+                        className="w-4 h-4 highlight-green mr-2"
+                    />
                 )}
                 {!accepted && (
-                    <SVGWrongSimple cls="w-5 h-5 text-red-600 mr-2" />
+                    <FontAwesomeIcon
+                        icon="fa-xmark"
+                        className="w-4 h-4 highlight-red mr-2"
+                    />
                 )}
                 <Link
                     className="link whitespace-nowrap"

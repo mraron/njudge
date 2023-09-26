@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { SVGClose } from "../svg/SVGs";
-import TextBoxDropdown from "./TextBoxDropdown";
 import _ from "lodash";
+import { useEffect, useState } from "react";
+import TextBoxDropdown from "./TextBoxDropdown";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function Tag({ title, onClick }) {
     const [hovered, setHovered] = useState(false);
@@ -18,11 +18,11 @@ function Tag({ title, onClick }) {
             }`}>
             {title}
             <span
-                className={`ml-3 rounded-full p-1 hover:bg-red-700 dark:hover:bg-red-800`}
+                className={`my-0.5 flex ml-3 rounded-full p-1 hover:bg-red-700 dark:hover:bg-red-800`}
                 onMouseOver={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
                 onClick={handleClick}>
-                <SVGClose cls="h-2 w-2" />
+                <FontAwesomeIcon icon="fa-close" className="h-3 w-3" />
             </span>
         </span>
     );
