@@ -44,7 +44,7 @@
         --color-codebgcol: var(--color-grey-875);
     }
     html[data-theme="light"] {
-        --color-textcol: 59, 59, 59;
+        --color-textcol: 48, 48, 48;
         --color-inputfill: 205, 202, 210;
         --color-grey-100: 24, 24, 24;
         --color-grey-125: 31, 31, 31;

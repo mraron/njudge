@@ -11,18 +11,18 @@ function Tag({ title, onClick }) {
     };
     return (
         <span
-            className={`whitespace-nowrap flex items-center cursor-pointer text-sm px-2 py-1 border border-bordercol rounded m-1 hover:bg-grey-700 ${
+            className={`tag flex items-center ${
                 hovered
                     ? "text-white hover:bg-red-500 dark:hover:bg-red-600 hover:border-transparent"
                     : "bg-grey-725"
             }`}>
             {title}
             <span
-                className={`my-0.5 flex ml-3 rounded-full p-1 hover:bg-red-700 dark:hover:bg-red-800`}
+                className={`relative ml-3 rounded-full w-5 h-5 hover:bg-red-700 dark:hover:bg-red-800`}
                 onMouseOver={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
                 onClick={handleClick}>
-                <FontAwesomeIcon icon="fa-close" className="h-3 w-3" />
+                <FontAwesomeIcon icon="fa-close" className="h-3 w-3 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
             </span>
         </span>
     );
