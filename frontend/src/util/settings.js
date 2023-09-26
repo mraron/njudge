@@ -1,3 +1,5 @@
+import { apiRoute } from "../config/RouteConfig";
+
 export async function saveSettings(user, showUnsolved, hideSolved) {
     const requestOptions = {
         method: "POST",
@@ -8,7 +10,7 @@ export async function saveSettings(user, showUnsolved, hideSolved) {
         }),
     };
     const response = await fetch(
-        `/api/v2/user/profile/${user}/settings/other/`,
+        apiRoute(`/user/profile/${user}/settings/other/`),
         requestOptions,
     );
     const data = await response.json();
@@ -26,7 +28,7 @@ export async function changePassword(user, oldPw, newPw, newPwConfirm) {
         }),
     };
     const response = await fetch(
-        `/api/v2/user/profile/${user}/settings/change_password/`,
+        apiRoute(`/user/profile/${user}/settings/change_password/`),
         requestOptions,
     );
     const data = await response.json();

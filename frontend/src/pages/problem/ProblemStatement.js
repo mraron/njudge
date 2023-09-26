@@ -1,6 +1,9 @@
 import { useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
+import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import MapDataFrame from "../../components/container/MapDataFrame";
 import DropdownMenu from "../../components/input/DropdownMenu";
 import RoundedFrame from "../../components/container/RoundedFrame";
@@ -21,23 +24,30 @@ import {
 import RoundedTable from "../../components/container/RoundedTable";
 import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext";
 import submitSolution from "../../util/submitSolution";
-import { routeMap } from "../../config/RouteConfig";
+import { apiRoute, routeMap } from "../../config/RouteConfig";
 import themeContext from "../../contexts/theme/ThemeContext";
 import UserContext from "../../contexts/user/UserContext";
 import ThemeContext from "../../contexts/theme/ThemeContext";
+import TagModal from "../../components/container/modal/TagModal";
 
 function ProblemInfo({ info }) {
     const { t } = useTranslation();
+    const { theme } = useContext(ThemeContext)
+    const [isModalOpen, setModalOpen] = useState(false)
     const tagsContent = (
-        <div className="flex flex-wrap">
-            {info.tags.map((tagName, index) => (
-                <span className="tag" key={index}>
-                    {t(tagName)}
-                </span>
-            ))}
+        <div className="flex-col">
+            <div className="flex flex-wrap mb-4">
+                {info.tags.map((tagName, index) => (
+                    <span className="tag" key={index}>
+                        {t(tagName)}
+                    </span>
+                ))}
+                <button className="tag flex items-center" key={info.tags.length} onClick={() => setModalOpen(true)}>
+                    <FontAwesomeIcon icon={theme === "light"? faPenToSquare: faEdit} className="w-3 h-3" />
+                </button>
+            </div>
         </div>
     );
-
     const titleComponent = (
         <SVGTitleComponent
             svg={<SVGInformation cls="w-6 h-6 mr-2" />}
@@ -45,21 +55,24 @@ function ProblemInfo({ info }) {
         />
     );
     return (
-        <MapDataFrame
-            titleComponent={titleComponent}
-            data={[
-                [t("problem_statement.id"), info.id],
-                [t("problem_statement.title"), info.title],
-                [t("problem_statement.time_limit"), `${info.timeLimit} ms`],
-                [
-                    t("problem_statement.memory_limit"),
-                    `${info.memoryLimit} MiB`,
-                ],
-                [t("problem_statement.tags"), tagsContent],
-                [t("problem_statement.type"), info.type],
-            ]}
-            labelColWidth="9rem"
-        />
+        <>
+            <TagModal isOpen={isModalOpen} onClose={() => setModalOpen(false)}/>
+            <MapDataFrame
+                titleComponent={titleComponent}
+                data={[
+                    [t("problem_statement.id"), info.id],
+                    [t("problem_statement.title"), info.title],
+                    [t("problem_statement.time_limit"), `${info.timeLimit} ms`],
+                    [
+                        t("problem_statement.memory_limit"),
+                        `${info.memoryLimit} MiB`,
+                    ],
+                    [t("problem_statement.tags"), tagsContent],
+                    [t("problem_statement.type"), info.type],
+                ]}
+                labelColWidth="9rem"
+            />
+        </>
     );
 }
 
@@ -199,7 +212,7 @@ function ProblemAttachment({ type, name, href }) {
         <li>
             <a
                 className="link no-underline flex items-start my-0.5"
-                href={`http://localhost:5555${href}`} download>
+                href={apiRoute(href)} download="statement.pdf" target="_blank">
                 {type === "file" && (
                     <SVGAttachmentFile cls="w-5 h-5 mr-2 shrink-0" />
                 )}
@@ -259,7 +272,6 @@ function ProblemStatement({ data }) {
     const [statementIndex, setStatementIndex] = useState(0);
     const statementSrc = data.attachments.statements[statementIndex].href;
     const statementType = data.attachments.statements[statementIndex].type;
-    console.log(statementSrc + " -- " + statementType);
     return (
         <div className="flex flex-col lg:flex-row">
             <div className="w-full flex flex-col">
@@ -274,7 +286,7 @@ function ProblemStatement({ data }) {
                             </div>
                             <a
                                 className="btn-gray py-2 px-4 flex justify-center items-center"
-                                href={statementSrc}
+                                href={apiRoute(statementSrc)}
                                 target="_blank"
                                 rel="noreferrer">
                                 <SVGView cls="w-[1.4rem] h-[1.4rem]" />
@@ -286,7 +298,7 @@ function ProblemStatement({ data }) {
                     {statementType === "pdf" && (
                         <object
                             color-scheme={theme}
-                            data={statementSrc}
+                            data={apiRoute(statementSrc)}
                             aria-label="Problem statement"
                             type="application/pdf"
                             width="100%"
@@ -294,7 +306,7 @@ function ProblemStatement({ data }) {
                     )}
                     {statementType === "html" && (
                         <iframe
-                            src={statementSrc}
+                            src={apiRoute(statementSrc)}
                             width="100%"
                             title="Problem statement"
                             className="h-[36rem] lg:h-[52rem] border border-grey-600"></iframe>

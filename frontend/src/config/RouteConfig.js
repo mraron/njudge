@@ -19,3 +19,10 @@ export const routeMap = {
     logout: "/user/logout/",
     admin: "/user/admin/",
 };
+
+const apiRoot = "https://127.0.0.1:5555/api/v2"
+
+export function apiRoute(route) {
+    console.log(`${apiRoot}${route}`)
+    return `${apiRoot}${route}`
+}

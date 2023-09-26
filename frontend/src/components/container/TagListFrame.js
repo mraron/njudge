@@ -12,13 +12,15 @@ export function LinkTag({ data }) {
     return (
         <Link
             to={data.href}
-            className="text-white w-28 text-center truncate whitespace-nowrap cursor-pointer text-sm px-2 py-1 border rounded bg-grey-725 hover:bg-indigo-600 hover:border-transparent border-grey-650">
+            className="w-28 text-center truncate whitespace-nowrap cursor-pointer text-sm px-2 py-1 border border-bordercol rounded bg-grey-725 hover:bg-indigo-200 hover:border-indigo-300 dark:hover:bg-indigo-600 dark:hover:border-transparent">
             {t(data.text)}
         </Link>
     );
 }
 
 function TagListFrame({ title, titleComponent, tag: Tag = DefaultTag, tags }) {
+    console.log(tags)
+    console.log("nigga")
     const tagsContent = tags.map((item, index) => (
         <div className="flex m-1" key={index}>
             <Tag data={item} key={index} />

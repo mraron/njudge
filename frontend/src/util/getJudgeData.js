@@ -1,17 +1,19 @@
+import { apiRoute } from "../config/RouteConfig";
+
 export async function getLanguages() {
-    const response = await fetch("/api/v2/data/languages/");
+    const response = await fetch(apiRoute("/data/languages/"));
     const data = await response.json();
     return { ...data, success: response.ok };
 }
 
 export async function getCategories() {
-    const response = await fetch("/api/v2/data/categories/");
+    const response = await fetch(apiRoute("/data/categories/"));
     const data = await response.json();
     return { ...data, success: response.ok };
 }
 
 export async function getTags() {
-    const response = await fetch("/api/v2/data/tags/");
+    const response = await fetch(apiRoute("/data/tags/"));
     const data = await response.json();
     return { ...data, success: response.ok };
 }

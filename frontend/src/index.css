@@ -95,6 +95,9 @@
     .editor {
         @apply border border-bordercol;
     }
+    .tag {
+        @apply whitespace-nowrap cursor-pointer text-sm px-2 py-1 border rounded m-1 bg-grey-725 hover:bg-grey-700 border-grey-625 truncate;
+    }
 }
 
 #root {
@@ -138,10 +141,6 @@ th {
 .text-dropdown-list {
     font-size: 0.95rem;
     line-height: 1.3rem;
-}
-
-.tag {
-    @apply whitespace-nowrap cursor-pointer text-sm px-2 py-1 border rounded m-1 bg-grey-725 hover:bg-grey-700 border-bordercol truncate;
 }
 
 html {

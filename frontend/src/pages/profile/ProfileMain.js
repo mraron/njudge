@@ -2,15 +2,15 @@ import { useTranslation } from "react-i18next";
 import SVGTitleComponent from "../../components/svg/SVGTitleComponent";
 import TagListFrame, { LinkTag } from "../../components/container/TagListFrame";
 import { SVGCorrectSimple, SVGWrongSimple } from "../../components/svg/SVGs";
-import { routeMap } from "../../config/RouteConfig";
 import {
     ProfileDataFrame,
     ProfilePictureFrame,
 } from "../../components/concrete/other/ProfileSidebar";
+import { routeMap } from "../../config/RouteConfig";
 
-const makeSubmissionLink = (submission) => {
-    return submission;
-};
+// const makeProblemLink = (problem) => {
+//     return {"text": problem, "href": routeMap.problem.replace(":problem", problem)}
+// };
 
 function ProfileMain({ data }) {
     const { t } = useTranslation();
@@ -26,7 +26,6 @@ function ProfileMain({ data }) {
             title={t("profile_main.unsolved_problems")}
         />
     );
-
     return (
         <div className="flex flex-col sm:flex-row w-full items-start">
             <div className="w-full sm:w-80 mb-3 shrink-0">
@@ -42,14 +41,14 @@ function ProfileMain({ data }) {
                 <div className="mb-3">
                     <TagListFrame
                         titleComponent={titleComponentCorrect}
-                        tags={data.solved.map(makeSubmissionLink)}
+                        tags={data.solved}
                         tag={LinkTag}
                     />
                 </div>
                 <div className="mb-3">
                     <TagListFrame
                         titleComponent={titleComponentWrong}
-                        tags={data.unsolved.map(makeSubmissionLink)}
+                        tags={data.unsolved}
                         tag={LinkTag}
                     />
                 </div>

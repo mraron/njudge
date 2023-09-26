@@ -1,4 +1,5 @@
 import { authenticate } from "./auth";
+import { apiRoute } from "../config/RouteConfig";
 
 export async function updatePageData(
     location,
@@ -8,7 +9,7 @@ export async function updatePageData(
 ) {
     try {
         const fullPath = location.pathname + location.search;
-        const response = await fetch(`/api/v2${fullPath}`, {
+        const response = await fetch(apiRoute(fullPath), {
             signal: abortController.signal,
         });
         const newData = await response.json();

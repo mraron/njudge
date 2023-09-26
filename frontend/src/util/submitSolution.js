@@ -1,3 +1,5 @@
+import { apiRoute } from "../config/RouteConfig";
+
 async function submitSolution({ problem, language, file, submissionCode }) {
     const formData = new FormData();
     formData.append("problem", problem);
@@ -13,7 +15,7 @@ async function submitSolution({ problem, language, file, submissionCode }) {
         body: formData,
     };
     const response = await fetch(
-        "/api/v2/problemset/main/submit/",
+        apiRoute("/problemset/main/submit/"),
         requestOptions,
     );
     return response.ok;

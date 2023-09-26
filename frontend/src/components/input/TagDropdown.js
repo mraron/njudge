@@ -30,7 +30,11 @@ function Tag({ title, onClick }) {
 
 function TagDropdown({ id, label, itemNames, initTags = [], onChange }) {
     const [tags, setTags] = useState(initTags);
-    useEffect(() => onChange(tags), [onChange, tags]);
+    useEffect(() => {
+        if (onChange) {
+            onChange(tags)
+        }
+    }, [onChange, tags]);
 
     const tagsContent = tags.map((tag, index) => {
         const handleRemoveTag = () => {
