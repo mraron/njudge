@@ -58,7 +58,7 @@ function RoutingComponent() {
         const routeIndex = findRouteIndex(routes, location.pathname);
         if (routeIndex !== -1) {
             const params = extractParams(location.pathname, routes[routeIndex]);
-            console.log(params)
+            console.log(params);
             document.title = t(titles[routes[routeIndex]], { params });
         } else {
             document.title = "njudge";

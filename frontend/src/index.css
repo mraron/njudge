@@ -101,7 +101,7 @@
 }
 
 #root {
-    @apply h-full antialiased bg-grey-900 text-textcol
+    @apply h-full antialiased bg-grey-900 text-textcol;
 }
 
 .padding-btn-default {

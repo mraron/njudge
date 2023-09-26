@@ -32,8 +32,8 @@ import TagModal from "../../components/container/modal/TagModal";
 
 function ProblemInfo({ info }) {
     const { t } = useTranslation();
-    const { theme } = useContext(ThemeContext)
-    const [isModalOpen, setModalOpen] = useState(false)
+    const { theme } = useContext(ThemeContext);
+    const [isModalOpen, setModalOpen] = useState(false);
     const tagsContent = (
         <div className="flex-col">
             <div className="flex flex-wrap mb-4">
@@ -42,9 +42,17 @@ function ProblemInfo({ info }) {
                         {t(tagName)}
                     </span>
                 ))}
-                <button className="tag flex items-center" key={info.tags.length} onClick={() => setModalOpen(true)}>
-                    <FontAwesomeIcon icon={theme === "light"? faPenToSquare: faEdit} className="w-3 h-3" />
-                </button>
+                {info.isSolved && (
+                    <button
+                        className="tag flex items-center"
+                        key={info.tags.length}
+                        onClick={() => setModalOpen(true)}>
+                        <FontAwesomeIcon
+                            icon={theme === "light" ? faPenToSquare : faEdit}
+                            className="w-3 h-3"
+                        />
+                    </button>
+                )}
             </div>
         </div>
     );
@@ -56,7 +64,12 @@ function ProblemInfo({ info }) {
     );
     return (
         <>
-            <TagModal isOpen={isModalOpen} onClose={() => setModalOpen(false)}/>
+            {info.isSolved && (
+                <TagModal
+                    isOpen={isModalOpen}
+                    onClose={() => setModalOpen(false)}
+                />
+            )}
             <MapDataFrame
                 titleComponent={titleComponent}
                 data={[
@@ -212,7 +225,9 @@ function ProblemAttachment({ type, name, href }) {
         <li>
             <a
                 className="link no-underline flex items-start my-0.5"
-                href={apiRoute(href)} download="statement.pdf" target="_blank">
+                href={apiRoute(href)}
+                download="statement.pdf"
+                target="_blank">
                 {type === "file" && (
                     <SVGAttachmentFile cls="w-5 h-5 mr-2 shrink-0" />
                 )}
@@ -280,7 +295,9 @@ function ProblemStatement({ data }) {
                         <div className="w-full px-4 py-3 sm:px-6 sm:py-5 flex">
                             <div className="w-full mr-3 min-w-0">
                                 <DropdownMenu
-                                    itemNames={data.attachments.statements.map(item => item.name)}
+                                    itemNames={data.attachments.statements.map(
+                                        (item) => item.name,
+                                    )}
                                     onChange={setStatementIndex}
                                 />
                             </div>

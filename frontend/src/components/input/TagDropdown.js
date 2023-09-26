@@ -32,7 +32,7 @@ function TagDropdown({ id, label, itemNames, initTags = [], onChange }) {
     const [tags, setTags] = useState(initTags);
     useEffect(() => {
         if (onChange) {
-            onChange(tags)
+            onChange(tags);
         }
     }, [onChange, tags]);
 
