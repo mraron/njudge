@@ -13,6 +13,7 @@ import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext";
 import ThemeContext from "../../contexts/theme/ThemeContext";
 import submitSolution from "../../util/submitSolution";
 import { apiRoute, routeMap } from "../../config/RouteConfig";
+import Tag from "../../components/util/Tag";
 
 function ProblemInfo({ info }) {
     const { t } = useTranslation();
@@ -22,23 +23,22 @@ function ProblemInfo({ info }) {
         <div className="flex-col">
             <div className="flex flex-wrap mb-4">
                 {info.tags.map((tagName, index) => (
-                    <span className="tag" key={index}>
-                        {t(tagName)}
-                    </span>
+                    <Tag key={index}>{t(tagName)}</Tag>
                 ))}
                 {info.isSolved && (
                     <button
-                        className="tag flex items-center"
                         key={info.tags.length}
                         onClick={() => setModalOpen(true)}>
-                        <FontAwesomeIcon
-                            icon={
-                                (theme === "light"
-                                    ? "fa-regular"
-                                    : "fa-solid") + " fa-edit"
-                            }
-                            className="w-3 h-3"
-                        />
+                        <Tag cls="items-center">
+                            <FontAwesomeIcon
+                                icon={
+                                    (theme === "light"
+                                        ? "fa-regular"
+                                        : "fa-solid") + " fa-edit"
+                                }
+                                className="w-3 h-3"
+                            />
+                        </Tag>
                     </button>
                 )}
             </div>

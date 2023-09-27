@@ -1,19 +1,20 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import RoundedFrame from "./RoundedFrame";
+import Tag from "../util/Tag";
 
 export function DefaultTag({ data }) {
     const { t } = useTranslation();
-    return <span className="w-28 tag text-center">{t(data)}</span>;
+    return <Tag cls="w-28 items-center">{t(data)}</Tag>;
 }
 
 export function LinkTag({ data }) {
     const { t } = useTranslation();
     return (
-        <Link
-            to={data.href}
-            className="w-28 tag text-center hover:bg-indigo-200 hover:border-indigo-300 dark:hover:bg-indigo-600 dark:hover:border-transparent">
-            {t(data.text)}
+        <Link to={data.href}>
+            <Tag cls="w-28 items-center hover:bg-indigo-200 hover:border-indigo-400 dark:hover:bg-indigo-600 dark:hover:border-transparent">
+                {t(data.text)}
+            </Tag>
         </Link>
     );
 }

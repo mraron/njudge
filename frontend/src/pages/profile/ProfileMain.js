@@ -7,10 +7,6 @@ import {
     ProfilePictureFrame,
 } from "../../components/concrete/other/ProfileSidebar";
 
-// const makeProblemLink = (problem) => {
-//     return {"text": problem, "href": routeMap.problem.replace(":problem", problem)}
-// };
-
 function ProfileMain({ data }) {
     const { t } = useTranslation();
     const titleComponentCorrect = (

@@ -1,13 +1,13 @@
 import React, { useContext } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { SVGEllipsis } from "../../svg/SVGs";
 import RoundedTable from "../../container/RoundedTable";
 import UserContext from "../../../contexts/user/UserContext";
 import { routeMap } from "../../../config/RouteConfig";
-import queryString from "query-string";
 import OrderedColumnTitle from "../../util/OrderedColumnTitle";
+import Tag from "../../util/Tag";
 
 function Problem(data) {
     const { t } = useTranslation();
@@ -15,9 +15,7 @@ function Problem(data) {
     const { problem, solvedStatus, title, category, tags, solverCount } =
         data.problem;
     const tagsContent = tags.map((item, index) => (
-        <span className="tag" key={index}>
-            {t(item)}
-        </span>
+        <Tag key={index}>{t(item)}</Tag>
     ));
     return (
         <tr className={"divide-x divide-dividecol"}>
