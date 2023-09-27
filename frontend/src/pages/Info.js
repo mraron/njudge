@@ -9,8 +9,8 @@ function CompilerOption({ lang, command }) {
     return (
         <tr className={`divide-x divide-dividecol`}>
             <td className="padding-td-default whitespace-nowrap">{lang}</td>
-            <td className="padding-td-default">
-                <CopyableCommand text={command} />
+            <td>
+                <CopyableCommand text={command} cls="border-0 rounded-none" />
             </td>
         </tr>
     );

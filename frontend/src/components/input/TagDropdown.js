@@ -18,11 +18,11 @@ function Tag({ title, onClick }) {
             }`}>
             {title}
             <span
-                className={`relative ml-3 rounded-full w-[1.1rem] h-[1.1rem] hover:bg-red-700 dark:hover:bg-red-800`}
+                className={`flex ml-3 rounded-full p-1 hover:bg-red-700 dark:hover:bg-red-800`}
                 onMouseOver={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
                 onClick={handleClick}>
-                <FontAwesomeIcon icon="fa-close" className="h-3 w-3 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+                <FontAwesomeIcon icon="fa-close" className="h-3 w-3" />
             </span>
         </span>
     );
