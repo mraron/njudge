@@ -105,11 +105,11 @@
 }
 
 .font-code {
-    @apply font-mono text-[0.85rem]
+    @apply font-mono text-[0.85rem];
 }
 
 pre {
-    @apply font-code
+    @apply font-code;
 }
 
 .padding-btn-default {
@@ -149,7 +149,6 @@ th {
 }
 
 .text-code {
-
 }
 
 .text-table {

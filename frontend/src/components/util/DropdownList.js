@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { SVGDropdownListArrow } from "../svg/SVGs";
 
-function DropdownElem({ isOpen, text, onClick }) {
+function DropdownElem({ text, isOpen, onClick }) {
     return (
         <span
             className="w-fit flex link items-center font-medium no-underline"
@@ -25,8 +25,8 @@ function DropdownList({ tree, leaf: Leaf }) {
         : [];
     const innerNode = (
         <DropdownElem
-            isOpen={isOpen}
             text={tree.title}
+            isOpen={isOpen}
             onClick={() => setOpen(!isOpen)}
         />
     );

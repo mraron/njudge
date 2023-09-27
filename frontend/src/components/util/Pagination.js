@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { SVGDoubleRightArrow } from "../svg/SVGs";
 import RoundedFrame from "../container/RoundedFrame";
 import UpdateQueryString from "../../util/updateQueryString";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function Pagination({ paginationData }) {
     const { currentPage, lastPage } = paginationData;
@@ -11,7 +11,7 @@ function Pagination({ paginationData }) {
         UpdateQueryString(location, navigate, ["page"], [page]);
     };
     const cls =
-        "px-3 py-1.5 text-sm border-bordercol border hover:bg-grey-750 text-center";
+        "flex justify-center items-center px-3 py-1.5 text-sm border-bordercol border hover:bg-grey-750 text-center";
     return (
         <RoundedFrame>
             <div className="flex justify-center p-3 overflow-x-auto">
@@ -19,7 +19,10 @@ function Pagination({ paginationData }) {
                     aria-label="First"
                     className={`${cls} border-r-0 rounded-l-md`}
                     onClick={() => handlePageChanged(1)}>
-                    <SVGDoubleRightArrow cls="w-[1.32rem] h-[1.32rem] rotate-180" />
+                    <FontAwesomeIcon
+                        icon="fa-angles-left"
+                        className="w-3 h-3"
+                    />
                 </button>
                 {currentPage >= 3 && (
                     <button
@@ -56,7 +59,10 @@ function Pagination({ paginationData }) {
                     aria-label="Last"
                     className={`${cls} border-l-0 rounded-r-md`}
                     onClick={() => handlePageChanged(lastPage)}>
-                    <SVGDoubleRightArrow cls="w-[1.32rem] h-[1.32rem] rotate-0" />
+                    <FontAwesomeIcon
+                        icon="fa-angles-right"
+                        className="w-3 h-3"
+                    />
                 </button>
             </div>
         </RoundedFrame>

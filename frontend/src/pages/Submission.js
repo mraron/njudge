@@ -72,7 +72,7 @@ function Submission({ data }) {
                                     domReadOnly: true,
                                     readOnly: true,
                                     fontFamily: "JetBrains Mono",
-                                    fontSize: 13
+                                    fontSize: 13,
                                 }}
                                 value={data.summary.code}
                                 language={

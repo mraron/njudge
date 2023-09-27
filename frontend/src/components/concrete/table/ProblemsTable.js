@@ -1,11 +1,13 @@
-import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import React, { useContext } from "react";
+import { useTranslation } from "react-i18next";
+import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { SVGEllipsis } from "../../svg/SVGs";
 import RoundedTable from "../../container/RoundedTable";
 import UserContext from "../../../contexts/user/UserContext";
 import { routeMap } from "../../../config/RouteConfig";
+import queryString from "query-string";
+import OrderedColumnTitle from "../../util/OrderedColumnTitle";
 
 function Problem(data) {
     const { t } = useTranslation();
@@ -89,6 +91,7 @@ function Problem(data) {
 function ProblemsTable({ problems }) {
     const { t } = useTranslation();
     const { isLoggedIn } = useContext(UserContext);
+
     const problemsContent = problems.map((item, index) => (
         <Problem problem={item} key={index} />
     ));
@@ -111,7 +114,7 @@ function ProblemsTable({ problems }) {
                         {t("problems_table.tags")}
                     </th>
                     <th className="padding-td-default">
-                        {t("problems_table.solved")}
+                        <OrderedColumnTitle text={t("problems_table.solved")} label="solver_count" />
                     </th>
                 </tr>
             </thead>

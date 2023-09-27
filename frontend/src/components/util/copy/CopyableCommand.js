@@ -3,10 +3,8 @@ import RoundedFrame from "../../container/RoundedFrame";
 
 function CopyableCommand({ text, cls }) {
     return (
-        <RoundedFrame
-            cls={`${cls} overflow-auto`}>
-            <div
-                className="relative bg-codebgcol flex">
+        <RoundedFrame cls={`${cls} overflow-auto`}>
+            <div className="relative bg-codebgcol flex">
                 <div className="flex items-center w-full px-4 py-3 overflow-x-auto whitespace-nowrap font-code">
                     {text}
                 </div>
