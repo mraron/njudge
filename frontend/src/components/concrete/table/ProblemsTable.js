@@ -114,7 +114,10 @@ function ProblemsTable({ problems }) {
                         {t("problems_table.tags")}
                     </th>
                     <th className="padding-td-default">
-                        <OrderedColumnTitle text={t("problems_table.solved")} label="solver_count" />
+                        <OrderedColumnTitle
+                            text={t("problems_table.solved")}
+                            label="solver_count"
+                        />
                     </th>
                 </tr>
             </thead>

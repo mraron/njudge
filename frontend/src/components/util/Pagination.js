@@ -8,7 +8,12 @@ function Pagination({ paginationData }) {
     const location = useLocation();
     const navigate = useNavigate();
     const handlePageChanged = (page) => {
-        UpdateQueryString(location, navigate, ["page"], [page]);
+        UpdateQueryString({
+            location: location,
+            navigate: navigate,
+            args: ["page"],
+            values: [page],
+        });
     };
     const cls =
         "flex justify-center items-center px-3 py-1.5 text-sm border-bordercol border hover:bg-grey-750 text-center";

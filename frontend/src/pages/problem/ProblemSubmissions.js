@@ -21,17 +21,20 @@ function SubmissionFilterFrame() {
     const [onlyOwn, setOnlyOwn] = useState(qData["own"] === "1");
 
     const handleReset = () => {
-        updateQueryString(location, navigate, [], [], null, ["ac", "own"]);
+        updateQueryString({
+            location: location,
+            navigate: navigate,
+            validArgs: [],
+        });
     };
     const handleSubmit = () => {
-        UpdateQueryString(
-            location,
-            navigate,
-            ["ac", "own"],
-            [onlyAC ? 1 : 0, onlyOwn ? 1 : 0],
-            ["ac", "own"],
-            null,
-        );
+        UpdateQueryString({
+            location: location,
+            navigate: navigate,
+            args: ["ac", "own"],
+            values: [onlyAC ? 1 : 0, onlyOwn ? 1 : 0],
+            validArgs: ["ac", "own"],
+        });
     };
     return (
         <DropdownFrame title={t("problem_submissions.filter")}>

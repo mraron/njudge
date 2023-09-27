@@ -58,25 +58,24 @@ function ProblemFilter() {
         setTags(tags);
     };
     const handleSubmit = () => {
-        updateQueryString(
-            location,
-            navigate,
-            ["title", "tags", "category"],
-            [
+        updateQueryString({
+            location: location,
+            navigate: navigate,
+            args: ["title", "tags", "category"],
+            values: [
                 title,
                 tags.join(","),
                 category === -1 ? -1 : judgeData.categories[category].value,
             ],
-            ["title", "tags", "category"],
-            null,
-        );
+            validArgs: ["title", "tags", "category"],
+        });
     };
     const handleReset = () => {
-        updateQueryString(location, navigate, [], [], null, [
-            "title",
-            "tags",
-            "category",
-        ]);
+        updateQueryString({
+            location: location,
+            navigate: navigate,
+            validArgs: [],
+        });
     };
     return (
         <div className="w-full">
