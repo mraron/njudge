@@ -104,6 +104,14 @@
     @apply h-full antialiased bg-grey-900 text-textcol;
 }
 
+.font-code {
+    @apply font-mono text-[0.85rem]
+}
+
+pre {
+    @apply font-code
+}
+
 .padding-btn-default {
     @apply px-6 py-2;
 }
@@ -138,6 +146,10 @@
 
 th {
     @apply font-medium;
+}
+
+.text-code {
+
 }
 
 .text-table {

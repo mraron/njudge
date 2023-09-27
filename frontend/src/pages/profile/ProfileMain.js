@@ -37,7 +37,7 @@ function ProfileMain({ data }) {
     );
     return (
         <div className="flex flex-col sm:flex-row w-full items-start">
-            <div className="w-full sm:w-80 mb-3 shrink-0">
+            <div className="w-full sm:w-72 mb-3 shrink-0">
                 <div className="mb-3">
                     <ProfilePictureFrame
                         src="/assets/profile.webp"

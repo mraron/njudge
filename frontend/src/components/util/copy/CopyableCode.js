@@ -9,7 +9,7 @@ function CopyableCode({ text, maxHeight = "auto", titleComponent, cls }) {
             <div
                 className="relative bg-codebgcol flex"
                 style={{ minHeight: "3.75rem", maxHeight: maxHeight }}>
-                <pre className="w-full px-4 py-3 overflow-x-auto text-sm">
+                <pre className="w-full px-4 py-3 overflow-x-auto">
                     {text}
                 </pre>
                 <div className="absolute top-2.5 right-2.5 opacity-75 hover:opacity-100 transition duration-200">

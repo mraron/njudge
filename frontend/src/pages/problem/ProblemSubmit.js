@@ -71,7 +71,7 @@ function ProblemSubmit() {
                 language={
                     judgeData.highlightCodes[judgeData.languages[langIndex].id]
                 }
-                options={{ fontFamily: "JetBrains Mono" }}
+                options={{ fontFamily: "JetBrains Mono", fontSize: 13 }}
                 onChange={setSubmissionCode}
             />
         </div>

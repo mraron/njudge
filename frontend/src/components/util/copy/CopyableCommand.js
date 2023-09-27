@@ -8,7 +8,7 @@ function CopyableCommand({ text }) {
             </div>
             <div
                 className={`w-full bg-codebgcol border border-bordercol rounded-md flex items-center`}>
-                <div className="w-full px-3 py-2 font-mono whitespace-nowrap text-sm">
+                <div className="w-full px-3 py-2 font-code whitespace-nowrap text-sm">
                     {text}
                 </div>
             </div>

@@ -17,7 +17,7 @@ export function ProfilePictureFrame({ userData }) {
     );
     return (
         <RoundedFrame>
-            <div className="flex flex-col items-center p-8 pb-4">
+            <div className="flex flex-col items-center p-6 pb-4">
                 <Link to={profileRoute}>
                     <img
                         alt="avatar"
@@ -59,7 +59,7 @@ export function ProfileDataFrame({ userData }) {
                 [t("profile_sidebar.num_solved"), `${userData.numSolved}`],
             ]}
             titleComponent={titleComponent}
-            labelColWidth="14rem"
+            labelColWidth="12rem"
         />
     );
 }
@@ -107,7 +107,7 @@ function ProfileSideBar() {
     return (
         isLoggedIn && (
             <div className="w-full hidden lg:flex justify-center">
-                <div className="flex flex-col bg-grey-900 w-80">
+                <div className="flex flex-col bg-grey-900 w-72">
                     <div className="mb-3">
                         <ProfilePictureFrame userData={userData} />
                     </div>

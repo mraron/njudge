@@ -19,12 +19,8 @@ export function LinkTag({ data }) {
 }
 
 function TagListFrame({ title, titleComponent, tag: Tag = DefaultTag, tags }) {
-    console.log(tags);
-    console.log("nigga");
     const tagsContent = tags.map((item, index) => (
-        <div className="flex m-1" key={index}>
-            <Tag data={item} key={index} />
-        </div>
+        <Tag data={item} key={index} />
     ));
     return (
         <RoundedFrame title={title} titleComponent={titleComponent}>
