@@ -12,7 +12,7 @@ export function LinkTag({ data }) {
     const { t } = useTranslation();
     return (
         <Link to={data.href}>
-            <Tag cls="w-28 items-center hover:bg-indigo-200 hover:border-indigo-400 dark:hover:bg-indigo-600 dark:hover:border-transparent">
+            <Tag cls="w-28 items-center hover:bg-indigo-200 hover:border-indigo-400 dark:hover:bg-indigo-800 dark:hover:bg-indigo-600">
                 {t(data.text)}
             </Tag>
         </Link>
