@@ -56,6 +56,11 @@
         "unsuccessful_settings_save": "A beállítások mentése nem sikerült.",
         "successful_password_change": "A jelszóváltoztatás sikeres volt."
     },
+    "tag_modal": {
+        "title": "Címkék módosítása",
+        "cancel": "Mégse",
+        "save": "Mentés"
+    },
     "tag": {
         "dp": "dinamikus programozás",
         "greedy": "mohó",

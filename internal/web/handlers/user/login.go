@@ -38,7 +38,7 @@ type Authenticator func(c echo.Context) (*models.User, error)
 
 func loginUserHandler(auth Authenticator) echo.HandlerFunc {
 	type loginResponse struct {
-		Error string `json:"error"`
+		Message string `json:"message"`
 	}
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
@@ -51,7 +51,7 @@ func loginUserHandler(auth Authenticator) echo.HandlerFunc {
 		if err != nil {
 			if errors.Is(err, LoginError) {
 				return c.JSON(http.StatusUnauthorized, loginResponse{
-					Error: err.(LoginErrorWithMessage).TranslatedMessage,
+					Message: err.(LoginErrorWithMessage).TranslatedMessage,
 				})
 			} else {
 				return err
@@ -60,7 +60,7 @@ func loginUserHandler(auth Authenticator) echo.HandlerFunc {
 
 		if user.ActivationKey.Valid {
 			return c.JSON(http.StatusUnauthorized, loginResponse{
-				Error: tr.Translate("The account is not activated. Check your emails!"),
+				Message: tr.Translate("The account is not activated. Check your emails!"),
 			})
 		}
 

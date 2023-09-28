@@ -13,6 +13,7 @@ async function submitSolution({ problem, language, file, submissionCode }) {
     const requestOptions = {
         method: "POST",
         body: formData,
+        credentials: 'include',
     };
     const response = await fetch(
         apiRoute("/problemset/main/submit/"),

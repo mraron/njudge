@@ -1,8 +1,10 @@
 package profile
 
 import (
+	"crypto/md5"
 	"database/sql"
 	"fmt"
+	"github.com/mraron/njudge/internal/web/domain/submission"
 	"github.com/mraron/njudge/internal/web/handlers/problemset"
 	"github.com/mraron/njudge/internal/web/helpers/ui"
 	"github.com/mraron/njudge/pkg/problems"
@@ -10,6 +12,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/net/context"
 	"net/http"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
@@ -29,11 +32,29 @@ type UserData struct {
 	LastSubmissions []problemset.StatusRow `json:"lastSubmissions"`
 }
 
-func UserDataFromUser(u *models.User) (*UserData, error) {
+func GravatarHash(user *models.User) string {
+	return fmt.Sprintf("%x", md5.Sum([]byte(strings.ToLower(strings.TrimSpace(user.Email)))))
+}
+
+func UserDataFromUser(ctx context.Context, DB *sql.DB, problemStore problems.Store, tr i18n.Translator, u *models.User) (*UserData, error) {
+	lastSubmissions, err := models.Submissions(models.SubmissionWhere.UserID.EQ(u.ID), OrderBy("id DESC"), Limit(5)).All(ctx, DB)
+	if err != nil {
+		return nil, err
+	}
+
+	statusRows := make([]problemset.StatusRow, len(lastSubmissions))
+	for i := range lastSubmissions {
+		curr, err := problemset.StatusRowFromSubmission(ctx, DB, problemStore, tr, &submission.Submission{Submission: *lastSubmissions[i]})
+		if err != nil {
+			return nil, err
+		}
+		statusRows[i] = *curr
+	}
+
 	return &UserData{
 		Username:        u.Name,
-		PictureSrc:      "/assets/profile.webp",
-		LastSubmissions: []problemset.StatusRow{},
+		PictureSrc:      fmt.Sprintf("https://www.gravatar.com/avatar/%s?d=identicon&s=128", GravatarHash(u)),
+		LastSubmissions: statusRows,
 	}, nil
 }
 
@@ -43,7 +64,7 @@ type ProfileData struct {
 	Unsolved []ui.Link `json:"unsolved"`
 }
 
-func ProfileDataFromUser(ctx context.Context, DB *sql.DB, u *models.User) (*ProfileData, error) {
+func ProfileDataFromUser(ctx context.Context, DB *sql.DB, problemStore problems.Store, tr i18n.Translator, u *models.User) (*ProfileData, error) {
 	var (
 		solved, attempted models.SubmissionSlice
 		err               error
@@ -79,7 +100,7 @@ func ProfileDataFromUser(ctx context.Context, DB *sql.DB, u *models.User) (*Prof
 		return res
 	}
 
-	ud, err := UserDataFromUser(u)
+	ud, err := UserDataFromUser(ctx, DB, problemStore, tr, u)
 	if err != nil {
 		return nil, err
 	}
@@ -91,10 +112,13 @@ func ProfileDataFromUser(ctx context.Context, DB *sql.DB, u *models.User) (*Prof
 	}, nil
 }
 
-func GetProfile(DB *sqlx.DB) echo.HandlerFunc {
+func GetProfile(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		tr := c.Get("translator").(i18n.Translator)
+
 		u := c.Get("profile").(*models.User)
-		pd, err := ProfileDataFromUser(c.Request().Context(), DB.DB, u)
+
+		pd, err := ProfileDataFromUser(c.Request().Context(), DB.DB, problemStore, tr, u)
 		if err != nil {
 			return err
 		}

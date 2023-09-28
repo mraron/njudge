@@ -77,13 +77,13 @@ func ProblemAttachmentDataFromProblem(tr i18n.Translator, ps, probName string, p
 		res.Statements = append(res.Statements, ProblemAttachment{
 			Name: pdf.Locale(),
 			Type: "pdf",
-			Href: fmt.Sprintf("/api/v2/problemset/%s/%s/pdf/%s/", ps, probName, pdf.Locale()),
+			Href: fmt.Sprintf("/problemset/%s/%s/pdf/%s/", ps, probName, pdf.Locale()),
 		})
 	}
 	for _, elem := range prob.Attachments() {
 		res.Files = append(res.Files, ProblemAttachment{
 			Name: elem.Name(),
-			Href: fmt.Sprintf("/api/v2/problemset/%s/%s/attachment/%s/", ps, probName, elem.Name()),
+			Href: fmt.Sprintf("/problemset/%s/%s/attachment/%s/", ps, probName, elem.Name()),
 		})
 	}
 	return res

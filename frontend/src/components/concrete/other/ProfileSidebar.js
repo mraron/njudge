@@ -77,8 +77,8 @@ function SubmissionsFrame({ titleComponent, submissions }) {
             <td className="padding-td-default">
                 <Link
                     className="link"
-                    to={routeMap.problem.replace(":problem", item.problem)}>
-                    {item.problem}
+                    to={item.problem.href}>
+                    {item.problem.text}
                 </Link>
             </td>
         </tr>
@@ -93,6 +93,7 @@ function SubmissionsFrame({ titleComponent, submissions }) {
 function ProfileSideBar() {
     const { t } = useTranslation();
     const { userData, isLoggedIn } = useContext(UserContext);
+    console.log(`Hey there szexy lady ${isLoggedIn}`);
     const titleComponent = (
         <SVGTitleComponent
             svg={
