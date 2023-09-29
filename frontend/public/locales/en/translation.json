@@ -37,10 +37,12 @@
         "confirm_password": "Confirm password"
     },
     "forgotten_password": {
+        "page_title": "Forgotten password :: njudge",
         "change_password": "Change password",
         "email": "Email address"
     },
     "reset_password": {
+        "page_title": "Reset password :: njudge",
         "change_password": "Change password",
         "password": "Password",
         "confirm_password": "Confirm password"

@@ -37,10 +37,12 @@
         "confirm_password": "Jelszó megerősítése"
     },
     "forgotten_password": {
+        "page_title": "Elfelejtett jelszó :: njudge",
         "change_password": "Jelszóváltoztatás",
         "email": "Email-cím"
     },
     "reset_password": {
+        "page_title": "Jelszóváltoztatás :: njudge",
         "change_password": "Jelszóváltoztatás",
         "password": "Jelszó",
         "confirm_password": "Jelszó megerősítése"

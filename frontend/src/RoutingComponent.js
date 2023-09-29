@@ -41,6 +41,8 @@ const titles = {
     [routeMap.info]: "info.page_title",
     [routeMap.login]: "login.page_title",
     [routeMap.register]: "register.page_title",
+    [routeMap.forgotten_password]: "forgotten_password.page_title",
+    [routeMap.reset_password]: "reset_password.page_title",
     [routeMap.profile]: "profile_main.page_title",
     [routeMap.profileSubmissions]: "profile_submissions.page_title",
     [routeMap.profileSettings]: "profile_settings.page_title",
