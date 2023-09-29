@@ -43,19 +43,27 @@ func (s *Server) Run() {
 	e := echo.New()
 	if s.Mode == "development" {
 		e.Debug = true
-	} else {
-		e.HTTPErrorHandler = func(err error, c echo.Context) {
-			code := http.StatusInternalServerError
-			if he, ok := err.(*echo.HTTPError); ok {
-				code = he.Code
-			}
+	}
+	e.HTTPErrorHandler = func(err error, c echo.Context) {
+		code := http.StatusInternalServerError
+		if he, ok := err.(*echo.HTTPError); ok {
+			code = he.Code
+		}
 
-			if err := c.Render(code, "error.gohtml", "Hiba történt"); err != nil {
-				c.Logger().Error(err)
-			}
+		msg := "Hiba történt"
+		if s.Mode == "development" {
+			msg = err.Error()
+		}
 
+		if err := c.JSON(code, struct {
+			Message string `json:"message"`
+		}{
+			Message: msg,
+		}); err != nil {
 			c.Logger().Error(err)
 		}
+
+		c.Logger().Error(err)
 	}
 	e.Renderer = templates.New(s.Server, s.ProblemStore, s.DB.DB, partials.NewCached(s.DB.DB, 30*time.Second))
 
@@ -66,7 +74,10 @@ func (s *Server) Run() {
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	e.Use(session.Middleware(store))
+	e.Use(session.MiddlewareWithConfig(session.Config{
+		Skipper: nil,
+		Store:   store,
+	}))
 
 	s.prepareRoutes(e)
 

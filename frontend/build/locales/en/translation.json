@@ -56,6 +56,11 @@
         "unsuccessful_settings_save": "The settings couldn't be saved.",
         "successful_password_change": "The password has been changed successfully."
     },
+    "tag_modal": {
+        "title": "Change tags",
+        "cancel": "Cancel",
+        "save": "Save"
+    },
     "tag": {
         "dp": "dynamic programming",
         "greedy": "greedy",

@@ -1,15 +1,13 @@
 package web
 
 import (
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/pkg/language"
 	"net/http"
 	"sort"
 	"strconv"
 	"strings"
-	"time"
-
-	"github.com/labstack/echo/v4/middleware"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
 
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/web/extmodels"
@@ -19,8 +17,6 @@ import (
 	"github.com/mraron/njudge/internal/web/handlers/taskarchive"
 	"github.com/mraron/njudge/internal/web/handlers/user"
 	"github.com/mraron/njudge/internal/web/handlers/user/profile"
-	"github.com/mraron/njudge/internal/web/helpers"
-	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
 	"github.com/mraron/njudge/internal/web/models"
 	"github.com/mraron/njudge/internal/web/services"
 )
@@ -33,33 +29,47 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 		},
 		CookiePath: "/",
 	}))
+
 	e.Use(i18n.SetTranslatorMiddleware())
 	e.Use(user.SetUserMiddleware(s.DB))
-	e.Use(helpers.ClearTemporaryFlashes())
 
-	e.GET("/", handlers.GetHome())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowCredentials: true,
+		AllowMethods:     []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
+	}))
 
-	e.GET("/page/:page", handlers.GetPage(partials.NewCached(s.DB.DB, 30*time.Second)))
+	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
+		Skipper:    nil,
+		Root:       "frontend/build",
+		Index:      "index.html",
+		HTML5:      true,
+		Browse:     false,
+		IgnoreBase: false,
+		Filesystem: nil,
+	}))
 
-	e.Static("/static", "static")
+	//@TODO
+	//e.GET("/submission/rejudge/:id", handlers.RejudgeSubmission(services.NewSQLSubmission(s.DB.DB)), user.RequireLoginMiddleware()).Name = "rejudgeSubmission"
 
-	e.GET("/submission/rejudge/:id", handlers.RejudgeSubmission(services.NewSQLSubmission(s.DB.DB)), user.RequireLoginMiddleware()).Name = "rejudgeSubmission"
-
-	ps := e.Group("/problemset", problemset.SetNameMiddleware())
-	ps.GET("/:name/", problemset.GetProblemList(s.DB, services.NewSQLProblemListService(s.DB.DB, s.ProblemStore, services.NewSQLProblem(s.DB.DB, s.ProblemStore)), services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
+	//ps := e.Group("/problemset", problemset.SetNameMiddleware())
+	//ps.GET("/:name/", problemset.GetProblemList(s.DB, services.NewSQLProblemListService(s.DB.DB, s.ProblemStore, services.NewSQLProblem(s.DB.DB, s.ProblemStore)), services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
 	//ps.POST("/:name/submit", problemset.PostSubmit(services.NewSQLSubmitService(s.DB.DB, s.ProblemStore)), user.RequireLoginMiddleware())
 
-	psProb := ps.Group("/:name/:problem", problemset.RenameProblemMiddleware(s.ProblemStore), problemset.SetProblemMiddleware(services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
 	//psProb.GET("/", problemset.GetProblem()).Name = "getProblemMain"
 	////psProb.GET("/problem", problemset.GetProblem())
 	//psProb.GET("/status", problemset.GetProblemStatus(services.NewSQLStatusPageService(s.DB.DB)))
-	psProb.GET("/submit", problemset.GetProblemSubmit())
 	//psProb.GET("/ranklist", problemset.GetProblemRanklist(s.DB))
-	psProb.POST("/tags", problemset.PostProblemTag(services.NewSQLTagsService(s.DB.DB)))
-	psProb.GET("/delete_tag/:id", problemset.DeleteProblemTag(services.NewSQLTagsService(s.DB.DB)))
+
+	//@TODO
+	//psProb.POST("/tags", problemset.PostProblemTag(services.NewSQLTagsService(s.DB.DB)))
+	//psProb.GET("/delete_tag/:id", problemset.DeleteProblemTag(services.NewSQLTagsService(s.DB.DB)))
+
 	//psProb.GET("/pdf/:language/", problemset.GetProblemPDF())
 	//psProb.GET("/attachment/:attachment/", problemset.GetProblemAttachment())
-	psProb.GET("/:file", problemset.GetProblemFile())
+
+	//@TODO
+	//psProb.GET("/:file", problemset.GetProblemFile())
 
 	u := e.Group("/user")
 
@@ -69,21 +79,22 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	//u.GET("/logout", user.Logout())
 
 	//u.GET("/login", user.GetLogin()).Name = "getUserLogin"
-	u.GET("/register", user.GetRegister())
-	u.POST("/register", user.Register(s.Server, s.DB, s.MailService))
+	//u.GET("/register", user.GetRegister())
+	//u.POST("/register", user.Register(s.Server, s.DB, s.MailService))
 	u.GET("/activate", user.GetActivateInfo())
 	u.GET("/activate/:name/:key", user.Activate(s.DB))
 
-	u.GET("/forgotten_password", user.GetForgottenPassword()).Name = "GetForgottenPassword"
-	u.POST("/forgotten_password", user.PostForgottenPassword(s.Server, s.DB, s.MailService))
-	u.GET("/forgotten_password_form/:name/:key", user.GetForgottenPasswordForm(s.DB)).Name = "GetForgottenPasswordForm"
-	u.POST("/forgotten_password_form", user.PostForgottenPasswordForm(s.DB)).Name = "PostForgottenPasswordForm"
+	//@TODO
+	//u.GET("/forgotten_password", user.GetForgottenPassword()).Name = "GetForgottenPassword"
+	//u.POST("/forgotten_password", user.PostForgottenPassword(s.Server, s.DB, s.MailService))
+	//u.GET("/forgotten_password_form/:name/:key", user.GetForgottenPasswordForm(s.DB)).Name = "GetForgottenPasswordForm"
+	//u.POST("/forgotten_password_form", user.PostForgottenPasswordForm(s.DB)).Name = "PostForgottenPasswordForm"
 
-	pr := u.Group("/profile", profile.SetProfileMiddleware(s.DB))
+	//pr := u.Group("/profile", profile.SetProfileMiddleware(s.DB))
 	//pr.GET("/:name/", profile.GetProfile(s.DB))
 	//pr.GET("/:name/submissions/", profile.GetSubmissions(services.NewSQLStatusPageService(s.DB.DB)))
 
-	_ = pr.Group("/:name/settings", user.RequireLoginMiddleware(), profile.PrivateMiddleware())
+	//_ = pr.Group("/:name/settings", user.RequireLoginMiddleware(), profile.PrivateMiddleware())
 	//prs.GET("/", profile.GetSettings(s.DB))
 	//prs.POST("/change_password/", profile.PostSettingsChangePassword(s.DB))
 	//prs.POST("/misc/", profile.PostSettingsMisc(s.DB))
@@ -108,7 +119,7 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 		u := v2.Group("/user")
 
 		pr := u.Group("/profile", profile.SetProfileMiddleware(s.DB))
-		pr.GET("/:name/", profile.GetProfile(s.DB))
+		pr.GET("/:name/", profile.GetProfile(s.DB, s.ProblemStore))
 		pr.GET("/:name/submissions/", profile.GetSubmissions(s.DB, s.ProblemStore, services.NewSQLStatusPageService(s.DB.DB)))
 
 		prs := pr.Group("/:name/settings", user.RequireLoginMiddleware(), profile.PrivateMiddleware())
@@ -117,6 +128,7 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 		prs.POST("/other/", profile.PostSettingsMisc(s.DB))
 
 		u.GET("/auth/", func(c echo.Context) error {
+			tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 			u := c.Get("user").(*models.User)
 			var (
@@ -124,7 +136,7 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 				err error
 			)
 			if u != nil {
-				ud, err = profile.UserDataFromUser(u)
+				ud, err = profile.UserDataFromUser(c.Request().Context(), s.DB.DB, s.ProblemStore, tr, u)
 				if err != nil {
 					return err
 				}
@@ -139,6 +151,7 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 		u.GET("/auth/google/", user.BeginOAuth())
 		u.POST("/auth/login/", user.PostLogin(s.DB))
 		u.GET("/auth/logout/", user.Logout())
+		u.POST("/auth/register/", user.Register(s.Server, s.DB, s.MailService))
 
 		ps := v2.Group("/problemset", problemset.SetNameMiddleware())
 		ps.GET("/:name/", problemset.GetProblemList(s.DB, services.NewSQLProblemListService(s.DB.DB, s.ProblemStore, services.NewSQLProblem(s.DB.DB, s.ProblemStore)), services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))

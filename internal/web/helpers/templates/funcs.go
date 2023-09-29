@@ -2,7 +2,6 @@ package templates
 
 import (
 	"context"
-	"crypto/md5"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -10,6 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/mraron/njudge/internal/web/domain/problem"
+	"github.com/mraron/njudge/internal/web/handlers/user/profile"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/helpers/roles"
@@ -20,7 +20,6 @@ import (
 	"html/template"
 	"math"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -110,9 +109,7 @@ func statelessFuncs(store problems.Store, db *sql.DB, store2 partials.Store) tem
 
 			return ""
 		},
-		"gravatarHash": func(user *models.User) string {
-			return fmt.Sprintf("%x", md5.Sum([]byte(strings.ToLower(strings.TrimSpace(user.Email)))))
-		},
+		"gravatarHash": profile.GravatarHash,
 		"dict": func(values ...interface{}) (map[string]interface{}, error) {
 			if len(values)%2 != 0 {
 				return nil, errors.New("invalid dict call")

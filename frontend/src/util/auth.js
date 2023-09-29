@@ -9,6 +9,7 @@ export async function login(username, password) {
             username: username,
             password: password,
         }),
+        credentials: 'include',
     };
     try {
         const response = await fetch(
@@ -32,6 +33,7 @@ export async function register(username, email, password, passwordConfirm) {
             password: password,
             passwordConfirm: passwordConfirm,
         }),
+        credentials: 'include',
     };
     try {
         const response = await fetch(
@@ -67,7 +69,10 @@ export async function logout() {
 
 export async function authenticate() {
     try {
-        const response = await fetch(apiRoute("/user/auth/"));
+        const requestOptions = {
+            credentials: 'include',
+        };
+        const response = await fetch(apiRoute("/user/auth/"), requestOptions);
         const data = await response.json();
         return data.userData;
     } catch (error) {

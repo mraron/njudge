@@ -2,6 +2,8 @@ package user
 
 import (
 	"bytes"
+	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 	"unicode"
@@ -36,11 +38,14 @@ func GetRegister() echo.HandlerFunc {
 }
 
 func Register(cfg config.Server, DB *sqlx.DB, mailService services.MailService) echo.HandlerFunc {
+	type response struct {
+		Message string `json:"message"`
+	}
 	type request struct {
-		Name      string `form:"name"`
-		Email     string `form:"email"`
-		Password  string `form:"password"`
-		Password2 string `form:"password2"`
+		Name      string `json:"username"`
+		Email     string `json:"email"`
+		Password  string `json:"password"`
+		Password2 string `json:"passwordConfirm"`
 	}
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
@@ -57,13 +62,19 @@ func Register(cfg config.Server, DB *sqlx.DB, mailService services.MailService) 
 		)
 
 		if u := c.Get("user").(*models.User); u != nil {
-			return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
+			return c.JSON(http.StatusUnauthorized, response{
+				"Már be vagy lépve...",
+			})
 		}
 
 		used := func(col, value, msg string) {
-			if err != nil {
+			if err == nil {
 				u := ""
 				err = DB.Get(&u, "SELECT name FROM users WHERE "+col+"=$1", value)
+				if err != nil && errors.Is(err, sql.ErrNoRows) {
+					err = nil
+				}
+
 				if u != "" {
 					errStrings = append(errStrings, msg)
 				}
@@ -71,7 +82,7 @@ func Register(cfg config.Server, DB *sqlx.DB, mailService services.MailService) 
 		}
 
 		required := func(value, msg string) {
-			if c.FormValue(value) == "" {
+			if value == "" {
 				errStrings = append(errStrings, msg)
 			}
 		}
@@ -88,10 +99,10 @@ func Register(cfg config.Server, DB *sqlx.DB, mailService services.MailService) 
 		used("name", data.Name, tr.Translate("The nickname is already registered."))
 		used("email", data.Email, tr.Translate("The email is already registered."))
 
-		required("name", tr.Translate("The nickname field is required."))
-		required("password", tr.Translate("The password field is required."))
-		required("password2", tr.Translate("The password confirmation field is required."))
-		required("email", tr.Translate("The email field is required."))
+		required(data.Name, tr.Translate("The nickname field is required."))
+		required(data.Password, tr.Translate("The password field is required."))
+		required(data.Password2, tr.Translate("The password confirmation field is required."))
+		required(data.Email, tr.Translate("The email field is required."))
 
 		alphaNumeric(data.Name, tr.Translate("The nickname can only consist of alphanumeric characters: letters (including non-latin characters such as 'á' or 'ű') and digits."))
 
@@ -104,10 +115,8 @@ func Register(cfg config.Server, DB *sqlx.DB, mailService services.MailService) 
 		}
 
 		if len(errStrings) > 0 {
-			return c.Render(http.StatusOK, "user/register", RegistrationPageData{
-				ErrorStrings: errStrings,
-				Name:         data.Name,
-				Email:        data.Email,
+			return c.JSON(http.StatusUnprocessableEntity, response{
+				Message: errStrings[0],
 			})
 		}
 
@@ -118,7 +127,9 @@ func Register(cfg config.Server, DB *sqlx.DB, mailService services.MailService) 
 		}
 
 		transaction := func() {
-			tx, err := DB.Begin()
+			var tx *sql.Tx
+			tx, err = DB.Begin()
+
 			defer func() {
 				if p := recover(); p != nil {
 					tx.Rollback()
@@ -139,7 +150,7 @@ func Register(cfg config.Server, DB *sqlx.DB, mailService services.MailService) 
 			mustPanic(err)
 
 			m := email.Mail{}
-			m.Recipients = []string{c.FormValue("email")}
+			m.Recipients = []string{data.Email}
 			m.Subject = tr.Translate("Activate your account")
 
 			message := &bytes.Buffer{}
@@ -148,7 +159,7 @@ func Register(cfg config.Server, DB *sqlx.DB, mailService services.MailService) 
 				URL           string
 				ActivationKey string
 			}{
-				c.FormValue("name"),
+				data.Name,
 				cfg.Url,
 				key,
 			}, nil))
@@ -163,7 +174,7 @@ func Register(cfg config.Server, DB *sqlx.DB, mailService services.MailService) 
 			return err
 		}
 
-		return c.Redirect(http.StatusFound, "/user/activate")
+		return c.JSON(http.StatusOK, response{""})
 	}
 }
 

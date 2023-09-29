@@ -20,7 +20,7 @@ export const routeMap = {
     admin: "/user/admin/",
 };
 
-const apiRoot = "https://127.0.0.1:5555/api/v2";
+const apiRoot = "http://localhost:5555/api/v2";
 
 export function apiRoute(route) {
     console.log(`${apiRoot}${route}`);
