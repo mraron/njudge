@@ -93,6 +93,7 @@ function SubmissionsFrame({ titleComponent, submissions }) {
 function ProfileSideBar() {
     const { t } = useTranslation();
     const { userData, isLoggedIn } = useContext(UserContext);
+    console.log(isLoggedIn + " ??? ")
     const titleComponent = (
         <SVGTitleComponent
             svg={

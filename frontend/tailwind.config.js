@@ -1,11 +1,11 @@
-const { createThemes } = require('tw-colors');
-
 module.exports = {
     content: ["./src/**/*.{js, jsx, ts, tsx}", "./src/*.html"],
     darkMode: "class",
     theme: {
         extend: {
             transitionProperty: {
+                "opacity": "opacity",
+                "transform": "transform",
                 "width-opacity": "width, opacity",
                 "height-opacity": "height, opacity"
             },

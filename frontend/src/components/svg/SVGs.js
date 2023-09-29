@@ -1,9 +1,9 @@
 export function SVGDropdownListArrow({ isOpen }) {
     return (
         <svg
-            className={`w-4 h-4 mr-1 fill-current ${
+            className={`transform w-4 h-4 mr-1 fill-current ${
                 isOpen ? "rotate-90" : ""
-            } transition-all duration-100 shrink-0`}
+            } transition-transform duration-100 shrink-0`}
             viewBox="0 0 48 48"
             xmlns="http://www.w3.org/2000/svg">
             <rect width="48" height="48" fill="none" />
@@ -15,9 +15,9 @@ export function SVGDropdownListArrow({ isOpen }) {
 export function SVGDropdownMenuArrow({ cls = null, isOpen }) {
     return (
         <svg
-            className={`${cls} w-6 h-6 ml-4 ${
+            className={`transform ${cls} w-6 h-6 ml-4 ${
                 isOpen ? "rotate-180" : ""
-            } transition-all duration-100`}
+            } transition-transform duration-100`}
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg">
@@ -35,9 +35,9 @@ export function SVGDropdownMenuArrow({ cls = null, isOpen }) {
 export function SVGDropdownFilterArrow({ isOpen }) {
     return (
         <svg
-            className={`${
+            className={`transform ${
                 isOpen ? "rotate-180" : "rotate-0"
-            } h-[1.85rem] text-sm font-medium transition duration-100`}
+            } h-[1.85rem] text-sm font-medium transition-transform duration-100`}
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg">

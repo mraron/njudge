@@ -35,6 +35,8 @@ export async function updateData(
     isMounted,
 ) {
     const response = await authenticate();
+    console.log(JSON.stringify(response))
+    console.log(JSON.stringify(response !== null))
     if (response !== undefined) {
         setUserData(response);
         setLoggedIn(response !== null);
