@@ -4,10 +4,10 @@ import { SVGDropdownListArrow } from "../svg/SVGs";
 function DropdownElem({ text, isOpen, onClick }) {
     return (
         <span
-            className="w-fit flex link items-center font-medium no-underline"
+            className="max-w-fit flex link items-center font-medium no-underline"
             onClick={onClick}>
             <SVGDropdownListArrow isOpen={isOpen} />
-            {text}
+            <span className="truncate">{text}</span>
         </span>
     );
 }

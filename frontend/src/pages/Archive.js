@@ -50,7 +50,9 @@ function Archive({ data }) {
                 <div className="ml-0 lg:ml-4">
                     <ProfileSideBar />
                 </div>
-                <div className="w-full px-4 lg:pl-3">{categoriesContent}</div>
+                <div className="w-full px-4 lg:pl-3 min-w-0">
+                    {categoriesContent}
+                </div>
             </div>
         </div>
     );

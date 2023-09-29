@@ -8,7 +8,7 @@ function Contests() {
                 <div className="ml-0 lg:ml-4">
                     <ProfileSideBar />
                 </div>
-                <div className="w-full px-4 lg:pl-3">
+                <div className="w-full px-4 lg:pl-3 min-w-0">
                     <ContestList
                         contestData={[
                             [
