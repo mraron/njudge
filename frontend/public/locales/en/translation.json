@@ -43,7 +43,7 @@
     "reset_password": {
         "change_password": "Change password",
         "password": "Password",
-        "forgotten_password": "Forgotten password?"
+        "confirm_password": "Confirm password"
     },
     "submission": {
         "compilation_error": "Compilation error",
