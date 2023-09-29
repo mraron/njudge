@@ -18,7 +18,7 @@ function Pagination({ paginationData }) {
     const cls =
         "flex justify-center items-center px-3 py-1.5 text-sm border-bordercol border hover:bg-grey-750 text-center";
     return (
-        <RoundedFrame>
+        <RoundedFrame cls="overflow-hidden">
             <div className="flex justify-center p-3 overflow-x-auto">
                 <button
                     aria-label="First"

@@ -1,64 +1,44 @@
-import { useTranslation } from "react-i18next";
-import { Navigate, useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RoundedFrame from "../../components/container/RoundedFrame";
 import TextBox from "../../components/input/TextBox";
 import SVGTitleComponent from "../../components/svg/SVGTitleComponent";
-import { routeMap } from "../../config/RouteConfig";
-import { register } from "../../util/auth";
 import UserContext from "../../contexts/user/UserContext";
+import { routeMap } from "../../config/RouteConfig";
+import { reset_password } from "../../util/auth";
 
-function RegisterFrame() {
+function ResetPasswordFrame() {
     const { t } = useTranslation();
-    const [username, setUsername] = useState("");
+    const { user, token } = useParams();
     const [password, setPassword] = useState("");
     const [passwordConfirm, setPasswordConfirm] = useState("");
-    const [email, setEmail] = useState("");
-    const navigate = useNavigate();
+
     const titleComponent = (
         <SVGTitleComponent
-            svg={
-                <FontAwesomeIcon icon="fa-user-plus" className="w-5 h-5 mr-3" />
-            }
-            title={t("register.register")}
+            svg={<FontAwesomeIcon icon="fa-lock" className="w-5 h-5 mr-3" />}
+            title={t("reset_password.change_password")}
         />
     );
-    const handleRegister = (event) => {
+    const handleResetPassword = (event) => {
         event.preventDefault();
-        register(username, email, password, passwordConfirm).then((resp) => {
+        reset_password(user, token, password, passwordConfirm).then((resp) => {
             if (resp.success) {
-                window.flash("flash.successful_registration", "success");
-                navigate(routeMap.home);
+                window.flash("flash.successful_password_change", "success")
             } else {
-                window.flash(resp.message, "failure");
+                window.flash(resp.message, "failure")
             }
-        });
+        })
     };
     return (
         <RoundedFrame titleComponent={titleComponent}>
             <form method="POST">
-                <div className="px-10 pt-8 pb-6 border-b border-bordercol">
-                    <div className="mb-4 relative">
-                        <TextBox
-                            id="username"
-                            label={t("register.username")}
-                            initText={username}
-                            onChange={setUsername}
-                        />
-                    </div>
-                    <TextBox
-                        id="email"
-                        label={t("register.email")}
-                        initText={email}
-                        onChange={setEmail}
-                    />
-                </div>
-                <div className="px-10 pt-4 pb-8">
+                <div className="px-10 py-8">
                     <div className="mb-4">
                         <TextBox
                             id="password"
-                            label={t("register.password")}
+                            label={t("reset_password.password")}
                             type="password"
                             initText={password}
                             onChange={setPassword}
@@ -67,7 +47,7 @@ function RegisterFrame() {
                     <div className="mb-6">
                         <TextBox
                             id="passwordConfirm"
-                            label={t("register.confirm_password")}
+                            label={t("reset_password.confirm_password")}
                             type="password"
                             initText={passwordConfirm}
                             onChange={setPasswordConfirm}
@@ -77,8 +57,8 @@ function RegisterFrame() {
                         <button
                             type="submit"
                             className="btn-indigo padding-btn-default min-w-[12rem]"
-                            onClick={handleRegister}>
-                            {t("register.register")}
+                            onClick={handleResetPassword}>
+                            {t("reset_password.change_password")}
                         </button>
                     </div>
                 </div>
@@ -87,7 +67,7 @@ function RegisterFrame() {
     );
 }
 
-function Register() {
+function ResetPassword() {
     const { userData, isLoggedIn } = useContext(UserContext);
     if (isLoggedIn) {
         return (
@@ -103,11 +83,11 @@ function Register() {
         <div className="w-full flex justify-center">
             <div className="flex justify-center w-full sm:max-w-md">
                 <div className="w-full px-4">
-                    <RegisterFrame />
+                    <ResetPasswordFrame />
                 </div>
             </div>
         </div>
     );
 }
 
-export default Register;
+export default ResetPassword;

@@ -29,6 +29,8 @@ import UpdatePage from "./pages/wrappers/UpdatedPage";
 import { findRouteIndex } from "./util/findRouteIndex";
 import { routeMap } from "./config/RouteConfig";
 import extractParams from "./util/extractParams";
+import ForgottenPassword from "./pages/auth/ForgottenPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 const titles = {
     [routeMap.home]: "home.page_title",
@@ -107,6 +109,14 @@ function RoutingComponent() {
                 <Route
                     path={routeMap.register}
                     element={<UpdatePage key={location.key} page={Register} />}
+                />
+                <Route
+                    path={routeMap.forgotten_password}
+                    element={<UpdatePage key={location.key} page={ForgottenPassword} />}
+                />
+                <Route
+                    path={routeMap.reset_password}
+                    element={<UpdatePage key={location.key} page={ResetPassword} />}
                 />
                 <Route
                     path={routeMap.verify}

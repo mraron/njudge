@@ -46,6 +46,47 @@ export async function register(username, email, password, passwordConfirm) {
     }
 }
 
+export async function change_password(email) {
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            email: email,
+        })
+    };
+    try {
+        const response = await fetchWithCredentials(
+            apiRoute("/user/auth/forgotten_password/"),
+            requestOptions,
+        );
+        return response.ok;
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
+}
+
+export async function reset_password(user, token, password, passwordConfirm) {
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            password: password,
+            passwordConfirm: passwordConfirm,
+        })
+    };
+    try {
+        const response = await fetchWithCredentials(
+            apiRoute(`/user/auth/reset_password/${user}/${token}/`),
+            requestOptions,
+        );
+        const data = await response.json();
+        return { ...data, success: response.ok };
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 export async function verify(token) {
     const response = await fetchWithCredentials(apiRoute(`/user/auth/verify/${token}/`));
     const data = await response.json();

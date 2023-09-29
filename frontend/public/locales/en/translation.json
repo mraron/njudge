@@ -25,7 +25,8 @@
         "page_title": "Login :: njudge",
         "login": "Login",
         "username": "Username",
-        "password": "Password"
+        "password": "Password",
+        "forgotten_password": "Forgotten password?"
     },
     "register": {
         "page_title": "Register :: njudge",
@@ -34,6 +35,15 @@
         "email": "E-mail address",
         "password": "Password",
         "confirm_password": "Confirm password"
+    },
+    "forgotten_password": {
+        "change_password": "Change password",
+        "email": "Email address"
+    },
+    "reset_password": {
+        "change_password": "Change password",
+        "password": "Password",
+        "forgotten_password": "Forgotten password?"
     },
     "submission": {
         "compilation_error": "Compilation error",
@@ -54,7 +64,9 @@
         "password_mismatch": "The passwords do not match.",
         "successful_settings_save": "The settings have been saved successfully.",
         "unsuccessful_settings_save": "The settings couldn't be saved.",
-        "successful_password_change": "The password has been changed successfully."
+        "successful_password_change": "The password has been changed successfully.",
+        "unsuccessful_email_pw_change": "The e-mail for password change couldn't be sent.",
+        "successful_email_pw_change": "The e-mail for password change has been sent successfully."
     },
     "tag_modal": {
         "title": "Change tags",

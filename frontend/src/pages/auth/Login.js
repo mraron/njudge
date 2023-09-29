@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RoundedFrame from "../../components/container/RoundedFrame";
@@ -33,17 +33,17 @@ function LoginFrame() {
     };
     return (
         <RoundedFrame titleComponent={titleComponent}>
-            <form method="POST">
-                <div className="px-10 py-8">
+            <div className="px-10 py-8">
+                <form method="POST" className="mb-4">
                     <div className="mb-4">
                         <TextBox
-                            id="userName"
+                            id="username"
                             label={t("login.username")}
                             initText={username}
                             onChange={setUsername}
                         />
                     </div>
-                    <div className="mb-6">
+                    <div className="mb-2">
                         <TextBox
                             id="password"
                             label={t("login.password")}
@@ -52,7 +52,12 @@ function LoginFrame() {
                             onChange={setPassword}
                         />
                     </div>
-                    <div className="flex justify-center mb-2">
+                    <div className="mb-6">
+                        <Link to={routeMap.forgotten_password} className="link">
+                            {t("login.forgotten_password")}
+                        </Link>
+                    </div>
+                    <div className="flex justify-center mb-1">
                         <button
                             type="submit"
                             className="btn-indigo padding-btn-default mr-2 w-1/2"
@@ -63,8 +68,8 @@ function LoginFrame() {
                             Google
                         </button>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </RoundedFrame>
     );
 }

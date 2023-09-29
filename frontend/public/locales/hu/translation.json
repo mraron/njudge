@@ -25,13 +25,23 @@
         "page_title": "Belépés :: njudge",
         "login": "Belépés",
         "username": "Felhasználónév",
-        "password": "Jelszó"
+        "password": "Jelszó",
+        "forgotten_password": "Elfelejtetted a jelszavad?"
     },
     "register": {
         "page_title": "Regisztráció :: njudge",
         "register": "Regisztráció",
         "username": "Felhasználónév",
         "email": "E-mail cím",
+        "password": "Jelszó",
+        "confirm_password": "Jelszó megerősítése"
+    },
+    "forgotten_password": {
+        "change_password": "Jelszóváltoztatás",
+        "email": "Email-cím"
+    },
+    "reset_password": {
+        "change_password": "Jelszóváltoztatás",
         "password": "Jelszó",
         "confirm_password": "Jelszó megerősítése"
     },
@@ -54,7 +64,9 @@
         "password_mismatch": "A jelszavak nem egyeznek.",
         "successful_settings_save": "A beállítások mentése sikeres volt.",
         "unsuccessful_settings_save": "A beállítások mentése nem sikerült.",
-        "successful_password_change": "A jelszóváltoztatás sikeres volt."
+        "successful_password_change": "A jelszóváltoztatás sikeres volt.",
+        "unsuccessful_email_pw_change": "A jelszóváltoztató e-mail elküldése nem sikerült.",
+        "successful_email_pw_change": "A jelszóváltoztató e-mail sikeresen elküldve."
     },
     "tag_modal": {
         "title": "Címkék módosítása",

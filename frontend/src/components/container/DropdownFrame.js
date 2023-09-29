@@ -10,8 +10,8 @@ function DropdownFrame({ children, title }) {
                 onClick={() => setOpen(!isOpen)}
                 className={`w-full h-12 ${
                     isOpen
-                        ? "bg-grey-750 hover:bg-grey-725 rounded-tl-md rounded-tr-md"
-                        : "bg-grey-800 hover:bg-grey-775 rounded-md"
+                        ? "bg-grey-750 hover:bg-grey-725 rounded-t-container"
+                        : "bg-grey-800 hover:bg-grey-775 rounded-container"
                 } border-bordercol flex items-center justify-center`}>
                 <span className="font-medium mr-[0.3rem]">{title}</span>
                 <SVGDropdownFilterArrow isOpen={isOpen} />

@@ -87,7 +87,7 @@
 
 @layer components {
     .rounded-frame {
-        @apply bg-grey-800 border border-bordercol rounded-md flex w-full;
+        @apply rounded-container bg-grey-800 border border-bordercol flex w-full;
     }
     .link {
         @apply cursor-pointer underline underline-offset-2 hover:text-indigo-800 dark:hover:text-indigo-200;

@@ -28,9 +28,9 @@ function TagListFrame({ title, titleComponent, tag: Tag = DefaultTag, tags }) {
         <Tag data={item} key={index} />
     ));
     return (
-        <RoundedFrame title={title} titleComponent={titleComponent}>
-            <div className="flex flex-col w-full overflow-x-auto rounded-md">
-                <div className="flex flex-wrap p-4 bg-grey-850">
+        <RoundedFrame title={title} titleComponent={titleComponent} cls="overflow-hidden">
+            <div className={`flex flex-col w-full ${title || titleComponent? "rounded-b-container": "rounded-container"}`}>
+                <div className={`flex flex-wrap p-4 bg-grey-850 ${title || titleComponent? "rounded-b-container": "rounded-container"}`}>
                     {tagsContent}
                 </div>
             </div>

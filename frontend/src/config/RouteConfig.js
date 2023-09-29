@@ -17,10 +17,12 @@ export const routeMap = {
     register: "/user/register/",
     verify: "/user/verify/:token/",
     logout: "/user/logout/",
+    forgotten_password: "/user/forgotten_password/",
+    reset_password: "/user/reset_password/:user/:token/",
     admin: "/user/admin/",
 };
 
-const apiRoot = "http://localhost:5555/api/v2";
+const apiRoot = "https://127.0.0.1:5619/api/v2";
 
 export function apiRoute(route) {
     console.log(`${apiRoot}${route}`);
