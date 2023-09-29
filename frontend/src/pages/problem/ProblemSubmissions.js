@@ -57,12 +57,12 @@ function SubmissionFilterFrame() {
                 </div>
                 <div className="flex justify-center">
                     <button
-                        className="mr-1 btn-indigo padding-btn-default w-32"
+                        className="mr-1 btn-indigo padding-btn-default min-w-[8rem]"
                         onClick={handleSubmit}>
                         {t("problem_filter.search")}
                     </button>
                     <button
-                        className="ml-1 btn-gray padding-btn-default w-32"
+                        className="ml-1 btn-gray padding-btn-default min-w-[8rem]"
                         onClick={handleReset}>
                         {t("problem_filter.reset")}
                     </button>

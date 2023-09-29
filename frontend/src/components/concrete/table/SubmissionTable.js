@@ -109,11 +109,11 @@ function TestCase13({
             )}
             <td
                 className={`padding-td-default border border-t-0 border-dividecol ${bottomBorderCase}`}>
-                {testCase.timeSpent}
+                {testCase.time} ms
             </td>
             <td
                 className={`padding-td-default border border-t-0 border-r-0 border-dividecol ${bottomBorderCase}`}>
-                {testCase.memoryUsed}
+                {testCase.memory} KiB
             </td>
         </tr>
     );
@@ -160,7 +160,7 @@ function TestCase0({ testCase, index }) {
             )}
             <span>{index + 1}</span>
             <span className="mx-2">–</span>
-            <span>{testCase.verdictName}</span>
+            <span className="truncate">{testCase.verdictName}</span>
         </div>
     );
 
@@ -168,8 +168,8 @@ function TestCase0({ testCase, index }) {
         ["submission_table.output", testCase.output],
         ["submission_table.expected_output", testCase.expectedOutput],
         ["submission_table.checker_output", testCase.checkerOutput],
-    ].map((item) => (
-        <tr className="divide-x divide-dividecol">
+    ].map((item, index) => (
+        <tr className="divide-x divide-dividecol" key={index}>
             <td className="padding-td-default whitespace-nowrap w-48">
                 {t(item[0])}
             </td>
@@ -194,7 +194,7 @@ function TestCase0({ testCase, index }) {
                     <span className="hidden sm:inline">
                         {t("submission_table.time")}:&nbsp;
                     </span>
-                    <span>{testCase.timeSpent}</span>
+                    <span className="truncate">{testCase.time} ms</span>
                 </div>
                 <div className="ml-2 whitespace-nowrap truncate flex items-center">
                     <FontAwesomeIcon
@@ -204,7 +204,7 @@ function TestCase0({ testCase, index }) {
                     <span className="hidden sm:inline">
                         {t("submission_table.memory")}:&nbsp;
                     </span>
-                    <span>{testCase.memoryUsed}</span>
+                    <span className="truncate">{testCase.memory} KiB</span>
                 </div>
             </div>
             <div className="overflow-x-auto">
@@ -221,7 +221,7 @@ function TestCase0({ testCase, index }) {
 function SubmissionTable0({ status }) {
     const testCases = status.groups?.[0].testCases;
     const testCasesContent = testCases?.map((testCase, index) => (
-        <div className="mb-3">
+        <div className="mb-3" key={index}>
             <TestCase0 testCase={testCase} index={index} key={index} />
         </div>
     ));

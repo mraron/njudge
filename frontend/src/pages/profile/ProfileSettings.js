@@ -66,7 +66,7 @@ function PasswordChangeFrame() {
                 </div>
                 <div className="flex justify-center">
                     <button
-                        className="btn-indigo padding-btn-default w-32"
+                        className="btn-indigo padding-btn-default min-w-[8rem]"
                         onClick={handleChangePassword}>
                         {t("profile_settings.save")}
                     </button>
@@ -117,7 +117,7 @@ function OtherSettingsFrame({ data }) {
                 </div>
                 <div className="flex justify-center">
                     <button
-                        className="btn-indigo padding-btn-default w-32"
+                        className="btn-indigo padding-btn-default min-w-[8rem]"
                         onClick={handleSaveSettings}>
                         {t("profile_settings.save")}
                     </button>

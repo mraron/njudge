@@ -25,7 +25,7 @@ function SubmitControlsFrame({ onLanguageChanged, onSubmit }) {
                     />
                 </div>
                 <button
-                    className="ml-3 btn-indigo padding-btn-default w-32"
+                    className="ml-3 btn-indigo padding-btn-default min-w-[8rem]"
                     onClick={onSubmit}>
                     {t("problem_submit.submit")}
                 </button>
