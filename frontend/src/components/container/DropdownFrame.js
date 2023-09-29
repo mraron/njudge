@@ -8,12 +8,14 @@ function DropdownFrame({ children, title }) {
         <RoundedFrame>
             <button
                 onClick={() => setOpen(!isOpen)}
-                className={`w-full h-12 ${
+                className={`w-full padding-btn-default ${
                     isOpen
                         ? "bg-grey-750 hover:bg-grey-725 rounded-t-container"
                         : "bg-grey-800 hover:bg-grey-775 rounded-container"
                 } border-bordercol flex items-center justify-center`}>
-                <span className="font-medium mr-[0.3rem]">{title}</span>
+                <span className="font-medium mr-[0.3rem] break-words min-w-0">
+                    {title}
+                </span>
                 <SVGDropdownFilterArrow isOpen={isOpen} />
             </button>
             <div className={`${isOpen ? "" : "h-0 overflow-hidden"}`}>

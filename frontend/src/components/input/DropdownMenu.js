@@ -22,8 +22,8 @@ function DefaultDropdownButton({ label, isOpen, onClick }) {
                     : "bg-grey-850 hover:bg-grey-825"
             }`}
             onClick={onClick}>
-            <span className="truncate">{label}</span>
-            <SVGDropdownMenuArrow isOpen={isOpen} cls="shrink-0" />
+            <span className="truncate min-w-0">{label}</span>
+            <SVGDropdownMenuArrow isOpen={isOpen} />
         </button>
     );
 }

@@ -21,7 +21,7 @@ function PasswordChangeFrame() {
     const handleChangeNewPwConfirm = (newText) => setNewPwConfirm(newText);
     const titleComponent = (
         <SVGTitleComponent
-            svg={<FontAwesomeIcon icon="fa-lock" className="w-4 h-4 mr-3" />}
+            svg={<FontAwesomeIcon icon="fa-unlock" className="w-4 h-4 mr-3" />}
             title={t("profile_settings.password_change")}
         />
     );
@@ -144,10 +144,10 @@ function ProfileSettings({ data }) {
     return (
         isVisible && (
             <div className="flex flex-col lg:flex-row w-full items-start">
-                <div className="w-full lg:w-96 mb-3 shrink-0">
+                <div className="w-full lg:w-96 mb-3 min-w-0 shrink-0">
                     <PasswordChangeFrame />
                 </div>
-                <div className="w-full mb-3 lg:ml-3">
+                <div className="w-full mb-3 lg:ml-3 min-w-0">
                     <OtherSettingsFrame data={data} />
                 </div>
             </div>

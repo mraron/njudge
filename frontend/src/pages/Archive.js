@@ -6,7 +6,7 @@ import React from "react";
 
 function ProblemLeaf({ data }) {
     return (
-        <span className="w-fit flex items-center">
+        <span className="max-w-fit flex items-center mb-2">
             <div className="w-4 mr-2">
                 {data.solvedStatus === 1 && (
                     <FontAwesomeIcon
@@ -27,7 +27,7 @@ function ProblemLeaf({ data }) {
                     />
                 )}
             </div>
-            <Link className="link no-underline" to={data.link}>
+            <Link className="link no-underline truncate" to={data.link}>
                 {data.title}
             </Link>
         </span>

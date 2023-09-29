@@ -24,7 +24,7 @@ function Problem(data) {
                     <div className="flex items-center justify-center">
                         {solvedStatus === 0 && (
                             <SVGEllipsis
-                                cls="w-5 h-5 text-grey-300 shrink-0"
+                                cls="w-5 h-5 text-grey-300"
                                 title={t("solved_status.not_tried")}
                             />
                         )}

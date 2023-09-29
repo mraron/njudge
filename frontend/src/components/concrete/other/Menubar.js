@@ -189,7 +189,7 @@ function MenuSideBar({ selected, isOpen, onClose }) {
                 <div className="w-full flex px-4 mb-4">
                     <ProfileSettings />
                 </div>
-                <ol className="divide-y divide-dividecol border-t border-b border-grey-750">
+                <ol className="divide-y divide-grey-725 border-t border-b border-grey-725">
                     {menuOptions}
                 </ol>
             </div>

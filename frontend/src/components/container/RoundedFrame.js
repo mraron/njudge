@@ -3,7 +3,7 @@ function RoundedFrame({ children, title, titleComponent, cls = null }) {
         <div className={`${cls} rounded-frame`}>
             <div className="w-full flex flex-col">
                 {title && (
-                    <span className="font-medium p-4 text-center border-b-1 border-grey-700">
+                    <span className="font-medium p-4 text-center border-b-1 border-grey-700 break-words min-w-0">
                         {title}
                     </span>
                 )}

@@ -21,7 +21,9 @@ function ContestFrame({ name, date, active }) {
         <RoundedFrame>
             <div className="px-6 py-5 sm:px-10 sm:py-8">
                 <div className="flex justify-between items-start">
-                    <span className="text-lg font-semibold">{name}</span>
+                    <span className="text-lg font-semibold break-words min-w-0">
+                        {name}
+                    </span>
                     <span className="ml-4 date-label">{date}</span>
                 </div>
                 <div className="mt-2 flex">{buttons}</div>
@@ -38,7 +40,7 @@ function ContestList({ contestData }) {
             </div>
         );
     });
-    return <div>{contestItems}</div>;
+    return <>{contestItems}</>;
 }
 
 export default ContestList;

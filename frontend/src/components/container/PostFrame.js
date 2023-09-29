@@ -13,7 +13,10 @@ function PostItem({ post }) {
                     <span className="text-lg font-semibold">{title}</span>
                     <span className="ml-4 date-label">{date}</span>
                 </div>
-                <div className={`mt-2 ${truncated ? "truncate" : ""}`}>
+                <div
+                    className={`mt-2 ${
+                        truncated ? "truncate" : "break-words"
+                    }`}>
                     {content}
                 </div>
             </div>

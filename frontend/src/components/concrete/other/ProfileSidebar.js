@@ -107,7 +107,7 @@ function ProfileSideBar() {
     return (
         isLoggedIn && (
             <div className="w-full hidden lg:flex justify-center">
-                <div className="flex flex-col bg-grey-900 w-72">
+                <div className="flex flex-col bg-grey-900 w-72 shrink-0">
                     <div className="mb-3">
                         <ProfilePictureFrame userData={userData} />
                     </div>

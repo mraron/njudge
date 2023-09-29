@@ -42,7 +42,7 @@ function ProfileMain({ data }) {
                 </div>
                 <ProfileDataFrame userData={data.userData} />
             </div>
-            <div className="w-full mb-3 sm:ml-3">
+            <div className="w-full mb-3 sm:ml-3 min-w-0">
                 <div className="mb-3">
                     <TagListFrame
                         titleComponent={titleComponentCorrect}

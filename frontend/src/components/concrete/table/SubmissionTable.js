@@ -61,7 +61,7 @@ function TestCase13({
                     colSpan={2}>
                     <div className="flex">
                         {testCase.verdictType === 0 && (
-                            <SVGSpinner cls="w-4 h-4 shrink-0 mr-2" />
+                            <SVGSpinner cls="w-4 h-4 mr-2" />
                         )}
                         {testCase.verdictType === 1 && (
                             <FontAwesomeIcon
@@ -139,9 +139,7 @@ function TestCase0({ testCase, index }) {
     const { t } = useTranslation();
     const titleComponent = (
         <div className="py-3 px-5 border-b border-bordercol flex items-center text-table">
-            {testCase.verdictType === 0 && (
-                <SVGSpinner cls="w-5 h-5 shrink-0 mr-3" />
-            )}
+            {testCase.verdictType === 0 && <SVGSpinner cls="w-5 h-5 mr-3" />}
             {testCase.verdictType === 1 && (
                 <FontAwesomeIcon
                     icon="fa-xmark"

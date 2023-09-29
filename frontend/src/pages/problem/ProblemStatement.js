@@ -189,7 +189,7 @@ function ProblemLastSubmissions({ submissions, maxScore }) {
             <td className="padding-td-default" style={{ maxWidth: 100 }}>
                 <div className="flex items-center">
                     {item.verdictType === 0 && (
-                        <SVGSpinner cls="w-4 h-4 shrink-0 mr-3" />
+                        <SVGSpinner cls="w-4 h-4 mr-3" />
                     )}
                     {item.verdictType === 1 && (
                         <FontAwesomeIcon
@@ -304,7 +304,7 @@ function ProblemStatement({ data }) {
     const statementType = data.attachments.statements[statementIndex].type;
     return (
         <div className="flex flex-col lg:flex-row">
-            <div className="w-full flex flex-col">
+            <div className="w-full flex flex-col min-w-0">
                 <div className="w-full mb-2">
                     <RoundedFrame>
                         <div className="w-full px-4 py-3 sm:px-6 sm:py-5 flex">
