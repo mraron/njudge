@@ -9,7 +9,7 @@ export async function login(username, password) {
         body: JSON.stringify({
             username: username,
             password: password,
-        })
+        }),
     };
     try {
         const response = await fetchWithCredentials(
@@ -32,7 +32,7 @@ export async function register(username, email, password, passwordConfirm) {
             email: email,
             password: password,
             passwordConfirm: passwordConfirm,
-        })
+        }),
     };
     try {
         const response = await fetchWithCredentials(
@@ -52,7 +52,7 @@ export async function change_password(email) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             email: email,
-        })
+        }),
     };
     try {
         const response = await fetchWithCredentials(
@@ -73,7 +73,7 @@ export async function reset_password(user, token, password, passwordConfirm) {
         body: JSON.stringify({
             password: password,
             passwordConfirm: passwordConfirm,
-        })
+        }),
     };
     try {
         const response = await fetchWithCredentials(
@@ -88,7 +88,9 @@ export async function reset_password(user, token, password, passwordConfirm) {
 }
 
 export async function verify(token) {
-    const response = await fetchWithCredentials(apiRoute(`/user/auth/verify/${token}/`));
+    const response = await fetchWithCredentials(
+        apiRoute(`/user/auth/verify/${token}/`),
+    );
     const data = await response.json();
     const result = { ...data, success: response.ok };
     if (response.ok) {
@@ -99,7 +101,9 @@ export async function verify(token) {
 
 export async function logout() {
     try {
-        const response = await fetchWithCredentials(apiRoute("/user/auth/logout/"));
+        const response = await fetchWithCredentials(
+            apiRoute("/user/auth/logout/"),
+        );
         return response.ok;
     } catch (error) {
         console.error(error);

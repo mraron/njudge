@@ -8,7 +8,7 @@ export async function saveSettings(user, showUnsolved, hideSolved) {
         body: JSON.stringify({
             showUnsolved: showUnsolved,
             hideSolved: hideSolved,
-        })
+        }),
     };
     console.log(
         apiRoute(`/user/profile/${encodeURIComponent(user)}/settings/other/`),
@@ -29,7 +29,7 @@ export async function changePassword(user, oldPw, newPw, newPwConfirm) {
             oldPw: oldPw,
             newPw: newPw,
             newPwConfirm: newPwConfirm,
-        })
+        }),
     };
     const response = await fetchWithCredentials(
         apiRoute(

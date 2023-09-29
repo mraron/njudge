@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RoundedFrame from "../../components/container/RoundedFrame";
@@ -25,11 +25,11 @@ function ResetPasswordFrame() {
         event.preventDefault();
         reset_password(user, token, password, passwordConfirm).then((resp) => {
             if (resp.success) {
-                window.flash("flash.successful_password_change", "success")
+                window.flash("flash.successful_password_change", "success");
             } else {
-                window.flash(resp.message, "failure")
+                window.flash(resp.message, "failure");
             }
-        })
+        });
     };
     return (
         <RoundedFrame titleComponent={titleComponent}>

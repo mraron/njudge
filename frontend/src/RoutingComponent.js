@@ -112,11 +112,18 @@ function RoutingComponent() {
                 />
                 <Route
                     path={routeMap.forgotten_password}
-                    element={<UpdatePage key={location.key} page={ForgottenPassword} />}
+                    element={
+                        <UpdatePage
+                            key={location.key}
+                            page={ForgottenPassword}
+                        />
+                    }
                 />
                 <Route
                     path={routeMap.reset_password}
-                    element={<UpdatePage key={location.key} page={ResetPassword} />}
+                    element={
+                        <UpdatePage key={location.key} page={ResetPassword} />
+                    }
                 />
                 <Route
                     path={routeMap.verify}

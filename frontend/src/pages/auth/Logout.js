@@ -1,10 +1,10 @@
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { logout } from "../../util/auth";
 import { routeMap } from "../../config/RouteConfig";
 import { useEffect } from "react";
 
 function Logout() {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     useEffect(() => {
         logout().then((result) => {
             if (result) {
@@ -12,7 +12,7 @@ function Logout() {
             } else {
                 window.flash("flash.not_logged_in", "failure");
             }
-            navigate(routeMap.home)
+            navigate(routeMap.home);
         });
     }, []);
 }

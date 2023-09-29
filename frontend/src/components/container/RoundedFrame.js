@@ -8,7 +8,9 @@ function RoundedFrame({ children, title, titleComponent, cls = null }) {
                     </span>
                 )}
                 {titleComponent}
-                <div className="w-full text-dropdown-list min-h-[1rem]">{children}</div>
+                <div className="w-full text-dropdown-list min-h-[1rem]">
+                    {children}
+                </div>
             </div>
         </div>
     );

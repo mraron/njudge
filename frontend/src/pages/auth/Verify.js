@@ -5,7 +5,7 @@ import { routeMap } from "../../config/RouteConfig";
 
 function Verify() {
     const { token } = useParams();
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     useEffect(() => {
         verify(token).then((ok) => {
@@ -14,7 +14,7 @@ function Verify() {
             } else {
                 window.flash("flash.unsuccessful_verification", "failure");
             }
-            navigate(routeMap.home)
+            navigate(routeMap.home);
         });
     }, []);
 }

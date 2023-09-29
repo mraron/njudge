@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RoundedFrame from "../../components/container/RoundedFrame";
@@ -20,13 +20,13 @@ function ForgottenPasswordFrame() {
     );
     const handleChangePassword = (event) => {
         event.preventDefault();
-        change_password(email).then(ok => {
+        change_password(email).then((ok) => {
             if (ok) {
-                window.flash("flash.successful_email_pw_change", "success")
+                window.flash("flash.successful_email_pw_change", "success");
             } else {
-                window.flash("flash.unsuccessful_email_pw_change", "failure")
+                window.flash("flash.unsuccessful_email_pw_change", "failure");
             }
-        })
+        });
     };
     return (
         <RoundedFrame titleComponent={titleComponent}>

@@ -18,7 +18,9 @@ export function ProfilePictureFrame({ userData }) {
     return (
         <RoundedFrame>
             <div className="flex flex-col items-center p-6 pb-4">
-                <Link to={profileRoute} className="flex justify-center items-center w-full aspect-square bg-grey-875 border border-bordercol hover:border-grey-450">
+                <Link
+                    to={profileRoute}
+                    className="flex justify-center items-center w-full aspect-square bg-grey-875 border border-bordercol hover:border-grey-450">
                     <img
                         alt="avatar"
                         className="object-contain"
@@ -75,9 +77,7 @@ function SubmissionsFrame({ titleComponent, submissions }) {
                 </Link>
             </td>
             <td className="padding-td-default">
-                <Link
-                    className="link"
-                    to={item.problem.href}>
+                <Link className="link" to={item.problem.href}>
                     {item.problem.text}
                 </Link>
             </td>
