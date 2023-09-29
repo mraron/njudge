@@ -18,10 +18,10 @@ export function ProfilePictureFrame({ userData }) {
     return (
         <RoundedFrame>
             <div className="flex flex-col items-center p-6 pb-4">
-                <Link to={profileRoute}>
+                <Link to={profileRoute} className="flex justify-center items-center w-full aspect-square bg-grey-875 border border-bordercol hover:border-grey-450">
                     <img
                         alt="avatar"
-                        className="object-contain border border-bordercol hover:border-grey-450"
+                        className="object-contain"
                         src={userData.pictureSrc}
                     />
                 </Link>

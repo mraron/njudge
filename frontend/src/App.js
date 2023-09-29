@@ -23,7 +23,7 @@ function App() {
     const { setJudgeData, allLoaded } = useContext(JudgeDataContext);
 
     useEffect(() => {
-        const fetchJudgeData = async () => {
+        const fetchWithCredentialsJudgeData = async () => {
             await getLanguages().then((resp) => {
                 if (resp.success) {
                     setJudgeData((prevJudgeData) => {
@@ -49,7 +49,7 @@ function App() {
                 }
             });
         };
-        fetchJudgeData().then(
+        fetchWithCredentialsJudgeData().then(
             setJudgeData((prevJudgeData) => {
                 return {
                     ...prevJudgeData,

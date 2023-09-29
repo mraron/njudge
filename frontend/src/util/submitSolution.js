@@ -1,4 +1,5 @@
 import { apiRoute } from "../config/RouteConfig";
+import fetchWithCredentials from "./fetchWithCredentials";
 
 async function submitSolution({ problem, language, file, submissionCode }) {
     const formData = new FormData();
@@ -12,10 +13,9 @@ async function submitSolution({ problem, language, file, submissionCode }) {
     }
     const requestOptions = {
         method: "POST",
-        body: formData,
-        credentials: 'include',
+        body: formData
     };
-    const response = await fetch(
+    const response = await fetchWithCredentials(
         apiRoute("/problemset/main/submit/"),
         requestOptions,
     );

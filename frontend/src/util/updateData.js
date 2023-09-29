@@ -1,5 +1,6 @@
 import { authenticate } from "./auth";
 import { apiRoute } from "../config/RouteConfig";
+import fetchWithCredentials from "./fetchWithCredentials";
 
 export async function updatePageData(
     location,
@@ -9,7 +10,7 @@ export async function updatePageData(
 ) {
     try {
         const fullPath = location.pathname + location.search;
-        const response = await fetch(apiRoute(fullPath), {
+        const response = await fetchWithCredentials(apiRoute(fullPath), {
             signal: abortController.signal,
         });
         const newData = await response.json();
@@ -35,8 +36,6 @@ export async function updateData(
     isMounted,
 ) {
     const response = await authenticate();
-    console.log(JSON.stringify(response))
-    console.log(JSON.stringify(response !== null))
     if (response !== undefined) {
         setUserData(response);
         setLoggedIn(response !== null);

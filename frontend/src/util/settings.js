@@ -1,4 +1,5 @@
 import { apiRoute } from "../config/RouteConfig";
+import fetchWithCredentials from "./fetchWithCredentials";
 
 export async function saveSettings(user, showUnsolved, hideSolved) {
     const requestOptions = {
@@ -7,13 +8,12 @@ export async function saveSettings(user, showUnsolved, hideSolved) {
         body: JSON.stringify({
             showUnsolved: showUnsolved,
             hideSolved: hideSolved,
-        }),
-        credentials: 'include',
+        })
     };
     console.log(
         apiRoute(`/user/profile/${encodeURIComponent(user)}/settings/other/`),
     );
-    const response = await fetch(
+    const response = await fetchWithCredentials(
         apiRoute(`/user/profile/${encodeURIComponent(user)}/settings/other/`),
         requestOptions,
     );
@@ -29,10 +29,9 @@ export async function changePassword(user, oldPw, newPw, newPwConfirm) {
             oldPw: oldPw,
             newPw: newPw,
             newPwConfirm: newPwConfirm,
-        }),
-        credentials: 'include',
+        })
     };
-    const response = await fetch(
+    const response = await fetchWithCredentials(
         apiRoute(
             `/user/profile/${encodeURIComponent(
                 user,

@@ -1,5 +1,6 @@
-import Cookies from "js-cookie";
 import { apiRoute } from "../config/RouteConfig";
+import Cookies from "js-cookie";
+import fetchWithCredentials from "./fetchWithCredentials";
 
 export async function login(username, password) {
     const requestOptions = {
@@ -8,11 +9,10 @@ export async function login(username, password) {
         body: JSON.stringify({
             username: username,
             password: password,
-        }),
-        credentials: 'include',
+        })
     };
     try {
-        const response = await fetch(
+        const response = await fetchWithCredentials(
             apiRoute("/user/auth/login/"),
             requestOptions,
         );
@@ -32,11 +32,10 @@ export async function register(username, email, password, passwordConfirm) {
             email: email,
             password: password,
             passwordConfirm: passwordConfirm,
-        }),
-        credentials: 'include',
+        })
     };
     try {
-        const response = await fetch(
+        const response = await fetchWithCredentials(
             apiRoute("/user/auth/register/"),
             requestOptions,
         );
@@ -48,7 +47,7 @@ export async function register(username, email, password, passwordConfirm) {
 }
 
 export async function verify(token) {
-    const response = await fetch(apiRoute(`/user/auth/verify/${token}/`));
+    const response = await fetchWithCredentials(apiRoute(`/user/auth/verify/${token}/`));
     const data = await response.json();
     const result = { ...data, success: response.ok };
     if (response.ok) {
@@ -59,7 +58,7 @@ export async function verify(token) {
 
 export async function logout() {
     try {
-        const response = await fetch(apiRoute("/user/auth/logout/"));
+        const response = await fetchWithCredentials(apiRoute("/user/auth/logout/"));
         return response.ok;
     } catch (error) {
         console.error(error);
@@ -69,10 +68,7 @@ export async function logout() {
 
 export async function authenticate() {
     try {
-        const requestOptions = {
-            credentials: 'include',
-        };
-        const response = await fetch(apiRoute("/user/auth/"), requestOptions);
+        const response = await fetchWithCredentials(apiRoute("/user/auth/"));
         const data = await response.json();
         return data.userData;
     } catch (error) {
