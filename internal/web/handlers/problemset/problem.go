@@ -247,7 +247,7 @@ func GetProblemRanklist(DB *sqlx.DB) echo.HandlerFunc {
 
 		perPage := 20
 		pages := (cnt + perPage - 1) / perPage
-		if data.Page > pages {
+		if data.Page > pages && pages > 0 {
 			data.Page = pages
 		}
 
