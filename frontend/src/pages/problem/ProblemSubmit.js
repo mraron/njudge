@@ -37,7 +37,7 @@ function SubmitControlsFrame({ onLanguageChanged, onSubmit }) {
 function ProblemSubmit() {
     const { judgeData } = useContext(JudgeDataContext);
     const { theme } = useContext(ThemeContext);
-    const { problem } = useParams();
+    const { problem, problemset } = useParams();
     const [langIndex, setLangIndex] = useState(0);
     const [submissionCode, setSubmissionCode] = useState("");
     const navigate = useNavigate();
@@ -46,6 +46,7 @@ function ProblemSubmit() {
     };
     const handleSubmit = () => {
         submitSolution({
+            problemset: problemset,
             problem: problem,
             language: judgeData.languages[langIndex].id,
             submissionCode: submissionCode,
@@ -53,7 +54,7 @@ function ProblemSubmit() {
             if (ok) {
                 window.flash("flash.successful_submission", "success");
                 navigate(
-                    routeMap.problemSubmissions.replace(":problem", problem),
+                    routeMap.problemSubmissions.replace(":problem", problem).replace(":problemset", problemset),
                 );
             } else {
                 window.flash("flash.unsuccessful_submission", "failure");

@@ -56,8 +56,8 @@ function Problem(data) {
             <td className="padding-td-default">
                 <Link
                     className="link"
-                    to={routeMap.problem.replace(":problem", problem)}>
-                    {title}
+                    to={title.href}>
+                    {title.text}
                 </Link>
             </td>
             <td className="padding-td-default">

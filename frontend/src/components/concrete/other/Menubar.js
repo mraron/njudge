@@ -14,7 +14,7 @@ const menuRoutes = [
     routeMap.contests,
     routeMap.archive,
     routeMap.submissions,
-    routeMap.problems,
+    routeMap.problems.replace(":problemset", "main"),
     routeMap.info,
 ];
 const menuRouteLabels = [

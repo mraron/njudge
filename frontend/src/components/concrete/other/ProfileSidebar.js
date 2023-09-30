@@ -79,8 +79,8 @@ function SubmissionsFrame({ titleComponent, submissions }) {
             <td className="padding-td-default">
                 <Link
                     className="link"
-                    to={routeMap.problem.replace(":problem", item.problem)}>
-                    {item.problem}
+                    to={item.problem.href}>
+                    {item.problem.text}
                 </Link>
             </td>
         </tr>

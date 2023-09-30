@@ -80,7 +80,7 @@ function ProblemInfo({ info }) {
 function ProblemSubmit() {
     const { t } = useTranslation();
     const { judgeData } = useContext(JudgeDataContext);
-    const { problem } = useParams();
+    const { problem, problemset } = useParams();
     const [file, setFile] = useState(null);
     const [langIndex, setLangIndex] = useState(0);
     const navigate = useNavigate();
@@ -104,6 +104,7 @@ function ProblemSubmit() {
             return;
         }
         submitSolution({
+            problemset: problemset,
             problem: problem,
             language: judgeData.languages[langIndex].id,
             file: file,
@@ -111,7 +112,7 @@ function ProblemSubmit() {
             if (ok) {
                 window.flash("flash.successful_submission", "success");
                 navigate(
-                    routeMap.problemSubmissions.replace(":problem", problem),
+                    routeMap.problemSubmissions.replace(":problem", problem).replace(":problemset", problemset),
                 );
             } else {
                 window.flash("flash.unsuccessful_submission", "failure");

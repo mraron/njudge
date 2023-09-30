@@ -18,11 +18,10 @@ const routePatterns = [
 
 function Problem({ data }) {
     const { t } = useTranslation();
-    const { problem } = useParams();
+    const { problemset, problem } = useParams();
     const routes = routePatterns.map((item) =>
-        item.replace(":problem", problem),
+        item.replace(":problem", problem).replace(":problemset", problemset),
     );
-
     return (
         <div className="flex justify-center">
             <div className="w-full max-w-7xl">
