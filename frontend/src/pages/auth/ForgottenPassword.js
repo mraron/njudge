@@ -8,6 +8,7 @@ import SVGTitleComponent from "../../components/svg/SVGTitleComponent";
 import { routeMap } from "../../config/RouteConfig";
 import UserContext from "../../contexts/user/UserContext";
 import { change_password } from "../../util/auth";
+import Button from "../../components/util/Button";
 
 function ForgottenPasswordFrame() {
     const { t } = useTranslation();
@@ -41,12 +42,13 @@ function ForgottenPasswordFrame() {
                         />
                     </div>
                     <div className="flex justify-center">
-                        <button
+                        <Button
                             type="submit"
-                            className="btn-indigo padding-btn-default min-w-[12rem]"
-                            onClick={handleChangePassword}>
+                            theme="indigo"
+                            onClick={handleChangePassword}
+                            minWidth="12rem">
                             {t("forgotten_password.change_password")}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </form>

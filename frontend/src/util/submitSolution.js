@@ -1,7 +1,13 @@
 import { apiRoute } from "../config/RouteConfig";
 import fetchWithCredentials from "./fetchWithCredentials";
 
-async function submitSolution({ problem, problemset, language, file, submissionCode }) {
+async function submitSolution({
+    problem,
+    problemset,
+    language,
+    file,
+    submissionCode,
+}) {
     const formData = new FormData();
     formData.append("problem", problem);
     formData.append("language", language);

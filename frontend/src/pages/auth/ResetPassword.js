@@ -8,6 +8,7 @@ import SVGTitleComponent from "../../components/svg/SVGTitleComponent";
 import UserContext from "../../contexts/user/UserContext";
 import { routeMap } from "../../config/RouteConfig";
 import { reset_password } from "../../util/auth";
+import Button from "../../components/util/Button";
 
 function ResetPasswordFrame() {
     const { t } = useTranslation();
@@ -17,7 +18,7 @@ function ResetPasswordFrame() {
 
     const titleComponent = (
         <SVGTitleComponent
-            svg={<FontAwesomeIcon icon="fa-unlock" className="w-5 h-5 mr-3" />}
+            svg={<FontAwesomeIcon icon="fa-unlock" className="w-4 h-4 mr-3" />}
             title={t("reset_password.change_password")}
         />
     );
@@ -54,12 +55,13 @@ function ResetPasswordFrame() {
                         />
                     </div>
                     <div className="flex justify-center">
-                        <button
+                        <Button
                             type="submit"
-                            className="btn-indigo padding-btn-default min-w-[12rem]"
-                            onClick={handleResetPassword}>
+                            theme="indigo"
+                            onClick={handleResetPassword}
+                            minWidth="12rem">
                             {t("reset_password.change_password")}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </form>

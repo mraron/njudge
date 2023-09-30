@@ -8,6 +8,7 @@ import { routeMap } from "../../config/RouteConfig";
 import submitSolution from "../../util/submitSolution";
 import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext";
 import ThemeContext from "../../contexts/theme/ThemeContext";
+import Button from "../../components/util/Button";
 
 function SubmitControlsFrame({ onLanguageChanged, onSubmit }) {
     const { t } = useTranslation();
@@ -24,11 +25,11 @@ function SubmitControlsFrame({ onLanguageChanged, onSubmit }) {
                         onChange={onLanguageChanged}
                     />
                 </div>
-                <button
-                    className="ml-3 btn-indigo padding-btn-default min-w-[8rem]"
-                    onClick={onSubmit}>
-                    {t("problem_submit.submit")}
-                </button>
+                <div className="ml-3">
+                    <Button theme="indigo" minWidth="8rem" onClick={onSubmit}>
+                        {t("problem_submit.submit")}
+                    </Button>
+                </div>
             </div>
         </RoundedFrame>
     );
@@ -54,7 +55,9 @@ function ProblemSubmit() {
             if (ok) {
                 window.flash("flash.successful_submission", "success");
                 navigate(
-                    routeMap.problemSubmissions.replace(":problemset", problemset).replace(":problem", problem),
+                    routeMap.problemSubmissions
+                        .replace(":problemset", problemset)
+                        .replace(":problem", problem),
                 );
             } else {
                 window.flash("flash.unsuccessful_submission", "failure");

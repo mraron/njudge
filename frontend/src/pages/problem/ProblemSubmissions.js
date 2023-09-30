@@ -9,6 +9,7 @@ import SubmissionsTable from "../../components/concrete/table/SubmissionsTable";
 import UpdateQueryString from "../../util/updateQueryString";
 import updateQueryString from "../../util/updateQueryString";
 import UserContext from "../../contexts/user/UserContext";
+import Button from "../../components/util/Button";
 
 function SubmissionFilterFrame() {
     const { t } = useTranslation();
@@ -56,16 +57,17 @@ function SubmissionFilterFrame() {
                     />
                 </div>
                 <div className="flex justify-center">
-                    <button
-                        className="mr-1 btn-indigo padding-btn-default min-w-[8rem]"
-                        onClick={handleSubmit}>
-                        {t("problem_filter.search")}
-                    </button>
-                    <button
-                        className="ml-1 btn-gray padding-btn-default min-w-[8rem]"
-                        onClick={handleReset}>
-                        {t("problem_filter.reset")}
-                    </button>
+                    <div className="mr-2">
+                        <Button
+                            theme="indigo"
+                            onClick={handleSubmit}
+                            minWidth="8rem">
+                            {t("problem_filter.search")}
+                        </Button>
+                    </div>
+                    <Button theme="gray" onClick={handleReset} minWidth="8rem">
+                        {t("problem_filter.reset")}{" "}
+                    </Button>
                 </div>
             </div>
         </DropdownFrame>

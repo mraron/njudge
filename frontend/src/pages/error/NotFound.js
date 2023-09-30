@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { SVGNotFound } from "../../components/svg/SVGs";
 import RoundedFrame from "../../components/container/RoundedFrame";
+import Button from "../../components/util/Button";
 
 function NotFoundFrame() {
     return (
@@ -14,10 +15,10 @@ function NotFoundFrame() {
                     <SVGNotFound />
                 </div>
                 <div className="flex justify-center mt-8">
-                    <Link
-                        className="z-10 w-60 btn-indigo padding-btn-default text-center"
-                        to="/">
-                        Vissza a főoldalra
+                    <Link className="z-10" to="/">
+                        <Button theme="indigo" minWidth="15rem">
+                            Vissza
+                        </Button>
                     </Link>
                 </div>
             </div>

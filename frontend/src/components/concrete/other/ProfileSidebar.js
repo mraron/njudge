@@ -17,7 +17,7 @@ export function ProfilePictureFrame({ userData }) {
     );
     return (
         <RoundedFrame>
-            <div className="flex flex-col items-center p-6 pb-4">
+            <div className="flex flex-col items-center p-5 border-b border-bordercol">
                 <Link
                     to={profileRoute}
                     className="flex justify-center items-center w-full aspect-square bg-grey-875 border border-bordercol hover:border-grey-450">
@@ -27,17 +27,15 @@ export function ProfilePictureFrame({ userData }) {
                         src={userData.pictureSrc}
                     />
                 </Link>
-                <div className="mt-2 flex justify-center items-center w-full">
-                    <Link
-                        className="link truncate font-medium no-underline"
-                        to={profileRoute}>
-                        {userData.username}
-                    </Link>
-                    <span className="text-2xl font-semibold text-indigo-600 mx-2">
-                        &#8226;
-                    </span>
-                    <span className="truncate">{userData.rating}</span>
-                </div>
+            </div>
+            <div className="px-6 py-2 flex justify-center items-center w-full">
+                <Link className="link truncate" to={profileRoute}>
+                    {userData.username}
+                </Link>
+                <span className="text-xl font-semibold text-indigo-600 mx-2">
+                    &#8226;
+                </span>
+                <span className="truncate">{userData.rating}</span>
             </div>
         </RoundedFrame>
     );
@@ -77,9 +75,7 @@ function SubmissionsFrame({ titleComponent, submissions }) {
                 </Link>
             </td>
             <td className="padding-td-default">
-                <Link
-                    className="link"
-                    to={item.problem.href}>
+                <Link className="link" to={item.problem.href}>
                     {item.problem.text}
                 </Link>
             </td>

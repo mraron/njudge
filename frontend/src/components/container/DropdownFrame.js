@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SVGDropdownFilterArrow } from "../svg/SVGs";
+import { SVGDropdownFrameArrow } from "../svg/SVGs";
 import RoundedFrame from "./RoundedFrame";
 
 function DropdownFrame({ children, title }) {
@@ -16,7 +16,7 @@ function DropdownFrame({ children, title }) {
                 <span className="font-medium mr-[0.3rem] truncate">
                     {title}
                 </span>
-                <SVGDropdownFilterArrow isOpen={isOpen} />
+                <SVGDropdownFrameArrow isOpen={isOpen} />
             </button>
             <div className={`${isOpen ? "" : "h-0 overflow-hidden"}`}>
                 <div className="border-t border-bordercol">{children}</div>

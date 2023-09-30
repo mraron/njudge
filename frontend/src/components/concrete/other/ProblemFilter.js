@@ -9,6 +9,7 @@ import updateQueryString from "../../../util/updateQueryString";
 import JudgeDataContext from "../../../contexts/judgeData/JudgeDataContext";
 import queryString from "query-string";
 import { parseInt } from "lodash";
+import Button from "../../util/Button";
 
 function ProblemFilter() {
     const { t } = useTranslation();
@@ -113,16 +114,17 @@ function ProblemFilter() {
                 />
             </div>
             <div className="flex justify-center">
-                <button
-                    className="mr-1 btn-indigo padding-btn-default min-w-[8rem]"
-                    onClick={handleSubmit}>
-                    {t("problem_filter.search")}
-                </button>
-                <button
-                    className="ml-1 btn-gray padding-btn-default min-w-[8rem]"
-                    onClick={handleReset}>
+                <div className="mr-2">
+                    <Button
+                        theme="indigo"
+                        minWidth="8rem"
+                        onClick={handleSubmit}>
+                        {t("problem_filter.search")}
+                    </Button>
+                </div>
+                <Button theme="gray" minWidth="8rem" onClick={handleSubmit}>
                     {t("problem_filter.reset")}
-                </button>
+                </Button>
             </div>
         </div>
     );

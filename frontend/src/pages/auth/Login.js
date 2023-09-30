@@ -8,6 +8,7 @@ import SVGTitleComponent from "../../components/svg/SVGTitleComponent";
 import { login } from "../../util/auth";
 import { routeMap } from "../../config/RouteConfig";
 import UserContext from "../../contexts/user/UserContext";
+import Button from "../../components/util/Button";
 
 function LoginFrame() {
     const { t } = useTranslation();
@@ -16,7 +17,12 @@ function LoginFrame() {
     const [password, setPassword] = useState("");
     const titleComponent = (
         <SVGTitleComponent
-            svg={<FontAwesomeIcon icon="fa-sign-in" className="w-5 h-5 mr-3" />}
+            svg={
+                <FontAwesomeIcon
+                    icon="fa-user-check"
+                    className="w-5 h-5 mr-3"
+                />
+            }
             title={t("login.login")}
         />
     );
@@ -58,15 +64,17 @@ function LoginFrame() {
                         </Link>
                     </div>
                     <div className="flex justify-center mb-1">
-                        <button
-                            type="submit"
-                            className="btn-indigo padding-btn-default mr-2 w-1/2"
-                            onClick={handleLogin}>
-                            {t("login.login")}
-                        </button>
-                        <button className="btn-gray padding-btn-default flex items-center justify-center w-1/2">
+                        <div className="mr-2 w-full">
+                            <Button
+                                theme="indigo"
+                                onClick={handleLogin}
+                                fullWidth={true}>
+                                {t("login.login")}
+                            </Button>
+                        </div>
+                        <Button theme="gray" fullWidth={true}>
                             Google
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </div>

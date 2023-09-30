@@ -26,7 +26,7 @@ function Pagination({ paginationData }) {
                     onClick={() => handlePageChanged(1)}>
                     <FontAwesomeIcon
                         icon="fa-angles-left"
-                        className="w-3 h-3"
+                        className="w-2.5 h-2.5"
                     />
                 </button>
                 {currentPage >= 3 && (
@@ -66,7 +66,7 @@ function Pagination({ paginationData }) {
                     onClick={() => handlePageChanged(lastPage)}>
                     <FontAwesomeIcon
                         icon="fa-angles-right"
-                        className="w-3 h-3"
+                        className="w-2.5 h-2.5"
                     />
                 </button>
             </div>

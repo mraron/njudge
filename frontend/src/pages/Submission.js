@@ -11,6 +11,7 @@ import UserContext from "../contexts/user/UserContext";
 import Editor from "@monaco-editor/react";
 import ThemeContext from "../contexts/theme/ThemeContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Button from "../components/util/Button";
 
 function CompileErrorFrame({ message }) {
     const { t } = useTranslation();
@@ -20,7 +21,7 @@ function CompileErrorFrame({ message }) {
             svg={
                 <FontAwesomeIcon
                     icon="fa-xmark"
-                    className="w-5 h-5 mr-3 text-red-600"
+                    className="w-4 h-4 mr-3 text-red-600"
                 />
             }
         />
@@ -47,12 +48,14 @@ function Submission({ data }) {
                         <div className="mb-3">
                             <DropdownFrame title="Kezelés">
                                 <div className="px-4 py-3 sm:px-6 sm:py-5 flex items-center justify-center">
-                                    <button className="min-w-[8rem] btn-indigo padding-btn-default mr-2">
-                                        Újrafordít
-                                    </button>
-                                    <button className="min-w-[8rem] btn-gray padding-btn-default">
+                                    <div className="mr-2">
+                                        <Button theme="indigo" minWidth="8rem">
+                                            Újfafordít
+                                        </Button>
+                                    </div>
+                                    <Button theme="gray" minWidth="8rem">
                                         Újraértékel
-                                    </button>
+                                    </Button>
                                 </div>
                             </DropdownFrame>
                         </div>

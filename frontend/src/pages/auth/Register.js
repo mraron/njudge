@@ -8,6 +8,7 @@ import SVGTitleComponent from "../../components/svg/SVGTitleComponent";
 import { routeMap } from "../../config/RouteConfig";
 import { register } from "../../util/auth";
 import UserContext from "../../contexts/user/UserContext";
+import Button from "../../components/util/Button";
 
 function RegisterFrame() {
     const { t } = useTranslation();
@@ -74,12 +75,13 @@ function RegisterFrame() {
                         />
                     </div>
                     <div className="flex justify-center">
-                        <button
+                        <Button
                             type="submit"
-                            className="btn-indigo padding-btn-default min-w-[12rem]"
-                            onClick={handleRegister}>
+                            theme="indigo"
+                            onClick={handleRegister}
+                            minWidth="12rem">
                             {t("register.register")}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </form>

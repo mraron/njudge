@@ -8,10 +8,11 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import App from "./App";
 import UserProvider from "./contexts/user/UserProvider";
 import JudgeDataProvider from "./contexts/judgeData/JudgeDataProvider";
+import ThemeProvider from "./contexts/theme/ThemeProvider";
 
+import "tw-elements-react/dist/css/tw-elements-react.min.css";
 import "./index.css";
 import "./i18n";
-import ThemeProvider from "./contexts/theme/ThemeProvider";
 
 library.add(fas, far, fab);
 

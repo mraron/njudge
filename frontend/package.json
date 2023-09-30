@@ -35,6 +35,8 @@
         "react-scripts": "5.0.1",
         "react-transition-group": "^4.4.5",
         "resize-observer-polyfill": "^1.5.1",
+        "tw-elements": "^1.0.0",
+        "tw-elements-react": "^1.0.0-alpha1",
         "web-vitals": "^2.1.4"
     },
     "scripts": {

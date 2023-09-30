@@ -9,6 +9,7 @@ import RoundedFrame from "../../components/container/RoundedFrame";
 import { changePassword, saveSettings } from "../../util/settings";
 import { routeMap } from "../../config/RouteConfig";
 import UserContext from "../../contexts/user/UserContext";
+import Button from "../../components/util/Button";
 
 function PasswordChangeFrame() {
     const { t } = useTranslation();
@@ -21,7 +22,7 @@ function PasswordChangeFrame() {
     const handleChangeNewPwConfirm = (newText) => setNewPwConfirm(newText);
     const titleComponent = (
         <SVGTitleComponent
-            svg={<FontAwesomeIcon icon="fa-unlock" className="w-4 h-4 mr-3" />}
+            svg={<FontAwesomeIcon icon="fa-unlock" className="w-5 h-5 mr-3" />}
             title={t("profile_settings.password_change")}
         />
     );
@@ -65,11 +66,12 @@ function PasswordChangeFrame() {
                     />
                 </div>
                 <div className="flex justify-center">
-                    <button
-                        className="btn-indigo padding-btn-default min-w-[8rem]"
-                        onClick={handleChangePassword}>
+                    <Button
+                        theme="indigo"
+                        onClick={handleChangePassword}
+                        minWidth="8rem">
                         {t("profile_settings.save")}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </RoundedFrame>
@@ -83,7 +85,7 @@ function OtherSettingsFrame({ data }) {
     const [hideSolved, setHideSolved] = useState(data.hideSolved);
     const titleComponent = (
         <SVGTitleComponent
-            svg={<FontAwesomeIcon icon="fa-cog" className="w-4 h-4 mr-3" />}
+            svg={<FontAwesomeIcon icon="fa-cog" className="w-5 h-5 mr-3" />}
             title={t("profile_settings.other_settings")}
         />
     );
@@ -116,11 +118,12 @@ function OtherSettingsFrame({ data }) {
                     />
                 </div>
                 <div className="flex justify-center">
-                    <button
-                        className="btn-indigo padding-btn-default min-w-[8rem]"
-                        onClick={handleSaveSettings}>
+                    <Button
+                        theme="indigo"
+                        onClick={handleSaveSettings}
+                        minWidth="8rem">
                         {t("profile_settings.save")}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </RoundedFrame>

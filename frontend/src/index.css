@@ -39,8 +39,8 @@
         --color-grey-150: 218, 218, 218;
         --color-grey-125: 225, 225, 225;
         --color-grey-100: 232, 232, 232;
-        --color-dividecol: var(--color-grey-650);
-        --color-bordercol: var(--color-grey-675);
+        --color-bordercol: var(--color-grey-650);
+        --color-dividecol: var(--color-grey-675);
         --color-codebgcol: var(--color-grey-875);
         --color-highlight: 79, 70, 229;
     }
@@ -80,8 +80,8 @@
         --color-grey-850: 234, 234, 234;
         --color-grey-875: 241, 241, 241;
         --color-grey-900: 248, 248, 248;
+        --color-bordercol: var(--color-grey-625);
         --color-dividecol: var(--color-grey-650);
-        --color-bordercol: var(--color-grey-675);
         --color-codebgcol: var(--color-grey-875);
         --color-highlight: 99, 102, 241;
     }
@@ -92,8 +92,7 @@
         @apply rounded-container bg-grey-800 border border-bordercol flex w-full shadow-frame dark:shadow-none;
     }
     .frame-title {
-        @apply font-medium p-4 text-center border-b-1 border-grey-575 dark:border-grey-625;
-        font-size: 0.96rem;
+        @apply font-medium p-4 text-center border-b-1 border-bordercol;
     }
     .link {
         @apply cursor-pointer underline underline-offset-1 hover:text-indigo-800 dark:hover:text-indigo-200;
@@ -102,16 +101,16 @@
         @apply border border-bordercol;
     }
     .tag {
-        @apply whitespace-nowrap cursor-pointer text-sm px-2 py-1 border rounded m-1 bg-grey-750 hover:bg-grey-725 border-grey-625 truncate h-8 flex items-center;
+        @apply whitespace-nowrap cursor-pointer text-sm px-2 py-1 border rounded m-1 bg-grey-750 hover:bg-grey-725 border-bordercol truncate h-8 flex items-center;
     }
     .btn-indigo {
         @apply text-white text-sm font-medium bg-indigo-600 rounded-md hover:bg-indigo-500 text-center;
     }
     .btn-gray {
-        @apply text-sm dark:font-medium bg-grey-725 rounded-md hover:bg-grey-700 border border-grey-625 text-center;
+        @apply text-sm dark:font-medium bg-grey-725 rounded-md hover:bg-grey-700 border border-bordercol text-center;
     }
     .date-label {
-        @apply cursor-pointer text-sm px-2 py-1 bg-grey-725 rounded border border-grey-625 hover:bg-grey-700 shrink-0;
+        @apply cursor-pointer text-sm px-2 py-1 bg-grey-725 rounded border border-bordercol hover:bg-grey-700 shrink-0;
     }
 }
 
@@ -121,7 +120,7 @@
 
 .font-code {
     @apply font-mono text-sm;
-    font-size: 0.875rem;
+    font-size: 0.82rem;
     font-family: "JetBrains Mono", monospace;
 }
 

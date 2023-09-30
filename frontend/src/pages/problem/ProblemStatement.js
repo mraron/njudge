@@ -14,6 +14,7 @@ import ThemeContext from "../../contexts/theme/ThemeContext";
 import submitSolution from "../../util/submitSolution";
 import { apiRoute, routeMap } from "../../config/RouteConfig";
 import Tag from "../../components/util/Tag";
+import Button from "../../components/util/Button";
 
 function ProblemInfo({ info }) {
     const { t } = useTranslation();
@@ -112,7 +113,9 @@ function ProblemSubmit() {
             if (ok) {
                 window.flash("flash.successful_submission", "success");
                 navigate(
-                    routeMap.problemSubmissions.replace(":problemset", problemset).replace(":problem", problem),
+                    routeMap.problemSubmissions
+                        .replace(":problemset", problemset)
+                        .replace(":problem", problem),
                 );
             } else {
                 window.flash("flash.unsuccessful_submission", "failure");
@@ -140,24 +143,24 @@ function ProblemSubmit() {
                             : t("problem_statement.no_file_selected")}
                     </span>
                     <div className="flex justify-center">
-                        <button
-                            className="btn-gray padding-btn-default w-1/2"
-                            onClick={() =>
-                                document.getElementById("uploadFile").click()
-                            }>
-                            <span>{t("problem_statement.choose")}</span>
-                            <input
-                                id="uploadFile"
-                                className="hidden"
-                                type="file"
-                                onChange={handleFileUploaded}
-                            />
-                        </button>
-                        <button
-                            className="ml-2 btn-indigo padding-btn-default w-1/2"
-                            onClick={handleSubmit}>
+                        <div className="mr-2 w-full">
+                            <Button
+                                theme="gray"
+                                onClick={() =>
+                                    document
+                                        .getElementById("uploadFile")
+                                        .click()
+                                }
+                                fullWidth={true}>
+                                {t("problem_statement.choose")}
+                            </Button>
+                        </div>
+                        <Button
+                            theme="indigo"
+                            onClick={handleSubmit}
+                            fullWidth={true}>
                             {t("problem_statement.submit")}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -318,11 +321,12 @@ function ProblemStatement({ data }) {
                                 />
                             </div>
                             <a
-                                className="btn-gray py-2 px-4 flex justify-center items-center"
                                 href={apiRoute(statementSrc)}
                                 target="_blank"
                                 rel="noreferrer">
-                                <SVGView cls="w-[1.4rem] h-[1.4rem]" />
+                                <Button theme="gray">
+                                    <SVGView cls="w-[1.4rem] h-[1.4rem]" />
+                                </Button>
                             </a>
                         </div>
                     </RoundedFrame>
@@ -335,14 +339,14 @@ function ProblemStatement({ data }) {
                             aria-label="Problem statement"
                             type="application/pdf"
                             width="100%"
-                            className="h-[36rem] lg:h-[52rem] border border-grey-600"></object>
+                            className="h-[36rem] lg:h-[52rem] border border-bordercol"></object>
                     )}
                     {statementType === "html" && (
                         <iframe
                             src={apiRoute(statementSrc)}
                             width="100%"
                             title="Problem statement"
-                            className="h-[36rem] lg:h-[52rem] border border-grey-600"></iframe>
+                            className="h-[36rem] lg:h-[52rem] border border-bordercol"></iframe>
                     )}
                 </div>
             </div>

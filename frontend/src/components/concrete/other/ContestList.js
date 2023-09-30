@@ -1,27 +1,26 @@
 import { useTranslation } from "react-i18next";
 import RoundedFrame from "../../container/RoundedFrame";
+import Button from "../../util/Button";
 
 function ContestFrame({ name, date, active }) {
     const { t } = useTranslation();
     const buttons = [
-        <button className="btn-gray padding-btn-default mr-1" key={0}>
-            {t("contests.view")}
-        </button>,
+        <div className="mr-2" key={0}>
+            <Button theme="gray">{t("contests.view")}</Button>
+        </div>,
     ];
     if (active) {
         buttons.push(
-            <button
-                className="btn-indigo padding-btn-default ml-1"
-                key={buttons.length}>
+            <Button theme="indigo" key={buttons.length}>
                 {t("contests.register")}
-            </button>,
+            </Button>,
         );
     }
     return (
         <RoundedFrame>
             <div className="px-6 py-5 sm:px-10 sm:py-8">
                 <div className="flex justify-between items-start">
-                    <span className="text-lg font-semibold break-words min-w-0">
+                    <span className="text-base font-semibold break-words min-w-0">
                         {name}
                     </span>
                     <span className="ml-4 date-label">{date}</span>

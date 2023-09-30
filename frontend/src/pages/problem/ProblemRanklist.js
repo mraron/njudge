@@ -6,24 +6,12 @@ import Pagination from "../../components/util/Pagination";
 
 function ProblemRanklist({ data }) {
     const { t } = useTranslation();
-    const titleComponent = (
-        <SVGTitleComponent
-            svg={
-                <FontAwesomeIcon
-                    icon="fa-ranking-star"
-                    className="w-5 h-5 mr-2"
-                />
-            }
-            title={t("problem_ranklist.ranklist")}
-        />
-    );
-
     return (
         <div>
             <div className="mb-2">
                 <Ranklist
                     ranklist={data.ranklist}
-                    titleComponent={titleComponent}
+                    title={t("problem_ranklist.ranklist")}
                 />
             </div>
             <Pagination paginationData={data.paginationData} />

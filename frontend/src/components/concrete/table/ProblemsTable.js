@@ -56,8 +56,10 @@ function Problem(data) {
             <td className="padding-td-default">
                 <Link
                     className="link"
-                    to={title.href}>
-                    {title.text}
+                    to={routeMap.problem
+                        .replace(":problemset", data.problemset)
+                        .replace(":problem", problem)}>
+                    {title}
                 </Link>
             </td>
             <td className="padding-td-default">
@@ -71,10 +73,9 @@ function Problem(data) {
             <td className="padding-td-default w-0">
                 <Link
                     className="link flex items-center justify-center"
-                    to={`${routeMap.problemSubmissions.replace(
-                        ":problem",
-                        problem,
-                    )}?ac=1`}>
+                    to={`${routeMap.problemSubmissions
+                        .replace(":problemset", data.problemset)
+                        .replace(":problem", problem)}?ac=1`}>
                     <FontAwesomeIcon
                         icon="fa-user"
                         className="w-3.5 h-3.5 mr-1"
@@ -86,12 +87,12 @@ function Problem(data) {
     );
 }
 
-function ProblemsTable({ problems }) {
+function ProblemsTable({ problemset = "main", problems }) {
     const { t } = useTranslation();
     const { isLoggedIn } = useContext(UserContext);
 
     const problemsContent = problems.map((item, index) => (
-        <Problem problem={item} key={index} />
+        <Problem problemset={problemset} problem={item} key={index} />
     ));
     return (
         <RoundedTable>

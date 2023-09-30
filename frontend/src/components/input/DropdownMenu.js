@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { matchPath, useLocation, useNavigate } from "react-router-dom";
 import { SVGDropdownMenuArrow } from "../svg/SVGs";
 import { findRouteIndex } from "../../util/findRouteIndex";
+import { TERipple } from "tw-elements-react";
 
 function DropdownItem({ name, onClick }) {
     return (
@@ -80,7 +81,7 @@ function DropdownMenu({ initSelected, itemNames, button: Button, onChange }) {
                 <div
                     className={`rounded-md max-h-60 overflow-y-auto border-bordercol border`}>
                     <ul
-                        className={`divide-y divide-dividecol bg-grey-875 rounded-md`}>
+                        className={`divide-y divide-grey-750 bg-grey-875 rounded-md overflow-hidden`}>
                         {items}
                     </ul>
                 </div>
