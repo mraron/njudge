@@ -207,8 +207,8 @@ function TestCase0({ testCase, index }) {
                     <span className="truncate">{testCase.memory} KiB</span>
                 </div>
             </div>
-            <div className="overflow-x-auto">
-                <table className="w-full text-table bg-grey-850 rounded-b-md">
+            <div className="overflow-x-auto rounded-b-container">
+                <table className="w-full text-table bg-grey-850 rounded-b-container">
                     <tbody className="divide-y divide-dividecol">
                         {outputRows}
                     </tbody>

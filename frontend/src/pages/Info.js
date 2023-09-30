@@ -8,8 +8,10 @@ import CopyableCommand from "../components/util/copy/CopyableCommand";
 function CompilerOption({ lang, command }) {
     return (
         <tr className={`divide-x divide-dividecol`}>
-            <td className="padding-td-default whitespace-nowrap">{lang}</td>
-            <td>
+            <td className="padding-td-default whitespace-nowrap w-32 text-center">
+                {lang}
+            </td>
+            <td style={{ maxWidth: 0 }}>
                 <CopyableCommand text={command} cls="border-0 rounded-none" />
             </td>
         </tr>
@@ -19,10 +21,7 @@ function CompilerOption({ lang, command }) {
 function InfoTable() {
     const { t } = useTranslation();
     const compilerOptions = [
-        [
-            "C++ (11 / 14 / 17)",
-            "g++ -std=c++<verzió> -O2 -static -DONLINE_JUDGE main.cpp",
-        ],
+        ["C++", "g++ -std=c++<verzió> -O2 -static -DONLINE_JUDGE main.cpp"],
         ["C#", "/usr/bin/mcs -out:main.exe -optimize+ main.cs"],
         ["Go", "/usr/bin/gccgo main.go"],
         ["Java", "/usr/bin/javac main.java"],

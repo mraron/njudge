@@ -115,6 +115,8 @@
 
 .font-code {
     @apply font-mono text-sm;
+    font-size: 0.875rem;
+    font-family: "JetBrains Mono", monospace;
 }
 
 pre {
@@ -145,9 +147,6 @@ th {
     @apply font-medium;
 }
 
-.text-code {
-}
-
 .text-table {
     font-size: 0.92rem;
     line-height: 1.25rem;
@@ -165,10 +164,6 @@ th {
 
 html {
     color-scheme: dark;
-}
-
-pre {
-    font-family: "JetBrains Mono", monospace;
 }
 
 .fade-appear,
