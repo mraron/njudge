@@ -44,7 +44,7 @@ function ForgottenPasswordFrame() {
                     <div className="flex justify-center">
                         <Button
                             type="submit"
-                            theme="indigo"
+                            color="indigo"
                             onClick={handleChangePassword}
                             minWidth="12rem">
                             {t("forgotten_password.change_password")}

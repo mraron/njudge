@@ -13,7 +13,9 @@ function CopyButton({ text, isVisible }) {
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1, transition: { duration: 0.2 } }}>
-                    <TERipple>
+                    <TERipple
+                        className="rounded-md overflow-hidden"
+                        rippleColor="#808080">
                         <button
                             className={`rounded-md bg-grey-775 hover:bg-grey-750 border border-bordercol relative h-9 w-9`}
                             aria-label="Copy"

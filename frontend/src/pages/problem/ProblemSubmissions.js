@@ -59,13 +59,13 @@ function SubmissionFilterFrame() {
                 <div className="flex justify-center">
                     <div className="mr-2">
                         <Button
-                            theme="indigo"
+                            color="indigo"
                             onClick={handleSubmit}
                             minWidth="8rem">
                             {t("problem_filter.search")}
                         </Button>
                     </div>
-                    <Button theme="gray" onClick={handleReset} minWidth="8rem">
+                    <Button color="gray" onClick={handleReset} minWidth="8rem">
                         {t("problem_filter.reset")}{" "}
                     </Button>
                 </div>

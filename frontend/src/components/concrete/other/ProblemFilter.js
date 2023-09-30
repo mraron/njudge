@@ -116,13 +116,13 @@ function ProblemFilter() {
             <div className="flex justify-center">
                 <div className="mr-2">
                     <Button
-                        theme="indigo"
+                        color="indigo"
                         minWidth="8rem"
                         onClick={handleSubmit}>
                         {t("problem_filter.search")}
                     </Button>
                 </div>
-                <Button theme="gray" minWidth="8rem" onClick={handleSubmit}>
+                <Button color="gray" minWidth="8rem" onClick={handleSubmit}>
                     {t("problem_filter.reset")}
                 </Button>
             </div>

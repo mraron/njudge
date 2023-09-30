@@ -6,12 +6,12 @@ function ContestFrame({ name, date, active }) {
     const { t } = useTranslation();
     const buttons = [
         <div className="mr-2" key={0}>
-            <Button theme="gray">{t("contests.view")}</Button>
+            <Button color="gray">{t("contests.view")}</Button>
         </div>,
     ];
     if (active) {
         buttons.push(
-            <Button theme="indigo" key={buttons.length}>
+            <Button color="indigo" key={buttons.length}>
                 {t("contests.register")}
             </Button>,
         );

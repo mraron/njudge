@@ -29,11 +29,11 @@ function TagModal({ isOpen, onClose }) {
                     </div>
                     <div className="flex justify-center">
                         <div className="mr-2">
-                            <Button theme="indigo">
+                            <Button color="indigo">
                                 {t("tag_modal.save")}
                             </Button>
                         </div>
-                        <Button theme="gray" onClick={onClose}>
+                        <Button color="gray" onClick={onClose}>
                             {t("tag_modal.save")}
                         </Button>
                     </div>

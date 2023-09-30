@@ -51,6 +51,10 @@
         "compilation_error": "Compilation error",
         "page_title": "Submission #{{params.id}} :: njudge"
     },
+    "not_found": {
+        "message": "The page is not found. Please check if the entered route is correct.",
+        "back_to_home": "Back to the homepage"
+    },
     "flash": {
         "no_permission": "You have no permission to perform this operation.",
         "successful_logout": "Successful logout.",

@@ -66,13 +66,13 @@ function LoginFrame() {
                     <div className="flex justify-center mb-1">
                         <div className="mr-2 w-full">
                             <Button
-                                theme="indigo"
+                                color="indigo"
                                 onClick={handleLogin}
                                 fullWidth={true}>
                                 {t("login.login")}
                             </Button>
                         </div>
-                        <Button theme="gray" fullWidth={true}>
+                        <Button color="gray" fullWidth={true}>
                             Google
                         </Button>
                     </div>

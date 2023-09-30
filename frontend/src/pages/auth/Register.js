@@ -77,7 +77,7 @@ function RegisterFrame() {
                     <div className="flex justify-center">
                         <Button
                             type="submit"
-                            theme="indigo"
+                            color="indigo"
                             onClick={handleRegister}
                             minWidth="12rem">
                             {t("register.register")}

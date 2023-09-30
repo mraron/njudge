@@ -31,6 +31,7 @@
         "react-dom": "^18.2.0",
         "react-i18next": "^13.2.2",
         "react-pdf": "^7.3.3",
+        "react-ripples": "^2.2.1",
         "react-router-dom": "^6.15.0",
         "react-scripts": "5.0.1",
         "react-transition-group": "^4.4.5",

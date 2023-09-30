@@ -1,15 +1,19 @@
 import { TERipple } from "tw-elements-react";
 
-function Button({ type, theme, minWidth, fullWidth, onClick, children }) {
+function Button({ type, color, minWidth, fullWidth, onClick, children }) {
+    const rippleColor = color === "gray" ? "#808080" : "#000000";
     return (
-        <TERipple className={`${fullWidth ? "w-full" : ""}`}>
+        <TERipple
+            rippleColor={rippleColor}
+            className={`rounded-md overflow-hidden ${
+                fullWidth ? "w-full" : ""
+            }`}>
             <button
                 type={type}
                 className={`${
-                    theme === "indigo" ? "btn-indigo" : "btn-gray"
-                } min-w-[${minWidth}] padding-btn-default ${
-                    fullWidth ? "w-full" : ""
-                }`}
+                    color === "indigo" ? "btn-indigo" : "btn-gray"
+                } padding-btn-default ${fullWidth ? "w-full" : ""}`}
+                style={{ minWidth: minWidth }}
                 onClick={onClick}>
                 {children}
             </button>

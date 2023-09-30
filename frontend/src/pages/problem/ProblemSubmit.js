@@ -26,7 +26,7 @@ function SubmitControlsFrame({ onLanguageChanged, onSubmit }) {
                     />
                 </div>
                 <div className="ml-3">
-                    <Button theme="indigo" minWidth="8rem" onClick={onSubmit}>
+                    <Button color="indigo" minWidth="8rem" onClick={onSubmit}>
                         {t("problem_submit.submit")}
                     </Button>
                 </div>

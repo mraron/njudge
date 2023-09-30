@@ -39,8 +39,8 @@
         --color-grey-150: 218, 218, 218;
         --color-grey-125: 225, 225, 225;
         --color-grey-100: 232, 232, 232;
-        --color-bordercol: var(--color-grey-650);
-        --color-dividecol: var(--color-grey-675);
+        --color-bordercol: var(--color-grey-675);
+        --color-dividecol: var(--color-grey-700);
         --color-codebgcol: var(--color-grey-875);
         --color-highlight: 79, 70, 229;
     }
@@ -81,7 +81,7 @@
         --color-grey-875: 241, 241, 241;
         --color-grey-900: 248, 248, 248;
         --color-bordercol: var(--color-grey-625);
-        --color-dividecol: var(--color-grey-650);
+        --color-dividecol: var(--color-grey-700);
         --color-codebgcol: var(--color-grey-875);
         --color-highlight: 99, 102, 241;
     }

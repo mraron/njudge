@@ -51,6 +51,10 @@
         "compilation_error": "Fordítási hiba",
         "page_title": "Beküldés #{{params.id}} :: njudge"
     },
+    "not_found": {
+        "message": "A keresett oldal nem található. Győződj meg róla, hogy a megadott útvonal helyes.",
+        "back_to_home": "Vissza a főoldalra"
+    },
     "flash": {
         "no_permission": "Nincs jogosultságod végrehajtani ezt a műveletet.",
         "successful_logout": "Sikeres kijelentkezés.",

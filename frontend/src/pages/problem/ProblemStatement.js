@@ -145,7 +145,7 @@ function ProblemSubmit() {
                     <div className="flex justify-center">
                         <div className="mr-2 w-full">
                             <Button
-                                theme="gray"
+                                color="gray"
                                 onClick={() =>
                                     document
                                         .getElementById("uploadFile")
@@ -156,7 +156,7 @@ function ProblemSubmit() {
                             </Button>
                         </div>
                         <Button
-                            theme="indigo"
+                            color="indigo"
                             onClick={handleSubmit}
                             fullWidth={true}>
                             {t("problem_statement.submit")}
@@ -324,7 +324,7 @@ function ProblemStatement({ data }) {
                                 href={apiRoute(statementSrc)}
                                 target="_blank"
                                 rel="noreferrer">
-                                <Button theme="gray">
+                                <Button color="gray">
                                     <SVGView cls="w-[1.4rem] h-[1.4rem]" />
                                 </Button>
                             </a>
