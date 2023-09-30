@@ -6,7 +6,7 @@ function CopyableCode({ text, maxHeight = "auto", titleComponent, cls }) {
     const [isHovered, setHovered] = useState(false);
     return (
         <RoundedFrame
-            cls={`${cls} overflow-auto`}
+            cls={`${cls} overflow-auto shadow-none`}
             titleComponent={titleComponent}>
             <div
                 onMouseEnter={() => setHovered(true)}

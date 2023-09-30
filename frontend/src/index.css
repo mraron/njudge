@@ -42,6 +42,7 @@
         --color-dividecol: var(--color-grey-650);
         --color-bordercol: var(--color-grey-675);
         --color-codebgcol: var(--color-grey-875);
+        --color-highlight: 79, 70, 229;
     }
     html[data-theme="light"] {
         --color-textcol: 48, 48, 48;
@@ -82,15 +83,19 @@
         --color-dividecol: var(--color-grey-650);
         --color-bordercol: var(--color-grey-675);
         --color-codebgcol: var(--color-grey-875);
+        --color-highlight: 99, 102, 241;
     }
 }
 
 @layer components {
     .rounded-frame {
-        @apply rounded-container bg-grey-800 border border-bordercol flex w-full;
+        @apply rounded-container bg-grey-800 border border-bordercol flex w-full shadow-frame dark:shadow-none;
+    }
+    .frame-title {
+        @apply font-medium p-4 text-center border-b-1 border-grey-575 dark:border-grey-625;
     }
     .link {
-        @apply cursor-pointer underline underline-offset-2 hover:text-indigo-800 dark:hover:text-indigo-200;
+        @apply cursor-pointer underline underline-offset-1 hover:text-indigo-800 dark:hover:text-indigo-200;
     }
     .editor {
         @apply border border-bordercol;

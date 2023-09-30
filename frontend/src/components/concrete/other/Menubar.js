@@ -35,7 +35,7 @@ function MenuOption({ label, route, selected, horizontal, onClick }) {
                     horizontal ? "border-b-3 pt-1" : "border-l-3 p-3"
                 } ${
                     selected
-                        ? "border-indigo-600 bg-grey-775"
+                        ? "border-highlight bg-grey-775"
                         : "border-transparent hover:bg-grey-800"
                 }`}
                 to={route}>

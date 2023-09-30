@@ -32,14 +32,14 @@ function InfoTable() {
     const compilerOptionElems = compilerOptions.map((item, index) => (
         <CompilerOption lang={item[0]} command={item[1]} key={index} />
     ));
-    const titleComponent = (
-        <SVGTitleComponent
-            title={t("info.compiler_options")}
-            svg={<FontAwesomeIcon icon="fa-code" className="w-5 h-5 mr-3" />}
-        />
-    );
     return (
-        <RoundedTable titleComponent={titleComponent}>
+        <RoundedTable title={t("info.compiler_options")}>
+            <thead className="bg-grey-800">
+                <tr className="divide-x divide-bordercol">
+                    <th className="padding-td-default">Nyelv</th>
+                    <th className="padding-td-default">Parancs</th>
+                </tr>
+            </thead>
             <tbody className="divide-y divide-dividecol text-sm">
                 {compilerOptionElems}
             </tbody>

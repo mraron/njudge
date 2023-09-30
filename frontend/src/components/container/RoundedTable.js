@@ -13,7 +13,7 @@ function RoundedTable({ children, title, titleComponent }) {
                         : "rounded-container"
                 }`}>
                 <table
-                    className={`w-full divide-y divide-indigo-600 bg-grey-850 border-collapse text-table overflow-x-auto ${
+                    className={`w-full divide-y divide-highlight bg-grey-850 border-collapse text-table overflow-x-auto ${
                         title || titleComponent
                             ? "rounded-b-container"
                             : "rounded-container"

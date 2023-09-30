@@ -5,7 +5,7 @@ import { useState } from "react";
 function CopyableCommand({ text, cls }) {
     const [isHovered, setHovered] = useState(false);
     return (
-        <RoundedFrame cls={`${cls} overflow-auto`}>
+        <RoundedFrame cls={`${cls} overflow-auto shadow-none`}>
             <div
                 className="p-0.5 relative bg-codebgcol flex"
                 onMouseEnter={() => setHovered(true)}

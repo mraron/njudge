@@ -3,6 +3,9 @@ module.exports = {
     darkMode: "class",
     theme: {
         extend: {
+            boxShadow: {
+                "frame": "0 6px 10px -6px rgba(0, 0, 0, 0.2)"
+            },
             transitionProperty: {
                 "opacity": "opacity",
                 "transform": "transform",
@@ -24,6 +27,7 @@ module.exports = {
                 "bordercol": "rgb(var(--color-bordercol))",
                 "dividecol": "rgb(var(--color-dividecol))",
                 "codebgcol": "rgb(var(--color-codebgcol))",
+                "highlight": "rgb(var(--color-highlight))",
                 "grey-900": "rgb(var(--color-grey-900))",
                 "grey-875": "rgb(var(--color-grey-875))",
                 "grey-850": "rgb(var(--color-grey-850))",
