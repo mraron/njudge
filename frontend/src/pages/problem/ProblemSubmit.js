@@ -54,7 +54,7 @@ function ProblemSubmit() {
             if (ok) {
                 window.flash("flash.successful_submission", "success");
                 navigate(
-                    routeMap.problemSubmissions.replace(":problem", problem).replace(":problemset", problemset),
+                    routeMap.problemSubmissions.replace(":problemset", problemset).replace(":problem", problem),
                 );
             } else {
                 window.flash("flash.unsuccessful_submission", "failure");
