@@ -15,12 +15,7 @@ function ForgottenPasswordFrame() {
     const [email, setEmail] = useState("");
     const titleComponent = (
         <SVGTitleComponent
-            svg={
-                <FontAwesomeIcon
-                    icon="fa-unlock-keyhole"
-                    className="w-5 h-5 mr-3"
-                />
-            }
+            svg={<FontAwesomeIcon icon="fa-lock" className="w-5 h-5 mr-3" />}
             title={t("forgotten_password.change_password")}
         />
     );

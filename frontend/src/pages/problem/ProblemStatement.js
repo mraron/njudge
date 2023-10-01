@@ -334,14 +334,14 @@ function ProblemStatement({ data }) {
                             aria-label="Problem statement"
                             type="application/pdf"
                             width="100%"
-                            className="h-[36rem] lg:h-[52rem] border border-bordercol"></object>
+                            className="h-[36rem] lg:h-[52rem] border border-bordefcol"></object>
                     )}
                     {statementType === "html" && (
                         <iframe
                             src={apiRoute(statementSrc)}
                             width="100%"
                             title="Problem statement"
-                            className="h-[36rem] lg:h-[52rem] border border-bordercol"></iframe>
+                            className="h-[36rem] lg:h-[52rem] border border-bordefcol"></iframe>
                     )}
                 </div>
             </div>

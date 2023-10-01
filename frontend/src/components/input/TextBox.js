@@ -38,7 +38,7 @@ function TextBox({
                 } w-full mt-1`}>
                 <div
                     className={`border-b-1 ${
-                        focused ? "border-indigo-600" : "border-bordercol"
+                        focused ? "border-indigo-600" : "border-bordefcol"
                     } w-full`}>
                     <input
                         id={id}

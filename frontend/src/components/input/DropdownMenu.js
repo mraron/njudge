@@ -17,7 +17,7 @@ function DropdownItem({ name, onClick }) {
 function DefaultDropdownButton({ label, isOpen, onClick }) {
     return (
         <button
-            className={`w-full rounded-md px-3 py-2 border flex items-center justify-between border-bordercol ${
+            className={`w-full rounded-md px-3 py-2 border flex items-center justify-between border-bordefcol ${
                 isOpen
                     ? "bg-grey-775 hover:bg-grey-750"
                     : "bg-grey-850 hover:bg-grey-825"
@@ -79,7 +79,7 @@ function DropdownMenu({ initSelected, itemNames, button: Button, onChange }) {
                     isOpen ? "max-h-60 opacity-100" : "max-h-0 opacity-0"
                 } transition-height-opacity duration-[250ms]`}>
                 <div
-                    className={`rounded-md max-h-60 overflow-y-auto border-bordercol border`}>
+                    className={`rounded-md max-h-60 overflow-y-auto border-bordefcol border`}>
                     <ul
                         className={`divide-y divide-grey-750 bg-grey-875 rounded-md overflow-hidden`}>
                         {items}

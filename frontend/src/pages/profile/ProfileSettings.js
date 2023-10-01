@@ -22,12 +22,7 @@ function PasswordChangeFrame() {
     const handleChangeNewPwConfirm = (newText) => setNewPwConfirm(newText);
     const titleComponent = (
         <SVGTitleComponent
-            svg={
-                <FontAwesomeIcon
-                    icon="fa-unlock-keyhole"
-                    className="w-5 h-5 mr-3"
-                />
-            }
+            svg={<FontAwesomeIcon icon="fa-lock" className="w-4 h-4 mr-3" />}
             title={t("profile_settings.password_change")}
         />
     );
@@ -90,7 +85,7 @@ function OtherSettingsFrame({ data }) {
     const [hideSolved, setHideSolved] = useState(data.hideSolved);
     const titleComponent = (
         <SVGTitleComponent
-            svg={<FontAwesomeIcon icon="fa-cog" className="w-5 h-5 mr-3" />}
+            svg={<FontAwesomeIcon icon="fa-cog" className="w-4 h-4 mr-3" />}
             title={t("profile_settings.other_settings")}
         />
     );

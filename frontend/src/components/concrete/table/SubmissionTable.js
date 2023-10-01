@@ -139,7 +139,7 @@ function TestCase0({ testCase, index }) {
     const { t } = useTranslation();
     const titleComponent = (
         <div className="flex flex-col">
-            <div className="py-3 px-5 border-b border-bordercol flex items-center">
+            <div className="py-3 px-5 border-b border-bordefcol flex items-center">
                 {testCase.verdictType === 0 && (
                     <SVGSpinner cls="w-5 h-5 mr-3" />
                 )}
@@ -165,7 +165,7 @@ function TestCase0({ testCase, index }) {
                 <span className="mx-2">–</span>
                 <span className="truncate">{testCase.verdictName}</span>
             </div>
-            <div className="py-3 px-5 flex justify-between border-b border-bordercol text-table">
+            <div className="py-3 px-5 flex justify-between border-b border-bordefcol text-table">
                 <div className="mr-2 whitespace-nowrap truncate flex items-center">
                     <FontAwesomeIcon
                         icon="fa-regular fa-clock"

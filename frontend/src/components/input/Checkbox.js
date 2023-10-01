@@ -24,7 +24,7 @@ function Checkbox({ id, label, initChecked, onChange }) {
                           }`
                         : `${
                               hovered ? "bg-grey-825" : "bg-grey-850"
-                          } border-bordercol`
+                          } border-bordefcol`
                 } w-5 h-5 rounded-sm`}>
                 <FontAwesomeIcon
                     icon="fa-check"

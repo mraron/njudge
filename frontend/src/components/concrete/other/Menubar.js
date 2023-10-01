@@ -50,7 +50,7 @@ function getProfileDropdownButton(isLoggedIn) {
         const { t } = useTranslation();
         return (
             <button
-                className={`border border-bordercol rounded-tl-md rounded-bl-md flex items-center justify-between px-3 py-2 w-full h-full ${
+                className={`border border-bordefcol rounded-tl-md rounded-bl-md flex items-center justify-between px-3 py-2 w-full h-full ${
                     isOpen
                         ? "bg-grey-775 hover:bg-grey-725"
                         : "bg-grey-850 hover:bg-framebgcol"
@@ -100,7 +100,7 @@ function ProfileSettings() {
                 routes={profileRoutes}
                 routeLabels={profileRouteLabels.map(t)}
             />
-            <div className="px-3 flex items-center justify-center border border-l-0 border-bordercol">
+            <div className="px-3 flex items-center justify-center border border-l-0 border-bordefcol">
                 <button
                     className={`px-2 ${
                         i18n.resolvedLanguage === "hu"
@@ -138,7 +138,7 @@ function ThemeButton() {
     };
     return (
         <button
-            className="border border-l-0 border-bordercol p-2 rounded-r-md hover:bg-framebgcol"
+            className="h-full border border-l-0 border-bordefcol flex items-center justify-center p-2 rounded-r-md hover:bg-framebgcol"
             onClick={toggleTheme}>
             <FontAwesomeIcon
                 icon={theme === "light" ? "fa-moon" : "fa-sun"}
@@ -182,7 +182,7 @@ function MenuSideBar({ selected, isOpen, onClose }) {
     return (
         <aside
             ref={menuRef}
-            className={`h-full z-20 pt-20 overflow-y-auto overflow-x-hidden xl:hidden fixed right-0 bg-grey-825 border-l-1 border-bordercol ${
+            className={`h-full z-20 pt-20 overflow-y-auto overflow-x-hidden xl:hidden fixed right-0 bg-grey-825 border-l-1 border-bordefcol ${
                 isOpen ? "w-80 opacity-100" : "w-0 opacity-0"
             } ease-in-out transition-width-opacity duration-200`}>
             <div className="flex flex-col justify-center">
@@ -261,7 +261,7 @@ function Menubar() {
     };
     return (
         isLoggedIn !== null && (
-            <div>
+            <div className="text-menubar">
                 <MenuTopBar
                     selected={selected}
                     isOpen={isOpen}

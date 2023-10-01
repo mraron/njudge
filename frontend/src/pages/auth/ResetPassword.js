@@ -18,12 +18,7 @@ function ResetPasswordFrame() {
 
     const titleComponent = (
         <SVGTitleComponent
-            svg={
-                <FontAwesomeIcon
-                    icon="fa-unlock-keyhole"
-                    className="w-4 h-4 mr-3"
-                />
-            }
+            svg={<FontAwesomeIcon icon="fa-lock" className="w-4 h-4 mr-3" />}
             title={t("reset_password.change_password")}
         />
     );

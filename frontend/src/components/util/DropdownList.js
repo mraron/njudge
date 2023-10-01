@@ -4,7 +4,7 @@ import { SVGDropdownListArrow } from "../svg/SVGs";
 function DropdownElem({ text, isOpen, onClick }) {
     return (
         <span
-            className="max-w-fit flex link items-center dark:font-medium no-underline"
+            className="max-w-fit flex link items-center emph-med no-underline"
             onClick={onClick}>
             <SVGDropdownListArrow isOpen={isOpen} />
             <span className="truncate">{text}</span>
@@ -39,7 +39,7 @@ function DropdownList({ tree, leaf: Leaf }) {
             {!isRoot && isLeaf && leafNode}
             <ul
                 className={`${isOpen ? "" : "hidden"} ${
-                    isRoot ? "" : "ml-6"
+                    isRoot ? "" : "ml-5"
                 } mb-4`}>
                 {children}
             </ul>

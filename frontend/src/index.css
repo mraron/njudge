@@ -39,7 +39,8 @@
         --color-grey-150: 218, 218, 218;
         --color-grey-125: 225, 225, 225;
         --color-grey-100: 232, 232, 232;
-        --color-bordercol: var(--color-grey-675);
+        --color-bordefcol: var(--color-grey-675);
+        --color-borstrcol: var(--color-grey-625);
         --color-dividecol: var(--color-grey-725);
         --color-codebgcol: var(--color-grey-875);
         --color-framebgcol: var(--color-grey-800);
@@ -81,7 +82,8 @@
         --color-grey-850: 234, 234, 234;
         --color-grey-875: 241, 241, 241;
         --color-grey-900: 248, 248, 248;
-        --color-bordercol: var(--color-grey-650);
+        --color-bordefcol: var(--color-grey-650);
+        --color-borstrcol: var(--color-grey-600);
         --color-dividecol: var(--color-grey-725);
         --color-codebgcol: var(--color-grey-875);
         --color-framebgcol: var(--color-grey-800);
@@ -91,28 +93,28 @@
 
 @layer components {
     .rounded-frame {
-        @apply rounded-container bg-framebgcol border border-bordercol flex w-full shadow-frame dark:shadow-none;
+        @apply rounded-container bg-framebgcol border border-bordefcol flex w-full shadow-frame dark:shadow-none;
     }
     .frame-title {
-        @apply dark:font-medium p-4 text-center border-b-1 border-bordercol;
+        @apply emph-med p-4 text-center border-b-1 border-bordefcol;
     }
     .link {
         @apply cursor-pointer underline underline-offset-1 hover:text-indigo-800 dark:hover:text-indigo-200;
     }
     .editor {
-        @apply border border-bordercol;
+        @apply border border-bordefcol;
     }
     .tag {
-        @apply whitespace-nowrap cursor-pointer text-sm px-2 py-1 border rounded m-1 bg-grey-750 hover:bg-grey-725 border-bordercol truncate h-8 flex items-center;
+        @apply whitespace-nowrap cursor-pointer text-sm px-2 py-1 border rounded m-1 bg-grey-750 hover:bg-grey-725 border-borstrcol truncate h-8 flex items-center;
     }
     .btn-indigo {
         @apply text-white text-sm font-medium bg-indigo-600 rounded-md hover:bg-indigo-500 text-center;
     }
     .btn-gray {
-        @apply text-sm dark:font-medium bg-grey-725 rounded-md hover:bg-grey-700 border border-bordercol text-center;
+        @apply text-sm emph-med bg-grey-725 rounded-md hover:bg-grey-700 border border-borstrcol text-center;
     }
     .date-label {
-        @apply cursor-pointer text-sm px-2 py-1 bg-grey-725 rounded border border-bordercol hover:bg-grey-700 shrink-0;
+        @apply cursor-pointer text-sm px-2 py-1 bg-grey-725 rounded border border-bordefcol hover:bg-grey-700 shrink-0;
     }
     .padding-btn-default {
         @apply px-6 py-2;
@@ -150,10 +152,22 @@ pre {
 }
 
 th {
+    @apply emph-med;
+}
+
+.emph-med {
     @apply font-normal dark:font-medium;
 }
 
+.emph-strong {
+    @apply font-medium dark:font-semibold;
+}
+
 .text-frame {
+    font-size: 0.96rem;
+}
+
+.text-menubar {
     font-size: 0.96rem;
 }
 

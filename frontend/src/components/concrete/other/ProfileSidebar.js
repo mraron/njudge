@@ -17,10 +17,10 @@ export function ProfilePictureFrame({ userData }) {
     );
     return (
         <RoundedFrame>
-            <div className="flex flex-col items-center p-5 border-b border-bordercol">
+            <div className="flex flex-col items-center p-5 border-b border-bordefcol">
                 <Link
                     to={profileRoute}
-                    className="flex justify-center items-center w-full aspect-square bg-grey-875 border border-bordercol hover:border-grey-450">
+                    className="flex justify-center items-center w-full aspect-square bg-grey-875 border border-bordefcol hover:border-grey-450">
                     <img
                         alt="avatar"
                         className="object-contain"
@@ -32,7 +32,7 @@ export function ProfilePictureFrame({ userData }) {
                 <Link className="link truncate" to={profileRoute}>
                     {userData.username}
                 </Link>
-                <span className="text-xl font-medium dark:font-semibold text-indigo-600 mx-2">
+                <span className="text-xl emph-strong text-indigo-600 mx-2">
                     &#8226;
                 </span>
                 <span className="truncate">{userData.rating}</span>

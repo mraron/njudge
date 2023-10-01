@@ -20,7 +20,7 @@ function ContestFrame({ name, date, active }) {
         <RoundedFrame>
             <div className="px-6 py-5 sm:px-10 sm:py-8">
                 <div className="flex justify-between items-start">
-                    <span className="text-base font-medium dark:font-semibold break-words min-w-0">
+                    <span className="text-base emph-strong break-words min-w-0">
                         {name}
                     </span>
                     <span className="ml-4 date-label">{date}</span>

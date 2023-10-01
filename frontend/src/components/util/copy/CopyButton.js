@@ -18,7 +18,7 @@ function CopyButton({ text, isVisible }) {
                         className="rounded-md overflow-hidden"
                         rippleColor="#808080">
                         <button
-                            className={`rounded-md bg-grey-775 hover:bg-grey-750 border border-bordercol relative h-9 w-9`}
+                            className={`rounded-md bg-grey-775 hover:bg-grey-750 border border-bordefcol relative h-9 w-9`}
                             aria-label="Copy"
                             onClick={handleCopy}>
                             <FontAwesomeIcon
