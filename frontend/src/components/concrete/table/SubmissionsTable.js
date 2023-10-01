@@ -90,7 +90,7 @@ function SubmissionsTable({ submissions }) {
     ));
     return (
         <RoundedTable>
-            <thead className="bg-grey-800">
+            <thead className="bg-framebgcol">
                 <tr className="divide-x divide-dividecol">
                     <th className="padding-td-default">
                         {t("submissions_table.id")}

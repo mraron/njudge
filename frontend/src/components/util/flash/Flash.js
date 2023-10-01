@@ -8,8 +8,8 @@ function FlashMessage({ message, type, onClose }) {
     const { t } = useTranslation();
     return (
         <div className="absolute bottom-0 left-0 right-0 bg-grey-850 border rounded-md flex border-bordercol w-full">
-            <div className="w-full p-6 flex justify-between items-center">
-                <div className="flex items-center">
+            <div className="w-full p-6 flex justify-between items-center rounded-md">
+                <div className="flex items-center mr-2">
                     {type === "success" && (
                         <FontAwesomeIcon
                             icon="fa-regular fa-circle-check"
@@ -25,7 +25,7 @@ function FlashMessage({ message, type, onClose }) {
                     <span>{t(message)}</span>
                 </div>
                 <button
-                    className="flex rounded-full p-3 hover:bg-grey-800"
+                    className="flex rounded-full p-3 hover:bg-framebgcol"
                     onClick={onClose}>
                     <FontAwesomeIcon icon="fa-close" className="w-5 h-5" />
                 </button>
@@ -46,12 +46,12 @@ function FlashContainer() {
                 animate={{
                     scaleX: 1,
                     opacity: 1,
-                    transition: { duration: 0.16, ease: "linear" },
+                    transition: { duration: 0.16, ease: "easeOut" },
                 }}
                 exit={{
                     scaleX: 0.36,
                     opacity: 0.01,
-                    transition: { duration: 0.16, ease: "linear" },
+                    transition: { duration: 0.16, ease: "easeIn" },
                 }}>
                 <FlashMessage
                     message={message}
@@ -75,7 +75,7 @@ function FlashContainer() {
 
     return (
         <div className="z-10 fixed bottom-2 left-2 right-2 flex justify-center">
-            <div className={`relative w-full max-w-7xl px-2`}>
+            <div className={`relative w-full max-w-7xl`}>
                 <AnimatePresence>{messages}</AnimatePresence>
             </div>
         </div>

@@ -47,7 +47,7 @@ function TextBox({
                         onChange={handleChange}
                         onFocus={handleFocus}
                         onBlur={handleBlur}
-                        className={`py-1.5 px-2 bg-grey-850 border border-b-0 ${
+                        className={`py-1.5 px-2 bg-grey-850 border border-b-0 text-sm ${
                             focused ? "border-grey-575" : "border-grey-650"
                         } w-full outline-none`}
                     />

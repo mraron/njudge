@@ -32,7 +32,7 @@ export function ProfilePictureFrame({ userData }) {
                 <Link className="link truncate" to={profileRoute}>
                     {userData.username}
                 </Link>
-                <span className="text-xl font-semibold text-indigo-600 mx-2">
+                <span className="text-xl font-medium dark:font-semibold text-indigo-600 mx-2">
                     &#8226;
                 </span>
                 <span className="truncate">{userData.rating}</span>

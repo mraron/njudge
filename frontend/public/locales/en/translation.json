@@ -34,7 +34,8 @@
         "username": "Username",
         "email": "E-mail address",
         "password": "Password",
-        "confirm_password": "Confirm password"
+        "confirm_password": "Confirm password",
+        "already_registered": "Already have an account?"
     },
     "forgotten_password": {
         "page_title": "Forgotten password :: njudge",

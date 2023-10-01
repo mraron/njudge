@@ -40,7 +40,7 @@ function LoginFrame() {
     return (
         <RoundedFrame titleComponent={titleComponent}>
             <div className="px-10 py-8">
-                <form method="POST" className="mb-4">
+                <form method="POST">
                     <div className="mb-4">
                         <TextBox
                             id="username"
@@ -59,20 +59,23 @@ function LoginFrame() {
                         />
                     </div>
                     <div className="mb-6">
-                        <Link to={routeMap.forgotten_password} className="link">
+                        <Link
+                            to={routeMap.forgotten_password}
+                            className="link text-sm">
                             {t("login.forgotten_password")}
                         </Link>
                     </div>
-                    <div className="flex justify-center mb-1">
+                    <div className="mb-2 flex justify-center">
                         <div className="mr-2 w-full">
                             <Button
                                 color="indigo"
+                                cls="py-2.5"
                                 onClick={handleLogin}
                                 fullWidth={true}>
                                 {t("login.login")}
                             </Button>
                         </div>
-                        <Button color="gray" fullWidth={true}>
+                        <Button color="gray" cls="py-2.5" fullWidth={true}>
                             Google
                         </Button>
                     </div>

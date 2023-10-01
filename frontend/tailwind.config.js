@@ -27,6 +27,8 @@ module.exports = {
                 "bordercol": "rgb(var(--color-bordercol))",
                 "dividecol": "rgb(var(--color-dividecol))",
                 "codebgcol": "rgb(var(--color-codebgcol))",
+                "titlebgcol": "rgb(var(--color-titlebgcol))",
+                "framebgcol": "rgb(var(--color-framebgcol))",
                 "highlight": "rgb(var(--color-highlight))",
                 "grey-900": "rgb(var(--color-grey-900))",
                 "grey-875": "rgb(var(--color-grey-875))",

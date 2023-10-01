@@ -15,7 +15,12 @@ function ForgottenPasswordFrame() {
     const [email, setEmail] = useState("");
     const titleComponent = (
         <SVGTitleComponent
-            svg={<FontAwesomeIcon icon="fa-unlock" className="w-5 h-5 mr-3" />}
+            svg={
+                <FontAwesomeIcon
+                    icon="fa-unlock-keyhole"
+                    className="w-5 h-5 mr-3"
+                />
+            }
             title={t("forgotten_password.change_password")}
         />
     );
@@ -31,8 +36,8 @@ function ForgottenPasswordFrame() {
     };
     return (
         <RoundedFrame titleComponent={titleComponent}>
-            <form method="POST">
-                <div className="px-10 py-8">
+            <div className="px-10 py-8">
+                <form method="POST">
                     <div className="mb-6">
                         <TextBox
                             id="email"
@@ -41,17 +46,18 @@ function ForgottenPasswordFrame() {
                             onChange={setEmail}
                         />
                     </div>
-                    <div className="flex justify-center">
+                    <div className="mb-2 flex justify-center">
                         <Button
                             type="submit"
                             color="indigo"
+                            cls="py-2.5"
                             onClick={handleChangePassword}
                             minWidth="12rem">
                             {t("forgotten_password.change_password")}
                         </Button>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </RoundedFrame>
     );
 }

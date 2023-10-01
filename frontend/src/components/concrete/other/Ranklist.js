@@ -13,7 +13,7 @@ function RanklistRow({ result, maxScore }) {
                 to={routeMap.profile.replace(":user", username)}>
                 {username}
             </Link>
-            <div className="flex">
+            <div className="flex items-center">
                 {accepted && (
                     <FontAwesomeIcon
                         icon="fa-check"

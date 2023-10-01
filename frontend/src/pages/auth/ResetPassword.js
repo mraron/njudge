@@ -18,7 +18,12 @@ function ResetPasswordFrame() {
 
     const titleComponent = (
         <SVGTitleComponent
-            svg={<FontAwesomeIcon icon="fa-unlock" className="w-4 h-4 mr-3" />}
+            svg={
+                <FontAwesomeIcon
+                    icon="fa-unlock-keyhole"
+                    className="w-4 h-4 mr-3"
+                />
+            }
             title={t("reset_password.change_password")}
         />
     );
@@ -34,8 +39,8 @@ function ResetPasswordFrame() {
     };
     return (
         <RoundedFrame titleComponent={titleComponent}>
-            <form method="POST">
-                <div className="px-10 py-8">
+            <div className="px-10 py-8">
+                <form method="POST">
                     <div className="mb-4">
                         <TextBox
                             id="password"
@@ -54,17 +59,18 @@ function ResetPasswordFrame() {
                             onChange={setPasswordConfirm}
                         />
                     </div>
-                    <div className="flex justify-center">
+                    <div className="mb-2 flex justify-center">
                         <Button
                             type="submit"
                             color="indigo"
+                            cls="py-2.5"
                             onClick={handleResetPassword}
                             minWidth="12rem">
                             {t("reset_password.change_password")}
                         </Button>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </RoundedFrame>
     );
 }

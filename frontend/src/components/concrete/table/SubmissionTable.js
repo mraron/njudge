@@ -138,54 +138,34 @@ function TestGroup({ group, isLast }) {
 function TestCase0({ testCase, index }) {
     const { t } = useTranslation();
     const titleComponent = (
-        <div className="py-3 px-5 border-b border-bordercol flex items-center text-table">
-            {testCase.verdictType === 0 && <SVGSpinner cls="w-5 h-5 mr-3" />}
-            {testCase.verdictType === 1 && (
-                <FontAwesomeIcon
-                    icon="fa-xmark"
-                    className="w-5 h-5 highlight-red mr-3"
-                />
-            )}
-            {testCase.verdictType === 2 && (
-                <FontAwesomeIcon
-                    icon="fa-check"
-                    className="w-5 h-5 highlight-yellow mr-3"
-                />
-            )}
-            {testCase.verdictType === 3 && (
-                <FontAwesomeIcon
-                    icon="fa-check"
-                    className="w-5 h-5 highlight-green mr-3"
-                />
-            )}
-            <span>{index + 1}</span>
-            <span className="mx-2">–</span>
-            <span className="truncate">{testCase.verdictName}</span>
-        </div>
-    );
-
-    const outputRows = [
-        ["submission_table.output", testCase.output],
-        ["submission_table.expected_output", testCase.expectedOutput],
-        ["submission_table.checker_output", testCase.checkerOutput],
-    ].map((item, index) => (
-        <tr className="divide-x divide-dividecol" key={index}>
-            <td className="padding-td-default whitespace-nowrap w-48">
-                {t(item[0])}
-            </td>
-            <td style={{ maxWidth: 0 }}>
-                <CopyableCode
-                    cls="border-0 rounded-none"
-                    text={item[1]}
-                    isMultiline={true}
-                    maxHeight={"6rem"}
-                />
-            </td>
-        </tr>
-    ));
-    return (
-        <RoundedFrame cls="overflow-hidden" titleComponent={titleComponent}>
-            <div className="py-3 px-5 flex justify-between border-b border-bordercol">
+        <div className="flex flex-col">
+            <div className="py-3 px-5 border-b border-bordercol flex items-center">
+                {testCase.verdictType === 0 && (
+                    <SVGSpinner cls="w-5 h-5 mr-3" />
+                )}
+                {testCase.verdictType === 1 && (
+                    <FontAwesomeIcon
+                        icon="fa-xmark"
+                        className="w-5 h-5 highlight-red mr-3"
+                    />
+                )}
+                {testCase.verdictType === 2 && (
+                    <FontAwesomeIcon
+                        icon="fa-check"
+                        className="w-5 h-5 highlight-yellow mr-3"
+                    />
+                )}
+                {testCase.verdictType === 3 && (
+                    <FontAwesomeIcon
+                        icon="fa-check"
+                        className="w-5 h-5 highlight-green mr-3"
+                    />
+                )}
+                <span>{index + 1}</span>
+                <span className="mx-2">–</span>
+                <span className="truncate">{testCase.verdictName}</span>
+            </div>
+            <div className="py-3 px-5 flex justify-between border-b border-bordercol text-table">
                 <div className="mr-2 whitespace-nowrap truncate flex items-center">
                     <FontAwesomeIcon
                         icon="fa-regular fa-clock"
@@ -207,14 +187,31 @@ function TestCase0({ testCase, index }) {
                     <span className="truncate">{testCase.memory} KiB</span>
                 </div>
             </div>
-            <div className="overflow-x-auto rounded-b-container">
-                <table className="w-full text-table bg-grey-850 rounded-b-container">
-                    <tbody className="divide-y divide-dividecol">
-                        {outputRows}
-                    </tbody>
-                </table>
-            </div>
-        </RoundedFrame>
+        </div>
+    );
+    const outputRows = [
+        ["submission_table.output", testCase.output],
+        ["submission_table.expected_output", testCase.expectedOutput],
+        ["submission_table.checker_output", testCase.checkerOutput],
+    ].map((item, index) => (
+        <tr className="divide-x divide-dividecol" key={index}>
+            <td className="padding-td-default whitespace-nowrap w-48">
+                {t(item[0])}
+            </td>
+            <td style={{ maxWidth: 0 }}>
+                <CopyableCode
+                    cls="border-0 rounded-none"
+                    text={item[1]}
+                    isMultiline={true}
+                    maxHeight={"6rem"}
+                />
+            </td>
+        </tr>
+    ));
+    return (
+        <RoundedTable titleComponent={titleComponent}>
+            <tbody className="divide-y divide-dividecol">{outputRows}</tbody>
+        </RoundedTable>
     );
 }
 
@@ -240,7 +237,7 @@ function SubmissionTable13({ status }) {
     ));
     return (
         <RoundedTable>
-            <thead className="bg-grey-800">
+            <thead className="bg-framebgcol">
                 <tr className="divide-x divide-dividecol">
                     <th className="padding-td-default">
                         {t("submission_table.subtask")}

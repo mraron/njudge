@@ -40,8 +40,9 @@
         --color-grey-125: 225, 225, 225;
         --color-grey-100: 232, 232, 232;
         --color-bordercol: var(--color-grey-675);
-        --color-dividecol: var(--color-grey-700);
+        --color-dividecol: var(--color-grey-725);
         --color-codebgcol: var(--color-grey-875);
+        --color-framebgcol: var(--color-grey-800);
         --color-highlight: 79, 70, 229;
     }
     html[data-theme="light"] {
@@ -80,19 +81,20 @@
         --color-grey-850: 234, 234, 234;
         --color-grey-875: 241, 241, 241;
         --color-grey-900: 248, 248, 248;
-        --color-bordercol: var(--color-grey-625);
-        --color-dividecol: var(--color-grey-700);
+        --color-bordercol: var(--color-grey-650);
+        --color-dividecol: var(--color-grey-725);
         --color-codebgcol: var(--color-grey-875);
+        --color-framebgcol: var(--color-grey-800);
         --color-highlight: 99, 102, 241;
     }
 }
 
 @layer components {
     .rounded-frame {
-        @apply rounded-container bg-grey-800 border border-bordercol flex w-full shadow-frame dark:shadow-none;
+        @apply rounded-container bg-framebgcol border border-bordercol flex w-full shadow-frame dark:shadow-none;
     }
     .frame-title {
-        @apply font-medium p-4 text-center border-b-1 border-bordercol;
+        @apply dark:font-medium p-4 text-center border-b-1 border-bordercol;
     }
     .link {
         @apply cursor-pointer underline underline-offset-1 hover:text-indigo-800 dark:hover:text-indigo-200;
@@ -112,6 +114,9 @@
     .date-label {
         @apply cursor-pointer text-sm px-2 py-1 bg-grey-725 rounded border border-bordercol hover:bg-grey-700 shrink-0;
     }
+    .padding-btn-default {
+        @apply px-6 py-2;
+    }
 }
 
 #root {
@@ -126,10 +131,6 @@
 
 pre {
     @apply font-code;
-}
-
-.padding-btn-default {
-    @apply px-6 py-2;
 }
 
 .highlight-green {
@@ -149,7 +150,11 @@ pre {
 }
 
 th {
-    @apply font-medium;
+    @apply font-normal dark:font-medium;
+}
+
+.text-frame {
+    font-size: 0.96rem;
 }
 
 .text-table {

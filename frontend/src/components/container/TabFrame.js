@@ -6,7 +6,7 @@ function Tab({ isSelected, label, route }) {
     return (
         <Link
             className={`block rounded-md px-4 py-2 ${
-                isSelected ? "bg-grey-800" : "hover:bg-grey-850"
+                isSelected ? "bg-framebgcol" : "hover:bg-grey-850"
             }`}
             to={route}>
             {label}

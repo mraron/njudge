@@ -7,7 +7,7 @@ import { TERipple } from "tw-elements-react";
 function DropdownItem({ name, onClick }) {
     return (
         <li
-            className="cursor-pointer px-4 py-3 flex items-center hover:bg-grey-800 border-grey-750"
+            className="cursor-pointer px-4 py-3 flex items-center hover:bg-framebgcol border-grey-750"
             onClick={onClick}>
             <span className="truncate">{name}</span>
         </li>

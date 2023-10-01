@@ -96,7 +96,7 @@ function ProblemsTable({ problemset = "main", problems }) {
     ));
     return (
         <RoundedTable>
-            <thead className="bg-grey-800">
+            <thead className="bg-framebgcol">
                 <tr className="divide-x divide-dividecol">
                     <th
                         className="padding-td-default"

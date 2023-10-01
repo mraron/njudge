@@ -34,7 +34,7 @@ function InfoTable() {
     ));
     return (
         <RoundedTable title={t("info.compiler_options")}>
-            <thead className="bg-grey-800">
+            <thead className="bg-framebgcol">
                 <tr className="divide-x divide-bordercol">
                     <th className="padding-td-default">Nyelv</th>
                     <th className="padding-td-default">Parancs</th>

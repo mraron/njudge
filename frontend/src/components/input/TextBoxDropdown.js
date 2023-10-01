@@ -4,7 +4,7 @@ import TextBox from "./TextBox";
 function DropdownItem({ itemName, onClick }) {
     return (
         <li
-            className="cursor-pointer px-4 py-2 flex items-center hover:bg-grey-800 border-grey-750"
+            className="cursor-pointer px-4 py-2 flex items-center hover:bg-framebgcol border-grey-750"
             onMouseDown={onClick}>
             {itemName}
         </li>

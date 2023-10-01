@@ -4,7 +4,7 @@ function MapDataFrame({ data, title, titleComponent, labelColWidth }) {
     const rows = data.map((pair, index) => (
         <tr className="divide-x divide-dividecol" key={index}>
             <td
-                className="padding-td-default bg-grey-800 whitespace-nowrap"
+                className="padding-td-default bg-grey-850 whitespace-nowrap"
                 style={{ width: labelColWidth || "0" }}>
                 {pair[0]}
             </td>

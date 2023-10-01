@@ -11,9 +11,9 @@ function DropdownFrame({ children, title }) {
                 className={`w-full padding-btn-default ${
                     isOpen
                         ? "bg-grey-750 hover:bg-grey-725 rounded-t-container"
-                        : "bg-grey-800 hover:bg-grey-775 rounded-container"
+                        : "bg-framebgcol hover:bg-grey-775 rounded-container"
                 } border-bordercol flex items-center justify-center`}>
-                <span className="font-medium mr-[0.3rem] truncate">
+                <span className="dark:font-medium mr-[0.3rem] truncate">
                     {title}
                 </span>
                 <SVGDropdownFrameArrow isOpen={isOpen} />

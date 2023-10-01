@@ -22,7 +22,12 @@ function PasswordChangeFrame() {
     const handleChangeNewPwConfirm = (newText) => setNewPwConfirm(newText);
     const titleComponent = (
         <SVGTitleComponent
-            svg={<FontAwesomeIcon icon="fa-unlock" className="w-5 h-5 mr-3" />}
+            svg={
+                <FontAwesomeIcon
+                    icon="fa-unlock-keyhole"
+                    className="w-5 h-5 mr-3"
+                />
+            }
             title={t("profile_settings.password_change")}
         />
     );

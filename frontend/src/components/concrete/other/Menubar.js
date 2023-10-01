@@ -36,7 +36,7 @@ function MenuOption({ label, route, selected, horizontal, onClick }) {
                 } ${
                     selected
                         ? "border-highlight bg-grey-775"
-                        : "border-transparent hover:bg-grey-800"
+                        : "border-transparent hover:bg-framebgcol"
                 }`}
                 to={route}>
                 {label}
@@ -53,7 +53,7 @@ function getProfileDropdownButton(isLoggedIn) {
                 className={`border border-bordercol rounded-tl-md rounded-bl-md flex items-center justify-between px-3 py-2 w-full h-full ${
                     isOpen
                         ? "bg-grey-775 hover:bg-grey-725"
-                        : "bg-grey-850 hover:bg-grey-800"
+                        : "bg-grey-850 hover:bg-framebgcol"
                 }`}
                 onClick={onClick}>
                 <span className="text-left">
@@ -138,7 +138,7 @@ function ThemeButton() {
     };
     return (
         <button
-            className="border border-l-0 border-bordercol p-2 rounded-r-md hover:bg-grey-800"
+            className="border border-l-0 border-bordercol p-2 rounded-r-md hover:bg-framebgcol"
             onClick={toggleTheme}>
             <FontAwesomeIcon
                 icon={theme === "light" ? "fa-moon" : "fa-sun"}
@@ -228,7 +228,7 @@ function MenuTopBar({ selected, isOpen, onToggle }) {
                     <button
                         id="menuButton"
                         aria-label="Open menu"
-                        className="flex items-center justify-center p-2 rounded-full hover:bg-grey-800"
+                        className="flex items-center justify-center p-2 rounded-full hover:bg-framebgcol"
                         onClick={() => onToggle(this)}>
                         {isOpen ? (
                             <FontAwesomeIcon

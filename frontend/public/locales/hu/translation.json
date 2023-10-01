@@ -34,7 +34,8 @@
         "username": "Felhasználónév",
         "email": "E-mail cím",
         "password": "Jelszó",
-        "confirm_password": "Jelszó megerősítése"
+        "confirm_password": "Jelszó megerősítése",
+        "already_registered": "Már van fiókod?"
     },
     "forgotten_password": {
         "page_title": "Elfelejtett jelszó :: njudge",

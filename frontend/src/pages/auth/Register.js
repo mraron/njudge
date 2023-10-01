@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RoundedFrame from "../../components/container/RoundedFrame";
@@ -38,9 +38,9 @@ function RegisterFrame() {
     };
     return (
         <RoundedFrame titleComponent={titleComponent}>
-            <form method="POST">
-                <div className="px-10 pt-8 pb-6 border-b border-bordercol">
-                    <div className="mb-4 relative">
+            <div className="px-10 py-8">
+                <form method="POST">
+                    <div className="mb-4">
                         <TextBox
                             id="username"
                             label={t("register.username")}
@@ -48,14 +48,14 @@ function RegisterFrame() {
                             onChange={setUsername}
                         />
                     </div>
-                    <TextBox
-                        id="email"
-                        label={t("register.email")}
-                        initText={email}
-                        onChange={setEmail}
-                    />
-                </div>
-                <div className="px-10 pt-4 pb-8">
+                    <div className="mb-4">
+                        <TextBox
+                            id="email"
+                            label={t("register.email")}
+                            initText={email}
+                            onChange={setEmail}
+                        />
+                    </div>
                     <div className="mb-4">
                         <TextBox
                             id="password"
@@ -65,7 +65,7 @@ function RegisterFrame() {
                             onChange={setPassword}
                         />
                     </div>
-                    <div className="mb-6">
+                    <div className="mb-2">
                         <TextBox
                             id="passwordConfirm"
                             label={t("register.confirm_password")}
@@ -74,17 +74,23 @@ function RegisterFrame() {
                             onChange={setPasswordConfirm}
                         />
                     </div>
-                    <div className="flex justify-center">
+                    <div className="mb-6">
+                        <Link to={routeMap.login} className="link text-sm">
+                            {t("register.already_registered")}
+                        </Link>
+                    </div>
+                    <div className="mb-2 flex justify-center">
                         <Button
                             type="submit"
                             color="indigo"
+                            cls="py-2.5"
                             onClick={handleRegister}
                             minWidth="12rem">
                             {t("register.register")}
                         </Button>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </RoundedFrame>
     );
 }

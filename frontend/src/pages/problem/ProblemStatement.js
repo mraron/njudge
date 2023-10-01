@@ -18,7 +18,6 @@ import Button from "../../components/util/Button";
 
 function ProblemInfo({ info }) {
     const { t } = useTranslation();
-    const { theme } = useContext(ThemeContext);
     const [isModalOpen, setModalOpen] = useState(false);
     const tagsContent = (
         <div className="flex-col">
@@ -32,12 +31,8 @@ function ProblemInfo({ info }) {
                         onClick={() => setModalOpen(true)}>
                         <Tag cls="items-center">
                             <FontAwesomeIcon
-                                icon={
-                                    (theme === "light"
-                                        ? "fa-regular"
-                                        : "fa-solid") + " fa-edit"
-                                }
-                                className="w-3 h-3"
+                                icon="fa-regular fa-edit"
+                                className="w-3.5 h-3.5"
                             />
                         </Tag>
                     </button>
