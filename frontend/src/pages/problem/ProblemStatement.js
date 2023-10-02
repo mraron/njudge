@@ -47,7 +47,7 @@ function ProblemInfo({ info }) {
         />
     );
     return (
-        <>
+        <div>
             {info.isSolved && (
                 <TagModal
                     isOpen={isModalOpen}
@@ -69,7 +69,7 @@ function ProblemInfo({ info }) {
                 ]}
                 labelColWidth="9rem"
             />
-        </>
+        </div>
     );
 }
 
