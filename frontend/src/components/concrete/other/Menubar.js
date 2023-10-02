@@ -67,7 +67,7 @@ function getProfileDropdownButton(isLoggedIn) {
     return ProfileDropdownButton;
 }
 
-function ProfileSettings() {
+function ProfileSettings({ onSidebarClose }) {
     const { userData, isLoggedIn } = useContext(UserContext);
     const { t, i18n } = useTranslation();
 
@@ -98,6 +98,7 @@ function ProfileSettings() {
             <DropdownRoutes
                 button={getProfileDropdownButton(isLoggedIn)}
                 routes={profileRoutes}
+                onChange={onSidebarClose}
                 routeLabels={profileRouteLabels.map(t)}
             />
             <div className="px-3 flex items-center justify-center border border-l-0 border-bordefcol">
@@ -154,10 +155,11 @@ function MenuSideBar({ selected, isOpen, onClose }) {
     const menuOptions = menuRoutes.map((item, index) => {
         return (
             <MenuOption
-                label={t(menuRouteLabels[index])}
                 route={item}
+                label={t(menuRouteLabels[index])}
                 selected={index === selected}
                 horizontal={false}
+                onClick={onClose}
                 key={index}
             />
         );
@@ -182,12 +184,14 @@ function MenuSideBar({ selected, isOpen, onClose }) {
     return (
         <aside
             ref={menuRef}
-            className={`h-full z-20 pt-20 overflow-y-auto overflow-x-hidden xl:hidden fixed right-0 bg-grey-825 border-l-1 border-bordefcol ${
-                isOpen ? "w-80 opacity-100" : "w-0 opacity-0"
-            } ease-in-out transition-width-opacity duration-200`}>
+            className={`h-full w-80 z-20 pt-20 overflow-y-auto overflow-x-hidden xl:hidden fixed bg-grey-825 border-l-1 border-bordefcol right-0 transform ${
+                isOpen
+                    ? "translate-x-0 opacity-100"
+                    : "translate-x-80 opacity-0"
+            } ease-out transition-transform-opacity duration-200`}>
             <div className="flex flex-col justify-center">
                 <div className="w-full flex px-4 mb-4">
-                    <ProfileSettings />
+                    <ProfileSettings onSidebarClose={onClose} />
                 </div>
                 <ol className="divide-y divide-grey-725 border-t border-b border-grey-725">
                     {menuOptions}
@@ -202,8 +206,8 @@ function MenuTopBar({ selected, isOpen, onToggle }) {
     const menuOptions = menuRoutes.map((item, index) => {
         return (
             <MenuOption
-                label={t(menuRouteLabels[index])}
                 route={item}
+                label={t(menuRouteLabels[index])}
                 selected={index === selected}
                 horizontal={true}
                 key={index}

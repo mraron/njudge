@@ -89,13 +89,21 @@ function DropdownMenu({ initSelected, itemNames, button: Button, onChange }) {
     );
 }
 
-export function DropdownRoutes({ routes, routeLabels, button: Button }) {
+export function DropdownRoutes({
+    routes,
+    routeLabels,
+    button: Button,
+    onChange,
+}) {
     const navigate = useNavigate();
     const location = useLocation();
     const selected = findRouteIndex(routes, location.pathname);
     const handleChange = (index) => {
         if (index !== -1 && !matchPath(routes[index], location.pathname)) {
             navigate(routes[index]);
+        }
+        if (onChange) {
+            onChange(index);
         }
     };
     return (

@@ -10,6 +10,7 @@ module.exports = {
                 "opacity": "opacity",
                 "transform": "transform",
                 "width-opacity": "width, opacity",
+                "transform-opacity": "transform, opacity",
                 "height-opacity": "height, opacity"
             },
             borderRadius: {
