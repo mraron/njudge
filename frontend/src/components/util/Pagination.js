@@ -16,7 +16,7 @@ function Pagination({ paginationData }) {
         });
     };
     const cls =
-        "flex justify-center items-center px-3 py-1.5 text-sm border-bordefcol border hover:bg-grey-750 text-center";
+        "flex justify-center items-center px-3 py-1.5 text-sm border-bordefcol border hover:bg-grey-750";
     return (
         <RoundedFrame cls="overflow-hidden">
             <div className="flex justify-center p-4 overflow-x-auto">

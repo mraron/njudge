@@ -114,7 +114,7 @@
         @apply text-sm emph-med bg-grey-725 rounded-md hover:bg-grey-700 border border-borstrcol text-center;
     }
     .date-label {
-        @apply cursor-pointer text-sm px-2 py-1 bg-grey-725 rounded border border-bordefcol hover:bg-grey-700 shrink-0;
+        @apply cursor-pointer text-sm px-2 py-1 bg-grey-725 rounded border border-borstrcol hover:bg-grey-700 shrink-0;
     }
     .padding-btn-default {
         @apply px-6 py-2;
