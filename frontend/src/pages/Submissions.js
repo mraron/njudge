@@ -1,5 +1,4 @@
 import Pagination from "../components/util/Pagination";
-import ProfileSideBar from "../components/concrete/other/ProfileSidebar";
 import SubmissionsTable from "../components/concrete/table/SubmissionsTable";
 
 function Submissions({ data }) {

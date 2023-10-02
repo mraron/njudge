@@ -40,7 +40,7 @@
         --color-grey-125: 225, 225, 225;
         --color-grey-100: 232, 232, 232;
         --color-bordefcol: var(--color-grey-675);
-        --color-borstrcol: var(--color-grey-625);
+        --color-borstrcol: var(--color-grey-650);
         --color-dividecol: var(--color-grey-725);
         --color-codebgcol: var(--color-grey-875);
         --color-framebgcol: var(--color-grey-800);
@@ -83,7 +83,7 @@
         --color-grey-875: 241, 241, 241;
         --color-grey-900: 248, 248, 248;
         --color-bordefcol: var(--color-grey-650);
-        --color-borstrcol: var(--color-grey-600);
+        --color-borstrcol: var(--color-grey-625);
         --color-dividecol: var(--color-grey-725);
         --color-codebgcol: var(--color-grey-875);
         --color-framebgcol: var(--color-grey-800);
@@ -111,7 +111,7 @@
         @apply text-white text-sm font-medium bg-indigo-600 rounded-md hover:bg-indigo-500 text-center;
     }
     .btn-gray {
-        @apply text-sm emph-med bg-grey-700 rounded-md hover:bg-grey-675 border border-borstrcol text-center;
+        @apply text-sm emph-med bg-grey-725 rounded-md hover:bg-grey-700 border border-borstrcol text-center;
     }
     .date-label {
         @apply cursor-pointer text-sm px-2 py-1 bg-grey-725 rounded border border-bordefcol hover:bg-grey-700 shrink-0;

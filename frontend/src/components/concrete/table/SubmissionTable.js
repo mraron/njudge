@@ -2,7 +2,6 @@ import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RoundedTable from "../../container/RoundedTable";
 import { SVGSpinner } from "../../svg/SVGs";
-import RoundedFrame from "../../container/RoundedFrame";
 import CopyableCode from "../../util/copy/CopyableCode";
 import React from "react";
 
