@@ -146,11 +146,11 @@ function ProfileSettings({ data }) {
     }, []);
     return (
         isVisible && (
-            <div className="flex flex-col lg:flex-row w-full items-start">
-                <div className="w-full lg:w-96 mb-3 min-w-0 shrink-0">
+            <div className="flex flex-col lg:flex-row w-full items-start space-y-3 lg:space-y-0 lg:space-x-3">
+                <div className="w-full lg:w-96 min-w-0 shrink-0">
                     <PasswordChangeFrame />
                 </div>
-                <div className="w-full mb-3 lg:ml-3 min-w-0">
+                <div className="w-full min-w-0">
                     <OtherSettingsFrame data={data} />
                 </div>
             </div>

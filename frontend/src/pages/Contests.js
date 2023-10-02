@@ -1,14 +1,13 @@
 import ProfileSideBar from "../components/concrete/other/ProfileSidebar";
 import ContestList from "../components/concrete/other/ContestList";
+import React from "react";
 
 function Contests() {
     return (
         <div className="w-full flex justify-center">
-            <div className="flex justify-center w-full max-w-7xl">
-                <div className="ml-0 lg:ml-4">
-                    <ProfileSideBar />
-                </div>
-                <div className="w-full px-4 lg:pl-3 min-w-0">
+            <div className="flex justify-center w-full max-w-7xl lg:space-x-3 px-4">
+                <ProfileSideBar />
+                <div className="w-full min-w-0">
                     <ContestList
                         contestData={[
                             [

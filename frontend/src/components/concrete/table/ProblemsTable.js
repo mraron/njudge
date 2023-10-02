@@ -20,7 +20,7 @@ function Problem(data) {
     return (
         <tr className={"divide-x divide-dividecol"}>
             {isLoggedIn && (
-                <td className="padding-td-default w-0">
+                <td className=" w-0">
                     <div className="flex items-center justify-center">
                         {solvedStatus === 0 && (
                             <SVGEllipsis
@@ -52,8 +52,8 @@ function Problem(data) {
                     </div>
                 </td>
             )}
-            <td className="padding-td-default">{problem}</td>
-            <td className="padding-td-default">
+            <td>{problem}</td>
+            <td>
                 <Link
                     className="link"
                     to={routeMap.problem
@@ -62,15 +62,15 @@ function Problem(data) {
                     {title}
                 </Link>
             </td>
-            <td className="padding-td-default">
+            <td>
                 <Link className="link" to={category.href}>
                     {category.text}
                 </Link>
             </td>
-            <td className="padding-td-default">
-                <div className="flex flex-wrap">{tagsContent}</div>
+            <td>
+                <div className="flex flex-wrap -m-1.5">{tagsContent}</div>
             </td>
-            <td className="padding-td-default w-0">
+            <td className=" w-0">
                 <Link
                     className="link flex items-center justify-center"
                     to={`${routeMap.problemSubmissions
@@ -98,21 +98,13 @@ function ProblemsTable({ problemset = "main", problems }) {
         <RoundedTable>
             <thead className="bg-framebgcol">
                 <tr className="divide-x divide-dividecol">
-                    <th
-                        className="padding-td-default"
-                        colSpan={isLoggedIn ? 2 : 1}>
+                    <th colSpan={isLoggedIn ? 2 : 1}>
                         {t("problems_table.id")}
                     </th>
-                    <th className="padding-td-default">
-                        {t("problems_table.title")}
-                    </th>
-                    <th className="padding-td-default">
-                        {t("problems_table.category")}
-                    </th>
-                    <th className="padding-td-default">
-                        {t("problems_table.tags")}
-                    </th>
-                    <th className="padding-td-default">
+                    <th>{t("problems_table.title")}</th>
+                    <th>{t("problems_table.category")}</th>
+                    <th>{t("problems_table.tags")}</th>
+                    <th>
                         <OrderedColumnTitle
                             text={t("problems_table.solved")}
                             label="solver_count"

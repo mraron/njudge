@@ -43,48 +43,36 @@ function Submission({ data }) {
     return (
         <div className="w-full flex justify-center">
             <div className="flex justify-center w-full max-w-7xl">
-                <div className="w-full px-4">
+                <div className="w-full px-4 space-y-3">
                     {userData && userData.isAdmin && (
-                        <div className="mb-3">
-                            <DropdownFrame title="Kezelés">
-                                <div className="px-4 py-3 sm:px-6 sm:py-5 flex items-center justify-center">
-                                    <div className="mr-2">
-                                        <Button color="indigo" minWidth="8rem">
-                                            Újfafordít
-                                        </Button>
-                                    </div>
-                                    <Button color="gray" minWidth="8rem">
-                                        Újraértékel
-                                    </Button>
-                                </div>
-                            </DropdownFrame>
-                        </div>
+                        <DropdownFrame title="Kezelés">
+                            <div className="px-4 py-3 sm:px-6 sm:py-5 flex items-center justify-center space-x-2">
+                                <Button color="indigo" minWidth="8rem">
+                                    Újfafordít
+                                </Button>
+                                <Button color="gray" minWidth="8rem">
+                                    Újraértékel
+                                </Button>
+                            </div>
+                        </DropdownFrame>
                     )}
-                    <div className="mb-3">
-                        <SubmissionsTable submissions={[data.summary]} />
-                    </div>
+                    <SubmissionsTable submissions={[data.summary]} />
                     {data.language !== "zip" && (
-                        <div className="mb-3">
-                            <Editor
-                                className="editor"
-                                height="40vh"
-                                theme={`${
-                                    theme === "light" ? "vs" : "vs-dark"
-                                }`}
-                                options={{
-                                    domReadOnly: true,
-                                    readOnly: true,
-                                    fontFamily: "JetBrains Mono",
-                                    fontSize: 13,
-                                }}
-                                value={data.summary.code}
-                                language={
-                                    judgeData.highlightCodes[
-                                        data.summary.language
-                                    ]
-                                }
-                            />
-                        </div>
+                        <Editor
+                            className="editor"
+                            height="40vh"
+                            theme={`${theme === "light" ? "vs" : "vs-dark"}`}
+                            options={{
+                                domReadOnly: true,
+                                readOnly: true,
+                                fontFamily: "JetBrains Mono",
+                                fontSize: 13,
+                            }}
+                            value={data.summary.code}
+                            language={
+                                judgeData.highlightCodes[data.summary.language]
+                            }
+                        />
                     )}
                     {data.summary.compileError && (
                         <CompileErrorFrame

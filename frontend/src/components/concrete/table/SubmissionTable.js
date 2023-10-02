@@ -21,7 +21,7 @@ function TestCase13({
             {index === 0 && (
                 <>
                     <td
-                        className={`padding-td-default border border-t-0 border-dividecol text-center ${bottomBorderGroup}`}
+                        className={`border border-t-0 border-dividecol text-center ${bottomBorderGroup}`}
                         rowSpan={numCases}>
                         <div className="flex flex-col justify-center">
                             <div className="flex items-center justify-center mb-2">
@@ -45,19 +45,19 @@ function TestCase13({
                         </div>
                     </td>
                     <td
-                        className={`padding-td-default border border-t-0 border-dividecol text-center ${bottomBorderGroup}`}
+                        className={`border border-t-0 border-dividecol text-center ${bottomBorderGroup}`}
                         rowSpan={numCases}>
                         {`${group.score} / ${group.maxScore}`}
                     </td>
                 </>
             )}
             <td
-                className={`padding-td-default border border-t-0 border-dividecol ${bottomBorderCase}`}>
+                className={`border border-t-0 border-dividecol text-center ${bottomBorderCase}`}>
                 {testCase.index}
             </td>
             {group.scoring !== 1 && (
                 <td
-                    className={`padding-td-default border border-t-0 border-dividecol ${bottomBorderCase}`}
+                    className={`border border-t-0 border-dividecol ${bottomBorderCase}`}
                     colSpan={2}>
                     <div className="flex">
                         {testCase.verdictType === 0 && (
@@ -90,7 +90,7 @@ function TestCase13({
             {group.scoring === 1 && (
                 <>
                     <td
-                        className={`padding-td-default border border-t-0 border-dividecol ${bottomBorderCase}`}>
+                        className={`border border-t-0 border-dividecol ${bottomBorderCase}`}>
                         <div className="flex items-center">
                             <FontAwesomeIcon
                                 icon="fa-xmark"
@@ -102,17 +102,17 @@ function TestCase13({
                         </div>
                     </td>
                     <td
-                        className={`padding-td-default border border-t-0 border-dividecol whitespace-nowrap ${bottomBorderCase}`}>
+                        className={`border border-t-0 border-dividecol text-center whitespace-nowrap ${bottomBorderCase}`}>
                         {testCase.score} / {testCase.maxScore}
                     </td>
                 </>
             )}
             <td
-                className={`padding-td-default border border-t-0 border-dividecol ${bottomBorderCase}`}>
+                className={`border border-t-0 border-dividecol ${bottomBorderCase}`}>
                 {testCase.time} ms
             </td>
             <td
-                className={`padding-td-default border border-t-0 border-r-0 border-dividecol ${bottomBorderCase}`}>
+                className={`border border-t-0 border-r-0 border-dividecol ${bottomBorderCase}`}>
                 {testCase.memory} KiB
             </td>
         </tr>
@@ -165,8 +165,8 @@ function TestCase0({ testCase, index }) {
                 <span className="mx-2">–</span>
                 <span className="truncate">{testCase.verdictName}</span>
             </div>
-            <div className="py-3 px-5 flex justify-between border-b border-bordefcol text-table">
-                <div className="mr-2 whitespace-nowrap truncate flex items-center">
+            <div className="py-3 px-5 flex justify-between border-b border-bordefcol text-table space-x-4">
+                <div className="whitespace-nowrap truncate flex items-center">
                     <FontAwesomeIcon
                         icon="fa-regular fa-clock"
                         className="w-4 h-4 mr-2"
@@ -176,7 +176,7 @@ function TestCase0({ testCase, index }) {
                     </span>
                     <span className="truncate">{testCase.time} ms</span>
                 </div>
-                <div className="ml-2 whitespace-nowrap truncate flex items-center">
+                <div className="whitespace-nowrap truncate flex items-center">
                     <FontAwesomeIcon
                         icon="fa-regular fa-hdd"
                         className="w-4 h-4 mr-2"
@@ -195,10 +195,8 @@ function TestCase0({ testCase, index }) {
         ["submission_table.checker_output", testCase.checkerOutput],
     ].map((item, index) => (
         <tr className="divide-x divide-dividecol" key={index}>
-            <td className="padding-td-default whitespace-nowrap w-48">
-                {t(item[0])}
-            </td>
-            <td style={{ maxWidth: 0 }}>
+            <td className=" whitespace-nowrap w-48">{t(item[0])}</td>
+            <td className="p-0" style={{ maxWidth: 0 }}>
                 <CopyableCode
                     cls="border-0 rounded-none"
                     text={item[1]}
@@ -218,11 +216,9 @@ function TestCase0({ testCase, index }) {
 function SubmissionTable0({ status }) {
     const testCases = status.groups?.[0].testCases;
     const testCasesContent = testCases?.map((testCase, index) => (
-        <div className="mb-3" key={index}>
-            <TestCase0 testCase={testCase} index={index} key={index} />
-        </div>
+        <TestCase0 testCase={testCase} index={index} key={index} />
     ));
-    return <>{testCasesContent}</>;
+    return <div className="space-y-3">{testCasesContent}</div>;
 }
 
 function SubmissionTable13({ status }) {
@@ -239,31 +235,18 @@ function SubmissionTable13({ status }) {
         <RoundedTable>
             <thead className="bg-framebgcol">
                 <tr className="divide-x divide-dividecol">
-                    <th className="padding-td-default">
-                        {t("submission_table.subtask")}
-                    </th>
-                    <th className="padding-td-default">
-                        {t("submission_table.total")}
-                    </th>
-                    <th className="padding-td-default">
-                        {t("submission_table.test")}
-                    </th>
-                    <th className="padding-td-default" colSpan={2}>
-                        {t("submission_table.verdict")}
-                    </th>
-                    <th className="padding-td-default">
-                        {t("submission_table.time")}
-                    </th>
-                    <th className="padding-td-default">
-                        {t("submission_table.memory")}
-                    </th>
+                    <th>{t("submission_table.subtask")}</th>
+                    <th>{t("submission_table.total")}</th>
+                    <th>{t("submission_table.test")}</th>
+                    <th colSpan={2}>{t("submission_table.verdict")}</th>
+                    <th>{t("submission_table.time")}</th>
+                    <th>{t("submission_table.memory")}</th>
                 </tr>
             </thead>
             <tbody>{groupsContent}</tbody>
         </RoundedTable>
     );
 }
-
 function SubmissionTable({ status }) {
     if (status.feedbackType === 0) {
         return <SubmissionTable0 status={status} />;

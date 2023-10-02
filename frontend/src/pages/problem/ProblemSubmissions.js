@@ -56,15 +56,13 @@ function SubmissionFilterFrame() {
                         initChecked={onlyAC}
                     />
                 </div>
-                <div className="flex justify-center">
-                    <div className="mr-2">
-                        <Button
-                            color="indigo"
-                            onClick={handleSubmit}
-                            minWidth="8rem">
-                            {t("problem_filter.search")}
-                        </Button>
-                    </div>
+                <div className="flex justify-center space-x-2">
+                    <Button
+                        color="indigo"
+                        onClick={handleSubmit}
+                        minWidth="8rem">
+                        {t("problem_filter.search")}
+                    </Button>
                     <Button color="gray" onClick={handleReset} minWidth="8rem">
                         {t("problem_filter.reset")}{" "}
                     </Button>
@@ -76,13 +74,9 @@ function SubmissionFilterFrame() {
 
 function ProblemSubmissions({ data }) {
     return (
-        <div className="relative">
-            <div className="mb-2">
-                <SubmissionFilterFrame />
-            </div>
-            <div className="mb-2">
-                <SubmissionsTable submissions={data.submissions} />
-            </div>
+        <div className="relative space-y-2">
+            <SubmissionFilterFrame />
+            <SubmissionsTable submissions={data.submissions} />
             <Pagination paginationData={data.paginationData} />
         </div>
     );

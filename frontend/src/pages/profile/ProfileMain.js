@@ -32,31 +32,25 @@ function ProfileMain({ data }) {
         />
     );
     return (
-        <div className="flex flex-col sm:flex-row w-full items-start">
-            <div className="w-full sm:w-72 mb-3 shrink-0">
-                <div className="mb-3">
-                    <ProfilePictureFrame
-                        src="/assets/profile.webp"
-                        userData={data.userData}
-                    />
-                </div>
+        <div className="flex flex-col sm:flex-row w-full items-start space-y-3 sm:space-y-0 sm:space-x-3">
+            <div className="w-full sm:w-72 shrink-0 space-y-3">
+                <ProfilePictureFrame
+                    src="/assets/profile.webp"
+                    userData={data.userData}
+                />
                 <ProfileDataFrame userData={data.userData} />
             </div>
-            <div className="w-full mb-3 sm:ml-3 min-w-0">
-                <div className="mb-3">
-                    <TagListFrame
-                        titleComponent={titleComponentCorrect}
-                        tags={data.solved}
-                        tag={LinkTag}
-                    />
-                </div>
-                <div className="mb-3">
-                    <TagListFrame
-                        titleComponent={titleComponentWrong}
-                        tags={data.unsolved}
-                        tag={LinkTag}
-                    />
-                </div>
+            <div className="w-full min-w-0 space-y-3">
+                <TagListFrame
+                    titleComponent={titleComponentCorrect}
+                    tags={data.solved}
+                    tag={LinkTag}
+                />
+                <TagListFrame
+                    titleComponent={titleComponentWrong}
+                    tags={data.unsolved}
+                    tag={LinkTag}
+                />
             </div>
         </div>
     );

@@ -8,7 +8,7 @@ function DropdownFrame({ children, title }) {
         <RoundedFrame>
             <button
                 onClick={() => setOpen(!isOpen)}
-                className={`w-full padding-btn-default ${
+                className={`w-full px-8 py-3 ${
                     isOpen
                         ? "bg-grey-750 hover:bg-grey-725 rounded-t-container"
                         : "bg-framebgcol hover:bg-grey-775 rounded-container"

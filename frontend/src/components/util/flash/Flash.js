@@ -8,8 +8,8 @@ function FlashMessage({ message, type, onClose }) {
     const { t } = useTranslation();
     return (
         <div className="absolute bottom-0 left-0 right-0 bg-grey-850 border rounded-md flex border-bordefcol w-full">
-            <div className="w-full p-6 flex justify-between items-center rounded-md">
-                <div className="flex items-center mr-2">
+            <div className="w-full p-6 flex justify-between items-center rounded-md space-x-2">
+                <div className="flex items-center">
                     {type === "success" && (
                         <FontAwesomeIcon
                             icon="fa-regular fa-circle-check"

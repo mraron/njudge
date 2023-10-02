@@ -28,9 +28,9 @@ function TabFrame({ routes, routeLabels, routePatterns, children }) {
         </li>
     ));
     return (
-        <div className="w-full">
-            <ul className="hidden sm:flex mb-2">{tabsContent}</ul>
-            <div className="block sm:hidden mb-2">
+        <div className="w-full space-y-2">
+            <ul className="hidden sm:flex">{tabsContent}</ul>
+            <div className="block sm:hidden">
                 <DropdownRoutes
                     label="Profil"
                     routes={routes}

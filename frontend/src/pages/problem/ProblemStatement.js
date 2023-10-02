@@ -21,7 +21,7 @@ function ProblemInfo({ info }) {
     const [isModalOpen, setModalOpen] = useState(false);
     const tagsContent = (
         <div className="flex-col">
-            <div className="flex flex-wrap mb-4">
+            <div className="flex flex-wrap -m-1">
                 {info.tags.map((tagName, index) => (
                     <Tag key={index}>{t(tagName)}</Tag>
                 ))}
@@ -32,7 +32,7 @@ function ProblemInfo({ info }) {
                         <Tag cls="items-center">
                             <FontAwesomeIcon
                                 icon="fa-regular fa-edit"
-                                className="w-3.5 h-3.5"
+                                className="w-5 h-3.5"
                             />
                         </Tag>
                     </button>
@@ -137,19 +137,21 @@ function ProblemSubmit() {
                             ? file.name
                             : t("problem_statement.no_file_selected")}
                     </span>
-                    <div className="flex justify-center">
-                        <div className="mr-2 w-full">
-                            <Button
-                                color="gray"
-                                onClick={() =>
-                                    document
-                                        .getElementById("uploadFile")
-                                        .click()
-                                }
-                                fullWidth={true}>
-                                {t("problem_statement.choose")}
-                            </Button>
-                        </div>
+                    <div className="flex justify-center space-x-2">
+                        <Button
+                            color="gray"
+                            onClick={() =>
+                                document.getElementById("uploadFile").click()
+                            }
+                            fullWidth={true}>
+                            <input
+                                id="uploadFile"
+                                type="file"
+                                className="hidden"
+                                onChange={handleFileUploaded}
+                            />
+                            {t("problem_statement.choose")}
+                        </Button>
                         <Button
                             color="indigo"
                             onClick={handleSubmit}
@@ -178,14 +180,14 @@ function ProblemLastSubmissions({ submissions, maxScore }) {
     );
     const rows = submissions.map((item, index) => (
         <tr className="divide-x divide-dividecol" key={index}>
-            <td className="padding-td-default w-0">
+            <td className=" w-0">
                 <Link
                     className="link"
                     to={routeMap.submission.replace(":id", item.id)}>
                     {item.id}
                 </Link>
             </td>
-            <td className="padding-td-default" style={{ maxWidth: 100 }}>
+            <td style={{ maxWidth: 100 }}>
                 <div className="flex items-center">
                     {item.verdictType === 0 && (
                         <SVGSpinner cls="w-4 h-4 mr-3" />
@@ -211,7 +213,7 @@ function ProblemLastSubmissions({ submissions, maxScore }) {
                     <span className="truncate">{item.verdictName}</span>
                 </div>
             </td>
-            <td className="padding-td-default w-0 text-center">
+            <td className=" w-0 text-center">
                 <span className="whitespace-nowrap">
                     {item.score} / {maxScore}
                 </span>
@@ -233,7 +235,8 @@ function ProblemAttachment({ type, name, href }) {
                 className="link no-underline flex items-center my-0.5"
                 href={apiRoute(href)}
                 download="statement.pdf"
-                target="_blank">
+                target="_blank"
+                rel="noreferrer">
                 {type === "file" && (
                     <FontAwesomeIcon
                         icon="fa-regular fa-file"
@@ -302,9 +305,9 @@ function ProblemStatement({ data }) {
     const statementSrc = data.attachments.statements[statementIndex].href;
     const statementType = data.attachments.statements[statementIndex].type;
     return (
-        <div className="flex flex-col lg:flex-row">
-            <div className="w-full flex flex-col min-w-0">
-                <div className="w-full mb-2">
+        <div className="flex flex-col lg:flex-row space-y-3 lg:space-y-0 lg:space-x-3">
+            <div className="w-full flex flex-col min-w-0 space-y-2">
+                <div className="w-full">
                     <RoundedFrame>
                         <div className="w-full px-4 py-3 sm:px-6 sm:py-5 flex">
                             <div className="w-full mr-3 min-w-0">
@@ -326,7 +329,7 @@ function ProblemStatement({ data }) {
                         </div>
                     </RoundedFrame>
                 </div>
-                <div className="w-full mb-3">
+                <div className="w-full">
                     {statementType === "pdf" && (
                         <object
                             color-scheme={theme}
@@ -345,24 +348,16 @@ function ProblemStatement({ data }) {
                     )}
                 </div>
             </div>
-            <div className="w-full lg:w-96 mb-3 lg:ml-3 shrink-0">
-                <div className="mb-3">
-                    <ProblemInfo info={data.info} />
-                </div>
-                <div className="mb-3">
-                    <ProblemSubmit />
-                </div>
+            <div className="w-full lg:w-96 shrink-0 space-y-3">
+                <ProblemInfo info={data.info} />
+                <ProblemSubmit />
                 {data.lastSubmissions && data.lastSubmissions.length > 0 && (
-                    <div className="mb-3">
-                        <ProblemLastSubmissions
-                            submissions={data.lastSubmissions}
-                            maxScore={data.info.maxScore}
-                        />
-                    </div>
+                    <ProblemLastSubmissions
+                        submissions={data.lastSubmissions}
+                        maxScore={data.info.maxScore}
+                    />
                 )}
-                <div className="mb-3">
-                    <ProblemAttachments attachments={data.attachments} />
-                </div>
+                <ProblemAttachments attachments={data.attachments} />
             </div>
         </div>
     );

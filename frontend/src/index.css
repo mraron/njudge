@@ -105,19 +105,28 @@
         @apply border border-bordefcol;
     }
     .tag {
-        @apply whitespace-nowrap cursor-pointer text-sm px-2 py-1 border rounded m-1 bg-grey-750 hover:bg-grey-725 border-borstrcol truncate h-8 flex items-center;
+        @apply whitespace-nowrap cursor-pointer text-sm px-2 py-1 border rounded bg-grey-750 hover:bg-grey-725 border-borstrcol truncate h-8 flex items-center;
     }
     .btn-indigo {
         @apply text-white text-sm font-medium bg-indigo-600 rounded-md hover:bg-indigo-500 text-center;
     }
     .btn-gray {
-        @apply text-sm emph-med bg-grey-725 rounded-md hover:bg-grey-700 border border-borstrcol text-center;
+        @apply text-sm emph-med bg-grey-700 rounded-md hover:bg-grey-675 border border-borstrcol text-center;
     }
     .date-label {
         @apply cursor-pointer text-sm px-2 py-1 bg-grey-725 rounded border border-bordefcol hover:bg-grey-700 shrink-0;
     }
     .padding-btn-default {
         @apply px-6 py-2;
+    }
+    .padding-td-default {
+        @apply py-4 px-5;
+    }
+    .padding-td-mapdata {
+        @apply py-3 px-5;
+    }
+    .padding-th-default {
+        @apply py-4 px-8;
     }
 }
 
@@ -127,8 +136,8 @@
 
 .font-code {
     @apply font-mono text-sm;
-    font-size: 0.82rem;
-    font-family: "JetBrains Mono", monospace;
+    font-size: 0.85rem;
+    font-family: "Roboto Mono", monospace;
 }
 
 pre {
@@ -147,12 +156,12 @@ pre {
     @apply text-yellow-600 dark:text-yellow-500;
 }
 
-.padding-td-default {
-    @apply py-3 px-5;
+th {
+    @apply emph-med padding-th-default;
 }
 
-th {
-    @apply emph-med;
+td {
+    @apply padding-td-default;
 }
 
 .emph-med {

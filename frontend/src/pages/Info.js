@@ -1,17 +1,14 @@
 import { useTranslation } from "react-i18next";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ProfileSideBar from "../components/concrete/other/ProfileSidebar";
-import SVGTitleComponent from "../components/svg/SVGTitleComponent";
 import RoundedTable from "../components/container/RoundedTable";
 import CopyableCommand from "../components/util/copy/CopyableCommand";
+import React from "react";
 
 function CompilerOption({ lang, command }) {
     return (
         <tr className={`divide-x divide-dividecol`}>
-            <td className="padding-td-default whitespace-nowrap w-32 text-center">
-                {lang}
-            </td>
-            <td style={{ maxWidth: 0 }}>
+            <td className="whitespace-nowrap w-32 text-center">{lang}</td>
+            <td className="p-0" style={{ maxWidth: 0 }}>
                 <CopyableCommand text={command} cls="border-0 rounded-none" />
             </td>
         </tr>
@@ -36,8 +33,8 @@ function InfoTable() {
         <RoundedTable title={t("info.compiler_options")}>
             <thead className="bg-framebgcol">
                 <tr className="divide-x divide-bordefcol">
-                    <th className="padding-td-default">Nyelv</th>
-                    <th className="padding-td-default">Parancs</th>
+                    <th>Nyelv</th>
+                    <th>Parancs</th>
                 </tr>
             </thead>
             <tbody className="divide-y divide-dividecol text-sm">
@@ -50,11 +47,9 @@ function InfoTable() {
 function Info({ data }) {
     return (
         <div className="w-full flex justify-center">
-            <div className="flex justify-center w-full max-w-7xl">
-                <div className="ml-0 lg:ml-4">
-                    <ProfileSideBar />
-                </div>
-                <div className="w-full px-4 lg:pl-3 overflow-x-auto">
+            <div className="flex justify-center w-full max-w-7xl lg:space-x-3 px-4">
+                <ProfileSideBar />
+                <div className="w-full min-w-0">
                     <InfoTable />
                 </div>
             </div>

@@ -4,15 +4,10 @@ import SubmissionsTable from "../components/concrete/table/SubmissionsTable";
 
 function Submissions({ data }) {
     return (
-        <div className="relative w-full flex justify-center">
+        <div className="w-full flex justify-center">
             <div className="flex justify-center w-full max-w-7xl">
-                <div className="ml-0 lg:ml-4">
-                    <ProfileSideBar />
-                </div>
-                <div className="w-full px-4 lg:pl-3 overflow-x-auto">
-                    <div className="mb-2">
-                        <SubmissionsTable submissions={data.submissions} />
-                    </div>
+                <div className="w-full px-4 overflow-x-auto space-y-2">
+                    <SubmissionsTable submissions={data.submissions} />
                     <Pagination paginationData={data.paginationData} />
                 </div>
             </div>

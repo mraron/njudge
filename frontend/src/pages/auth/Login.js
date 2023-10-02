@@ -65,16 +65,14 @@ function LoginFrame() {
                             {t("login.forgotten_password")}
                         </Link>
                     </div>
-                    <div className="mb-2 flex justify-center">
-                        <div className="mr-2 w-full">
-                            <Button
-                                color="indigo"
-                                cls="py-2.5"
-                                onClick={handleLogin}
-                                fullWidth={true}>
-                                {t("login.login")}
-                            </Button>
-                        </div>
+                    <div className="mb-2 flex justify-center space-x-2">
+                        <Button
+                            color="indigo"
+                            cls="py-2.5"
+                            onClick={handleLogin}
+                            fullWidth={true}>
+                            {t("login.login")}
+                        </Button>
                         <Button color="gray" cls="py-2.5" fullWidth={true}>
                             Google
                         </Button>

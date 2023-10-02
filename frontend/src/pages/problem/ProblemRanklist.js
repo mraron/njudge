@@ -7,13 +7,11 @@ import Pagination from "../../components/util/Pagination";
 function ProblemRanklist({ data }) {
     const { t } = useTranslation();
     return (
-        <div>
-            <div className="mb-2">
-                <Ranklist
-                    ranklist={data.ranklist}
-                    title={t("problem_ranklist.ranklist")}
-                />
-            </div>
+        <div className="space-y-2">
+            <Ranklist
+                ranklist={data.ranklist}
+                title={t("problem_ranklist.ranklist")}
+            />
             <Pagination paginationData={data.paginationData} />
         </div>
     );

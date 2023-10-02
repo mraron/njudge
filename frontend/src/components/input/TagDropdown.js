@@ -11,14 +11,14 @@ function Tag({ title, onClick }) {
     };
     return (
         <span
-            className={`tag flex items-center ${
+            className={`tag m-1 flex items-center space-x-3 ${
                 hovered
                     ? "text-white hover:bg-red-500 dark:hover:bg-red-600 hover:border-transparent"
-                    : "bg-grey-725"
+                    : ""
             }`}>
-            {title}
+            <span>{title}</span>
             <span
-                className={`flex ml-3 rounded-full p-1 hover:bg-red-700 dark:hover:bg-red-800`}
+                className={`flex rounded-full p-1 hover:bg-red-700 dark:hover:bg-red-800`}
                 onMouseOver={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
                 onClick={handleClick}>

@@ -63,13 +63,11 @@ function ProblemSubmit() {
         });
     };
     return (
-        <div className="flex flex-col">
-            <div className="mb-2">
-                <SubmitControlsFrame
-                    onSubmit={handleSubmit}
-                    onLanguageChanged={handleLanguageChanged}
-                />
-            </div>
+        <div className="flex flex-col space-y-2">
+            <SubmitControlsFrame
+                onSubmit={handleSubmit}
+                onLanguageChanged={handleLanguageChanged}
+            />
             <MonacoEditor
                 className="editor"
                 height="60vh"

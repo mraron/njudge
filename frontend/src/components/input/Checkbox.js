@@ -13,7 +13,7 @@ function Checkbox({ id, label, initChecked, onChange }) {
     return (
         <label
             htmlFor={id}
-            className="flex items-start justify-center max-w-fit"
+            className="flex items-start justify-center max-w-fit space-x-3"
             onMouseOver={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}>
             <div
@@ -40,7 +40,7 @@ function Checkbox({ id, label, initChecked, onChange }) {
                     checked={initChecked}
                 />
             </div>
-            <span className="text-label ml-3">{label}</span>
+            <span className="text-label">{label}</span>
         </label>
     );
 }

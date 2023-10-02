@@ -23,30 +23,28 @@ function Submission({ submission }) {
     console.log(problem);
     return (
         <tr className={"divide-x divide-dividecol"}>
-            <td className="padding-td-default w-0">
+            <td className=" w-0 text-center">
                 <Link
                     className="link"
                     to={routeMap.submission.replace(":id", submission.id)}>
                     {id}
                 </Link>
             </td>
-            <td className="padding-td-default">{date}</td>
-            <td className="padding-td-default">
+            <td>{date}</td>
+            <td>
                 <Link
                     className="link"
                     to={routeMap.profile.replace(":user", submission.user)}>
                     {user}
                 </Link>
             </td>
-            <td className="padding-td-default">
+            <td>
                 <Link className="link" to={problem.href}>
                     {problem.text}
                 </Link>
             </td>
-            <td className="padding-td-default">{language}</td>
-            <td
-                className="padding-td-default"
-                colSpan={maxScore === 0.0 ? 2 : 1}>
+            <td>{language}</td>
+            <td colSpan={maxScore === 0.0 ? 2 : 1}>
                 <div className="flex items-center">
                     {verdictType === 0 && <SVGSpinner cls="w-4 h-4 mr-2" />}
                     {verdictType === 1 && (
@@ -71,14 +69,14 @@ function Submission({ submission }) {
                 </div>
             </td>
             {maxScore !== 0.0 && (
-                <td className="padding-td-default w-0 text-center">
+                <td className=" w-0 text-center">
                     <span className="whitespace-nowrap">
                         {score} / {maxScore}
                     </span>
                 </td>
             )}
-            <td className="padding-td-default">{time} ms</td>
-            <td className="padding-td-default">{memory} KiB</td>
+            <td>{time} ms</td>
+            <td>{memory} KiB</td>
         </tr>
     );
 }
@@ -92,30 +90,14 @@ function SubmissionsTable({ submissions }) {
         <RoundedTable>
             <thead className="bg-framebgcol">
                 <tr className="divide-x divide-dividecol">
-                    <th className="padding-td-default">
-                        {t("submissions_table.id")}
-                    </th>
-                    <th className="padding-td-default">
-                        {t("submissions_table.date")}
-                    </th>
-                    <th className="padding-td-default">
-                        {t("submissions_table.user")}
-                    </th>
-                    <th className="padding-td-default">
-                        {t("submissions_table.problem")}
-                    </th>
-                    <th className="padding-td-default">
-                        {t("submissions_table.language")}
-                    </th>
-                    <th className="padding-td-default" colSpan={2}>
-                        {t("submissions_table.verdict")}
-                    </th>
-                    <th className="padding-td-default">
-                        {t("submissions_table.time")}
-                    </th>
-                    <th className="padding-td-default">
-                        {t("submissions_table.memory")}
-                    </th>
+                    <th>{t("submissions_table.id")}</th>
+                    <th>{t("submissions_table.date")}</th>
+                    <th>{t("submissions_table.user")}</th>
+                    <th>{t("submissions_table.problem")}</th>
+                    <th>{t("submissions_table.language")}</th>
+                    <th colSpan={2}>{t("submissions_table.verdict")}</th>
+                    <th>{t("submissions_table.time")}</th>
+                    <th>{t("submissions_table.memory")}</th>
                 </tr>
             </thead>
             <tbody className="divide-y divide-dividecol">

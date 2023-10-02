@@ -28,7 +28,7 @@ export function ProfilePictureFrame({ userData }) {
                     />
                 </Link>
             </div>
-            <div className="px-6 py-2 flex justify-center items-center w-full">
+            <div className="px-6 py-3 flex justify-center items-center w-full">
                 <Link className="link truncate" to={profileRoute}>
                     {userData.username}
                 </Link>
@@ -67,14 +67,14 @@ export function ProfileDataFrame({ userData }) {
 function SubmissionsFrame({ titleComponent, submissions }) {
     const rows = submissions.map((item, index) => (
         <tr className="divide-x divide-dividecol" key={index}>
-            <td className="padding-td-default">
+            <td>
                 <Link
                     className="link"
                     to={routeMap.submission.replace(":id", item.id)}>
                     {item.id}
                 </Link>
             </td>
-            <td className="padding-td-default">
+            <td>
                 <Link className="link" to={item.problem.href}>
                     {item.problem.text}
                 </Link>
@@ -104,19 +104,13 @@ function ProfileSideBar() {
     );
     return (
         isLoggedIn && (
-            <div className="w-full hidden lg:flex justify-center">
-                <div className="flex flex-col bg-grey-900 w-72 shrink-0">
-                    <div className="mb-3">
-                        <ProfilePictureFrame userData={userData} />
-                    </div>
-                    <div className="mb-3">
-                        <ProfileDataFrame userData={userData} />
-                    </div>
-                    <SubmissionsFrame
-                        titleComponent={titleComponent}
-                        submissions={userData.lastSubmissions}
-                    />
-                </div>
+            <div className="hidden lg:flex flex-col bg-grey-900 w-72 shrink-0 space-y-3">
+                <ProfilePictureFrame userData={userData} />
+                <ProfileDataFrame userData={userData} />
+                <SubmissionsFrame
+                    titleComponent={titleComponent}
+                    submissions={userData.lastSubmissions}
+                />
             </div>
         )
     );

@@ -27,14 +27,12 @@ function TagModal({ isOpen, onClose }) {
                             initTags={[0, 1]}
                         />
                     </div>
-                    <div className="flex justify-center">
-                        <div className="mr-2">
-                            <Button color="indigo">
-                                {t("tag_modal.save")}
-                            </Button>
-                        </div>
-                        <Button color="gray" onClick={onClose}>
+                    <div className="flex justify-center space-x-2">
+                        <Button color="indigo" fullWidth={true}>
                             {t("tag_modal.save")}
+                        </Button>
+                        <Button color="gray" fullWidth={true} onClick={onClose}>
+                            {t("tag_modal.cancel")}
                         </Button>
                     </div>
                 </div>
