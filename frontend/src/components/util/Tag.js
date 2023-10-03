@@ -1,6 +1,6 @@
-function Tag({ cls, children }) {
+function Tag({ cls, children, addMargin = true }) {
     return (
-        <div className={`${cls} tag m-1`}>
+        <div className={`${cls} tag ${addMargin ? "m-1" : ""}`}>
             <span className="whitespace-nowrap truncate">{children}</span>
         </div>
     );

@@ -11,8 +11,10 @@ export function DefaultTag({ data }) {
 export function LinkTag({ data }) {
     const { t } = useTranslation();
     return (
-        <Link to={data.href}>
-            <Tag cls="w-28 justify-center hover:bg-indigo-200 hover:border-indigo-400 dark:hover:bg-indigo-800 dark:hover:bg-indigo-600">
+        <Link to={data.href} className="m-1">
+            <Tag
+                cls="w-28 justify-center hover:bg-indigo-200 hover:border-indigo-400 dark:hover:bg-indigo-800 dark:hover:bg-indigo-600"
+                addMargin={false}>
                 {t(data.text)}
             </Tag>
         </Link>

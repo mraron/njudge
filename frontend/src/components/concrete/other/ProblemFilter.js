@@ -117,7 +117,7 @@ function ProblemFilter() {
                 <Button color="indigo" minWidth="8rem" onClick={handleSubmit}>
                     {t("problem_filter.search")}
                 </Button>
-                <Button color="gray" minWidth="8rem" onClick={handleSubmit}>
+                <Button color="gray" minWidth="8rem" onClick={handleReset}>
                     {t("problem_filter.reset")}
                 </Button>
             </div>
