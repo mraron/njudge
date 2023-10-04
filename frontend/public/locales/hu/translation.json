@@ -26,6 +26,11 @@
         "submissions": "Beküldések",
         "ranklist": "Eredmények"
     },
+    "contest_problems": {
+        "id": "ID",
+        "title": "Cím",
+        "status": "Státusz"
+    },
     "login": {
         "page_title": "Belépés :: njudge",
         "login": "Belépés",
@@ -125,6 +130,13 @@
         "title": "Cím",
         "tags": "Címkék",
         "category": "Kategória",
+        "search": "Keres",
+        "reset": "Visszaállít"
+    },
+    "submission_filter": {
+        "filter": "Szűrés",
+        "full_solutions": "Csak teljes megoldások",
+        "own_solutions": "Csak saját megoldások",
         "search": "Keres",
         "reset": "Visszaállít"
     },

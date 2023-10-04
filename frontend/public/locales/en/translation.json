@@ -26,6 +26,11 @@
         "submissions": "Submissions",
         "ranklist": "Ranklist"
     },
+    "contest_problems": {
+        "id": "ID",
+        "title": "Title",
+        "status": "Status"
+    },
     "login": {
         "page_title": "Login :: njudge",
         "login": "Login",
@@ -128,6 +133,13 @@
         "search": "Search",
         "reset": "Reset"
     },
+    "submission_filter": {
+        "filter": "Filter",
+        "full_solutions": "Only full solutions",
+        "own_solutions": "Only my solutions",
+        "search": "Search",
+        "reset": "Reset"
+    },
     "submissions_table": {
         "id": "ID",
         "date": "Date",
@@ -203,10 +215,7 @@
         "submit": "Submit"
     },
     "problem_submissions": {
-        "filter": "Filter",
-        "page_title": "Submissions – {{params.problem}} :: njudge",
-        "full_solutions": "Only full solutions",
-        "own_solutions": "Only my solutions"
+        "page_title": "Submissions – {{params.problem}} :: njudge"
     },
     "problem_ranklist": {
         "page_title": "Ranklist – {{params.problem}} :: njudge",

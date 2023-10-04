@@ -20,7 +20,6 @@ function Submission({ submission }) {
         time,
         memory,
     } = submission;
-    console.log(problem);
     return (
         <tr className={"divide-x divide-dividecol"}>
             <td className=" w-0 text-center">

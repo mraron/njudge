@@ -14,7 +14,7 @@ export const routeMap = {
     problemSubmissions: "/problemset/:problemset/:problem/submissions/",
     problemRanklist: "/problemset/:problemset/:problem/ranklist/",
     contest: "/contest/:contest/",
-    contestProblems: "/contest/:contest/problems/",
+    contestProblems: "/contest/:contest/",
     contestSubmissions: "/contest/:contest/submissions/",
     contestRanklist: "/contest/:contest/ranklist/",
     login: "/user/login/",

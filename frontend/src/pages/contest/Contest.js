@@ -15,8 +15,10 @@ function Contest() {
         routeMap.contestSubmissions,
         routeMap.contestRanklist,
     ];
-    const {contest} = useParams()
-    const routes = routePatterns.map((item) => item.replace(":contest", contest));
+    const { contest } = useParams();
+    const routes = routePatterns.map((item) =>
+        item.replace(":contest", contest),
+    );
     return (
         <div className="flex justify-center">
             <div className="w-full max-w-7xl">

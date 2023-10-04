@@ -1,5 +1,5 @@
 function ContestRanklist() {
-    return <></>
+    return <></>;
 }
 
-export default ContestRanklist
+export default ContestRanklist;

@@ -208,9 +208,33 @@ function RoutingComponent() {
                     />
                 </Route>
                 <Route path={routeMap.contest} element={<Contest />}>
-                    <Route path={routeMap.contestProblems} element={<UpdatePage key={location.key} page={ContestProblems} />} />
-                    <Route path={routeMap.contestSubmissions} element={<UpdatePage key={location.key} page={ContestSubmissions} />} />
-                    <Route path={routeMap.contestRanklist} element={<UpdatePage key={location.key} page={ContestRanklist} />} />
+                    <Route
+                        index
+                        element={
+                            <UpdatePage
+                                key={location.key}
+                                page={ContestProblems}
+                            />
+                        }
+                    />
+                    <Route
+                        path={routeMap.contestSubmissions}
+                        element={
+                            <UpdatePage
+                                key={location.key}
+                                page={ContestSubmissions}
+                            />
+                        }
+                    />
+                    <Route
+                        path={routeMap.contestRanklist}
+                        element={
+                            <UpdatePage
+                                key={location.key}
+                                page={ContestRanklist}
+                            />
+                        }
+                    />
                 </Route>
                 <Route path="*" element={<UpdatePage page={NotFound} />} />
             </Routes>
