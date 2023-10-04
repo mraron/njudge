@@ -60,24 +60,24 @@ function TestCase13({
                     colSpan={2}>
                     <div className="flex">
                         {testCase.verdictType === 0 && (
-                            <SVGSpinner cls="w-4 h-4 mr-2" />
+                            <SVGSpinner cls="w-4 h-4 mr-3" />
                         )}
                         {testCase.verdictType === 1 && (
                             <FontAwesomeIcon
                                 icon="fa-xmark"
-                                className="w-4 h-4 highlight-red mr-2"
+                                className="w-4 h-4 highlight-red mr-3"
                             />
                         )}
                         {testCase.verdictType === 2 && (
                             <FontAwesomeIcon
                                 icon="fa-check"
-                                className="w-4 h-4 highlight-yellow mr-2"
+                                className="w-4 h-4 highlight-yellow mr-3"
                             />
                         )}
                         {testCase.verdictType === 3 && (
                             <FontAwesomeIcon
                                 icon="fa-check"
-                                className="w-4 h-4 highlight-green mr-2"
+                                className="w-4 h-4 highlight-green mr-3"
                             />
                         )}
                         <span className="whitespace-nowrap">
@@ -93,7 +93,7 @@ function TestCase13({
                         <div className="flex items-center">
                             <FontAwesomeIcon
                                 icon="fa-xmark"
-                                className="w-4 h-4 highlight-red mr-2"
+                                className="w-4 h-4 highlight-red mr-3"
                             />
                             <span className="whitespace-nowrap">
                                 {testCase.verdictName}
@@ -138,30 +138,28 @@ function TestCase0({ testCase, index }) {
     const { t } = useTranslation();
     const titleComponent = (
         <div className="flex flex-col">
-            <div className="py-3 px-5 border-b border-bordefcol flex items-center">
-                {testCase.verdictType === 0 && (
-                    <SVGSpinner cls="w-5 h-5 mr-3" />
-                )}
+            <div className="py-3 px-6 border-b border-bordefcol flex items-center space-x-3">
+                {testCase.verdictType === 0 && <SVGSpinner cls="w-5 h-5" />}
                 {testCase.verdictType === 1 && (
                     <FontAwesomeIcon
                         icon="fa-xmark"
-                        className="w-5 h-5 highlight-red mr-3"
+                        className="w-5 h-5 highlight-red"
                     />
                 )}
                 {testCase.verdictType === 2 && (
                     <FontAwesomeIcon
                         icon="fa-check"
-                        className="w-5 h-5 highlight-yellow mr-3"
+                        className="w-5 h-5 highlight-yellow"
                     />
                 )}
                 {testCase.verdictType === 3 && (
                     <FontAwesomeIcon
                         icon="fa-check"
-                        className="w-5 h-5 highlight-green mr-3"
+                        className="w-5 h-5 highlight-green"
                     />
                 )}
                 <span>{index + 1}</span>
-                <span className="mx-2">–</span>
+                <span>–</span>
                 <span className="truncate">{testCase.verdictName}</span>
             </div>
             <div className="py-3 px-5 flex justify-between border-b border-bordefcol text-table space-x-4">

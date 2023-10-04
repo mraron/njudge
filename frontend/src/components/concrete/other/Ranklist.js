@@ -7,7 +7,10 @@ import RoundedTable from "../../container/RoundedTable";
 function RanklistRow({ result, maxScore, index }) {
     const { username, score, submissionID, accepted } = result;
     return (
-        <tr className={`divide-x divide-dividecol ${index % 2 === 0? "bg-grey-850": "bg-grey-825"}`}>
+        <tr
+            className={`divide-x divide-dividecol ${
+                index % 2 === 0 ? "bg-grey-850" : "bg-grey-825"
+            }`}>
             <td className="py-2.5">
                 <Link
                     className="link"
@@ -42,11 +45,15 @@ function RanklistRow({ result, maxScore, index }) {
 
 function Ranklist({ ranklist }) {
     const rows = ranklist.results.map((item, index) => (
-        <RanklistRow result={item} maxScore={ranklist.maxScore} index={index} key={index} />
+        <RanklistRow
+            result={item}
+            maxScore={ranklist.maxScore}
+            index={index}
+            key={index}
+        />
     ));
     return (
-        <RoundedTable
-            cls="overflow-hidden">
+        <RoundedTable cls="overflow-hidden">
             <thead className="bg-grey-800">
                 <tr className="divide-x divide-dividecol">
                     <th>Név</th>

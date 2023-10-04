@@ -16,9 +16,7 @@ function Problem({ problem }) {
                 </Link>
             </td>
             <td className="text-center">
-                {status === 0 && (
-                    <SVGEllipsis cls="w-4 h-4 text-grey-300" />
-                )}
+                {status === 0 && <SVGEllipsis cls="w-4 h-4 text-grey-300" />}
                 {status === 1 && (
                     <FontAwesomeIcon
                         icon="fa-xmark"

@@ -6,42 +6,63 @@ import Pagination from "../../components/util/Pagination";
 import DropdownFrame from "../../components/container/DropdownFrame";
 
 function RanklistRow(data) {
-    const {place, name, score, verdicts} = data.result
+    const { place, name, score, verdicts } = data.result;
     const verdictsContent = verdicts.map((item, index) => {
-            return (
-                <td className="py-2.5 px-0 w-0" key={index}>
-                    <span className="flex justify-center items-center">
-                        {item.verdictType === 1 && <FontAwesomeIcon icon="fa-xmark" className="w-3 h-3 highlight-red" />}
-                        {item.verdictType === 2 && <FontAwesomeIcon icon="fa-check" className="w-3 h-3 highlight-yellow" />}
-                        {item.verdictType === 3 && <FontAwesomeIcon icon="fa-check" className="w-3 h-3 highlight-green" />}
-                    </span>
-                </td>
-            )
-        }
-    )
+        return (
+            <td className="py-2.5 px-0 w-0" key={index}>
+                <span className="flex justify-center items-center">
+                    {item.verdictType === 1 && (
+                        <FontAwesomeIcon
+                            icon="fa-xmark"
+                            className="w-3 h-3 highlight-red"
+                        />
+                    )}
+                    {item.verdictType === 2 && (
+                        <FontAwesomeIcon
+                            icon="fa-check"
+                            className="w-3 h-3 highlight-yellow"
+                        />
+                    )}
+                    {item.verdictType === 3 && (
+                        <FontAwesomeIcon
+                            icon="fa-check"
+                            className="w-3 h-3 highlight-green"
+                        />
+                    )}
+                </span>
+            </td>
+        );
+    });
     return (
-        <tr className={`divide-x divide-dividecol ${data.index % 2 === 0? "bg-grey-850": "bg-grey-825"} hover:bg-grey-800 cursor-pointer`}>
+        <tr
+            className={`divide-x divide-dividecol ${
+                data.index % 2 === 0 ? "bg-grey-850" : "bg-grey-825"
+            } hover:bg-grey-800 cursor-pointer`}>
             <td className="py-2.5 text-center">{place}</td>
             <td className="py-2.5">
-                <Link className="link" to={routeMap.profile.replace(":user", "dbence")}>{name}</Link>
+                <Link
+                    className="link"
+                    to={routeMap.profile.replace(":user", "dbence")}>
+                    {name}
+                </Link>
             </td>
             <td className="py-2.5 w-0 text-center">{score}</td>
             {verdictsContent}
         </tr>
-    )
+    );
 }
 
-function ContestRanklist({data}) {
-    const ranklistContent = data.ranklist.map((item, index) =>
+function ContestRanklist({ data }) {
+    const ranklistContent = data.ranklist.map((item, index) => (
         <RanklistRow result={item} index={index} key={index} />
-    )
-    const problemsContent = data.problems.map((item, index) =>
+    ));
+    const problemsContent = data.problems.map((item, index) => (
         <th className="px-4" key={index}>
             <Link className="link" to={item.href}>
                 {item.text}
             </Link>
         </th>
-    )
+    ));
     return (
         <div className="space-y-2">
             <DropdownFrame title="Szűrés">...</DropdownFrame>
@@ -60,7 +81,7 @@ function ContestRanklist({data}) {
             </RoundedTable>
             <Pagination paginationData={data.paginationData} />
         </div>
-    )
+    );
 }
 
 export default ContestRanklist;

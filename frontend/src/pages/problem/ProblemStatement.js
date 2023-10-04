@@ -195,19 +195,19 @@ function ProblemLastSubmissions({ submissions, maxScore }) {
                     {item.verdictType === 1 && (
                         <FontAwesomeIcon
                             icon="fa-xmark"
-                            className="w-4 h-4 highlight-red mr-2"
+                            className="w-4 h-4 highlight-red mr-3"
                         />
                     )}
                     {item.verdictType === 2 && (
                         <FontAwesomeIcon
                             icon="fa-check"
-                            className="w-4 h-4 highlight-yellow mr-2"
+                            className="w-4 h-4 highlight-yellow mr-3"
                         />
                     )}
                     {item.verdictType === 3 && (
                         <FontAwesomeIcon
                             icon="fa-check"
-                            className="w-4 h-4 highlight-green mr-2"
+                            className="w-4 h-4 highlight-green mr-3"
                         />
                     )}
                     <span className="truncate">{item.verdictName}</span>
@@ -240,13 +240,13 @@ function ProblemAttachment({ type, name, href }) {
                 {type === "file" && (
                     <FontAwesomeIcon
                         icon="fa-regular fa-file"
-                        className="w-4 h-4 mr-2"
+                        className="w-4 h-4 mr-3"
                     />
                 )}
                 {type === "statement" && (
                     <FontAwesomeIcon
                         icon="fa-regular fa-file-lines"
-                        className="w-4 h-4 mr-2"
+                        className="w-4 h-4 mr-3"
                     />
                 )}
                 <span className="underline truncate">

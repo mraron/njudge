@@ -45,23 +45,23 @@ function Submission({ submission }) {
             <td>{language}</td>
             <td colSpan={maxScore === 0.0 ? 2 : 1}>
                 <div className="flex items-center">
-                    {verdictType === 0 && <SVGSpinner cls="w-4 h-4 mr-2" />}
+                    {verdictType === 0 && <SVGSpinner cls="w-4 h-4 mr-3" />}
                     {verdictType === 1 && (
                         <FontAwesomeIcon
                             icon="fa-xmark"
-                            className="w-4 h-4 highlight-red mr-2"
+                            className="w-4 h-4 highlight-red mr-3"
                         />
                     )}
                     {verdictType === 2 && (
                         <FontAwesomeIcon
                             icon="fa-check"
-                            className="w-4 h-4 highlight-yellow mr-2"
+                            className="w-4 h-4 highlight-yellow mr-3"
                         />
                     )}
                     {verdictType === 3 && (
                         <FontAwesomeIcon
                             icon="fa-check"
-                            className="w-4 h-4 highlight-green mr-2"
+                            className="w-4 h-4 highlight-green mr-3"
                         />
                     )}
                     <span className="whitespace-nowrap">{verdictName}</span>
