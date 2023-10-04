@@ -21,6 +21,11 @@
         "successful_copy": "A szöveg a vágólapra lett másolva.",
         "compiler_options": "Fordítási és futtatási opciók"
     },
+    "contest": {
+        "problems": "Feladatok",
+        "submissions": "Beküldések",
+        "ranklist": "Eredmények"
+    },
     "login": {
         "page_title": "Belépés :: njudge",
         "login": "Belépés",

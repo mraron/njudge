@@ -21,6 +21,11 @@
         "successful_copy": "The text has been copied to the clipboard.",
         "compiler_options": "Compilation and execution options"
     },
+    "contest": {
+        "problems": "Problems",
+        "submissions": "Submissions",
+        "ranklist": "Ranklist"
+    },
     "login": {
         "page_title": "Login :: njudge",
         "login": "Login",

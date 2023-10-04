@@ -31,6 +31,10 @@ import { routeMap } from "./config/RouteConfig";
 import extractParams from "./util/extractParams";
 import ForgottenPassword from "./pages/auth/ForgottenPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
+import Contest from "./pages/contest/Contest";
+import ContestProblems from "./pages/contest/ContestProblems";
+import ContestSubmissions from "./pages/contest/ContestSubmissions";
+import ContestRanklist from "./pages/contest/ContestRanklist";
 
 const titles = {
     [routeMap.home]: "home.page_title",
@@ -202,6 +206,11 @@ function RoutingComponent() {
                             />
                         }
                     />
+                </Route>
+                <Route path={routeMap.contest} element={<Contest />}>
+                    <Route path={routeMap.contestProblems} element={<UpdatePage key={location.key} page={ContestProblems} />} />
+                    <Route path={routeMap.contestSubmissions} element={<UpdatePage key={location.key} page={ContestSubmissions} />} />
+                    <Route path={routeMap.contestRanklist} element={<UpdatePage key={location.key} page={ContestRanklist} />} />
                 </Route>
                 <Route path="*" element={<UpdatePage page={NotFound} />} />
             </Routes>
