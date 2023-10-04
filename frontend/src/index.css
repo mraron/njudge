@@ -99,7 +99,7 @@
         @apply emph-med p-4 text-center border-b-1 border-bordefcol;
     }
     .link {
-        @apply cursor-pointer underline underline-offset-1 hover:text-indigo-800 dark:hover:text-indigo-200;
+        @apply cursor-pointer underline underline-offset-2 hover:text-indigo-800 dark:hover:text-indigo-200;
     }
     .editor {
         @apply border border-bordefcol;
@@ -176,8 +176,8 @@ td {
     font-size: 0.96rem;
 }
 
-.text-menubar {
-    font-size: 0.96rem;
+.text-nav {
+    font-size: 0.975rem;
 }
 
 .text-table {

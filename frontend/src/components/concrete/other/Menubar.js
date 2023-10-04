@@ -265,7 +265,7 @@ function Menubar() {
     };
     return (
         isLoggedIn !== null && (
-            <div className="text-menubar">
+            <div className="text-nav">
                 <MenuTopBar
                     selected={selected}
                     isOpen={isOpen}

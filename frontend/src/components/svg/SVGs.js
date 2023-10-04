@@ -116,7 +116,7 @@ export function SVGSpinner({ cls = null }) {
 export function SVGEllipsis({ cls = null, title }) {
     return (
         <svg
-            className={`${cls} stroke-current shrink-0`}
+            className={`inline ${cls} stroke-current shrink-0`}
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
