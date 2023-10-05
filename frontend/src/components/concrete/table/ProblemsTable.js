@@ -1,22 +1,22 @@
-import React, { useContext } from "react";
-import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { SVGEllipsis } from "../../svg/SVGs";
-import RoundedTable from "../../container/RoundedTable";
-import UserContext from "../../../contexts/user/UserContext";
-import { routeMap } from "../../../config/RouteConfig";
-import OrderedColumnTitle from "../../util/OrderedColumnTitle";
-import Tag from "../../util/Tag";
+import React, { useContext } from "react"
+import { useTranslation } from "react-i18next"
+import { Link } from "react-router-dom"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { SVGEllipsis } from "../../svg/SVGs"
+import RoundedTable from "../../container/RoundedTable"
+import UserContext from "../../../contexts/user/UserContext"
+import { routeMap } from "../../../config/RouteConfig"
+import OrderedColumnTitle from "../../util/OrderedColumnTitle"
+import Tag from "../../util/Tag"
 
 function Problem(data) {
-    const { t } = useTranslation();
-    const { isLoggedIn } = useContext(UserContext);
+    const { t } = useTranslation()
+    const { isLoggedIn } = useContext(UserContext)
     const { problem, solvedStatus, title, category, tags, solverCount } =
-        data.problem;
+        data.problem
     const tagsContent = tags.map((item, index) => (
         <Tag key={index}>{t(item)}</Tag>
-    ));
+    ))
     return (
         <tr className={"divide-x divide-dividecol"}>
             {isLoggedIn && (
@@ -84,16 +84,16 @@ function Problem(data) {
                 </Link>
             </td>
         </tr>
-    );
+    )
 }
 
 function ProblemsTable({ problemset = "main", problems }) {
-    const { t } = useTranslation();
-    const { isLoggedIn } = useContext(UserContext);
+    const { t } = useTranslation()
+    const { isLoggedIn } = useContext(UserContext)
 
     const problemsContent = problems.map((item, index) => (
         <Problem problemset={problemset} problem={item} key={index} />
-    ));
+    ))
     return (
         <RoundedTable>
             <thead className="bg-framebgcol">
@@ -116,7 +116,7 @@ function ProblemsTable({ problemset = "main", problems }) {
                 {problemsContent}
             </tbody>
         </RoundedTable>
-    );
+    )
 }
 
-export default ProblemsTable;
+export default ProblemsTable

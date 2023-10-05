@@ -1,22 +1,22 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import RoundedFrame from "../container/RoundedFrame";
-import UpdateQueryString from "../../util/updateQueryString";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useLocation, useNavigate } from "react-router-dom"
+import RoundedFrame from "../container/RoundedFrame"
+import UpdateQueryString from "../../util/updateQueryString"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 function Pagination({ paginationData }) {
-    const { currentPage, lastPage } = paginationData;
-    const location = useLocation();
-    const navigate = useNavigate();
+    const { currentPage, lastPage } = paginationData
+    const location = useLocation()
+    const navigate = useNavigate()
     const handlePageChanged = (page) => {
         UpdateQueryString({
             location: location,
             navigate: navigate,
             args: ["page"],
             values: [page],
-        });
-    };
+        })
+    }
     const cls =
-        "flex justify-center items-center px-3 py-1.5 text-sm border-bordefcol border hover:bg-grey-750";
+        "flex justify-center items-center px-3 py-1.5 text-sm border-bordefcol border hover:bg-grey-750"
     return (
         <RoundedFrame cls="overflow-hidden">
             <div className="flex justify-center p-4 overflow-x-auto">
@@ -71,7 +71,7 @@ function Pagination({ paginationData }) {
                 </button>
             </div>
         </RoundedFrame>
-    );
+    )
 }
 
-export default Pagination;
+export default Pagination

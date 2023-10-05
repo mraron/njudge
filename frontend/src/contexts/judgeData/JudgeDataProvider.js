@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState } from "react"
 
-import JudgeDataContext from "./JudgeDataContext";
+import JudgeDataContext from "./JudgeDataContext"
 
 function JudgeDataProvider({ children }) {
-    const [judgeData, setJudgeData] = useState(null);
+    const [judgeData, setJudgeData] = useState(null)
 
     const allLoaded = () => {
         return (
@@ -11,14 +11,14 @@ function JudgeDataProvider({ children }) {
             judgeData.languages &&
             judgeData.tags &&
             judgeData.categories
-        );
-    };
+        )
+    }
     return (
         <JudgeDataContext.Provider
             value={{ judgeData, setJudgeData, allLoaded }}>
             {children}
         </JudgeDataContext.Provider>
-    );
+    )
 }
 
-export default JudgeDataProvider;
+export default JudgeDataProvider

@@ -1,15 +1,12 @@
-import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import RoundedFrame from "./RoundedFrame";
-import Tag from "../util/Tag";
+import { Link } from "react-router-dom"
+import RoundedFrame from "./RoundedFrame"
+import Tag from "../util/Tag"
 
 export function DefaultTag({ data }) {
-    const { t } = useTranslation();
-    return <Tag cls="w-28 justify-center">{data}</Tag>;
+    return <Tag cls="w-28 justify-center">{data}</Tag>
 }
 
 export function LinkTag({ data }) {
-    const { t } = useTranslation();
     return (
         <Link to={data.href} className="m-1">
             <Tag
@@ -18,13 +15,13 @@ export function LinkTag({ data }) {
                 {data.text}
             </Tag>
         </Link>
-    );
+    )
 }
 
 function TagListFrame({ title, titleComponent, tag: Tag = DefaultTag, tags }) {
     const tagsContent = tags.map((item, index) => (
         <Tag data={item} key={index} />
-    ));
+    ))
     return (
         <RoundedFrame
             title={title}
@@ -46,7 +43,7 @@ function TagListFrame({ title, titleComponent, tag: Tag = DefaultTag, tags }) {
                 </div>
             </div>
         </RoundedFrame>
-    );
+    )
 }
 
-export default TagListFrame;
+export default TagListFrame

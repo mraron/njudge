@@ -1,5 +1,5 @@
-import { apiRoute } from "../config/RouteConfig";
-import fetchWithCredentials from "./fetchWithCredentials";
+import { apiRoute } from "../config/RouteConfig"
+import fetchWithCredentials from "./fetchWithCredentials"
 
 export async function saveSettings(user, showUnsolved, hideSolved) {
     const requestOptions = {
@@ -9,16 +9,16 @@ export async function saveSettings(user, showUnsolved, hideSolved) {
             showUnsolved: showUnsolved,
             hideSolved: hideSolved,
         }),
-    };
+    }
     console.log(
         apiRoute(`/user/profile/${encodeURIComponent(user)}/settings/other/`),
-    );
+    )
     const response = await fetchWithCredentials(
         apiRoute(`/user/profile/${encodeURIComponent(user)}/settings/other/`),
         requestOptions,
-    );
-    const data = await response.json();
-    return { ...data, success: response.ok };
+    )
+    const data = await response.json()
+    return { ...data, success: response.ok }
 }
 
 export async function changePassword(user, oldPw, newPw, newPwConfirm) {
@@ -30,7 +30,7 @@ export async function changePassword(user, oldPw, newPw, newPwConfirm) {
             newPw: newPw,
             newPwConfirm: newPwConfirm,
         }),
-    };
+    }
     const response = await fetchWithCredentials(
         apiRoute(
             `/user/profile/${encodeURIComponent(
@@ -38,7 +38,7 @@ export async function changePassword(user, oldPw, newPw, newPwConfirm) {
             )}/settings/change_password/`,
         ),
         requestOptions,
-    );
-    const data = await response.json();
-    return { ...data, success: response.ok };
+    )
+    const data = await response.json()
+    return { ...data, success: response.ok }
 }

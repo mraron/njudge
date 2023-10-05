@@ -1,5 +1,5 @@
-import Pagination from "../components/util/Pagination";
-import SubmissionsTable from "../components/concrete/table/SubmissionsTable";
+import Pagination from "../components/util/Pagination"
+import SubmissionsTable from "../components/concrete/table/SubmissionsTable"
 
 function Submissions({ data }) {
     return (
@@ -11,7 +11,7 @@ function Submissions({ data }) {
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
-export default Submissions;
+export default Submissions

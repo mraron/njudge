@@ -1,18 +1,18 @@
-import { useContext, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import MonacoEditor from "@monaco-editor/react";
-import RoundedFrame from "../../components/container/RoundedFrame";
-import DropdownMenu from "../../components/input/DropdownMenu";
-import { routeMap } from "../../config/RouteConfig";
-import submitSolution from "../../util/submitSolution";
-import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext";
-import ThemeContext from "../../contexts/theme/ThemeContext";
-import Button from "../../components/util/Button";
+import { useContext, useState } from "react"
+import { useNavigate, useParams } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import MonacoEditor from "@monaco-editor/react"
+import RoundedFrame from "../../components/container/RoundedFrame"
+import DropdownMenu from "../../components/input/DropdownMenu"
+import { routeMap } from "../../config/RouteConfig"
+import submitSolution from "../../util/submitSolution"
+import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext"
+import ThemeContext from "../../contexts/theme/ThemeContext"
+import Button from "../../components/util/Button"
 
 function SubmitControlsFrame({ onLanguageChanged, onSubmit }) {
-    const { t } = useTranslation();
-    const { judgeData } = useContext(JudgeDataContext);
+    const { t } = useTranslation()
+    const { judgeData } = useContext(JudgeDataContext)
 
     return (
         <RoundedFrame>
@@ -30,19 +30,19 @@ function SubmitControlsFrame({ onLanguageChanged, onSubmit }) {
                 </Button>
             </div>
         </RoundedFrame>
-    );
+    )
 }
 
 function ProblemSubmit() {
-    const { judgeData } = useContext(JudgeDataContext);
-    const { theme } = useContext(ThemeContext);
-    const { problem, problemset } = useParams();
-    const [langIndex, setLangIndex] = useState(0);
-    const [submissionCode, setSubmissionCode] = useState("");
-    const navigate = useNavigate();
+    const { judgeData } = useContext(JudgeDataContext)
+    const { theme } = useContext(ThemeContext)
+    const { problem, problemset } = useParams()
+    const [langIndex, setLangIndex] = useState(0)
+    const [submissionCode, setSubmissionCode] = useState("")
+    const navigate = useNavigate()
     const handleLanguageChanged = (index) => {
-        setLangIndex(index);
-    };
+        setLangIndex(index)
+    }
     const handleSubmit = () => {
         submitSolution({
             problemset: problemset,
@@ -51,17 +51,17 @@ function ProblemSubmit() {
             submissionCode: submissionCode,
         }).then((ok) => {
             if (ok) {
-                window.flash("flash.successful_submission", "success");
+                window.flash("flash.successful_submission", "success")
                 navigate(
                     routeMap.problemSubmissions
                         .replace(":problemset", problemset)
                         .replace(":problem", problem),
-                );
+                )
             } else {
-                window.flash("flash.unsuccessful_submission", "failure");
+                window.flash("flash.unsuccessful_submission", "failure")
             }
-        });
-    };
+        })
+    }
     return (
         <div className="flex flex-col space-y-2">
             <SubmitControlsFrame
@@ -79,7 +79,7 @@ function ProblemSubmit() {
                 onChange={setSubmissionCode}
             />
         </div>
-    );
+    )
 }
 
-export default ProblemSubmit;
+export default ProblemSubmit

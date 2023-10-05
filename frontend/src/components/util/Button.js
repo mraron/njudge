@@ -1,7 +1,7 @@
-import { TERipple } from "tw-elements-react";
+import { TERipple } from "tw-elements-react"
 
 function Button({ type, color, minWidth, fullWidth, cls, onClick, children }) {
-    const rippleColor = color === "gray" ? "#808080" : "#000000";
+    const rippleColor = color === "gray" ? "#808080" : "#000000"
     return (
         <TERipple
             rippleColor={rippleColor}
@@ -20,7 +20,7 @@ function Button({ type, color, minWidth, fullWidth, cls, onClick, children }) {
                 {children}
             </button>
         </TERipple>
-    );
+    )
 }
 
-export default Button;
+export default Button

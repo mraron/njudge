@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { AnimatePresence, motion } from "framer-motion";
-import FlashEvent from "./FlashEvent";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
+import { AnimatePresence, motion } from "framer-motion"
+import FlashEvent from "./FlashEvent"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 function FlashMessage({ message, type, onClose }) {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     return (
         <div className="absolute bottom-0 left-0 right-0 bg-grey-850 border rounded-md flex border-bordefcol w-full">
             <div className="w-full p-6 flex justify-between items-center rounded-md space-x-2">
@@ -31,11 +31,11 @@ function FlashMessage({ message, type, onClose }) {
                 </button>
             </div>
         </div>
-    );
+    )
 }
 
 function FlashContainer() {
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState([])
 
     const pushMessage = (message, type) => {
         setMessages((prevMessages) => [
@@ -59,19 +59,19 @@ function FlashContainer() {
                     onClose={popMessage}
                 />
             </motion.div>,
-        ]);
-    };
+        ])
+    }
     const popMessage = () => {
-        setMessages((prevMessages) => prevMessages.slice(0, -1));
-    };
+        setMessages((prevMessages) => prevMessages.slice(0, -1))
+    }
     useEffect(() => {
         FlashEvent.addListener("flash", ({ message, type }) => {
-            pushMessage(message, type);
-        });
+            pushMessage(message, type)
+        })
         return () => {
-            FlashEvent.removeAllListeners();
-        };
-    }, []);
+            FlashEvent.removeAllListeners()
+        }
+    }, [])
 
     return (
         <div className="z-10 fixed bottom-2 left-2 right-2 flex justify-center">
@@ -79,7 +79,7 @@ function FlashContainer() {
                 <AnimatePresence>{messages}</AnimatePresence>
             </div>
         </div>
-    );
+    )
 }
 
-export default FlashContainer;
+export default FlashContainer

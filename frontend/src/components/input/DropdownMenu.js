@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { matchPath, useLocation, useNavigate } from "react-router-dom";
-import { SVGDropdownMenuArrow } from "../svg/SVGs";
-import { findRouteIndex } from "../../util/findRouteIndex";
+import { useEffect, useRef, useState } from "react"
+import { matchPath, useLocation, useNavigate } from "react-router-dom"
+import { SVGDropdownMenuArrow } from "../svg/SVGs"
+import { findRouteIndex } from "../../util/findRouteIndex"
 
 function DropdownItem({ name, onClick }) {
     return (
@@ -10,7 +10,7 @@ function DropdownItem({ name, onClick }) {
             onClick={onClick}>
             <span className="truncate">{name}</span>
         </li>
-    );
+    )
 }
 
 function DefaultDropdownButton({ label, isOpen, onClick }) {
@@ -25,13 +25,13 @@ function DefaultDropdownButton({ label, isOpen, onClick }) {
             <span className="truncate min-w-0">{label}</span>
             <SVGDropdownMenuArrow isOpen={isOpen} />
         </button>
-    );
+    )
 }
 
 function DropdownMenu({ initSelected, itemNames, button: Button, onChange }) {
-    const [selected, setSelected] = useState(initSelected);
-    const [isOpen, setOpen] = useState(false);
-    const dropdownRef = useRef(null);
+    const [selected, setSelected] = useState(initSelected)
+    const [isOpen, setOpen] = useState(false)
+    const dropdownRef = useRef(null)
     const items = itemNames.map((itemName, index) => (
         <DropdownItem
             index={index}
@@ -39,16 +39,16 @@ function DropdownMenu({ initSelected, itemNames, button: Button, onChange }) {
             key={index}
             onClick={() => {
                 if (onChange) {
-                    onChange(index);
+                    onChange(index)
                 }
-                setOpen(false);
-                setSelected(index);
+                setOpen(false)
+                setSelected(index)
             }}
         />
-    ));
+    ))
     useEffect(() => {
-        setSelected(initSelected || -1);
-    }, [initSelected]);
+        setSelected(initSelected || -1)
+    }, [initSelected])
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -56,16 +56,16 @@ function DropdownMenu({ initSelected, itemNames, button: Button, onChange }) {
                 dropdownRef.current &&
                 !dropdownRef.current.contains(event.target)
             ) {
-                setOpen(false);
+                setOpen(false)
             }
-        };
-        document.addEventListener("click", handleClickOutside);
+        }
+        document.addEventListener("click", handleClickOutside)
         return () => {
-            document.removeEventListener("click", handleClickOutside);
-        };
-    }, []);
+            document.removeEventListener("click", handleClickOutside)
+        }
+    }, [])
 
-    Button = Button || DefaultDropdownButton;
+    Button = Button || DefaultDropdownButton
     return (
         <div className="relative w-full" ref={dropdownRef}>
             <Button
@@ -86,7 +86,7 @@ function DropdownMenu({ initSelected, itemNames, button: Button, onChange }) {
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
 export function DropdownRoutes({
@@ -95,17 +95,17 @@ export function DropdownRoutes({
     button: Button,
     onChange,
 }) {
-    const navigate = useNavigate();
-    const location = useLocation();
-    const selected = findRouteIndex(routes, location.pathname);
+    const navigate = useNavigate()
+    const location = useLocation()
+    const selected = findRouteIndex(routes, location.pathname)
     const handleChange = (index) => {
         if (index !== -1 && !matchPath(routes[index], location.pathname)) {
-            navigate(routes[index]);
+            navigate(routes[index])
         }
         if (onChange) {
-            onChange(index);
+            onChange(index)
         }
-    };
+    }
     return (
         <DropdownMenu
             initSelected={selected}
@@ -113,7 +113,7 @@ export function DropdownRoutes({
             itemNames={routeLabels}
             onChange={handleChange}
         />
-    );
+    )
 }
 
-export default DropdownMenu;
+export default DropdownMenu

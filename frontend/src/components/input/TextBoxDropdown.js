@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import TextBox from "./TextBox";
+import { useEffect, useState } from "react"
+import TextBox from "./TextBox"
 
 function DropdownItem({ itemName, onClick }) {
     return (
@@ -8,7 +8,7 @@ function DropdownItem({ itemName, onClick }) {
             onMouseDown={onClick}>
             {itemName}
         </li>
-    );
+    )
 }
 
 function TextBoxDropdown({
@@ -21,28 +21,28 @@ function TextBoxDropdown({
     onChange,
     onClick,
 }) {
-    const [focused, setFocused] = useState(false);
-    const [selected, setSelected] = useState(initSelected);
-    const [text, setText] = useState(initText);
+    const [focused, setFocused] = useState(false)
+    const [selected, setSelected] = useState(initSelected)
+    const [text, setText] = useState(initText)
 
     useEffect(() => {
-        if (onChange) onChange(selected, text);
-    }, [selected, text]);
+        if (onChange) onChange(selected, text)
+    }, [selected, text])
 
     const handleFocus = () => {
-        setFocused(true);
-    };
+        setFocused(true)
+    }
     const handleBlur = () => {
-        setFocused(false);
-    };
+        setFocused(false)
+    }
     const handleTextChange = (newText) => {
         setSelected(
             itemNames
                 .map((itemName) => itemName.toLowerCase())
                 .indexOf(newText.toLowerCase()),
-        );
-        setText(newText);
-    };
+        )
+        setText(newText)
+    }
     const items = itemNames
         .filter((itemName) =>
             itemName.toLowerCase().includes(text.toLowerCase()),
@@ -50,21 +50,21 @@ function TextBoxDropdown({
         .map((itemName, index) => {
             const handleClick = () => {
                 if (fillSelected) {
-                    setText(itemName);
+                    setText(itemName)
                 }
-                setSelected(index);
+                setSelected(index)
                 if (onClick) {
-                    onClick(index, itemName);
+                    onClick(index, itemName)
                 }
-            };
+            }
             return (
                 <DropdownItem
                     itemName={itemName}
                     onClick={handleClick}
                     key={index}
                 />
-            );
-        });
+            )
+        })
     return (
         <div className="relative">
             <TextBox
@@ -89,7 +89,7 @@ function TextBoxDropdown({
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
-export default TextBoxDropdown;
+export default TextBoxDropdown

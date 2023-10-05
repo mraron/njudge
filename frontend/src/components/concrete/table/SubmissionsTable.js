@@ -1,10 +1,10 @@
-import RoundedTable from "../../container/RoundedTable";
-import { SVGSpinner } from "../../svg/SVGs";
-import { Link } from "react-router-dom";
-import { routeMap } from "../../../config/RouteConfig";
-import { useTranslation } from "react-i18next";
-import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import RoundedTable from "../../container/RoundedTable"
+import { SVGSpinner } from "../../svg/SVGs"
+import { Link } from "react-router-dom"
+import { routeMap } from "../../../config/RouteConfig"
+import { useTranslation } from "react-i18next"
+import React from "react"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 function Submission({ submission }) {
     const {
@@ -19,7 +19,7 @@ function Submission({ submission }) {
         maxScore,
         time,
         memory,
-    } = submission;
+    } = submission
     return (
         <tr className={"divide-x divide-dividecol"}>
             <td className=" w-0 text-center">
@@ -77,14 +77,14 @@ function Submission({ submission }) {
             <td>{time} ms</td>
             <td>{memory} KiB</td>
         </tr>
-    );
+    )
 }
 
 function SubmissionsTable({ submissions }) {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     const submissionsContent = submissions.map((item, index) => (
         <Submission submission={item} key={index} />
-    ));
+    ))
     return (
         <RoundedTable>
             <thead className="bg-framebgcol">
@@ -103,7 +103,7 @@ function SubmissionsTable({ submissions }) {
                 {submissionsContent}
             </tbody>
         </RoundedTable>
-    );
+    )
 }
 
-export default SubmissionsTable;
+export default SubmissionsTable

@@ -1,14 +1,14 @@
-import { useTranslation } from "react-i18next";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import SVGTitleComponent from "../../components/svg/SVGTitleComponent";
-import TagListFrame, { LinkTag } from "../../components/container/TagListFrame";
+import { useTranslation } from "react-i18next"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import SVGTitleComponent from "../../components/svg/SVGTitleComponent"
+import TagListFrame, { LinkTag } from "../../components/container/TagListFrame"
 import {
     ProfileDataFrame,
     ProfilePictureFrame,
-} from "../../components/concrete/other/ProfileSidebar";
+} from "../../components/concrete/other/ProfileSidebar"
 
 function ProfileMain({ data }) {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     const titleComponentCorrect = (
         <SVGTitleComponent
             svg={
@@ -19,7 +19,7 @@ function ProfileMain({ data }) {
             }
             title={t("profile_main.solved_problems")}
         />
-    );
+    )
     const titleComponentWrong = (
         <SVGTitleComponent
             svg={
@@ -30,7 +30,7 @@ function ProfileMain({ data }) {
             }
             title={t("profile_main.unsolved_problems")}
         />
-    );
+    )
     return (
         <div className="flex flex-col sm:flex-row w-full items-start space-y-3 sm:space-y-0 sm:space-x-3">
             <div className="w-full sm:w-72 shrink-0 space-y-3">
@@ -53,7 +53,7 @@ function ProfileMain({ data }) {
                 />
             </div>
         </div>
-    );
+    )
 }
 
-export default ProfileMain;
+export default ProfileMain

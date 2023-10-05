@@ -1,18 +1,19 @@
-import RoundedTable from "../../components/container/RoundedTable";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { routeMap } from "../../config/RouteConfig";
-import Pagination from "../../components/util/Pagination";
-import DropdownFrame from "../../components/container/DropdownFrame";
-import TextBox from "../../components/input/TextBox";
-import { useTranslation } from "react-i18next";
-import Button from "../../components/util/Button";
-import updateQueryString from "../../util/updateQueryString";
-import { useState } from "react";
-import queryString from "query-string";
+import RoundedTable from "../../components/container/RoundedTable"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { Link, useLocation, useNavigate } from "react-router-dom"
+import { routeMap } from "../../config/RouteConfig"
+import Pagination from "../../components/util/Pagination"
+import DropdownFrame from "../../components/container/DropdownFrame"
+import TextBox from "../../components/input/TextBox"
+import { useTranslation } from "react-i18next"
+import Button from "../../components/util/Button"
+import updateQueryString from "../../util/updateQueryString"
+import { useState } from "react"
+import queryString from "query-string"
+import RanklistNotPublic from "../../components/concrete/other/RanklistNotPublic"
 
 function RanklistRow(data) {
-    const { place, name, score, verdicts } = data.result;
+    const { place, name, score, verdicts } = data.result
     const verdictsContent = verdicts.map((item, index) => {
         return (
             <td className="py-2.5 px-0 w-0" key={index}>
@@ -37,8 +38,8 @@ function RanklistRow(data) {
                     )}
                 </span>
             </td>
-        );
-    });
+        )
+    })
     return (
         <tr
             className={`divide-x divide-dividecol ${
@@ -55,16 +56,16 @@ function RanklistRow(data) {
             <td className="py-2.5 w-0 text-center">{score}</td>
             {verdictsContent}
         </tr>
-    );
+    )
 }
 
 function RanklistFilter() {
-    const { t } = useTranslation();
-    const location = useLocation();
-    const navigate = useNavigate();
+    const { t } = useTranslation()
+    const location = useLocation()
+    const navigate = useNavigate()
 
-    const qData = queryString.parse(location.search);
-    const [username, setUsername] = useState(qData["user"]);
+    const qData = queryString.parse(location.search)
+    const [username, setUsername] = useState(qData["user"])
     const handleSubmit = () => {
         updateQueryString({
             location: location,
@@ -72,15 +73,15 @@ function RanklistFilter() {
             args: ["user"],
             values: [username],
             validArgs: ["user"],
-        });
-    };
+        })
+    }
     const handleReset = () => {
         updateQueryString({
             location: location,
             navigate: navigate,
             validArgs: [],
-        });
-    };
+        })
+    }
     return (
         <div>
             <div className="flex flex-col space-y-4 mb-5">
@@ -100,44 +101,49 @@ function RanklistFilter() {
                 </Button>
             </div>
         </div>
-    );
+    )
 }
 
 function ContestRanklist({ data }) {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     const ranklistContent = data.ranklist.map((item, index) => (
         <RanklistRow result={item} index={index} key={index} />
-    ));
+    ))
     const problemsContent = data.problems.map((item, index) => (
         <th className="px-4" key={index}>
             <Link className="link" to={item.href}>
                 {item.text}
             </Link>
         </th>
-    ));
+    ))
     return (
-        <div className="space-y-2">
-            <DropdownFrame title="Szűrés">
-                <div className="px-8 py-6">
-                    <RanklistFilter />
+        <>
+            {data.isPublic && (
+                <div className="space-y-2">
+                    <DropdownFrame title="Szűrés">
+                        <div className="px-8 py-6">
+                            <RanklistFilter />
+                        </div>
+                    </DropdownFrame>
+                    <RoundedTable>
+                        <thead className="bg-grey-800">
+                            <tr className="divide-x divide-dividecol">
+                                <th className="w-0">#</th>
+                                <th>{t("contest_ranklist.username")}</th>
+                                <th className="w-0">=</th>
+                                {problemsContent}
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-dividecol">
+                            {ranklistContent}
+                        </tbody>
+                    </RoundedTable>
+                    <Pagination paginationData={data.paginationData} />
                 </div>
-            </DropdownFrame>
-            <RoundedTable>
-                <thead className="bg-grey-800">
-                    <tr className="divide-x divide-dividecol">
-                        <th className="w-0">#</th>
-                        <th>{t("contest_ranklist.username")}</th>
-                        <th className="w-0">=</th>
-                        {problemsContent}
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-dividecol">
-                    {ranklistContent}
-                </tbody>
-            </RoundedTable>
-            <Pagination paginationData={data.paginationData} />
-        </div>
-    );
+            )}
+            {!data.isPublic && <RanklistNotPublic />}
+        </>
+    )
 }
 
-export default ContestRanklist;
+export default ContestRanklist

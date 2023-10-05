@@ -1,20 +1,20 @@
-import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import UpdateQueryString from "../../util/updateQueryString";
-import queryString from "query-string";
+import React from "react"
+import { useLocation, useNavigate } from "react-router-dom"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import UpdateQueryString from "../../util/updateQueryString"
+import queryString from "query-string"
 
 function OrderedColumnTitle({ text, label }) {
-    const location = useLocation();
-    const navigate = useNavigate();
-    const qData = queryString.parse(location.search);
+    const location = useLocation()
+    const navigate = useNavigate()
+    const qData = queryString.parse(location.search)
 
     const currentOrder =
         qData.order === "ASC" && qData.by === label
             ? 1
             : qData.order === "DESC" && qData.by === label
             ? 2
-            : 0;
+            : 0
 
     const handleOrderChanged = () => {
         if (currentOrder === 2) {
@@ -22,17 +22,17 @@ function OrderedColumnTitle({ text, label }) {
                 location: location,
                 navigate: navigate,
                 invalidArgs: ["by", "order"],
-            });
+            })
         } else {
-            const newOrder = currentOrder === 1 ? 2 : 1;
+            const newOrder = currentOrder === 1 ? 2 : 1
             UpdateQueryString({
                 location: location,
                 navigate: navigate,
                 args: ["by", "order"],
                 values: [label, newOrder === 1 ? "ASC" : "DESC"],
-            });
+            })
         }
-    };
+    }
     return (
         <div
             className="flex items-center link no-underline"
@@ -51,7 +51,7 @@ function OrderedColumnTitle({ text, label }) {
                 />
             )}
         </div>
-    );
+    )
 }
 
-export default OrderedColumnTitle;
+export default OrderedColumnTitle

@@ -1,37 +1,37 @@
-import { useContext, useState } from "react";
-import { Navigate, useParams } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import RoundedFrame from "../../components/container/RoundedFrame";
-import TextBox from "../../components/input/TextBox";
-import SVGTitleComponent from "../../components/svg/SVGTitleComponent";
-import UserContext from "../../contexts/user/UserContext";
-import { routeMap } from "../../config/RouteConfig";
-import { reset_password } from "../../util/auth";
-import Button from "../../components/util/Button";
+import { useContext, useState } from "react"
+import { Navigate, useParams } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import RoundedFrame from "../../components/container/RoundedFrame"
+import TextBox from "../../components/input/TextBox"
+import SVGTitleComponent from "../../components/svg/SVGTitleComponent"
+import UserContext from "../../contexts/user/UserContext"
+import { routeMap } from "../../config/RouteConfig"
+import { reset_password } from "../../util/auth"
+import Button from "../../components/util/Button"
 
 function ResetPasswordFrame() {
-    const { t } = useTranslation();
-    const { user, token } = useParams();
-    const [password, setPassword] = useState("");
-    const [passwordConfirm, setPasswordConfirm] = useState("");
+    const { t } = useTranslation()
+    const { user, token } = useParams()
+    const [password, setPassword] = useState("")
+    const [passwordConfirm, setPasswordConfirm] = useState("")
 
     const titleComponent = (
         <SVGTitleComponent
             svg={<FontAwesomeIcon icon="fa-lock" className="w-4 h-4 mr-3" />}
             title={t("reset_password.change_password")}
         />
-    );
+    )
     const handleResetPassword = (event) => {
-        event.preventDefault();
+        event.preventDefault()
         reset_password(user, token, password, passwordConfirm).then((resp) => {
             if (resp.success) {
-                window.flash("flash.successful_password_change", "success");
+                window.flash("flash.successful_password_change", "success")
             } else {
-                window.flash(resp.message, "failure");
+                window.flash(resp.message, "failure")
             }
-        });
-    };
+        })
+    }
     return (
         <RoundedFrame titleComponent={titleComponent}>
             <div className="px-10 py-8">
@@ -67,11 +67,11 @@ function ResetPasswordFrame() {
                 </form>
             </div>
         </RoundedFrame>
-    );
+    )
 }
 
 function ResetPassword() {
-    const { userData, isLoggedIn } = useContext(UserContext);
+    const { userData, isLoggedIn } = useContext(UserContext)
     if (isLoggedIn) {
         return (
             <Navigate
@@ -80,7 +80,7 @@ function ResetPassword() {
                     encodeURIComponent(userData.username),
                 )}
             />
-        );
+        )
     }
     return (
         <div className="w-full flex justify-center">
@@ -90,7 +90,7 @@ function ResetPassword() {
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
-export default ResetPassword;
+export default ResetPassword

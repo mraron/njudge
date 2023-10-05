@@ -1,34 +1,34 @@
-import { useContext, useState } from "react";
-import { Navigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import RoundedFrame from "../../components/container/RoundedFrame";
-import TextBox from "../../components/input/TextBox";
-import SVGTitleComponent from "../../components/svg/SVGTitleComponent";
-import { routeMap } from "../../config/RouteConfig";
-import UserContext from "../../contexts/user/UserContext";
-import { change_password } from "../../util/auth";
-import Button from "../../components/util/Button";
+import { useContext, useState } from "react"
+import { Navigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import RoundedFrame from "../../components/container/RoundedFrame"
+import TextBox from "../../components/input/TextBox"
+import SVGTitleComponent from "../../components/svg/SVGTitleComponent"
+import { routeMap } from "../../config/RouteConfig"
+import UserContext from "../../contexts/user/UserContext"
+import { change_password } from "../../util/auth"
+import Button from "../../components/util/Button"
 
 function ForgottenPasswordFrame() {
-    const { t } = useTranslation();
-    const [email, setEmail] = useState("");
+    const { t } = useTranslation()
+    const [email, setEmail] = useState("")
     const titleComponent = (
         <SVGTitleComponent
             svg={<FontAwesomeIcon icon="fa-lock" className="w-5 h-5 mr-3" />}
             title={t("forgotten_password.change_password")}
         />
-    );
+    )
     const handleChangePassword = (event) => {
-        event.preventDefault();
+        event.preventDefault()
         change_password(email).then((ok) => {
             if (ok) {
-                window.flash("flash.successful_email_pw_change", "success");
+                window.flash("flash.successful_email_pw_change", "success")
             } else {
-                window.flash("flash.unsuccessful_email_pw_change", "failure");
+                window.flash("flash.unsuccessful_email_pw_change", "failure")
             }
-        });
-    };
+        })
+    }
     return (
         <RoundedFrame titleComponent={titleComponent}>
             <div className="px-10 py-8">
@@ -54,11 +54,11 @@ function ForgottenPasswordFrame() {
                 </form>
             </div>
         </RoundedFrame>
-    );
+    )
 }
 
 function ForgottenPassword() {
-    const { userData, isLoggedIn } = useContext(UserContext);
+    const { userData, isLoggedIn } = useContext(UserContext)
     if (isLoggedIn) {
         return (
             <Navigate
@@ -67,7 +67,7 @@ function ForgottenPassword() {
                     encodeURIComponent(userData.username),
                 )}
             />
-        );
+        )
     }
     return (
         <div className="w-full flex justify-center">
@@ -77,7 +77,7 @@ function ForgottenPassword() {
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
-export default ForgottenPassword;
+export default ForgottenPassword

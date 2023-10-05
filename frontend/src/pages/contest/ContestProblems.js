@@ -1,12 +1,12 @@
-import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { SVGEllipsis } from "../../components/svg/SVGs";
-import RoundedTable from "../../components/container/RoundedTable";
-import React from "react";
+import { Link } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { SVGEllipsis } from "../../components/svg/SVGs"
+import RoundedTable from "../../components/container/RoundedTable"
+import React from "react"
 
 function Problem({ problem }) {
-    const { id, title, status } = problem;
+    const { id, title, status } = problem
     return (
         <tr className="divide-x divide-dividecol">
             <td className="text-center">{id}</td>
@@ -37,14 +37,14 @@ function Problem({ problem }) {
                 )}
             </td>
         </tr>
-    );
+    )
 }
 
 function ContestProblems({ data }) {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     const problemsContent = data.problems.map((item, index) => (
         <Problem problem={item} key={index} />
-    ));
+    ))
     return (
         <RoundedTable>
             <thead className="bg-grey-800">
@@ -58,7 +58,7 @@ function ContestProblems({ data }) {
                 {problemsContent}
             </tbody>
         </RoundedTable>
-    );
+    )
 }
 
-export default ContestProblems;
+export default ContestProblems

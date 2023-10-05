@@ -1,6 +1,6 @@
-import { Link, useLocation } from "react-router-dom";
-import { DropdownRoutes } from "../input/DropdownMenu";
-import { findRouteIndex } from "../../util/findRouteIndex";
+import { Link, useLocation } from "react-router-dom"
+import { DropdownRoutes } from "../input/DropdownMenu"
+import { findRouteIndex } from "../../util/findRouteIndex"
 
 function Tab({ isSelected, label, route }) {
     return (
@@ -11,12 +11,12 @@ function Tab({ isSelected, label, route }) {
             to={route}>
             {label}
         </Link>
-    );
+    )
 }
 
 function TabFrame({ routes, routeLabels, routePatterns, children }) {
-    const location = useLocation();
-    const selected = findRouteIndex(routePatterns, location.pathname);
+    const location = useLocation()
+    const selected = findRouteIndex(routePatterns, location.pathname)
     const tabsContent = routes.map((item, index) => (
         <li className="mr-1.5" key={index}>
             <Tab
@@ -26,7 +26,7 @@ function TabFrame({ routes, routeLabels, routePatterns, children }) {
                 key={index}
             />
         </li>
-    ));
+    ))
     return (
         <div className="w-full space-y-2">
             <ul className="hidden sm:flex">{tabsContent}</ul>
@@ -40,7 +40,7 @@ function TabFrame({ routes, routeLabels, routePatterns, children }) {
             </div>
             <div>{children}</div>
         </div>
-    );
+    )
 }
 
-export default TabFrame;
+export default TabFrame

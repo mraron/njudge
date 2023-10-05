@@ -1,19 +1,19 @@
-import { useContext, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
-import { updateData } from "../../util/updateData";
-import PageLoadingAnimation from "../../components/util/PageLoadingAnimation";
-import UserContext from "../../contexts/user/UserContext";
+import { useContext, useEffect, useState } from "react"
+import { useLocation } from "react-router-dom"
+import { AnimatePresence, motion } from "framer-motion"
+import { updateData } from "../../util/updateData"
+import PageLoadingAnimation from "../../components/util/PageLoadingAnimation"
+import UserContext from "../../contexts/user/UserContext"
 
 function UpdatePage({ page: Page }) {
-    const { setUserData, setLoggedIn } = useContext(UserContext);
-    const location = useLocation();
-    const [data, setData] = useState(null);
-    const [isLoading, setLoading] = useState(true);
-    const abortController = new AbortController();
+    const { setUserData, setLoggedIn } = useContext(UserContext)
+    const location = useLocation()
+    const [data, setData] = useState(null)
+    const [isLoading, setLoading] = useState(true)
+    const abortController = new AbortController()
 
     useEffect(() => {
-        let isMounted = true;
+        let isMounted = true
         updateData(
             location,
             abortController,
@@ -21,16 +21,16 @@ function UpdatePage({ page: Page }) {
             setUserData,
             setLoggedIn,
             () => isMounted,
-        ).then(() => setLoading(false));
+        ).then(() => setLoading(false))
         return () => {
-            isMounted = false;
-            abortController.abort();
-        };
-    }, []);
+            isMounted = false
+            abortController.abort()
+        }
+    }, [])
 
-    let passedData = null;
+    let passedData = null
     if (!isLoading) {
-        passedData = data;
+        passedData = data
     }
     return (
         <div className="relative w-full">
@@ -46,7 +46,7 @@ function UpdatePage({ page: Page }) {
                 )}
             </AnimatePresence>
         </div>
-    );
+    )
 }
 
-export default UpdatePage;
+export default UpdatePage

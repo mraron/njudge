@@ -1,6 +1,6 @@
-import ProfileSideBar from "../components/concrete/other/ProfileSidebar";
-import ContestList from "../components/concrete/other/ContestList";
-import React from "react";
+import ProfileSideBar from "../components/concrete/other/ProfileSidebar"
+import ContestList from "../components/concrete/other/ContestList"
+import React from "react"
 
 function Contests({ data }) {
     return (
@@ -12,7 +12,7 @@ function Contests({ data }) {
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
-export default Contests;
+export default Contests

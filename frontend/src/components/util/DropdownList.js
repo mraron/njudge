@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { SVGDropdownListArrow } from "../svg/SVGs";
+import { useState } from "react"
+import { SVGDropdownListArrow } from "../svg/SVGs"
 
 function DropdownElem({ text, isOpen, onClick }) {
     return (
@@ -9,12 +9,12 @@ function DropdownElem({ text, isOpen, onClick }) {
             <SVGDropdownListArrow isOpen={isOpen} />
             <span className="truncate">{text}</span>
         </span>
-    );
+    )
 }
 
 function DropdownList({ tree, leaf: Leaf }) {
-    const isRoot = !tree.title;
-    const [isOpen, setOpen] = useState(isRoot);
+    const isRoot = !tree.title
+    const [isOpen, setOpen] = useState(isRoot)
 
     const children = tree.children
         ? tree.children.map((child, index) => (
@@ -22,16 +22,16 @@ function DropdownList({ tree, leaf: Leaf }) {
                   <DropdownList tree={child} leaf={Leaf} />
               </li>
           ))
-        : [];
+        : []
     const innerNode = (
         <DropdownElem
             text={tree.title}
             isOpen={isOpen}
             onClick={() => setOpen(!isOpen)}
         />
-    );
-    const leafNode = <Leaf data={tree} />;
-    const isLeaf = !tree.children || tree.children.length === 0;
+    )
+    const leafNode = <Leaf data={tree} />
+    const isLeaf = !tree.children || tree.children.length === 0
 
     return (
         <div>
@@ -44,7 +44,7 @@ function DropdownList({ tree, leaf: Leaf }) {
                 {children}
             </ul>
         </div>
-    );
+    )
 }
 
-export default DropdownList;
+export default DropdownList

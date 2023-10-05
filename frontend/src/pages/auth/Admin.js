@@ -1,9 +1,9 @@
-import { useEffect } from "react";
+import { useEffect } from "react"
 
 function Admin() {
     useEffect(() => {
-        window.location.href = "/admin";
-    }, []);
+        window.location.href = "/admin"
+    }, [])
 }
 
-export default Admin;
+export default Admin

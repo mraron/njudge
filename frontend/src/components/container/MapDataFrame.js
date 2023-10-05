@@ -1,4 +1,4 @@
-import RoundedTable from "./RoundedTable";
+import RoundedTable from "./RoundedTable"
 
 function MapDataFrame({ data, title, titleComponent, labelColWidth }) {
     const rows = data.map((pair, index) => (
@@ -12,12 +12,12 @@ function MapDataFrame({ data, title, titleComponent, labelColWidth }) {
                 {pair[1]}
             </td>
         </tr>
-    ));
+    ))
     return (
         <RoundedTable title={title} titleComponent={titleComponent}>
             <tbody className="divide-y divide-dividecol">{rows}</tbody>
         </RoundedTable>
-    );
+    )
 }
 
-export default MapDataFrame;
+export default MapDataFrame

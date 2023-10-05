@@ -1,20 +1,20 @@
-import { useContext } from "react";
-import { useTranslation } from "react-i18next";
-import SubmissionTable from "../components/concrete/table/SubmissionTable";
-import SubmissionsTable from "../components/concrete/table/SubmissionsTable";
-import SVGTitleComponent from "../components/svg/SVGTitleComponent";
-import CopyableCode from "../components/util/copy/CopyableCode";
-import DropdownFrame from "../components/container/DropdownFrame";
+import { useContext } from "react"
+import { useTranslation } from "react-i18next"
+import SubmissionTable from "../components/concrete/table/SubmissionTable"
+import SubmissionsTable from "../components/concrete/table/SubmissionsTable"
+import SVGTitleComponent from "../components/svg/SVGTitleComponent"
+import CopyableCode from "../components/util/copy/CopyableCode"
+import DropdownFrame from "../components/container/DropdownFrame"
 
-import JudgeDataContext from "../contexts/judgeData/JudgeDataContext";
-import UserContext from "../contexts/user/UserContext";
-import Editor from "@monaco-editor/react";
-import ThemeContext from "../contexts/theme/ThemeContext";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Button from "../components/util/Button";
+import JudgeDataContext from "../contexts/judgeData/JudgeDataContext"
+import UserContext from "../contexts/user/UserContext"
+import Editor from "@monaco-editor/react"
+import ThemeContext from "../contexts/theme/ThemeContext"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import Button from "../components/util/Button"
 
 function CompileErrorFrame({ message }) {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     const titleComponent = (
         <SVGTitleComponent
             title={t("submission.compilation_error")}
@@ -25,20 +25,20 @@ function CompileErrorFrame({ message }) {
                 />
             }
         />
-    );
+    )
     return (
         <CopyableCode
             text={message}
             titleComponent={titleComponent}
             maxHeight="16rem"
         />
-    );
+    )
 }
 
 function Submission({ data }) {
-    const { userData } = useContext(UserContext);
-    const { judgeData } = useContext(JudgeDataContext);
-    const { theme } = useContext(ThemeContext);
+    const { userData } = useContext(UserContext)
+    const { judgeData } = useContext(JudgeDataContext)
+    const { theme } = useContext(ThemeContext)
 
     return (
         <div className="w-full flex justify-center">
@@ -85,7 +85,7 @@ function Submission({ data }) {
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
-export default Submission;
+export default Submission

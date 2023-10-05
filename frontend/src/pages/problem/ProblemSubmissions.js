@@ -1,6 +1,6 @@
-import Pagination from "../../components/util/Pagination";
-import SubmissionsTable from "../../components/concrete/table/SubmissionsTable";
-import SubmissionFilterFrame from "../../components/concrete/other/SubmissionFilter";
+import Pagination from "../../components/util/Pagination"
+import SubmissionsTable from "../../components/concrete/table/SubmissionsTable"
+import SubmissionFilterFrame from "../../components/concrete/other/SubmissionFilter"
 
 function ProblemSubmissions({ data }) {
     return (
@@ -9,7 +9,7 @@ function ProblemSubmissions({ data }) {
             <SubmissionsTable submissions={data.submissions} />
             <Pagination paginationData={data.paginationData} />
         </div>
-    );
+    )
 }
 
-export default ProblemSubmissions;
+export default ProblemSubmissions

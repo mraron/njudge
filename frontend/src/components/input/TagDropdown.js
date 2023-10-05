@@ -1,14 +1,14 @@
-import _ from "lodash";
-import { useEffect, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import TextBoxDropdown from "./TextBoxDropdown";
+import _ from "lodash"
+import { useEffect, useState } from "react"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import TextBoxDropdown from "./TextBoxDropdown"
 
 function Tag({ title, onClick }) {
-    const [hovered, setHovered] = useState(false);
+    const [hovered, setHovered] = useState(false)
     const handleClick = (event) => {
-        event.stopPropagation();
-        onClick();
-    };
+        event.stopPropagation()
+        onClick()
+    }
     return (
         <span
             className={`tag m-1 flex items-center space-x-3 ${
@@ -25,36 +25,34 @@ function Tag({ title, onClick }) {
                 <FontAwesomeIcon icon="fa-close" className="h-3 w-3" />
             </span>
         </span>
-    );
+    )
 }
 
 function TagDropdown({ id, label, itemNames, initTags = [], onChange }) {
-    const [tags, setTags] = useState(initTags);
+    const [tags, setTags] = useState(initTags)
     useEffect(() => {
         if (onChange) {
-            onChange(tags);
+            onChange(tags)
         }
-    }, [onChange, tags]);
+    }, [onChange, tags])
 
     const tagsContent = tags.map((tag, index) => {
         const handleRemoveTag = () => {
-            setTags((prevTags) =>
-                prevTags.filter((prevTag) => prevTag !== tag),
-            );
-        };
+            setTags((prevTags) => prevTags.filter((prevTag) => prevTag !== tag))
+        }
         return (
             <Tag title={itemNames[tag]} onClick={handleRemoveTag} key={index} />
-        );
-    });
+        )
+    })
     const handleAddTag = (selected, title) => {
         const remaining = _.range(itemNames.length).filter(
             (index) => !tags.includes(index),
-        );
-        const tag = remaining[selected];
+        )
+        const tag = remaining[selected]
         setTags((prevTags) =>
             prevTags.includes(tag) ? prevTags : [...prevTags, tag],
-        );
-    };
+        )
+    }
     return (
         <div>
             <TextBoxDropdown
@@ -72,7 +70,7 @@ function TagDropdown({ id, label, itemNames, initTags = [], onChange }) {
                 {tagsContent}
             </div>
         </div>
-    );
+    )
 }
 
-export default TagDropdown;
+export default TagDropdown

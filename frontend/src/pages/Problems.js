@@ -1,6 +1,6 @@
-import { ProblemFilterFrame } from "../components/concrete/other/ProblemFilter";
-import ProblemsTable from "../components/concrete/table/ProblemsTable";
-import Pagination from "../components/util/Pagination";
+import { ProblemFilterFrame } from "../components/concrete/other/ProblemFilter"
+import ProblemsTable from "../components/concrete/table/ProblemsTable"
+import Pagination from "../components/util/Pagination"
 
 function Problems({ data }) {
     return (
@@ -15,7 +15,7 @@ function Problems({ data }) {
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
-export default Problems;
+export default Problems

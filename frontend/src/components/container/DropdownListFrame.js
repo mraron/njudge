@@ -1,5 +1,5 @@
-import DropdownList from "../util/DropdownList";
-import RoundedFrame from "./RoundedFrame";
+import DropdownList from "../util/DropdownList"
+import RoundedFrame from "./RoundedFrame"
 
 function DropdownListFrame({ title, tree, leaf: Leaf }) {
     return (
@@ -8,7 +8,7 @@ function DropdownListFrame({ title, tree, leaf: Leaf }) {
                 <DropdownList tree={tree} leaf={Leaf} />
             </div>
         </RoundedFrame>
-    );
+    )
 }
 
-export default DropdownListFrame;
+export default DropdownListFrame

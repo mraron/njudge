@@ -1,15 +1,15 @@
-import { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState } from "react"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 function Checkbox({ id, label, initChecked, onChange }) {
-    const [checked, setChecked] = useState(initChecked);
-    const [hovered, setHovered] = useState(false);
+    const [checked, setChecked] = useState(initChecked)
+    const [hovered, setHovered] = useState(false)
     const handleChange = (event) => {
-        setChecked(event.target.checked);
+        setChecked(event.target.checked)
         if (onChange) {
-            onChange(event.target.checked);
+            onChange(event.target.checked)
         }
-    };
+    }
     return (
         <label
             htmlFor={id}
@@ -42,7 +42,7 @@ function Checkbox({ id, label, initChecked, onChange }) {
             </div>
             <span className="text-label">{label}</span>
         </label>
-    );
+    )
 }
 
-export default Checkbox;
+export default Checkbox

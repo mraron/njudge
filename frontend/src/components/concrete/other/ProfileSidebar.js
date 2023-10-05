@@ -1,20 +1,20 @@
-import { useContext } from "react";
-import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLineChart } from "@fortawesome/free-solid-svg-icons";
-import MapDataFrame from "../../container/MapDataFrame";
-import SVGTitleComponent from "../../svg/SVGTitleComponent";
-import RoundedTable from "../../container/RoundedTable";
-import UserContext from "../../../contexts/user/UserContext";
-import RoundedFrame from "../../container/RoundedFrame";
-import { routeMap } from "../../../config/RouteConfig";
+import { useContext } from "react"
+import { useTranslation } from "react-i18next"
+import { Link } from "react-router-dom"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faLineChart } from "@fortawesome/free-solid-svg-icons"
+import MapDataFrame from "../../container/MapDataFrame"
+import SVGTitleComponent from "../../svg/SVGTitleComponent"
+import RoundedTable from "../../container/RoundedTable"
+import UserContext from "../../../contexts/user/UserContext"
+import RoundedFrame from "../../container/RoundedFrame"
+import { routeMap } from "../../../config/RouteConfig"
 
 export function ProfilePictureFrame({ userData }) {
     const profileRoute = routeMap.profile.replace(
         ":user",
         encodeURIComponent(userData.username),
-    );
+    )
     return (
         <RoundedFrame>
             <div className="flex flex-col items-center p-5 border-b border-bordefcol">
@@ -38,11 +38,11 @@ export function ProfilePictureFrame({ userData }) {
                 <span className="truncate">{userData.rating}</span>
             </div>
         </RoundedFrame>
-    );
+    )
 }
 
 export function ProfileDataFrame({ userData }) {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     const titleComponent = (
         <SVGTitleComponent
             svg={
@@ -50,7 +50,7 @@ export function ProfileDataFrame({ userData }) {
             }
             title={t("profile_sidebar.stats")}
         />
-    );
+    )
     return (
         <MapDataFrame
             data={[
@@ -61,7 +61,7 @@ export function ProfileDataFrame({ userData }) {
             titleComponent={titleComponent}
             labelColWidth="12rem"
         />
-    );
+    )
 }
 
 function SubmissionsFrame({ titleComponent, submissions }) {
@@ -80,17 +80,17 @@ function SubmissionsFrame({ titleComponent, submissions }) {
                 </Link>
             </td>
         </tr>
-    ));
+    ))
     return (
         <RoundedTable titleComponent={titleComponent}>
             <tbody className="divide-y divide-dividecol">{rows}</tbody>
         </RoundedTable>
-    );
+    )
 }
 
 function ProfileSideBar() {
-    const { t } = useTranslation();
-    const { userData, isLoggedIn } = useContext(UserContext);
+    const { t } = useTranslation()
+    const { userData, isLoggedIn } = useContext(UserContext)
     const titleComponent = (
         <SVGTitleComponent
             svg={
@@ -101,7 +101,7 @@ function ProfileSideBar() {
             }
             title={t("profile_sidebar.last_submissions")}
         />
-    );
+    )
     return (
         isLoggedIn && (
             <div className="hidden lg:flex flex-col bg-grey-900 w-72 shrink-0 space-y-3">
@@ -113,7 +113,7 @@ function ProfileSideBar() {
                 />
             </div>
         )
-    );
+    )
 }
 
-export default ProfileSideBar;
+export default ProfileSideBar

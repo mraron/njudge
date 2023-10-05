@@ -66,6 +66,7 @@
         "page_title": "Beküldés #{{params.id}} :: njudge"
     },
     "not_found": {
+        "title": "Az oldal nem található",
         "message": "A keresett oldal nem található. Győződj meg róla, hogy a megadott útvonal helyes.",
         "back_to_home": "Vissza a főoldalra"
     },
@@ -226,6 +227,10 @@
     "problem_ranklist": {
         "page_title": "Eredmények – {{params.problem}} :: njudge",
         "ranklist": "Eredmények"
+    },
+    "ranklist_not_public": {
+        "title": "Az eredmények nem publikusak",
+        "message": "Az eredmények egyelőre nem publikusak, így nem tudod őket megtekinteni."
     },
     "solved_status": {
         "not_tried": "Nem próbáltad",

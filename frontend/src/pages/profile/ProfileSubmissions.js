@@ -1,5 +1,5 @@
-import Pagination from "../../components/util/Pagination";
-import SubmissionsTable from "../../components/concrete/table/SubmissionsTable";
+import Pagination from "../../components/util/Pagination"
+import SubmissionsTable from "../../components/concrete/table/SubmissionsTable"
 
 function ProfileSubmissions({ data }) {
     return (
@@ -11,7 +11,7 @@ function ProfileSubmissions({ data }) {
                 <Pagination paginationData={data.paginationData} />
             </div>
         </div>
-    );
+    )
 }
 
-export default ProfileSubmissions;
+export default ProfileSubmissions

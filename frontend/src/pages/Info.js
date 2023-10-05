@@ -1,8 +1,8 @@
-import { useTranslation } from "react-i18next";
-import ProfileSideBar from "../components/concrete/other/ProfileSidebar";
-import RoundedTable from "../components/container/RoundedTable";
-import CopyableCommand from "../components/util/copy/CopyableCommand";
-import React from "react";
+import { useTranslation } from "react-i18next"
+import ProfileSideBar from "../components/concrete/other/ProfileSidebar"
+import RoundedTable from "../components/container/RoundedTable"
+import CopyableCommand from "../components/util/copy/CopyableCommand"
+import React from "react"
 
 function CompilerOption({ lang, command }) {
     return (
@@ -12,11 +12,11 @@ function CompilerOption({ lang, command }) {
                 <CopyableCommand text={command} cls="border-0 rounded-none" />
             </td>
         </tr>
-    );
+    )
 }
 
 function InfoTable() {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     const compilerOptions = [
         ["C++", "g++ -std=c++<verzió> -O2 -static -DONLINE_JUDGE main.cpp"],
         ["C#", "/usr/bin/mcs -out:main.exe -optimize+ main.cs"],
@@ -25,10 +25,10 @@ function InfoTable() {
         ["Pascal", "/usr/bin/fpc -Mobjfpc -O2 -Xss main.pas"],
         ["PyPy3", "/usr/bin/pypy3 main.py"],
         ["Python3", "/usr/bin/python3 main.py"],
-    ];
+    ]
     const compilerOptionElems = compilerOptions.map((item, index) => (
         <CompilerOption lang={item[0]} command={item[1]} key={index} />
-    ));
+    ))
     return (
         <RoundedTable title={t("info.compiler_options")}>
             <thead className="bg-framebgcol">
@@ -41,7 +41,7 @@ function InfoTable() {
                 {compilerOptionElems}
             </tbody>
         </RoundedTable>
-    );
+    )
 }
 
 function Info({ data }) {
@@ -54,7 +54,7 @@ function Info({ data }) {
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
-export default Info;
+export default Info

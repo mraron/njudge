@@ -1,9 +1,9 @@
-import CopyButton from "./CopyButton";
-import RoundedFrame from "../../container/RoundedFrame";
-import { useState } from "react";
+import CopyButton from "./CopyButton"
+import RoundedFrame from "../../container/RoundedFrame"
+import { useState } from "react"
 
 function CopyableCommand({ text, cls }) {
-    const [isHovered, setHovered] = useState(false);
+    const [isHovered, setHovered] = useState(false)
     return (
         <RoundedFrame cls={`${cls} overflow-auto shadow-none`}>
             <div
@@ -18,7 +18,7 @@ function CopyableCommand({ text, cls }) {
                 </div>
             </div>
         </RoundedFrame>
-    );
+    )
 }
 
-export default CopyableCommand;
+export default CopyableCommand

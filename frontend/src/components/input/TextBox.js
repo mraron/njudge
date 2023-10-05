@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from "react"
 
 function TextBox({
     id,
@@ -9,24 +9,24 @@ function TextBox({
     onFocus,
     onBlur,
 }) {
-    const [focused, setFocused] = useState(false);
+    const [focused, setFocused] = useState(false)
     const handleChange = (event) => {
         if (onChange) {
-            onChange(event.target.value);
+            onChange(event.target.value)
         }
-    };
+    }
     const handleFocus = () => {
-        setFocused(true);
+        setFocused(true)
         if (onFocus) {
-            onFocus();
+            onFocus()
         }
-    };
+    }
     const handleBlur = () => {
-        setFocused(false);
+        setFocused(false)
         if (onBlur) {
-            onBlur();
+            onBlur()
         }
-    };
+    }
     return (
         <div>
             <label htmlFor={id} className="text-label">
@@ -54,7 +54,7 @@ function TextBox({
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
-export default TextBox;
+export default TextBox

@@ -1,12 +1,12 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AnimatePresence, motion } from "framer-motion";
-import { TERipple } from "tw-elements-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { AnimatePresence, motion } from "framer-motion"
+import { TERipple } from "tw-elements-react"
 
 function CopyButton({ text, isVisible }) {
     const handleCopy = () => {
-        navigator.clipboard.writeText(text);
-        window.flash("info.successful_copy", "success");
-    };
+        navigator.clipboard.writeText(text)
+        window.flash("info.successful_copy", "success")
+    }
     return (
         <AnimatePresence>
             {isVisible && (
@@ -30,7 +30,7 @@ function CopyButton({ text, isVisible }) {
                 </motion.div>
             )}
         </AnimatePresence>
-    );
+    )
 }
 
-export default CopyButton;
+export default CopyButton

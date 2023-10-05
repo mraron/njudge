@@ -1,13 +1,13 @@
-import { useContext, useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { DropdownRoutes } from "../../input/DropdownMenu";
-import { SVGDropdownMenuArrow } from "../../svg/SVGs";
-import { findRouteIndex } from "../../../util/findRouteIndex";
-import { routeMap } from "../../../config/RouteConfig";
-import UserContext from "../../../contexts/user/UserContext";
-import ThemeContext from "../../../contexts/theme/ThemeContext";
+import { useContext, useEffect, useRef, useState } from "react"
+import { Link, useLocation } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { DropdownRoutes } from "../../input/DropdownMenu"
+import { SVGDropdownMenuArrow } from "../../svg/SVGs"
+import { findRouteIndex } from "../../../util/findRouteIndex"
+import { routeMap } from "../../../config/RouteConfig"
+import UserContext from "../../../contexts/user/UserContext"
+import ThemeContext from "../../../contexts/theme/ThemeContext"
 
 const menuRoutes = [
     routeMap.home,
@@ -16,7 +16,7 @@ const menuRoutes = [
     routeMap.submissions,
     routeMap.problems.replace(":problemset", "main"),
     routeMap.info,
-];
+]
 const menuRouteLabels = [
     "menubar.home",
     "menubar.contests",
@@ -24,7 +24,7 @@ const menuRouteLabels = [
     "menubar.submissions",
     "menubar.problems",
     "menubar.information",
-];
+]
 
 function MenuOption({ label, route, selected, horizontal, onClick }) {
     return (
@@ -42,12 +42,12 @@ function MenuOption({ label, route, selected, horizontal, onClick }) {
                 {label}
             </Link>
         </li>
-    );
+    )
 }
 
 function getProfileDropdownButton(isLoggedIn) {
     function ProfileDropdownButton({ isOpen, onClick }) {
-        const { t } = useTranslation();
+        const { t } = useTranslation()
         return (
             <button
                 className={`border border-bordefcol rounded-tl-md rounded-bl-md flex items-center justify-between px-3 py-2 w-full h-full ${
@@ -61,18 +61,18 @@ function getProfileDropdownButton(isLoggedIn) {
                 </span>
                 <SVGDropdownMenuArrow isOpen={isOpen} />
             </button>
-        );
+        )
     }
 
-    return ProfileDropdownButton;
+    return ProfileDropdownButton
 }
 
 function ProfileSettings({ onSidebarClose }) {
-    const { userData, isLoggedIn } = useContext(UserContext);
-    const { t, i18n } = useTranslation();
+    const { userData, isLoggedIn } = useContext(UserContext)
+    const { t, i18n } = useTranslation()
 
-    let profileRoutes = [routeMap.login, routeMap.register];
-    let profileRouteLabels = ["menubar.login", "menubar.register"];
+    let profileRoutes = [routeMap.login, routeMap.register]
+    let profileRouteLabels = ["menubar.login", "menubar.register"]
     if (isLoggedIn) {
         profileRoutes = [
             routeMap.profile.replace(
@@ -80,17 +80,17 @@ function ProfileSettings({ onSidebarClose }) {
                 encodeURIComponent(userData.username),
             ),
             routeMap.logout,
-        ];
-        profileRouteLabels = ["menubar.profile", "menubar.logout"];
+        ]
+        profileRouteLabels = ["menubar.profile", "menubar.logout"]
         if (userData.isAdmin) {
             profileRoutes = profileRoutes
                 .slice(0, 1)
                 .concat([routeMap.admin])
-                .concat(profileRoutes.slice(1));
+                .concat(profileRoutes.slice(1))
             profileRouteLabels = profileRouteLabels
                 .slice(0, 1)
                 .concat(["menubar.admin"])
-                .concat(profileRouteLabels.slice(1));
+                .concat(profileRouteLabels.slice(1))
         }
     }
     return (
@@ -125,18 +125,18 @@ function ProfileSettings({ onSidebarClose }) {
                 <ThemeButton />
             </div>
         </div>
-    );
+    )
 }
 
 function ThemeButton() {
-    const { theme, changeTheme } = useContext(ThemeContext);
+    const { theme, changeTheme } = useContext(ThemeContext)
     const toggleTheme = () => {
         if (theme === "light") {
-            changeTheme("dark");
+            changeTheme("dark")
         } else {
-            changeTheme("light");
+            changeTheme("light")
         }
-    };
+    }
     return (
         <button
             className="h-full border border-l-0 border-bordefcol flex items-center justify-center p-2 rounded-r-md hover:bg-framebgcol"
@@ -146,12 +146,12 @@ function ThemeButton() {
                 className="w-6 h-4"
             />
         </button>
-    );
+    )
 }
 
 function MenuSideBar({ selected, isOpen, onClose }) {
-    const { t } = useTranslation();
-    const menuRef = useRef(null);
+    const { t } = useTranslation()
+    const menuRef = useRef(null)
     const menuOptions = menuRoutes.map((item, index) => {
         return (
             <MenuOption
@@ -162,8 +162,8 @@ function MenuSideBar({ selected, isOpen, onClose }) {
                 onClick={onClose}
                 key={index}
             />
-        );
-    });
+        )
+    })
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (
@@ -172,14 +172,14 @@ function MenuSideBar({ selected, isOpen, onClose }) {
                 event.target.id !== "menuButton" &&
                 !event.target.closest("#menuButton")
             ) {
-                onClose();
+                onClose()
             }
-        };
-        document.addEventListener("click", handleClickOutside);
+        }
+        document.addEventListener("click", handleClickOutside)
         return () => {
-            document.removeEventListener("click", handleClickOutside);
-        };
-    }, []);
+            document.removeEventListener("click", handleClickOutside)
+        }
+    }, [])
 
     return (
         <aside
@@ -198,11 +198,11 @@ function MenuSideBar({ selected, isOpen, onClose }) {
                 </ol>
             </div>
         </aside>
-    );
+    )
 }
 
 function MenuTopBar({ selected, isOpen, onToggle }) {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     const menuOptions = menuRoutes.map((item, index) => {
         return (
             <MenuOption
@@ -212,8 +212,8 @@ function MenuTopBar({ selected, isOpen, onToggle }) {
                 horizontal={true}
                 key={index}
             />
-        );
-    });
+        )
+    })
     return (
         <div className="z-30 flex justify-center bg-grey-825 border-b-1 border-grey-750 fixed w-full top-0">
             <div className="w-full max-w-7xl flex justify-between items-center">
@@ -249,20 +249,20 @@ function MenuTopBar({ selected, isOpen, onToggle }) {
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
 function Menubar() {
-    const { isLoggedIn } = useContext(UserContext);
-    const location = useLocation();
-    const selected = findRouteIndex(menuRoutes, location.pathname);
-    const [isOpen, setOpen] = useState(false);
+    const { isLoggedIn } = useContext(UserContext)
+    const location = useLocation()
+    const selected = findRouteIndex(menuRoutes, location.pathname)
+    const [isOpen, setOpen] = useState(false)
     const handleToggle = () => {
-        setOpen((prevOpen) => !prevOpen);
-    };
+        setOpen((prevOpen) => !prevOpen)
+    }
     const handleClose = () => {
-        setOpen(false);
-    };
+        setOpen(false)
+    }
     return (
         isLoggedIn !== null && (
             <div className="text-nav">
@@ -278,7 +278,7 @@ function Menubar() {
                 />
             </div>
         )
-    );
+    )
 }
 
-export default Menubar;
+export default Menubar

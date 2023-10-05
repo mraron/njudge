@@ -1,4 +1,4 @@
-import RoundedFrame from "./RoundedFrame";
+import RoundedFrame from "./RoundedFrame"
 
 function RoundedTable({ children, title, titleComponent }) {
     return (
@@ -22,7 +22,7 @@ function RoundedTable({ children, title, titleComponent }) {
                 </table>
             </div>
         </RoundedFrame>
-    );
+    )
 }
 
-export default RoundedTable;
+export default RoundedTable

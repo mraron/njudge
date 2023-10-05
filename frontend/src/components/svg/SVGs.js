@@ -9,7 +9,7 @@ export function SVGDropdownListArrow({ isOpen }) {
             <rect width="48" height="48" fill="none" />
             <path d="M19.5,37.4l11.9-12a1.9,1.9,0,0,0,0-2.8l-11.9-12A2,2,0,0,0,16,12h0V36h0a2,2,0,0,0,3.5,1.4Z" />
         </svg>
-    );
+    )
 }
 
 export function SVGDropdownMenuArrow({ cls = null, isOpen }) {
@@ -29,7 +29,7 @@ export function SVGDropdownMenuArrow({ cls = null, isOpen }) {
                 strokeLinejoin="round"
             />
         </svg>
-    );
+    )
 }
 
 export function SVGDropdownFrameArrow({ isOpen }) {
@@ -50,7 +50,7 @@ export function SVGDropdownFrameArrow({ isOpen }) {
                 strokeLinejoin="round"
             />
         </svg>
-    );
+    )
 }
 
 export function SVGNotFound() {
@@ -91,7 +91,7 @@ export function SVGNotFound() {
                 className="stroke-current"
             />
         </svg>
-    );
+    )
 }
 
 export function SVGSpinner({ cls = null }) {
@@ -110,7 +110,7 @@ export function SVGSpinner({ cls = null }) {
                 fill="currentFill"
             />
         </svg>
-    );
+    )
 }
 
 export function SVGEllipsis({ cls = null, title }) {
@@ -150,7 +150,7 @@ export function SVGEllipsis({ cls = null, title }) {
                 strokeWidth="2"
             />
         </svg>
-    );
+    )
 }
 
 export function SVGView({ cls = null }) {
@@ -165,5 +165,5 @@ export function SVGView({ cls = null }) {
                 d="M12.406 13.844c1.188 0 2.156 0.969 2.156 2.156s-0.969 2.125-2.156 2.125-2.125-0.938-2.125-2.125 0.938-2.156 2.125-2.156zM12.406 8.531c7.063 0 12.156 6.625 12.156 6.625 0.344 0.438 0.344 1.219 0 1.656 0 0-5.094 6.625-12.156 6.625s-12.156-6.625-12.156-6.625c-0.344-0.438-0.344-1.219 0-1.656 0 0 5.094-6.625 12.156-6.625zM12.406 21.344c2.938 0 5.344-2.406 5.344-5.344s-2.406-5.344-5.344-5.344-5.344 2.406-5.344 5.344 2.406 5.344 5.344 5.344z"
             />
         </svg>
-    );
+    )
 }

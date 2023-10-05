@@ -1,6 +1,6 @@
-import ProfileSideBar from "../components/concrete/other/ProfileSidebar";
-import PostFrame from "../components/container/PostFrame";
-import React from "react";
+import ProfileSideBar from "../components/concrete/other/ProfileSidebar"
+import PostFrame from "../components/container/PostFrame"
+import React from "react"
 
 function Home({ data }) {
     return (
@@ -12,7 +12,7 @@ function Home({ data }) {
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
-export default Home;
+export default Home

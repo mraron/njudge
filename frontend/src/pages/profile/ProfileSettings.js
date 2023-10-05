@@ -1,40 +1,40 @@
-import { useContext, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Checkbox from "../../components/input/Checkbox";
-import TextBox from "../../components/input/TextBox";
-import SVGTitleComponent from "../../components/svg/SVGTitleComponent";
-import RoundedFrame from "../../components/container/RoundedFrame";
-import { changePassword, saveSettings } from "../../util/settings";
-import { routeMap } from "../../config/RouteConfig";
-import UserContext from "../../contexts/user/UserContext";
-import Button from "../../components/util/Button";
+import { useContext, useEffect, useState } from "react"
+import { useNavigate, useParams } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import Checkbox from "../../components/input/Checkbox"
+import TextBox from "../../components/input/TextBox"
+import SVGTitleComponent from "../../components/svg/SVGTitleComponent"
+import RoundedFrame from "../../components/container/RoundedFrame"
+import { changePassword, saveSettings } from "../../util/settings"
+import { routeMap } from "../../config/RouteConfig"
+import UserContext from "../../contexts/user/UserContext"
+import Button from "../../components/util/Button"
 
 function PasswordChangeFrame() {
-    const { t } = useTranslation();
-    const { user } = useParams();
-    const [oldPw, setOldPw] = useState("");
-    const [newPw, setNewPw] = useState("");
-    const [newPwConfirm, setNewPwConfirm] = useState("");
-    const handleChangeOldPw = (newText) => setOldPw(newText);
-    const handleChangeNewPw = (newText) => setNewPw(newText);
-    const handleChangeNewPwConfirm = (newText) => setNewPwConfirm(newText);
+    const { t } = useTranslation()
+    const { user } = useParams()
+    const [oldPw, setOldPw] = useState("")
+    const [newPw, setNewPw] = useState("")
+    const [newPwConfirm, setNewPwConfirm] = useState("")
+    const handleChangeOldPw = (newText) => setOldPw(newText)
+    const handleChangeNewPw = (newText) => setNewPw(newText)
+    const handleChangeNewPwConfirm = (newText) => setNewPwConfirm(newText)
     const titleComponent = (
         <SVGTitleComponent
             svg={<FontAwesomeIcon icon="fa-lock" className="w-4 h-4 mr-3" />}
             title={t("profile_settings.password_change")}
         />
-    );
+    )
     const handleChangePassword = async () => {
         changePassword(user, oldPw, newPw, newPwConfirm).then((resp) => {
             if (resp.success) {
-                window.flash("flash.successful_password_change", "success");
+                window.flash("flash.successful_password_change", "success")
             } else {
-                window.flash(resp.message, "failure");
+                window.flash(resp.message, "failure")
             }
-        });
-    };
+        })
+    }
     return (
         <RoundedFrame titleComponent={titleComponent}>
             <div className="flex flex-col px-6 py-5 sm:px-10 sm:py-8 w-full">
@@ -75,29 +75,29 @@ function PasswordChangeFrame() {
                 </div>
             </div>
         </RoundedFrame>
-    );
+    )
 }
 
 function OtherSettingsFrame({ data }) {
-    const { t } = useTranslation();
-    const { user } = useParams();
-    const [showUnsolved, setShowUnsolved] = useState(data.showUnsolved);
-    const [hideSolved, setHideSolved] = useState(data.hideSolved);
+    const { t } = useTranslation()
+    const { user } = useParams()
+    const [showUnsolved, setShowUnsolved] = useState(data.showUnsolved)
+    const [hideSolved, setHideSolved] = useState(data.hideSolved)
     const titleComponent = (
         <SVGTitleComponent
             svg={<FontAwesomeIcon icon="fa-cog" className="w-4 h-4 mr-3" />}
             title={t("profile_settings.other_settings")}
         />
-    );
+    )
     const handleSaveSettings = async () => {
         saveSettings(user, showUnsolved, hideSolved).then((resp) => {
             if (resp.success) {
-                window.flash(t("flash.successful_settings_save"), "success");
+                window.flash(t("flash.successful_settings_save"), "success")
             } else {
-                window.flash(t("flash.unsuccessful_settings_save"), "failure");
+                window.flash(t("flash.unsuccessful_settings_save"), "failure")
             }
-        });
-    };
+        })
+    }
     return (
         <RoundedFrame titleComponent={titleComponent}>
             <div className="flex flex-col px-6 py-5 sm:px-10 sm:py-8 w-full">
@@ -127,23 +127,23 @@ function OtherSettingsFrame({ data }) {
                 </div>
             </div>
         </RoundedFrame>
-    );
+    )
 }
 
 function ProfileSettings({ data }) {
-    const navigate = useNavigate();
-    const [isVisible, setVisible] = useState(false);
-    const { user } = useParams();
-    const { userData, isLoggedIn } = useContext(UserContext);
+    const navigate = useNavigate()
+    const [isVisible, setVisible] = useState(false)
+    const { user } = useParams()
+    const { userData, isLoggedIn } = useContext(UserContext)
 
     useEffect(() => {
         if (!isLoggedIn || userData.username !== user) {
-            navigate(routeMap.home);
-            window.flash("flash.no_permission", "failure");
+            navigate(routeMap.home)
+            window.flash("flash.no_permission", "failure")
         } else {
-            setVisible(true);
+            setVisible(true)
         }
-    }, []);
+    }, [])
     return (
         isVisible && (
             <div className="flex flex-col lg:flex-row w-full items-start space-y-3 lg:space-y-0 lg:space-x-3">
@@ -155,7 +155,7 @@ function ProfileSettings({ data }) {
                 </div>
             </div>
         )
-    );
+    )
 }
 
-export default ProfileSettings;
+export default ProfileSettings

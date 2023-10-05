@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { SVGDropdownFrameArrow } from "../svg/SVGs";
-import RoundedFrame from "./RoundedFrame";
+import { useState } from "react"
+import { SVGDropdownFrameArrow } from "../svg/SVGs"
+import RoundedFrame from "./RoundedFrame"
 
 function DropdownFrame({ children, title }) {
-    const [isOpen, setOpen] = useState(false);
+    const [isOpen, setOpen] = useState(false)
     return (
         <RoundedFrame>
             <button
@@ -20,7 +20,7 @@ function DropdownFrame({ children, title }) {
                 <div className="border-t border-bordefcol">{children}</div>
             </div>
         </RoundedFrame>
-    );
+    )
 }
 
-export default DropdownFrame;
+export default DropdownFrame

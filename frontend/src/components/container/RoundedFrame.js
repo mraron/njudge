@@ -11,7 +11,7 @@ function RoundedFrame({ children, title, titleComponent, cls = null }) {
                 <div className="w-full min-h-[1rem]">{children}</div>
             </div>
         </div>
-    );
+    )
 }
 
-export default RoundedFrame;
+export default RoundedFrame

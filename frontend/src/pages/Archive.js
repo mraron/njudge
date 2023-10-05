@@ -1,8 +1,8 @@
-import { Link } from "react-router-dom";
-import ProfileSideBar from "../components/concrete/other/ProfileSidebar";
-import DropdownListFrame from "../components/container/DropdownListFrame";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React from "react";
+import { Link } from "react-router-dom"
+import ProfileSideBar from "../components/concrete/other/ProfileSidebar"
+import DropdownListFrame from "../components/container/DropdownListFrame"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import React from "react"
 
 function ProblemLeaf({ data }) {
     return (
@@ -31,7 +31,7 @@ function ProblemLeaf({ data }) {
                 {data.title}
             </Link>
         </span>
-    );
+    )
 }
 
 function Archive({ data }) {
@@ -42,7 +42,7 @@ function Archive({ data }) {
             tree={{ children: item.children }}
             leaf={ProblemLeaf}
         />
-    ));
+    ))
     return (
         <div className="w-full flex justify-center">
             <div className="flex justify-center w-full max-w-7xl lg:space-x-3 px-4">
@@ -52,7 +52,7 @@ function Archive({ data }) {
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
-export default Archive;
+export default Archive

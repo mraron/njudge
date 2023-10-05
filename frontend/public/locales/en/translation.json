@@ -66,6 +66,7 @@
         "page_title": "Submission #{{params.id}} :: njudge"
     },
     "not_found": {
+        "title": "The page is not found",
         "message": "The page is not found. Please check if the entered route is correct.",
         "back_to_home": "Back to the homepage"
     },
@@ -223,6 +224,10 @@
     "problem_ranklist": {
         "page_title": "Ranklist – {{params.problem}} :: njudge",
         "ranklist": "Ranklist"
+    },
+    "ranklist_not_public": {
+        "title": "The ranklist is not public",
+        "message": "The ranklist is not public, so you cannot view it right now."
     },
     "solved_status": {
         "not_tried": "Not tried yet",

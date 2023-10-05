@@ -1,5 +1,5 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClose } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faClose } from "@fortawesome/free-solid-svg-icons"
 
 function Modal({ children, isOpen, onClose }) {
     return (
@@ -26,7 +26,7 @@ function Modal({ children, isOpen, onClose }) {
                 </div>
             )}
         </>
-    );
+    )
 }
 
-export default Modal;
+export default Modal

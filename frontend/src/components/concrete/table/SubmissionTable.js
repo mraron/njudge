@@ -1,9 +1,9 @@
-import { useTranslation } from "react-i18next";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import RoundedTable from "../../container/RoundedTable";
-import { SVGSpinner } from "../../svg/SVGs";
-import CopyableCode from "../../util/copy/CopyableCode";
-import React from "react";
+import { useTranslation } from "react-i18next"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import RoundedTable from "../../container/RoundedTable"
+import { SVGSpinner } from "../../svg/SVGs"
+import CopyableCode from "../../util/copy/CopyableCode"
+import React from "react"
 
 function TestCase13({
     index,
@@ -13,8 +13,8 @@ function TestCase13({
     isLastGroup,
     isLastCase,
 }) {
-    const bottomBorderCase = isLastGroup && isLastCase ? "border-b-0" : "";
-    const bottomBorderGroup = isLastGroup ? "border-b-0" : "";
+    const bottomBorderCase = isLastGroup && isLastCase ? "border-b-0" : ""
+    const bottomBorderGroup = isLastGroup ? "border-b-0" : ""
     return (
         <tr>
             {index === 0 && (
@@ -115,11 +115,11 @@ function TestCase13({
                 {testCase.memory} KiB
             </td>
         </tr>
-    );
+    )
 }
 
 function TestGroup({ group, isLast }) {
-    const testCases = group.testCases;
+    const testCases = group.testCases
     const testCasesContent = testCases.map((testCase, index) => (
         <TestCase13
             index={index}
@@ -130,12 +130,12 @@ function TestGroup({ group, isLast }) {
             isLastGroup={isLast}
             isLastCase={index === testCases.length - 1}
         />
-    ));
-    return <>{testCasesContent}</>;
+    ))
+    return <>{testCasesContent}</>
 }
 
 function TestCase0({ testCase, index }) {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     const titleComponent = (
         <div className="flex flex-col">
             <div className="py-3 px-6 border-b border-bordefcol flex items-center space-x-3">
@@ -185,7 +185,7 @@ function TestCase0({ testCase, index }) {
                 </div>
             </div>
         </div>
-    );
+    )
     const outputRows = [
         ["submission_table.output", testCase.output],
         ["submission_table.expected_output", testCase.expectedOutput],
@@ -202,32 +202,32 @@ function TestCase0({ testCase, index }) {
                 />
             </td>
         </tr>
-    ));
+    ))
     return (
         <RoundedTable titleComponent={titleComponent}>
             <tbody className="divide-y divide-dividecol">{outputRows}</tbody>
         </RoundedTable>
-    );
+    )
 }
 
 function SubmissionTable0({ status }) {
-    const testCases = status.groups?.[0].testCases;
+    const testCases = status.groups?.[0].testCases
     const testCasesContent = testCases?.map((testCase, index) => (
         <TestCase0 testCase={testCase} index={index} key={index} />
-    ));
-    return <div className="space-y-3">{testCasesContent}</div>;
+    ))
+    return <div className="space-y-3">{testCasesContent}</div>
 }
 
 function SubmissionTable13({ status }) {
-    const { t } = useTranslation();
-    const groups = status.groups;
+    const { t } = useTranslation()
+    const groups = status.groups
     const groupsContent = groups.map((group, index) => (
         <TestGroup
             group={group}
             isLast={index === groups.length - 1}
             key={index}
         />
-    ));
+    ))
     return (
         <RoundedTable>
             <thead className="bg-framebgcol">
@@ -242,15 +242,15 @@ function SubmissionTable13({ status }) {
             </thead>
             <tbody>{groupsContent}</tbody>
         </RoundedTable>
-    );
+    )
 }
 function SubmissionTable({ status }) {
     if (status.feedbackType === 0) {
-        return <SubmissionTable0 status={status} />;
+        return <SubmissionTable0 status={status} />
     }
     if ([1, 3].includes(status.feedbackType)) {
-        return <SubmissionTable13 status={status} />;
+        return <SubmissionTable13 status={status} />
     }
 }
 
-export default SubmissionTable;
+export default SubmissionTable

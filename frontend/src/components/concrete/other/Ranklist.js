@@ -1,11 +1,11 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { routeMap } from "../../../config/RouteConfig";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import RoundedTable from "../../container/RoundedTable";
+import React from "react"
+import { Link } from "react-router-dom"
+import { routeMap } from "../../../config/RouteConfig"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import RoundedTable from "../../container/RoundedTable"
 
 function RanklistRow({ result, maxScore, index }) {
-    const { username, score, submissionID, accepted } = result;
+    const { username, score, submissionID, accepted } = result
     return (
         <tr
             className={`divide-x divide-dividecol ${
@@ -40,7 +40,7 @@ function RanklistRow({ result, maxScore, index }) {
                 </div>
             </td>
         </tr>
-    );
+    )
 }
 
 function Ranklist({ ranklist }) {
@@ -51,7 +51,7 @@ function Ranklist({ ranklist }) {
             index={index}
             key={index}
         />
-    ));
+    ))
     return (
         <RoundedTable cls="overflow-hidden">
             <thead className="bg-grey-800">
@@ -64,7 +64,7 @@ function Ranklist({ ranklist }) {
                 {rows}
             </tbody>
         </RoundedTable>
-    );
+    )
 }
 
-export default Ranklist;
+export default Ranklist

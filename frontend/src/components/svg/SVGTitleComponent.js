@@ -4,7 +4,7 @@ function SVGTitleComponent({ title, svg }) {
             {svg}
             <span className="break-words min-w-0">{title}</span>
         </div>
-    );
+    )
 }
 
-export default SVGTitleComponent;
+export default SVGTitleComponent

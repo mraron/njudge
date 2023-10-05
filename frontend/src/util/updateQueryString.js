@@ -1,4 +1,4 @@
-import queryString from "query-string";
+import queryString from "query-string"
 
 function UpdateQueryString({
     location,
@@ -8,22 +8,22 @@ function UpdateQueryString({
     validArgs,
     invalidArgs,
 }) {
-    const qString = location.search;
-    const qData = queryString.parse(qString);
+    const qString = location.search
+    const qData = queryString.parse(qString)
 
     if (args) {
         args.forEach((arg, index) => {
-            qData[arg] = values[index];
-        });
+            qData[arg] = values[index]
+        })
     }
-    let urlNew = `${location.pathname}?${queryString.stringify(qData)}`;
+    let urlNew = `${location.pathname}?${queryString.stringify(qData)}`
     if (validArgs) {
-        urlNew = queryString.pick(urlNew, validArgs);
+        urlNew = queryString.pick(urlNew, validArgs)
     }
     if (invalidArgs) {
-        urlNew = queryString.exclude(urlNew, invalidArgs);
+        urlNew = queryString.exclude(urlNew, invalidArgs)
     }
-    return navigate(urlNew);
+    return navigate(urlNew)
 }
 
-export default UpdateQueryString;
+export default UpdateQueryString

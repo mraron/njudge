@@ -1,30 +1,30 @@
-import { useContext, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import Checkbox from "../../input/Checkbox";
-import Button from "../../util/Button";
-import DropdownFrame from "../../container/DropdownFrame";
-import updateQueryString from "../../../util/updateQueryString";
-import UserContext from "../../../contexts/user/UserContext";
-import queryString from "query-string";
+import { useContext, useState } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import Checkbox from "../../input/Checkbox"
+import Button from "../../util/Button"
+import DropdownFrame from "../../container/DropdownFrame"
+import updateQueryString from "../../../util/updateQueryString"
+import UserContext from "../../../contexts/user/UserContext"
+import queryString from "query-string"
 
 function SubmissionFilter({ optionOwn }) {
-    const { t } = useTranslation();
-    const { isLoggedIn } = useContext(UserContext);
-    const location = useLocation();
-    const navigate = useNavigate();
+    const { t } = useTranslation()
+    const { isLoggedIn } = useContext(UserContext)
+    const location = useLocation()
+    const navigate = useNavigate()
 
-    const qData = queryString.parse(location.search);
-    const [onlyAC, setOnlyAC] = useState(qData["ac"] === "1");
-    const [onlyOwn, setOnlyOwn] = useState(qData["own"] === "1");
+    const qData = queryString.parse(location.search)
+    const [onlyAC, setOnlyAC] = useState(qData["ac"] === "1")
+    const [onlyOwn, setOnlyOwn] = useState(qData["own"] === "1")
 
     const handleReset = () => {
         updateQueryString({
             location: location,
             navigate: navigate,
             validArgs: [],
-        });
-    };
+        })
+    }
     const handleSubmit = () => {
         updateQueryString({
             location: location,
@@ -32,8 +32,8 @@ function SubmissionFilter({ optionOwn }) {
             args: ["ac", "own"],
             values: [onlyAC ? 1 : 0, onlyOwn ? 1 : 0],
             validArgs: ["ac", "own"],
-        });
-    };
+        })
+    }
     return (
         <div className="flex flex-col">
             {isLoggedIn && optionOwn && (
@@ -61,18 +61,18 @@ function SubmissionFilter({ optionOwn }) {
                 </Button>
             </div>
         </div>
-    );
+    )
 }
 
 function SubmissionFilterFrame({ optionOwn = true }) {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     return (
         <DropdownFrame title={t("submission_filter.filter")}>
             <div className="px-8 py-6">
                 <SubmissionFilter optionOwn={optionOwn} />
             </div>
         </DropdownFrame>
-    );
+    )
 }
 
-export default SubmissionFilterFrame;
+export default SubmissionFilterFrame

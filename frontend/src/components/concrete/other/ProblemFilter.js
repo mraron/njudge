@@ -1,63 +1,63 @@
-import { useContext, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import TextBox from "../../input/TextBox";
-import TextBoxDropdown from "../../input/TextBoxDropdown";
-import TagDropdown from "../../input/TagDropdown";
-import DropdownFrame from "../../container/DropdownFrame";
-import updateQueryString from "../../../util/updateQueryString";
-import JudgeDataContext from "../../../contexts/judgeData/JudgeDataContext";
-import queryString from "query-string";
-import { parseInt } from "lodash";
-import Button from "../../util/Button";
+import { useContext, useState } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import TextBox from "../../input/TextBox"
+import TextBoxDropdown from "../../input/TextBoxDropdown"
+import TagDropdown from "../../input/TagDropdown"
+import DropdownFrame from "../../container/DropdownFrame"
+import updateQueryString from "../../../util/updateQueryString"
+import JudgeDataContext from "../../../contexts/judgeData/JudgeDataContext"
+import queryString from "query-string"
+import { parseInt } from "lodash"
+import Button from "../../util/Button"
 
 function ProblemFilter() {
-    const { t } = useTranslation();
-    const { judgeData } = useContext(JudgeDataContext);
-    const location = useLocation();
-    const navigate = useNavigate();
+    const { t } = useTranslation()
+    const { judgeData } = useContext(JudgeDataContext)
+    const location = useLocation()
+    const navigate = useNavigate()
 
     const parseTitle = (title) => {
-        return title ? title : "";
-    };
+        return title ? title : ""
+    }
     const parseCategory = (category) => {
         if (category === undefined) {
-            return -1;
+            return -1
         }
-        const categoryInt = parseInt(category);
+        const categoryInt = parseInt(category)
         return judgeData.categories.findIndex(
             (item) => item.value === categoryInt,
-        );
-    };
+        )
+    }
     const parseTags = (tags) => {
         if (tags === undefined) {
-            return [];
+            return []
         }
-        const tokens = tags.split(",").map(parseInt);
+        const tokens = tags.split(",").map(parseInt)
         if (
             tokens.some(
                 (elem) =>
                     isNaN(elem) || elem <= -1 || elem >= judgeData.tags.length,
             )
         ) {
-            return [];
+            return []
         }
-        return tokens;
-    };
-    const qData = queryString.parse(location.search);
-    const [title, setTitle] = useState(parseTitle(qData.title));
-    const [tags, setTags] = useState(parseTags(qData.tags));
-    const [category, setCategory] = useState(parseCategory(qData.category));
+        return tokens
+    }
+    const qData = queryString.parse(location.search)
+    const [title, setTitle] = useState(parseTitle(qData.title))
+    const [tags, setTags] = useState(parseTags(qData.tags))
+    const [category, setCategory] = useState(parseCategory(qData.category))
 
     const handleTitleChange = (newText) => {
-        setTitle(newText);
-    };
+        setTitle(newText)
+    }
     const handleCategoryChange = (selected, newText) => {
-        setCategory(selected);
-    };
+        setCategory(selected)
+    }
     const handleTagsChange = (tags) => {
-        setTags(tags);
-    };
+        setTags(tags)
+    }
     const handleSubmit = () => {
         updateQueryString({
             location: location,
@@ -69,15 +69,15 @@ function ProblemFilter() {
                 category === -1 ? -1 : judgeData.categories[category].value,
             ],
             validArgs: ["title", "tags", "category"],
-        });
-    };
+        })
+    }
     const handleReset = () => {
         updateQueryString({
             location: location,
             navigate: navigate,
             validArgs: [],
-        });
-    };
+        })
+    }
     return (
         <div className="w-full">
             <div className="space-y-4 mb-5">
@@ -118,18 +118,18 @@ function ProblemFilter() {
                 </Button>
             </div>
         </div>
-    );
+    )
 }
 
 export function ProblemFilterFrame() {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     return (
         <DropdownFrame title={t("problem_filter.filter")}>
             <div className="px-8 py-6">
                 <ProblemFilter />
             </div>
         </DropdownFrame>
-    );
+    )
 }
 
-export default ProblemFilter;
+export default ProblemFilter

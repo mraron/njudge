@@ -1,24 +1,24 @@
-import React, { useContext, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import MapDataFrame from "../../components/container/MapDataFrame";
-import DropdownMenu from "../../components/input/DropdownMenu";
-import RoundedFrame from "../../components/container/RoundedFrame";
-import SVGTitleComponent from "../../components/svg/SVGTitleComponent";
-import { SVGSpinner, SVGView } from "../../components/svg/SVGs";
-import RoundedTable from "../../components/container/RoundedTable";
-import TagModal from "../../components/container/modal/TagModal";
-import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext";
-import ThemeContext from "../../contexts/theme/ThemeContext";
-import submitSolution from "../../util/submitSolution";
-import { apiRoute, routeMap } from "../../config/RouteConfig";
-import Tag from "../../components/util/Tag";
-import Button from "../../components/util/Button";
+import React, { useContext, useState } from "react"
+import { useTranslation } from "react-i18next"
+import { Link, useNavigate, useParams } from "react-router-dom"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import MapDataFrame from "../../components/container/MapDataFrame"
+import DropdownMenu from "../../components/input/DropdownMenu"
+import RoundedFrame from "../../components/container/RoundedFrame"
+import SVGTitleComponent from "../../components/svg/SVGTitleComponent"
+import { SVGSpinner, SVGView } from "../../components/svg/SVGs"
+import RoundedTable from "../../components/container/RoundedTable"
+import TagModal from "../../components/container/modal/TagModal"
+import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext"
+import ThemeContext from "../../contexts/theme/ThemeContext"
+import submitSolution from "../../util/submitSolution"
+import { apiRoute, routeMap } from "../../config/RouteConfig"
+import Tag from "../../components/util/Tag"
+import Button from "../../components/util/Button"
 
 function ProblemInfo({ info }) {
-    const { t } = useTranslation();
-    const [isModalOpen, setModalOpen] = useState(false);
+    const { t } = useTranslation()
+    const [isModalOpen, setModalOpen] = useState(false)
     const tagsContent = (
         <div className="flex-col">
             <div className="flex flex-wrap -m-1">
@@ -39,13 +39,13 @@ function ProblemInfo({ info }) {
                 )}
             </div>
         </div>
-    );
+    )
     const titleComponent = (
         <SVGTitleComponent
             svg={<FontAwesomeIcon icon="fa-info" className="w-4 h-4 mr-3" />}
             title={t("problem_statement.information")}
         />
-    );
+    )
     return (
         <div>
             {info.isSolved && (
@@ -70,16 +70,16 @@ function ProblemInfo({ info }) {
                 labelColWidth="9rem"
             />
         </div>
-    );
+    )
 }
 
 function ProblemSubmit() {
-    const { t } = useTranslation();
-    const { judgeData } = useContext(JudgeDataContext);
-    const { problem, problemset } = useParams();
-    const [file, setFile] = useState(null);
-    const [langIndex, setLangIndex] = useState(0);
-    const navigate = useNavigate();
+    const { t } = useTranslation()
+    const { judgeData } = useContext(JudgeDataContext)
+    const { problem, problemset } = useParams()
+    const [file, setFile] = useState(null)
+    const [langIndex, setLangIndex] = useState(0)
+    const navigate = useNavigate()
     const titleComponent = (
         <SVGTitleComponent
             svg={
@@ -90,14 +90,14 @@ function ProblemSubmit() {
             }
             title={t("problem_statement.submit_solution")}
         />
-    );
+    )
     const handleFileUploaded = (event) => {
-        setFile(event.target.files[0]);
-    };
+        setFile(event.target.files[0])
+    }
     const handleSubmit = () => {
         if (!file) {
-            window.flash("flash.must_choose_file", "failure");
-            return;
+            window.flash("flash.must_choose_file", "failure")
+            return
         }
         submitSolution({
             problemset: problemset,
@@ -106,20 +106,20 @@ function ProblemSubmit() {
             file: file,
         }).then((ok) => {
             if (ok) {
-                window.flash("flash.successful_submission", "success");
+                window.flash("flash.successful_submission", "success")
                 navigate(
                     routeMap.problemSubmissions
                         .replace(":problemset", problemset)
                         .replace(":problem", problem),
-                );
+                )
             } else {
-                window.flash("flash.unsuccessful_submission", "failure");
+                window.flash("flash.unsuccessful_submission", "failure")
             }
-        });
-    };
+        })
+    }
     const handleLanguageChanged = (index) => {
-        setLangIndex(index);
-    };
+        setLangIndex(index)
+    }
     return (
         <RoundedFrame titleComponent={titleComponent}>
             <div className="px-6 py-5">
@@ -162,11 +162,11 @@ function ProblemSubmit() {
                 </div>
             </div>
         </RoundedFrame>
-    );
+    )
 }
 
 function ProblemLastSubmissions({ submissions, maxScore }) {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     const titleComponent = (
         <SVGTitleComponent
             svg={
@@ -177,7 +177,7 @@ function ProblemLastSubmissions({ submissions, maxScore }) {
             }
             title={t("problem_statement.last_submissions")}
         />
-    );
+    )
     const rows = submissions.map((item, index) => (
         <tr className="divide-x divide-dividecol" key={index}>
             <td className=" w-0">
@@ -219,16 +219,16 @@ function ProblemLastSubmissions({ submissions, maxScore }) {
                 </span>
             </td>
         </tr>
-    ));
+    ))
     return (
         <RoundedTable titleComponent={titleComponent}>
             <tbody className="divide-y divide-dividecol">{rows}</tbody>
         </RoundedTable>
-    );
+    )
 }
 
 function ProblemAttachment({ type, name, href }) {
-    const { t } = useTranslation();
+    const { t } = useTranslation()
     return (
         <li>
             <a
@@ -257,12 +257,12 @@ function ProblemAttachment({ type, name, href }) {
                 </span>
             </a>
         </li>
-    );
+    )
 }
 
 function ProblemAttachments({ attachments }) {
-    const { t } = useTranslation();
-    console.log(attachments.statements);
+    const { t } = useTranslation()
+    console.log(attachments.statements)
     const attachmentsContent = attachments.statements
         .map((item, index) => (
             <ProblemAttachment
@@ -281,7 +281,7 @@ function ProblemAttachments({ attachments }) {
                     href={item.href}
                 />
             )),
-        );
+        )
     const titleComponent = (
         <SVGTitleComponent
             svg={
@@ -289,21 +289,21 @@ function ProblemAttachments({ attachments }) {
             }
             title={t("problem_statement.attachments")}
         />
-    );
+    )
     return (
         <RoundedFrame titleComponent={titleComponent}>
             <div className="px-6 py-5">
                 <ul>{attachmentsContent}</ul>
             </div>
         </RoundedFrame>
-    );
+    )
 }
 
 function ProblemStatement({ data }) {
-    const { theme } = useContext(ThemeContext);
-    const [statementIndex, setStatementIndex] = useState(0);
-    const statementSrc = data.attachments.statements[statementIndex].href;
-    const statementType = data.attachments.statements[statementIndex].type;
+    const { theme } = useContext(ThemeContext)
+    const [statementIndex, setStatementIndex] = useState(0)
+    const statementSrc = data.attachments.statements[statementIndex].href
+    const statementType = data.attachments.statements[statementIndex].type
     return (
         <div className="flex flex-col lg:flex-row space-y-3 lg:space-y-0 lg:space-x-3">
             <div className="w-full flex flex-col min-w-0 space-y-2">
@@ -360,7 +360,7 @@ function ProblemStatement({ data }) {
                 <ProblemAttachments attachments={data.attachments} />
             </div>
         </div>
-    );
+    )
 }
 
-export default ProblemStatement;
+export default ProblemStatement

@@ -1,22 +1,22 @@
-import { apiRoute } from "../config/RouteConfig";
-import fetchWithCredentials from "./fetchWithCredentials";
+import { apiRoute } from "../config/RouteConfig"
+import fetchWithCredentials from "./fetchWithCredentials"
 
 export async function getLanguages() {
-    const response = await fetchWithCredentials(apiRoute("/data/languages/"));
-    const data = await response.json();
-    return { ...data, success: response.ok };
+    const response = await fetchWithCredentials(apiRoute("/data/languages/"))
+    const data = await response.json()
+    return { ...data, success: response.ok }
 }
 
 export async function getCategories() {
-    const response = await fetchWithCredentials(apiRoute("/data/categories/"));
-    const data = await response.json();
-    return { ...data, success: response.ok };
+    const response = await fetchWithCredentials(apiRoute("/data/categories/"))
+    const data = await response.json()
+    return { ...data, success: response.ok }
 }
 
 export async function getTags() {
-    const response = await fetchWithCredentials(apiRoute("/data/tags/"));
-    const data = await response.json();
-    return { ...data, success: response.ok };
+    const response = await fetchWithCredentials(apiRoute("/data/tags/"))
+    const data = await response.json()
+    return { ...data, success: response.ok }
 }
 
 export function getHighlightCodes() {
@@ -27,5 +27,5 @@ export function getHighlightCodes() {
         cs: "cs",
         java: "java",
         python3: "python",
-    };
+    }
 }

@@ -1,63 +1,63 @@
-import { useContext, useEffect } from "react";
-import { BrowserRouter as Router } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import { useContext, useEffect } from "react"
+import { BrowserRouter as Router } from "react-router-dom"
+import { AnimatePresence, motion } from "framer-motion"
 
-import RoutingComponent from "./RoutingComponent";
-import FlashContainer from "./components/util/flash/Flash";
-import Menubar from "./components/concrete/other/Menubar";
-import FlashEvent from "./components/util/flash/FlashEvent";
+import RoutingComponent from "./RoutingComponent"
+import FlashContainer from "./components/util/flash/Flash"
+import Menubar from "./components/concrete/other/Menubar"
+import FlashEvent from "./components/util/flash/FlashEvent"
 
 import {
     getCategories,
     getHighlightCodes,
     getLanguages,
     getTags,
-} from "./util/getJudgeData";
+} from "./util/getJudgeData"
 
-import JudgeDataContext from "./contexts/judgeData/JudgeDataContext";
+import JudgeDataContext from "./contexts/judgeData/JudgeDataContext"
 
 window.flash = (message, type = "success") =>
-    FlashEvent.emit("flash", { message, type });
+    FlashEvent.emit("flash", { message, type })
 
 function App() {
-    const { setJudgeData, allLoaded } = useContext(JudgeDataContext);
+    const { setJudgeData, allLoaded } = useContext(JudgeDataContext)
 
     useEffect(() => {
         const fetchWithCredentialsJudgeData = async () => {
             await getLanguages().then((resp) => {
                 if (resp.success) {
                     setJudgeData((prevJudgeData) => {
-                        return { ...prevJudgeData, languages: resp.languages };
-                    });
+                        return { ...prevJudgeData, languages: resp.languages }
+                    })
                 }
-            });
+            })
             await getCategories().then((resp) => {
                 if (resp.success) {
                     setJudgeData((prevJudgeData) => {
                         return {
                             ...prevJudgeData,
                             categories: resp.categories,
-                        };
-                    });
+                        }
+                    })
                 }
-            });
+            })
             await getTags().then((resp) => {
                 if (resp.success) {
                     setJudgeData((prevJudgeData) => {
-                        return { ...prevJudgeData, tags: resp.tags };
-                    });
+                        return { ...prevJudgeData, tags: resp.tags }
+                    })
                 }
-            });
-        };
+            })
+        }
         fetchWithCredentialsJudgeData().then(
             setJudgeData((prevJudgeData) => {
                 return {
                     ...prevJudgeData,
                     highlightCodes: getHighlightCodes(),
-                };
+                }
             }),
-        );
-    }, []);
+        )
+    }, [])
 
     return (
         <AnimatePresence>
@@ -80,7 +80,7 @@ function App() {
                 )}
             </motion.div>
         </AnimatePresence>
-    );
+    )
 }
 
-export default App;
+export default App

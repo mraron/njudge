@@ -1,20 +1,20 @@
-import { useContext, useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import RoundedFrame from "../../components/container/RoundedFrame";
-import TextBox from "../../components/input/TextBox";
-import SVGTitleComponent from "../../components/svg/SVGTitleComponent";
-import { login } from "../../util/auth";
-import { routeMap } from "../../config/RouteConfig";
-import UserContext from "../../contexts/user/UserContext";
-import Button from "../../components/util/Button";
+import { useContext, useState } from "react"
+import { Link, Navigate, useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import RoundedFrame from "../../components/container/RoundedFrame"
+import TextBox from "../../components/input/TextBox"
+import SVGTitleComponent from "../../components/svg/SVGTitleComponent"
+import { login } from "../../util/auth"
+import { routeMap } from "../../config/RouteConfig"
+import UserContext from "../../contexts/user/UserContext"
+import Button from "../../components/util/Button"
 
 function LoginFrame() {
-    const { t } = useTranslation();
-    const navigate = useNavigate();
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    const { t } = useTranslation()
+    const navigate = useNavigate()
+    const [username, setUsername] = useState("")
+    const [password, setPassword] = useState("")
     const titleComponent = (
         <SVGTitleComponent
             svg={
@@ -25,18 +25,18 @@ function LoginFrame() {
             }
             title={t("login.login")}
         />
-    );
+    )
     const handleLogin = (event) => {
-        event.preventDefault();
+        event.preventDefault()
         login(username, password).then((resp) => {
             if (resp.success) {
-                window.flash("flash.successful_login", "success");
-                navigate(routeMap.home);
+                window.flash("flash.successful_login", "success")
+                navigate(routeMap.home)
             } else {
-                window.flash("flash.unsuccessful_login", "failure");
+                window.flash("flash.unsuccessful_login", "failure")
             }
-        });
-    };
+        })
+    }
     return (
         <RoundedFrame titleComponent={titleComponent}>
             <div className="px-10 py-8">
@@ -80,11 +80,11 @@ function LoginFrame() {
                 </form>
             </div>
         </RoundedFrame>
-    );
+    )
 }
 
 function Login() {
-    const { userData, isLoggedIn } = useContext(UserContext);
+    const { userData, isLoggedIn } = useContext(UserContext)
     if (isLoggedIn) {
         return (
             <Navigate
@@ -93,7 +93,7 @@ function Login() {
                     encodeURIComponent(userData.username),
                 )}
             />
-        );
+        )
     }
     return (
         <div className="w-full flex justify-center">
@@ -103,7 +103,7 @@ function Login() {
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
-export default Login;
+export default Login

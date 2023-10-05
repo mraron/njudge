@@ -1,22 +1,22 @@
-import { useTranslation } from "react-i18next";
-import { Link, Navigate, useNavigate } from "react-router-dom";
-import { useContext, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import RoundedFrame from "../../components/container/RoundedFrame";
-import TextBox from "../../components/input/TextBox";
-import SVGTitleComponent from "../../components/svg/SVGTitleComponent";
-import { routeMap } from "../../config/RouteConfig";
-import { register } from "../../util/auth";
-import UserContext from "../../contexts/user/UserContext";
-import Button from "../../components/util/Button";
+import { useTranslation } from "react-i18next"
+import { Link, Navigate, useNavigate } from "react-router-dom"
+import { useContext, useState } from "react"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import RoundedFrame from "../../components/container/RoundedFrame"
+import TextBox from "../../components/input/TextBox"
+import SVGTitleComponent from "../../components/svg/SVGTitleComponent"
+import { routeMap } from "../../config/RouteConfig"
+import { register } from "../../util/auth"
+import UserContext from "../../contexts/user/UserContext"
+import Button from "../../components/util/Button"
 
 function RegisterFrame() {
-    const { t } = useTranslation();
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [passwordConfirm, setPasswordConfirm] = useState("");
-    const [email, setEmail] = useState("");
-    const navigate = useNavigate();
+    const { t } = useTranslation()
+    const [username, setUsername] = useState("")
+    const [password, setPassword] = useState("")
+    const [passwordConfirm, setPasswordConfirm] = useState("")
+    const [email, setEmail] = useState("")
+    const navigate = useNavigate()
     const titleComponent = (
         <SVGTitleComponent
             svg={
@@ -24,18 +24,18 @@ function RegisterFrame() {
             }
             title={t("register.register")}
         />
-    );
+    )
     const handleRegister = (event) => {
-        event.preventDefault();
+        event.preventDefault()
         register(username, email, password, passwordConfirm).then((resp) => {
             if (resp.success) {
-                window.flash("flash.successful_registration", "success");
-                navigate(routeMap.home);
+                window.flash("flash.successful_registration", "success")
+                navigate(routeMap.home)
             } else {
-                window.flash(resp.message, "failure");
+                window.flash(resp.message, "failure")
             }
-        });
-    };
+        })
+    }
     return (
         <RoundedFrame titleComponent={titleComponent}>
             <div className="px-10 py-8">
@@ -92,11 +92,11 @@ function RegisterFrame() {
                 </form>
             </div>
         </RoundedFrame>
-    );
+    )
 }
 
 function Register() {
-    const { userData, isLoggedIn } = useContext(UserContext);
+    const { userData, isLoggedIn } = useContext(UserContext)
     if (isLoggedIn) {
         return (
             <Navigate
@@ -105,7 +105,7 @@ function Register() {
                     encodeURIComponent(userData.username),
                 )}
             />
-        );
+        )
     }
     return (
         <div className="w-full flex justify-center">
@@ -115,7 +115,7 @@ function Register() {
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
-export default Register;
+export default Register

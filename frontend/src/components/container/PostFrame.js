@@ -1,9 +1,9 @@
-import { useState } from "react";
-import RoundedFrame from "./RoundedFrame";
+import { useState } from "react"
+import RoundedFrame from "./RoundedFrame"
 
 function PostItem({ post }) {
-    const [truncated, setTruncated] = useState(true);
-    const { title, content, date } = post;
+    const [truncated, setTruncated] = useState(true)
+    const { title, content, date } = post
     return (
         <RoundedFrame>
             <div
@@ -23,14 +23,14 @@ function PostItem({ post }) {
                 </div>
             </div>
         </RoundedFrame>
-    );
+    )
 }
 
 function PostFrame({ posts }) {
     const newsItems = posts.map((item, index) => (
         <PostItem post={item} key={index} />
-    ));
-    return <div className="space-y-3">{newsItems}</div>;
+    ))
+    return <div className="space-y-3">{newsItems}</div>
 }
 
-export default PostFrame;
+export default PostFrame

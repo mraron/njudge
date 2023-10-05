@@ -1,6 +1,6 @@
-import { authenticate } from "./auth";
-import { apiRoute } from "../config/RouteConfig";
-import fetchWithCredentials from "./fetchWithCredentials";
+import { authenticate } from "./auth"
+import { apiRoute } from "../config/RouteConfig"
+import fetchWithCredentials from "./fetchWithCredentials"
 
 export async function updatePageData(
     location,
@@ -9,21 +9,21 @@ export async function updatePageData(
     isMounted,
 ) {
     try {
-        const fullPath = location.pathname + location.search;
+        const fullPath = location.pathname + location.search
         const response = await fetchWithCredentials(apiRoute(fullPath), {
             signal: abortController.signal,
-        });
-        const newData = await response.json();
+        })
+        const newData = await response.json()
 
         if (!response.ok) {
-            console.error("Network response was not ok.");
-            return;
+            console.error("Network response was not ok.")
+            return
         }
         if (isMounted()) {
-            setData(newData);
+            setData(newData)
         }
     } catch (error) {
-        console.error(error);
+        console.error(error)
     }
 }
 
@@ -35,10 +35,10 @@ export async function updateData(
     setLoggedIn,
     isMounted,
 ) {
-    const response = await authenticate();
+    const response = await authenticate()
     if (response !== undefined) {
-        setUserData(response);
-        setLoggedIn(response !== null);
+        setUserData(response)
+        setLoggedIn(response !== null)
     }
-    await updatePageData(location, abortController, setData, isMounted);
+    await updatePageData(location, abortController, setData, isMounted)
 }
