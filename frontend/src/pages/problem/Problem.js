@@ -16,7 +16,7 @@ const routePatterns = [
     routeMap.problemRanklist,
 ];
 
-function Problem({ data }) {
+function Problem() {
     const { t } = useTranslation();
     const { problem, problemset } = useParams();
     const routes = routePatterns.map((item) =>

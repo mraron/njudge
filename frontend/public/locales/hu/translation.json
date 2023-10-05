@@ -31,6 +31,9 @@
         "title": "Cím",
         "status": "Státusz"
     },
+    "contest_ranklist": {
+        "username": "Felhasználónév"
+    },
     "login": {
         "page_title": "Belépés :: njudge",
         "login": "Belépés",

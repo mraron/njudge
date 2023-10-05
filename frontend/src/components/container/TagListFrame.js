@@ -5,7 +5,7 @@ import Tag from "../util/Tag";
 
 export function DefaultTag({ data }) {
     const { t } = useTranslation();
-    return <Tag cls="w-28 justify-center">{t(data)}</Tag>;
+    return <Tag cls="w-28 justify-center">{data}</Tag>;
 }
 
 export function LinkTag({ data }) {
@@ -15,7 +15,7 @@ export function LinkTag({ data }) {
             <Tag
                 cls="w-28 justify-center hover:bg-indigo-200 hover:border-indigo-400 dark:hover:bg-indigo-800 dark:hover:bg-indigo-600"
                 addMargin={false}>
-                {t(data.text)}
+                {data.text}
             </Tag>
         </Link>
     );

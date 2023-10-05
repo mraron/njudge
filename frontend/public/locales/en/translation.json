@@ -31,6 +31,9 @@
         "title": "Title",
         "status": "Status"
     },
+    "contest_ranklist": {
+        "username": "Username"
+    },
     "login": {
         "page_title": "Login :: njudge",
         "login": "Login",

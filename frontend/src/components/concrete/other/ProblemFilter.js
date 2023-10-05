@@ -80,15 +80,13 @@ function ProblemFilter() {
     };
     return (
         <div className="w-full">
-            <div className="mb-4">
+            <div className="space-y-4 mb-5">
                 <TextBox
                     id="filterTitle"
                     label={t("problem_filter.title")}
                     initText={title}
                     onChange={handleTitleChange}
                 />
-            </div>
-            <div className="mb-4">
                 <TagDropdown
                     id="filterTags"
                     label={t("problem_filter.tags")}
@@ -97,8 +95,6 @@ function ProblemFilter() {
                     initTags={tags}
                     onChange={handleTagsChange}
                 />
-            </div>
-            <div className="mb-5">
                 <TextBoxDropdown
                     id="filterCategory"
                     label={t("problem_filter.category")}

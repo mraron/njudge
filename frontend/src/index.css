@@ -135,7 +135,6 @@
 }
 
 .font-code {
-    @apply font-mono text-sm;
     font-size: 0.85rem;
     font-family: "Roboto Mono", monospace;
 }

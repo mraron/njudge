@@ -1,9 +1,15 @@
 import RoundedTable from "../../components/container/RoundedTable";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { routeMap } from "../../config/RouteConfig";
 import Pagination from "../../components/util/Pagination";
 import DropdownFrame from "../../components/container/DropdownFrame";
+import TextBox from "../../components/input/TextBox";
+import { useTranslation } from "react-i18next";
+import Button from "../../components/util/Button";
+import updateQueryString from "../../util/updateQueryString";
+import { useState } from "react";
+import queryString from "query-string";
 
 function RanklistRow(data) {
     const { place, name, score, verdicts } = data.result;
@@ -52,7 +58,53 @@ function RanklistRow(data) {
     );
 }
 
+function RanklistFilter() {
+    const { t } = useTranslation();
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const qData = queryString.parse(location.search);
+    const [username, setUsername] = useState(qData["user"]);
+    const handleSubmit = () => {
+        updateQueryString({
+            location: location,
+            navigate: navigate,
+            args: ["user"],
+            values: [username],
+            validArgs: ["user"],
+        });
+    };
+    const handleReset = () => {
+        updateQueryString({
+            location: location,
+            navigate: navigate,
+            validArgs: [],
+        });
+    };
+    return (
+        <div>
+            <div className="flex flex-col space-y-4 mb-5">
+                <TextBox
+                    id="filterName"
+                    label={t("contest_ranklist.username")}
+                    initText={username}
+                    onChange={setUsername}
+                />
+            </div>
+            <div className="flex justify-center space-x-2">
+                <Button color="indigo" minWidth="8rem" onClick={handleSubmit}>
+                    {t("problem_filter.search")}
+                </Button>
+                <Button color="gray" minWidth="8rem" onClick={handleReset}>
+                    {t("problem_filter.reset")}
+                </Button>
+            </div>
+        </div>
+    );
+}
+
 function ContestRanklist({ data }) {
+    const { t } = useTranslation();
     const ranklistContent = data.ranklist.map((item, index) => (
         <RanklistRow result={item} index={index} key={index} />
     ));
@@ -65,12 +117,16 @@ function ContestRanklist({ data }) {
     ));
     return (
         <div className="space-y-2">
-            <DropdownFrame title="Szűrés">...</DropdownFrame>
+            <DropdownFrame title="Szűrés">
+                <div className="px-8 py-6">
+                    <RanklistFilter />
+                </div>
+            </DropdownFrame>
             <RoundedTable>
                 <thead className="bg-grey-800">
                     <tr className="divide-x divide-dividecol">
                         <th className="w-0">#</th>
-                        <th>Név</th>
+                        <th>{t("contest_ranklist.username")}</th>
                         <th className="w-0">=</th>
                         {problemsContent}
                     </tr>

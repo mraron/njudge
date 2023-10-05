@@ -6,7 +6,7 @@ import UserContext from "../../contexts/user/UserContext";
 import TabFrame from "../../components/container/TabFrame";
 
 function Profile() {
-    const { t } = useTranslation();
+    console.log("nigga");
     let routeLabels = [
         "profile.profile",
         "profile.submissions",
@@ -17,6 +17,7 @@ function Profile() {
         routeMap.profileSubmissions,
         routeMap.profileSettings,
     ];
+    const { t } = useTranslation();
     const { user } = useParams();
     const { userData, isLoggedIn } = useContext(UserContext);
     const routes = routePatterns.map((item) => item.replace(":user", user));

@@ -1,46 +1,38 @@
 import { useTranslation } from "react-i18next";
 import RoundedFrame from "../../container/RoundedFrame";
 import Button from "../../util/Button";
+import { Link } from "react-router-dom";
 
-function ContestFrame({ name, date, active }) {
+function ContestFrame({ contest }) {
     const { t } = useTranslation();
-    const buttons = [
-        <Button key={0} color="gray">
-            {t("contests.view")}
-        </Button>,
-    ];
-    if (active) {
-        buttons.push(
-            <Button color="indigo" key={buttons.length}>
-                {t("contests.register")}
-            </Button>,
-        );
-    }
+    const { name, href, date, active } = contest;
     return (
         <RoundedFrame>
             <div className="px-6 py-5 sm:px-10 sm:py-8">
-                <div className="flex justify-between items-start space-x-4">
+                <div className="flex justify-between items-start space-x-4 mb-2">
                     <span className="text-base emph-strong break-words min-w-0">
                         {name}
                     </span>
                     <span className="date-label">{date}</span>
                 </div>
-                <div className="mt-2 flex space-x-2">{buttons}</div>
+                <div className="flex space-x-2">
+                    <Link to={href}>
+                        <Button color="gray">{t("contests.view")}</Button>
+                    </Link>
+                    {active && (
+                        <Button color="indigo">{t("contests.register")}</Button>
+                    )}
+                </div>
             </div>
         </RoundedFrame>
     );
 }
 
-function ContestList({ contestData }) {
-    const contestItems = contestData.map((data, index) => (
-        <ContestFrame
-            key={index}
-            name={data[0]}
-            date={data[1]}
-            active={data[2]}
-        />
+function ContestList({ contests }) {
+    const contestsContent = contests.map((item, index) => (
+        <ContestFrame key={index} contest={item} />
     ));
-    return <div className="space-y-3">{contestItems}</div>;
+    return <div className="space-y-3">{contestsContent}</div>;
 }
 
 export default ContestList;
