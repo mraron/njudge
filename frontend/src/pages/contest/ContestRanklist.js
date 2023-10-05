@@ -1,16 +1,15 @@
-import RoundedTable from "../../components/container/RoundedTable"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { useEffect, useState } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { routeMap } from "../../config/RouteConfig"
+import RoundedTable from "../../components/container/RoundedTable"
 import Pagination from "../../components/util/Pagination"
 import DropdownFrame from "../../components/container/DropdownFrame"
 import TextBox from "../../components/input/TextBox"
-import { useTranslation } from "react-i18next"
 import Button from "../../components/util/Button"
 import updateQueryString from "../../util/updateQueryString"
-import { useState } from "react"
 import queryString from "query-string"
-import RanklistNotPublic from "../../components/concrete/other/RanklistNotPublic"
 
 function RanklistRow(data) {
     const { place, name, score, verdicts } = data.result
@@ -106,6 +105,8 @@ function RanklistFilter() {
 
 function ContestRanklist({ data }) {
     const { t } = useTranslation()
+    const navigate = useNavigate()
+
     const ranklistContent = data.ranklist.map((item, index) => (
         <RanklistRow result={item} index={index} key={index} />
     ))
@@ -116,33 +117,36 @@ function ContestRanklist({ data }) {
             </Link>
         </th>
     ))
+    useEffect(() => {
+        if (!data.isPublic) {
+            window.flash("flash.ranklist_not_public", "failure")
+            navigate(-1)
+        }
+    })
     return (
-        <>
-            {data.isPublic && (
-                <div className="space-y-2">
-                    <DropdownFrame title="Szűrés">
-                        <div className="px-8 py-6">
-                            <RanklistFilter />
-                        </div>
-                    </DropdownFrame>
-                    <RoundedTable>
-                        <thead className="bg-grey-800">
-                            <tr className="divide-x divide-dividecol">
-                                <th className="w-0">#</th>
-                                <th>{t("contest_ranklist.username")}</th>
-                                <th className="w-0">=</th>
-                                {problemsContent}
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-dividecol">
-                            {ranklistContent}
-                        </tbody>
-                    </RoundedTable>
-                    <Pagination paginationData={data.paginationData} />
-                </div>
-            )}
-            {!data.isPublic && <RanklistNotPublic />}
-        </>
+        data.isPublic && (
+            <div className="space-y-2">
+                <DropdownFrame title="Szűrés">
+                    <div className="px-8 py-6">
+                        <RanklistFilter />
+                    </div>
+                </DropdownFrame>
+                <RoundedTable>
+                    <thead className="bg-grey-800">
+                        <tr className="divide-x divide-dividecol">
+                            <th className="w-0">#</th>
+                            <th>{t("contest_ranklist.username")}</th>
+                            <th className="w-0">=</th>
+                            {problemsContent}
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-dividecol">
+                        {ranklistContent}
+                    </tbody>
+                </RoundedTable>
+                <Pagination paginationData={data.paginationData} />
+            </div>
+        )
     )
 }
 

@@ -87,7 +87,8 @@
         "unsuccessful_settings_save": "A beállítások mentése nem sikerült.",
         "successful_password_change": "A jelszóváltoztatás sikeres volt.",
         "unsuccessful_email_pw_change": "A jelszóváltoztató e-mail elküldése nem sikerült.",
-        "successful_email_pw_change": "A jelszóváltoztató e-mail sikeresen elküldve."
+        "successful_email_pw_change": "A jelszóváltoztató e-mail sikeresen elküldve.",
+        "ranklist_not_public": "Az eredmények nem publikusak."
     },
     "tag_modal": {
         "title": "Címkék módosítása",
@@ -227,10 +228,6 @@
     "problem_ranklist": {
         "page_title": "Eredmények – {{params.problem}} :: njudge",
         "ranklist": "Eredmények"
-    },
-    "ranklist_not_public": {
-        "title": "Az eredmények nem publikusak",
-        "message": "Az eredmények egyelőre nem publikusak, így nem tudod őket megtekinteni."
     },
     "solved_status": {
         "not_tried": "Nem próbáltad",
