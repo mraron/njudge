@@ -17,7 +17,9 @@
         "page_title": "Feladatok :: njudge"
     },
     "info": {
-        "page_title": "Tudnivalók :: njudge",
+        "page_title": "Információ :: njudge",
+        "info": "Információk",
+        "contests": "Versenyek",
         "successful_copy": "A szöveg a vágólapra lett másolva.",
         "compiler_options": "Fordítási és futtatási opciók"
     },
@@ -135,15 +137,19 @@
         "title": "Cím",
         "tags": "Címkék",
         "category": "Kategória",
-        "search": "Keres",
-        "reset": "Visszaállít"
+        "search": "Szűrés",
+        "reset": "Visszaállítás"
     },
     "submission_filter": {
         "filter": "Szűrés",
         "full_solutions": "Csak teljes megoldások",
         "own_solutions": "Csak saját megoldások",
-        "search": "Keres",
-        "reset": "Visszaállít"
+        "reset": "Visszaállítás"
+    },
+    "ranklist_filter": {
+        "filter": "Szűrés",
+        "reset": "Visszaállítás",
+        "username": "Felhasználónév"
     },
     "submissions_table": {
         "id": "ID",
@@ -227,7 +233,9 @@
     },
     "problem_ranklist": {
         "page_title": "Eredmények – {{params.problem}} :: njudge",
-        "ranklist": "Eredmények"
+        "ranklist": "Eredmények",
+        "username": "Felhasználónév",
+        "result": "Eredmény"
     },
     "solved_status": {
         "not_tried": "Nem próbáltad",

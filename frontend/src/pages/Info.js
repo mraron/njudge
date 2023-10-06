@@ -3,42 +3,37 @@ import ProfileSideBar from "../components/concrete/other/ProfileSidebar"
 import RoundedTable from "../components/container/RoundedTable"
 import CopyableCommand from "../components/util/copy/CopyableCommand"
 import React from "react"
-
-function CompilerOption({ lang, command }) {
-    return (
-        <tr className={`divide-x divide-dividecol`}>
-            <td className="whitespace-nowrap w-32 text-center">{lang}</td>
-            <td className="p-0" style={{ maxWidth: 0 }}>
-                <CopyableCommand text={command} cls="border-0 rounded-none" />
-            </td>
-        </tr>
-    )
-}
+import { Link } from "react-router-dom"
+import SVGTitleComponent from "../components/svg/SVGTitleComponent"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 function InfoTable() {
     const { t } = useTranslation()
-    const compilerOptions = [
-        ["C++", "g++ -std=c++<verzió> -O2 -static -DONLINE_JUDGE main.cpp"],
-        ["C#", "/usr/bin/mcs -out:main.exe -optimize+ main.cs"],
-        ["Go", "/usr/bin/gccgo main.go"],
-        ["Java", "/usr/bin/javac main.java"],
-        ["Pascal", "/usr/bin/fpc -Mobjfpc -O2 -Xss main.pas"],
-        ["PyPy3", "/usr/bin/pypy3 main.py"],
-        ["Python3", "/usr/bin/python3 main.py"],
-    ]
-    const compilerOptionElems = compilerOptions.map((item, index) => (
-        <CompilerOption lang={item[0]} command={item[1]} key={index} />
-    ))
+    const titleComponent = (
+        <SVGTitleComponent
+            svg={<FontAwesomeIcon icon="fa-info" className="w-4 h-4 mr-3" />}
+            title={t("info.info")}
+        />
+    )
     return (
-        <RoundedTable title={t("info.compiler_options")}>
-            <thead className="bg-framebgcol">
-                <tr className="divide-x divide-bordefcol">
-                    <th>Nyelv</th>
-                    <th>Parancs</th>
-                </tr>
-            </thead>
+        <RoundedTable titleComponent={titleComponent}>
             <tbody className="divide-y divide-dividecol text-sm">
-                {compilerOptionElems}
+                <tr className="divide-x divide-dividecol">
+                    <td>{t("info.compiler_options")}</td>
+                    <td>
+                        <Link to="#" className="link">
+                            options.pdf
+                        </Link>
+                    </td>
+                </tr>
+                <tr className="divide-x divide-dividecol">
+                    <td>{t("info.contests")}</td>
+                    <td>
+                        <Link to="#" className="link">
+                            contests.pdf
+                        </Link>
+                    </td>
+                </tr>
             </tbody>
         </RoundedTable>
     )

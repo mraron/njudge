@@ -111,7 +111,7 @@ function ProblemFilter() {
             </div>
             <div className="flex justify-center space-x-2">
                 <Button color="indigo" minWidth="8rem" onClick={handleSubmit}>
-                    {t("problem_filter.search")}
+                    {t("problem_filter.filter")}
                 </Button>
                 <Button color="gray" minWidth="8rem" onClick={handleReset}>
                     {t("problem_filter.reset")}

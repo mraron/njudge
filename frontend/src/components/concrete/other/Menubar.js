@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, useState } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { DropdownRoutes } from "../../input/DropdownMenu"
+import { DefaultDropdownButton, DropdownRoutes } from "../../input/DropdownMenu"
 import { SVGDropdownMenuArrow } from "../../svg/SVGs"
 import { findRouteIndex } from "../../../util/findRouteIndex"
 import { routeMap } from "../../../config/RouteConfig"
@@ -49,21 +49,14 @@ function getProfileDropdownButton(isLoggedIn) {
     function ProfileDropdownButton({ isOpen, onClick }) {
         const { t } = useTranslation()
         return (
-            <button
-                className={`border border-bordefcol rounded-tl-md rounded-bl-md flex items-center justify-between px-3 py-2 w-full h-full ${
-                    isOpen
-                        ? "bg-grey-775 hover:bg-grey-725"
-                        : "bg-grey-850 hover:bg-framebgcol"
-                }`}
-                onClick={onClick}>
-                <span className="text-left">
-                    {isLoggedIn ? t("menubar.profile") : t("menubar.login")}
-                </span>
-                <SVGDropdownMenuArrow isOpen={isOpen} />
-            </button>
+            <DefaultDropdownButton
+                label={isLoggedIn ? t("menubar.profile") : t("menubar.login")}
+                isOpen={isOpen}
+                onClick={onClick}
+                cls="rounded-r-none"
+            />
         )
     }
-
     return ProfileDropdownButton
 }
 

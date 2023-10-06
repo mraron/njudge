@@ -48,7 +48,7 @@ function Submission({ data }) {
                         <DropdownFrame title="Kezelés">
                             <div className="px-4 py-3 sm:px-6 sm:py-5 flex items-center justify-center space-x-2">
                                 <Button color="indigo" minWidth="8rem">
-                                    Újfafordít
+                                    Újrafordít
                                 </Button>
                                 <Button color="gray" minWidth="8rem">
                                     Újraértékel

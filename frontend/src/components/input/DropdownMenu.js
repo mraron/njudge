@@ -13,13 +13,18 @@ function DropdownItem({ name, onClick }) {
     )
 }
 
-function DefaultDropdownButton({ label, isOpen, onClick }) {
+export function DefaultDropdownButton({
+    label,
+    isOpen,
+    onClick,
+    cls,
+    clsOpen = "bg-grey-775 hover:bg-grey-750",
+    clsClosed = "bg-grey-850 hover:bg-grey-825",
+}) {
     return (
         <button
-            className={`w-full rounded-md px-3 py-2 border flex items-center justify-between border-bordefcol ${
-                isOpen
-                    ? "bg-grey-775 hover:bg-grey-750"
-                    : "bg-grey-850 hover:bg-grey-825"
+            className={`${cls} dropdown-button ${
+                isOpen ? `${clsOpen}` : `${clsClosed}`
             }`}
             onClick={onClick}>
             <span className="truncate min-w-0">{label}</span>
@@ -80,7 +85,7 @@ function DropdownMenu({ initSelected, itemNames, button: Button, onChange }) {
                 <div
                     className={`rounded-md max-h-60 overflow-y-auto border-bordefcol border`}>
                     <ul
-                        className={`divide-y divide-grey-750 bg-grey-875 rounded-md overflow-hidden`}>
+                        className={`divide-y divide-grey-750 bg-grey-875 rounded-md overflow-hidden text-dropdown`}>
                         {items}
                     </ul>
                 </div>

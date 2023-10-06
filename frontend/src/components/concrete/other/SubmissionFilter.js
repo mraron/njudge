@@ -54,7 +54,7 @@ function SubmissionFilter({ optionOwn }) {
             </div>
             <div className="flex justify-center space-x-2">
                 <Button color="indigo" onClick={handleSubmit} minWidth="8rem">
-                    {t("submission_filter.search")}
+                    {t("submission_filter.filter")}
                 </Button>
                 <Button color="gray" onClick={handleReset} minWidth="8rem">
                     {t("submission_filter.reset")}{" "}

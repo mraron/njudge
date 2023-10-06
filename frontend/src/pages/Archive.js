@@ -7,7 +7,7 @@ import React from "react"
 function ProblemLeaf({ data }) {
     return (
         <span className="ml-2 max-w-fit flex items-center">
-            <div className="w-4 mr-3 flex justify-center items-center">
+            <div className="w-4 mr-2 flex justify-center items-center">
                 {data.solvedStatus === 1 && (
                     <FontAwesomeIcon
                         icon="fa-xmark"

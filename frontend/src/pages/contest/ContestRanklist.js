@@ -86,17 +86,17 @@ function RanklistFilter() {
             <div className="flex flex-col space-y-4 mb-5">
                 <TextBox
                     id="filterName"
-                    label={t("contest_ranklist.username")}
+                    label={t("ranklist_filter.username")}
                     initText={username}
                     onChange={setUsername}
                 />
             </div>
             <div className="flex justify-center space-x-2">
                 <Button color="indigo" minWidth="8rem" onClick={handleSubmit}>
-                    {t("problem_filter.search")}
+                    {t("ranklist_filter.filter")}
                 </Button>
                 <Button color="gray" minWidth="8rem" onClick={handleReset}>
-                    {t("problem_filter.reset")}
+                    {t("ranklist_filter.reset")}
                 </Button>
             </div>
         </div>
@@ -126,7 +126,7 @@ function ContestRanklist({ data }) {
     return (
         data.isPublic && (
             <div className="space-y-2">
-                <DropdownFrame title="Szűrés">
+                <DropdownFrame title={t("ranklist_filter.filter")}>
                     <div className="px-8 py-6">
                         <RanklistFilter />
                     </div>

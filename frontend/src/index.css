@@ -7,84 +7,84 @@
         --color-textcol: 232, 232, 232;
         --color-inputfill: 55, 52, 60;
         --color-grey-900: 8, 8, 8;
-        --color-grey-875: 15, 15, 15;
-        --color-grey-850: 22, 22, 22;
-        --color-grey-825: 29, 29, 29;
-        --color-grey-800: 36, 36, 36;
-        --color-grey-775: 43, 43, 43;
-        --color-grey-750: 50, 50, 50;
-        --color-grey-725: 57, 57, 57;
-        --color-grey-700: 64, 64, 64;
-        --color-grey-675: 71, 71, 71;
-        --color-grey-650: 78, 78, 78;
-        --color-grey-625: 85, 85, 85;
-        --color-grey-600: 92, 92, 92;
-        --color-grey-575: 99, 99, 99;
-        --color-grey-550: 106, 106, 106;
-        --color-grey-525: 113, 113, 113;
-        --color-grey-500: 120, 120, 120;
-        --color-grey-475: 127, 127, 127;
-        --color-grey-450: 134, 134, 134;
-        --color-grey-425: 141, 141, 141;
-        --color-grey-400: 148, 148, 148;
-        --color-grey-375: 155, 155, 155;
-        --color-grey-350: 162, 162, 162;
-        --color-grey-325: 169, 169, 169;
-        --color-grey-300: 176, 176, 176;
-        --color-grey-275: 183, 183, 183;
-        --color-grey-250: 190, 190, 190;
-        --color-grey-225: 197, 197, 197;
-        --color-grey-200: 204, 204, 204;
-        --color-grey-175: 211, 211, 211;
-        --color-grey-150: 218, 218, 218;
-        --color-grey-125: 225, 225, 225;
-        --color-grey-100: 232, 232, 232;
-        --color-bordefcol: var(--color-grey-675);
-        --color-borstrcol: var(--color-grey-650);
+        --color-grey-875: 14, 14, 14;
+        --color-grey-850: 20, 20, 20;
+        --color-grey-825: 26, 26, 26;
+        --color-grey-800: 32, 32, 32;
+        --color-grey-775: 38, 38, 38;
+        --color-grey-750: 44, 44, 44;
+        --color-grey-725: 50, 50, 50;
+        --color-grey-700: 56, 56, 56;
+        --color-grey-675: 62, 62, 62;
+        --color-grey-650: 68, 68, 68;
+        --color-grey-625: 74, 74, 74;
+        --color-grey-600: 80, 80, 80;
+        --color-grey-575: 86, 86, 86;
+        --color-grey-550: 92, 92, 92;
+        --color-grey-525: 98, 98, 98;
+        --color-grey-500: 104, 104, 104;
+        --color-grey-475: 110, 110, 110;
+        --color-grey-450: 116, 116, 116;
+        --color-grey-425: 122, 122, 122;
+        --color-grey-400: 128, 128, 128;
+        --color-grey-375: 134, 134, 134;
+        --color-grey-350: 140, 140, 140;
+        --color-grey-325: 146, 146, 146;
+        --color-grey-300: 152, 152, 152;
+        --color-grey-275: 158, 158, 158;
+        --color-grey-250: 164, 164, 164;
+        --color-grey-225: 170, 170, 170;
+        --color-grey-200: 176, 176, 176;
+        --color-grey-175: 182, 182, 182;
+        --color-grey-150: 188, 188, 188;
+        --color-grey-125: 194, 194, 194;
+        --color-grey-100: 200, 200, 200;
+        --color-bordefcol: var(--color-grey-650);
+        --color-borstrcol: var(--color-grey-625);
         --color-dividecol: var(--color-grey-725);
         --color-codebgcol: var(--color-grey-875);
         --color-framebgcol: var(--color-grey-800);
         --color-highlight: 79, 70, 229;
     }
     html[data-theme="light"] {
-        --color-textcol: 48, 48, 48;
+        --color-textcol: 60, 60, 60;
         --color-inputfill: 205, 202, 210;
-        --color-grey-100: 24, 24, 24;
-        --color-grey-125: 31, 31, 31;
-        --color-grey-150: 38, 38, 38;
-        --color-grey-175: 45, 45, 45;
-        --color-grey-200: 52, 52, 52;
-        --color-grey-225: 59, 59, 59;
-        --color-grey-250: 66, 66, 66;
-        --color-grey-275: 73, 73, 73;
-        --color-grey-300: 80, 80, 80;
-        --color-grey-325: 87, 87, 87;
-        --color-grey-350: 94, 94, 94;
-        --color-grey-375: 101, 101, 101;
-        --color-grey-400: 108, 108, 108;
-        --color-grey-425: 115, 115, 115;
-        --color-grey-450: 122, 122, 122;
-        --color-grey-475: 129, 129, 129;
-        --color-grey-500: 136, 136, 136;
-        --color-grey-525: 143, 143, 143;
-        --color-grey-550: 150, 150, 150;
-        --color-grey-575: 157, 157, 157;
-        --color-grey-600: 164, 164, 164;
-        --color-grey-625: 171, 171, 171;
-        --color-grey-650: 178, 178, 178;
-        --color-grey-675: 185, 185, 185;
-        --color-grey-700: 192, 192, 192;
-        --color-grey-725: 199, 199, 199;
-        --color-grey-750: 206, 206, 206;
-        --color-grey-775: 213, 213, 213;
-        --color-grey-800: 220, 220, 220;
-        --color-grey-825: 227, 227, 227;
-        --color-grey-850: 234, 234, 234;
-        --color-grey-875: 241, 241, 241;
-        --color-grey-900: 248, 248, 248;
-        --color-bordefcol: var(--color-grey-650);
-        --color-borstrcol: var(--color-grey-625);
-        --color-dividecol: var(--color-grey-725);
+        --color-grey-100: 72, 72, 72;
+        --color-grey-125: 77, 77, 77;
+        --color-grey-150: 83, 83, 83;
+        --color-grey-175: 89, 89, 89;
+        --color-grey-200: 94, 94, 94;
+        --color-grey-225: 100, 100, 100;
+        --color-grey-250: 106, 106, 106;
+        --color-grey-275: 112, 112, 112;
+        --color-grey-300: 117, 117, 117;
+        --color-grey-325: 123, 123, 123;
+        --color-grey-350: 129, 129, 129;
+        --color-grey-375: 134, 134, 134;
+        --color-grey-400: 140, 140, 140;
+        --color-grey-425: 146, 146, 146;
+        --color-grey-450: 152, 152, 152;
+        --color-grey-475: 157, 157, 157;
+        --color-grey-500: 163, 163, 163;
+        --color-grey-525: 169, 169, 169;
+        --color-grey-550: 174, 174, 174;
+        --color-grey-575: 180, 180, 180;
+        --color-grey-600: 186, 186, 186;
+        --color-grey-625: 192, 192, 192;
+        --color-grey-650: 197, 197, 197;
+        --color-grey-675: 203, 203, 203;
+        --color-grey-700: 209, 209, 209;
+        --color-grey-725: 214, 214, 214;
+        --color-grey-750: 220, 220, 220;
+        --color-grey-775: 226, 226, 226;
+        --color-grey-800: 232, 232, 232;
+        --color-grey-825: 237, 237, 237;
+        --color-grey-850: 243, 243, 243;
+        --color-grey-875: 249, 249, 249;
+        --color-grey-900: 255, 255, 255;
+        --color-bordefcol: var(--color-grey-575);
+        --color-borstrcol: var(--color-grey-550);
+        --color-dividecol: var(--color-grey-675);
         --color-codebgcol: var(--color-grey-875);
         --color-framebgcol: var(--color-grey-800);
         --color-highlight: 99, 102, 241;
@@ -94,6 +94,9 @@
 @layer components {
     .rounded-frame {
         @apply rounded-container bg-framebgcol border border-bordefcol flex w-full shadow-frame dark:shadow-none;
+    }
+    .dropdown-button {
+        @apply w-full rounded-md px-3 py-2 border flex items-center justify-between border-bordefcol text-dropdown;
     }
     .frame-title {
         @apply emph-med p-4 text-center border-b-1 border-bordefcol;
@@ -105,13 +108,15 @@
         @apply border border-bordefcol;
     }
     .tag {
-        @apply whitespace-nowrap cursor-pointer text-sm px-2 py-1 border rounded bg-grey-750 hover:bg-grey-725 border-borstrcol truncate h-8 flex items-center;
+        @apply whitespace-nowrap cursor-pointer text-small px-2 py-1 border rounded bg-grey-750 hover:bg-grey-725 border-borstrcol truncate h-8 flex items-center;
     }
     .btn-indigo {
-        @apply text-white text-sm font-medium bg-indigo-600 rounded-md hover:bg-indigo-500 text-center;
+        @apply text-white bg-indigo-600 dark:bg-indigo-700 rounded-md hover:bg-indigo-500 dark:hover:bg-indigo-600 text-center;
+        font-size: 0.95rem;
     }
     .btn-gray {
-        @apply text-sm emph-med bg-grey-725 rounded-md hover:bg-grey-700 border border-borstrcol text-center;
+        @apply text-small bg-grey-725 rounded-md hover:bg-grey-700 border border-borstrcol text-center;
+        font-size: 0.95rem;
     }
     .date-label {
         @apply cursor-pointer text-sm px-2 py-1 bg-grey-725 rounded border border-borstrcol hover:bg-grey-700 shrink-0;
@@ -135,7 +140,7 @@
 }
 
 .font-code {
-    font-size: 0.85rem;
+    @apply text-small;
     font-family: "Roboto Mono", monospace;
 }
 
@@ -189,9 +194,14 @@ td {
     line-height: 1.25rem;
 }
 
-.text-dropdown-list {
+.text-dropdown-list,
+.text-dropdown {
     font-size: 0.95rem;
     line-height: 1.3rem;
+}
+
+.text-small {
+    font-size: 0.85rem;
 }
 
 html {

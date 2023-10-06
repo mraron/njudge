@@ -18,6 +18,8 @@
     },
     "info": {
         "page_title": "Info :: njudge",
+        "info": "Information",
+        "contests": "Contests",
         "successful_copy": "The text has been copied to the clipboard.",
         "compiler_options": "Compilation and execution options"
     },
@@ -135,15 +137,18 @@
         "title": "Title",
         "tags": "Tags",
         "category": "Category",
-        "search": "Search",
         "reset": "Reset"
     },
     "submission_filter": {
         "filter": "Filter",
         "full_solutions": "Only full solutions",
         "own_solutions": "Only my solutions",
-        "search": "Search",
         "reset": "Reset"
+    },
+    "ranklist_filter": {
+        "filter": "Filter",
+        "reset": "Reset",
+        "username": "Username"
     },
     "submissions_table": {
         "id": "ID",
@@ -224,7 +229,9 @@
     },
     "problem_ranklist": {
         "page_title": "Ranklist – {{params.problem}} :: njudge",
-        "ranklist": "Ranklist"
+        "ranklist": "Ranklist",
+        "username": "Username",
+        "result": "Result"
     },
     "solved_status": {
         "not_tried": "Not tried yet",
