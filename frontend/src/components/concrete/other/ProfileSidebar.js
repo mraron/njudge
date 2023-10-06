@@ -10,30 +10,21 @@ import RoundedFrame, { SVGTitleComponent } from "../../container/RoundedFrame"
 import { routeMap } from "../../../config/RouteConfig"
 
 export function ProfilePictureFrame({ userData }) {
-    const profileRoute = routeMap.profile.replace(
-        ":user",
-        encodeURIComponent(userData.username),
-    )
+    const profileRoute = routeMap.profile.replace(":user", encodeURIComponent(userData.username))
     return (
         <RoundedFrame>
             <div className="flex flex-col items-center p-5 border-b border-bordefcol">
                 <Link
                     to={profileRoute}
                     className="flex justify-center items-center w-full aspect-square bg-grey-875 border border-bordefcol hover:border-grey-450">
-                    <img
-                        alt="avatar"
-                        className="object-contain"
-                        src={userData.pictureSrc}
-                    />
+                    <img alt="avatar" className="object-contain" src={userData.pictureSrc} />
                 </Link>
             </div>
             <div className="px-6 py-3 flex justify-center items-center w-full">
                 <Link className="link truncate" to={profileRoute}>
                     {userData.username}
                 </Link>
-                <span className="text-xl emph-strong text-indigo-600 mx-2">
-                    &#8226;
-                </span>
+                <span className="text-xl emph-strong text-indigo-600 mx-2">&#8226;</span>
                 <span className="truncate">{userData.rating}</span>
             </div>
         </RoundedFrame>
@@ -44,9 +35,7 @@ export function ProfileDataFrame({ userData }) {
     const { t } = useTranslation()
     const titleComponent = (
         <SVGTitleComponent
-            svg={
-                <FontAwesomeIcon icon={faLineChart} className="w-4 h-4 mr-3" />
-            }
+            svg={<FontAwesomeIcon icon={faLineChart} className="w-4 h-4 mr-3" />}
             title={t("profile_sidebar.stats")}
         />
     )
@@ -67,9 +56,7 @@ function SubmissionsFrame({ titleComponent, submissions }) {
     const rows = submissions.map((item, index) => (
         <tr key={index}>
             <td>
-                <Link
-                    className="link"
-                    to={routeMap.submission.replace(":id", item.id)}>
+                <Link className="link" to={routeMap.submission.replace(":id", item.id)}>
                     {item.id}
                 </Link>
             </td>
@@ -92,12 +79,7 @@ function ProfileSideBar() {
     const { userData, isLoggedIn } = useContext(UserContext)
     const titleComponent = (
         <SVGTitleComponent
-            svg={
-                <FontAwesomeIcon
-                    icon="fa-regular fa-clock"
-                    className="w-4 h-4 mr-3"
-                />
-            }
+            svg={<FontAwesomeIcon icon="fa-regular fa-clock" className="w-4 h-4 mr-3" />}
             title={t("profile_sidebar.last_submissions")}
         />
     )
@@ -106,10 +88,7 @@ function ProfileSideBar() {
             <div className="hidden lg:flex flex-col bg-grey-900 w-72 shrink-0 space-y-3">
                 <ProfilePictureFrame userData={userData} />
                 <ProfileDataFrame userData={userData} />
-                <SubmissionsFrame
-                    titleComponent={titleComponent}
-                    submissions={userData.lastSubmissions}
-                />
+                <SubmissionsFrame titleComponent={titleComponent} submissions={userData.lastSubmissions} />
             </div>
         )
     )

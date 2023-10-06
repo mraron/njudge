@@ -1,13 +1,6 @@
 import queryString from "query-string"
 
-function UpdateQueryString({
-    location,
-    navigate,
-    args,
-    values,
-    validArgs,
-    invalidArgs,
-}) {
+function UpdateQueryString({ location, navigate, args, values, validArgs, invalidArgs }) {
     const qString = location.search
     const qData = queryString.parse(qString)
 

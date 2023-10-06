@@ -30,12 +30,8 @@ function MenuOption({ label, route, selected, horizontal, onClick }) {
         <li>
             <Link
                 onClick={onClick}
-                className={`flex items-center h-full px-4 ${
-                    horizontal ? "border-b-3 pt-1" : "border-l-3 p-3"
-                } ${
-                    selected
-                        ? "border-highlight bg-grey-775"
-                        : "border-transparent hover:bg-framebgcol"
+                className={`flex items-center h-full px-4 ${horizontal ? "border-b-3 pt-1" : "border-l-3 p-3"} ${
+                    selected ? "border-highlight bg-grey-775" : "border-transparent hover:bg-framebgcol"
                 }`}
                 to={route}>
                 {label}
@@ -66,19 +62,10 @@ function ProfileSettings({ onSidebarClose }) {
     let profileRoutes = [routeMap.login, routeMap.register]
     let profileRouteLabels = ["menubar.login", "menubar.register"]
     if (isLoggedIn) {
-        profileRoutes = [
-            routeMap.profile.replace(
-                ":user",
-                encodeURIComponent(userData.username),
-            ),
-            routeMap.logout,
-        ]
+        profileRoutes = [routeMap.profile.replace(":user", encodeURIComponent(userData.username)), routeMap.logout]
         profileRouteLabels = ["menubar.profile", "menubar.logout"]
         if (userData.isAdmin) {
-            profileRoutes = profileRoutes
-                .slice(0, 1)
-                .concat([routeMap.admin])
-                .concat(profileRoutes.slice(1))
+            profileRoutes = profileRoutes.slice(0, 1).concat([routeMap.admin]).concat(profileRoutes.slice(1))
             profileRouteLabels = profileRouteLabels
                 .slice(0, 1)
                 .concat(["menubar.admin"])
@@ -96,19 +83,13 @@ function ProfileSettings({ onSidebarClose }) {
             <div className="px-3 flex items-center justify-center border border-l-0 border-bordefcol">
                 <button
                     className={`px-2 ${
-                        i18n.resolvedLanguage === "hu"
-                            ? "bg-grey-725"
-                            : "hover:bg-grey-775"
+                        i18n.resolvedLanguage === "hu" ? "bg-grey-725" : "hover:bg-grey-775"
                     } rounded mr-1`}
                     onClick={() => i18n.changeLanguage("hu")}>
                     hu
                 </button>
                 <button
-                    className={`px-2 ${
-                        i18n.resolvedLanguage === "en"
-                            ? "bg-grey-725"
-                            : "hover:bg-grey-775"
-                    } rounded`}
+                    className={`px-2 ${i18n.resolvedLanguage === "en" ? "bg-grey-725" : "hover:bg-grey-775"} rounded`}
                     onClick={() => i18n.changeLanguage("en")}>
                     en
                 </button>
@@ -133,10 +114,7 @@ function ThemeButton() {
         <button
             className="h-full border border-l-0 border-bordefcol flex items-center justify-center p-2 rounded-r-md hover:bg-framebgcol"
             onClick={toggleTheme}>
-            <FontAwesomeIcon
-                icon={theme === "light" ? "fa-moon" : "fa-sun"}
-                className="w-6 h-4"
-            />
+            <FontAwesomeIcon icon={theme === "light" ? "fa-moon" : "fa-sun"} className="w-6 h-4" />
         </button>
     )
 }
@@ -177,17 +155,13 @@ function MenuSideBar({ selected, isOpen, onClose }) {
         <aside
             ref={menuRef}
             className={`h-full w-80 z-20 pt-20 overflow-y-auto overflow-x-hidden xl:hidden fixed bg-grey-825 border-l-1 border-bordefcol right-0 transform ${
-                isOpen
-                    ? "translate-x-0 opacity-100"
-                    : "translate-x-80 opacity-0"
+                isOpen ? "translate-x-0 opacity-100" : "translate-x-80 opacity-0"
             } ease-out transition-transform-opacity duration-200`}>
             <div className="flex flex-col justify-center">
                 <div className="w-full flex px-4 mb-4">
                     <ProfileSettings onSidebarClose={onClose} />
                 </div>
-                <ol className="divide-y divide-grey-725 border-t border-b border-grey-725">
-                    {menuOptions}
-                </ol>
+                <ol className="divide-y divide-grey-725 border-t border-b border-grey-725">{menuOptions}</ol>
             </div>
         </aside>
     )
@@ -227,15 +201,9 @@ function MenuTopBar({ selected, isOpen, onToggle }) {
                         className="flex items-center justify-center p-2 rounded-full hover:bg-framebgcol"
                         onClick={() => onToggle(this)}>
                         {isOpen ? (
-                            <FontAwesomeIcon
-                                icon="fa-close"
-                                className="w-5 h-5"
-                            />
+                            <FontAwesomeIcon icon="fa-close" className="w-5 h-5" />
                         ) : (
-                            <FontAwesomeIcon
-                                icon="fa-bars"
-                                className="w-5 h-5"
-                            />
+                            <FontAwesomeIcon icon="fa-bars" className="w-5 h-5" />
                         )}
                     </button>
                 </div>
@@ -258,16 +226,8 @@ function Menubar() {
     return (
         isLoggedIn !== null && (
             <div className="text-nav">
-                <MenuTopBar
-                    selected={selected}
-                    isOpen={isOpen}
-                    onToggle={handleToggle}
-                />
-                <MenuSideBar
-                    selected={selected}
-                    isOpen={isOpen}
-                    onClose={handleClose}
-                />
+                <MenuTopBar selected={selected} isOpen={isOpen} onToggle={handleToggle} />
+                <MenuSideBar selected={selected} isOpen={isOpen} onClose={handleClose} />
             </div>
         )
     )

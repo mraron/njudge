@@ -7,17 +7,11 @@ import FlashContainer from "./components/util/flash/Flash"
 import Menubar from "./components/concrete/other/Menubar"
 import FlashEvent from "./components/util/flash/FlashEvent"
 
-import {
-    getCategories,
-    getHighlightCodes,
-    getLanguages,
-    getTags,
-} from "./util/getJudgeData"
+import { getCategories, getHighlightCodes, getLanguages, getTags } from "./util/getJudgeData"
 
 import JudgeDataContext from "./contexts/judgeData/JudgeDataContext"
 
-window.flash = (message, type = "success") =>
-    FlashEvent.emit("flash", { message, type })
+window.flash = (message, type = "success") => FlashEvent.emit("flash", { message, type })
 
 function App() {
     const { setJudgeData, allLoaded } = useContext(JudgeDataContext)

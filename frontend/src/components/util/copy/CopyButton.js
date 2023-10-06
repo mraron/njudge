@@ -14,9 +14,7 @@ function CopyButton({ text, isVisible }) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1, transition: { duration: 0.2 } }}
                     exit={{ opacity: 0, transition: { duration: 0.1 } }}>
-                    <TERipple
-                        className="rounded-lg overflow-hidden"
-                        rippleColor="#808080">
+                    <TERipple className="rounded-lg overflow-hidden" rippleColor="#808080">
                         <button
                             className={`rounded-lg bg-grey-775 hover:bg-grey-750 border border-borstrcol relative h-9 w-9`}
                             aria-label="Copy"

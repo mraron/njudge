@@ -19,9 +19,7 @@ function SubmitControlsFrame({ onLanguageChanged, onSubmit }) {
             <div className="px-4 py-3 sm:px-6 sm:py-5 flex items-stretch">
                 <div className="w-full min-w-0 mr-3">
                     <DropdownMenu
-                        itemNames={judgeData.languages.map(
-                            (item) => item.label,
-                        )}
+                        itemNames={judgeData.languages.map((item) => item.label)}
                         onChange={onLanguageChanged}
                     />
                 </div>
@@ -52,11 +50,7 @@ function ProblemSubmit() {
         }).then((ok) => {
             if (ok) {
                 window.flash("flash.successful_submission", "success")
-                navigate(
-                    routeMap.problemSubmissions
-                        .replace(":problemset", problemset)
-                        .replace(":problem", problem),
-                )
+                navigate(routeMap.problemSubmissions.replace(":problemset", problemset).replace(":problem", problem))
             } else {
                 window.flash("flash.unsuccessful_submission", "failure")
             }
@@ -64,17 +58,12 @@ function ProblemSubmit() {
     }
     return (
         <div className="flex flex-col space-y-2">
-            <SubmitControlsFrame
-                onSubmit={handleSubmit}
-                onLanguageChanged={handleLanguageChanged}
-            />
+            <SubmitControlsFrame onSubmit={handleSubmit} onLanguageChanged={handleLanguageChanged} />
             <MonacoEditor
                 className="editor"
                 height="60vh"
                 theme={`${theme === "light" ? "vs" : "vs-dark"}`}
-                language={
-                    judgeData.highlightCodes[judgeData.languages[langIndex].id]
-                }
+                language={judgeData.highlightCodes[judgeData.languages[langIndex].id]}
                 options={{ fontFamily: "JetBrains Mono", fontSize: 13 }}
                 onChange={setSubmissionCode}
             />

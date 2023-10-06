@@ -25,11 +25,7 @@ function ThemeProvider({ children }) {
         doc.classList.add(newTheme)
         localStorage.setItem("theme", newTheme)
     }
-    return (
-        <ThemeContext.Provider value={{ theme, changeTheme }}>
-            {children}
-        </ThemeContext.Provider>
-    )
+    return <ThemeContext.Provider value={{ theme, changeTheme }}>{children}</ThemeContext.Provider>
 }
 
 export default ThemeProvider

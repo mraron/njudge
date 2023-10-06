@@ -12,9 +12,7 @@ function Tag({ title, onClick }) {
     return (
         <span
             className={`tag m-1 flex items-center space-x-3 ${
-                hovered
-                    ? "text-white hover:bg-red-500 dark:hover:bg-red-600 hover:border-transparent"
-                    : ""
+                hovered ? "text-white hover:bg-red-500 dark:hover:bg-red-600 hover:border-transparent" : ""
             }`}>
             <span>{title}</span>
             <span
@@ -40,35 +38,22 @@ function TagDropdown({ id, label, itemNames, initTags = [], onChange }) {
         const handleRemoveTag = () => {
             setTags((prevTags) => prevTags.filter((prevTag) => prevTag !== tag))
         }
-        return (
-            <Tag title={itemNames[tag]} onClick={handleRemoveTag} key={index} />
-        )
+        return <Tag title={itemNames[tag]} onClick={handleRemoveTag} key={index} />
     })
     const handleAddTag = (selected, title) => {
-        const remaining = _.range(itemNames.length).filter(
-            (index) => !tags.includes(index),
-        )
+        const remaining = _.range(itemNames.length).filter((index) => !tags.includes(index))
         const tag = remaining[selected]
-        setTags((prevTags) =>
-            prevTags.includes(tag) ? prevTags : [...prevTags, tag],
-        )
+        setTags((prevTags) => (prevTags.includes(tag) ? prevTags : [...prevTags, tag]))
     }
     return (
         <div>
             <TextBoxDropdown
                 id={id}
                 label={label}
-                itemNames={itemNames.filter(
-                    (itemName, index) => !tags.includes(index),
-                )}
+                itemNames={itemNames.filter((itemName, index) => !tags.includes(index))}
                 onClick={handleAddTag}
             />
-            <div
-                className={`${
-                    tagsContent.length > 0 ? "mt-2" : ""
-                } flex flex-wrap`}>
-                {tagsContent}
-            </div>
+            <div className={`${tagsContent.length > 0 ? "mt-2" : ""} flex flex-wrap`}>{tagsContent}</div>
         </div>
     )
 }

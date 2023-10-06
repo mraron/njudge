@@ -46,11 +46,7 @@ function SubmissionFilter({ optionOwn }) {
                 </div>
             )}
             <div className="mb-5">
-                <Checkbox
-                    label={t("submission_filter.full_solutions")}
-                    onChange={setOnlyAC}
-                    initChecked={onlyAC}
-                />
+                <Checkbox label={t("submission_filter.full_solutions")} onChange={setOnlyAC} initChecked={onlyAC} />
             </div>
             <div className="flex justify-center space-x-2">
                 <Button color="indigo" onClick={handleSubmit} minWidth="8rem">

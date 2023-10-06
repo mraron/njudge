@@ -5,14 +5,10 @@ function Button({ type, color, minWidth, fullWidth, cls, onClick, children }) {
     return (
         <TERipple
             rippleColor={rippleColor}
-            className={`rounded-md ${
-                minWidth ? "shrink-0" : ""
-            } overflow-hidden ${fullWidth ? "w-full" : ""}`}>
+            className={`rounded-md ${minWidth ? "shrink-0" : ""} overflow-hidden ${fullWidth ? "w-full" : ""}`}>
             <button
                 type={type}
-                className={`${
-                    color === "indigo" ? "btn-indigo" : "btn-gray"
-                } padding-btn-default ${
+                className={`${color === "indigo" ? "btn-indigo" : "btn-gray"} padding-btn-default ${
                     fullWidth ? "w-full" : ""
                 } h-full ${cls}`}
                 style={{ minWidth: minWidth }}

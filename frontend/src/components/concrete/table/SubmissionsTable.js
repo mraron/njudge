@@ -1,38 +1,22 @@
 import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import RoundedTable from "../../container/RoundedTable"
 import { SVGSpinner } from "../../svg/SVGs"
 import { routeMap } from "../../../config/RouteConfig"
+import RoundedTable from "../../container/RoundedTable"
 
 function Submission({ submission }) {
-    const {
-        id,
-        date,
-        user,
-        problem,
-        language,
-        verdictName,
-        verdictType,
-        score,
-        maxScore,
-        time,
-        memory,
-    } = submission
+    const { id, date, user, problem, language, verdictName, verdictType, score, maxScore, time, memory } = submission
     return (
         <tr>
             <td className=" w-0 text-center">
-                <Link
-                    className="link"
-                    to={routeMap.submission.replace(":id", submission.id)}>
+                <Link className="link" to={routeMap.submission.replace(":id", submission.id)}>
                     {id}
                 </Link>
             </td>
             <td>{date}</td>
             <td>
-                <Link
-                    className="link"
-                    to={routeMap.profile.replace(":user", submission.user)}>
+                <Link className="link" to={routeMap.profile.replace(":user", submission.user)}>
                     {user}
                 </Link>
             </td>
@@ -45,24 +29,9 @@ function Submission({ submission }) {
             <td colSpan={maxScore === 0.0 ? 2 : 1}>
                 <div className="flex items-center">
                     {verdictType === 0 && <SVGSpinner cls="w-4 h-4 mr-3" />}
-                    {verdictType === 1 && (
-                        <FontAwesomeIcon
-                            icon="fa-xmark"
-                            className="w-4 h-4 highlight-red mr-3"
-                        />
-                    )}
-                    {verdictType === 2 && (
-                        <FontAwesomeIcon
-                            icon="fa-check"
-                            className="w-4 h-4 highlight-yellow mr-3"
-                        />
-                    )}
-                    {verdictType === 3 && (
-                        <FontAwesomeIcon
-                            icon="fa-check"
-                            className="w-4 h-4 highlight-green mr-3"
-                        />
-                    )}
+                    {verdictType === 1 && <FontAwesomeIcon icon="fa-xmark" className="w-4 h-4 highlight-red mr-3" />}
+                    {verdictType === 2 && <FontAwesomeIcon icon="fa-check" className="w-4 h-4 highlight-yellow mr-3" />}
+                    {verdictType === 3 && <FontAwesomeIcon icon="fa-check" className="w-4 h-4 highlight-green mr-3" />}
                     <span className="whitespace-nowrap">{verdictName}</span>
                 </div>
             </td>
@@ -81,9 +50,7 @@ function Submission({ submission }) {
 
 function SubmissionsTable({ submissions }) {
     const { t } = useTranslation()
-    const submissionsContent = submissions.map((item, index) => (
-        <Submission submission={item} key={index} />
-    ))
+    const submissionsContent = submissions.map((item, index) => <Submission submission={item} key={index} />)
     return (
         <RoundedTable>
             <thead>

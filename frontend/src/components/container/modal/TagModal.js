@@ -21,10 +21,7 @@ function TagModal({ isOpen, onClose }) {
             <RoundedFrame titleComponent={titleComponent} cls="shadow-md">
                 <div className="w-96 px-6 py-5">
                     <div className="mb-5">
-                        <TagDropdown
-                            itemNames={judgeData.tags.map(t)}
-                            initTags={[0, 1]}
-                        />
+                        <TagDropdown itemNames={judgeData.tags.map(t)} initTags={[0, 1]} />
                     </div>
                     <div className="flex justify-center space-x-2">
                         <Button color="indigo" fullWidth={true}>

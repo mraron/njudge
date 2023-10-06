@@ -12,21 +12,15 @@ import Tag from "../../basic/Tag"
 function Problem(data) {
     const { t } = useTranslation()
     const { isLoggedIn } = useContext(UserContext)
-    const { problem, solvedStatus, title, category, tags, solverCount } =
-        data.problem
-    const tagsContent = tags.map((item, index) => (
-        <Tag key={index}>{t(item)}</Tag>
-    ))
+    const { problem, solvedStatus, title, category, tags, solverCount } = data.problem
+    const tagsContent = tags.map((item, index) => <Tag key={index}>{t(item)}</Tag>)
     return (
         <tr>
             {isLoggedIn && (
                 <td className=" w-0">
                     <div className="flex items-center justify-center">
                         {solvedStatus === 0 && (
-                            <SVGEllipsis
-                                cls="w-5 h-5 text-grey-300"
-                                title={t("solved_status.not_tried")}
-                            />
+                            <SVGEllipsis cls="w-5 h-5 text-grey-300" title={t("solved_status.not_tried")} />
                         )}
                         {solvedStatus === 1 && (
                             <FontAwesomeIcon
@@ -56,9 +50,7 @@ function Problem(data) {
             <td>
                 <Link
                     className="link"
-                    to={routeMap.problem
-                        .replace(":problemset", data.problemset)
-                        .replace(":problem", problem)}>
+                    to={routeMap.problem.replace(":problemset", data.problemset).replace(":problem", problem)}>
                     {title}
                 </Link>
             </td>
@@ -76,10 +68,7 @@ function Problem(data) {
                     to={`${routeMap.problemSubmissions
                         .replace(":problemset", data.problemset)
                         .replace(":problem", problem)}?ac=1`}>
-                    <FontAwesomeIcon
-                        icon="fa-user"
-                        className="w-3.5 h-3.5 mr-1"
-                    />
+                    <FontAwesomeIcon icon="fa-user" className="w-3.5 h-3.5 mr-1" />
                     <span>{solverCount}</span>
                 </Link>
             </td>
@@ -98,17 +87,12 @@ function ProblemsTable({ problemset = "main", problems }) {
         <RoundedTable>
             <thead>
                 <tr>
-                    <th colSpan={isLoggedIn ? 2 : 1}>
-                        {t("problems_table.id")}
-                    </th>
+                    <th colSpan={isLoggedIn ? 2 : 1}>{t("problems_table.id")}</th>
                     <th>{t("problems_table.title")}</th>
                     <th>{t("problems_table.category")}</th>
                     <th>{t("problems_table.tags")}</th>
                     <th>
-                        <OrderedColumnTitle
-                            text={t("problems_table.solved")}
-                            label="solver_count"
-                        />
+                        <OrderedColumnTitle text={t("problems_table.solved")} label="solver_count" />
                     </th>
                 </tr>
             </thead>

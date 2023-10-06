@@ -10,9 +10,7 @@ export async function saveSettings(user, showUnsolved, hideSolved) {
             hideSolved: hideSolved,
         }),
     }
-    console.log(
-        apiRoute(`/user/profile/${encodeURIComponent(user)}/settings/other/`),
-    )
+    console.log(apiRoute(`/user/profile/${encodeURIComponent(user)}/settings/other/`))
     const response = await fetchWithCredentials(
         apiRoute(`/user/profile/${encodeURIComponent(user)}/settings/other/`),
         requestOptions,
@@ -32,11 +30,7 @@ export async function changePassword(user, oldPw, newPw, newPwConfirm) {
         }),
     }
     const response = await fetchWithCredentials(
-        apiRoute(
-            `/user/profile/${encodeURIComponent(
-                user,
-            )}/settings/change_password/`,
-        ),
+        apiRoute(`/user/profile/${encodeURIComponent(user)}/settings/change_password/`),
         requestOptions,
     )
     const data = await response.json()

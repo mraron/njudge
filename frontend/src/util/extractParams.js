@@ -7,9 +7,7 @@ function extractParams(pathname, route) {
         .map((item, index) => (item.startsWith(":") ? index : -1))
         .filter((index) => index !== -1)
         .forEach((index) => {
-            result[routeSegments[index].slice(1)] = decodeURIComponent(
-                pathnameSegments[index],
-            )
+            result[routeSegments[index].slice(1)] = decodeURIComponent(pathnameSegments[index])
         })
     return result
 }

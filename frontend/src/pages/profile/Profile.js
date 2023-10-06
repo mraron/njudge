@@ -7,16 +7,8 @@ import TabFrame from "../../components/container/TabFrame"
 
 function Profile() {
     console.log("nigga")
-    let routeLabels = [
-        "profile.profile",
-        "profile.submissions",
-        "profile.settings",
-    ]
-    let routePatterns = [
-        routeMap.profile,
-        routeMap.profileSubmissions,
-        routeMap.profileSettings,
-    ]
+    let routeLabels = ["profile.profile", "profile.submissions", "profile.settings"]
+    let routePatterns = [routeMap.profile, routeMap.profileSubmissions, routeMap.profileSettings]
     const { t } = useTranslation()
     const { user } = useParams()
     const { userData, isLoggedIn } = useContext(UserContext)
@@ -30,10 +22,7 @@ function Profile() {
         <div className="flex justify-center">
             <div className="w-full max-w-7xl">
                 <div className="w-full px-4">
-                    <TabFrame
-                        routes={routes}
-                        routePatterns={routePatterns}
-                        routeLabels={routeLabels.map(t)}>
+                    <TabFrame routes={routes} routePatterns={routePatterns} routeLabels={routeLabels.map(t)}>
                         <div className="relative w-full">
                             <Outlet />
                         </div>

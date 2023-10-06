@@ -4,9 +4,7 @@ import RoundedFrame from "./RoundedFrame"
 
 function DropdownElem({ text, isOpen, onClick }) {
     return (
-        <span
-            className="max-w-fit flex link items-center emph-med no-underline"
-            onClick={onClick}>
+        <span className="max-w-fit flex link items-center emph-med no-underline" onClick={onClick}>
             <SVGDropdownListArrow isOpen={isOpen} />
             <span className="truncate">{text}</span>
         </span>
@@ -24,13 +22,7 @@ function DropdownList({ tree, leaf: Leaf }) {
               </li>
           ))
         : []
-    const innerNode = (
-        <DropdownElem
-            text={tree.title}
-            isOpen={isOpen}
-            onClick={() => setOpen(!isOpen)}
-        />
-    )
+    const innerNode = <DropdownElem text={tree.title} isOpen={isOpen} onClick={() => setOpen(!isOpen)} />
     const leafNode = <Leaf data={tree} />
     const isLeaf = !tree.children || tree.children.length === 0
 
@@ -38,12 +30,7 @@ function DropdownList({ tree, leaf: Leaf }) {
         <div>
             {!isRoot && !isLeaf && innerNode}
             {!isRoot && isLeaf && leafNode}
-            <ul
-                className={`${isOpen ? "" : "hidden"} ${
-                    isRoot ? "" : "ml-5"
-                } mb-4`}>
-                {children}
-            </ul>
+            <ul className={`${isOpen ? "" : "hidden"} ${isRoot ? "" : "ml-5"} mb-4`}>{children}</ul>
         </div>
     )
 }

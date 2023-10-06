@@ -10,11 +10,7 @@ function OrderedColumnTitle({ text, label }) {
     const qData = queryString.parse(location.search)
 
     const currentOrder =
-        qData.order === "ASC" && qData.by === label
-            ? 1
-            : qData.order === "DESC" && qData.by === label
-            ? 2
-            : 0
+        qData.order === "ASC" && qData.by === label ? 1 : qData.order === "DESC" && qData.by === label ? 2 : 0
 
     const handleOrderChanged = () => {
         if (currentOrder === 2) {
@@ -34,22 +30,11 @@ function OrderedColumnTitle({ text, label }) {
         }
     }
     return (
-        <div
-            className="flex items-center link no-underline"
-            onClick={handleOrderChanged}>
+        <div className="flex items-center link no-underline" onClick={handleOrderChanged}>
             <span>{text}</span>
-            {currentOrder === 0 && (
-                <FontAwesomeIcon icon="fa-sort" className="w-3 h-3 ml-1.5" />
-            )}
-            {currentOrder === 1 && (
-                <FontAwesomeIcon icon="fa-sort-up" className="w-3 h-3 ml-1.5" />
-            )}
-            {currentOrder === 2 && (
-                <FontAwesomeIcon
-                    icon="fa-sort-down"
-                    className="w-3 h-3 ml-1.5"
-                />
-            )}
+            {currentOrder === 0 && <FontAwesomeIcon icon="fa-sort" className="w-3 h-3 ml-1.5" />}
+            {currentOrder === 1 && <FontAwesomeIcon icon="fa-sort-up" className="w-3 h-3 ml-1.5" />}
+            {currentOrder === 2 && <FontAwesomeIcon icon="fa-sort-down" className="w-3 h-3 ml-1.5" />}
         </div>
     )
 }

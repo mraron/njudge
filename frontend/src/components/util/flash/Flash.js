@@ -11,22 +11,14 @@ function FlashMessage({ message, type, onClose }) {
             <div className="w-full p-6 flex justify-between items-center rounded-md space-x-2">
                 <div className="flex items-center">
                     {type === "success" && (
-                        <FontAwesomeIcon
-                            icon="fa-regular fa-circle-check"
-                            className="w-6 h-6 highlight-green mr-3"
-                        />
+                        <FontAwesomeIcon icon="fa-regular fa-circle-check" className="w-6 h-6 highlight-green mr-3" />
                     )}
                     {type === "failure" && (
-                        <FontAwesomeIcon
-                            icon="fa-regular fa-circle-xmark"
-                            className="w-6 h-6 highlight-red mr-3"
-                        />
+                        <FontAwesomeIcon icon="fa-regular fa-circle-xmark" className="w-6 h-6 highlight-red mr-3" />
                     )}
                     <span>{t(message)}</span>
                 </div>
-                <button
-                    className="flex rounded-full p-3 hover:bg-framebgcol"
-                    onClick={onClose}>
+                <button className="flex rounded-full p-3 hover:bg-framebgcol" onClick={onClose}>
                     <FontAwesomeIcon icon="fa-close" className="w-5 h-5" />
                 </button>
             </div>
@@ -53,11 +45,7 @@ function FlashContainer() {
                     opacity: 0.01,
                     transition: { duration: 0.16, ease: "easeIn" },
                 }}>
-                <FlashMessage
-                    message={message}
-                    type={type}
-                    onClose={popMessage}
-                />
+                <FlashMessage message={message} type={type} onClose={popMessage} />
             </motion.div>,
         ])
     }

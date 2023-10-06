@@ -17,21 +17,10 @@ function CompileErrorFrame({ message }) {
     const titleComponent = (
         <SVGTitleComponent
             title={t("submission.compilation_error")}
-            svg={
-                <FontAwesomeIcon
-                    icon="fa-xmark"
-                    className="w-4 h-4 mr-3 text-red-600"
-                />
-            }
+            svg={<FontAwesomeIcon icon="fa-xmark" className="w-4 h-4 mr-3 text-red-600" />}
         />
     )
-    return (
-        <CopyableCode
-            text={message}
-            titleComponent={titleComponent}
-            maxHeight="16rem"
-        />
-    )
+    return <CopyableCode text={message} titleComponent={titleComponent} maxHeight="16rem" />
 }
 
 function Submission({ data }) {
@@ -68,19 +57,11 @@ function Submission({ data }) {
                                 fontSize: 13,
                             }}
                             value={data.summary.code}
-                            language={
-                                judgeData.highlightCodes[data.summary.language]
-                            }
+                            language={judgeData.highlightCodes[data.summary.language]}
                         />
                     )}
-                    {data.summary.compileError && (
-                        <CompileErrorFrame
-                            message={data.summary.compileErrorMessage}
-                        />
-                    )}
-                    {!data.summary.compileError && (
-                        <SubmissionTable status={data.status} />
-                    )}
+                    {data.summary.compileError && <CompileErrorFrame message={data.summary.compileErrorMessage} />}
+                    {!data.summary.compileError && <SubmissionTable status={data.status} />}
                 </div>
             </div>
         </div>

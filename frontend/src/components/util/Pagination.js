@@ -15,8 +15,7 @@ function Pagination({ paginationData }) {
             values: [page],
         })
     }
-    const cls =
-        "flex justify-center items-center px-3 py-1.5 text-sm border-borstrcol border hover:bg-grey-750"
+    const cls = "flex justify-center items-center px-3 py-1.5 text-sm border-borstrcol border hover:bg-grey-750"
     return (
         <RoundedFrame cls="overflow-hidden">
             <div className="flex justify-center p-4 overflow-x-auto">
@@ -24,10 +23,7 @@ function Pagination({ paginationData }) {
                     aria-label="First"
                     className={`${cls} border-r-0 rounded-l-md`}
                     onClick={() => handlePageChanged(1)}>
-                    <FontAwesomeIcon
-                        icon="fa-angles-left"
-                        className="w-2.5 h-2.5"
-                    />
+                    <FontAwesomeIcon icon="fa-angles-left" className="w-2.5 h-2.5" />
                 </button>
                 {currentPage >= 3 && (
                     <button
@@ -37,9 +33,7 @@ function Pagination({ paginationData }) {
                     </button>
                 )}
                 {currentPage >= 2 && (
-                    <button
-                        className={`${cls} border-r-0`}
-                        onClick={() => handlePageChanged(currentPage - 1)}>
+                    <button className={`${cls} border-r-0`} onClick={() => handlePageChanged(currentPage - 1)}>
                         {currentPage - 1}
                     </button>
                 )}
@@ -47,9 +41,7 @@ function Pagination({ paginationData }) {
                     {currentPage}
                 </button>
                 {currentPage <= lastPage - 1 && (
-                    <button
-                        className={`${cls} border-l-0`}
-                        onClick={() => handlePageChanged(currentPage + 1)}>
+                    <button className={`${cls} border-l-0`} onClick={() => handlePageChanged(currentPage + 1)}>
                         {currentPage + 1}
                     </button>
                 )}
@@ -64,10 +56,7 @@ function Pagination({ paginationData }) {
                     aria-label="Last"
                     className={`${cls} border-l-0 rounded-r-md`}
                     onClick={() => handlePageChanged(lastPage)}>
-                    <FontAwesomeIcon
-                        icon="fa-angles-right"
-                        className="w-2.5 h-2.5"
-                    />
+                    <FontAwesomeIcon icon="fa-angles-right" className="w-2.5 h-2.5" />
                 </button>
             </div>
         </RoundedFrame>

@@ -1,4 +1,4 @@
-import { ProblemFilterFrame } from "../components/concrete/other/ProblemFilter"
+import ProblemFilterFrame from "../components/concrete/filter/ProblemFilter"
 import ProblemsTable from "../components/concrete/table/ProblemsTable"
 import Pagination from "../components/util/Pagination"
 

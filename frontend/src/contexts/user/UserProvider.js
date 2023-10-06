@@ -7,8 +7,7 @@ function UserProvider({ children }) {
     const [isLoggedIn, setLoggedIn] = useState(null)
 
     return (
-        <UserContext.Provider
-            value={{ userData, isLoggedIn, setUserData, setLoggedIn }}>
+        <UserContext.Provider value={{ userData, isLoggedIn, setUserData, setLoggedIn }}>
             {children}
         </UserContext.Provider>
     )

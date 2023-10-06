@@ -19,25 +19,16 @@ export function LinkTag({ data }) {
 }
 
 function TagListFrame({ title, titleComponent, tag: Tag = DefaultTag, tags }) {
-    const tagsContent = tags.map((item, index) => (
-        <Tag data={item} key={index} />
-    ))
+    const tagsContent = tags.map((item, index) => <Tag data={item} key={index} />)
     return (
-        <RoundedFrame
-            title={title}
-            titleComponent={titleComponent}
-            cls="overflow-hidden">
+        <RoundedFrame title={title} titleComponent={titleComponent} cls="overflow-hidden">
             <div
                 className={`flex flex-col w-full ${
-                    title || titleComponent
-                        ? "rounded-b-container"
-                        : "rounded-container"
+                    title || titleComponent ? "rounded-b-container" : "rounded-container"
                 }`}>
                 <div
                     className={`flex flex-wrap p-4 bg-grey-850 ${
-                        title || titleComponent
-                            ? "rounded-b-container"
-                            : "rounded-container"
+                        title || titleComponent ? "rounded-b-container" : "rounded-container"
                     }`}>
                     {tagsContent}
                 </div>

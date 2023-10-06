@@ -14,14 +14,9 @@ function UpdatePage({ page: Page }) {
 
     useEffect(() => {
         let isMounted = true
-        updateData(
-            location,
-            abortController,
-            setData,
-            setUserData,
-            setLoggedIn,
-            () => isMounted,
-        ).then(() => setLoading(false))
+        updateData(location, abortController, setData, setUserData, setLoggedIn, () => isMounted).then(() =>
+            setLoading(false),
+        )
         return () => {
             isMounted = false
             abortController.abort()

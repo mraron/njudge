@@ -12,10 +12,7 @@ export async function login(username, password) {
         }),
     }
     try {
-        const response = await fetchWithCredentials(
-            apiRoute("/user/auth/login/"),
-            requestOptions,
-        )
+        const response = await fetchWithCredentials(apiRoute("/user/auth/login/"), requestOptions)
         const data = await response.json()
         return { ...data, success: response.ok }
     } catch (error) {
@@ -35,10 +32,7 @@ export async function register(username, email, password, passwordConfirm) {
         }),
     }
     try {
-        const response = await fetchWithCredentials(
-            apiRoute("/user/auth/register/"),
-            requestOptions,
-        )
+        const response = await fetchWithCredentials(apiRoute("/user/auth/register/"), requestOptions)
         const data = await response.json()
         return { ...data, success: response.ok }
     } catch (error) {
@@ -55,10 +49,7 @@ export async function change_password(email) {
         }),
     }
     try {
-        const response = await fetchWithCredentials(
-            apiRoute("/user/auth/forgotten_password/"),
-            requestOptions,
-        )
+        const response = await fetchWithCredentials(apiRoute("/user/auth/forgotten_password/"), requestOptions)
         return response.ok
     } catch (error) {
         console.error(error)
@@ -88,9 +79,7 @@ export async function reset_password(user, token, password, passwordConfirm) {
 }
 
 export async function verify(token) {
-    const response = await fetchWithCredentials(
-        apiRoute(`/user/auth/verify/${token}/`),
-    )
+    const response = await fetchWithCredentials(apiRoute(`/user/auth/verify/${token}/`))
     const data = await response.json()
     const result = { ...data, success: response.ok }
     if (response.ok) {
@@ -101,9 +90,7 @@ export async function verify(token) {
 
 export async function logout() {
     try {
-        const response = await fetchWithCredentials(
-            apiRoute("/user/auth/logout/"),
-        )
+        const response = await fetchWithCredentials(apiRoute("/user/auth/logout/"))
         return response.ok
     } catch (error) {
         console.error(error)

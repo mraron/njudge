@@ -4,9 +4,7 @@ import { useTranslation } from "react-i18next"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import Checkbox from "../../components/input/Checkbox"
 import TextBox from "../../components/input/TextBox"
-import RoundedFrame, {
-    SVGTitleComponent,
-} from "../../components/container/RoundedFrame"
+import RoundedFrame, { SVGTitleComponent } from "../../components/container/RoundedFrame"
 import Button from "../../components/basic/Button"
 import UserContext from "../../contexts/user/UserContext"
 import { routeMap } from "../../config/RouteConfig"
@@ -67,10 +65,7 @@ function PasswordChangeFrame() {
                     />
                 </div>
                 <div className="flex justify-center">
-                    <Button
-                        color="indigo"
-                        onClick={handleChangePassword}
-                        minWidth="8rem">
+                    <Button color="indigo" onClick={handleChangePassword} minWidth="8rem">
                         {t("profile_settings.save")}
                     </Button>
                 </div>
@@ -119,10 +114,7 @@ function OtherSettingsFrame({ data }) {
                     />
                 </div>
                 <div className="flex justify-center">
-                    <Button
-                        color="indigo"
-                        onClick={handleSaveSettings}
-                        minWidth="8rem">
+                    <Button color="indigo" onClick={handleSaveSettings} minWidth="8rem">
                         {t("profile_settings.save")}
                     </Button>
                 </div>

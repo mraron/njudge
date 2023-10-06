@@ -2,9 +2,7 @@ import { useContext, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Link, Navigate, useNavigate } from "react-router-dom"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import RoundedFrame, {
-    SVGTitleComponent,
-} from "../../components/container/RoundedFrame"
+import RoundedFrame, { SVGTitleComponent } from "../../components/container/RoundedFrame"
 import TextBox from "../../components/input/TextBox"
 import Button from "../../components/basic/Button"
 import UserContext from "../../contexts/user/UserContext"
@@ -20,9 +18,7 @@ function RegisterFrame() {
     const navigate = useNavigate()
     const titleComponent = (
         <SVGTitleComponent
-            svg={
-                <FontAwesomeIcon icon="fa-user-plus" className="w-5 h-5 mr-3" />
-            }
+            svg={<FontAwesomeIcon icon="fa-user-plus" className="w-5 h-5 mr-3" />}
             title={t("register.register")}
         />
     )
@@ -50,12 +46,7 @@ function RegisterFrame() {
                         />
                     </div>
                     <div className="mb-4">
-                        <TextBox
-                            id="email"
-                            label={t("register.email")}
-                            initText={email}
-                            onChange={setEmail}
-                        />
+                        <TextBox id="email" label={t("register.email")} initText={email} onChange={setEmail} />
                     </div>
                     <div className="mb-4">
                         <TextBox
@@ -81,12 +72,7 @@ function RegisterFrame() {
                         </Link>
                     </div>
                     <div className="mb-2 flex justify-center">
-                        <Button
-                            type="submit"
-                            color="indigo"
-                            cls="py-2.5"
-                            onClick={handleRegister}
-                            minWidth="12rem">
+                        <Button type="submit" color="indigo" cls="py-2.5" onClick={handleRegister} minWidth="12rem">
                             {t("register.register")}
                         </Button>
                     </div>
@@ -99,14 +85,7 @@ function RegisterFrame() {
 function Register() {
     const { userData, isLoggedIn } = useContext(UserContext)
     if (isLoggedIn) {
-        return (
-            <Navigate
-                to={routeMap.profile.replace(
-                    ":user",
-                    encodeURIComponent(userData.username),
-                )}
-            />
-        )
+        return <Navigate to={routeMap.profile.replace(":user", encodeURIComponent(userData.username))} />
     }
     return (
         <div className="w-full flex justify-center">

@@ -22,11 +22,7 @@ export function DefaultDropdownButton({
     clsClosed = "bg-grey-850 hover:bg-grey-825",
 }) {
     return (
-        <button
-            className={`${cls} dropdown-button ${
-                isOpen ? `${clsOpen}` : `${clsClosed}`
-            }`}
-            onClick={onClick}>
+        <button className={`${cls} dropdown-button ${isOpen ? `${clsOpen}` : `${clsClosed}`}`} onClick={onClick}>
             <span className="truncate min-w-0">{label}</span>
             <SVGDropdownMenuArrow isOpen={isOpen} />
         </button>
@@ -57,10 +53,7 @@ function DropdownMenu({ initSelected, itemNames, button: Button, onChange }) {
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (
-                dropdownRef.current &&
-                !dropdownRef.current.contains(event.target)
-            ) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setOpen(false)
             }
         }
@@ -82,10 +75,8 @@ function DropdownMenu({ initSelected, itemNames, button: Button, onChange }) {
                 className={`z-10 absolute overflow-hidden top-12 inset-x-0 ${
                     isOpen ? "max-h-60 opacity-100" : "max-h-0 opacity-0"
                 } transition-height-opacity duration-[250ms]`}>
-                <div
-                    className={`rounded-md max-h-60 overflow-y-auto border-bordefcol border`}>
-                    <ul
-                        className={`divide-y divide-grey-750 bg-grey-875 rounded-md overflow-hidden text-dropdown`}>
+                <div className={`rounded-md max-h-60 overflow-y-auto border-bordefcol border`}>
+                    <ul className={`divide-y divide-grey-750 bg-grey-875 rounded-md overflow-hidden text-dropdown`}>
                         {items}
                     </ul>
                 </div>
@@ -94,12 +85,7 @@ function DropdownMenu({ initSelected, itemNames, button: Button, onChange }) {
     )
 }
 
-export function DropdownRoutes({
-    routes,
-    routeLabels,
-    button: Button,
-    onChange,
-}) {
+export function DropdownRoutes({ routes, routeLabels, button: Button, onChange }) {
     const navigate = useNavigate()
     const location = useLocation()
     const selected = findRouteIndex(routes, location.pathname)
@@ -111,14 +97,7 @@ export function DropdownRoutes({
             onChange(index)
         }
     }
-    return (
-        <DropdownMenu
-            initSelected={selected}
-            button={Button}
-            itemNames={routeLabels}
-            onChange={handleChange}
-        />
-    )
+    return <DropdownMenu initSelected={selected} button={Button} itemNames={routeLabels} onChange={handleChange} />
 }
 
 export default DropdownMenu

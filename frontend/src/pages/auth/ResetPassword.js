@@ -2,9 +2,7 @@ import { useContext, useState } from "react"
 import { Navigate, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import RoundedFrame, {
-    SVGTitleComponent,
-} from "../../components/container/RoundedFrame"
+import RoundedFrame, { SVGTitleComponent } from "../../components/container/RoundedFrame"
 import TextBox from "../../components/input/TextBox"
 import Button from "../../components/basic/Button"
 import UserContext from "../../contexts/user/UserContext"
@@ -74,14 +72,7 @@ function ResetPasswordFrame() {
 function ResetPassword() {
     const { userData, isLoggedIn } = useContext(UserContext)
     if (isLoggedIn) {
-        return (
-            <Navigate
-                to={routeMap.profile.replace(
-                    ":user",
-                    encodeURIComponent(userData.username),
-                )}
-            />
-        )
+        return <Navigate to={routeMap.profile.replace(":user", encodeURIComponent(userData.username))} />
     }
     return (
         <div className="w-full flex justify-center">

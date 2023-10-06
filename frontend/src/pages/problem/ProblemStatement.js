@@ -5,9 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { SVGSpinner, SVGView } from "../../components/svg/SVGs"
 import MapDataFrame from "../../components/container/MapDataFrame"
 import DropdownMenu from "../../components/input/DropdownMenu"
-import RoundedFrame, {
-    SVGTitleComponent,
-} from "../../components/container/RoundedFrame"
+import RoundedFrame, { SVGTitleComponent } from "../../components/container/RoundedFrame"
 import RoundedTable from "../../components/container/RoundedTable"
 import TagModal from "../../components/container/modal/TagModal"
 import Tag from "../../components/basic/Tag"
@@ -27,14 +25,9 @@ function ProblemInfo({ info }) {
                     <Tag key={index}>{t(tagName)}</Tag>
                 ))}
                 {info.isSolved && (
-                    <button
-                        key={info.tags.length}
-                        onClick={() => setModalOpen(true)}>
+                    <button key={info.tags.length} onClick={() => setModalOpen(true)}>
                         <Tag cls="items-center">
-                            <FontAwesomeIcon
-                                icon="fa-regular fa-edit"
-                                className="w-5 h-3.5"
-                            />
+                            <FontAwesomeIcon icon="fa-regular fa-edit" className="w-5 h-3.5" />
                         </Tag>
                     </button>
                 )}
@@ -49,22 +42,14 @@ function ProblemInfo({ info }) {
     )
     return (
         <div>
-            {info.isSolved && (
-                <TagModal
-                    isOpen={isModalOpen}
-                    onClose={() => setModalOpen(false)}
-                />
-            )}
+            {info.isSolved && <TagModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />}
             <MapDataFrame
                 titleComponent={titleComponent}
                 data={[
                     [t("problem_statement.id"), info.id],
                     [t("problem_statement.title"), info.title],
                     [t("problem_statement.time_limit"), `${info.timeLimit} ms`],
-                    [
-                        t("problem_statement.memory_limit"),
-                        `${info.memoryLimit} MiB`,
-                    ],
+                    [t("problem_statement.memory_limit"), `${info.memoryLimit} MiB`],
                     [t("problem_statement.tags"), tagsContent],
                     [t("problem_statement.type"), info.type],
                 ]}
@@ -83,12 +68,7 @@ function ProblemSubmit() {
     const navigate = useNavigate()
     const titleComponent = (
         <SVGTitleComponent
-            svg={
-                <FontAwesomeIcon
-                    icon="fa-regular fa-paper-plane"
-                    className="w-4 h-4 mr-3"
-                />
-            }
+            svg={<FontAwesomeIcon icon="fa-regular fa-paper-plane" className="w-4 h-4 mr-3" />}
             title={t("problem_statement.submit_solution")}
         />
     )
@@ -108,11 +88,7 @@ function ProblemSubmit() {
         }).then((ok) => {
             if (ok) {
                 window.flash("flash.successful_submission", "success")
-                navigate(
-                    routeMap.problemSubmissions
-                        .replace(":problemset", problemset)
-                        .replace(":problem", problem),
-                )
+                navigate(routeMap.problemSubmissions.replace(":problemset", problemset).replace(":problem", problem))
             } else {
                 window.flash("flash.unsuccessful_submission", "failure")
             }
@@ -127,36 +103,22 @@ function ProblemSubmit() {
                 <div className="flex flex-col">
                     <div className="mb-4">
                         <DropdownMenu
-                            itemNames={judgeData.languages.map(
-                                (item) => item.label,
-                            )}
+                            itemNames={judgeData.languages.map((item) => item.label)}
                             onChange={handleLanguageChanged}
                         />
                     </div>
                     <span className="mb-2 mx-1 text-label break-words">
-                        {file
-                            ? file.name
-                            : t("problem_statement.no_file_selected")}
+                        {file ? file.name : t("problem_statement.no_file_selected")}
                     </span>
                     <div className="flex justify-center space-x-2">
                         <Button
                             color="gray"
-                            onClick={() =>
-                                document.getElementById("uploadFile").click()
-                            }
+                            onClick={() => document.getElementById("uploadFile").click()}
                             fullWidth={true}>
-                            <input
-                                id="uploadFile"
-                                type="file"
-                                className="hidden"
-                                onChange={handleFileUploaded}
-                            />
+                            <input id="uploadFile" type="file" className="hidden" onChange={handleFileUploaded} />
                             {t("problem_statement.choose")}
                         </Button>
-                        <Button
-                            color="indigo"
-                            onClick={handleSubmit}
-                            fullWidth={true}>
+                        <Button color="indigo" onClick={handleSubmit} fullWidth={true}>
                             {t("problem_statement.submit")}
                         </Button>
                     </div>
@@ -170,46 +132,28 @@ function ProblemLastSubmissions({ submissions, maxScore }) {
     const { t } = useTranslation()
     const titleComponent = (
         <SVGTitleComponent
-            svg={
-                <FontAwesomeIcon
-                    icon="fa-regular fa-clock"
-                    className="w-4 h-4 mr-3"
-                />
-            }
+            svg={<FontAwesomeIcon icon="fa-regular fa-clock" className="w-4 h-4 mr-3" />}
             title={t("problem_statement.last_submissions")}
         />
     )
     const rows = submissions.map((item, index) => (
         <tr key={index}>
             <td className=" w-0">
-                <Link
-                    className="link"
-                    to={routeMap.submission.replace(":id", item.id)}>
+                <Link className="link" to={routeMap.submission.replace(":id", item.id)}>
                     {item.id}
                 </Link>
             </td>
             <td style={{ maxWidth: 100 }}>
                 <div className="flex items-center">
-                    {item.verdictType === 0 && (
-                        <SVGSpinner cls="w-4 h-4 mr-3" />
-                    )}
+                    {item.verdictType === 0 && <SVGSpinner cls="w-4 h-4 mr-3" />}
                     {item.verdictType === 1 && (
-                        <FontAwesomeIcon
-                            icon="fa-xmark"
-                            className="w-4 h-4 highlight-red mr-3"
-                        />
+                        <FontAwesomeIcon icon="fa-xmark" className="w-4 h-4 highlight-red mr-3" />
                     )}
                     {item.verdictType === 2 && (
-                        <FontAwesomeIcon
-                            icon="fa-check"
-                            className="w-4 h-4 highlight-yellow mr-3"
-                        />
+                        <FontAwesomeIcon icon="fa-check" className="w-4 h-4 highlight-yellow mr-3" />
                     )}
                     {item.verdictType === 3 && (
-                        <FontAwesomeIcon
-                            icon="fa-check"
-                            className="w-4 h-4 highlight-green mr-3"
-                        />
+                        <FontAwesomeIcon icon="fa-check" className="w-4 h-4 highlight-green mr-3" />
                     )}
                     <span className="truncate">{item.verdictName}</span>
                 </div>
@@ -238,22 +182,10 @@ function ProblemAttachment({ type, name, href }) {
                 download="statement.pdf"
                 target="_blank"
                 rel="noreferrer">
-                {type === "file" && (
-                    <FontAwesomeIcon
-                        icon="fa-regular fa-file"
-                        className="w-4 h-4 mr-3"
-                    />
-                )}
-                {type === "statement" && (
-                    <FontAwesomeIcon
-                        icon="fa-regular fa-file-lines"
-                        className="w-4 h-4 mr-3"
-                    />
-                )}
+                {type === "file" && <FontAwesomeIcon icon="fa-regular fa-file" className="w-4 h-4 mr-3" />}
+                {type === "statement" && <FontAwesomeIcon icon="fa-regular fa-file-lines" className="w-4 h-4 mr-3" />}
                 <span className="underline truncate">
-                    {type === "statement"
-                        ? t("problem_statement.statement")
-                        : t("problem_statement.file")}
+                    {type === "statement" ? t("problem_statement.statement") : t("problem_statement.file")}
                     &nbsp;({name})
                 </span>
             </a>
@@ -265,14 +197,7 @@ function ProblemAttachments({ attachments }) {
     const { t } = useTranslation()
     console.log(attachments.statements)
     const attachmentsContent = attachments.statements
-        .map((item, index) => (
-            <ProblemAttachment
-                key={index}
-                type="statement"
-                name={item.name}
-                href={item.href}
-            />
-        ))
+        .map((item, index) => <ProblemAttachment key={index} type="statement" name={item.name} href={item.href} />)
         .concat(
             attachments.files.map((item, index) => (
                 <ProblemAttachment
@@ -285,9 +210,7 @@ function ProblemAttachments({ attachments }) {
         )
     const titleComponent = (
         <SVGTitleComponent
-            svg={
-                <FontAwesomeIcon icon="fa-paperclip" className="w-4 h-4 mr-3" />
-            }
+            svg={<FontAwesomeIcon icon="fa-paperclip" className="w-4 h-4 mr-3" />}
             title={t("problem_statement.attachments")}
         />
     )
@@ -313,16 +236,11 @@ function ProblemStatement({ data }) {
                         <div className="w-full px-4 py-3 sm:px-6 sm:py-5 flex">
                             <div className="w-full mr-3 min-w-0">
                                 <DropdownMenu
-                                    itemNames={data.attachments.statements.map(
-                                        (item) => item.name,
-                                    )}
+                                    itemNames={data.attachments.statements.map((item) => item.name)}
                                     onChange={setStatementIndex}
                                 />
                             </div>
-                            <a
-                                href={apiRoute(statementSrc)}
-                                target="_blank"
-                                rel="noreferrer">
+                            <a href={apiRoute(statementSrc)} target="_blank" rel="noreferrer">
                                 <Button color="gray">
                                     <SVGView cls="w-[1.4rem] h-[1.4rem]" />
                                 </Button>
@@ -353,10 +271,7 @@ function ProblemStatement({ data }) {
                 <ProblemInfo info={data.info} />
                 <ProblemSubmit />
                 {data.lastSubmissions && data.lastSubmissions.length > 0 && (
-                    <ProblemLastSubmissions
-                        submissions={data.lastSubmissions}
-                        maxScore={data.info.maxScore}
-                    />
+                    <ProblemLastSubmissions submissions={data.lastSubmissions} maxScore={data.info.maxScore} />
                 )}
                 <ProblemAttachments attachments={data.attachments} />
             </div>

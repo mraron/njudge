@@ -5,16 +5,11 @@ function Modal({ children, isOpen, onClose }) {
     return (
         <>
             {isOpen && (
-                <div
-                    className="z-40 fixed inset-0 bg-black opacity-50"
-                    onClick={onClose}>
+                <div className="z-40 fixed inset-0 bg-black opacity-50" onClick={onClose}>
                     <button
                         onClick={onClose}
                         className="flex items-center justify-center absolute top-3 right-3 p-2 rounded-full bg-transparent hover:bg-grey-100 dark:hover:bg-grey-700">
-                        <FontAwesomeIcon
-                            icon={faClose}
-                            className="w-6 h-6 text-white"
-                        />
+                        <FontAwesomeIcon icon={faClose} className="w-6 h-6 text-white" />
                     </button>
                 </div>
             )}

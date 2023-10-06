@@ -76,164 +76,61 @@ function RoutingComponent() {
     return (
         <div className="w-full">
             <Routes>
-                <Route
-                    path={routeMap.home}
-                    element={<UpdatePage key={location.key} page={Home} />}
-                />
-                <Route
-                    path={routeMap.contests}
-                    element={<UpdatePage key={location.key} page={Contests} />}
-                />
-                <Route
-                    path={routeMap.info}
-                    element={<UpdatePage key={location.key} page={Info} />}
-                />
-                <Route
-                    path={routeMap.archive}
-                    element={<UpdatePage key={location.key} page={Archive} />}
-                />
-                <Route
-                    path={routeMap.submissions}
-                    element={
-                        <UpdatePage key={location.key} page={Submissions} />
-                    }
-                />
-                <Route
-                    path={routeMap.problems}
-                    element={<UpdatePage key={location.key} page={Problems} />}
-                />
-                <Route
-                    path={routeMap.submission}
-                    element={
-                        <UpdatePage key={location.key} page={Submission} />
-                    }
-                />
-                <Route
-                    path={routeMap.login}
-                    element={<UpdatePage key={location.key} page={Login} />}
-                />
-                <Route
-                    path={routeMap.register}
-                    element={<UpdatePage key={location.key} page={Register} />}
-                />
+                <Route path={routeMap.home} element={<UpdatePage key={location.key} page={Home} />} />
+                <Route path={routeMap.contests} element={<UpdatePage key={location.key} page={Contests} />} />
+                <Route path={routeMap.info} element={<UpdatePage key={location.key} page={Info} />} />
+                <Route path={routeMap.archive} element={<UpdatePage key={location.key} page={Archive} />} />
+                <Route path={routeMap.submissions} element={<UpdatePage key={location.key} page={Submissions} />} />
+                <Route path={routeMap.problems} element={<UpdatePage key={location.key} page={Problems} />} />
+                <Route path={routeMap.submission} element={<UpdatePage key={location.key} page={Submission} />} />
+                <Route path={routeMap.login} element={<UpdatePage key={location.key} page={Login} />} />
+                <Route path={routeMap.register} element={<UpdatePage key={location.key} page={Register} />} />
                 <Route
                     path={routeMap.forgotten_password}
-                    element={
-                        <UpdatePage
-                            key={location.key}
-                            page={ForgottenPassword}
-                        />
-                    }
+                    element={<UpdatePage key={location.key} page={ForgottenPassword} />}
                 />
                 <Route
                     path={routeMap.reset_password}
-                    element={
-                        <UpdatePage key={location.key} page={ResetPassword} />
-                    }
+                    element={<UpdatePage key={location.key} page={ResetPassword} />}
                 />
-                <Route
-                    path={routeMap.verify}
-                    element={<UpdatePage key={location.key} page={Verify} />}
-                />
-                <Route
-                    path={routeMap.logout}
-                    element={<UpdatePage key={location.key} page={Logout} />}
-                />
-                <Route
-                    path={routeMap.admin}
-                    element={<UpdatePage key={location.key} page={Admin} />}
-                />
+                <Route path={routeMap.verify} element={<UpdatePage key={location.key} page={Verify} />} />
+                <Route path={routeMap.logout} element={<UpdatePage key={location.key} page={Logout} />} />
+                <Route path={routeMap.admin} element={<UpdatePage key={location.key} page={Admin} />} />
                 <Route path={routeMap.profile} element={<Profile />}>
-                    <Route
-                        index
-                        element={
-                            <UpdatePage key={location.key} page={ProfileMain} />
-                        }
-                    />
+                    <Route index element={<UpdatePage key={location.key} page={ProfileMain} />} />
                     <Route
                         path={routeMap.profileSubmissions}
-                        element={
-                            <UpdatePage
-                                key={location.key}
-                                page={ProfileSubmissions}
-                            />
-                        }
+                        element={<UpdatePage key={location.key} page={ProfileSubmissions} />}
                     />
                     <Route
                         path={routeMap.profileSettings}
-                        element={
-                            <UpdatePage
-                                key={location.key}
-                                page={ProfileSettings}
-                            />
-                        }
+                        element={<UpdatePage key={location.key} page={ProfileSettings} />}
                     />
                 </Route>
                 <Route path={routeMap.problem} element={<Problem />}>
-                    <Route
-                        index
-                        element={
-                            <UpdatePage
-                                key={location.key}
-                                page={ProblemStatement}
-                            />
-                        }
-                    />
+                    <Route index element={<UpdatePage key={location.key} page={ProblemStatement} />} />
                     <Route
                         path={routeMap.problemSubmit}
-                        element={
-                            <UpdatePage
-                                key={location.key}
-                                page={ProblemSubmit}
-                            />
-                        }
+                        element={<UpdatePage key={location.key} page={ProblemSubmit} />}
                     />
                     <Route
                         path={routeMap.problemSubmissions}
-                        element={
-                            <UpdatePage
-                                key={location.key}
-                                page={ProblemSubmissions}
-                            />
-                        }
+                        element={<UpdatePage key={location.key} page={ProblemSubmissions} />}
                     />
                     <Route
                         path={routeMap.problemRanklist}
-                        element={
-                            <UpdatePage
-                                key={location.key}
-                                page={ProblemRanklist}
-                            />
-                        }
+                        element={<UpdatePage key={location.key} page={ProblemRanklist} />}
                     />
                 </Route>
                 <Route path={routeMap.contest} element={<Contest />}>
-                    <Route
-                        index
-                        element={
-                            <UpdatePage
-                                key={location.key}
-                                page={ContestProblems}
-                            />
-                        }
-                    />
+                    <Route index element={<UpdatePage key={location.key} page={ContestProblems} />} />
                     <Route
                         path={routeMap.contestSubmissions}
-                        element={
-                            <UpdatePage
-                                key={location.key}
-                                page={ContestSubmissions}
-                            />
-                        }
+                        element={<UpdatePage key={location.key} page={ContestSubmissions} />}
                     />
                     <Route
                         path={routeMap.contestRanklist}
-                        element={
-                            <UpdatePage
-                                key={location.key}
-                                page={ContestRanklist}
-                            />
-                        }
+                        element={<UpdatePage key={location.key} page={ContestRanklist} />}
                     />
                 </Route>
                 <Route path="*" element={<UpdatePage page={NotFound} />} />

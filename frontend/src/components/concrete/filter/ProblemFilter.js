@@ -25,21 +25,14 @@ function ProblemFilter() {
             return -1
         }
         const categoryInt = parseInt(category)
-        return judgeData.categories.findIndex(
-            (item) => item.value === categoryInt,
-        )
+        return judgeData.categories.findIndex((item) => item.value === categoryInt)
     }
     const parseTags = (tags) => {
         if (tags === undefined) {
             return []
         }
         const tokens = tags.split(",").map(parseInt)
-        if (
-            tokens.some(
-                (elem) =>
-                    isNaN(elem) || elem <= -1 || elem >= judgeData.tags.length,
-            )
-        ) {
+        if (tokens.some((elem) => isNaN(elem) || elem <= -1 || elem >= judgeData.tags.length)) {
             return []
         }
         return tokens
@@ -52,7 +45,7 @@ function ProblemFilter() {
     const handleTitleChange = (newText) => {
         setTitle(newText)
     }
-    const handleCategoryChange = (selected, newText) => {
+    const handleCategoryChange = (selected, _) => {
         setCategory(selected)
     }
     const handleTagsChange = (tags) => {
@@ -63,11 +56,7 @@ function ProblemFilter() {
             location: location,
             navigate: navigate,
             args: ["title", "tags", "category"],
-            values: [
-                title,
-                tags.join(","),
-                category === -1 ? -1 : judgeData.categories[category].value,
-            ],
+            values: [title, tags.join(","), category === -1 ? -1 : judgeData.categories[category].value],
             validArgs: ["title", "tags", "category"],
         })
     }
@@ -98,11 +87,7 @@ function ProblemFilter() {
                 <TextBoxDropdown
                     id="filterCategory"
                     label={t("problem_filter.category")}
-                    initText={
-                        category === -1
-                            ? ""
-                            : judgeData.categories[category].label
-                    }
+                    initText={category === -1 ? "" : judgeData.categories[category].label}
                     initSelected={category}
                     fillSelected={true}
                     itemNames={judgeData.categories.map((x) => x.label)}
@@ -132,4 +117,4 @@ export function ProblemFilterFrame() {
     )
 }
 
-export default ProblemFilter
+export default ProblemFilterFrame

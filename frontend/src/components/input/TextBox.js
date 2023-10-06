@@ -1,14 +1,6 @@
 import { useState } from "react"
 
-function TextBox({
-    id,
-    label,
-    type = "",
-    initText = "",
-    onChange,
-    onFocus,
-    onBlur,
-}) {
+function TextBox({ id, label, type = "", initText = "", onChange, onFocus, onBlur }) {
     const [focused, setFocused] = useState(false)
     const handleChange = (event) => {
         if (onChange) {
@@ -32,14 +24,8 @@ function TextBox({
             <label htmlFor={id} className="text-label">
                 {label}
             </label>
-            <div
-                className={`border-b-1 ${
-                    focused ? "border-indigo-600" : "border-transparent"
-                } w-full mt-1`}>
-                <div
-                    className={`border-b-1 ${
-                        focused ? "border-indigo-600" : "border-bordefcol"
-                    } w-full`}>
+            <div className={`border-b-1 ${focused ? "border-indigo-600" : "border-transparent"} w-full mt-1`}>
+                <div className={`border-b-1 ${focused ? "border-indigo-600" : "border-bordefcol"} w-full`}>
                     <input
                         id={id}
                         type={type}

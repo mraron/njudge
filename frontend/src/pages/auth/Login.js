@@ -2,9 +2,7 @@ import { useContext, useState } from "react"
 import { Link, Navigate, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import RoundedFrame, {
-    SVGTitleComponent,
-} from "../../components/container/RoundedFrame"
+import RoundedFrame, { SVGTitleComponent } from "../../components/container/RoundedFrame"
 import TextBox from "../../components/input/TextBox"
 import Button from "../../components/basic/Button"
 import UserContext from "../../contexts/user/UserContext"
@@ -18,12 +16,7 @@ function LoginFrame() {
     const [password, setPassword] = useState("")
     const titleComponent = (
         <SVGTitleComponent
-            svg={
-                <FontAwesomeIcon
-                    icon="fa-user-check"
-                    className="w-5 h-5 mr-3"
-                />
-            }
+            svg={<FontAwesomeIcon icon="fa-user-check" className="w-5 h-5 mr-3" />}
             title={t("login.login")}
         />
     )
@@ -43,12 +36,7 @@ function LoginFrame() {
             <div className="px-10 py-8">
                 <form method="POST">
                     <div className="mb-4">
-                        <TextBox
-                            id="username"
-                            label={t("login.username")}
-                            initText={username}
-                            onChange={setUsername}
-                        />
+                        <TextBox id="username" label={t("login.username")} initText={username} onChange={setUsername} />
                     </div>
                     <div className="mb-2">
                         <TextBox
@@ -60,18 +48,12 @@ function LoginFrame() {
                         />
                     </div>
                     <div className="mb-6">
-                        <Link
-                            to={routeMap.forgotten_password}
-                            className="link text-sm">
+                        <Link to={routeMap.forgotten_password} className="link text-sm">
                             {t("login.forgotten_password")}
                         </Link>
                     </div>
                     <div className="mb-2 flex justify-center space-x-2">
-                        <Button
-                            color="indigo"
-                            cls="py-2.5"
-                            onClick={handleLogin}
-                            fullWidth={true}>
+                        <Button color="indigo" cls="py-2.5" onClick={handleLogin} fullWidth={true}>
                             {t("login.login")}
                         </Button>
                         <Button color="gray" cls="py-2.5" fullWidth={true}>
@@ -87,14 +69,7 @@ function LoginFrame() {
 function Login() {
     const { userData, isLoggedIn } = useContext(UserContext)
     if (isLoggedIn) {
-        return (
-            <Navigate
-                to={routeMap.profile.replace(
-                    ":user",
-                    encodeURIComponent(userData.username),
-                )}
-            />
-        )
+        return <Navigate to={routeMap.profile.replace(":user", encodeURIComponent(userData.username))} />
     }
     return (
         <div className="w-full flex justify-center">

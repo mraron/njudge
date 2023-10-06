@@ -5,9 +5,7 @@ import { useState } from "react"
 function CopyableCode({ text, maxHeight = "auto", titleComponent, cls }) {
     const [isHovered, setHovered] = useState(false)
     return (
-        <RoundedFrame
-            cls={`${cls} overflow-auto shadow-none`}
-            titleComponent={titleComponent}>
+        <RoundedFrame cls={`${cls} overflow-auto shadow-none`} titleComponent={titleComponent}>
             <div
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}

@@ -11,16 +11,7 @@ function DropdownItem({ itemName, onClick }) {
     )
 }
 
-function TextBoxDropdown({
-    id,
-    label,
-    itemNames,
-    fillSelected,
-    initText = "",
-    initSelected = -1,
-    onChange,
-    onClick,
-}) {
+function TextBoxDropdown({ id, label, itemNames, fillSelected, initText = "", initSelected = -1, onChange, onClick }) {
     const [focused, setFocused] = useState(false)
     const [selected, setSelected] = useState(initSelected)
     const [text, setText] = useState(initText)
@@ -36,17 +27,11 @@ function TextBoxDropdown({
         setFocused(false)
     }
     const handleTextChange = (newText) => {
-        setSelected(
-            itemNames
-                .map((itemName) => itemName.toLowerCase())
-                .indexOf(newText.toLowerCase()),
-        )
+        setSelected(itemNames.map((itemName) => itemName.toLowerCase()).indexOf(newText.toLowerCase()))
         setText(newText)
     }
     const items = itemNames
-        .filter((itemName) =>
-            itemName.toLowerCase().includes(text.toLowerCase()),
-        )
+        .filter((itemName) => itemName.toLowerCase().includes(text.toLowerCase()))
         .map((itemName, index) => {
             const handleClick = () => {
                 if (fillSelected) {
@@ -57,13 +42,7 @@ function TextBoxDropdown({
                     onClick(index, itemName)
                 }
             }
-            return (
-                <DropdownItem
-                    itemName={itemName}
-                    onClick={handleClick}
-                    key={index}
-                />
-            )
+            return <DropdownItem itemName={itemName} onClick={handleClick} key={index} />
         })
     return (
         <div className="relative">
@@ -75,18 +54,12 @@ function TextBoxDropdown({
                 onFocus={handleFocus}
                 onBlur={handleBlur}
             />
-            <div
-                className={`z-10 absolute overflow-hidden inset-x-0 ${
-                    focused ? "max-h-60" : "max-h-0"
-                }`}>
+            <div className={`z-10 absolute overflow-hidden inset-x-0 ${focused ? "max-h-60" : "max-h-0"}`}>
                 <div
                     className={`rounded-sm max-h-60 overflow-y-auto border-bordefcol ${
                         items.length > 0 ? "border" : ""
                     }`}>
-                    <ul
-                        className={`divide-y divide-dividecol bg-grey-875 text-sm`}>
-                        {items}
-                    </ul>
+                    <ul className={`divide-y divide-dividecol bg-grey-875 text-sm`}>{items}</ul>
                 </div>
             </div>
         </div>
