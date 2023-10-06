@@ -14,4 +14,13 @@ function RoundedFrame({ children, title, titleComponent, cls = null }) {
     )
 }
 
+export function SVGTitleComponent({ title, icon }) {
+    return (
+        <div className="frame-title flex items-center justify-center">
+            {icon}
+            <span className="break-words min-w-0">{title}</span>
+        </div>
+    )
+}
+
 export default RoundedFrame

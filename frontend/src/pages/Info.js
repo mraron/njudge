@@ -1,10 +1,9 @@
+import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { SVGTitleComponent } from "../components/container/RoundedFrame"
 import ProfileSideBar from "../components/concrete/other/ProfileSidebar"
 import RoundedTable from "../components/container/RoundedTable"
-import React from "react"
-import { Link } from "react-router-dom"
-import SVGTitleComponent from "../components/svg/SVGTitleComponent"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 function InfoTable() {
     const { t } = useTranslation()
@@ -17,7 +16,7 @@ function InfoTable() {
     return (
         <RoundedTable titleComponent={titleComponent}>
             <tbody className="divide-y divide-dividecol text-sm">
-                <tr className="divide-x divide-dividecol">
+                <tr>
                     <td>{t("info.compiler_options")}</td>
                     <td>
                         <Link to="#" className="link">
@@ -25,7 +24,7 @@ function InfoTable() {
                         </Link>
                     </td>
                 </tr>
-                <tr className="divide-x divide-dividecol">
+                <tr>
                     <td>{t("info.contests")}</td>
                     <td>
                         <Link to="#" className="link">

@@ -2,13 +2,14 @@ import { useContext, useState } from "react"
 import { Link, Navigate, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import RoundedFrame from "../../components/container/RoundedFrame"
+import RoundedFrame, {
+    SVGTitleComponent,
+} from "../../components/container/RoundedFrame"
 import TextBox from "../../components/input/TextBox"
-import SVGTitleComponent from "../../components/svg/SVGTitleComponent"
-import { login } from "../../util/auth"
-import { routeMap } from "../../config/RouteConfig"
-import UserContext from "../../contexts/user/UserContext"
 import Button from "../../components/basic/Button"
+import UserContext from "../../contexts/user/UserContext"
+import { routeMap } from "../../config/RouteConfig"
+import { login } from "../../util/auth"
 
 function LoginFrame() {
     const { t } = useTranslation()

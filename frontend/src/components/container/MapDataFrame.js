@@ -2,7 +2,7 @@ import RoundedTable from "./RoundedTable"
 
 function MapDataFrame({ data, title, titleComponent, labelColWidth }) {
     const rows = data.map((pair, index) => (
-        <tr className="divide-x divide-dividecol" key={index}>
+        <tr key={index}>
             <td
                 className="padding-td-mapdata bg-grey-850 whitespace-nowrap"
                 style={{ width: labelColWidth || "0" }}>
@@ -15,7 +15,7 @@ function MapDataFrame({ data, title, titleComponent, labelColWidth }) {
     ))
     return (
         <RoundedTable title={title} titleComponent={titleComponent}>
-            <tbody className="divide-y divide-dividecol">{rows}</tbody>
+            <tbody>{rows}</tbody>
         </RoundedTable>
     )
 }

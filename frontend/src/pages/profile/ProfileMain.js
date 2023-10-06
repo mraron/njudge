@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import SVGTitleComponent from "../../components/svg/SVGTitleComponent"
+import { SVGTitleComponent } from "../../components/container/RoundedFrame"
 import TagListFrame, { LinkTag } from "../../components/container/TagListFrame"
 import {
     ProfileDataFrame,

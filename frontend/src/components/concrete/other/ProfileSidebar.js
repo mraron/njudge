@@ -4,10 +4,9 @@ import { Link } from "react-router-dom"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faLineChart } from "@fortawesome/free-solid-svg-icons"
 import MapDataFrame from "../../container/MapDataFrame"
-import SVGTitleComponent from "../../svg/SVGTitleComponent"
 import RoundedTable from "../../container/RoundedTable"
 import UserContext from "../../../contexts/user/UserContext"
-import RoundedFrame from "../../container/RoundedFrame"
+import RoundedFrame, { SVGTitleComponent } from "../../container/RoundedFrame"
 import { routeMap } from "../../../config/RouteConfig"
 
 export function ProfilePictureFrame({ userData }) {
@@ -66,7 +65,7 @@ export function ProfileDataFrame({ userData }) {
 
 function SubmissionsFrame({ titleComponent, submissions }) {
     const rows = submissions.map((item, index) => (
-        <tr className="divide-x divide-dividecol" key={index}>
+        <tr key={index}>
             <td>
                 <Link
                     className="link"
@@ -83,7 +82,7 @@ function SubmissionsFrame({ titleComponent, submissions }) {
     ))
     return (
         <RoundedTable titleComponent={titleComponent}>
-            <tbody className="divide-y divide-dividecol">{rows}</tbody>
+            <tbody>{rows}</tbody>
         </RoundedTable>
     )
 }

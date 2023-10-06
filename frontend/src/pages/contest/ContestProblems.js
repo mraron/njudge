@@ -8,7 +8,7 @@ import React from "react"
 function Problem({ problem }) {
     const { id, title, status } = problem
     return (
-        <tr className="divide-x divide-dividecol">
+        <tr>
             <td className="text-center">{id}</td>
             <td>
                 <Link className="link" to={title.href}>
@@ -47,16 +47,14 @@ function ContestProblems({ data }) {
     ))
     return (
         <RoundedTable>
-            <thead className="bg-grey-800">
-                <tr className="divide-x divide-dividecol">
+            <thead>
+                <tr>
                     <th className="w-0">{t("contest_problems.id")}</th>
                     <th>{t("contest_problems.title")}</th>
                     <th className="w-0">{t("contest_problems.status")}</th>
                 </tr>
             </thead>
-            <tbody className="divide-y divide-dividecol">
-                {problemsContent}
-            </tbody>
+            <tbody>{problemsContent}</tbody>
         </RoundedTable>
     )
 }

@@ -132,17 +132,15 @@ function ContestRanklist({ data }) {
                     </div>
                 </DropdownFrame>
                 <RoundedTable>
-                    <thead className="bg-grey-800">
-                        <tr className="divide-x divide-dividecol">
+                    <thead>
+                        <tr>
                             <th className="w-0">#</th>
                             <th>{t("contest_ranklist.username")}</th>
                             <th className="w-0">=</th>
                             {problemsContent}
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-dividecol">
-                        {ranklistContent}
-                    </tbody>
+                    <tbody>{ranklistContent}</tbody>
                 </RoundedTable>
                 <Pagination paginationData={data.paginationData} />
             </div>

@@ -1,17 +1,16 @@
 import { useContext } from "react"
 import { useTranslation } from "react-i18next"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { SVGTitleComponent } from "../components/container/RoundedFrame"
 import SubmissionTable from "../components/concrete/table/SubmissionTable"
 import SubmissionsTable from "../components/concrete/table/SubmissionsTable"
-import SVGTitleComponent from "../components/svg/SVGTitleComponent"
 import CopyableCode from "../components/util/copy/CopyableCode"
 import DropdownFrame from "../components/container/DropdownFrame"
-
+import Button from "../components/basic/Button"
 import JudgeDataContext from "../contexts/judgeData/JudgeDataContext"
 import UserContext from "../contexts/user/UserContext"
-import Editor from "@monaco-editor/react"
 import ThemeContext from "../contexts/theme/ThemeContext"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import Button from "../components/basic/Button"
+import Editor from "@monaco-editor/react"
 
 function CompileErrorFrame({ message }) {
     const { t } = useTranslation()

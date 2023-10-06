@@ -60,15 +60,13 @@ function Ranklist({ ranklist }) {
     ))
     return (
         <RoundedTable cls="overflow-hidden">
-            <thead className="bg-grey-800">
-                <tr className="divide-x divide-dividecol">
+            <thead>
+                <tr>
                     <th>{t("problem_ranklist.username")}</th>
                     <th colSpan={2}>{t("problem_ranklist.result")}</th>
                 </tr>
             </thead>
-            <tbody className="divide-y divide-dividecol bg-grey-850">
-                {rows}
-            </tbody>
+            <tbody className="bg-grey-850">{rows}</tbody>
         </RoundedTable>
     )
 }

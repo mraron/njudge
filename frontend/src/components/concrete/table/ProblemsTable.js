@@ -18,7 +18,7 @@ function Problem(data) {
         <Tag key={index}>{t(item)}</Tag>
     ))
     return (
-        <tr className={"divide-x divide-dividecol"}>
+        <tr>
             {isLoggedIn && (
                 <td className=" w-0">
                     <div className="flex items-center justify-center">
@@ -96,8 +96,8 @@ function ProblemsTable({ problemset = "main", problems }) {
     ))
     return (
         <RoundedTable>
-            <thead className="bg-framebgcol">
-                <tr className="divide-x divide-dividecol">
+            <thead>
+                <tr>
                     <th colSpan={isLoggedIn ? 2 : 1}>
                         {t("problems_table.id")}
                     </th>
@@ -112,9 +112,7 @@ function ProblemsTable({ problemset = "main", problems }) {
                     </th>
                 </tr>
             </thead>
-            <tbody className="divide-y divide-dividecol">
-                {problemsContent}
-            </tbody>
+            <tbody>{problemsContent}</tbody>
         </RoundedTable>
     )
 }

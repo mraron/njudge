@@ -191,7 +191,7 @@ function TestCase0({ testCase, index }) {
         ["submission_table.expected_output", testCase.expectedOutput],
         ["submission_table.checker_output", testCase.checkerOutput],
     ].map((item, index) => (
-        <tr className="divide-x divide-dividecol" key={index}>
+        <tr key={index}>
             <td className=" whitespace-nowrap w-48">{t(item[0])}</td>
             <td className="p-0" style={{ maxWidth: 0 }}>
                 <CopyableCode
@@ -205,7 +205,7 @@ function TestCase0({ testCase, index }) {
     ))
     return (
         <RoundedTable titleComponent={titleComponent}>
-            <tbody className="divide-y divide-dividecol">{outputRows}</tbody>
+            <tbody>{outputRows}</tbody>
         </RoundedTable>
     )
 }
@@ -230,8 +230,8 @@ function SubmissionTable13({ status }) {
     ))
     return (
         <RoundedTable>
-            <thead className="bg-framebgcol">
-                <tr className="divide-x divide-dividecol">
+            <thead>
+                <tr>
                     <th>{t("submission_table.subtask")}</th>
                     <th>{t("submission_table.total")}</th>
                     <th>{t("submission_table.test")}</th>

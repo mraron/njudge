@@ -57,7 +57,7 @@ function SubmissionFilter({ optionOwn }) {
                     {t("submission_filter.filter")}
                 </Button>
                 <Button color="gray" onClick={handleReset} minWidth="8rem">
-                    {t("submission_filter.reset")}{" "}
+                    {t("submission_filter.reset")}
                 </Button>
             </div>
         </div>

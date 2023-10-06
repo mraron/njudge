@@ -1,20 +1,21 @@
-import React, { useContext, useState } from "react"
+import { useContext, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { SVGSpinner, SVGView } from "../../components/svg/SVGs"
 import MapDataFrame from "../../components/container/MapDataFrame"
 import DropdownMenu from "../../components/input/DropdownMenu"
-import RoundedFrame from "../../components/container/RoundedFrame"
-import SVGTitleComponent from "../../components/svg/SVGTitleComponent"
-import { SVGSpinner, SVGView } from "../../components/svg/SVGs"
+import RoundedFrame, {
+    SVGTitleComponent,
+} from "../../components/container/RoundedFrame"
 import RoundedTable from "../../components/container/RoundedTable"
 import TagModal from "../../components/container/modal/TagModal"
+import Tag from "../../components/basic/Tag"
+import Button from "../../components/basic/Button"
 import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext"
 import ThemeContext from "../../contexts/theme/ThemeContext"
 import submitSolution from "../../util/submitSolution"
 import { apiRoute, routeMap } from "../../config/RouteConfig"
-import Tag from "../../components/basic/Tag"
-import Button from "../../components/basic/Button"
 
 function ProblemInfo({ info }) {
     const { t } = useTranslation()
@@ -179,7 +180,7 @@ function ProblemLastSubmissions({ submissions, maxScore }) {
         />
     )
     const rows = submissions.map((item, index) => (
-        <tr className="divide-x divide-dividecol" key={index}>
+        <tr key={index}>
             <td className=" w-0">
                 <Link
                     className="link"
@@ -222,7 +223,7 @@ function ProblemLastSubmissions({ submissions, maxScore }) {
     ))
     return (
         <RoundedTable titleComponent={titleComponent}>
-            <tbody className="divide-y divide-dividecol">{rows}</tbody>
+            <tbody>{rows}</tbody>
         </RoundedTable>
     )
 }

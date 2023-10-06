@@ -158,6 +158,18 @@ pre {
     @apply text-yellow-600 dark:text-yellow-500;
 }
 
+thead {
+    @apply bg-framebgcol;
+}
+
+tbody {
+    @apply divide-y divide-dividecol;
+}
+
+tr {
+    @apply divide-x divide-dividecol;
+}
+
 th {
     @apply emph-med padding-th-default;
 }

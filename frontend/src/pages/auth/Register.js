@@ -1,14 +1,15 @@
+import { useContext, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Link, Navigate, useNavigate } from "react-router-dom"
-import { useContext, useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import RoundedFrame from "../../components/container/RoundedFrame"
+import RoundedFrame, {
+    SVGTitleComponent,
+} from "../../components/container/RoundedFrame"
 import TextBox from "../../components/input/TextBox"
-import SVGTitleComponent from "../../components/svg/SVGTitleComponent"
+import Button from "../../components/basic/Button"
+import UserContext from "../../contexts/user/UserContext"
 import { routeMap } from "../../config/RouteConfig"
 import { register } from "../../util/auth"
-import UserContext from "../../contexts/user/UserContext"
-import Button from "../../components/basic/Button"
 
 function RegisterFrame() {
     const { t } = useTranslation()

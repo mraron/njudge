@@ -1,10 +1,9 @@
+import { Link } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import RoundedTable from "../../container/RoundedTable"
 import { SVGSpinner } from "../../svg/SVGs"
-import { Link } from "react-router-dom"
 import { routeMap } from "../../../config/RouteConfig"
-import { useTranslation } from "react-i18next"
-import React from "react"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 function Submission({ submission }) {
     const {
@@ -21,7 +20,7 @@ function Submission({ submission }) {
         memory,
     } = submission
     return (
-        <tr className={"divide-x divide-dividecol"}>
+        <tr>
             <td className=" w-0 text-center">
                 <Link
                     className="link"
@@ -68,7 +67,7 @@ function Submission({ submission }) {
                 </div>
             </td>
             {maxScore !== 0.0 && (
-                <td className=" w-0 text-center">
+                <td className="w-0 text-center">
                     <span className="whitespace-nowrap">
                         {score} / {maxScore}
                     </span>
@@ -87,8 +86,8 @@ function SubmissionsTable({ submissions }) {
     ))
     return (
         <RoundedTable>
-            <thead className="bg-framebgcol">
-                <tr className="divide-x divide-dividecol">
+            <thead>
+                <tr>
                     <th>{t("submissions_table.id")}</th>
                     <th>{t("submissions_table.date")}</th>
                     <th>{t("submissions_table.user")}</th>
@@ -99,9 +98,7 @@ function SubmissionsTable({ submissions }) {
                     <th>{t("submissions_table.memory")}</th>
                 </tr>
             </thead>
-            <tbody className="divide-y divide-dividecol">
-                {submissionsContent}
-            </tbody>
+            <tbody>{submissionsContent}</tbody>
         </RoundedTable>
     )
 }
