@@ -7,7 +7,7 @@ import RoundedTable from "../../container/RoundedTable"
 import UserContext from "../../../contexts/user/UserContext"
 import { routeMap } from "../../../config/RouteConfig"
 import OrderedColumnTitle from "../../util/OrderedColumnTitle"
-import Tag from "../../util/Tag"
+import Tag from "../../basic/Tag"
 
 function Problem(data) {
     const { t } = useTranslation()

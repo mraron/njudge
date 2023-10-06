@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom"
 import RoundedFrame from "./RoundedFrame"
-import Tag from "../util/Tag"
+import Tag from "../basic/Tag"
 
 export function DefaultTag({ data }) {
     return <Tag cls="w-28 justify-center">{data}</Tag>

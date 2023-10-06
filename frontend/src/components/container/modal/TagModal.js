@@ -6,7 +6,7 @@ import RoundedFrame from "../RoundedFrame"
 import TagDropdown from "../../input/TagDropdown"
 import SVGTitleComponent from "../../svg/SVGTitleComponent"
 import JudgeDataContext from "../../../contexts/judgeData/JudgeDataContext"
-import Button from "../../util/Button"
+import Button from "../../basic/Button"
 
 function TagModal({ isOpen, onClose }) {
     const { t } = useTranslation()

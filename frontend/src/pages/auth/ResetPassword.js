@@ -8,7 +8,7 @@ import SVGTitleComponent from "../../components/svg/SVGTitleComponent"
 import UserContext from "../../contexts/user/UserContext"
 import { routeMap } from "../../config/RouteConfig"
 import { reset_password } from "../../util/auth"
-import Button from "../../components/util/Button"
+import Button from "../../components/basic/Button"
 
 function ResetPasswordFrame() {
     const { t } = useTranslation()

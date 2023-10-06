@@ -8,7 +8,7 @@ import SVGTitleComponent from "../../components/svg/SVGTitleComponent"
 import { routeMap } from "../../config/RouteConfig"
 import UserContext from "../../contexts/user/UserContext"
 import { change_password } from "../../util/auth"
-import Button from "../../components/util/Button"
+import Button from "../../components/basic/Button"
 
 function ForgottenPasswordFrame() {
     const { t } = useTranslation()

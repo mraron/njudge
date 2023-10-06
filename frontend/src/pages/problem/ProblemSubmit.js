@@ -8,7 +8,7 @@ import { routeMap } from "../../config/RouteConfig"
 import submitSolution from "../../util/submitSolution"
 import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext"
 import ThemeContext from "../../contexts/theme/ThemeContext"
-import Button from "../../components/util/Button"
+import Button from "../../components/basic/Button"
 
 function SubmitControlsFrame({ onLanguageChanged, onSubmit }) {
     const { t } = useTranslation()

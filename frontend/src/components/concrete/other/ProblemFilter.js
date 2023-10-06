@@ -9,7 +9,7 @@ import updateQueryString from "../../../util/updateQueryString"
 import JudgeDataContext from "../../../contexts/judgeData/JudgeDataContext"
 import queryString from "query-string"
 import { parseInt } from "lodash"
-import Button from "../../util/Button"
+import Button from "../../basic/Button"
 
 function ProblemFilter() {
     const { t } = useTranslation()

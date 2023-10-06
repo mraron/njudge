@@ -7,7 +7,7 @@ import RoundedTable from "../../components/container/RoundedTable"
 import Pagination from "../../components/util/Pagination"
 import DropdownFrame from "../../components/container/DropdownFrame"
 import TextBox from "../../components/input/TextBox"
-import Button from "../../components/util/Button"
+import Button from "../../components/basic/Button"
 import updateQueryString from "../../util/updateQueryString"
 import queryString from "query-string"
 

@@ -11,7 +11,7 @@ import UserContext from "../contexts/user/UserContext"
 import Editor from "@monaco-editor/react"
 import ThemeContext from "../contexts/theme/ThemeContext"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import Button from "../components/util/Button"
+import Button from "../components/basic/Button"
 
 function CompileErrorFrame({ message }) {
     const { t } = useTranslation()

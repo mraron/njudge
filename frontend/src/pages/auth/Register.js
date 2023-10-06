@@ -8,7 +8,7 @@ import SVGTitleComponent from "../../components/svg/SVGTitleComponent"
 import { routeMap } from "../../config/RouteConfig"
 import { register } from "../../util/auth"
 import UserContext from "../../contexts/user/UserContext"
-import Button from "../../components/util/Button"
+import Button from "../../components/basic/Button"
 
 function RegisterFrame() {
     const { t } = useTranslation()

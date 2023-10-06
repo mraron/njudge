@@ -13,8 +13,8 @@ import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext"
 import ThemeContext from "../../contexts/theme/ThemeContext"
 import submitSolution from "../../util/submitSolution"
 import { apiRoute, routeMap } from "../../config/RouteConfig"
-import Tag from "../../components/util/Tag"
-import Button from "../../components/util/Button"
+import Tag from "../../components/basic/Tag"
+import Button from "../../components/basic/Button"
 
 function ProblemInfo({ info }) {
     const { t } = useTranslation()

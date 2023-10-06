@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next"
 import ProfileSideBar from "../components/concrete/other/ProfileSidebar"
 import RoundedTable from "../components/container/RoundedTable"
-import CopyableCommand from "../components/util/copy/CopyableCommand"
 import React from "react"
 import { Link } from "react-router-dom"
 import SVGTitleComponent from "../components/svg/SVGTitleComponent"

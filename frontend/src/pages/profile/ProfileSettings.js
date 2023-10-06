@@ -9,7 +9,7 @@ import RoundedFrame from "../../components/container/RoundedFrame"
 import { changePassword, saveSettings } from "../../util/settings"
 import { routeMap } from "../../config/RouteConfig"
 import UserContext from "../../contexts/user/UserContext"
-import Button from "../../components/util/Button"
+import Button from "../../components/basic/Button"
 
 function PasswordChangeFrame() {
     const { t } = useTranslation()
