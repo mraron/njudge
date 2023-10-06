@@ -17,7 +17,7 @@ function CompileErrorFrame({ message }) {
     const titleComponent = (
         <SVGTitleComponent
             title={t("submission.compilation_error")}
-            svg={<FontAwesomeIcon icon="fa-xmark" className="w-4 h-4 mr-3 text-red-600" />}
+            icon={<FontAwesomeIcon icon="fa-xmark" className="w-4 h-4 mr-3 text-red-600" />}
         />
     )
     return <CopyableCode text={message} titleComponent={titleComponent} maxHeight="16rem" />

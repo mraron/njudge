@@ -2,22 +2,17 @@ import { useState } from "react"
 
 function TextBox({ id, label, type = "", initText = "", onChange, onFocus, onBlur }) {
     const [focused, setFocused] = useState(false)
+
     const handleChange = (event) => {
-        if (onChange) {
-            onChange(event.target.value)
-        }
+        onChange?.(event.target.value)
     }
     const handleFocus = () => {
         setFocused(true)
-        if (onFocus) {
-            onFocus()
-        }
+        onFocus?.()
     }
     const handleBlur = () => {
         setFocused(false)
-        if (onBlur) {
-            onBlur()
-        }
+        onBlur?.()
     }
     return (
         <div>
@@ -34,7 +29,7 @@ function TextBox({ id, label, type = "", initText = "", onChange, onFocus, onBlu
                         onFocus={handleFocus}
                         onBlur={handleBlur}
                         className={`py-2 px-2 bg-grey-850 border border-b-0 text-sm ${
-                            focused ? "border-grey-575" : "border-grey-650"
+                            focused ? "border-borstrcol" : "border-bordefcol"
                         } w-full outline-none`}
                     />
                 </div>

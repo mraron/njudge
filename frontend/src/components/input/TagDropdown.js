@@ -1,4 +1,3 @@
-import _ from "lodash"
 import { useEffect, useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import TextBoxDropdown from "./TextBoxDropdown"
@@ -26,22 +25,21 @@ function Tag({ title, onClick }) {
     )
 }
 
-function TagDropdown({ id, label, itemNames, initTags = [], onChange }) {
+function TagDropdown({ id, label, items, initTags = [], onChange }) {
     const [tags, setTags] = useState(initTags)
+
     useEffect(() => {
-        if (onChange) {
-            onChange(tags)
-        }
+        onChange?.(tags)
     }, [onChange, tags])
 
     const tagsContent = tags.map((tag, index) => {
         const handleRemoveTag = () => {
             setTags((prevTags) => prevTags.filter((prevTag) => prevTag !== tag))
         }
-        return <Tag title={itemNames[tag]} onClick={handleRemoveTag} key={index} />
+        return <Tag title={items[tag]} onClick={handleRemoveTag} key={index} />
     })
-    const handleAddTag = (selected, title) => {
-        const remaining = _.range(itemNames.length).filter((index) => !tags.includes(index))
+    const handleAddTag = (selected, _) => {
+        const remaining = _.range(items.length).filter((index) => !tags.includes(index))
         const tag = remaining[selected]
         setTags((prevTags) => (prevTags.includes(tag) ? prevTags : [...prevTags, tag]))
     }
@@ -50,7 +48,7 @@ function TagDropdown({ id, label, itemNames, initTags = [], onChange }) {
             <TextBoxDropdown
                 id={id}
                 label={label}
-                itemNames={itemNames.filter((itemName, index) => !tags.includes(index))}
+                items={items.filter((item, index) => !tags.includes(index))}
                 onClick={handleAddTag}
             />
             <div className={`${tagsContent.length > 0 ? "mt-2" : ""} flex flex-wrap`}>{tagsContent}</div>

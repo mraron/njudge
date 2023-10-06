@@ -8,13 +8,13 @@ function ProfileMain({ data }) {
     const { t } = useTranslation()
     const titleComponentCorrect = (
         <SVGTitleComponent
-            svg={<FontAwesomeIcon icon="fa-check" className="w-5 h-5 highlight-green mr-3" />}
+            icon={<FontAwesomeIcon icon="fa-check" className="w-5 h-5 highlight-green mr-3" />}
             title={t("profile_main.solved_problems")}
         />
     )
     const titleComponentWrong = (
         <SVGTitleComponent
-            svg={<FontAwesomeIcon icon="fa-xmark" className="w-5 h-5 highlight-red mr-3" />}
+            icon={<FontAwesomeIcon icon="fa-xmark" className="w-5 h-5 highlight-red mr-3" />}
             title={t("profile_main.unsolved_problems")}
         />
     )

@@ -16,7 +16,7 @@ function LoginFrame() {
     const [password, setPassword] = useState("")
     const titleComponent = (
         <SVGTitleComponent
-            svg={<FontAwesomeIcon icon="fa-user-check" className="w-5 h-5 mr-3" />}
+            icon={<FontAwesomeIcon icon="fa-user-check" className="w-5 h-5 mr-3" />}
             title={t("login.login")}
         />
     )

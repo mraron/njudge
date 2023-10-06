@@ -29,10 +29,10 @@ function MenuOption({ label, route, selected, horizontal, onClick }) {
     return (
         <li>
             <Link
-                onClick={onClick}
                 className={`flex items-center h-full px-4 ${horizontal ? "border-b-3 pt-1" : "border-l-3 p-3"} ${
                     selected ? "border-highlight bg-grey-775" : "border-transparent hover:bg-framebgcol"
                 }`}
+                onClick={onClick}
                 to={route}>
                 {label}
             </Link>
@@ -72,6 +72,17 @@ function ProfileSettings({ onSidebarClose }) {
                 .concat(profileRouteLabels.slice(1))
         }
     }
+    function LanguageButton({ lang }) {
+        return (
+            <button
+                className={`px-2 py-0.5 ${
+                    i18n.resolvedLanguage === lang ? "bg-grey-725" : "hover:bg-grey-775"
+                } rounded`}
+                onClick={() => i18n.changeLanguage(lang)}>
+                {lang}
+            </button>
+        )
+    }
     return (
         <div className="w-full flex items-stretch">
             <DropdownRoutes
@@ -80,19 +91,9 @@ function ProfileSettings({ onSidebarClose }) {
                 onChange={onSidebarClose}
                 routeLabels={profileRouteLabels.map(t)}
             />
-            <div className="px-3 flex items-center justify-center border border-l-0 border-bordefcol">
-                <button
-                    className={`px-2 ${
-                        i18n.resolvedLanguage === "hu" ? "bg-grey-725" : "hover:bg-grey-775"
-                    } rounded mr-1`}
-                    onClick={() => i18n.changeLanguage("hu")}>
-                    hu
-                </button>
-                <button
-                    className={`px-2 ${i18n.resolvedLanguage === "en" ? "bg-grey-725" : "hover:bg-grey-775"} rounded`}
-                    onClick={() => i18n.changeLanguage("en")}>
-                    en
-                </button>
+            <div className="px-3 flex items-center justify-center border border-l-0 border-bordefcol space-x-1">
+                <LanguageButton lang="hu" />
+                <LanguageButton lang="en" />
             </div>
             <div>
                 <ThemeButton />
@@ -154,7 +155,7 @@ function MenuSideBar({ selected, isOpen, onClose }) {
     return (
         <aside
             ref={menuRef}
-            className={`h-full w-80 z-20 pt-20 overflow-y-auto overflow-x-hidden xl:hidden fixed bg-grey-825 border-l-1 border-bordefcol right-0 transform ${
+            className={`h-full w-80 z-20 pt-20 overflow-y-auto overflow-x-hidden xl:hidden fixed bg-grey-825 border-l border-bordefcol right-0 transform ${
                 isOpen ? "translate-x-0 opacity-100" : "translate-x-80 opacity-0"
             } ease-out transition-transform-opacity duration-200`}>
             <div className="flex flex-col justify-center">
@@ -181,7 +182,7 @@ function MenuTopBar({ selected, isOpen, onToggle }) {
         )
     })
     return (
-        <div className="z-30 flex justify-center bg-grey-825 border-b-1 border-grey-750 fixed w-full top-0">
+        <div className="z-30 flex justify-center bg-grey-825 border-b border-grey-700 fixed w-full top-0">
             <div className="w-full max-w-7xl flex justify-between items-center">
                 <div className="flex w-full">
                     <Link to="/" className="font-semibold text-lg mx-8 my-4">

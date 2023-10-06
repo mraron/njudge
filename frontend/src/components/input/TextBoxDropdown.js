@@ -1,23 +1,23 @@
 import { useEffect, useState } from "react"
 import TextBox from "./TextBox"
 
-function DropdownItem({ itemName, onClick }) {
+function DropdownItem({ text, onClick }) {
     return (
         <li
             className="cursor-pointer px-4 py-2 flex items-center hover:bg-framebgcol border-grey-750"
             onMouseDown={onClick}>
-            {itemName}
+            {text}
         </li>
     )
 }
 
-function TextBoxDropdown({ id, label, itemNames, fillSelected, initText = "", initSelected = -1, onChange, onClick }) {
+function TextBoxDropdown({ id, label, items, fillSelected, initText = "", initSelected = -1, onChange, onClick }) {
     const [focused, setFocused] = useState(false)
     const [selected, setSelected] = useState(initSelected)
     const [text, setText] = useState(initText)
 
     useEffect(() => {
-        if (onChange) onChange(selected, text)
+        onChange?.(selected, text)
     }, [selected, text])
 
     const handleFocus = () => {
@@ -27,22 +27,20 @@ function TextBoxDropdown({ id, label, itemNames, fillSelected, initText = "", in
         setFocused(false)
     }
     const handleTextChange = (newText) => {
-        setSelected(itemNames.map((itemName) => itemName.toLowerCase()).indexOf(newText.toLowerCase()))
+        setSelected(items.map((item) => item.toLowerCase()).indexOf(newText.toLowerCase()))
         setText(newText)
     }
-    const items = itemNames
-        .filter((itemName) => itemName.toLowerCase().includes(text.toLowerCase()))
-        .map((itemName, index) => {
+    const itemsContent = items
+        .filter((item) => item.toLowerCase().includes(text.toLowerCase()))
+        .map((item, index) => {
             const handleClick = () => {
                 if (fillSelected) {
-                    setText(itemName)
+                    setText(item)
                 }
                 setSelected(index)
-                if (onClick) {
-                    onClick(index, itemName)
-                }
+                onClick?.(index, item)
             }
-            return <DropdownItem itemName={itemName} onClick={handleClick} key={index} />
+            return <DropdownItem text={item} onClick={handleClick} key={index} />
         })
     return (
         <div className="relative">
@@ -59,7 +57,7 @@ function TextBoxDropdown({ id, label, itemNames, fillSelected, initText = "", in
                     className={`rounded-sm max-h-60 overflow-y-auto border-bordefcol ${
                         items.length > 0 ? "border" : ""
                     }`}>
-                    <ul className={`divide-y divide-dividecol bg-grey-875 text-sm`}>{items}</ul>
+                    <ul className={`divide-y divide-dividecol bg-grey-875 text-sm`}>{itemsContent}</ul>
                 </div>
             </div>
         </div>

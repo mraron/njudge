@@ -36,7 +36,7 @@ function ProblemInfo({ info }) {
     )
     const titleComponent = (
         <SVGTitleComponent
-            svg={<FontAwesomeIcon icon="fa-info" className="w-4 h-4 mr-3" />}
+            icon={<FontAwesomeIcon icon="fa-info" className="w-4 h-4 mr-3" />}
             title={t("problem_statement.information")}
         />
     )
@@ -68,7 +68,7 @@ function ProblemSubmit() {
     const navigate = useNavigate()
     const titleComponent = (
         <SVGTitleComponent
-            svg={<FontAwesomeIcon icon="fa-regular fa-paper-plane" className="w-4 h-4 mr-3" />}
+            icon={<FontAwesomeIcon icon="fa-regular fa-paper-plane" className="w-4 h-4 mr-3" />}
             title={t("problem_statement.submit_solution")}
         />
     )
@@ -103,7 +103,7 @@ function ProblemSubmit() {
                 <div className="flex flex-col">
                     <div className="mb-4">
                         <DropdownMenu
-                            itemNames={judgeData.languages.map((item) => item.label)}
+                            items={judgeData.languages.map((item) => item.label)}
                             onChange={handleLanguageChanged}
                         />
                     </div>
@@ -132,7 +132,7 @@ function ProblemLastSubmissions({ submissions, maxScore }) {
     const { t } = useTranslation()
     const titleComponent = (
         <SVGTitleComponent
-            svg={<FontAwesomeIcon icon="fa-regular fa-clock" className="w-4 h-4 mr-3" />}
+            icon={<FontAwesomeIcon icon="fa-regular fa-clock" className="w-4 h-4 mr-3" />}
             title={t("problem_statement.last_submissions")}
         />
     )
@@ -210,7 +210,7 @@ function ProblemAttachments({ attachments }) {
         )
     const titleComponent = (
         <SVGTitleComponent
-            svg={<FontAwesomeIcon icon="fa-paperclip" className="w-4 h-4 mr-3" />}
+            icon={<FontAwesomeIcon icon="fa-paperclip" className="w-4 h-4 mr-3" />}
             title={t("problem_statement.attachments")}
         />
     )
@@ -236,7 +236,7 @@ function ProblemStatement({ data }) {
                         <div className="w-full px-4 py-3 sm:px-6 sm:py-5 flex">
                             <div className="w-full mr-3 min-w-0">
                                 <DropdownMenu
-                                    itemNames={data.attachments.statements.map((item) => item.name)}
+                                    items={data.attachments.statements.map((item) => item.name)}
                                     onChange={setStatementIndex}
                                 />
                             </div>

@@ -29,19 +29,17 @@ export function DefaultDropdownButton({
     )
 }
 
-function DropdownMenu({ initSelected, itemNames, button: Button, onChange }) {
+function DropdownMenu({ initSelected, items, button: Button, onChange }) {
     const [selected, setSelected] = useState(initSelected)
     const [isOpen, setOpen] = useState(false)
     const dropdownRef = useRef(null)
-    const items = itemNames.map((itemName, index) => (
+    const itemsContent = items.map((item, index) => (
         <DropdownItem
             index={index}
-            name={itemName}
+            name={item}
             key={index}
             onClick={() => {
-                if (onChange) {
-                    onChange(index)
-                }
+                onChange?.(index)
                 setOpen(false)
                 setSelected(index)
             }}
@@ -66,18 +64,14 @@ function DropdownMenu({ initSelected, itemNames, button: Button, onChange }) {
     Button = Button || DefaultDropdownButton
     return (
         <div className="relative w-full" ref={dropdownRef}>
-            <Button
-                label={itemNames[selected === -1 ? 0 : selected]}
-                isOpen={isOpen}
-                onClick={() => setOpen(!isOpen)}
-            />
+            <Button label={items[selected === -1 ? 0 : selected]} isOpen={isOpen} onClick={() => setOpen(!isOpen)} />
             <div
                 className={`z-10 absolute overflow-hidden top-12 inset-x-0 ${
                     isOpen ? "max-h-60 opacity-100" : "max-h-0 opacity-0"
                 } transition-height-opacity duration-[250ms]`}>
                 <div className={`rounded-md max-h-60 overflow-y-auto border-bordefcol border`}>
                     <ul className={`divide-y divide-grey-750 bg-grey-875 rounded-md overflow-hidden text-dropdown`}>
-                        {items}
+                        {itemsContent}
                     </ul>
                 </div>
             </div>
@@ -93,11 +87,9 @@ export function DropdownRoutes({ routes, routeLabels, button: Button, onChange }
         if (index !== -1 && !matchPath(routes[index], location.pathname)) {
             navigate(routes[index])
         }
-        if (onChange) {
-            onChange(index)
-        }
+        onChange?.(index)
     }
-    return <DropdownMenu initSelected={selected} button={Button} itemNames={routeLabels} onChange={handleChange} />
+    return <DropdownMenu initSelected={selected} button={Button} items={routeLabels} onChange={handleChange} />
 }
 
 export default DropdownMenu

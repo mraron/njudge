@@ -8,11 +8,11 @@ import RoundedTable from "../components/container/RoundedTable"
 function InfoTable() {
     const { t } = useTranslation()
     const titleComponent = (
-        <SVGTitleComponent svg={<FontAwesomeIcon icon="fa-info" className="w-4 h-4 mr-3" />} title={t("info.info")} />
+        <SVGTitleComponent icon={<FontAwesomeIcon icon="fa-info" className="w-4 h-4 mr-3" />} title={t("info.info")} />
     )
     return (
         <RoundedTable titleComponent={titleComponent}>
-            <tbody className="divide-y divide-dividecol text-sm">
+            <tbody className="divide-y divide-dividecol">
                 <tr>
                     <td>{t("info.compiler_options")}</td>
                     <td>

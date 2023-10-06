@@ -35,7 +35,7 @@ export function ProfileDataFrame({ userData }) {
     const { t } = useTranslation()
     const titleComponent = (
         <SVGTitleComponent
-            svg={<FontAwesomeIcon icon={faLineChart} className="w-4 h-4 mr-3" />}
+            icon={<FontAwesomeIcon icon={faLineChart} className="w-4 h-4 mr-3" />}
             title={t("profile_sidebar.stats")}
         />
     )
@@ -79,7 +79,7 @@ function ProfileSideBar() {
     const { userData, isLoggedIn } = useContext(UserContext)
     const titleComponent = (
         <SVGTitleComponent
-            svg={<FontAwesomeIcon icon="fa-regular fa-clock" className="w-4 h-4 mr-3" />}
+            icon={<FontAwesomeIcon icon="fa-regular fa-clock" className="w-4 h-4 mr-3" />}
             title={t("profile_sidebar.last_submissions")}
         />
     )

@@ -1,15 +1,15 @@
 import { useContext, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+import { parseInt } from "lodash"
 import TextBox from "../../input/TextBox"
 import TextBoxDropdown from "../../input/TextBoxDropdown"
 import TagDropdown from "../../input/TagDropdown"
 import DropdownFrame from "../../container/DropdownFrame"
+import Button from "../../basic/Button"
 import updateQueryString from "../../../util/updateQueryString"
 import JudgeDataContext from "../../../contexts/judgeData/JudgeDataContext"
 import queryString from "query-string"
-import { parseInt } from "lodash"
-import Button from "../../basic/Button"
 
 function ProblemFilter() {
     const { t } = useTranslation()
@@ -41,6 +41,8 @@ function ProblemFilter() {
     const [title, setTitle] = useState(parseTitle(qData.title))
     const [tags, setTags] = useState(parseTags(qData.tags))
     const [category, setCategory] = useState(parseCategory(qData.category))
+
+    console.log("CATEGORY:" + category)
 
     const handleTitleChange = (newText) => {
         setTitle(newText)
@@ -80,7 +82,7 @@ function ProblemFilter() {
                     id="filterTags"
                     label={t("problem_filter.tags")}
                     fillSelected={false}
-                    itemNames={judgeData.tags.map(t)}
+                    items={judgeData.tags.map(t)}
                     initTags={tags}
                     onChange={handleTagsChange}
                 />
@@ -90,7 +92,7 @@ function ProblemFilter() {
                     initText={category === -1 ? "" : judgeData.categories[category].label}
                     initSelected={category}
                     fillSelected={true}
-                    itemNames={judgeData.categories.map((x) => x.label)}
+                    items={judgeData.categories.map((x) => x.label)}
                     onChange={handleCategoryChange}
                 />
             </div>

@@ -6,9 +6,7 @@ function Checkbox({ id, label, initChecked, onChange }) {
     const [hovered, setHovered] = useState(false)
     const handleChange = (event) => {
         setChecked(event.target.checked)
-        if (onChange) {
-            onChange(event.target.checked)
-        }
+        onChange?.(event.target.checked)
     }
     return (
         <label

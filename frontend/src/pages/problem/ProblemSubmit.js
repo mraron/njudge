@@ -18,10 +18,7 @@ function SubmitControlsFrame({ onLanguageChanged, onSubmit }) {
         <RoundedFrame>
             <div className="px-4 py-3 sm:px-6 sm:py-5 flex items-stretch">
                 <div className="w-full min-w-0 mr-3">
-                    <DropdownMenu
-                        itemNames={judgeData.languages.map((item) => item.label)}
-                        onChange={onLanguageChanged}
-                    />
+                    <DropdownMenu items={judgeData.languages.map((item) => item.label)} onChange={onLanguageChanged} />
                 </div>
                 <Button color="indigo" minWidth="8rem" onClick={onSubmit}>
                     {t("problem_submit.submit")}
