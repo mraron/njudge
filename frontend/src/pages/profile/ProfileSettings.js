@@ -92,9 +92,9 @@ function OtherSettingsFrame({ data }) {
     const handleSaveSettings = async () => {
         saveSettings(user, showUnsolved, hideSolved).then((resp) => {
             if (resp.success) {
-                window.flash(t("flash.successful_settings_save"), "success")
+                window.flash("flash.successful_settings_save", "success")
             } else {
-                window.flash(t("flash.unsuccessful_settings_save"), "failure")
+                window.flash("flash.unsuccessful_settings_save", "failure")
             }
         })
     }
