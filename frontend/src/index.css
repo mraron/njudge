@@ -111,12 +111,10 @@
         @apply whitespace-nowrap cursor-pointer text-small px-2 py-1 border rounded bg-grey-750 hover:bg-grey-725 border-borstrcol truncate h-8 flex items-center;
     }
     .btn-indigo {
-        @apply text-white bg-indigo-600 dark:bg-indigo-700 rounded-md hover:bg-indigo-500 dark:hover:bg-indigo-600 text-center;
-        font-size: 0.95rem;
+        @apply text-white text-btn font-medium bg-indigo-600 dark:bg-indigo-700 rounded-md hover:bg-indigo-500 dark:hover:bg-indigo-600 text-center;
     }
     .btn-gray {
-        @apply text-small bg-grey-725 rounded-md hover:bg-grey-700 border border-borstrcol text-center;
-        font-size: 0.95rem;
+        @apply text-btn bg-grey-725 rounded-md hover:bg-grey-700 border border-borstrcol text-center;
     }
     .date-label {
         @apply cursor-pointer text-sm px-2 py-1 bg-grey-725 rounded border border-borstrcol hover:bg-grey-700 shrink-0;
@@ -178,10 +176,12 @@ td {
 
 .text-frame {
     font-size: 0.96rem;
+    line-height: 1.35rem;
 }
 
 .text-nav {
     font-size: 0.975rem;
+    line-height: 1.35rem;
 }
 
 .text-table {
@@ -194,6 +194,11 @@ td {
     line-height: 1.25rem;
 }
 
+.text-btn {
+    font-size: 0.9rem;
+    line-height: 1.25rem;
+}
+
 .text-dropdown-list,
 .text-dropdown {
     font-size: 0.95rem;
@@ -202,6 +207,7 @@ td {
 
 .text-small {
     font-size: 0.85rem;
+    line-height: 1.2rem;
 }
 
 html {
