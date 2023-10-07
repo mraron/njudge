@@ -7,10 +7,9 @@ import SubmissionsTable from "../components/concrete/table/SubmissionsTable"
 import CopyableCode from "../components/util/copy/CopyableCode"
 import DropdownFrame from "../components/container/DropdownFrame"
 import Button from "../components/basic/Button"
+import CodeEditor from "../components/input/CodeEditor"
 import JudgeDataContext from "../contexts/judgeData/JudgeDataContext"
 import UserContext from "../contexts/user/UserContext"
-import ThemeContext from "../contexts/theme/ThemeContext"
-import Editor from "@monaco-editor/react"
 
 function CompileErrorFrame({ message }) {
     const { t } = useTranslation()
@@ -26,7 +25,6 @@ function CompileErrorFrame({ message }) {
 function Submission({ data }) {
     const { userData } = useContext(UserContext)
     const { judgeData } = useContext(JudgeDataContext)
-    const { theme } = useContext(ThemeContext)
 
     return (
         <div className="w-full flex justify-center">
@@ -46,10 +44,9 @@ function Submission({ data }) {
                     )}
                     <SubmissionsTable submissions={[data.summary]} />
                     {data.language !== "zip" && (
-                        <Editor
+                        <CodeEditor
                             className="editor"
                             height="40vh"
-                            theme={`${theme === "light" ? "vs" : "vs-dark"}`}
                             options={{
                                 domReadOnly: true,
                                 readOnly: true,

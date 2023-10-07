@@ -17,12 +17,14 @@ function Checkbox({ id, label, initChecked, onChange }) {
             <div
                 className={`flex border items-center justify-center ${
                     checked
-                        ? `${hovered ? "bg-indigo-500" : "bg-indigo-600"} border-transparent`
+                        ? `${
+                              hovered ? "bg-indigo-400 dark:bg-indigo-500" : "bg-indigo-500 dark:bg-indigo-600"
+                          } border-transparent`
                         : `${hovered ? "bg-grey-825" : "bg-grey-850"} border-bordefcol`
                 } w-[1.35rem] h-[1.35rem] rounded`}>
                 <FontAwesomeIcon
                     icon="fa-check"
-                    className={`w-4 h-4 text-white ${checked ? "opacity-100" : "opacity-0"}`}
+                    className={`w-[0.9rem] h-[0.9rem] text-white ${checked ? "opacity-100" : "opacity-0"}`}
                 />
                 <input
                     id={id}

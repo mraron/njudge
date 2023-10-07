@@ -1,14 +1,13 @@
 import { useContext, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import MonacoEditor from "@monaco-editor/react"
 import RoundedFrame from "../../components/container/RoundedFrame"
 import DropdownMenu from "../../components/input/DropdownMenu"
-import { routeMap } from "../../config/RouteConfig"
 import submitSolution from "../../util/submitSolution"
-import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext"
-import ThemeContext from "../../contexts/theme/ThemeContext"
 import Button from "../../components/basic/Button"
+import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext"
+import { routeMap } from "../../config/RouteConfig"
+import CodeEditor from "../../components/input/CodeEditor"
 
 function SubmitControlsFrame({ onLanguageChanged, onSubmit }) {
     const { t } = useTranslation()
@@ -30,11 +29,11 @@ function SubmitControlsFrame({ onLanguageChanged, onSubmit }) {
 
 function ProblemSubmit() {
     const { judgeData } = useContext(JudgeDataContext)
-    const { theme } = useContext(ThemeContext)
     const { problem, problemset } = useParams()
     const [langIndex, setLangIndex] = useState(0)
     const [submissionCode, setSubmissionCode] = useState("")
     const navigate = useNavigate()
+
     const handleLanguageChanged = (index) => {
         setLangIndex(index)
     }
@@ -56,12 +55,15 @@ function ProblemSubmit() {
     return (
         <div className="flex flex-col space-y-2">
             <SubmitControlsFrame onSubmit={handleSubmit} onLanguageChanged={handleLanguageChanged} />
-            <MonacoEditor
+            <CodeEditor
                 className="editor"
                 height="60vh"
-                theme={`${theme === "light" ? "vs" : "vs-dark"}`}
                 language={judgeData.highlightCodes[judgeData.languages[langIndex].id]}
-                options={{ fontFamily: "JetBrains Mono", fontSize: 13 }}
+                options={{
+                    fontFamily: "JetBrains Mono",
+                    fontSize: 13,
+                    lineHeight: 21,
+                }}
                 onChange={setSubmissionCode}
             />
         </div>

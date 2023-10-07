@@ -1,0 +1,10 @@
+{
+    "base": "vs-dark",
+    "inherit": true,
+    "rules": [
+        {
+            "background": "#1B171E",
+            "token": ""
+        }
+    ]
+}
