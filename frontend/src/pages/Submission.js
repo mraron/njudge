@@ -46,7 +46,7 @@ function Submission({ data }) {
                     {data.language !== "zip" && (
                         <CodeEditor
                             className="editor"
-                            height="40vh"
+                            height="28rem"
                             options={{
                                 domReadOnly: true,
                                 readOnly: true,

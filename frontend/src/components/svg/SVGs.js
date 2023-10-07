@@ -79,7 +79,7 @@ export function SVGNotFound() {
 export function SVGSpinner({ cls = null }) {
     return (
         <svg
-            className={`${cls} text-grey-700 animate-spin-slow fill-indigo-600 shrink-0`}
+            className={`${cls} text-grey-675 animate-spin-slow fill-indigo-600 shrink-0`}
             viewBox="0 0 100 101"
             fill="none"
             xmlns="http://www.w3.org/2000/svg">

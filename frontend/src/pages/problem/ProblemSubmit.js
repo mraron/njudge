@@ -57,7 +57,7 @@ function ProblemSubmit() {
             <SubmitControlsFrame onSubmit={handleSubmit} onLanguageChanged={handleLanguageChanged} />
             <CodeEditor
                 className="editor"
-                height="60vh"
+                height="40rem"
                 language={judgeData.highlightCodes[judgeData.languages[langIndex].id]}
                 options={{
                     fontFamily: "JetBrains Mono",

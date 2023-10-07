@@ -115,7 +115,7 @@
         @apply whitespace-nowrap cursor-pointer text-small px-2 py-1 border border-borstrcol rounded bg-btncol hover:bg-btnhovcol truncate h-8 flex items-center;
     }
     .btn-indigo {
-        @apply text-white text-btn font-medium bg-indigo-600 dark:bg-indigo-700 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-800 text-center;
+        @apply text-white text-btn font-medium bg-indigo-600 hover:bg-indigo-700 rounded-lg text-center;
     }
     .btn-gray {
         @apply text-btn bg-btncol rounded-lg hover:bg-btnhovcol border border-borstrcol text-center;
