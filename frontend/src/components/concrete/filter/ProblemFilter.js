@@ -42,8 +42,6 @@ function ProblemFilter() {
     const [tags, setTags] = useState(parseTags(qData.tags))
     const [category, setCategory] = useState(parseCategory(qData.category))
 
-    console.log("CATEGORY:" + category)
-
     const handleTitleChange = (newText) => {
         setTitle(newText)
     }
@@ -112,7 +110,7 @@ export function ProblemFilterFrame() {
     const { t } = useTranslation()
     return (
         <DropdownFrame title={t("problem_filter.filter")}>
-            <div className="px-8 py-6">
+            <div className="px-6 py-5 sm:px-10 sm:py-8">
                 <ProblemFilter />
             </div>
         </DropdownFrame>

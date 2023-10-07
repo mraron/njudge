@@ -38,7 +38,7 @@ function DropdownList({ tree, leaf: Leaf }) {
 function DropdownListFrame({ title, tree, leaf: Leaf }) {
     return (
         <RoundedFrame title={title}>
-            <div className="px-8 pt-4 pb-2 bg-grey-850 rounded-b-container">
+            <div className="px-8 pt-4 pb-2 bg-grey-850 rounded-b-container text-dropdown-list">
                 <DropdownList tree={tree} leaf={Leaf} />
             </div>
         </RoundedFrame>

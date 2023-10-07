@@ -184,7 +184,7 @@ function ProblemAttachment({ type, name, href }) {
                 rel="noreferrer">
                 {type === "file" && <FontAwesomeIcon icon="fa-regular fa-file" className="w-4 h-4 mr-3" />}
                 {type === "statement" && <FontAwesomeIcon icon="fa-regular fa-file-lines" className="w-4 h-4 mr-3" />}
-                <span className="underline truncate">
+                <span className="underline truncate text-label">
                     {type === "statement" ? t("problem_statement.statement") : t("problem_statement.file")}
                     &nbsp;({name})
                 </span>

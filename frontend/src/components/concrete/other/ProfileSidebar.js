@@ -85,7 +85,7 @@ function ProfileSideBar() {
     )
     return (
         isLoggedIn && (
-            <div className="hidden lg:flex flex-col bg-grey-900 w-72 shrink-0 space-y-3">
+            <div className="hidden lg:flex flex-col w-72 shrink-0 space-y-3">
                 <ProfilePictureFrame userData={userData} />
                 <ProfileDataFrame userData={userData} />
                 <SubmissionsFrame titleComponent={titleComponent} submissions={userData.lastSubmissions} />

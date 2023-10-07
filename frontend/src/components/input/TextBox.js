@@ -19,8 +19,14 @@ function TextBox({ id, label, type = "", initText = "", onChange, onFocus, onBlu
             <label htmlFor={id} className="text-label">
                 {label}
             </label>
-            <div className={`border-b-1 ${focused ? "border-indigo-600" : "border-transparent"} w-full mt-1`}>
-                <div className={`border-b-1 ${focused ? "border-indigo-600" : "border-bordefcol"} w-full`}>
+            <div
+                className={`border-b-1 ${
+                    focused ? "border-indigo-500 dark:border-indigo-600" : "border-transparent"
+                } w-full mt-1`}>
+                <div
+                    className={`border-b-1 ${
+                        focused ? "border-indigo-500 dark:border-indigo-600" : "border-bordefcol"
+                    } w-full`}>
                     <input
                         id={id}
                         type={type}
@@ -28,7 +34,7 @@ function TextBox({ id, label, type = "", initText = "", onChange, onFocus, onBlu
                         onChange={handleChange}
                         onFocus={handleFocus}
                         onBlur={handleBlur}
-                        className={`py-2 px-2 bg-grey-850 border border-b-0 text-sm ${
+                        className={`py-2 px-2 bg-grey-875 dark:bg-grey-850 border border-b-0 text-sm ${
                             focused ? "border-borstrcol" : "border-bordefcol"
                         } w-full outline-none`}
                     />

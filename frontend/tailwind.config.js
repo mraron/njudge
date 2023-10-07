@@ -4,7 +4,7 @@ module.exports = {
     theme: {
         extend: {
             boxShadow: {
-                "frame": "0 3px 5px -3px rgba(0, 0, 0, 0.25)"
+                "frame": "0 3.5px 5.5px -3.5px rgba(0, 0, 0, 0.3)"
             },
             transitionProperty: {
                 "opacity": "opacity",
@@ -14,7 +14,7 @@ module.exports = {
                 "height-opacity": "height, opacity"
             },
             borderRadius: {
-                "container": "0.4rem"
+                "container": "0.6rem"
             },
             animation: {
                 "spin-slow": "spin 2s linear infinite",
@@ -31,6 +31,8 @@ module.exports = {
                 "codebgcol": "rgb(var(--color-codebgcol))",
                 "titlebgcol": "rgb(var(--color-titlebgcol))",
                 "framebgcol": "rgb(var(--color-framebgcol))",
+                "btncol": "rgb(var(--color-btncol))",
+                "btnhovcol": "rgb(var(--color-btnhovcol))",
                 "highlight": "rgb(var(--color-highlight))",
                 "grey-900": "rgb(var(--color-grey-900))",
                 "grey-875": "rgb(var(--color-grey-875))",

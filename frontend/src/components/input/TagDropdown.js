@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import TextBoxDropdown from "./TextBoxDropdown"
+import _ from "lodash"
 
 function Tag({ title, onClick }) {
     const [hovered, setHovered] = useState(false)
@@ -38,7 +39,7 @@ function TagDropdown({ id, label, items, initTags = [], onChange }) {
         }
         return <Tag title={items[tag]} onClick={handleRemoveTag} key={index} />
     })
-    const handleAddTag = (selected, _) => {
+    const handleAddTag = (selected, text) => {
         const remaining = _.range(items.length).filter((index) => !tags.includes(index))
         const tag = remaining[selected]
         setTags((prevTags) => (prevTags.includes(tag) ? prevTags : [...prevTags, tag]))

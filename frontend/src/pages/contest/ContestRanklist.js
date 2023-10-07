@@ -17,9 +17,15 @@ function RanklistRow(data) {
         return (
             <td className="py-2.5 px-0 w-0" key={index}>
                 <span className="flex justify-center items-center">
-                    {item.verdictType === 1 && <FontAwesomeIcon icon="fa-xmark" className="w-3 h-3 highlight-red" />}
-                    {item.verdictType === 2 && <FontAwesomeIcon icon="fa-check" className="w-3 h-3 highlight-yellow" />}
-                    {item.verdictType === 3 && <FontAwesomeIcon icon="fa-check" className="w-3 h-3 highlight-green" />}
+                    {item.verdictType === 1 && (
+                        <FontAwesomeIcon icon="fa-xmark" className="w-[0.8rem] h-[0.8rem] highlight-red" />
+                    )}
+                    {item.verdictType === 2 && (
+                        <FontAwesomeIcon icon="fa-check" className="w-[0.8rem] h-[0.8rem] highlight-yellow" />
+                    )}
+                    {item.verdictType === 3 && (
+                        <FontAwesomeIcon icon="fa-check" className="w-[0.8rem] h-[0.8rem] highlight-green" />
+                    )}
                 </span>
             </td>
         )
@@ -108,7 +114,7 @@ function ContestRanklist({ data }) {
         data.isPublic && (
             <div className="space-y-2">
                 <DropdownFrame title={t("ranklist_filter.filter")}>
-                    <div className="px-8 py-6">
+                    <div className="px-6 py-5 sm:px-10 sm:py-8">
                         <RanklistFilter />
                     </div>
                 </DropdownFrame>
