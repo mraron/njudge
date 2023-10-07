@@ -10,11 +10,32 @@ import FlashEvent from "./components/util/flash/FlashEvent"
 import { getCategories, getHighlightCodes, getLanguages, getTags } from "./util/getJudgeData"
 
 import JudgeDataContext from "./contexts/judgeData/JudgeDataContext"
+import { useMonaco } from "@monaco-editor/react"
 
 window.flash = (message, type = "success") => FlashEvent.emit("flash", { message, type })
 
 function App() {
     const { setJudgeData, allLoaded } = useContext(JudgeDataContext)
+    const monaco = useMonaco()
+
+    useEffect(() => {
+        monaco?.editor.defineTheme("dark-theme", {
+            base: "vs-dark",
+            inherit: true,
+            rules: [],
+            colors: {
+                "editor.background": "#0c080f",
+            },
+        })
+        monaco?.editor.defineTheme("light-theme", {
+            base: "vs",
+            inherit: true,
+            rules: [],
+            colors: {
+                "editor.background": "#faf7ff",
+            },
+        })
+    }, [monaco])
 
     useEffect(() => {
         const fetchWithCredentialsJudgeData = async () => {
