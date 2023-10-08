@@ -55,12 +55,12 @@ export function ProfileDataFrame({ userData }) {
 function SubmissionsFrame({ titleComponent, submissions }) {
     const rows = submissions.map((item, index) => (
         <tr key={index}>
-            <td>
+            <td className="py-3">
                 <Link className="link" to={routeMap.submission.replace(":id", item.id)}>
                     {item.id}
                 </Link>
             </td>
-            <td>
+            <td className="py-3">
                 <Link className="link" to={item.problem.href}>
                     {item.problem.text}
                 </Link>

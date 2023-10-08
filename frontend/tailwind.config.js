@@ -14,7 +14,7 @@ module.exports = {
                 "height-opacity": "height, opacity"
             },
             borderRadius: {
-                "container": "0.6rem"
+                "container": "0.25rem"
             },
             animation: {
                 "spin-slow": "spin 2s linear infinite",

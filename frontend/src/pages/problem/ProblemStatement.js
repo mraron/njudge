@@ -138,12 +138,12 @@ function ProblemLastSubmissions({ submissions, maxScore }) {
     )
     const rows = submissions.map((item, index) => (
         <tr key={index}>
-            <td className=" w-0">
+            <td className="py-3 w-0">
                 <Link className="link" to={routeMap.submission.replace(":id", item.id)}>
                     {item.id}
                 </Link>
             </td>
-            <td style={{ maxWidth: 100 }}>
+            <td className="py-3" style={{ maxWidth: 100 }}>
                 <div className="flex items-center">
                     {item.verdictType === 0 && <SVGSpinner cls="w-4 h-4 mr-3" />}
                     {item.verdictType === 1 && (
@@ -158,7 +158,7 @@ function ProblemLastSubmissions({ submissions, maxScore }) {
                     <span className="truncate">{item.verdictName}</span>
                 </div>
             </td>
-            <td className=" w-0 text-center">
+            <td className="py-3 w-0 text-center">
                 <span className="whitespace-nowrap">
                     {item.score} / {maxScore}
                 </span>
