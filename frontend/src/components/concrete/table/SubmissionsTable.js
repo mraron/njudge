@@ -9,7 +9,7 @@ function Submission({ submission }) {
     const { id, date, user, problem, language, verdictName, verdictType, score, maxScore, time, memory } = submission
     return (
         <tr>
-            <td className=" w-0 text-center">
+            <td className="w-0 text-center">
                 <Link className="link" to={routeMap.submission.replace(":id", submission.id)}>
                     {id}
                 </Link>

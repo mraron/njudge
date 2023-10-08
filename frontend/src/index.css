@@ -40,6 +40,7 @@
         --color-grey-125: 207, 204, 210;
         --color-grey-100: 213, 209, 216;
         --color-bordefcol: var(--color-grey-700);
+        --color-bormedcol: var(--color-grey-675);
         --color-borstrcol: var(--color-grey-650);
         --color-dividecol: var(--color-grey-725);
         --color-codebgcol: var(--color-grey-875);
@@ -51,41 +52,42 @@
     html[data-theme="light"] {
         --color-textcol: 40, 40, 40;
         --color-inputfill: 205, 202, 210;
-        --color-grey-100: 37, 33, 40;
-        --color-grey-125: 44, 41, 47;
-        --color-grey-150: 52, 49, 55;
-        --color-grey-175: 60, 57, 63;
-        --color-grey-200: 68, 65, 71;
-        --color-grey-225: 75, 73, 78;
-        --color-grey-250: 83, 81, 86;
-        --color-grey-275: 91, 88, 93;
-        --color-grey-300: 99, 96, 101;
-        --color-grey-325: 106, 103, 108;
-        --color-grey-350: 114, 112, 116;
-        --color-grey-375: 121, 119, 123;
-        --color-grey-400: 128, 126, 130;
-        --color-grey-425: 135, 133, 137;
-        --color-grey-450: 142, 139, 144;
-        --color-grey-475: 149, 146, 151;
-        --color-grey-500: 156, 153, 158;
-        --color-grey-525: 163, 160, 165;
-        --color-grey-550: 169, 167, 172;
-        --color-grey-575: 176, 173, 179;
-        --color-grey-600: 182, 179, 185;
-        --color-grey-625: 189, 186, 192;
-        --color-grey-650: 195, 192, 198;
-        --color-grey-675: 202, 199, 205;
-        --color-grey-700: 208, 205, 211;
-        --color-grey-725: 215, 211, 218;
-        --color-grey-750: 221, 217, 224;
-        --color-grey-775: 227, 223, 230;
-        --color-grey-800: 233, 229, 236;
-        --color-grey-825: 239, 235, 242;
-        --color-grey-850: 246, 242, 249;
-        --color-grey-875: 251, 247, 255;
-        --color-grey-900: 251, 247, 255;
+        --color-grey-100: 37, 34, 40;
+        --color-grey-125: 45, 42, 48;
+        --color-grey-150: 53, 50, 56;
+        --color-grey-175: 61, 58, 64;
+        --color-grey-200: 69, 66, 72;
+        --color-grey-225: 77, 74, 80;
+        --color-grey-250: 85, 82, 88;
+        --color-grey-275: 93, 90, 96;
+        --color-grey-300: 100, 97, 103;
+        --color-grey-325: 108, 105, 111;
+        --color-grey-350: 115, 112, 118;
+        --color-grey-375: 123, 120, 126;
+        --color-grey-400: 130, 127, 133;
+        --color-grey-425: 137, 134, 140;
+        --color-grey-450: 144, 141, 147;
+        --color-grey-475: 151, 148, 154;
+        --color-grey-500: 158, 155, 161;
+        --color-grey-525: 165, 162, 168;
+        --color-grey-550: 172, 169, 175;
+        --color-grey-575: 178, 175, 181;
+        --color-grey-600: 185, 182, 188;
+        --color-grey-625: 192, 189, 195;
+        --color-grey-650: 198, 195, 201;
+        --color-grey-675: 204, 201, 207;
+        --color-grey-700: 210, 207, 213;
+        --color-grey-725: 217, 214, 220;
+        --color-grey-750: 223, 220, 226;
+        --color-grey-775: 229, 226, 232;
+        --color-grey-800: 234, 231, 237;
+        --color-grey-825: 240, 237, 243;
+        --color-grey-850: 246, 243, 249;
+        --color-grey-875: 252, 249, 255;
+        --color-grey-900: 252, 249, 255;
         --color-bordefcol: var(--color-grey-625);
-        --color-borstrcol: var(--color-grey-600);
+        --color-bormedcol: var(--color-grey-600);
+        --color-borstrcol: var(--color-grey-575);
         --color-dividecol: var(--color-grey-700);
         --color-codebgcol: var(--color-grey-875);
         --color-framebgcol: var(--color-grey-800);
@@ -103,7 +105,7 @@
         @apply w-full rounded-md px-3 py-2 border flex items-center justify-between border-bordefcol text-dropdown;
     }
     .frame-title {
-        @apply emph-med p-4 text-grey-200 text-center border-b-1 border-bordefcol;
+        @apply emph-med p-4 text-grey-150 text-center border-b-1 border-bordefcol;
     }
     .link {
         @apply cursor-pointer underline underline-offset-2 hover:text-indigo-800 dark:hover:text-indigo-200;
@@ -121,10 +123,10 @@
         @apply text-btn bg-btncol rounded-lg hover:bg-btnhovcol border border-borstrcol text-center;
     }
     .date-label {
-        @apply cursor-pointer text-sm px-2 py-1 rounded border border-borstrcol bg-grey-725 hover:bg-grey-700 shrink-0;
+        @apply cursor-pointer text-small px-2 py-1 rounded border border-borstrcol bg-grey-725 hover:bg-grey-700 shrink-0;
     }
     .padding-btn-default {
-        @apply px-6 py-2;
+        @apply px-6 py-[0.6rem];
     }
     .padding-td-default {
         @apply py-4 px-5;

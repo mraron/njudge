@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { routeMap } from "../../config/RouteConfig"
+import { SVGEllipsis } from "../../components/svg/SVGs"
 import RoundedTable from "../../components/container/RoundedTable"
 import Pagination from "../../components/util/Pagination"
 import DropdownFrame from "../../components/container/DropdownFrame"
@@ -12,19 +13,35 @@ import updateQueryString from "../../util/updateQueryString"
 import queryString from "query-string"
 
 function RanklistRow(data) {
+    const { t } = useTranslation()
     const { place, name, score, verdicts } = data.result
     const verdictsContent = verdicts.map((item, index) => {
         return (
             <td className="py-2.5 px-0 w-0" key={index}>
                 <span className="flex justify-center items-center">
+                    {item.verdictType === 0 && (
+                        <SVGEllipsis cls="w-4 h-4 text-grey-150" title={t("solved_status.not_tried")} />
+                    )}
                     {item.verdictType === 1 && (
-                        <FontAwesomeIcon icon="fa-xmark" className="w-[0.8rem] h-[0.8rem] highlight-red" />
+                        <FontAwesomeIcon
+                            icon="fa-xmark"
+                            className="w-[0.8rem] h-[0.8rem] highlight-red"
+                            title={t("solved_status.wrong")}
+                        />
                     )}
                     {item.verdictType === 2 && (
-                        <FontAwesomeIcon icon="fa-check" className="w-[0.8rem] h-[0.8rem] highlight-yellow" />
+                        <FontAwesomeIcon
+                            icon="fa-check"
+                            className="w-[0.8rem] h-[0.8rem] highlight-yellow"
+                            title={t("solved_status.partially_correct")}
+                        />
                     )}
                     {item.verdictType === 3 && (
-                        <FontAwesomeIcon icon="fa-check" className="w-[0.8rem] h-[0.8rem] highlight-green" />
+                        <FontAwesomeIcon
+                            icon="fa-check"
+                            className="w-[0.8rem] h-[0.8rem] highlight-green"
+                            title={t("solved_status.correct")}
+                        />
                     )}
                 </span>
             </td>

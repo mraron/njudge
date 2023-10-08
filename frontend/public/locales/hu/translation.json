@@ -238,9 +238,9 @@
         "result": "Eredmény"
     },
     "solved_status": {
-        "not_tried": "Nem próbáltad",
-        "correct": "Megoldottad",
-        "wrong": "Megpróbáltad",
-        "partially_correct": "Részlegesen megoldottad"
+        "not_tried": "Nincs megpróbálva",
+        "correct": "Megoldva",
+        "wrong": "Megpróbálva",
+        "partially_correct": "Részlegesen megoldva"
     }
 }

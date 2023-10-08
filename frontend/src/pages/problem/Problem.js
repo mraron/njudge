@@ -13,7 +13,7 @@ function Problem() {
     return (
         <div className="flex justify-center">
             <div className="w-full max-w-7xl">
-                <div className="w-full px-4">
+                <div className="w-full px-3">
                     <TabFrame routes={routes} routeLabels={routeLabels.map(t)} routePatterns={routePatterns}>
                         <div className="relative w-full">
                             <Outlet />

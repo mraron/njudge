@@ -29,7 +29,7 @@ function Submission({ data }) {
     return (
         <div className="w-full flex justify-center">
             <div className="flex justify-center w-full max-w-7xl">
-                <div className="w-full px-4 space-y-3">
+                <div className="w-full px-3 space-y-3">
                     {userData && userData.isAdmin && (
                         <DropdownFrame title="Kezelés">
                             <div className="px-4 py-3 sm:px-6 sm:py-5 flex items-center justify-center space-x-2">

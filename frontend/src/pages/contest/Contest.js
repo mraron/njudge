@@ -12,7 +12,7 @@ function Contest() {
     return (
         <div className="flex justify-center">
             <div className="w-full max-w-7xl">
-                <div className="w-full px-4">
+                <div className="w-full px-3">
                     <TabFrame routes={routes} routePatterns={routePatterns} routeLabels={routeLabels.map(t)}>
                         <div className="relative w-full">
                             <Outlet />

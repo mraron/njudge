@@ -30,7 +30,7 @@ function DropdownList({ tree, leaf: Leaf }) {
         <div>
             {!isRoot && !isLeaf && innerNode}
             {!isRoot && isLeaf && leafNode}
-            <ul className={`${isOpen ? "" : "hidden"} ${isRoot ? "" : "ml-5"} mb-4`}>{children}</ul>
+            <ul className={`${isOpen ? "" : "hidden"} ${isRoot ? "" : "ml-6"} mb-4`}>{children}</ul>
         </div>
     )
 }

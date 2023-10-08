@@ -13,7 +13,7 @@ function TestCase13({ index, numCases, testCase, group, isLastGroup, isLastCase 
             {index === 0 && (
                 <>
                     <td
-                        className={`border border-t-0 border-dividecol text-center ${bottomBorderGroup}`}
+                        className={`py-2.5 border border-t-0 border-dividecol text-center ${bottomBorderGroup}`}
                         rowSpan={numCases}>
                         <div className="flex flex-col justify-center">
                             <div className="flex items-center justify-center mb-2">
@@ -27,15 +27,17 @@ function TestCase13({ index, numCases, testCase, group, isLastGroup, isLastCase 
                         </div>
                     </td>
                     <td
-                        className={`border border-t-0 border-dividecol text-center ${bottomBorderGroup}`}
+                        className={`py-2.5 border border-t-0 border-dividecol text-center ${bottomBorderGroup}`}
                         rowSpan={numCases}>
                         {`${group.score} / ${group.maxScore}`}
                     </td>
                 </>
             )}
-            <td className={`border border-t-0 border-dividecol text-center ${bottomBorderCase}`}>{testCase.index}</td>
+            <td className={`py-2.5 border border-t-0 border-dividecol text-center ${bottomBorderCase}`}>
+                {testCase.index}
+            </td>
             {group.scoring !== 1 && (
-                <td className={`border border-t-0 border-dividecol ${bottomBorderCase}`} colSpan={2}>
+                <td className={`py-2.5 border border-t-0 border-dividecol ${bottomBorderCase}`} colSpan={2}>
                     <div className="flex">
                         {testCase.verdictType === 0 && <SVGSpinner cls="w-4 h-4 mr-3" />}
                         {testCase.verdictType === 1 && (
@@ -53,20 +55,20 @@ function TestCase13({ index, numCases, testCase, group, isLastGroup, isLastCase 
             )}
             {group.scoring === 1 && (
                 <>
-                    <td className={`border border-t-0 border-dividecol ${bottomBorderCase}`}>
+                    <td className={`py-2.5 border border-t-0 border-dividecol ${bottomBorderCase}`}>
                         <div className="flex items-center">
                             <FontAwesomeIcon icon="fa-xmark" className="w-4 h-4 highlight-red mr-3" />
                             <span className="whitespace-nowrap">{testCase.verdictName}</span>
                         </div>
                     </td>
                     <td
-                        className={`border border-t-0 border-dividecol text-center whitespace-nowrap ${bottomBorderCase}`}>
+                        className={`py-2.5 border border-t-0 border-dividecol text-center whitespace-nowrap ${bottomBorderCase}`}>
                         {testCase.score} / {testCase.maxScore}
                     </td>
                 </>
             )}
-            <td className={`border border-t-0 border-dividecol ${bottomBorderCase}`}>{testCase.time} ms</td>
-            <td className={`border border-t-0 border-r-0 border-dividecol ${bottomBorderCase}`}>
+            <td className={`py-2.5 border border-t-0 border-dividecol ${bottomBorderCase}`}>{testCase.time} ms</td>
+            <td className={`py-2.5 border border-t-0 border-r-0 border-dividecol ${bottomBorderCase}`}>
                 {testCase.memory} KiB
             </td>
         </tr>
@@ -104,13 +106,11 @@ function TestCase0({ testCase, index }) {
             </div>
             <div className="py-3 px-5 flex justify-between border-b border-bordefcol text-table space-x-4">
                 <div className="whitespace-nowrap truncate flex items-center">
-                    <FontAwesomeIcon icon="fa-regular fa-clock" className="w-4 h-4 mr-2" />
-                    <span className="hidden sm:inline">{t("submission_table.time")}:&nbsp;</span>
+                    <span>{t("submission_table.time")}:&nbsp;</span>
                     <span className="truncate">{testCase.time} ms</span>
                 </div>
                 <div className="whitespace-nowrap truncate flex items-center">
-                    <FontAwesomeIcon icon="fa-regular fa-hdd" className="w-4 h-4 mr-2" />
-                    <span className="hidden sm:inline">{t("submission_table.memory")}:&nbsp;</span>
+                    <span>{t("submission_table.memory")}:&nbsp;</span>
                     <span className="truncate">{testCase.memory} KiB</span>
                 </div>
             </div>
@@ -122,9 +122,9 @@ function TestCase0({ testCase, index }) {
         ["submission_table.checker_output", testCase.checkerOutput],
     ].map((item, index) => (
         <tr key={index}>
-            <td className=" whitespace-nowrap w-48">{t(item[0])}</td>
-            <td className="p-0" style={{ maxWidth: 0 }}>
-                <CopyableCode cls="border-0 rounded-none" text={item[1]} isMultiline={true} maxHeight={"6rem"} />
+            <td className="whitespace-nowrap w-48">{t(item[0])}</td>
+            <td className="p-0 bg-codebgcol" style={{ maxWidth: 0 }}>
+                <CopyableCode cls="border-0 rounded-none" text={item[1]} maxHeight={"6rem"} />
             </td>
         </tr>
     ))

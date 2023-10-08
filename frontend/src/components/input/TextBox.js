@@ -34,7 +34,7 @@ function TextBox({ id, label, type = "", initText = "", onChange, onFocus, onBlu
                         onChange={handleChange}
                         onFocus={handleFocus}
                         onBlur={handleBlur}
-                        className={`py-2 px-2 bg-grey-875 dark:bg-grey-850 border border-b-0 text-sm ${
+                        className={`py-[0.45rem] px-2 bg-grey-850 border border-b-0 text-sm ${
                             focused ? "border-borstrcol" : "border-bordefcol"
                         } w-full outline-none`}
                     />
