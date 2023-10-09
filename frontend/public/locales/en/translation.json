@@ -238,5 +238,13 @@
         "correct": "Solved",
         "wrong": "Unsolved",
         "partially_correct": "Partially solved"
+    },
+    "aria_label": {
+        "copy": "Copy",
+        "view": "View",
+        "first": "First",
+        "last": "Last",
+        "open_menu": "Open menu",
+        "problem_statement": "Problem statement"
     }
 }

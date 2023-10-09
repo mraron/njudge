@@ -181,7 +181,8 @@ function ProblemAttachment({ type, name, href }) {
                 href={apiRoute(href)}
                 download="statement.pdf"
                 target="_blank"
-                rel="noreferrer">
+                rel="noreferrer"
+                aria-label={t("aria_label.view")}>
                 {type === "file" && <FontAwesomeIcon icon="fa-regular fa-file" className="w-4 h-4 mr-3" />}
                 {type === "statement" && <FontAwesomeIcon icon="fa-regular fa-file-lines" className="w-4 h-4 mr-3" />}
                 <span className="underline truncate text-label">
@@ -224,6 +225,7 @@ function ProblemAttachments({ attachments }) {
 }
 
 function ProblemStatement({ data }) {
+    const { t } = useTranslation()
     const { theme } = useContext(ThemeContext)
     const [statementIndex, setStatementIndex] = useState(0)
     const statementSrc = data.attachments.statements[statementIndex].href
@@ -253,7 +255,7 @@ function ProblemStatement({ data }) {
                         <object
                             color-scheme={theme}
                             data={apiRoute(statementSrc)}
-                            aria-label="Problem statement"
+                            aria-label={t("aria_label.problem_statement")}
                             type="application/pdf"
                             width="100%"
                             className="h-[36rem] lg:h-[52rem] border border-bordefcol"></object>

@@ -242,5 +242,13 @@
         "correct": "Megoldva",
         "wrong": "Megpróbálva",
         "partially_correct": "Részlegesen megoldva"
+    },
+    "aria_label": {
+        "copy": "Másolás",
+        "view": "Megtekintés",
+        "first": "Első",
+        "last": "Utolsó",
+        "open_menu": "Menü megnyitása",
+        "problem_statement": "Feladatleírás"
     }
 }

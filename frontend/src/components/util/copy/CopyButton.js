@@ -1,8 +1,11 @@
+import { useTranslation } from "react-i18next"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { AnimatePresence, motion } from "framer-motion"
 import { TERipple } from "tw-elements-react"
 
 function CopyButton({ text, isVisible }) {
+    const { t } = useTranslation()
+
     const handleCopy = () => {
         navigator.clipboard.writeText(text)
         window.flash("info.successful_copy", "success")
@@ -17,7 +20,7 @@ function CopyButton({ text, isVisible }) {
                     <TERipple className="rounded-lg overflow-hidden" rippleColor="#808080">
                         <button
                             className={`rounded-lg text-grey-200 bg-grey-775 hover:bg-grey-750 border border-borstrcol relative h-9 w-9`}
-                            aria-label="Copy"
+                            aria-label={t("aria_label.copy")}
                             onClick={handleCopy}>
                             <FontAwesomeIcon
                                 icon="fa-regular fa-copy"

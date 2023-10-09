@@ -1,8 +1,8 @@
 import RoundedFrame from "./RoundedFrame"
 
-function RoundedTable({ children, title, titleComponent }) {
+function RoundedTable({ children, title, titleComponent, cls }) {
     return (
-        <RoundedFrame title={title} titleComponent={titleComponent} cls="overflow-hidden">
+        <RoundedFrame title={title} titleComponent={titleComponent} cls={`${cls} overflow-hidden`}>
             <div
                 className={`w-full overflow-x-auto ${
                     title || titleComponent ? "rounded-b-container" : "rounded-container"

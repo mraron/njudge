@@ -1,9 +1,10 @@
 import { useTranslation } from "react-i18next"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import RoundedTable from "../../container/RoundedTable"
-import { SVGSpinner } from "../../svg/SVGs"
+import { SVGSpinner, SVGView } from "../../svg/SVGs"
 import CopyableCode from "../../util/copy/CopyableCode"
-import React from "react"
+import React, { useState } from "react"
+import Modal from "../../container/modal/Modal"
 
 function TestCase13({ index, numCases, testCase, group, isLastGroup, isLastCase }) {
     const bottomBorderCase = isLastGroup && isLastCase ? "border-b-0" : ""
@@ -91,56 +92,88 @@ function TestGroup({ group, isLast }) {
     return <>{testCasesContent}</>
 }
 
-function TestCase0({ testCase, index }) {
+function TestCase0({ testCase, onRowClicked }) {
     const { t } = useTranslation()
-    const titleComponent = (
-        <div className="flex flex-col">
-            <div className="py-3 px-6 border-b border-bordefcol flex items-center space-x-3">
-                {testCase.verdictType === 0 && <SVGSpinner cls="w-5 h-5" />}
-                {testCase.verdictType === 1 && <FontAwesomeIcon icon="fa-xmark" className="w-5 h-5 highlight-red" />}
-                {testCase.verdictType === 2 && <FontAwesomeIcon icon="fa-check" className="w-5 h-5 highlight-yellow" />}
-                {testCase.verdictType === 3 && <FontAwesomeIcon icon="fa-check" className="w-5 h-5 highlight-green" />}
-                <span>{index + 1}</span>
-                <span>–</span>
-                <span className="truncate">{testCase.verdictName}</span>
-            </div>
-            <div className="py-3 px-5 flex justify-between border-b border-bordefcol text-table space-x-4">
-                <div className="whitespace-nowrap truncate flex items-center">
-                    <span>{t("submission_table.time")}:&nbsp;</span>
-                    <span className="truncate">{testCase.time} ms</span>
-                </div>
-                <div className="whitespace-nowrap truncate flex items-center">
-                    <span>{t("submission_table.memory")}:&nbsp;</span>
-                    <span className="truncate">{testCase.memory} KiB</span>
-                </div>
-            </div>
-        </div>
-    )
-    const outputRows = [
-        ["submission_table.output", testCase.output],
-        ["submission_table.expected_output", testCase.expectedOutput],
-        ["submission_table.checker_output", testCase.checkerOutput],
-    ].map((item, index) => (
-        <tr key={index}>
-            <td className="whitespace-nowrap w-48">{t(item[0])}</td>
-            <td className="p-0 bg-codebgcol" style={{ maxWidth: 0 }}>
-                <CopyableCode cls="border-0 rounded-none" text={item[1]} maxHeight={"6rem"} />
-            </td>
-        </tr>
-    ))
     return (
-        <RoundedTable titleComponent={titleComponent}>
-            <tbody>{outputRows}</tbody>
-        </RoundedTable>
+        <tr className="cursor-pointer hover:bg-grey-825" onClick={() => onRowClicked(testCase)}>
+            <td className="py-3">
+                <div className="flex items-center">
+                    {testCase.verdictType === 0 && <SVGSpinner cls="w-4 h-4 mr-3" />}
+                    {testCase.verdictType === 1 && (
+                        <FontAwesomeIcon icon="fa-xmark" className="w-4 h-4 mr-3 highlight-red" />
+                    )}
+                    {testCase.verdictType === 2 && (
+                        <FontAwesomeIcon icon="fa-check" className="w-4 h-4 mr-3 highlight-yellow" />
+                    )}
+                    {testCase.verdictType === 3 && (
+                        <FontAwesomeIcon icon="fa-check" className="w-4 h-4 mr-3 highlight-green" />
+                    )}
+                    <span>{testCase.verdictName}</span>
+                </div>
+            </td>
+            <td className="w-0 py-3">
+                <button aria-label={t("aria_label.view")}>
+                    <SVGView cls="w-6 h-6 text-grey-200 hover:text-indigo-500" />
+                </button>
+            </td>
+            <td className="py-3">{testCase.time} ms</td>
+            <td className="py-3">{testCase.memory} KiB</td>
+        </tr>
     )
 }
 
 function SubmissionTable0({ status }) {
+    const { t } = useTranslation()
+    const [testCase, setTestCase] = useState(null)
+    const [isModalOpen, setModalOpen] = useState(false)
+
+    const handleRowClicked = (testCase) => {
+        console.log(testCase.output)
+        setTestCase(testCase)
+        setModalOpen(true)
+    }
     const testCases = status.groups?.[0].testCases
-    const testCasesContent = testCases?.map((testCase, index) => (
-        <TestCase0 testCase={testCase} index={index} key={index} />
+    const testCasesContent = testCases.map((testCase, index) => (
+        <TestCase0 testCase={testCase} onRowClicked={handleRowClicked} key={index} />
     ))
-    return <div className="space-y-3">{testCasesContent}</div>
+    const outputRows = [
+        ["submission_table.output", testCase?.output],
+        ["submission_table.expected_output", testCase?.expectedOutput],
+        ["submission_table.checker_output", testCase?.checkerOutput],
+    ].map((item, index) => (
+        <tr key={index}>
+            <td className="whitespace-nowrap max-w-xl">{t(item[0])}</td>
+            <td className="p-0 bg-codebgcol w-96">
+                <CopyableCode cls="border-0 rounded-none" text={item[1]} maxHeight={"6rem"} />
+            </td>
+        </tr>
+    ))
+    const title = (
+        <span className="space-x-2">
+            <span>{testCase?.index}</span>
+            <span>–</span>
+            <span>Kimenet</span>
+        </span>
+    )
+    return (
+        <>
+            <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
+                <RoundedTable cls="w-full sm:w-[30rem]" title={title}>
+                    <tbody>{outputRows}</tbody>
+                </RoundedTable>
+            </Modal>
+            <RoundedTable>
+                <thead>
+                    <tr>
+                        <th colSpan={2}>Verdikt</th>
+                        <th>Idő</th>
+                        <th>Memória</th>
+                    </tr>
+                </thead>
+                <tbody>{testCasesContent}</tbody>
+            </RoundedTable>
+        </>
+    )
 }
 
 function SubmissionTable13({ status }) {

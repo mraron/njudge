@@ -2,8 +2,10 @@ import { useLocation, useNavigate } from "react-router-dom"
 import RoundedFrame from "../container/RoundedFrame"
 import UpdateQueryString from "../../util/updateQueryString"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { useTranslation } from "react-i18next"
 
 function Pagination({ paginationData }) {
+    const { t } = useTranslation()
     const { currentPage, lastPage } = paginationData
     const location = useLocation()
     const navigate = useNavigate()
@@ -20,7 +22,7 @@ function Pagination({ paginationData }) {
         <RoundedFrame cls="overflow-hidden">
             <div className="flex justify-center p-4 overflow-x-auto">
                 <button
-                    aria-label="First"
+                    aria-label={t("aria_label.first")}
                     className={`${cls} border-r-0 rounded-l-md`}
                     onClick={() => handlePageChanged(1)}>
                     <FontAwesomeIcon icon="fa-angles-left" className="w-2.5 h-2.5" />
@@ -53,7 +55,7 @@ function Pagination({ paginationData }) {
                     </button>
                 )}
                 <button
-                    aria-label="Last"
+                    aria-label={t("aria_label.last")}
                     className={`${cls} border-l-0 rounded-r-md`}
                     onClick={() => handlePageChanged(lastPage)}>
                     <FontAwesomeIcon icon="fa-angles-right" className="w-2.5 h-2.5" />

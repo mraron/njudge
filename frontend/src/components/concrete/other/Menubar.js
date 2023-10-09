@@ -198,9 +198,9 @@ function MenuTopBar({ selected, isOpen, onToggle }) {
                 <div className="xl:hidden mx-4">
                     <button
                         id="menuButton"
-                        aria-label="Open menu"
                         className="flex items-center justify-center p-2 rounded-full hover:bg-framebgcol"
-                        onClick={() => onToggle(this)}>
+                        onClick={() => onToggle(this)}
+                        aria-label={t("aria_label.toggle_menu")}>
                         {isOpen ? (
                             <FontAwesomeIcon icon="fa-close" className="w-5 h-5" />
                         ) : (
