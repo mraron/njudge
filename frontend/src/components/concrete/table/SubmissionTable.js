@@ -39,7 +39,7 @@ function TestCase13({ index, numCases, testCase, group, isLastGroup, isLastCase 
             </td>
             {group.scoring !== 1 && (
                 <td className={`py-2.5 border border-t-0 border-dividecol ${bottomBorderCase}`} colSpan={2}>
-                    <div className="flex">
+                    <div className="flex items-center">
                         {testCase.verdictType === 0 && <SVGSpinner cls="w-4 h-4 mr-3" />}
                         {testCase.verdictType === 1 && (
                             <FontAwesomeIcon icon="fa-xmark" className="w-4 h-4 highlight-red mr-3" />
@@ -95,7 +95,7 @@ function TestGroup({ group, isLast }) {
 function TestCase0({ testCase, onRowClicked }) {
     const { t } = useTranslation()
     return (
-        <tr className="cursor-pointer hover:bg-grey-825" onClick={() => onRowClicked(testCase)}>
+        <tr>
             <td className="py-3">
                 <div className="flex items-center">
                     {testCase.verdictType === 0 && <SVGSpinner cls="w-4 h-4 mr-3" />}
@@ -112,8 +112,8 @@ function TestCase0({ testCase, onRowClicked }) {
                 </div>
             </td>
             <td className="w-0 py-3">
-                <button aria-label={t("aria_label.view")}>
-                    <SVGView cls="w-6 h-6 text-grey-200 hover:text-indigo-500" />
+                <button aria-label={t("aria_label.view")} onClick={() => onRowClicked(testCase)}>
+                    <SVGView cls="w-6 h-6 text-grey-200 hover:text-indigo-600 hover:scale-105" />
                 </button>
             </td>
             <td className="py-3">{testCase.time} ms</td>
@@ -149,17 +149,17 @@ function SubmissionTable0({ status }) {
         </tr>
     ))
     const titleComponent = (
-        <div className="py-4 px-5 flex justify-center items-center space-x-2 border-b border-bordefcol">
+        <div className="frame-title flex items-center justify-center">
             <div className="flex items-center">
-                {testCase?.verdictType === 0 && <SVGSpinner cls="w-5 h-5 mr-3" />}
+                {testCase?.verdictType === 0 && <SVGSpinner cls="w-4 h-4 mr-3" />}
                 {testCase?.verdictType === 1 && (
-                    <FontAwesomeIcon icon="fa-xmark" className="w-5 h-5 highlight-red mr-3" />
+                    <FontAwesomeIcon icon="fa-xmark" className="w-4 h-4 highlight-red mr-3" />
                 )}
                 {testCase?.verdictType === 2 && (
-                    <FontAwesomeIcon icon="fa-check" className="w-5 h-5 highlight-yellow mr-3" />
+                    <FontAwesomeIcon icon="fa-check" className="w-4 h-4 highlight-yellow mr-3" />
                 )}
                 {testCase?.verdictType === 3 && (
-                    <FontAwesomeIcon icon="fa-check" className="w-5 h-5 highlight-green mr-3" />
+                    <FontAwesomeIcon icon="fa-check" className="w-4 h-4 highlight-green mr-3" />
                 )}
                 <div className="space-x-2">
                     <span>{t("submission_table.test_case")}</span>
