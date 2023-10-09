@@ -28,6 +28,7 @@ module.exports = {
                 "bordefcol": "rgb(var(--color-bordefcol))",
                 "bormedcol": "rgb(var(--color-bormedcol))",
                 "borstrcol": "rgb(var(--color-borstrcol))",
+                "borxstrcol": "rgb(var(--color-borxstrcol))",
                 "dividecol": "rgb(var(--color-dividecol))",
                 "codebgcol": "rgb(var(--color-codebgcol))",
                 "titlebgcol": "rgb(var(--color-titlebgcol))",

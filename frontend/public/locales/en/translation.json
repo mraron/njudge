@@ -168,6 +168,7 @@
         "time": "Time",
         "memory": "Memory",
         "output": "Output",
+        "test_case": "Test case",
         "expected_output": "Expected output",
         "checker_output": "Checker's output"
     },

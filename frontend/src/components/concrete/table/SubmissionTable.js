@@ -1,9 +1,9 @@
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import RoundedTable from "../../container/RoundedTable"
 import { SVGSpinner, SVGView } from "../../svg/SVGs"
+import RoundedTable from "../../container/RoundedTable"
 import CopyableCode from "../../util/copy/CopyableCode"
-import React, { useState } from "react"
 import Modal from "../../container/modal/Modal"
 
 function TestCase13({ index, numCases, testCase, group, isLastGroup, isLastCase }) {
@@ -148,26 +148,39 @@ function SubmissionTable0({ status }) {
             </td>
         </tr>
     ))
-    const title = (
-        <span className="space-x-2">
-            <span>{testCase?.index}</span>
-            <span>–</span>
-            <span>Kimenet</span>
-        </span>
+    const titleComponent = (
+        <div className="py-4 px-5 flex justify-center items-center space-x-2 border-b border-bordefcol">
+            <div className="flex items-center">
+                {testCase?.verdictType === 0 && <SVGSpinner cls="w-5 h-5 mr-3" />}
+                {testCase?.verdictType === 1 && (
+                    <FontAwesomeIcon icon="fa-xmark" className="w-5 h-5 highlight-red mr-3" />
+                )}
+                {testCase?.verdictType === 2 && (
+                    <FontAwesomeIcon icon="fa-check" className="w-5 h-5 highlight-yellow mr-3" />
+                )}
+                {testCase?.verdictType === 3 && (
+                    <FontAwesomeIcon icon="fa-check" className="w-5 h-5 highlight-green mr-3" />
+                )}
+                <div className="space-x-2">
+                    <span>{t("submission_table.test_case")}</span>
+                    <span>#{testCase?.index}</span>
+                </div>
+            </div>
+        </div>
     )
     return (
         <>
             <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
-                <RoundedTable cls="w-full sm:w-[30rem]" title={title}>
+                <RoundedTable cls="w-full sm:w-[30rem]" titleComponent={titleComponent}>
                     <tbody>{outputRows}</tbody>
                 </RoundedTable>
             </Modal>
             <RoundedTable>
                 <thead>
                     <tr>
-                        <th colSpan={2}>Verdikt</th>
-                        <th>Idő</th>
-                        <th>Memória</th>
+                        <th colSpan={2}>{t("submission_table.verdict")}</th>
+                        <th>{t("submission_table.time")}</th>
+                        <th>{t("submission_table.memory")}</th>
                     </tr>
                 </thead>
                 <tbody>{testCasesContent}</tbody>

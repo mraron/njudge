@@ -169,6 +169,7 @@
         "time": "Idő",
         "memory": "Memória",
         "output": "Kimenet",
+        "test_case": "Teszteset",
         "expected_output": "Elvárt kimenet",
         "checker_output": "Ellenőrző kimenet"
     },

@@ -42,6 +42,7 @@
         --color-bordefcol: var(--color-grey-700);
         --color-bormedcol: var(--color-grey-675);
         --color-borstrcol: var(--color-grey-650);
+        --color-borxstrcol: var(--color-grey-625);
         --color-dividecol: var(--color-grey-725);
         --color-codebgcol: var(--color-grey-875);
         --color-framebgcol: var(--color-grey-800);
@@ -88,6 +89,7 @@
         --color-bordefcol: var(--color-grey-625);
         --color-bormedcol: var(--color-grey-600);
         --color-borstrcol: var(--color-grey-575);
+        --color-borxstrcol: var(--color-grey-550);
         --color-dividecol: var(--color-grey-700);
         --color-codebgcol: var(--color-grey-875);
         --color-framebgcol: var(--color-grey-800);
