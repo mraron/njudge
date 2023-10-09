@@ -1,6 +1,6 @@
 import { TERipple } from "tw-elements-react"
 
-function Button({ type, color, minWidth, fullWidth, cls, onClick, children }) {
+function Button({ type, color, minWidth, fullWidth, cls, onClick, children, ariaLabel }) {
     const rippleColor = color === "gray" ? "#808080" : "#000000"
     return (
         <TERipple
@@ -12,7 +12,8 @@ function Button({ type, color, minWidth, fullWidth, cls, onClick, children }) {
                     fullWidth ? "w-full" : ""
                 } h-full ${cls}`}
                 style={{ minWidth: minWidth }}
-                onClick={onClick}>
+                onClick={onClick}
+                aria-label={ariaLabel}>
                 {children}
             </button>
         </TERipple>

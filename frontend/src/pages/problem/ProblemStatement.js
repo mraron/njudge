@@ -181,8 +181,7 @@ function ProblemAttachment({ type, name, href }) {
                 href={apiRoute(href)}
                 download="statement.pdf"
                 target="_blank"
-                rel="noreferrer"
-                aria-label={t("aria_label.view")}>
+                rel="noreferrer">
                 {type === "file" && <FontAwesomeIcon icon="fa-regular fa-file" className="w-4 h-4 mr-3" />}
                 {type === "statement" && <FontAwesomeIcon icon="fa-regular fa-file-lines" className="w-4 h-4 mr-3" />}
                 <span className="underline truncate text-label">
@@ -235,7 +234,7 @@ function ProblemStatement({ data }) {
             <div className="w-full flex flex-col min-w-0 space-y-2">
                 <div className="w-full">
                     <RoundedFrame>
-                        <div className="w-full px-4 py-3 sm:px-6 sm:py-5 flex">
+                        <div className="w-full px-4 py-3 sm:px-6 sm:py-5 flex items-center">
                             <div className="w-full mr-3 min-w-0">
                                 <DropdownMenu
                                     items={data.attachments.statements.map((item) => item.name)}
@@ -243,8 +242,8 @@ function ProblemStatement({ data }) {
                                 />
                             </div>
                             <a href={apiRoute(statementSrc)} target="_blank" rel="noreferrer">
-                                <Button color="gray">
-                                    <SVGView cls="w-[1.4rem] h-[1.4rem]" />
+                                <Button color="gray" aria-label={t("aria_label.view")}>
+                                    <SVGView cls="text-grey-200 w-[1.4rem] h-[1.4rem]" />
                                 </Button>
                             </a>
                         </div>
