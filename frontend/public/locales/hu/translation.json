@@ -29,11 +29,16 @@
         "ranklist": "Eredmények"
     },
     "contest_problems": {
+        "page_title": "Feladatok – {{params.contest}} :: njudge",
         "id": "ID",
         "title": "Cím",
         "status": "Státusz"
     },
+    "contest_submissions": {
+        "page_title": "Beküldések – {{params.contest}} :: njudge"
+    },
     "contest_ranklist": {
+        "page_title": "Eredmények – {{params.contest}} :: njudge",
         "username": "Felhasználónév"
     },
     "login": {

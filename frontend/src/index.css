@@ -265,3 +265,7 @@ input:-webkit-autofill:active {
 input:autofill {
     background: rgb(var(--color-inputfill));
 }
+
+body {
+    scrollbar-gutter: stable both-edges;
+}

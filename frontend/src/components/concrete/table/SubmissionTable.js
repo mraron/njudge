@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { SVGSpinner, SVGView } from "../../svg/SVGs"
 import RoundedTable from "../../container/RoundedTable"
-import CopyableCode from "../../util/copy/CopyableCode"
 import Modal from "../../container/modal/Modal"
 
 function TestCase13({ index, numCases, testCase, group, isLastGroup, isLastCase }) {
@@ -142,9 +141,11 @@ function SubmissionTable0({ status }) {
         ["submission_table.checker_output", testCase?.checkerOutput],
     ].map((item, index) => (
         <tr key={index}>
-            <td className="whitespace-nowrap max-w-xl">{t(item[0])}</td>
-            <td className="p-0 bg-codebgcol w-96">
-                <CopyableCode cls="border-0 rounded-none" text={item[1]} maxHeight={"6rem"} />
+            <td className="whitespace-nowrap w-0">{t(item[0])}</td>
+            <td className="p-0 bg-codebgcol">
+                <pre className="w-full px-4 py-3 overflow-x-auto" style={{ maxHeight: "6rem" }}>
+                    {item[1]}
+                </pre>
             </td>
         </tr>
     ))
@@ -171,7 +172,7 @@ function SubmissionTable0({ status }) {
     return (
         <>
             <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
-                <RoundedTable cls="w-full sm:w-[30rem]" titleComponent={titleComponent}>
+                <RoundedTable cls="w-full md:w-[40rem]" titleComponent={titleComponent}>
                     <tbody>{outputRows}</tbody>
                 </RoundedTable>
             </Modal>

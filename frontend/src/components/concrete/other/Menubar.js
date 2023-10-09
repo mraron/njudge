@@ -78,7 +78,10 @@ function ProfileSettings({ onSidebarClose }) {
                 className={`px-2 py-0.5 ${
                     i18n.resolvedLanguage === lang ? "bg-grey-725" : "hover:bg-grey-775"
                 } rounded`}
-                onClick={() => i18n.changeLanguage(lang)}>
+                onClick={() => {
+                    console.log("nigga")
+                    i18n.changeLanguage(lang)
+                }}>
                 {lang}
             </button>
         )
@@ -115,7 +118,7 @@ function ThemeButton() {
         <button
             className="h-full border border-l-0 border-bordefcol flex items-center justify-center p-2 rounded-r-md hover:bg-framebgcol"
             onClick={toggleTheme}>
-            <FontAwesomeIcon icon={theme === "light" ? "fa-moon" : "fa-sun"} className="w-6 h-4" />
+            <FontAwesomeIcon icon={theme === "light" ? "fa-moon" : "fa-sun"} className="text-grey-200 w-6 h-4" />
         </button>
     )
 }

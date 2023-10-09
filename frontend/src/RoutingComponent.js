@@ -54,6 +54,9 @@ const titles = {
     [routeMap.problemSubmit]: "problem_submit.page_title",
     [routeMap.problemSubmissions]: "problem_submissions.page_title",
     [routeMap.problemRanklist]: "problem_ranklist.page_title",
+    [routeMap.contestProblems]: "contest_problems.page_title",
+    [routeMap.contestSubmissions]: "contest_submissions.page_title",
+    [routeMap.contestRanklist]: "contest_ranklist.page_title",
     [routeMap.submission]: "submission.page_title",
 }
 const routes = Object.keys(titles)
