@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react"
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import Checkbox from "../../components/input/Checkbox"

@@ -2,9 +2,8 @@ import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { SVGTitleComponent } from "../components/container/RoundedFrame"
-import ProfileSideBar from "../components/concrete/other/ProfileSidebar"
 import RoundedTable from "../components/container/RoundedTable"
-import ProfileSidebarPage from "./wrappers/ProfileSidebarPage";
+import ProfileSidebarPage from "./wrappers/ProfileSidebarPage"
 
 function InfoTable() {
     const { t } = useTranslation()

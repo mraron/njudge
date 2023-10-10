@@ -2,7 +2,7 @@ import { Outlet, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { routeMap } from "../../config/RouteConfig"
 import TabFrame from "../../components/container/TabFrame"
-import WidePage from "../wrappers/WidePage";
+import WidePage from "../wrappers/WidePage"
 
 function Contest() {
     const { t } = useTranslation()

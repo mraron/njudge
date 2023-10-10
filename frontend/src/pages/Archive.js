@@ -1,11 +1,10 @@
 import { Link } from "react-router-dom"
-import ProfileSideBar from "../components/concrete/other/ProfileSidebar"
 import DropdownListFrame from "../components/container/DropdownListFrame"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import React from "react"
 import { SVGEllipsis } from "../components/svg/SVGs"
 import { useTranslation } from "react-i18next"
-import ProfileSidebarPage from "./wrappers/ProfileSidebarPage";
+import ProfileSidebarPage from "./wrappers/ProfileSidebarPage"
 
 function ProblemLeaf({ data }) {
     const { t } = useTranslation()
@@ -48,11 +47,7 @@ function Archive({ data }) {
     const categoriesContent = data.categories.map((item, index) => (
         <DropdownListFrame key={index} title={item.title} tree={{ children: item.children }} leaf={ProblemLeaf} />
     ))
-    return (
-        <ProfileSidebarPage>
-            {categoriesContent}
-        </ProfileSidebarPage>
-    )
+    return <ProfileSidebarPage>{categoriesContent}</ProfileSidebarPage>
 }
 
 export default Archive

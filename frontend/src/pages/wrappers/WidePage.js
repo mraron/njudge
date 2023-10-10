@@ -1,9 +1,7 @@
-function WidePage({children}) {
+function WidePage({ children }) {
     return (
         <div className="w-full flex justify-center">
-            <div className="flex justify-center w-full max-w-7xl px-3">
-                {children}
-            </div>
+            <div className="flex justify-center w-full max-w-7xl px-3">{children}</div>
         </div>
     )
 }

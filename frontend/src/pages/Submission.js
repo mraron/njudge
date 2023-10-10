@@ -10,7 +10,7 @@ import Button from "../components/basic/Button"
 import CodeEditor from "../components/input/CodeEditor"
 import JudgeDataContext from "../contexts/judgeData/JudgeDataContext"
 import UserContext from "../contexts/user/UserContext"
-import WidePage from "./wrappers/WidePage";
+import WidePage from "./wrappers/WidePage"
 
 function CompileErrorFrame({ message }) {
     const { t } = useTranslation()

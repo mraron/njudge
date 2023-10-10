@@ -8,7 +8,7 @@ import Button from "../../components/basic/Button"
 import UserContext from "../../contexts/user/UserContext"
 import { routeMap } from "../../config/RouteConfig"
 import { login } from "../../util/auth"
-import NarrowPage from "../wrappers/NarrowPage";
+import NarrowPage from "../wrappers/NarrowPage"
 
 function LoginFrame() {
     const { t } = useTranslation()

@@ -1,14 +1,11 @@
-import { useContext, useState } from "react"
-import { Navigate } from "react-router-dom"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import RoundedFrame, { SVGTitleComponent } from "../../components/container/RoundedFrame"
 import TextBox from "../../components/input/TextBox"
 import Button from "../../components/basic/Button"
-import UserContext from "../../contexts/user/UserContext"
-import { routeMap } from "../../config/RouteConfig"
 import { change_password } from "../../util/auth"
-import NarrowPage from "../wrappers/NarrowPage";
+import NarrowPage from "../wrappers/NarrowPage"
 
 function ForgottenPasswordFrame() {
     const { t } = useTranslation()

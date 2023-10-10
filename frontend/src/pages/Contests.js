@@ -1,9 +1,8 @@
 import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import ProfileSideBar from "../components/concrete/other/ProfileSidebar"
 import RoundedFrame from "../components/container/RoundedFrame"
 import Button from "../components/basic/Button"
-import ProfileSidebarPage from "./wrappers/ProfileSidebarPage";
+import ProfileSidebarPage from "./wrappers/ProfileSidebarPage"
 
 function ContestFrame({ contest }) {
     const { t } = useTranslation()

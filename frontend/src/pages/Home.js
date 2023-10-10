@@ -1,7 +1,6 @@
-import ProfileSideBar from "../components/concrete/other/ProfileSidebar"
 import PostFrame from "../components/container/PostFrame"
 import React from "react"
-import ProfileSidebarPage from "./wrappers/ProfileSidebarPage";
+import ProfileSidebarPage from "./wrappers/ProfileSidebarPage"
 
 function Home({ data }) {
     return (
