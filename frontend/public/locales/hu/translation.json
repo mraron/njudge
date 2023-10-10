@@ -200,7 +200,8 @@
         "confirm_password": "Jelszó megerősítése",
         "save": "Mentés",
         "show_unsolved": "Megoldatlan feladatok címkéinek mutatása",
-        "hide_solved": "Megoldott feladatok elrejtése"
+        "hide_solved": "Megoldott feladatok elrejtése",
+        "forgotten_password": "Elfelejtetted a jelszavad?"
     },
     "problem": {
         "statement": "Leírás",

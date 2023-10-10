@@ -2,6 +2,7 @@ import { Outlet, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { routeMap } from "../../config/RouteConfig"
 import TabFrame from "../../components/container/TabFrame"
+import WidePage from "../wrappers/WidePage";
 
 function Contest() {
     const { t } = useTranslation()
@@ -10,17 +11,13 @@ function Contest() {
     const { contest } = useParams()
     const routes = routePatterns.map((item) => item.replace(":contest", contest))
     return (
-        <div className="flex justify-center">
-            <div className="w-full max-w-7xl">
-                <div className="w-full px-3">
-                    <TabFrame routes={routes} routePatterns={routePatterns} routeLabels={routeLabels.map(t)}>
-                        <div className="relative w-full">
-                            <Outlet />
-                        </div>
-                    </TabFrame>
+        <WidePage>
+            <TabFrame routes={routes} routePatterns={routePatterns} routeLabels={routeLabels.map(t)}>
+                <div className="w-full">
+                    <Outlet />
                 </div>
-            </div>
-        </div>
+            </TabFrame>
+        </WidePage>
     )
 }
 

@@ -4,7 +4,7 @@ import RoundedFrame from "./RoundedFrame"
 
 function DropdownElem({ text, isOpen, onClick }) {
     return (
-        <span className="max-w-fit flex link items-center emph-med no-underline" onClick={onClick}>
+        <span className="max-w-fit flex link items-center no-underline" onClick={onClick}>
             <SVGDropdownListArrow isOpen={isOpen} />
             <span className="truncate">{text}</span>
         </span>

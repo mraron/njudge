@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import React from "react"
 import { SVGEllipsis } from "../components/svg/SVGs"
 import { useTranslation } from "react-i18next"
+import ProfileSidebarPage from "./wrappers/ProfileSidebarPage";
 
 function ProblemLeaf({ data }) {
     const { t } = useTranslation()
@@ -48,12 +49,9 @@ function Archive({ data }) {
         <DropdownListFrame key={index} title={item.title} tree={{ children: item.children }} leaf={ProblemLeaf} />
     ))
     return (
-        <div className="w-full flex justify-center">
-            <div className="flex justify-center w-full max-w-7xl lg:space-x-3 px-3">
-                <ProfileSideBar />
-                <div className="w-full min-w-0 space-y-3">{categoriesContent}</div>
-            </div>
-        </div>
+        <ProfileSidebarPage>
+            {categoriesContent}
+        </ProfileSidebarPage>
     )
 }
 

@@ -64,7 +64,7 @@ function Problem(data) {
             </td>
             <td className=" w-0">
                 <Link
-                    className="link flex items-center justify-center"
+                    className="link flex items-center justify-center text-grey-200"
                     to={`${routeMap.problemSubmissions
                         .replace(":problemset", data.problemset)
                         .replace(":problem", problem)}?ac=1`}>

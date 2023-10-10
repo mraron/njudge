@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { SVGTitleComponent } from "../components/container/RoundedFrame"
 import ProfileSideBar from "../components/concrete/other/ProfileSidebar"
 import RoundedTable from "../components/container/RoundedTable"
+import ProfileSidebarPage from "./wrappers/ProfileSidebarPage";
 
 function InfoTable() {
     const { t } = useTranslation()
@@ -36,14 +37,9 @@ function InfoTable() {
 
 function Info({ data }) {
     return (
-        <div className="w-full flex justify-center">
-            <div className="flex justify-center w-full max-w-7xl lg:space-x-3 px-3">
-                <ProfileSideBar />
-                <div className="w-full min-w-0">
-                    <InfoTable />
-                </div>
-            </div>
-        </div>
+        <ProfileSidebarPage>
+            <InfoTable />
+        </ProfileSidebarPage>
     )
 }
 

@@ -4,7 +4,7 @@ import SubmissionFilterFrame from "../../components/concrete/filter/SubmissionFi
 
 function ProblemSubmissions({ data }) {
     return (
-        <div className="relative space-y-2">
+        <div className="space-y-2">
             <SubmissionFilterFrame />
             <SubmissionsTable submissions={data.submissions} />
             <Pagination paginationData={data.paginationData} />

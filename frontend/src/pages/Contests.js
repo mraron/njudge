@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next"
 import ProfileSideBar from "../components/concrete/other/ProfileSidebar"
 import RoundedFrame from "../components/container/RoundedFrame"
 import Button from "../components/basic/Button"
+import ProfileSidebarPage from "./wrappers/ProfileSidebarPage";
 
 function ContestFrame({ contest }) {
     const { t } = useTranslation()
@@ -32,14 +33,9 @@ function ContestList({ contests }) {
 
 function Contests({ data }) {
     return (
-        <div className="w-full flex justify-center">
-            <div className="flex justify-center w-full max-w-7xl lg:space-x-3 px-3">
-                <ProfileSideBar />
-                <div className="w-full min-w-0">
-                    <ContestList contests={data.contests} />
-                </div>
-            </div>
-        </div>
+        <ProfileSidebarPage>
+            <ContestList contests={data.contests} />
+        </ProfileSidebarPage>
     )
 }
 

@@ -199,7 +199,8 @@
         "confirm_password": "Confirm password",
         "save": "Save",
         "show_unsolved": "Show tags for unsolved problems",
-        "hide_solved": "Hide solved problems"
+        "hide_solved": "Hide solved problems",
+        "forgotten_password": "Forgotten password?"
     },
     "problem": {
         "statement": "Statement",

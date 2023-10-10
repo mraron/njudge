@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import Checkbox from "../../components/input/Checkbox"
@@ -55,7 +55,7 @@ function PasswordChangeFrame() {
                         onChange={handleChangeNewPw}
                     />
                 </div>
-                <div className="mb-6 w-full">
+                <div className="mb-2 w-full">
                     <TextBox
                         id="newPasswordConfirm"
                         label={t("profile_settings.confirm_password")}
@@ -63,6 +63,11 @@ function PasswordChangeFrame() {
                         initText={newPwConfirm}
                         onChange={handleChangeNewPwConfirm}
                     />
+                </div>
+                <div className="mb-6">
+                    <Link to={routeMap.forgotten_password} className="link text-sm">
+                        {t("profile_settings.forgotten_password")}
+                    </Link>
                 </div>
                 <div className="flex justify-center">
                     <Button color="indigo" onClick={handleChangePassword} minWidth="8rem">

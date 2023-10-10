@@ -8,6 +8,7 @@ import Button from "../../components/basic/Button"
 import UserContext from "../../contexts/user/UserContext"
 import { routeMap } from "../../config/RouteConfig"
 import { login } from "../../util/auth"
+import NarrowPage from "../wrappers/NarrowPage";
 
 function LoginFrame() {
     const { t } = useTranslation()
@@ -72,13 +73,9 @@ function Login() {
         return <Navigate to={routeMap.profile.replace(":user", encodeURIComponent(userData.username))} />
     }
     return (
-        <div className="w-full flex justify-center">
-            <div className="flex justify-center w-full sm:max-w-md">
-                <div className="w-full px-4">
-                    <LoginFrame />
-                </div>
-            </div>
-        </div>
+        <NarrowPage>
+            <LoginFrame />
+        </NarrowPage>
     )
 }
 

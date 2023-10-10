@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next"
 import { routeMap } from "../../config/RouteConfig"
 import UserContext from "../../contexts/user/UserContext"
 import TabFrame from "../../components/container/TabFrame"
+import WidePage from "../wrappers/WidePage";
 
 function Profile() {
     console.log("nigga")
@@ -19,17 +20,13 @@ function Profile() {
         routePatterns.pop()
     }
     return (
-        <div className="flex justify-center">
-            <div className="w-full max-w-7xl">
-                <div className="w-full px-3">
-                    <TabFrame routes={routes} routePatterns={routePatterns} routeLabels={routeLabels.map(t)}>
-                        <div className="relative w-full">
-                            <Outlet />
-                        </div>
-                    </TabFrame>
+        <WidePage>
+            <TabFrame routes={routes} routePatterns={routePatterns} routeLabels={routeLabels.map(t)}>
+                <div className="w-full">
+                    <Outlet />
                 </div>
-            </div>
-        </div>
+            </TabFrame>
+        </WidePage>
     )
 }
 
