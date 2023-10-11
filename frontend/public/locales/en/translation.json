@@ -210,8 +210,6 @@
     },
     "problem_statement": {
         "page_title": "Statement – {{params.problem}} :: njudge",
-        "file": "File",
-        "statement": "Statement",
         "attachment": "Attachment",
         "attachments": "Attachments",
         "submit_solution": "Submit solution",

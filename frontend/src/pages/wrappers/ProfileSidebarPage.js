@@ -1,4 +1,4 @@
-import ProfileSideBar from "../../components/concrete/other/ProfileSidebar";
+import ProfileSideBar from "../../components/concrete/other/ProfileSidebar"
 
 function ProfileSidebarPage({ children }) {
     return (

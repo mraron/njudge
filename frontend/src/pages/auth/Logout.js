@@ -1,7 +1,7 @@
-import { useNavigate } from "react-router-dom";
-import { logout } from "../../util/auth";
-import { routeMap } from "../../config/RouteConfig";
-import { useEffect } from "react";
+import { useNavigate } from "react-router-dom"
+import { logout } from "../../util/auth"
+import { routeMap } from "../../config/RouteConfig"
+import { useEffect } from "react"
 
 function Logout() {
     const navigate = useNavigate()

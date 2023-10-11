@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import TextBox from "./TextBox";
+import { useEffect, useState } from "react"
+import TextBox from "./TextBox"
 
 function DropdownItem({ text, onClick }) {
     return (

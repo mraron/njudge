@@ -35,6 +35,7 @@ module.exports = {
                 "framebgcol": "rgb(var(--color-framebgcol))",
                 "btncol": "rgb(var(--color-btncol))",
                 "btnhovcol": "rgb(var(--color-btnhovcol))",
+                "iconcol": "rgb(var(--color-iconcol))",
                 "highlight": "rgb(var(--color-highlight))",
                 "grey-900": "rgb(var(--color-grey-900))",
                 "grey-875": "rgb(var(--color-grey-875))",

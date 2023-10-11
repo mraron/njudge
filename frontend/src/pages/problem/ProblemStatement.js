@@ -1,19 +1,19 @@
-import { useContext, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { SVGSpinner, SVGView } from "../../components/svg/SVGs";
-import MapDataFrame from "../../components/container/MapDataFrame";
-import DropdownMenu from "../../components/input/DropdownMenu";
-import RoundedFrame, { SVGTitleComponent } from "../../components/container/RoundedFrame";
-import RoundedTable from "../../components/container/RoundedTable";
-import TagModal from "../../components/container/modal/TagModal";
-import Tag from "../../components/basic/Tag";
-import Button from "../../components/basic/Button";
-import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext";
-import ThemeContext from "../../contexts/theme/ThemeContext";
-import submitSolution from "../../util/submitSolution";
-import { apiRoute, routeMap } from "../../config/RouteConfig";
+import { useContext, useState } from "react"
+import { useTranslation } from "react-i18next"
+import { Link, useNavigate, useParams } from "react-router-dom"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { SVGSpinner, SVGView } from "../../components/svg/SVGs"
+import MapDataFrame from "../../components/container/MapDataFrame"
+import DropdownMenu from "../../components/input/DropdownMenu"
+import RoundedFrame, { SVGTitleComponent } from "../../components/container/RoundedFrame"
+import RoundedTable from "../../components/container/RoundedTable"
+import TagModal from "../../components/container/modal/TagModal"
+import Tag from "../../components/basic/Tag"
+import Button from "../../components/basic/Button"
+import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext"
+import ThemeContext from "../../contexts/theme/ThemeContext"
+import submitSolution from "../../util/submitSolution"
+import { apiRoute, routeMap } from "../../config/RouteConfig"
 
 function ProblemInfo({ info }) {
     const { t } = useTranslation()
@@ -172,22 +172,18 @@ function ProblemLastSubmissions({ submissions, maxScore }) {
     )
 }
 
-function ProblemAttachment({ type, name, href }) {
+function ProblemAttachment({ name, href }) {
     const { t } = useTranslation()
     return (
         <li>
             <a
                 className="link no-underline flex items-center my-0.5"
                 href={apiRoute(href)}
-                download="statement.pdf"
                 target="_blank"
-                rel="noreferrer">
-                {type === "file" && <FontAwesomeIcon icon="fa-regular fa-file" className="w-4 h-4 mr-3" />}
-                {type === "statement" && <FontAwesomeIcon icon="fa-regular fa-file-lines" className="w-4 h-4 mr-3" />}
-                <span className="underline truncate text-label">
-                    {type === "statement" ? t("problem_statement.statement") : t("problem_statement.file")}
-                    &nbsp;({name})
-                </span>
+                rel="noreferrer"
+                download>
+                <FontAwesomeIcon icon="fa-regular fa-file" className="w-3.5 h-3.5 mr-2.5" />
+                <span className="underline truncate text-sm">{name}</span>
             </a>
         </li>
     )
@@ -195,19 +191,9 @@ function ProblemAttachment({ type, name, href }) {
 
 function ProblemAttachments({ attachments }) {
     const { t } = useTranslation()
-    console.log(attachments.statements)
-    const attachmentsContent = attachments.statements
-        .map((item, index) => <ProblemAttachment key={index} type="statement" name={item.name} href={item.href} />)
-        .concat(
-            attachments.files.map((item, index) => (
-                <ProblemAttachment
-                    key={attachments.statements.length + index}
-                    type="file"
-                    name={item.name}
-                    href={item.href}
-                />
-            )),
-        )
+    const attachmentsContent = attachments.files.map((item, index) => (
+        <ProblemAttachment key={attachments.statements.length + index} name={item.name} href={item.href} />
+    ))
     const titleComponent = (
         <SVGTitleComponent
             icon={<FontAwesomeIcon icon="fa-paperclip" className="w-4 h-4 mr-3" />}
@@ -215,11 +201,13 @@ function ProblemAttachments({ attachments }) {
         />
     )
     return (
-        <RoundedFrame titleComponent={titleComponent}>
-            <div className="px-6 py-5">
-                <ul>{attachmentsContent}</ul>
-            </div>
-        </RoundedFrame>
+        attachmentsContent.length > 0 && (
+            <RoundedFrame titleComponent={titleComponent}>
+                <div className="px-6 py-5">
+                    <ul className="space-y-0.5 text-sm">{attachmentsContent}</ul>
+                </div>
+            </RoundedFrame>
+        )
     )
 }
 
@@ -243,7 +231,7 @@ function ProblemStatement({ data }) {
                             </div>
                             <a href={apiRoute(statementSrc)} target="_blank" rel="noreferrer">
                                 <Button color="gray" aria-label={t("aria_label.view")}>
-                                    <SVGView cls="text-grey-200 w-[1.4rem] h-[1.4rem]" />
+                                    <SVGView cls="text-iconcol w-[1.4rem] h-[1.4rem]" />
                                 </Button>
                             </a>
                         </div>

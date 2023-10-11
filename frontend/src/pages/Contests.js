@@ -1,8 +1,8 @@
-import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import RoundedFrame from "../components/container/RoundedFrame";
-import Button from "../components/basic/Button";
-import ProfileSidebarPage from "./wrappers/ProfileSidebarPage";
+import { Link } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import RoundedFrame from "../components/container/RoundedFrame"
+import Button from "../components/basic/Button"
+import ProfileSidebarPage from "./wrappers/ProfileSidebarPage"
 
 function ContestFrame({ contest }) {
     const { t } = useTranslation()
@@ -29,9 +29,7 @@ function Contests({ data }) {
     const contestsContent = data.contests.map((item, index) => <ContestFrame key={index} contest={item} />)
     return (
         <ProfileSidebarPage>
-            <div className="space-y-3">
-                {contestsContent}
-            </div>
+            <div className="space-y-3">{contestsContent}</div>
         </ProfileSidebarPage>
     )
 }

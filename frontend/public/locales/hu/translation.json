@@ -211,8 +211,6 @@
     },
     "problem_statement": {
         "page_title": "Leírás – {{params.problem}} :: njudge",
-        "file": "Fájl",
-        "statement": "Leírás",
         "attachment": "Csatolmány",
         "attachments": "Mellékletek",
         "submit_solution": "Megoldás beküldése",

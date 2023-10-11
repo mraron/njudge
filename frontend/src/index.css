@@ -48,6 +48,7 @@
         --color-framebgcol: var(--color-grey-800);
         --color-btncol: var(--color-grey-725);
         --color-btnhovcol: var(--color-grey-700);
+        --color-iconcol: var(--color-grey-125);
         --color-highlight: 79, 70, 229;
     }
     html[data-theme="light"] {
@@ -95,6 +96,7 @@
         --color-framebgcol: var(--color-grey-800);
         --color-btncol: var(--color-grey-750);
         --color-btnhovcol: var(--color-grey-725);
+        --color-iconcol: var(--color-grey-175);
         --color-highlight: 99, 102, 241;
     }
 }
@@ -107,7 +109,7 @@
         @apply w-full rounded-md px-3 py-2 border flex items-center justify-between border-bordefcol text-dropdown;
     }
     .frame-title {
-        @apply emph-med p-4 text-grey-150 text-center border-b-1 border-bordefcol;
+        @apply emph-med p-4 text-iconcol text-center border-b-1 border-bordefcol;
     }
     .link {
         @apply cursor-pointer underline underline-offset-2 hover:text-indigo-800 dark:hover:text-indigo-200;

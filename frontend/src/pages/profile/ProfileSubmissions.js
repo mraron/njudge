@@ -1,5 +1,5 @@
-import Pagination from "../../components/util/Pagination";
-import SubmissionsTable from "../../components/concrete/table/SubmissionsTable";
+import Pagination from "../../components/util/Pagination"
+import SubmissionsTable from "../../components/concrete/table/SubmissionsTable"
 
 function ProfileSubmissions({ data }) {
     return (

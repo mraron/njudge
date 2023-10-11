@@ -1,13 +1,13 @@
-import { useContext, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import RoundedFrame from "../../components/container/RoundedFrame";
-import DropdownMenu from "../../components/input/DropdownMenu";
-import submitSolution from "../../util/submitSolution";
-import Button from "../../components/basic/Button";
-import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext";
-import { routeMap } from "../../config/RouteConfig";
-import CodeEditor from "../../components/input/CodeEditor";
+import { useContext, useState } from "react"
+import { useNavigate, useParams } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import RoundedFrame from "../../components/container/RoundedFrame"
+import DropdownMenu from "../../components/input/DropdownMenu"
+import submitSolution from "../../util/submitSolution"
+import Button from "../../components/basic/Button"
+import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext"
+import { routeMap } from "../../config/RouteConfig"
+import CodeEditor from "../../components/input/CodeEditor"
 
 function SubmitControlsFrame({ onLanguageChanged, onSubmit }) {
     const { t } = useTranslation()

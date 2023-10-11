@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { SVGDropdownFrameArrow } from "../svg/SVGs";
-import RoundedFrame from "./RoundedFrame";
+import { useState } from "react"
+import { SVGDropdownFrameArrow } from "../svg/SVGs"
+import RoundedFrame from "./RoundedFrame"
 
 function DropdownFrame({ children, title }) {
     const [isOpen, setOpen] = useState(false)

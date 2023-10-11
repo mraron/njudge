@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from "react"
 
 function TextBox({ id, label, type = "", initText = "", onChange, onFocus, onBlur }) {
     const [focused, setFocused] = useState(false)

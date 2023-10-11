@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import TextBoxDropdown from "./TextBoxDropdown";
-import _ from "lodash";
+import { useEffect, useState } from "react"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import TextBoxDropdown from "./TextBoxDropdown"
+import _ from "lodash"
 
 function Tag({ title, onClick }) {
     const [hovered, setHovered] = useState(false)

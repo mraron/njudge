@@ -1,12 +1,12 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import RoundedFrame, { SVGTitleComponent } from "../../components/container/RoundedFrame";
-import TextBox from "../../components/input/TextBox";
-import Button from "../../components/basic/Button";
-import { reset_password } from "../../util/auth";
-import NarrowPage from "../wrappers/NarrowPage";
+import { useState } from "react"
+import { useParams } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import RoundedFrame, { SVGTitleComponent } from "../../components/container/RoundedFrame"
+import TextBox from "../../components/input/TextBox"
+import Button from "../../components/basic/Button"
+import { reset_password } from "../../util/auth"
+import NarrowPage from "../wrappers/NarrowPage"
 
 function ResetPasswordFrame() {
     const { t } = useTranslation()

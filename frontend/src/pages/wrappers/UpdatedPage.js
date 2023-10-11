@@ -1,9 +1,9 @@
-import { useContext, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
-import { updateData } from "../../util/updateData";
-import PageLoadingAnimation from "../../components/util/PageLoadingAnimation";
-import UserContext from "../../contexts/user/UserContext";
+import { useContext, useEffect, useState } from "react"
+import { useLocation } from "react-router-dom"
+import { AnimatePresence, motion } from "framer-motion"
+import { updateData } from "../../util/updateData"
+import PageLoadingAnimation from "../../components/util/PageLoadingAnimation"
+import UserContext from "../../contexts/user/UserContext"
 
 function UpdatePage({ page: Page }) {
     const { setUserData, setLoggedIn } = useContext(UserContext)

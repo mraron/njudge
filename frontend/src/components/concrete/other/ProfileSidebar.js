@@ -1,13 +1,13 @@
-import { useContext } from "react";
-import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLineChart } from "@fortawesome/free-solid-svg-icons";
-import MapDataFrame from "../../container/MapDataFrame";
-import RoundedTable from "../../container/RoundedTable";
-import UserContext from "../../../contexts/user/UserContext";
-import RoundedFrame, { SVGTitleComponent } from "../../container/RoundedFrame";
-import { routeMap } from "../../../config/RouteConfig";
+import { useContext } from "react"
+import { useTranslation } from "react-i18next"
+import { Link } from "react-router-dom"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faLineChart } from "@fortawesome/free-solid-svg-icons"
+import MapDataFrame from "../../container/MapDataFrame"
+import RoundedTable from "../../container/RoundedTable"
+import UserContext from "../../../contexts/user/UserContext"
+import RoundedFrame, { SVGTitleComponent } from "../../container/RoundedFrame"
+import { routeMap } from "../../../config/RouteConfig"
 
 export function ProfilePictureFrame({ userData }) {
     const profileRoute = routeMap.profile.replace(":user", encodeURIComponent(userData.username))

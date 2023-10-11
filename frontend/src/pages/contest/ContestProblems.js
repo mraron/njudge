@@ -1,9 +1,9 @@
-import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { SVGEllipsis } from "../../components/svg/SVGs";
-import RoundedTable from "../../components/container/RoundedTable";
-import React from "react";
+import { Link } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { SVGEllipsis } from "../../components/svg/SVGs"
+import RoundedTable from "../../components/container/RoundedTable"
+import React from "react"
 
 function Problem({ problem }) {
     const { id, title, status } = problem

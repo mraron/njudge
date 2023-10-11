@@ -1,14 +1,14 @@
-import { useContext, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { Link, Navigate, useNavigate } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import RoundedFrame, { SVGTitleComponent } from "../../components/container/RoundedFrame";
-import TextBox from "../../components/input/TextBox";
-import Button from "../../components/basic/Button";
-import UserContext from "../../contexts/user/UserContext";
-import { routeMap } from "../../config/RouteConfig";
-import { register } from "../../util/auth";
-import NarrowPage from "../wrappers/NarrowPage";
+import { useContext, useState } from "react"
+import { useTranslation } from "react-i18next"
+import { Link, Navigate, useNavigate } from "react-router-dom"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import RoundedFrame, { SVGTitleComponent } from "../../components/container/RoundedFrame"
+import TextBox from "../../components/input/TextBox"
+import Button from "../../components/basic/Button"
+import UserContext from "../../contexts/user/UserContext"
+import { routeMap } from "../../config/RouteConfig"
+import { register } from "../../util/auth"
+import NarrowPage from "../wrappers/NarrowPage"
 
 function RegisterFrame() {
     const { t } = useTranslation()

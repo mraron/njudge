@@ -1,8 +1,8 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import RoundedFrame from "../container/RoundedFrame";
-import UpdateQueryString from "../../util/updateQueryString";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useTranslation } from "react-i18next";
+import { useLocation, useNavigate } from "react-router-dom"
+import RoundedFrame from "../container/RoundedFrame"
+import UpdateQueryString from "../../util/updateQueryString"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { useTranslation } from "react-i18next"
 
 function Pagination({ paginationData }) {
     const { t } = useTranslation()

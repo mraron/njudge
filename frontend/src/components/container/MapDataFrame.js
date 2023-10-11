@@ -1,4 +1,4 @@
-import RoundedTable from "./RoundedTable";
+import RoundedTable from "./RoundedTable"
 
 function MapDataFrame({ data, title, titleComponent, labelColWidth }) {
     const rows = data.map((pair, index) => (

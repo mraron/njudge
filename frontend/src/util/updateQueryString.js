@@ -1,4 +1,4 @@
-import queryString from "query-string";
+import queryString from "query-string"
 
 function UpdateQueryString({ location, navigate, args, values, validArgs, invalidArgs }) {
     const qString = location.search

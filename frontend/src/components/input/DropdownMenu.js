@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { matchPath, useLocation, useNavigate } from "react-router-dom";
-import { SVGDropdownMenuArrow } from "../svg/SVGs";
-import { findRouteIndex } from "../../util/findRouteIndex";
+import { useEffect, useRef, useState } from "react"
+import { matchPath, useLocation, useNavigate } from "react-router-dom"
+import { SVGDropdownMenuArrow } from "../svg/SVGs"
+import { findRouteIndex } from "../../util/findRouteIndex"
 
 function DropdownItem({ name, onClick }) {
     return (

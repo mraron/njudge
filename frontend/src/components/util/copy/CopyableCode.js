@@ -1,6 +1,6 @@
-import CopyButton from "./CopyButton";
-import RoundedFrame from "../../container/RoundedFrame";
-import { useState } from "react";
+import CopyButton from "./CopyButton"
+import RoundedFrame from "../../container/RoundedFrame"
+import { useState } from "react"
 
 function CopyableCode({ text, maxHeight = "auto", title, titleComponent, cls }) {
     const [isHovered, setHovered] = useState(false)

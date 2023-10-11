@@ -1,16 +1,16 @@
-import { useContext } from "react";
-import { useTranslation } from "react-i18next";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { SVGTitleComponent } from "../components/container/RoundedFrame";
-import SubmissionTable from "../components/concrete/table/SubmissionTable";
-import SubmissionsTable from "../components/concrete/table/SubmissionsTable";
-import CopyableCode from "../components/util/copy/CopyableCode";
-import DropdownFrame from "../components/container/DropdownFrame";
-import Button from "../components/basic/Button";
-import CodeEditor from "../components/input/CodeEditor";
-import JudgeDataContext from "../contexts/judgeData/JudgeDataContext";
-import UserContext from "../contexts/user/UserContext";
-import WidePage from "./wrappers/WidePage";
+import { useContext } from "react"
+import { useTranslation } from "react-i18next"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { SVGTitleComponent } from "../components/container/RoundedFrame"
+import SubmissionTable from "../components/concrete/table/SubmissionTable"
+import SubmissionsTable from "../components/concrete/table/SubmissionsTable"
+import CopyableCode from "../components/util/copy/CopyableCode"
+import DropdownFrame from "../components/container/DropdownFrame"
+import Button from "../components/basic/Button"
+import CodeEditor from "../components/input/CodeEditor"
+import JudgeDataContext from "../contexts/judgeData/JudgeDataContext"
+import UserContext from "../contexts/user/UserContext"
+import WidePage from "./wrappers/WidePage"
 
 function CompileErrorFrame({ message }) {
     const { t } = useTranslation()
@@ -44,10 +44,7 @@ function Submission({ data }) {
                 )}
                 <SubmissionsTable submissions={[data.summary]} />
                 {data.language !== "zip" && (
-                    <CodeEditor
-                        value={data.summary.code}
-                        language={judgeData.highlightCodes[data.summary.language]}
-                    />
+                    <CodeEditor value={data.summary.code} language={judgeData.highlightCodes[data.summary.language]} />
                 )}
                 {data.summary.compileError && <CompileErrorFrame message={data.summary.compileErrorMessage} />}
                 {!data.summary.compileError && <SubmissionTable status={data.status} />}

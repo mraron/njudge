@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState } from "react"
 
-import JudgeDataContext from "./JudgeDataContext";
+import JudgeDataContext from "./JudgeDataContext"
 
 function JudgeDataProvider({ children }) {
     const [judgeData, setJudgeData] = useState(null)

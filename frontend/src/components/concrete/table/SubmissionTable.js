@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { SVGSpinner, SVGView } from "../../svg/SVGs";
-import RoundedTable from "../../container/RoundedTable";
-import Modal from "../../container/modal/Modal";
+import { useState } from "react"
+import { useTranslation } from "react-i18next"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { SVGSpinner, SVGView } from "../../svg/SVGs"
+import RoundedTable from "../../container/RoundedTable"
+import Modal from "../../container/modal/Modal"
 
 function TestCase13({ index, numCases, testCase, group, isLastGroup, isLastCase }) {
     const bottomBorderCase = isLastGroup && isLastCase ? "border-b-0" : ""
@@ -112,7 +112,7 @@ function TestCase0({ testCase, onRowClicked }) {
             </td>
             <td className="w-0 py-3">
                 <button aria-label={t("aria_label.view")} onClick={() => onRowClicked(testCase)}>
-                    <SVGView cls="w-6 h-6 text-grey-200 hover:text-indigo-600 hover:scale-105" />
+                    <SVGView cls="w-6 h-6 text-iconcol hover:text-indigo-600 hover:scale-105" />
                 </button>
             </td>
             <td className="py-3">{testCase.time} ms</td>

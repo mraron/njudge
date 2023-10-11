@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState } from "react"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 function Checkbox({ id, label, initChecked, onChange }) {
     const [checked, setChecked] = useState(initChecked)

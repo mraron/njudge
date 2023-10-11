@@ -1,8 +1,8 @@
-import { Outlet, useParams } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { routeMap } from "../../config/RouteConfig";
-import TabFrame from "../../components/container/TabFrame";
-import WidePage from "../wrappers/WidePage";
+import { Outlet, useParams } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import { routeMap } from "../../config/RouteConfig"
+import TabFrame from "../../components/container/TabFrame"
+import WidePage from "../wrappers/WidePage"
 
 const routeLabels = ["problem.statement", "problem.submit", "problem.submissions", "problem.ranklist"]
 const routePatterns = [routeMap.problem, routeMap.problemSubmit, routeMap.problemSubmissions, routeMap.problemRanklist]

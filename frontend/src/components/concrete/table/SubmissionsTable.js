@@ -1,9 +1,9 @@
-import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { SVGSpinner } from "../../svg/SVGs";
-import { routeMap } from "../../../config/RouteConfig";
-import RoundedTable from "../../container/RoundedTable";
+import { Link } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { SVGSpinner } from "../../svg/SVGs"
+import { routeMap } from "../../../config/RouteConfig"
+import RoundedTable from "../../container/RoundedTable"
 
 function Submission({ submission }) {
     const { id, date, user, problem, language, verdictName, verdictType, score, maxScore, time, memory } = submission

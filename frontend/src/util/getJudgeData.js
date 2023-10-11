@@ -1,5 +1,5 @@
-import { apiRoute } from "../config/RouteConfig";
-import fetchWithCredentials from "./fetchWithCredentials";
+import { apiRoute } from "../config/RouteConfig"
+import fetchWithCredentials from "./fetchWithCredentials"
 
 export async function getLanguages() {
     const response = await fetchWithCredentials(apiRoute("/data/languages/"))

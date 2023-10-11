@@ -1,12 +1,12 @@
-import { useContext, useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { DefaultDropdownButton, DropdownRoutes } from "../../input/DropdownMenu";
-import { findRouteIndex } from "../../../util/findRouteIndex";
-import { routeMap } from "../../../config/RouteConfig";
-import UserContext from "../../../contexts/user/UserContext";
-import ThemeContext from "../../../contexts/theme/ThemeContext";
+import { useContext, useEffect, useRef, useState } from "react"
+import { Link, useLocation } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { DefaultDropdownButton, DropdownRoutes } from "../../input/DropdownMenu"
+import { findRouteIndex } from "../../../util/findRouteIndex"
+import { routeMap } from "../../../config/RouteConfig"
+import UserContext from "../../../contexts/user/UserContext"
+import ThemeContext from "../../../contexts/theme/ThemeContext"
 
 const menuRoutes = [
     routeMap.home,
@@ -118,7 +118,7 @@ function ThemeButton() {
         <button
             className="h-full border border-l-0 border-bordefcol flex items-center justify-center p-2 rounded-r-md hover:bg-framebgcol"
             onClick={toggleTheme}>
-            <FontAwesomeIcon icon={theme === "light" ? "fa-moon" : "fa-sun"} className="text-grey-200 w-6 h-4" />
+            <FontAwesomeIcon icon={theme === "light" ? "fa-moon" : "fa-sun"} className="text-iconcol w-6 h-4" />
         </button>
     )
 }

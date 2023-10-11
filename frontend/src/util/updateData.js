@@ -1,6 +1,6 @@
-import { authenticate } from "./auth";
-import { apiRoute } from "../config/RouteConfig";
-import fetchWithCredentials from "./fetchWithCredentials";
+import { authenticate } from "./auth"
+import { apiRoute } from "../config/RouteConfig"
+import fetchWithCredentials from "./fetchWithCredentials"
 
 export async function updatePageData(location, abortController, setData, isMounted) {
     try {

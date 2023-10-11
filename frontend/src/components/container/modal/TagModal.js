@@ -1,11 +1,11 @@
-import { useTranslation } from "react-i18next";
-import { useContext } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Modal from "./Modal";
-import RoundedFrame, { SVGTitleComponent } from "../RoundedFrame";
-import TagDropdown from "../../input/TagDropdown";
-import JudgeDataContext from "../../../contexts/judgeData/JudgeDataContext";
-import Button from "../../basic/Button";
+import { useTranslation } from "react-i18next"
+import { useContext } from "react"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import Modal from "./Modal"
+import RoundedFrame, { SVGTitleComponent } from "../RoundedFrame"
+import TagDropdown from "../../input/TagDropdown"
+import JudgeDataContext from "../../../contexts/judgeData/JudgeDataContext"
+import Button from "../../basic/Button"
 
 function TagModal({ isOpen, onClose }) {
     const { t } = useTranslation()
