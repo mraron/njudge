@@ -45,14 +45,6 @@ function Submission({ data }) {
                 <SubmissionsTable submissions={[data.summary]} />
                 {data.language !== "zip" && (
                     <CodeEditor
-                        className="editor"
-                        height="28rem"
-                        options={{
-                            domReadOnly: true,
-                            readOnly: true,
-                            fontFamily: "JetBrains Mono",
-                            fontSize: 13,
-                        }}
                         value={data.summary.code}
                         language={judgeData.highlightCodes[data.summary.language]}
                     />

@@ -56,14 +56,7 @@ function ProblemSubmit() {
         <div className="flex flex-col space-y-2">
             <SubmitControlsFrame onSubmit={handleSubmit} onLanguageChanged={handleLanguageChanged} />
             <CodeEditor
-                className="editor"
-                height="40rem"
                 language={judgeData.highlightCodes[judgeData.languages[langIndex].id]}
-                options={{
-                    fontFamily: "JetBrains Mono",
-                    fontSize: 13,
-                    lineHeight: 21,
-                }}
                 onChange={setSubmissionCode}
             />
         </div>

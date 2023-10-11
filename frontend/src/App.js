@@ -1,5 +1,6 @@
 import { useContext, useEffect } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
+import { useMonaco } from "@monaco-editor/react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import RoutingComponent from "./RoutingComponent";
@@ -10,32 +11,36 @@ import FlashEvent from "./components/util/flash/FlashEvent";
 import { getCategories, getHighlightCodes, getLanguages, getTags } from "./util/getJudgeData";
 
 import JudgeDataContext from "./contexts/judgeData/JudgeDataContext";
-import { useMonaco } from "@monaco-editor/react";
+import ThemeContext from "./contexts/theme/ThemeContext";
 
 window.flash = (message, type = "success") => FlashEvent.emit("flash", { message, type })
 
 function App() {
     const { setJudgeData, allLoaded } = useContext(JudgeDataContext)
+    const { theme } = useContext(ThemeContext)
     const monaco = useMonaco()
 
     useEffect(() => {
-        monaco?.editor.defineTheme("dark-theme", {
-            base: "vs-dark",
-            inherit: true,
-            rules: [],
-            colors: {
-                "editor.background": "#0c080f",
-            },
-        })
-        monaco?.editor.defineTheme("light-theme", {
-            base: "vs",
-            inherit: true,
-            rules: [],
-            colors: {
-                "editor.background": "#faf7ff",
-            },
-        })
-    }, [monaco])
+        if (theme === "light") {
+            monaco?.editor.defineTheme("standard-theme", {
+                base: "vs",
+                inherit: true,
+                rules: [],
+                colors: {
+                    "editor.background": "#faf7ff",
+                },
+            })
+        } else {
+            monaco?.editor.defineTheme("standard-theme", {
+                base: "vs-dark",
+                inherit: true,
+                rules: [],
+                colors: {
+                    "editor.background": "#0c080f",
+                },
+            })
+        }
+    }, [monaco, theme])
 
     useEffect(() => {
         const fetchWithCredentialsJudgeData = async () => {
