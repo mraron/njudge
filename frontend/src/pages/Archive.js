@@ -47,7 +47,13 @@ function Archive({ data }) {
     const categoriesContent = data.categories.map((item, index) => (
         <DropdownListFrame key={index} title={item.title} tree={{ children: item.children }} leaf={ProblemLeaf} />
     ))
-    return <ProfileSidebarPage>{categoriesContent}</ProfileSidebarPage>
+    return (
+        <ProfileSidebarPage>
+            <div className="space-y-3">
+                {categoriesContent}
+            </div>
+        </ProfileSidebarPage>
+    )
 }
 
 export default Archive
