@@ -1,8 +1,8 @@
-import React from "react"
-import { useLocation, useNavigate } from "react-router-dom"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import UpdateQueryString from "../../util/updateQueryString"
-import queryString from "query-string"
+import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import UpdateQueryString from "../../util/updateQueryString";
+import queryString from "query-string";
 
 function OrderedColumnTitle({ text, label }) {
     const location = useLocation()

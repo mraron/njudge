@@ -1,40 +1,40 @@
-import { useEffect } from "react"
-import { Route, Routes, useLocation } from "react-router-dom"
-import { useTranslation } from "react-i18next"
+import { useEffect } from "react";
+import { Route, Routes, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
-import Home from "./pages/Home"
-import Contests from "./pages/Contests"
-import Info from "./pages/Info"
-import Archive from "./pages/Archive"
-import Submissions from "./pages/Submissions"
-import Problems from "./pages/Problems"
-import Submission from "./pages/Submission"
-import Profile from "./pages/profile/Profile"
-import ProfileMain from "./pages/profile/ProfileMain"
-import ProfileSubmissions from "./pages/profile/ProfileSubmissions"
-import ProfileSettings from "./pages/profile/ProfileSettings"
-import Problem from "./pages/problem/Problem"
-import ProblemStatement from "./pages/problem/ProblemStatement"
-import ProblemSubmit from "./pages/problem/ProblemSubmit"
-import ProblemSubmissions from "./pages/problem/ProblemSubmissions"
-import ProblemRanklist from "./pages/problem/ProblemRanklist"
-import Login from "./pages/auth/Login"
-import Register from "./pages/auth/Register"
-import NotFound from "./pages/error/NotFound"
-import Logout from "./pages/auth/Logout"
-import Verify from "./pages/auth/Verify"
-import Admin from "./pages/auth/Admin"
-import UpdatePage from "./pages/wrappers/UpdatedPage"
+import Home from "./pages/Home";
+import Contests from "./pages/Contests";
+import Info from "./pages/Info";
+import Archive from "./pages/Archive";
+import Submissions from "./pages/Submissions";
+import Problems from "./pages/Problems";
+import Submission from "./pages/Submission";
+import Profile from "./pages/profile/Profile";
+import ProfileMain from "./pages/profile/ProfileMain";
+import ProfileSubmissions from "./pages/profile/ProfileSubmissions";
+import ProfileSettings from "./pages/profile/ProfileSettings";
+import Problem from "./pages/problem/Problem";
+import ProblemStatement from "./pages/problem/ProblemStatement";
+import ProblemSubmit from "./pages/problem/ProblemSubmit";
+import ProblemSubmissions from "./pages/problem/ProblemSubmissions";
+import ProblemRanklist from "./pages/problem/ProblemRanklist";
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
+import NotFound from "./pages/error/NotFound";
+import Logout from "./pages/auth/Logout";
+import Verify from "./pages/auth/Verify";
+import Admin from "./pages/auth/Admin";
+import UpdatePage from "./pages/wrappers/UpdatedPage";
 
-import { findRouteIndex } from "./util/findRouteIndex"
-import { routeMap } from "./config/RouteConfig"
-import extractParams from "./util/extractParams"
-import ForgottenPassword from "./pages/auth/ForgottenPassword"
-import ResetPassword from "./pages/auth/ResetPassword"
-import Contest from "./pages/contest/Contest"
-import ContestProblems from "./pages/contest/ContestProblems"
-import ContestSubmissions from "./pages/contest/ContestSubmissions"
-import ContestRanklist from "./pages/contest/ContestRanklist"
+import { findRouteIndex } from "./util/findRouteIndex";
+import { routeMap } from "./config/RouteConfig";
+import extractParams from "./util/extractParams";
+import ForgottenPassword from "./pages/auth/ForgottenPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
+import Contest from "./pages/contest/Contest";
+import ContestProblems from "./pages/contest/ContestProblems";
+import ContestSubmissions from "./pages/contest/ContestSubmissions";
+import ContestRanklist from "./pages/contest/ContestRanklist";
 
 const titles = {
     [routeMap.home]: "home.page_title",

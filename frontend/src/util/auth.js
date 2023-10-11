@@ -1,6 +1,6 @@
-import { apiRoute } from "../config/RouteConfig"
-import Cookies from "js-cookie"
-import fetchWithCredentials from "./fetchWithCredentials"
+import { apiRoute } from "../config/RouteConfig";
+import Cookies from "js-cookie";
+import fetchWithCredentials from "./fetchWithCredentials";
 
 export async function login(username, password) {
     const requestOptions = {

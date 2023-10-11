@@ -1,9 +1,9 @@
-import { useState } from "react"
-import { useTranslation } from "react-i18next"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { SVGSpinner, SVGView } from "../../svg/SVGs"
-import RoundedTable from "../../container/RoundedTable"
-import Modal from "../../container/modal/Modal"
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { SVGSpinner, SVGView } from "../../svg/SVGs";
+import RoundedTable from "../../container/RoundedTable";
+import Modal from "../../container/modal/Modal";
 
 function TestCase13({ index, numCases, testCase, group, isLastGroup, isLastCase }) {
     const bottomBorderCase = isLastGroup && isLastCase ? "border-b-0" : ""

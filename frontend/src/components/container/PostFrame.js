@@ -1,5 +1,5 @@
-import { useState } from "react"
-import RoundedFrame from "./RoundedFrame"
+import { useState } from "react";
+import RoundedFrame from "./RoundedFrame";
 
 function PostItem({ post }) {
     const [truncated, setTruncated] = useState(true)

@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react"
-import { useTranslation } from "react-i18next"
-import { AnimatePresence, motion } from "framer-motion"
-import FlashEvent from "./FlashEvent"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { AnimatePresence, motion } from "framer-motion";
+import FlashEvent from "./FlashEvent";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function FlashMessage({ message, type, onClose }) {
     const { t } = useTranslation()

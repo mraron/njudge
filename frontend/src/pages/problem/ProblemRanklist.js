@@ -1,10 +1,10 @@
-import { useEffect } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { useTranslation } from "react-i18next"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { routeMap } from "../../config/RouteConfig"
-import Pagination from "../../components/util/Pagination"
-import RoundedTable from "../../components/container/RoundedTable"
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { routeMap } from "../../config/RouteConfig";
+import Pagination from "../../components/util/Pagination";
+import RoundedTable from "../../components/container/RoundedTable";
 
 function RanklistRow({ result, maxScore, index }) {
     const { username, score, submissionID, accepted } = result

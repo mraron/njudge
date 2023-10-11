@@ -1,4 +1,4 @@
-import { TERipple } from "tw-elements-react"
+import { TERipple } from "tw-elements-react";
 
 function Button({ type, color, minWidth, fullWidth, cls, onClick, children, ariaLabel }) {
     const rippleColor = color === "gray" ? "#808080" : "#000000"

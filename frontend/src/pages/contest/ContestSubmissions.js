@@ -1,6 +1,6 @@
-import SubmissionsTable from "../../components/concrete/table/SubmissionsTable"
-import Pagination from "../../components/util/Pagination"
-import SubmissionFilterFrame from "../../components/concrete/filter/SubmissionFilter"
+import SubmissionsTable from "../../components/concrete/table/SubmissionsTable";
+import Pagination from "../../components/util/Pagination";
+import SubmissionFilterFrame from "../../components/concrete/filter/SubmissionFilter";
 
 function ContestSubmissions({ data }) {
     return (

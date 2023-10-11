@@ -1,10 +1,10 @@
-import { useContext } from "react"
-import { Outlet, useParams } from "react-router-dom"
-import { useTranslation } from "react-i18next"
-import { routeMap } from "../../config/RouteConfig"
-import UserContext from "../../contexts/user/UserContext"
-import TabFrame from "../../components/container/TabFrame"
-import WidePage from "../wrappers/WidePage"
+import { useContext } from "react";
+import { Outlet, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { routeMap } from "../../config/RouteConfig";
+import UserContext from "../../contexts/user/UserContext";
+import TabFrame from "../../components/container/TabFrame";
+import WidePage from "../wrappers/WidePage";
 
 function Profile() {
     console.log("nigga")

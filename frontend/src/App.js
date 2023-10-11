@@ -1,16 +1,16 @@
-import { useContext, useEffect } from "react"
-import { BrowserRouter as Router } from "react-router-dom"
-import { AnimatePresence, motion } from "framer-motion"
+import { useContext, useEffect } from "react";
+import { BrowserRouter as Router } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 
-import RoutingComponent from "./RoutingComponent"
-import FlashContainer from "./components/util/flash/Flash"
-import Menubar from "./components/concrete/other/Menubar"
-import FlashEvent from "./components/util/flash/FlashEvent"
+import RoutingComponent from "./RoutingComponent";
+import FlashContainer from "./components/util/flash/Flash";
+import Menubar from "./components/concrete/other/Menubar";
+import FlashEvent from "./components/util/flash/FlashEvent";
 
-import { getCategories, getHighlightCodes, getLanguages, getTags } from "./util/getJudgeData"
+import { getCategories, getHighlightCodes, getLanguages, getTags } from "./util/getJudgeData";
 
-import JudgeDataContext from "./contexts/judgeData/JudgeDataContext"
-import { useMonaco } from "@monaco-editor/react"
+import JudgeDataContext from "./contexts/judgeData/JudgeDataContext";
+import { useMonaco } from "@monaco-editor/react";
 
 window.flash = (message, type = "success") => FlashEvent.emit("flash", { message, type })
 

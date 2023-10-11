@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react"
-import { Link, useLocation, useNavigate } from "react-router-dom"
-import { useTranslation } from "react-i18next"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { routeMap } from "../../config/RouteConfig"
-import { SVGEllipsis } from "../../components/svg/SVGs"
-import RoundedTable from "../../components/container/RoundedTable"
-import Pagination from "../../components/util/Pagination"
-import DropdownFrame from "../../components/container/DropdownFrame"
-import TextBox from "../../components/input/TextBox"
-import Button from "../../components/basic/Button"
-import updateQueryString from "../../util/updateQueryString"
-import queryString from "query-string"
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { routeMap } from "../../config/RouteConfig";
+import { SVGEllipsis } from "../../components/svg/SVGs";
+import RoundedTable from "../../components/container/RoundedTable";
+import Pagination from "../../components/util/Pagination";
+import DropdownFrame from "../../components/container/DropdownFrame";
+import TextBox from "../../components/input/TextBox";
+import Button from "../../components/basic/Button";
+import updateQueryString from "../../util/updateQueryString";
+import queryString from "query-string";
 
 function RanklistRow(data) {
     const { t } = useTranslation()

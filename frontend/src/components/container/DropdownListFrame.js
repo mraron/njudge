@@ -1,6 +1,6 @@
-import { useState } from "react"
-import { SVGDropdownListArrow } from "../svg/SVGs"
-import RoundedFrame from "./RoundedFrame"
+import { useState } from "react";
+import { SVGDropdownListArrow } from "../svg/SVGs";
+import RoundedFrame from "./RoundedFrame";
 
 function DropdownElem({ text, isOpen, onClick }) {
     return (

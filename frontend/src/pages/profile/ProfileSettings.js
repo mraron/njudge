@@ -1,14 +1,14 @@
-import { useContext, useEffect, useState } from "react"
-import { Link, useNavigate, useParams } from "react-router-dom"
-import { useTranslation } from "react-i18next"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import Checkbox from "../../components/input/Checkbox"
-import TextBox from "../../components/input/TextBox"
-import RoundedFrame, { SVGTitleComponent } from "../../components/container/RoundedFrame"
-import Button from "../../components/basic/Button"
-import UserContext from "../../contexts/user/UserContext"
-import { routeMap } from "../../config/RouteConfig"
-import { changePassword, saveSettings } from "../../util/settings"
+import { useContext, useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Checkbox from "../../components/input/Checkbox";
+import TextBox from "../../components/input/TextBox";
+import RoundedFrame, { SVGTitleComponent } from "../../components/container/RoundedFrame";
+import Button from "../../components/basic/Button";
+import UserContext from "../../contexts/user/UserContext";
+import { routeMap } from "../../config/RouteConfig";
+import { changePassword, saveSettings } from "../../util/settings";
 
 function PasswordChangeFrame() {
     const { t } = useTranslation()

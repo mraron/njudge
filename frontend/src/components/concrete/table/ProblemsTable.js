@@ -1,13 +1,13 @@
-import React, { useContext } from "react"
-import { useTranslation } from "react-i18next"
-import { Link } from "react-router-dom"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { SVGEllipsis } from "../../svg/SVGs"
-import RoundedTable from "../../container/RoundedTable"
-import UserContext from "../../../contexts/user/UserContext"
-import { routeMap } from "../../../config/RouteConfig"
-import OrderedColumnTitle from "../../util/OrderedColumnTitle"
-import Tag from "../../basic/Tag"
+import React, { useContext } from "react";
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { SVGEllipsis } from "../../svg/SVGs";
+import RoundedTable from "../../container/RoundedTable";
+import UserContext from "../../../contexts/user/UserContext";
+import { routeMap } from "../../../config/RouteConfig";
+import OrderedColumnTitle from "../../util/OrderedColumnTitle";
+import Tag from "../../basic/Tag";
 
 function Problem(data) {
     const { t } = useTranslation()

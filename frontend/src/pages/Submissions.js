@@ -1,6 +1,6 @@
-import Pagination from "../components/util/Pagination"
-import SubmissionsTable from "../components/concrete/table/SubmissionsTable"
-import WidePage from "./wrappers/WidePage"
+import Pagination from "../components/util/Pagination";
+import SubmissionsTable from "../components/concrete/table/SubmissionsTable";
+import WidePage from "./wrappers/WidePage";
 
 function Submissions({ data }) {
     return (

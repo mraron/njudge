@@ -1,7 +1,7 @@
-import ProblemFilterFrame from "../components/concrete/filter/ProblemFilter"
-import ProblemsTable from "../components/concrete/table/ProblemsTable"
-import Pagination from "../components/util/Pagination"
-import WidePage from "./wrappers/WidePage"
+import ProblemFilterFrame from "../components/concrete/filter/ProblemFilter";
+import ProblemsTable from "../components/concrete/table/ProblemsTable";
+import Pagination from "../components/util/Pagination";
+import WidePage from "./wrappers/WidePage";
 
 function Problems({ data }) {
     return (

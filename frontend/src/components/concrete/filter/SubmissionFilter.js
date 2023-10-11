@@ -1,12 +1,12 @@
-import { useContext, useState } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
-import { useTranslation } from "react-i18next"
-import Checkbox from "../../input/Checkbox"
-import Button from "../../basic/Button"
-import DropdownFrame from "../../container/DropdownFrame"
-import updateQueryString from "../../../util/updateQueryString"
-import UserContext from "../../../contexts/user/UserContext"
-import queryString from "query-string"
+import { useContext, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import Checkbox from "../../input/Checkbox";
+import Button from "../../basic/Button";
+import DropdownFrame from "../../container/DropdownFrame";
+import updateQueryString from "../../../util/updateQueryString";
+import UserContext from "../../../contexts/user/UserContext";
+import queryString from "query-string";
 
 function SubmissionFilter({ optionOwn }) {
     const { t } = useTranslation()

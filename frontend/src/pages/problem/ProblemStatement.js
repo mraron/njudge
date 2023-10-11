@@ -1,19 +1,19 @@
-import { useContext, useState } from "react"
-import { useTranslation } from "react-i18next"
-import { Link, useNavigate, useParams } from "react-router-dom"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { SVGSpinner, SVGView } from "../../components/svg/SVGs"
-import MapDataFrame from "../../components/container/MapDataFrame"
-import DropdownMenu from "../../components/input/DropdownMenu"
-import RoundedFrame, { SVGTitleComponent } from "../../components/container/RoundedFrame"
-import RoundedTable from "../../components/container/RoundedTable"
-import TagModal from "../../components/container/modal/TagModal"
-import Tag from "../../components/basic/Tag"
-import Button from "../../components/basic/Button"
-import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext"
-import ThemeContext from "../../contexts/theme/ThemeContext"
-import submitSolution from "../../util/submitSolution"
-import { apiRoute, routeMap } from "../../config/RouteConfig"
+import { useContext, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { SVGSpinner, SVGView } from "../../components/svg/SVGs";
+import MapDataFrame from "../../components/container/MapDataFrame";
+import DropdownMenu from "../../components/input/DropdownMenu";
+import RoundedFrame, { SVGTitleComponent } from "../../components/container/RoundedFrame";
+import RoundedTable from "../../components/container/RoundedTable";
+import TagModal from "../../components/container/modal/TagModal";
+import Tag from "../../components/basic/Tag";
+import Button from "../../components/basic/Button";
+import JudgeDataContext from "../../contexts/judgeData/JudgeDataContext";
+import ThemeContext from "../../contexts/theme/ThemeContext";
+import submitSolution from "../../util/submitSolution";
+import { apiRoute, routeMap } from "../../config/RouteConfig";
 
 function ProblemInfo({ info }) {
     const { t } = useTranslation()

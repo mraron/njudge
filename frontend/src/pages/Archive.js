@@ -1,10 +1,10 @@
-import { Link } from "react-router-dom"
-import DropdownListFrame from "../components/container/DropdownListFrame"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import React from "react"
-import { SVGEllipsis } from "../components/svg/SVGs"
-import { useTranslation } from "react-i18next"
-import ProfileSidebarPage from "./wrappers/ProfileSidebarPage"
+import { Link } from "react-router-dom";
+import DropdownListFrame from "../components/container/DropdownListFrame";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React from "react";
+import { SVGEllipsis } from "../components/svg/SVGs";
+import { useTranslation } from "react-i18next";
+import ProfileSidebarPage from "./wrappers/ProfileSidebarPage";
 
 function ProblemLeaf({ data }) {
     const { t } = useTranslation()

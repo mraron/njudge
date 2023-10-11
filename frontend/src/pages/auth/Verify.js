@@ -1,7 +1,7 @@
-import { useEffect } from "react"
-import { useNavigate, useParams } from "react-router-dom"
-import { verify } from "../../util/auth"
-import { routeMap } from "../../config/RouteConfig"
+import { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { verify } from "../../util/auth";
+import { routeMap } from "../../config/RouteConfig";
 
 function Verify() {
     const { token } = useParams()

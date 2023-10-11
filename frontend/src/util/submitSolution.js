@@ -1,5 +1,5 @@
-import { apiRoute } from "../config/RouteConfig"
-import fetchWithCredentials from "./fetchWithCredentials"
+import { apiRoute } from "../config/RouteConfig";
+import fetchWithCredentials from "./fetchWithCredentials";
 
 async function submitSolution({ problem, problemset, language, file, submissionCode }) {
     const formData = new FormData()

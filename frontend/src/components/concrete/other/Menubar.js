@@ -1,12 +1,12 @@
-import { useContext, useEffect, useRef, useState } from "react"
-import { Link, useLocation } from "react-router-dom"
-import { useTranslation } from "react-i18next"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { DefaultDropdownButton, DropdownRoutes } from "../../input/DropdownMenu"
-import { findRouteIndex } from "../../../util/findRouteIndex"
-import { routeMap } from "../../../config/RouteConfig"
-import UserContext from "../../../contexts/user/UserContext"
-import ThemeContext from "../../../contexts/theme/ThemeContext"
+import { useContext, useEffect, useRef, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { DefaultDropdownButton, DropdownRoutes } from "../../input/DropdownMenu";
+import { findRouteIndex } from "../../../util/findRouteIndex";
+import { routeMap } from "../../../config/RouteConfig";
+import UserContext from "../../../contexts/user/UserContext";
+import ThemeContext from "../../../contexts/theme/ThemeContext";
 
 const menuRoutes = [
     routeMap.home,

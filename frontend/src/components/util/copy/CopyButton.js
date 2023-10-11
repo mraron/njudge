@@ -1,6 +1,6 @@
-import { useTranslation } from "react-i18next"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { TERipple } from "tw-elements-react"
+import { useTranslation } from "react-i18next";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { TERipple } from "tw-elements-react";
 
 function CopyButton({ text, isVisible }) {
     const { t } = useTranslation()

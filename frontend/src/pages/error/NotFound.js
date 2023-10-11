@@ -1,9 +1,9 @@
-import { Link } from "react-router-dom"
-import { useTranslation } from "react-i18next"
-import { SVGNotFound } from "../../components/svg/SVGs"
-import RoundedFrame from "../../components/container/RoundedFrame"
-import Button from "../../components/basic/Button"
-import NarrowPage from "../wrappers/NarrowPage"
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { SVGNotFound } from "../../components/svg/SVGs";
+import RoundedFrame from "../../components/container/RoundedFrame";
+import Button from "../../components/basic/Button";
+import NarrowPage from "../wrappers/NarrowPage";
 
 function NotFoundFrame() {
     const { t } = useTranslation()

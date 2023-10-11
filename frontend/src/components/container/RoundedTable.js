@@ -1,4 +1,4 @@
-import RoundedFrame from "./RoundedFrame"
+import RoundedFrame from "./RoundedFrame";
 
 function RoundedTable({ children, title, titleComponent, cls }) {
     return (
