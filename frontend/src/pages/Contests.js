@@ -25,15 +25,13 @@ function ContestFrame({ contest }) {
     )
 }
 
-function ContestList({ contests }) {
-    const contestsContent = contests.map((item, index) => <ContestFrame key={index} contest={item} />)
-    return <div className="space-y-3">{contestsContent}</div>
-}
-
 function Contests({ data }) {
+    const contestsContent = data.contests.map((item, index) => <ContestFrame key={index} contest={item} />)
     return (
         <ProfileSidebarPage>
-            <ContestList contests={data.contests} />
+            <div className="space-y-3">
+                {contestsContent}
+            </div>
         </ProfileSidebarPage>
     )
 }
