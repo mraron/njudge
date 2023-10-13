@@ -4,6 +4,7 @@ import { fas } from "@fortawesome/free-solid-svg-icons"
 import { far } from "@fortawesome/free-regular-svg-icons"
 import { fab } from "@fortawesome/free-brands-svg-icons"
 import { library } from "@fortawesome/fontawesome-svg-core"
+import { StyledEngineProvider } from "@mui/material"
 
 import App from "./App"
 import UserProvider from "./contexts/user/UserProvider"
@@ -34,11 +35,13 @@ for (let staticMethod in OriginalResizeObserver) {
 
 const root = ReactDOM.createRoot(document.getElementById("root"))
 root.render(
-    <UserProvider>
-        <JudgeDataProvider>
-            <ThemeProvider>
-                <App />
-            </ThemeProvider>
-        </JudgeDataProvider>
-    </UserProvider>,
+    <StyledEngineProvider injectFirst>
+        <UserProvider>
+            <JudgeDataProvider>
+                <ThemeProvider>
+                    <App />
+                </ThemeProvider>
+            </JudgeDataProvider>
+        </UserProvider>
+    </StyledEngineProvider>,
 )

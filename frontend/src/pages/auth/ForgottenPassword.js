@@ -13,7 +13,7 @@ function ForgottenPasswordFrame() {
     const titleComponent = (
         <SVGTitleComponent
             icon={<FontAwesomeIcon icon="fa-lock" className="w-5 h-5 mr-3" />}
-            title={t("forgotten_password.change_password")}
+            title={t("forgotten_password.forgotten_password")}
         />
     )
     const handleChangePassword = (event) => {

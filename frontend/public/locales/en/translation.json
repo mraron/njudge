@@ -58,11 +58,13 @@
         "already_registered": "Already have an account?"
     },
     "forgotten_password": {
+        "forgotten_password": "Forgotten password",
         "page_title": "Forgotten password :: njudge",
         "change_password": "Change password",
         "email": "Email address"
     },
     "reset_password": {
+        "reset_password": "Reset password",
         "page_title": "Reset password :: njudge",
         "change_password": "Change password",
         "password": "Password",

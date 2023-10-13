@@ -3,6 +3,24 @@ module.exports = {
     darkMode: "class",
     theme: {
         extend: {
+            width: {
+                '100': '25rem',
+                '104': '26rem',
+                '108': '27rem',
+                '112': '28rem',
+                '116': '29rem',
+                '120': '30rem',
+                '124': '31rem',
+                '128': '32rem',
+                '132': '33rem',
+                '136': '34rem',
+                '140': '35rem',
+                '144': '36rem',
+                '148': '37rem',
+                '152': '38rem',
+                '156': '39rem',
+                '160': '40rem'
+            },
             boxShadow: {
                 "frame": "0 3.5px 5.5px -3.5px rgba(0, 0, 0, 0.3)"
             },

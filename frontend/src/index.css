@@ -232,10 +232,6 @@ td {
     line-height: 1.2rem;
 }
 
-html {
-    color-scheme: dark;
-}
-
 .fade-appear,
 .fade-enter {
     opacity: 0;
