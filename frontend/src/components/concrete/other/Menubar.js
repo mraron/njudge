@@ -55,12 +55,31 @@ function getProfileDropdownButton(isLoggedIn) {
     return ProfileDropdownButton
 }
 
+function ThemeButton() {
+    const { theme, changeTheme } = useContext(ThemeContext)
+    const toggleTheme = () => {
+        if (theme === "light") {
+            changeTheme("dark")
+        } else {
+            changeTheme("light")
+        }
+    }
+    return (
+        <button
+            className="h-full border border-l-0 border-border-def flex items-center justify-center p-2 rounded-r-md hover:bg-frame-bg"
+            onClick={toggleTheme}>
+            <FontAwesomeIcon icon={theme === "light" ? "fa-moon" : "fa-sun"} className="text-icon w-6 h-4" />
+        </button>
+    )
+}
+
 function ProfileSettings({ onSidebarClose }) {
     const { userData, isLoggedIn } = useContext(UserContext)
     const { t, i18n } = useTranslation()
 
     let profileRoutes = [routeMap.login, routeMap.register]
     let profileRouteLabels = ["menubar.login", "menubar.register"]
+
     if (isLoggedIn) {
         profileRoutes = [routeMap.profile.replace(":user", encodeURIComponent(userData.username)), routeMap.logout]
         profileRouteLabels = ["menubar.profile", "menubar.logout"]
@@ -78,8 +97,7 @@ function ProfileSettings({ onSidebarClose }) {
                 className={`px-2 py-0.5 ${
                     i18n.resolvedLanguage === lang ? "bg-grey-725" : "hover:bg-grey-775"
                 } rounded`}
-                onClick={() => {
-                    console.log("nigga")
+                onClick={(event) => {
                     i18n.changeLanguage(lang)
                 }}>
                 {lang}
@@ -105,24 +123,6 @@ function ProfileSettings({ onSidebarClose }) {
     )
 }
 
-function ThemeButton() {
-    const { theme, changeTheme } = useContext(ThemeContext)
-    const toggleTheme = () => {
-        if (theme === "light") {
-            changeTheme("dark")
-        } else {
-            changeTheme("light")
-        }
-    }
-    return (
-        <button
-            className="h-full border border-l-0 border-border-def flex items-center justify-center p-2 rounded-r-md hover:bg-frame-bg"
-            onClick={toggleTheme}>
-            <FontAwesomeIcon icon={theme === "light" ? "fa-moon" : "fa-sun"} className="text-icon w-6 h-4" />
-        </button>
-    )
-}
-
 function MenuSideBar({ selected, isOpen, onClose }) {
     const { t } = useTranslation()
     const menuRef = useRef(null)
@@ -139,19 +139,9 @@ function MenuSideBar({ selected, isOpen, onClose }) {
         )
     })
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (
-                menuRef.current &&
-                !menuRef.current.contains(event.target) &&
-                event.target.id !== "menuButton" &&
-                !event.target.closest("#menuButton")
-            ) {
-                onClose()
-            }
-        }
-        document.addEventListener("click", handleClickOutside)
+        document.addEventListener("click", onClose)
         return () => {
-            document.removeEventListener("click", handleClickOutside)
+            document.removeEventListener("click", onClose)
         }
     }, [])
 
@@ -160,7 +150,8 @@ function MenuSideBar({ selected, isOpen, onClose }) {
             ref={menuRef}
             className={`h-full w-80 z-20 pt-20 overflow-y-auto overflow-x-hidden xl:hidden fixed mui-fixed bg-grey-825 border-l border-border-def right-0 transform ${
                 isOpen ? "translate-x-0 opacity-100" : "translate-x-80 opacity-0"
-            } ease-out transition-transform-opacity duration-200`}>
+            } ease-out transition-transform-opacity duration-200`}
+            onClick={(event) => event.stopPropagation()}>
             <div className="flex flex-col justify-center">
                 <div className="w-full flex px-4 mb-4">
                     <ProfileSettings onSidebarClose={onClose} />
@@ -200,9 +191,11 @@ function MenuTopBar({ selected, isOpen, onToggle }) {
                 </div>
                 <div className="xl:hidden mx-4">
                     <button
-                        id="menuButton"
                         className="flex items-center justify-center p-2 rounded-full hover:bg-frame-bg"
-                        onClick={() => onToggle(this)}
+                        onClick={(event) => {
+                            event.stopPropagation()
+                            onToggle(this)
+                        }}
                         aria-label={t("aria_label.toggle_menu")}>
                         {isOpen ? (
                             <FontAwesomeIcon icon="fa-close" className="w-5 h-5" />

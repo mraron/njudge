@@ -29,6 +29,5 @@ export const routeMap = {
 const apiRoot = "https://127.0.0.1:5619/api/v2"
 
 export function apiRoute(route) {
-    console.log(`${apiRoot}${route}`)
     return `${apiRoot}${route}`
 }

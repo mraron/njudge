@@ -127,7 +127,6 @@ function SubmissionTable0({ status }) {
     const [isModalOpen, setModalOpen] = useState(false)
 
     const handleRowClicked = (testCase) => {
-        console.log(testCase.output)
         setTestCase(testCase)
         setModalOpen(true)
     }

@@ -10,7 +10,6 @@ export async function saveSettings(user, showUnsolved, hideSolved) {
             hideSolved: hideSolved,
         }),
     }
-    console.log(apiRoute(`/user/profile/${encodeURIComponent(user)}/settings/other/`))
     const response = await fetchWithCredentials(
         apiRoute(`/user/profile/${encodeURIComponent(user)}/settings/other/`),
         requestOptions,
