@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { SVGSpinner, SVGView } from "../../svg/SVGs"
 import RoundedTable from "../../container/RoundedTable"
-import AnimatedModal from "../../container/modal/AnimatedModal"
+import Modal from "../../container/modal/Modal"
 
 function TestCase13({ index, numCases, testCase, group, isLastGroup, isLastCase }) {
     const bottomBorderCase = isLastGroup && isLastCase ? "border-b-0" : ""
@@ -170,11 +170,11 @@ function SubmissionTable0({ status }) {
     )
     return (
         <>
-            <AnimatedModal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
-                <RoundedTable titleComponent={titleComponent} cls="w-full md:w-140">
+            <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)} width="35rem">
+                <RoundedTable titleComponent={titleComponent}>
                     <tbody>{outputRows}</tbody>
                 </RoundedTable>
-            </AnimatedModal>
+            </Modal>
             <RoundedTable>
                 <thead>
                     <tr>

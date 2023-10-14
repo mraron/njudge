@@ -4,7 +4,7 @@ import { fas } from "@fortawesome/free-solid-svg-icons"
 import { far } from "@fortawesome/free-regular-svg-icons"
 import { fab } from "@fortawesome/free-brands-svg-icons"
 import { library } from "@fortawesome/fontawesome-svg-core"
-import { StyledEngineProvider } from "@mui/material"
+import { createTheme, ThemeProvider as MUIThemeProvider } from "@mui/material"
 
 import App from "./App"
 import UserProvider from "./contexts/user/UserProvider"
@@ -34,14 +34,25 @@ for (let staticMethod in OriginalResizeObserver) {
 }
 
 const root = ReactDOM.createRoot(document.getElementById("root"))
+const theme = createTheme({
+    breakpoints: {
+        values: {
+            xs: 0,
+            sm: 640,
+            md: 768,
+            lg: 1024,
+            xl: 1280,
+        },
+    },
+})
 root.render(
-    <StyledEngineProvider injectFirst>
-        <UserProvider>
-            <JudgeDataProvider>
-                <ThemeProvider>
+    <UserProvider>
+        <JudgeDataProvider>
+            <ThemeProvider>
+                <MUIThemeProvider theme={theme}>
                     <App />
-                </ThemeProvider>
-            </JudgeDataProvider>
-        </UserProvider>
-    </StyledEngineProvider>,
+                </MUIThemeProvider>
+            </ThemeProvider>
+        </JudgeDataProvider>
+    </UserProvider>,
 )

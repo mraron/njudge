@@ -1,11 +1,11 @@
 import { useTranslation } from "react-i18next"
 import { useContext } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import AnimatedModal from "./AnimatedModal"
+import Modal from "./Modal"
 import RoundedFrame, { SVGTitleComponent } from "../RoundedFrame"
 import TagDropdown from "../../input/TagDropdown"
-import JudgeDataContext from "../../../contexts/judgeData/JudgeDataContext"
 import Button from "../../basic/Button"
+import JudgeDataContext from "../../../contexts/judgeData/JudgeDataContext"
 
 function TagModal({ isOpen, onClose }) {
     const { t } = useTranslation()
@@ -17,8 +17,8 @@ function TagModal({ isOpen, onClose }) {
         />
     )
     return (
-        <AnimatedModal isOpen={isOpen} onClose={onClose}>
-            <RoundedFrame titleComponent={titleComponent} cls="shadow-md w-full md:w-96">
+        <Modal isOpen={isOpen} onClose={onClose} width="24rem">
+            <RoundedFrame titleComponent={titleComponent}>
                 <div className="px-6 py-5">
                     <div className="mb-5">
                         <TagDropdown items={judgeData.tags.map(t)} initTags={[0, 1]} />
@@ -33,7 +33,7 @@ function TagModal({ isOpen, onClose }) {
                     </div>
                 </div>
             </RoundedFrame>
-        </AnimatedModal>
+        </Modal>
     )
 }
 
