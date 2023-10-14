@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 function FlashMessage({ message, type, onClose }) {
     const { t } = useTranslation()
     return (
-        <div className="absolute bottom-0 left-0 right-0 bg-grey-850 border rounded-md flex border-borstrcol w-full">
+        <div className="absolute bottom-0 left-0 right-0 bg-grey-850 border rounded-md flex border-border-str w-full">
             <div className="w-full p-6 flex justify-between items-center rounded-md space-x-2">
                 <div className="flex items-center">
                     {type === "success" && (

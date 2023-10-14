@@ -5,7 +5,7 @@ import { findRouteIndex } from "../../util/findRouteIndex"
 function Tab({ isSelected, label, route }) {
     return (
         <Link
-            className={`block rounded-md px-4 py-2 text-nav ${isSelected ? "bg-framebgcol" : "hover:bg-grey-850"}`}
+            className={`block rounded-md px-4 py-2 text-nav ${isSelected ? "bg-frame-bg" : "hover:bg-grey-850"}`}
             to={route}>
             {label}
         </Link>

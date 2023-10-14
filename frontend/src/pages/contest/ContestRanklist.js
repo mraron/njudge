@@ -49,7 +49,7 @@ function RanklistRow(data) {
     })
     return (
         <tr
-            className={`divide-x divide-dividecol ${
+            className={`divide-x divide-divide-def ${
                 data.index % 2 === 0 ? "bg-grey-850" : "bg-grey-825"
             } hover:bg-grey-800 cursor-pointer`}>
             <td className="py-2.5 text-center">{place}</td>

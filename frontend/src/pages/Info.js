@@ -12,7 +12,7 @@ function InfoTable() {
     )
     return (
         <RoundedTable titleComponent={titleComponent}>
-            <tbody className="divide-y divide-dividecol">
+            <tbody className="divide-y divide-divide-def">
                 <tr>
                     <td>{t("info.compiler_options")}</td>
                     <td>

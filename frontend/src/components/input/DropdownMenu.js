@@ -67,7 +67,7 @@ function DropdownMenu({ initSelected, items, button: Button, onChange }) {
                 className={`z-10 absolute overflow-hidden top-12 inset-x-0 ${
                     isOpen ? "max-h-52 opacity-100" : "max-h-0 opacity-0"
                 } transition-height-opacity duration-[250ms]`}>
-                <div className={`rounded-md max-h-52 overflow-y-auto border-bordefcol border`}>
+                <div className={`rounded-md max-h-52 overflow-y-auto border-border-def border`}>
                     <ul className={`divide-y divide-grey-750 bg-grey-875 rounded-md overflow-hidden text-dropdown`}>
                         {itemsContent}
                     </ul>

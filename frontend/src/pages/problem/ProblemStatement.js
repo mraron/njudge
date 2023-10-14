@@ -231,7 +231,7 @@ function ProblemStatement({ data }) {
                             </div>
                             <a href={apiRoute(statementSrc)} target="_blank" rel="noreferrer">
                                 <Button color="gray" aria-label={t("aria_label.view")}>
-                                    <SVGView cls="text-iconcol w-[1.4rem] h-[1.4rem]" />
+                                    <SVGView cls="text-icon w-[1.4rem] h-[1.4rem]" />
                                 </Button>
                             </a>
                         </div>
@@ -245,14 +245,14 @@ function ProblemStatement({ data }) {
                             aria-label={t("aria_label.problem_statement")}
                             type="application/pdf"
                             width="100%"
-                            className="h-[36rem] lg:h-[52rem] border border-bordefcol"></object>
+                            className="h-[36rem] lg:h-[52rem] border border-border-def"></object>
                     )}
                     {statementType === "html" && (
                         <iframe
                             src={apiRoute(statementSrc)}
                             width="100%"
                             title="Problem statement"
-                            className="h-[36rem] lg:h-[52rem] border border-bordefcol"></iframe>
+                            className="h-[36rem] lg:h-[52rem] border border-border-def"></iframe>
                     )}
                 </div>
             </div>

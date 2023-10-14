@@ -17,7 +17,7 @@ function Pagination({ paginationData }) {
             values: [page],
         })
     }
-    const cls = "flex justify-center items-center px-3 py-1.5 text-sm border-bormedcol border hover:bg-grey-775"
+    const cls = "flex justify-center items-center px-3 py-1.5 text-sm border-border-med border hover:bg-grey-775"
     return (
         <RoundedFrame cls="overflow-hidden">
             <div className="flex justify-center p-4 overflow-x-auto">
@@ -39,7 +39,7 @@ function Pagination({ paginationData }) {
                         {currentPage - 1}
                     </button>
                 )}
-                <button className="px-3 py-1.5 text-sm bg-btncol border border-bormedcol text-center">
+                <button className="px-3 py-1.5 text-sm bg-button border border-border-med text-center">
                     {currentPage}
                 </button>
                 {currentPage <= lastPage - 1 && (

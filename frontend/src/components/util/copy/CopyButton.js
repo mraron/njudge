@@ -12,10 +12,10 @@ function CopyButton({ text, isVisible }) {
     return (
         isVisible && (
             <TERipple
-                className="rounded-lg bg-grey-825 hover:bg-grey-800 border border-borxstrcol overflow-hidden"
+                className="rounded-lg bg-grey-825 hover:bg-grey-800 border border-border-xstr overflow-hidden"
                 rippleColor="#808080">
                 <button
-                    className={`rounded-lg text-iconcol flex justify-center items-center p-2`}
+                    className={`rounded-lg text-icon flex justify-center items-center p-2`}
                     aria-label={t("aria_label.copy")}
                     onClick={handleCopy}>
                     <FontAwesomeIcon icon="fa-regular fa-copy" className="w-3.5 h-3.5" />

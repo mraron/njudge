@@ -30,7 +30,7 @@ function MenuOption({ label, route, selected, horizontal, onClick }) {
         <li>
             <Link
                 className={`flex items-center h-full px-4 ${horizontal ? "border-b-3 pt-1" : "border-l-3 p-3"} ${
-                    selected ? "border-highlight bg-grey-775" : "border-transparent hover:bg-framebgcol"
+                    selected ? "border-highlight bg-grey-775" : "border-transparent hover:bg-frame-bg"
                 }`}
                 onClick={onClick}
                 to={route}>
@@ -94,7 +94,7 @@ function ProfileSettings({ onSidebarClose }) {
                 onChange={onSidebarClose}
                 routeLabels={profileRouteLabels.map(t)}
             />
-            <div className="px-3 flex items-center justify-center border border-l-0 border-bordefcol space-x-1">
+            <div className="px-3 flex items-center justify-center border border-l-0 border-border-def space-x-1">
                 <LanguageButton lang="hu" />
                 <LanguageButton lang="en" />
             </div>
@@ -116,9 +116,9 @@ function ThemeButton() {
     }
     return (
         <button
-            className="h-full border border-l-0 border-bordefcol flex items-center justify-center p-2 rounded-r-md hover:bg-framebgcol"
+            className="h-full border border-l-0 border-border-def flex items-center justify-center p-2 rounded-r-md hover:bg-frame-bg"
             onClick={toggleTheme}>
-            <FontAwesomeIcon icon={theme === "light" ? "fa-moon" : "fa-sun"} className="text-iconcol w-6 h-4" />
+            <FontAwesomeIcon icon={theme === "light" ? "fa-moon" : "fa-sun"} className="text-icon w-6 h-4" />
         </button>
     )
 }
@@ -158,7 +158,7 @@ function MenuSideBar({ selected, isOpen, onClose }) {
     return (
         <aside
             ref={menuRef}
-            className={`h-full w-80 z-20 pt-20 overflow-y-auto overflow-x-hidden xl:hidden fixed mui-fixed bg-grey-825 border-l border-bordefcol right-0 transform ${
+            className={`h-full w-80 z-20 pt-20 overflow-y-auto overflow-x-hidden xl:hidden fixed mui-fixed bg-grey-825 border-l border-border-def right-0 transform ${
                 isOpen ? "translate-x-0 opacity-100" : "translate-x-80 opacity-0"
             } ease-out transition-transform-opacity duration-200`}>
             <div className="flex flex-col justify-center">
@@ -201,7 +201,7 @@ function MenuTopBar({ selected, isOpen, onToggle }) {
                 <div className="xl:hidden mx-4">
                     <button
                         id="menuButton"
-                        className="flex items-center justify-center p-2 rounded-full hover:bg-framebgcol"
+                        className="flex items-center justify-center p-2 rounded-full hover:bg-frame-bg"
                         onClick={() => onToggle(this)}
                         aria-label={t("aria_label.toggle_menu")}>
                         {isOpen ? (

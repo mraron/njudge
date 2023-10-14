@@ -25,7 +25,7 @@ function TextBox({ id, label, type = "", initText = "", onChange, onFocus, onBlu
                 } w-full mt-1`}>
                 <div
                     className={`border-b-1 ${
-                        focused ? "border-indigo-500 dark:border-indigo-600" : "border-bordefcol"
+                        focused ? "border-indigo-500 dark:border-indigo-600" : "border-border-def"
                     } w-full`}>
                     <input
                         id={id}
@@ -35,7 +35,7 @@ function TextBox({ id, label, type = "", initText = "", onChange, onFocus, onBlu
                         onFocus={handleFocus}
                         onBlur={handleBlur}
                         className={`py-[0.45rem] px-2 bg-grey-850 border border-b-0 text-sm ${
-                            focused ? "border-borstrcol" : "border-bordefcol"
+                            focused ? "border-border-str" : "border-border-def"
                         } w-full outline-none`}
                     />
                 </div>

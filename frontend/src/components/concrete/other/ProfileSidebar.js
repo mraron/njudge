@@ -12,11 +12,11 @@ import { routeMap } from "../../../config/RouteConfig"
 export function ProfilePictureFrame({ userData }) {
     const profileRoute = routeMap.profile.replace(":user", encodeURIComponent(userData.username))
     return (
-        <RoundedFrame>
-            <div className="flex flex-col items-center p-5 border-b border-bordefcol">
+        <RoundedFrame cls="bg-frame-bg">
+            <div className="flex flex-col items-center p-5 border-b border-border-def">
                 <Link
                     to={profileRoute}
-                    className="flex justify-center items-center w-full aspect-square bg-grey-875 border border-bordefcol hover:border-grey-450">
+                    className="flex justify-center items-center w-full aspect-square bg-grey-875 border border-border-def hover:border-grey-450">
                     <img alt="avatar" className="object-contain" src={userData.pictureSrc} />
                 </Link>
             </div>

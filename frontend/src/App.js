@@ -27,7 +27,7 @@ function App() {
                 inherit: true,
                 rules: [],
                 colors: {
-                    "editor.background": "#faf7ff",
+                    "editor.background": "#FDF9FF",
                 },
             })
         } else {

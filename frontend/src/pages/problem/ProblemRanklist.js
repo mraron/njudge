@@ -9,7 +9,7 @@ import RoundedTable from "../../components/container/RoundedTable"
 function RanklistRow({ result, maxScore, index }) {
     const { username, score, submissionID, accepted } = result
     return (
-        <tr className={`divide-x divide-dividecol ${index % 2 === 0 ? "bg-grey-850" : "bg-grey-825"}`}>
+        <tr className={`divide-x divide-divide-def ${index % 2 === 0 ? "bg-grey-850" : "bg-grey-825"}`}>
             <td className="py-3">
                 <Link className="link" to={routeMap.profile.replace(":user", username)}>
                     {username}

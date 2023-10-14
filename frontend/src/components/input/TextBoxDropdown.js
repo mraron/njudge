@@ -54,10 +54,10 @@ function TextBoxDropdown({ id, label, items, fillSelected, initText = "", initSe
             />
             <div className={`z-10 absolute overflow-hidden inset-x-0 ${focused ? "max-h-52" : "max-h-0"}`}>
                 <div
-                    className={`rounded-sm max-h-52 overflow-y-auto border-bordefcol ${
+                    className={`rounded-sm max-h-52 overflow-y-auto border-border-def ${
                         items.length > 0 ? "border" : ""
                     }`}>
-                    <ul className={`divide-y divide-dividecol bg-grey-875 text-sm`}>{itemsContent}</ul>
+                    <ul className={`divide-y divide-divide-def bg-grey-875 text-sm`}>{itemsContent}</ul>
                 </div>
             </div>
         </div>

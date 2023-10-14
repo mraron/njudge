@@ -13,7 +13,7 @@ function TestCase13({ index, numCases, testCase, group, isLastGroup, isLastCase 
             {index === 0 && (
                 <>
                     <td
-                        className={`py-2.5 border border-t-0 border-dividecol text-center ${bottomBorderGroup}`}
+                        className={`py-2.5 border border-t-0 border-divide-def text-center ${bottomBorderGroup}`}
                         rowSpan={numCases}>
                         <div className="flex flex-col justify-center">
                             <div className="flex items-center justify-center mb-2">
@@ -27,17 +27,17 @@ function TestCase13({ index, numCases, testCase, group, isLastGroup, isLastCase 
                         </div>
                     </td>
                     <td
-                        className={`py-2.5 border border-t-0 border-dividecol text-center ${bottomBorderGroup}`}
+                        className={`py-2.5 border border-t-0 border-divide-def text-center ${bottomBorderGroup}`}
                         rowSpan={numCases}>
                         {`${group.score} / ${group.maxScore}`}
                     </td>
                 </>
             )}
-            <td className={`py-2.5 border border-t-0 border-dividecol text-center ${bottomBorderCase}`}>
+            <td className={`py-2.5 border border-t-0 border-divide-def text-center ${bottomBorderCase}`}>
                 {testCase.index}
             </td>
             {group.scoring !== 1 && (
-                <td className={`py-2.5 border border-t-0 border-dividecol ${bottomBorderCase}`} colSpan={2}>
+                <td className={`py-2.5 border border-t-0 border-divide-def ${bottomBorderCase}`} colSpan={2}>
                     <div className="flex items-center">
                         {testCase.verdictType === 0 && <SVGSpinner cls="w-4 h-4 mr-3" />}
                         {testCase.verdictType === 1 && (
@@ -55,20 +55,20 @@ function TestCase13({ index, numCases, testCase, group, isLastGroup, isLastCase 
             )}
             {group.scoring === 1 && (
                 <>
-                    <td className={`py-2.5 border border-t-0 border-dividecol ${bottomBorderCase}`}>
+                    <td className={`py-2.5 border border-t-0 border-divide-def ${bottomBorderCase}`}>
                         <div className="flex items-center">
                             <FontAwesomeIcon icon="fa-xmark" className="w-4 h-4 highlight-red mr-3" />
                             <span className="whitespace-nowrap">{testCase.verdictName}</span>
                         </div>
                     </td>
                     <td
-                        className={`py-2.5 border border-t-0 border-dividecol text-center whitespace-nowrap ${bottomBorderCase}`}>
+                        className={`py-2.5 border border-t-0 border-divide-def text-center whitespace-nowrap ${bottomBorderCase}`}>
                         {testCase.score} / {testCase.maxScore}
                     </td>
                 </>
             )}
-            <td className={`py-2.5 border border-t-0 border-dividecol ${bottomBorderCase}`}>{testCase.time} ms</td>
-            <td className={`py-2.5 border border-t-0 border-r-0 border-dividecol ${bottomBorderCase}`}>
+            <td className={`py-2.5 border border-t-0 border-divide-def ${bottomBorderCase}`}>{testCase.time} ms</td>
+            <td className={`py-2.5 border border-t-0 border-r-0 border-divide-def ${bottomBorderCase}`}>
                 {testCase.memory} KiB
             </td>
         </tr>
@@ -112,7 +112,7 @@ function TestCase0({ testCase, onRowClicked }) {
             </td>
             <td className="w-0 py-3">
                 <button aria-label={t("aria_label.view")} onClick={() => onRowClicked(testCase)}>
-                    <SVGView cls="w-6 h-6 text-iconcol hover:text-indigo-600 hover:scale-105" />
+                    <SVGView cls="w-6 h-6 text-icon hover:text-indigo-600 hover:scale-105" />
                 </button>
             </td>
             <td className="py-3">{testCase.time} ms</td>
@@ -142,7 +142,7 @@ function SubmissionTable0({ status }) {
     ].map((item, index) => (
         <tr key={index}>
             <td className="whitespace-nowrap w-0">{t(item[0])}</td>
-            <td className="p-0 bg-codebgcol">
+            <td className="p-0 bg-code-bg">
                 <pre className="w-full px-4 py-3 overflow-x-auto" style={{ maxHeight: "6rem" }}>
                     {item[1]}
                 </pre>

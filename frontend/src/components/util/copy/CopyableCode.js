@@ -9,7 +9,7 @@ function CopyableCode({ text, maxHeight = "auto", title, titleComponent, cls }) 
             <div
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
-                className="relative flex bg-codebgcol"
+                className="relative flex bg-code-bg"
                 style={{ minHeight: "3rem", maxHeight: maxHeight }}>
                 <pre className="w-full px-4 py-3 overflow-x-auto ">{text}</pre>
                 <div className="absolute top-2 right-2">
