@@ -22,7 +22,7 @@ module.exports = {
                 '160': '40rem'
             },
             boxShadow: {
-                "frame": "0 2.5px 3.5px -2.5px rgba(0, 0, 0, 0.15)"
+                "frame": "0 2.5px 3.5px -2.5px rgba(0, 0, 0, 0.1)"
             },
             transitionProperty: {
                 "opacity": "opacity",

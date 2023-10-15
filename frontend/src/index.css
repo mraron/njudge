@@ -89,8 +89,8 @@
         --color-input-fill: 205, 202, 210;
         --color-border-def: var(--color-grey-625);
         --color-border-med: var(--color-grey-600);
-        --color-border-str: var(--color-grey-600);
-        --color-border-xstr: var(--color-grey-575);
+        --color-border-str: var(--color-grey-575);
+        --color-border-xstr: var(--color-grey-550);
         --color-divide-def: var(--color-grey-700);
         --color-code-bg: var(--color-grey-875);
         --color-frame-bg: var(--color-grey-800);
