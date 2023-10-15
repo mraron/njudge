@@ -59,11 +59,13 @@
     },
     "forgotten_password": {
         "page_title": "Elfelejtett jelszó :: njudge",
+        "forgotten_password": "Elfelejtett jelszó",
         "change_password": "Jelszóváltoztatás",
         "email": "Email-cím"
     },
     "reset_password": {
         "page_title": "Jelszóváltoztatás :: njudge",
+        "reset_password": "Jelszó visszaállítása",
         "change_password": "Jelszóváltoztatás",
         "password": "Jelszó",
         "confirm_password": "Jelszó megerősítése"
