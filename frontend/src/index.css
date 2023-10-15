@@ -43,13 +43,13 @@
         --color-border-med: var(--color-grey-700);
         --color-border-str: var(--color-grey-675);
         --color-border-xstr: var(--color-grey-625);
-        --color-divide-def: var(--color-grey-725);
+        --color-divide-def: var(--color-grey-750);
         --color-code-bg: var(--color-grey-875);
         --color-frame-bg: var(--color-grey-800);
         --color-button: var(--color-grey-725);
         --color-button-hover: var(--color-grey-700);
         --color-icon: var(--color-grey-125);
-        --color-highlight: 79, 70, 229;
+        --color-highlight: 89, 78, 239;
     }
     html[data-theme="light"] {
         --color-grey-100: 37, 34, 40;
