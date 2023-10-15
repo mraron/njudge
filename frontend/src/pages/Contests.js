@@ -9,7 +9,7 @@ function ContestFrame({ contest }) {
     const { name, href, date, active } = contest
     return (
         <RoundedFrame>
-            <div className="px-6 py-5 sm:px-10 sm:py-8">
+            <div className="px-8 py-6 sm:px-10 sm:py-8">
                 <div className="flex justify-between items-start space-x-4 mb-2">
                     <span className="text-base emph-strong break-words min-w-0">{name}</span>
                     <span className="date-label">{date}</span>

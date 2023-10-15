@@ -131,7 +131,7 @@ function ContestRanklist({ data }) {
         data.isPublic && (
             <div className="space-y-2">
                 <DropdownFrame title={t("ranklist_filter.filter")}>
-                    <div className="px-6 py-5 sm:px-10 sm:py-8">
+                    <div className="px-8 py-6 sm:px-10 sm:py-8">
                         <RanklistFilter />
                     </div>
                 </DropdownFrame>

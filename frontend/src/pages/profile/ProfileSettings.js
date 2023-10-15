@@ -36,7 +36,7 @@ function PasswordChangeFrame() {
     }
     return (
         <RoundedFrame titleComponent={titleComponent}>
-            <div className="flex flex-col px-6 py-5 sm:px-10 sm:py-8 w-full">
+            <div className="flex flex-col px-8 py-6 sm:px-10 sm:py-8 w-full">
                 <div className="mb-4 w-full">
                     <TextBox
                         id="oldPassword"
@@ -101,7 +101,7 @@ function OtherSettingsFrame({ data }) {
     }
     return (
         <RoundedFrame titleComponent={titleComponent}>
-            <div className="flex flex-col px-6 py-5 sm:px-10 sm:py-8 w-full">
+            <div className="flex flex-col px-8 py-6 sm:px-10 sm:py-8 w-full">
                 <div className="mb-3">
                     <Checkbox
                         id={"showUnsolved"}

@@ -87,8 +87,8 @@
         --color-grey-900: 252, 249, 255;
         --color-textcol: 40, 40, 40;
         --color-input-fill: 205, 202, 210;
-        --color-border-def: var(--color-grey-650);
-        --color-border-med: var(--color-grey-625);
+        --color-border-def: var(--color-grey-625);
+        --color-border-med: var(--color-grey-600);
         --color-border-str: var(--color-grey-600);
         --color-border-xstr: var(--color-grey-575);
         --color-divide-def: var(--color-grey-700);
@@ -139,7 +139,7 @@
         @apply py-3 px-5;
     }
     .padding-th-default {
-        @apply py-4 px-8;
+        @apply py-[1.1rem] px-8;
     }
 }
 
