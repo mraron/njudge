@@ -10,7 +10,7 @@ function Modal({ children, isOpen, onClose, width }) {
             open={isOpen}
             onClose={onClose}
             BackdropProps={{
-                style: { backgroundColor: theme === "light" ? "rgba(255, 255, 255, 0.6)" : "rgba(0, 0, 0, 0.6)" },
+                style: { backgroundColor: theme === "dark" ? "rgba(255, 255, 255, 0.25)" : "rgba(0, 0, 0, 0.25)" },
             }}>
             <AnimatePresence>
                 <div className="fixed mui-fixed left-2 right-2 top-1/2 sm:left-1/2 sm:right-auto transform sm:-translate-x-1/2 -translate-y-1/2">

@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion"
-import { SVGSpinner } from "../svg/SVGs"
+import { SVGLoading } from "../svg/SVGs"
 
 function PageLoadingAnimation({ isVisible }) {
     return (
@@ -13,7 +13,7 @@ function PageLoadingAnimation({ isVisible }) {
                     }}
                     exit={{ opacity: 0.01, transition: { duration: 0.1 } }}>
                     <div className="absolute top-16 left-1/2 z-10">
-                        <SVGSpinner cls="w-10 h-10" />
+                        <SVGLoading cls="w-12 h-12" />
                     </div>
                 </motion.div>
             )}

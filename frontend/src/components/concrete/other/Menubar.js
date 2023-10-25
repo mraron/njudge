@@ -176,7 +176,7 @@ function MenuTopBar({ selected, isOpen, onToggle }) {
         )
     })
     return (
-        <div className="z-30 flex justify-center bg-grey-825 border-b border-grey-675 dark:border-grey-725 fixed mui-fixed w-full top-0">
+        <div className="z-30 flex justify-center bg-grey-825 border-b border-grey-675 dark:border-grey-725 fixed mui-fixed w-full top-0 shadow-frame dark:shadow-none">
             <div className="w-full max-w-7xl flex justify-between items-center">
                 <div className="flex w-full">
                     <Link to="/" className="font-semibold text-lg mx-8 my-4">
