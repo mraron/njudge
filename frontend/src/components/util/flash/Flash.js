@@ -18,7 +18,7 @@ function FlashMessage({ message, type, onClose }) {
                     )}
                     <span>{t(message)}</span>
                 </div>
-                <button className="flex rounded-full p-3 hover:bg-grey-775" onClick={onClose}>
+                <button className="flex rounded-full p-3 hover:bg-grey-800" onClick={onClose}>
                     <FontAwesomeIcon icon="fa-close" className="w-5 h-5" />
                 </button>
             </div>

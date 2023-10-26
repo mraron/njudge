@@ -95,7 +95,7 @@ function ProfileSettings({ onSidebarClose }) {
         return (
             <button
                 className={`px-2 py-0.5 ${
-                    i18n.resolvedLanguage === lang ? "bg-grey-725" : "hover:bg-grey-775"
+                    i18n.resolvedLanguage === lang ? "bg-grey-725" : "hover:bg-grey-800"
                 } rounded`}
                 onClick={(event) => {
                     i18n.changeLanguage(lang)
