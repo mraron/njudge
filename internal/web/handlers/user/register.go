@@ -6,12 +6,11 @@ import (
 	"net/http"
 	"unicode"
 
-	"github.com/mraron/njudge/internal/web/domain/email"
+	"github.com/mraron/njudge/internal/njudge/email"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/config"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/models"
-	"github.com/mraron/njudge/internal/web/services"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 
 	"github.com/jmoiron/sqlx"
@@ -35,7 +34,7 @@ func GetRegister() echo.HandlerFunc {
 	}
 }
 
-func Register(cfg config.Server, DB *sqlx.DB, mailService services.MailService) echo.HandlerFunc {
+func Register(cfg config.Server, DB *sqlx.DB, mailService email.Service) echo.HandlerFunc {
 	type request struct {
 		Name      string `form:"name"`
 		Email     string `form:"email"`

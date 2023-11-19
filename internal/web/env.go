@@ -2,7 +2,6 @@ package web
 
 import (
 	"fmt"
-	"github.com/mraron/njudge/internal/web/services"
 	"log"
 	"strconv"
 	"time"
@@ -10,6 +9,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/providers/google"
+	"github.com/mraron/njudge/internal/njudge/email"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 )
@@ -42,7 +42,7 @@ func (s *Server) SetupEnvironment() {
 			panic(err)
 		}
 
-		s.MailService = services.SMTPMailService{
+		s.MailService = email.SMTPService{
 			From:     s.SMTP.MailAccount,
 			Host:     s.SMTP.MailServerHost,
 			Port:     port,
@@ -50,16 +50,16 @@ func (s *Server) SetupEnvironment() {
 			Password: s.SMTP.MailAccountPassword,
 		}
 	} else if s.Sendgrid.Enabled {
-		s.MailService = services.SendgridMailService{
+		s.MailService = email.SendgridService{
 			SenderName:    s.Sendgrid.SenderName,
 			SenderAddress: s.Sendgrid.SenderAddress,
 			APIKey:        s.Sendgrid.ApiKey,
 		}
 	} else {
 		if s.Mode == "development" {
-			s.MailService = services.LogMailService{Logger: log.Default()}
+			s.MailService = email.LogService{Logger: log.Default()}
 		} else {
-			s.MailService = services.ErrorMailService{}
+			s.MailService = email.ErrorService{}
 		}
 	}
 }

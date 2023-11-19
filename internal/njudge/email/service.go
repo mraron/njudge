@@ -1,21 +1,21 @@
-package services
+package email
 
 import (
 	"context"
 	"errors"
-	"github.com/mraron/njudge/internal/web/domain/email"
+	"log"
+	"regexp"
+
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"gopkg.in/gomail.v2"
-	"log"
-	"regexp"
 )
 
-type MailService interface {
-	Send(ctx context.Context, m email.Mail) error
+type Service interface {
+	Send(ctx context.Context, m Mail) error
 }
 
-type SMTPMailService struct {
+type SMTPService struct {
 	From     string
 	Host     string
 	Port     int
@@ -28,7 +28,7 @@ func StripHTMLRegex(s string) string {
 	return r.ReplaceAllString(s, "")
 }
 
-func (s SMTPMailService) Send(ctx context.Context, mail email.Mail) error {
+func (s SMTPService) Send(ctx context.Context, mail Mail) error {
 	m := gomail.NewMessage()
 
 	m.SetHeader("From", s.From)
@@ -41,13 +41,13 @@ func (s SMTPMailService) Send(ctx context.Context, mail email.Mail) error {
 	return gomail.NewDialer(s.Host, s.Port, s.User, s.Password).DialAndSend(m)
 }
 
-type SendgridMailService struct {
+type SendgridService struct {
 	SenderName    string
 	SenderAddress string
 	APIKey        string
 }
 
-func (s SendgridMailService) Send(ctx context.Context, m email.Mail) error {
+func (s SendgridService) Send(ctx context.Context, m Mail) error {
 	if len(m.Recipients) > 1 {
 		return errors.New("sendgridMailService doesn't support multiple recipients")
 	}
@@ -64,17 +64,17 @@ func (s SendgridMailService) Send(ctx context.Context, m email.Mail) error {
 	return err
 }
 
-type LogMailService struct {
+type LogService struct {
 	Logger *log.Logger
 }
 
-func (l LogMailService) Send(_ context.Context, m email.Mail) error {
+func (l LogService) Send(_ context.Context, m Mail) error {
 	l.Logger.Println("sending message", m)
 	return nil
 }
 
-type ErrorMailService struct{}
+type ErrorService struct{}
 
-func (e ErrorMailService) Send(_ context.Context, _ email.Mail) error {
+func (e ErrorService) Send(_ context.Context, _ Mail) error {
 	return errors.New("can't send mail")
 }

@@ -4,19 +4,19 @@ import (
 	"bytes"
 	"database/sql"
 	"errors"
+	"net/http"
+	"time"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
-	"github.com/mraron/njudge/internal/web/domain/email"
+	"github.com/mraron/njudge/internal/njudge/email"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/config"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/models"
-	"github.com/mraron/njudge/internal/web/services"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"go.uber.org/multierr"
 	"golang.org/x/crypto/bcrypt"
-	"net/http"
-	"time"
 )
 
 func GetForgottenPassword() echo.HandlerFunc {
@@ -34,7 +34,7 @@ func GetForgottenPassword() echo.HandlerFunc {
 	}
 }
 
-func PostForgottenPassword(cfg config.Server, DB *sqlx.DB, mailService services.MailService) echo.HandlerFunc {
+func PostForgottenPassword(cfg config.Server, DB *sqlx.DB, mailService email.Service) echo.HandlerFunc {
 	type request struct {
 		Email string `form:"email"`
 	}

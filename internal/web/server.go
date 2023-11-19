@@ -2,10 +2,12 @@ package web
 
 import (
 	"context"
-	"github.com/mraron/njudge/internal/web/services"
 	_ "mime"
 	"net/http"
 	"time"
+
+	"github.com/mraron/njudge/internal/njudge/email"
+	"github.com/mraron/njudge/internal/web/services"
 
 	"github.com/antonlindstrom/pgstore"
 	"github.com/mraron/njudge/internal/web/helpers/config"
@@ -33,7 +35,7 @@ type Server struct {
 	DB *sqlx.DB
 
 	ProblemStore problems.Store
-	MailService  services.MailService
+	MailService  email.Service
 }
 
 func (s *Server) Run() {
