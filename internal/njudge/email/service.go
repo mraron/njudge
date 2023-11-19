@@ -11,10 +11,12 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
+// Service sends and email
 type Service interface {
 	Send(ctx context.Context, m Mail) error
 }
 
+// SMTPService sends an email via SMTP
 type SMTPService struct {
 	From     string
 	Host     string
@@ -41,6 +43,7 @@ func (s SMTPService) Send(ctx context.Context, mail Mail) error {
 	return gomail.NewDialer(s.Host, s.Port, s.User, s.Password).DialAndSend(m)
 }
 
+// SendgridService sends and email via the Sendgrid API
 type SendgridService struct {
 	SenderName    string
 	SenderAddress string
@@ -64,6 +67,7 @@ func (s SendgridService) Send(ctx context.Context, m Mail) error {
 	return err
 }
 
+// LogService logs the email to a *log.Logger
 type LogService struct {
 	Logger *log.Logger
 }
@@ -73,6 +77,7 @@ func (l LogService) Send(_ context.Context, m Mail) error {
 	return nil
 }
 
+// ErrorService always return an error when sending an email
 type ErrorService struct{}
 
 func (e ErrorService) Send(_ context.Context, _ Mail) error {
