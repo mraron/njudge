@@ -3,7 +3,6 @@ package njudge
 import (
 	"context"
 	"errors"
-	"sync"
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
@@ -61,76 +60,4 @@ type Submissions interface {
 	Insert(ctx context.Context, s Submission) (*Submission, error)
 	Delete(ctx context.Context, ID int) error
 	Update(ctx context.Context, s Submission) error
-}
-
-type MemorySubmissions struct {
-	sync.Mutex
-	nextId int
-	data   []Submission
-}
-
-func NewMemorySubmissions() *MemorySubmissions {
-	return &MemorySubmissions{
-		nextId: 1,
-		data:   make([]Submission, 0),
-	}
-}
-
-func (m *MemorySubmissions) Get(ctx context.Context, ID int) (*Submission, error) {
-	m.Lock()
-	defer m.Unlock()
-	for ind := range m.data {
-		if m.data[ind].ID == ID {
-			res := m.data[ind]
-			return &res, nil
-		}
-	}
-
-	return nil, ErrorSubmissionNotFound
-}
-func (m *MemorySubmissions) GetAll(ctx context.Context) ([]Submission, error) {
-	m.Lock()
-	defer m.Unlock()
-	res := make([]Submission, len(m.data))
-	copy(res, m.data)
-
-	return res, nil
-}
-
-func (m *MemorySubmissions) Insert(ctx context.Context, s Submission) (*Submission, error) {
-	m.Lock()
-	defer m.Unlock()
-	s.ID = m.nextId
-	m.nextId++
-
-	m.data = append(m.data, s)
-
-	res := m.data[len(m.data)-1]
-	return &res, nil
-}
-
-func (m *MemorySubmissions) Delete(ctx context.Context, ID int) error {
-	m.Lock()
-	defer m.Unlock()
-	for ind := range m.data {
-		if m.data[ind].ID == ID {
-			m.data[ind] = m.data[len(m.data)-1]
-			m.data = m.data[:len(m.data)-1]
-			return nil
-		}
-	}
-
-	return ErrorSubmissionNotFound
-}
-
-func (m *MemorySubmissions) Update(ctx context.Context, s Submission) error {
-	m.Lock()
-	defer m.Unlock()
-	for ind := range m.data {
-		if m.data[ind].ID == s.ID {
-			m.data[ind] = s
-			return nil
-		}
-	}
-	return ErrorSubmissionNotFound
 }

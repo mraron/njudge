@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/mraron/njudge/internal/web/domain/submission"
@@ -94,100 +93,6 @@ type Problems interface {
 	Insert(ctx context.Context, p Problem) (*Problem, error)
 	Delete(ctx context.Context, ID int) error
 	Update(ctx context.Context, p Problem) error
-}
-
-type MemoryProblems struct {
-	sync.Mutex
-	nextId int
-	data   []Problem
-
-	nextProblemTagId int
-}
-
-func NewMemoryProblems() *MemoryProblems {
-	return &MemoryProblems{
-		nextId:           1,
-		data:             make([]Problem, 0),
-		nextProblemTagId: 1,
-	}
-}
-
-func (m *MemoryProblems) Get(ctx context.Context, ID int) (*Problem, error) {
-	m.Lock()
-	defer m.Unlock()
-	for ind := range m.data {
-		if m.data[ind].ID == ID {
-			res := m.data[ind]
-			res.Tags = make([]ProblemTag, len(res.Tags))
-			copy(res.Tags, m.data[ind].Tags)
-			return &res, nil
-		}
-	}
-
-	return nil, ErrorProblemNotFound
-}
-
-func (m *MemoryProblems) GetAll(ctx context.Context) ([]Problem, error) {
-	m.Lock()
-	defer m.Unlock()
-	res := make([]Problem, len(m.data))
-	copy(res, m.data)
-	for ind := range res {
-		res[ind].Tags = make([]ProblemTag, len(res[ind].Tags))
-		copy(res[ind].Tags, m.data[ind].Tags)
-	}
-
-	return res, nil
-}
-
-func (m *MemoryProblems) Insert(ctx context.Context, p Problem) (*Problem, error) {
-	m.Lock()
-	defer m.Unlock()
-	p.ID = m.nextId
-	m.nextId++
-
-	for ind := range p.Tags {
-		p.Tags[ind].ID = m.nextProblemTagId
-		m.nextProblemTagId++
-	}
-
-	m.data = append(m.data, p)
-
-	res := m.data[len(m.data)-1]
-	return &res, nil
-}
-
-func (m *MemoryProblems) Delete(ctx context.Context, id int) error {
-	m.Lock()
-	defer m.Unlock()
-	for ind := range m.data {
-		if m.data[ind].ID == id {
-			m.data[ind] = m.data[len(m.data)-1]
-			m.data = m.data[:len(m.data)-1]
-			return nil
-		}
-	}
-
-	return ErrorProblemNotFound
-}
-
-func (m *MemoryProblems) Update(ctx context.Context, p Problem) error {
-	m.Lock()
-	defer m.Unlock()
-	for ind := range m.data {
-		if m.data[ind].ID == p.ID {
-			for tagInd := range p.Tags {
-				if p.Tags[tagInd].ID == 0 {
-					p.Tags[tagInd].ID = m.nextProblemTagId
-					m.nextProblemTagId++
-				}
-			}
-
-			m.data[ind] = p
-			return nil
-		}
-	}
-	return ErrorProblemNotFound
 }
 
 type ProblemStoredData interface {
