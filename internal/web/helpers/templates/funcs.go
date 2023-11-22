@@ -7,8 +7,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html/template"
+	"math"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/web/domain/problem"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
@@ -17,11 +24,6 @@ import (
 	"github.com/mraron/njudge/internal/web/models"
 	"github.com/mraron/njudge/pkg/problems"
 	"golang.org/x/text/message"
-	"html/template"
-	"math"
-	"strconv"
-	"strings"
-	"time"
 )
 
 func contextFuncs(c echo.Context) template.FuncMap {
@@ -134,8 +136,12 @@ func statelessFuncs(store problems.Store, db *sql.DB, store2 partials.Store) tem
 		"roundTo": func(num float64, digs int) float64 {
 			return math.Round(num*100) / 100
 		},
-		"tags": func() (models.TagSlice, error) {
-			return models.Tags().All(context.Background(), db)
+		"tags": func() ([]njudge.Tag, error) {
+			//@TODO
+			return []njudge.Tag{
+				{1, "dp"},
+				{2, "greedy"},
+			}, nil
 		},
 		"contextTODO": func() context.Context {
 			return context.TODO()

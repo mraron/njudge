@@ -6,8 +6,11 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gorilla/sessions"
+	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/njudge/email"
 	"github.com/mraron/njudge/internal/web/services"
+	"github.com/quasoft/memstore"
 
 	"github.com/antonlindstrom/pgstore"
 	"github.com/mraron/njudge/internal/web/helpers/config"
@@ -34,8 +37,15 @@ type Server struct {
 	config.Server
 	DB *sqlx.DB
 
-	ProblemStore problems.Store
-	MailService  email.Service
+	ProblemStore  problems.Store
+	MailService   email.Service
+	PartialsStore partials.Store
+
+	Problems         njudge.Problems
+	Users            njudge.Users
+	Submissions      njudge.Submissions
+	ProblemInfoQuery njudge.ProblemInfoQuery
+	ProblemQuery     njudge.ProblemQuery
 }
 
 func (s *Server) Run() {
@@ -59,11 +69,30 @@ func (s *Server) Run() {
 			c.Logger().Error(err)
 		}
 	}
-	e.Renderer = templates.New(s.Server, s.ProblemStore, s.DB.DB, partials.NewCached(s.DB.DB, 30*time.Second))
 
-	store, err := pgstore.NewPGStoreFromPool(s.DB.DB, []byte(s.CookieSecret))
-	if err != nil {
-		panic(err)
+	if s.Mode == "development" {
+		s.PartialsStore = partials.Empty{}
+	} else {
+		s.PartialsStore = partials.NewCached(nil, 30*time.Second)
+	}
+
+	e.Renderer = templates.New(s.Server, s.ProblemStore, nil, s.PartialsStore)
+
+	var (
+		store sessions.Store
+		err   error
+	)
+
+	if s.Mode == "development " {
+		store, err = pgstore.NewPGStoreFromPool(s.DB.DB, []byte(s.CookieSecret))
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		store = memstore.NewMemStore(
+			[]byte("authkey123"),
+			[]byte("enckey12341234567890123456789012"),
+		)
 	}
 
 	e.Use(middleware.Logger())

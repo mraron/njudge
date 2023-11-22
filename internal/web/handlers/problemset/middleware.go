@@ -2,13 +2,13 @@ package problemset
 
 import (
 	"fmt"
-	"github.com/labstack/echo/v4"
-	"github.com/mraron/njudge/internal/web/domain/problem"
-	"github.com/mraron/njudge/internal/web/services"
-	"github.com/mraron/njudge/pkg/problems"
-	"golang.org/x/exp/slices"
 	"net/http"
 	"strings"
+
+	"github.com/labstack/echo/v4"
+	"github.com/mraron/njudge/internal/njudge"
+	"github.com/mraron/njudge/pkg/problems"
+	"golang.org/x/exp/slices"
 )
 
 func SetNameMiddleware() func(echo.HandlerFunc) echo.HandlerFunc {
@@ -41,22 +41,27 @@ func RenameProblemMiddleware(problemStore problems.Store) func(echo.HandlerFunc)
 	}
 }
 
-func SetProblemMiddleware(pr problem.Repository, problemStatsService services.ProblemStatsService) func(echo.HandlerFunc) echo.HandlerFunc {
+func SetProblemMiddleware(store problems.Store, ps njudge.ProblemQuery, pinfo njudge.ProblemInfoQuery) func(echo.HandlerFunc) echo.HandlerFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			problemset, problemName := c.Param("name"), c.Param("problem")
-			p, err := pr.GetByNames(c.Request().Context(), problemset, problemName)
+			p, err := ps.GetProblem(c.Request().Context(), problemset, problemName)
 			if err != nil {
 				return err
 			}
-
 			c.Set("problem", *p)
 
-			stats, err := problemStatsService.GetStatsData(c.Request().Context(), *p, c.Get("userID").(int))
+			info, err := pinfo.GetProblemData(c.Request().Context(), p.ID, c.Get("userID").(int))
 			if err != nil {
 				return err
 			}
-			c.Set("problemStats", *stats)
+			c.Set("problemInfo", *info)
+
+			sdata, err := p.WithStoredData(store)
+			if err != nil {
+				return err
+			}
+			c.Set("problemStoredData", sdata)
 
 			return next(c)
 		}

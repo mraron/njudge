@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mraron/njudge/internal/web/domain/submission"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/config/polygon"
@@ -143,14 +142,21 @@ func (p *problemStoredData) GetAttachment(attachment string) (problems.NamedData
 	return nil, ErrorFileNotFound
 }
 
-type ProblemUserData struct {
+type ProblemUserInfo struct {
 	SolvedStatus SolvedStatus
 	LastLanguage string
+	Submissions  []Submission
 }
 
-type ProblemData struct {
+type ProblemInfo struct {
 	SolverCount int
-	UserData    *ProblemUserData
-	Tags        []Tag
-	Submissions []submission.Submission
+	UserInfo    *ProblemUserInfo
+}
+
+type ProblemInfoQuery interface {
+	GetProblemData(ctx context.Context, problemID, userID int) (*ProblemInfo, error)
+}
+
+type ProblemQuery interface {
+	GetProblem(ctx context.Context, problemset, problem string) (*Problem, error)
 }

@@ -1,23 +1,16 @@
 package web
 
 import (
+	"strings"
+
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
-	"strings"
-	"time"
 
 	"github.com/labstack/echo/v4"
-	"github.com/mraron/njudge/internal/web/extmodels"
 	"github.com/mraron/njudge/internal/web/handlers"
-	"github.com/mraron/njudge/internal/web/handlers/api"
 	"github.com/mraron/njudge/internal/web/handlers/problemset"
-	"github.com/mraron/njudge/internal/web/handlers/taskarchive"
 	"github.com/mraron/njudge/internal/web/handlers/user"
-	"github.com/mraron/njudge/internal/web/handlers/user/profile"
 	"github.com/mraron/njudge/internal/web/helpers"
-	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
-	"github.com/mraron/njudge/internal/web/models"
-	"github.com/mraron/njudge/internal/web/services"
 )
 
 func (s *Server) prepareRoutes(e *echo.Echo) {
@@ -33,23 +26,24 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	e.Use(helpers.ClearTemporaryFlashes())
 
 	e.GET("/", handlers.GetHome())
-	e.GET("/page/:page", handlers.GetPage(partials.NewCached(s.DB.DB, 30*time.Second)))
+	e.GET("/page/:page", handlers.GetPage(s.PartialsStore))
 
 	e.Static("/static", "static")
 
-	e.GET("/submission/:id", handlers.GetSubmission(services.NewSQLSubmission(s.DB.DB))).Name = "getSubmission"
+	/*e.GET("/submission/:id", handlers.GetSubmission(services.NewSQLSubmission(s.DB.DB))).Name = "getSubmission"
 	e.GET("/submission/rejudge/:id", handlers.RejudgeSubmission(services.NewSQLSubmission(s.DB.DB)), user.RequireLoginMiddleware()).Name = "rejudgeSubmission"
 	e.GET("/task_archive", taskarchive.Get(s.DB, s.ProblemStore))
-
+	*/
 	ps := e.Group("/problemset", problemset.SetNameMiddleware())
-	ps.GET("/:name/", problemset.GetProblemList(s.DB, services.NewSQLProblemListService(s.DB.DB, s.ProblemStore, services.NewSQLProblem(s.DB.DB, s.ProblemStore)), services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
+	/*ps.GET("/:name/", problemset.GetProblemList(s.DB, services.NewSQLProblemListService(s.DB.DB, s.ProblemStore, services.NewSQLProblem(s.DB.DB, s.ProblemStore)), services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
 	ps.POST("/:name/submit", problemset.PostSubmit(services.NewSQLSubmitService(s.DB.DB, s.ProblemStore)), user.RequireLoginMiddleware())
 	ps.GET("/status/", problemset.GetStatus(services.NewSQLStatusPageService(s.DB.DB))).Name = "getProblemsetStatus"
-
-	psProb := ps.Group("/:name/:problem", problemset.RenameProblemMiddleware(s.ProblemStore), problemset.SetProblemMiddleware(services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
+	*/
+	psProb := ps.Group("/:name/:problem", problemset.RenameProblemMiddleware(s.ProblemStore),
+		problemset.SetProblemMiddleware(s.ProblemStore, s.ProblemQuery, s.ProblemInfoQuery))
 	psProb.GET("/", problemset.GetProblem()).Name = "getProblemMain"
 	psProb.GET("/problem", problemset.GetProblem())
-	psProb.GET("/status", problemset.GetProblemStatus(services.NewSQLStatusPageService(s.DB.DB)))
+	/*psProb.GET("/status", problemset.GetProblemStatus(services.NewSQLStatusPageService(s.DB.DB)))
 	psProb.GET("/submit", problemset.GetProblemSubmit())
 	psProb.GET("/ranklist", problemset.GetProblemRanklist(s.DB))
 	psProb.POST("/tags", problemset.PostProblemTag(services.NewSQLTagsService(s.DB.DB)))
@@ -122,5 +116,5 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	v1.PUT("/submissions/:id", api.Put[models.Submission](submissionDataProvider))
 	v1.DELETE("/submissions/:id", api.Delete[models.Submission](submissionDataProvider))
 
-	e.GET("/admin", handlers.GetAdmin(s.Server), user.RequireLoginMiddleware())
+	e.GET("/admin", handlers.GetAdmin(s.Server), user.RequireLoginMiddleware())*/
 }

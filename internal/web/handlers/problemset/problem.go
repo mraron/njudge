@@ -11,6 +11,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
+	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/web/domain/problem"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
@@ -24,15 +25,18 @@ import (
 func GetProblem() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
-		prob := c.Get("problem").(problem.Problem)
-		stats := c.Get("problemStats").(problem.StatsData)
+		prob := c.Get("problem").(njudge.Problem)
+		info := c.Get("problemInfo").(njudge.ProblemInfo)
+		sdata := c.Get("problemStoredData").(njudge.ProblemStoredData)
 
-		c.Set("title", tr.Translate("Statement - %s (%s)", tr.TranslateContent(prob.Titles()).String(), prob.Name()))
+		c.Set("title", tr.Translate("Statement - %s (%s)",
+			tr.TranslateContent(sdata.Titles()).String(), sdata.Name()))
 
 		return c.Render(http.StatusOK, "problemset/problem/problem", struct {
-			problem.Problem
-			problem.StatsData
-		}{Problem: prob, StatsData: stats})
+			njudge.Problem
+			njudge.ProblemStoredData
+			njudge.ProblemInfo
+		}{Problem: prob, ProblemStoredData: sdata, ProblemInfo: info})
 	}
 }
 

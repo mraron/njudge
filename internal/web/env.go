@@ -1,6 +1,7 @@
 package web
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
@@ -9,10 +10,26 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/providers/google"
+	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/njudge/email"
+	"github.com/mraron/njudge/internal/njudge/memory"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 )
+
+func (s *Server) SetupDataAccess() {
+	if s.Mode == "development" {
+		s.Problems = memory.NewProblems()
+		s.Submissions = memory.NewSubmissions()
+		s.Users = memory.NewUsers()
+		s.ProblemQuery = memory.NewProblemQuery(s.Problems)
+		s.ProblemInfoQuery = memory.NewProblemInfoQuery(s.Submissions)
+
+		s.Problems.Insert(context.Background(), njudge.NewProblem("main", "is1"))
+	} else {
+		panic("not supported yet :P")
+	}
+}
 
 func (s *Server) SetupEnvironment() {
 	if s.Mode == "development" {
@@ -32,7 +49,9 @@ func (s *Server) SetupEnvironment() {
 		)
 	}
 
-	s.ConnectToDB()
+	//TODO
+	//s.ConnectToDB()
+	s.SetupDataAccess()
 	s.Keys.MustParse()
 
 	s.ProblemStore = problems.NewFsStore(s.ProblemsDir)
