@@ -85,21 +85,17 @@ func (p *Problem) DeleteTag(t Tag) error {
 		}
 	}
 
-	panic("???")
+	panic("")
 }
 
 type Problems interface {
 	Get(ctx context.Context, ID int) (*Problem, error)
 	GetAll(ctx context.Context) ([]Problem, error)
 	Insert(ctx context.Context, p Problem) (*Problem, error)
-	Delete(ctx context.Context, id int) error
+	Delete(ctx context.Context, ID int) error
 	Update(ctx context.Context, p Problem) error
 }
 
-type pairTagProblem struct {
-	Tag       Tag
-	ProblemID int
-}
 type MemoryProblems struct {
 	sync.Mutex
 	nextId int
