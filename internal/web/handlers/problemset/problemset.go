@@ -100,11 +100,15 @@ func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categori
 			return err
 		}
 
-		result := ProblemList{
-			//TODO
-			Pages: nil,
-			//Pages: problemList.PaginationData.Pages,
+		u := *c.Request().URL
+		links, err := pagination.Links(problemList.PaginationData.Page, problemList.PaginationData.PerPage, int64(problemList.PaginationData.Count), u.Query())
+		if err != nil {
+			return err
 		}
+		result := ProblemList{
+			Pages: links,
+		}
+
 		for ind := range problemList.Problems {
 			p, err := ps.Get(c.Request().Context(), problemList.Problems[ind].ID)
 			if err != nil {
@@ -126,7 +130,8 @@ func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categori
 			})
 		}
 
-		sortOrder, qu := "", c.Request().URL.Query()
+		sortOrder, u := "", *c.Request().URL
+		qu := u.Query()
 		if qu.Get("by") == "solver_count" {
 			sortOrder = qu.Get("order")
 			if qu.Get("order") == "DESC" {

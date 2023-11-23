@@ -159,9 +159,11 @@ func (p *ProblemListQuery) GetProblemList(ctx context.Context, req njudge.Proble
 		}
 	})
 
-	//TODO: pagination
+	var pdata njudge.PaginationData
+	problems, pdata = Paginate(problems, req.Page, req.PerPage)
+
 	return &njudge.ProblemList{
-		PaginationData: njudge.PaginationData{},
+		PaginationData: pdata,
 		Problems:       problems,
 	}, nil
 }
