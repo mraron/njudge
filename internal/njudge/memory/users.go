@@ -46,6 +46,19 @@ func (m *Users) GetByName(ctx context.Context, name string) (*njudge.User, error
 	return nil, njudge.ErrorUserNotFound
 }
 
+func (m *Users) GetByEmail(ctx context.Context, email string) (*njudge.User, error) {
+	m.Lock()
+	defer m.Unlock()
+	for ind := range m.data {
+		if m.data[ind].Email == email {
+			res := m.data[ind]
+			return &res, nil
+		}
+	}
+
+	return nil, njudge.ErrorUserNotFound
+}
+
 func (m *Users) Insert(ctx context.Context, u njudge.User) (*njudge.User, error) {
 	m.Lock()
 	defer m.Unlock()

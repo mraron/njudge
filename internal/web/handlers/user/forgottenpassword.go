@@ -9,6 +9,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
+	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/njudge/email"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/config"
@@ -24,7 +25,7 @@ func GetForgottenPassword() echo.HandlerFunc {
 
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		if u := c.Get("user").(*models.User); u != nil {
+		if u := c.Get("user").(*njudge.User); u != nil {
 			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
 		}
 
@@ -41,7 +42,7 @@ func PostForgottenPassword(cfg config.Server, DB *sqlx.DB, mailService email.Ser
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		if u := c.Get("user").(*models.User); u != nil {
+		if u := c.Get("user").(*njudge.User); u != nil {
 			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
 		}
 
@@ -123,7 +124,7 @@ func GetForgottenPasswordForm(DB *sqlx.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		if u := c.Get("user").(*models.User); u != nil {
+		if u := c.Get("user").(*njudge.User); u != nil {
 			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
 		}
 
@@ -152,7 +153,7 @@ func PostForgottenPasswordForm(DB *sqlx.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		if u := c.Get("user").(*models.User); u != nil {
+		if u := c.Get("user").(*njudge.User); u != nil {
 			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
 		}
 

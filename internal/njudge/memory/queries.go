@@ -38,6 +38,7 @@ func (p *ProblemInfoQuery) GetProblemData(ctx context.Context, problemID int, us
 	}
 
 	if userID > 0 {
+		res.UserInfo = &njudge.ProblemUserInfo{}
 		res.UserInfo.SolvedStatus = njudge.Unattempted
 		if _, ok := userTried[userID]; ok {
 			res.UserInfo.SolvedStatus = njudge.Attempted

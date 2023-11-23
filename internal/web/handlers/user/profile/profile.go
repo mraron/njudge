@@ -1,12 +1,13 @@
 package profile
 
 import (
-	"github.com/volatiletech/sqlboiler/v4/boil"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
+
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
+	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/web/domain/submission"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
@@ -20,7 +21,7 @@ func GetProfile(DB *sqlx.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		u := c.Get("profile").(*models.User)
+		u := c.Get("profile").(*njudge.User)
 		var (
 			solved, attempted models.SubmissionSlice
 			err               error
@@ -46,7 +47,7 @@ func GetProfile(DB *sqlx.DB) echo.HandlerFunc {
 
 		c.Set("title", tr.Translate("%s's profile", u.Name))
 		return c.Render(http.StatusOK, "user/profile/main", struct {
-			User                       *models.User
+			User                       *njudge.User
 			SolvedProblems             models.SubmissionSlice
 			AttemptedNotSolvedProblems models.SubmissionSlice
 		}{u, solved, attempted})
@@ -60,7 +61,7 @@ func GetSubmissions(statusPageService services.StatusPageService) echo.HandlerFu
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		u := c.Get("profile").(*models.User)
+		u := c.Get("profile").(*njudge.User)
 
 		data := request{}
 		if err := c.Bind(&data); err != nil {
@@ -89,24 +90,24 @@ func GetSubmissions(statusPageService services.StatusPageService) echo.HandlerFu
 
 		c.Set("title", tr.Translate("%s's submissions", u.Name))
 		return c.Render(http.StatusOK, "user/profile/submissions", struct {
-			User       *models.User
+			User       *njudge.User
 			StatusPage *submission.StatusPage
 		}{u, statusPage})
 	}
 }
 
-func GetSettings(DB *sqlx.DB) echo.HandlerFunc {
+func GetSettings() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := c.Get("user").(*models.User)
+		u := c.Get("user").(*njudge.User)
 
 		helpers.DeleteFlash(c, "ChangePassword")
 		return c.Render(http.StatusOK, "user/profile/settings", struct {
-			User *models.User
+			User *njudge.User
 		}{u})
 	}
 }
 
-func PostSettingsChangePassword(DB *sqlx.DB) echo.HandlerFunc {
+func PostSettingsChangePassword(us njudge.Users) echo.HandlerFunc {
 	type request struct {
 		PasswordOld  string `form:"passwordOld"`
 		PasswordNew1 string `form:"passwordNew1"`
@@ -114,7 +115,7 @@ func PostSettingsChangePassword(DB *sqlx.DB) echo.HandlerFunc {
 	}
 	return func(c echo.Context) error {
 		tr := c.Get("translator").(i18n.Translator)
-		u := c.Get("user").(*models.User)
+		u := c.Get("user").(*njudge.User)
 
 		data := request{}
 		if err := c.Bind(&data); err != nil {
@@ -136,13 +137,8 @@ func PostSettingsChangePassword(DB *sqlx.DB) echo.HandlerFunc {
 			return c.Redirect(http.StatusFound, "../")
 		}
 
-		res, err := bcrypt.GenerateFromPassword([]byte(data.PasswordNew1), bcrypt.DefaultCost)
-		if err != nil {
-			return err
-		}
-
-		u.Password = string(res)
-		if _, err = u.Update(c.Request().Context(), DB, boil.Whitelist(models.UserColumns.Password)); err != nil {
+		u.SetPassword(data.PasswordNew1)
+		if err := us.Update(c.Request().Context(), *u); err != nil {
 			return err
 		}
 
@@ -150,14 +146,14 @@ func PostSettingsChangePassword(DB *sqlx.DB) echo.HandlerFunc {
 	}
 }
 
-func PostSettingsMisc(DB *sqlx.DB) echo.HandlerFunc {
+func PostSettingsMisc(us njudge.Users) echo.HandlerFunc {
 	type request struct {
 		ShowTagsForUnsolved string `form:"showTagsForUnsolved"`
 
 		ShowTagsForUnsolvedBool bool
 	}
 	return func(c echo.Context) error {
-		u := c.Get("user").(*models.User)
+		u := c.Get("user").(*njudge.User)
 
 		data := request{}
 		if err := c.Bind(&data); err != nil {
@@ -167,8 +163,8 @@ func PostSettingsMisc(DB *sqlx.DB) echo.HandlerFunc {
 			data.ShowTagsForUnsolvedBool = true
 		}
 
-		u.ShowUnsolvedTags = data.ShowTagsForUnsolvedBool
-		if _, err := u.Update(c.Request().Context(), DB, boil.Whitelist(models.UserColumns.ShowUnsolvedTags)); err != nil {
+		u.Settings.ShowUnsolvedTags = data.ShowTagsForUnsolvedBool
+		if err := us.Update(c.Request().Context(), *u); err != nil {
 			return err
 		}
 

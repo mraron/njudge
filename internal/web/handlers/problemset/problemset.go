@@ -12,7 +12,6 @@ import (
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
 	"github.com/mraron/njudge/internal/web/helpers/ui"
-	"github.com/mraron/njudge/internal/web/models"
 	"github.com/mraron/njudge/internal/web/services"
 	"github.com/mraron/njudge/pkg/problems"
 )
@@ -271,7 +270,7 @@ func PostSubmit(subService services.SubmitService) echo.HandlerFunc {
 		SubmissionCode string `form:"submissionCode"`
 	}
 	return func(c echo.Context) error {
-		u := c.Get("user").(*models.User)
+		u := c.Get("user").(*njudge.User)
 
 		data := request{}
 		if err := c.Bind(&data); err != nil {

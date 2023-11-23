@@ -209,7 +209,7 @@ func PostProblemTag(tgs services.TagsService) echo.HandlerFunc {
 			return err
 		}
 
-		u := c.Get("user").(*models.User)
+		u := c.Get("user").(*njudge.User)
 		if u == nil {
 			return helpers.UnauthorizedError(c)
 		}
@@ -233,7 +233,7 @@ func DeleteProblemTag(tgs services.TagsService) echo.HandlerFunc {
 			return err
 		}
 
-		u := c.Get("user").(*models.User)
+		u := c.Get("user").(*njudge.User)
 		if u == nil {
 			return helpers.UnauthorizedError(c)
 		}

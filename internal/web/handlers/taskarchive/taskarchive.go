@@ -1,10 +1,12 @@
 package taskarchive
 
 import (
-	"github.com/volatiletech/null/v8"
-	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"net/http"
 
+	"github.com/volatiletech/null/v8"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
+
+	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/web/domain/problem"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
@@ -32,7 +34,7 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		u := c.Get("user").(*models.User)
+		u := c.Get("user").(*njudge.User)
 
 		lst, err := models.ProblemCategories(models.ProblemCategoryWhere.ParentID.IsNull()).All(c.Request().Context(), DB)
 		if err != nil {

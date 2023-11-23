@@ -28,15 +28,15 @@ import (
 func contextFuncs(c echo.Context) template.FuncMap {
 	return template.FuncMap{
 		"logged": func() bool {
-			if _, ok := c.Get("user").(*models.User); ok {
-				return nil != c.Get("user").(*models.User)
+			if _, ok := c.Get("user").(*njudge.User); ok {
+				return nil != c.Get("user").(*njudge.User)
 			}
 
 			return false
 		},
-		"user": func() *models.User {
-			if _, ok := c.Get("user").(*models.User); ok {
-				return c.Get("user").(*models.User)
+		"user": func() *njudge.User {
+			if _, ok := c.Get("user").(*njudge.User); ok {
+				return c.Get("user").(*njudge.User)
 			}
 
 			return nil

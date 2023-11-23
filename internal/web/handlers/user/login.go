@@ -1,52 +1,49 @@
 package user
 
 import (
-	"database/sql"
 	"errors"
 	"net/http"
 
 	"github.com/markbates/goth/gothic"
+	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 
 	"github.com/mraron/njudge/internal/web/helpers"
-	"github.com/mraron/njudge/internal/web/models"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
-	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"golang.org/x/crypto/bcrypt"
 )
 
-var LoginError = errors.New("login error")
+var ErrorLogin = errors.New("login error")
 
 type LoginErrorWithMessage struct {
 	TranslatedMessage string
 }
 
 func (LoginErrorWithMessage) Error() string {
-	return LoginError.Error()
+	return ErrorLogin.Error()
 }
 
 func (LoginErrorWithMessage) Is(target error) bool {
-	return target == LoginError
+	return target == ErrorLogin
 }
 
 var alreadyLoggedInMessage = "You're already logged in..."
 
-type Authenticator func(c echo.Context) (*models.User, error)
+type Authenticator func(c echo.Context) (*njudge.User, error)
 
 func loginUserHandler(auth Authenticator) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		if u := c.Get("user").(*models.User); u != nil {
+		if u := c.Get("user").(*njudge.User); u != nil {
 			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
 		}
 
 		user, err := auth(c)
 		if err != nil {
-			if errors.Is(err, LoginError) {
+			if errors.Is(err, ErrorLogin) {
 				helpers.SetFlash(c, "LoginMessage", err.(LoginErrorWithMessage).TranslatedMessage)
 				return c.Redirect(http.StatusFound, c.Echo().Reverse("getUserLogin"))
 			} else {
@@ -55,7 +52,7 @@ func loginUserHandler(auth Authenticator) echo.HandlerFunc {
 		}
 		defer helpers.DeleteFlash(c, "LoginRedirect")
 
-		if user.ActivationKey.Valid {
+		if !user.ActivationInfo.Activated {
 			helpers.SetFlash(c, "LoginMessage", tr.Translate("The account is not activated. Check your emails!"))
 			return c.Redirect(http.StatusFound, "/user/login")
 		}
@@ -83,7 +80,7 @@ func BeginOAuth() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		if u := c.Get("user").(*models.User); u != nil {
+		if u := c.Get("user").(*njudge.User); u != nil {
 			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
 		}
 
@@ -96,7 +93,7 @@ func GetLogin() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		if u := c.Get("user").(*models.User); u != nil {
+		if u := c.Get("user").(*njudge.User); u != nil {
 			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
 		}
 
@@ -112,13 +109,13 @@ func GetLogin() echo.HandlerFunc {
 	}
 }
 
-func PostLogin(DB *sqlx.DB) echo.HandlerFunc {
+func PostLogin(us njudge.Users) echo.HandlerFunc {
 	type request struct {
 		Name     string `form:"name"`
 		Password string `form:"password"`
 	}
 
-	return loginUserHandler(func(c echo.Context) (*models.User, error) {
+	return loginUserHandler(func(c echo.Context) (*njudge.User, error) {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		data := request{}
@@ -128,9 +125,9 @@ func PostLogin(DB *sqlx.DB) echo.HandlerFunc {
 
 		wrongCredentialsErr := LoginErrorWithMessage{TranslatedMessage: tr.Translate("Wrong credentials.")}
 
-		u, err := models.Users(Where("name=?", data.Name)).One(c.Request().Context(), DB)
+		u, err := us.GetByName(c.Request().Context(), data.Name)
 		if err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
+			if errors.Is(err, njudge.ErrorUserNotFound) {
 				return nil, wrongCredentialsErr
 			}
 
@@ -145,8 +142,8 @@ func PostLogin(DB *sqlx.DB) echo.HandlerFunc {
 	})
 }
 
-func OAuthCallback(DB *sqlx.DB) echo.HandlerFunc {
-	return loginUserHandler(func(c echo.Context) (*models.User, error) {
+func OAuthCallback(us njudge.Users) echo.HandlerFunc {
+	return loginUserHandler(func(c echo.Context) (*njudge.User, error) {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		user, err := gothic.CompleteUserAuth(c.Response(), c.Request())
@@ -154,19 +151,14 @@ func OAuthCallback(DB *sqlx.DB) echo.HandlerFunc {
 			return nil, LoginErrorWithMessage{tr.Translate("Invalid authentication token.")}
 		}
 
-		lst, err := models.Users(Where("email = ?", user.Email)).All(c.Request().Context(), DB)
-		if len(lst) == 0 {
-			return nil, LoginErrorWithMessage{tr.Translate("Your email is not associated with any registered account.")}
-		}
-
-		return lst[0], nil
+		return us.GetByEmail(c.Request().Context(), user.Email)
 	})
 }
 
 func Logout() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
-		if u := c.Get("user").(*models.User); u == nil {
+		if u := c.Get("user").(*njudge.User); u == nil {
 			return c.Render(http.StatusOK, "error.gohtml", tr.Translate("Can't logout if you've not logged in."))
 		}
 

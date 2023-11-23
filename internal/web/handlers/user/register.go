@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"unicode"
 
+	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/njudge/email"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/config"
@@ -26,7 +27,7 @@ type RegistrationPageData struct {
 
 func GetRegister() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if u := c.Get("user").(*models.User); u != nil {
+		if u := c.Get("user").(*njudge.User); u != nil {
 			return c.Render(http.StatusOK, "error", "Már be vagy lépve...")
 		}
 
@@ -55,7 +56,7 @@ func Register(cfg config.Server, DB *sqlx.DB, mailService email.Service) echo.Ha
 			err        error
 		)
 
-		if u := c.Get("user").(*models.User); u != nil {
+		if u := c.Get("user").(*njudge.User); u != nil {
 			return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
 		}
 
@@ -170,7 +171,7 @@ func GetActivateInfo() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		if u := c.Get("user").(*models.User); u != nil {
+		if u := c.Get("user").(*njudge.User); u != nil {
 			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
 		}
 
@@ -191,7 +192,7 @@ func Activate(DB *sqlx.DB) echo.HandlerFunc {
 
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		if u := c.Get("user").(*models.User); u != nil {
+		if u := c.Get("user").(*njudge.User); u != nil {
 			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
 		}
 

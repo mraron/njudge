@@ -1,13 +1,14 @@
 package handlers
 
 import (
+	"html/template"
+	"net/http"
+
 	"github.com/labstack/echo/v4"
+	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/web/helpers/config"
 	"github.com/mraron/njudge/internal/web/helpers/roles"
 	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
-	"github.com/mraron/njudge/internal/web/models"
-	"html/template"
-	"net/http"
 )
 
 func GetHome() echo.HandlerFunc {
@@ -18,7 +19,7 @@ func GetHome() echo.HandlerFunc {
 
 func GetAdmin(cfg config.Server) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := c.Get("user").(*models.User)
+		u := c.Get("user").(*njudge.User)
 		if !roles.Can(roles.Role(u.Role), roles.ActionView, "admin_panel") {
 			return c.Render(http.StatusUnauthorized, "error.gohtml", "Engedély megtagadva.")
 		}

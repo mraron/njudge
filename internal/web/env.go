@@ -47,6 +47,11 @@ func (s *Server) SetupDataAccess() {
 		p := njudge.NewProblem("main", "NT21_Atvagas")
 		p.AddTag(*t, 1)
 
+		u, _ := njudge.NewUser("mraron", "email@email.com", "admin")
+		u.SetPassword("abc")
+		u.Activate()
+		s.Users.Insert(context.Background(), *u)
+
 		s.Problems.Insert(context.Background(), njudge.NewProblem("main", "is1"))
 		s.Problems.Insert(context.Background(), p)
 	} else {

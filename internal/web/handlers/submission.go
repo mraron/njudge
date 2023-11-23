@@ -4,11 +4,11 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/web/domain/submission"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/helpers/roles"
-	"github.com/mraron/njudge/internal/web/models"
 	"github.com/mraron/njudge/internal/web/services"
 )
 
@@ -41,7 +41,7 @@ func RejudgeSubmission(rs services.RejudgeService) echo.HandlerFunc {
 	}
 
 	return func(c echo.Context) error {
-		u := c.Get("user").(*models.User)
+		u := c.Get("user").(*njudge.User)
 		if !roles.Can(roles.Role(u.Role), roles.ActionCreate, "submissions/rejudge") {
 			return helpers.UnauthorizedError(c)
 		}
