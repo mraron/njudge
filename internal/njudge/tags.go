@@ -16,11 +16,12 @@ func NewTag(name string) *Tag {
 }
 
 var (
-	ErrorTagNotFound = errors.New("njudge: user not found")
+	ErrorTagNotFound = errors.New("njudge: tag not found")
 )
 
 type Tags interface {
 	Get(ctx context.Context, ID int) (*Tag, error)
+	GetByName(ctx context.Context, name string) (*Tag, error)
 	GetAll(ctx context.Context) ([]Tag, error)
 	Insert(ctx context.Context, p Tag) (*Tag, error)
 	Delete(ctx context.Context, ID int) error

@@ -35,7 +35,7 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	e.GET("/task_archive", taskarchive.Get(s.DB, s.ProblemStore))
 	*/
 	ps := e.Group("/problemset", problemset.SetNameMiddleware())
-	//ps.GET("/:name/", problemset.GetProblemList(s.DB, services.NewSQLProblemListService(s.DB.DB, s.ProblemStore, services.NewSQLProblem(s.DB.DB, s.ProblemStore)), services.NewSQLProblem(s.DB.DB, s.ProblemStore), services.NewSQLProblem(s.DB.DB, s.ProblemStore)))
+	ps.GET("/:name/", problemset.GetProblemList(s.ProblemStore, s.Problems, s.Categories, s.ProblemListQuery, s.ProblemInfoQuery))
 	/*ps.POST("/:name/submit", problemset.PostSubmit(services.NewSQLSubmitService(s.DB.DB, s.ProblemStore)), user.RequireLoginMiddleware())
 	ps.GET("/status/", problemset.GetStatus(services.NewSQLStatusPageService(s.DB.DB))).Name = "getProblemsetStatus"
 	*/

@@ -73,14 +73,14 @@ var tagify = new Tagify(input, {
         <tbody>
         {{ range $i := .Data.Problems }}
             <tr>
-                <td class="text-center">{{if eq $i.SolvedStatus 3}}<i class="fas fa-check text-success"></i>{{end}}{{if eq $i.SolvedStatus 1}}<i class="fas fa-times text-danger"></i>{{end}}</td>
+                <td class="text-center">{{if $i.UserInfo}}{{if eq $i.UserInfo.SolvedStatus 3}}<i class="fas fa-check text-success"></i>{{end}}{{if eq $i.SolvedStatus 1}}<i class="fas fa-times text-danger"></i>{{end}}{{end}}</td>
                 <td>{{$i.Name}}</td>
                 <td><a href="{{$i.Name}}/">{{(get "translator").TranslateContent $i.Titles}}</a></td>
                 <td>{{if $i.CategoryLink.Text}}<a href="{{$i.CategoryLink.Href}}">{{$i.CategoryLink.Text}}</a>{{end}}</td>
                 <td>
                 {{if or (not logged) (or (eq $i.SolvedStatus 3) user.ShowUnsolvedTags)}}
                 {{range $tag := $i.Tags}}
-                <span class="badge badge-secondary">{{$tag.Name}}</span>
+                <span class="badge badge-secondary">{{$tag.Tag.Name}}</span>
                 {{end}}
                 {{end}}
                 </td>

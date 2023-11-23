@@ -27,15 +27,19 @@ import (
 )
 
 func (s *Server) SetupDataAccess() {
+	s.ProblemStore = problems.NewFsStore(s.ProblemsDir)
+
 	if s.Mode == "demo" {
 		s.PartialsStore = partials.Empty{}
 
+		s.Categories = memory.NewCategories()
 		s.Tags = memory.NewTags()
 		s.Problems = memory.NewProblems()
 		s.Submissions = memory.NewSubmissions()
 		s.Users = memory.NewUsers()
 		s.ProblemQuery = memory.NewProblemQuery(s.Problems)
 		s.ProblemInfoQuery = memory.NewProblemInfoQuery(s.Submissions)
+		s.ProblemListQuery = memory.NewProblemListQuery(s.ProblemStore, s.Problems, s.Tags, s.Categories)
 
 		t := njudge.NewTag("constructive")
 		t, _ = s.Tags.Insert(context.Background(), *t)
@@ -73,7 +77,6 @@ func (s *Server) SetupEnvironment() {
 	s.SetupDataAccess()
 	s.Keys.MustParse()
 
-	s.ProblemStore = problems.NewFsStore(s.ProblemsDir)
 	if s.SMTP.Enabled {
 		port, err := strconv.Atoi(s.SMTP.MailServerPort)
 		if err != nil {
@@ -157,7 +160,7 @@ func (s *Server) setupEcho() {
 		err   error
 	)
 
-	if s.Mode == "development" {
+	if s.Mode == "development" || s.Mode == "production" {
 		store, err = pgstore.NewPGStoreFromPool(s.DB.DB, []byte(s.CookieSecret))
 		if err != nil {
 			panic(err)

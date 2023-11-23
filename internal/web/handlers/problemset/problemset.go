@@ -7,9 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
-	"github.com/mraron/njudge/internal/web/domain/problem"
+	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
 	"github.com/mraron/njudge/internal/web/helpers/ui"
@@ -24,14 +23,17 @@ type CategoryFilterOption struct {
 	Selected bool
 }
 
-type StatProblem struct {
-	problem.Problem
-	problem.StatsData
+type Problem struct {
+	njudge.Problem
+	njudge.ProblemStoredData
+	njudge.ProblemInfo
+
+	CategoryLink ui.Link
 }
 
 type ProblemList struct {
 	Pages        []pagination.Link
-	Problems     []StatProblem
+	Problems     []Problem
 	SolverSorter ui.SortColumn
 
 	Filtered bool
@@ -41,11 +43,11 @@ type ProblemList struct {
 	CategoryFilterOptions []CategoryFilterOption
 }
 
-func GetProblemList(DB *sqlx.DB, problemListService services.ProblemListService, problemRepo problem.Repository, problemStatsService services.ProblemStatsService) echo.HandlerFunc {
+func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categories, problemListQuery njudge.ProblemListQuery, pinfo njudge.ProblemInfoQuery) echo.HandlerFunc {
 	type request struct {
 		Page  int `query:"page"`
-		Order string
-		By    string
+		Order njudge.SortDirection
+		By    njudge.ProblemSortField
 
 		TitleFilter    string `query:"title"`
 		CategoryFilter int    `query:"category"`
@@ -64,24 +66,21 @@ func GetProblemList(DB *sqlx.DB, problemListService services.ProblemListService,
 			data.Page = 1
 		}
 
-		data.Order, data.By = "DESC", "id"
+		data.Order, data.By = njudge.SortDESC, njudge.ProblemSortFieldID
 		if c.QueryParam("by") == "solver_count" {
-			data.By = "solver_count"
+			data.By = njudge.ProblemSortFieldSolverCount
 		}
 		if c.QueryParam("order") == "ASC" {
-			data.Order = "ASC"
+			data.Order = njudge.SortASC
 		}
 
-		listRequest := services.ProblemListRequest{
-			Problemset: data.Problemset,
-			Pagination: pagination.Data{
-				Page:      data.Page,
-				PerPage:   20,
-				SortDir:   data.Order,
-				SortField: data.By,
-			},
+		listRequest := njudge.ProblemListRequest{
+			Problemset:  data.Problemset,
+			Page:        data.Page,
+			PerPage:     20,
+			SortDir:     data.Order,
+			SortField:   data.By,
 			TitleFilter: data.TitleFilter,
-			GETData:     c.Request().URL.Query(),
 		}
 
 		if data.TagFilter != "" {
@@ -90,33 +89,40 @@ func GetProblemList(DB *sqlx.DB, problemListService services.ProblemListService,
 
 		if data.CategoryFilter != 0 {
 			if data.CategoryFilter == -1 {
-				listRequest.CategoryFilter = problem.NewCategoryEmptyFilter()
+				listRequest.CategoryFilter = njudge.NewCategoryEmptyFilter()
 			} else {
-				listRequest.CategoryFilter = problem.NewCategoryIDFilter(data.CategoryFilter)
+				listRequest.CategoryFilter = njudge.NewCategoryIDFilter(data.CategoryFilter)
 			}
 		}
 
-		problemList, err := problemListService.GetProblemList(c.Request().Context(), listRequest)
+		problemList, err := problemListQuery.GetProblemList(c.Request().Context(), listRequest)
 		if err != nil {
 			return err
 		}
 
 		result := ProblemList{
-			Pages: problemList.Pages,
+			//TODO
+			Pages: nil,
+			//Pages: problemList.PaginationData.Pages,
 		}
 		for ind := range problemList.Problems {
-			p, err := problemRepo.Get(c.Request().Context(), problemList.Problems[ind].ID)
+			p, err := ps.Get(c.Request().Context(), problemList.Problems[ind].ID)
 			if err != nil {
 				return err
 			}
-			stat, err := problemStatsService.GetStatsData(c.Request().Context(), *p, c.Get("userID").(int))
+			info, err := pinfo.GetProblemData(c.Request().Context(), p.ID, c.Get("userID").(int))
+			if err != nil {
+				return err
+			}
+			data, err := p.WithStoredData(store)
 			if err != nil {
 				return err
 			}
 
-			result.Problems = append(result.Problems, StatProblem{
-				Problem:   *p,
-				StatsData: *stat,
+			result.Problems = append(result.Problems, Problem{
+				Problem:           *p,
+				ProblemInfo:       *info,
+				ProblemStoredData: data,
 			})
 		}
 
@@ -155,7 +161,7 @@ func GetProblemList(DB *sqlx.DB, problemListService services.ProblemListService,
 			Selected: emptySelected,
 		})
 
-		categories, err := models.ProblemCategories().All(c.Request().Context(), DB)
+		categories, err := cs.GetAll(c.Request().Context())
 		if err != nil {
 			return err
 		}

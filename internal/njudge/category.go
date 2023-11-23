@@ -1,9 +1,25 @@
 package njudge
 
+import (
+	"context"
+	"errors"
+
+	"github.com/volatiletech/null/v8"
+)
+
 type Category struct {
 	ID       int
 	Name     string
-	ParentID int
+	ParentID null.Int
+}
+
+var (
+	ErrorCategoryNotFound = errors.New("njudge: category not found")
+)
+
+type Categories interface {
+	GetAll(ctx context.Context) ([]Category, error)
+	Insert(ctx context.Context, c Category) (*Category, error)
 }
 
 type CategoryFilterType int

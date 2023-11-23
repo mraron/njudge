@@ -36,7 +36,6 @@ func (p *ProblemInfoQuery) GetProblemData(ctx context.Context, problemID int, us
 			userSolved[submissions[ind].UserID] = struct{}{}
 		}
 	}
-	res.SolverCount = len(userSolved)
 
 	if userID > 0 {
 		res.UserInfo.SolvedStatus = njudge.Unattempted

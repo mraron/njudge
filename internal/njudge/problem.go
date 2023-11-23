@@ -22,15 +22,25 @@ var (
 )
 
 type Problem struct {
-	ID         int
-	Problemset string
-	Problem    string
-	Category   *Category
-	Tags       []ProblemTag
+	ID          int
+	Problemset  string
+	Problem     string
+	Category    *Category
+	SolverCount int
+
+	Tags []ProblemTag
 }
 
 func NewProblem(problemset, problem string) Problem {
-	return Problem{0, problemset, problem, nil, nil}
+	return Problem{
+		ID:          0,
+		Problemset:  problemset,
+		Problem:     problem,
+		Category:    nil,
+		SolverCount: 0,
+
+		Tags: nil,
+	}
 }
 
 func (p *Problem) SetCategory(c Category) {
@@ -149,8 +159,7 @@ type ProblemUserInfo struct {
 }
 
 type ProblemInfo struct {
-	SolverCount int
-	UserInfo    *ProblemUserInfo
+	UserInfo *ProblemUserInfo
 }
 
 type ProblemInfoQuery interface {

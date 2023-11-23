@@ -44,7 +44,7 @@ func New(cfg config.Server, problemStore problems.Store, tags njudge.Tags, parti
 		log.Println("template parsing error:", err)
 	}
 
-	if cfg.Mode == "development" {
+	if cfg.Mode == "development" || cfg.Mode == "demo" {
 		renderer.startWatcher()
 	}
 
