@@ -1,10 +1,7 @@
 package templates
 
 import (
-	"database/sql"
 	"fmt"
-	"github.com/fsnotify/fsnotify"
-	"github.com/mraron/njudge/internal/web/templates"
 	"html/template"
 	"io"
 	"io/fs"
@@ -13,6 +10,10 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+
+	"github.com/fsnotify/fsnotify"
+	"github.com/mraron/njudge/internal/njudge"
+	"github.com/mraron/njudge/internal/web/templates"
 
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/web/helpers/config"
@@ -24,18 +25,18 @@ type Renderer struct {
 	templates     map[string]*template.Template
 	cfg           config.Server
 	problemStore  problems.Store
-	db            *sql.DB
+	tags          njudge.Tags
 	partialsStore partials.Store
 
 	sync.RWMutex
 }
 
-func New(cfg config.Server, problemStore problems.Store, db *sql.DB, partialsStore partials.Store) *Renderer {
+func New(cfg config.Server, problemStore problems.Store, tags njudge.Tags, partialsStore partials.Store) *Renderer {
 	renderer := &Renderer{
 		templates:     make(map[string]*template.Template),
 		cfg:           cfg,
 		problemStore:  problemStore,
-		db:            db,
+		tags:          tags,
 		partialsStore: partialsStore,
 	}
 
@@ -113,7 +114,7 @@ func (t *Renderer) Update() error {
 			} else {
 				tmpl, err := template.New(info.Name()).
 					Funcs(contextFuncs(nil)).
-					Funcs(statelessFuncs(t.problemStore, t.db, t.partialsStore)).
+					Funcs(statelessFuncs(t.problemStore, t.tags, t.partialsStore)).
 					ParseFS(usedFS, append(layoutFiles, path)...)
 
 				if err != nil {

@@ -2,6 +2,7 @@ package problemset
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"mime"
 	"net/http"
@@ -42,25 +43,30 @@ func GetProblem() echo.HandlerFunc {
 
 func GetProblemPDF() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		p := c.Get("problem").(problem.Problem)
+		sdata := c.Get("problemStoredData").(njudge.ProblemStoredData)
 
 		lang := c.Param("language")
 
-		dat, err := p.GetPDF(lang)
+		r, err := sdata.GetPDF(njudge.Language(lang))
 		if err != nil {
 			return err
 		}
 
-		return c.Blob(http.StatusOK, "application/pdf", dat)
+		data, err := io.ReadAll(r)
+		if err != nil {
+			return err
+		}
+
+		return c.Blob(http.StatusOK, "application/pdf", data)
 	}
 }
 
 func GetProblemFile() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		p := c.Get("problem").(problem.Problem)
+		sdata := c.Get("problemStoredData").(njudge.ProblemStoredData)
 
-		fileLoc, err := p.GetFile(c.Param("file"))
-		if err == problem.ErrorFileNotFound {
+		fileLoc, err := sdata.GetFile(c.Param("file"))
+		if errors.Is(err, njudge.ErrorFileNotFound) {
 			return echo.NewHTTPError(http.StatusNotFound, err)
 		} else if err != nil {
 			return err
@@ -72,11 +78,11 @@ func GetProblemFile() echo.HandlerFunc {
 
 func GetProblemAttachment() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		p := c.Get("problem").(problem.Problem)
+		sdata := c.Get("problemStoredData").(njudge.ProblemStoredData)
 		attachment := c.Param("attachment")
 
-		val, err := p.GetAttachment(attachment)
-		if err == problem.ErrorFileNotFound {
+		val, err := sdata.GetAttachment(attachment)
+		if errors.Is(err, njudge.ErrorFileNotFound) {
 			return echo.NewHTTPError(http.StatusNotFound, err)
 		} else if err != nil {
 			return err

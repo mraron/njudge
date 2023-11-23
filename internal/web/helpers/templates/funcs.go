@@ -3,7 +3,6 @@ package templates
 import (
 	"context"
 	"crypto/md5"
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -65,7 +64,7 @@ func contextFuncs(c echo.Context) template.FuncMap {
 	}
 }
 
-func statelessFuncs(store problems.Store, db *sql.DB, store2 partials.Store) template.FuncMap {
+func statelessFuncs(store problems.Store, tags njudge.Tags, store2 partials.Store) template.FuncMap {
 	return template.FuncMap{
 		"translateContent": i18n.TranslateContent,
 		"problem":          store.Get,
@@ -137,11 +136,7 @@ func statelessFuncs(store problems.Store, db *sql.DB, store2 partials.Store) tem
 			return math.Round(num*100) / 100
 		},
 		"tags": func() ([]njudge.Tag, error) {
-			//@TODO
-			return []njudge.Tag{
-				{1, "dp"},
-				{2, "greedy"},
-			}, nil
+			return tags.GetAll(context.Background())
 		},
 		"contextTODO": func() context.Context {
 			return context.TODO()
