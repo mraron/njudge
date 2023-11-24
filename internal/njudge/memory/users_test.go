@@ -51,3 +51,24 @@ func TestUsers(t *testing.T) {
 	_, err = m.GetByName(context.TODO(), "mraron")
 	assert.Nil(t, err)
 }
+
+func TestUsersUnique(t *testing.T) {
+	u1, err := njudge.NewUser("mraron", "asd@bsd.com", "user")
+	assert.Nil(t, err)
+	u2, err := njudge.NewUser("mraron", "csd@bsd.com", "user")
+	assert.Nil(t, err)
+
+	m := memory.NewUsers()
+	_, err = m.Insert(context.TODO(), *u1)
+	assert.Nil(t, err)
+	_, err = m.Insert(context.TODO(), *u2)
+	assert.Error(t, err)
+
+	m = memory.NewUsers()
+	u2.Name = "mraron2"
+	u2.Email = u1.Email
+	_, err = m.Insert(context.TODO(), *u1)
+	assert.Nil(t, err)
+	_, err = m.Insert(context.TODO(), *u2)
+	assert.Error(t, err)
+}

@@ -22,11 +22,11 @@ type UserActivationInfo struct {
 	Key       string
 }
 
-func GenerateActivationKey() UserActivationInfo {
+func genRandBytes(l int) []byte {
 	// TODO: move NewSource to rand.go as an init() func
 	var (
 		alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678901234567890123456789"
-		ans      = make([]byte, 32)
+		ans      = make([]byte, l)
 	)
 
 	src := rand.NewSource(time.Now().UnixNano())
@@ -34,6 +34,12 @@ func GenerateActivationKey() UserActivationInfo {
 	for i := 0; i < 32; i++ {
 		ans[i] = alphabet[(int(src.Int63()))%len(alphabet)]
 	}
+
+	return ans
+}
+
+func GenerateActivationKey() UserActivationInfo {
+	ans := genRandBytes(32)
 
 	return UserActivationInfo{
 		Activated: false,
@@ -45,22 +51,42 @@ type UserSettings struct {
 	ShowUnsolvedTags bool
 }
 
+type ForgottenPasswordKey struct {
+	UserID     int
+	Key        string
+	ValidUntil time.Time
+}
+
+func NewForgottenPasswordKey(validDuration time.Duration) ForgottenPasswordKey {
+	return ForgottenPasswordKey{
+		Key:        string(genRandBytes(32)),
+		ValidUntil: time.Now().Add(validDuration),
+	}
+}
+
+func (f *ForgottenPasswordKey) IsValid() bool {
+	return time.Now().Before(f.ValidUntil)
+}
+
 type User struct {
-	ID             int
-	Name           string
-	Password       HashedPassword
-	Email          string
-	ActivationInfo UserActivationInfo
-	Role           string
-	Points         float64
-	Settings       UserSettings
-	Created        time.Time
+	ID                   int
+	Name                 string
+	Password             HashedPassword
+	Email                string
+	ActivationInfo       UserActivationInfo
+	Role                 string
+	Points               float64
+	Settings             UserSettings
+	Created              time.Time
+	ForgottenPasswordKey *ForgottenPasswordKey
 }
 
 var (
 	ErrorNonAlphanumeric = errors.New("njudge: string is not alphanumeric")
 	ErrorFieldRequired   = errors.New("njudge: field must not be empty")
 	ErrorUnknownRole     = errors.New("njudge: unknown role")
+	ErrorSameName        = errors.New("njudge: name already in use")
+	ErrorSameEmail       = errors.New("njudge: email already in use")
 )
 
 func isAlphanumeric(s string) bool {
@@ -111,6 +137,15 @@ func (u *User) SetPassword(password string) error {
 func (u *User) Activate() {
 	u.ActivationInfo.Activated = true
 	u.ActivationInfo.Key = ""
+}
+
+func (u *User) SetForgottenPasswordKey(fpkey ForgottenPasswordKey) {
+	u.ForgottenPasswordKey = &fpkey
+	u.ForgottenPasswordKey.UserID = u.ID
+}
+
+func (u *User) DeleteForgottenPasswordKey() {
+	u.ForgottenPasswordKey = nil
 }
 
 func (u *User) AuthenticatePassword(password string) bool {

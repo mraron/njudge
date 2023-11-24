@@ -42,6 +42,8 @@ type Server struct {
 	ProblemQuery     njudge.ProblemQuery
 	ProblemListQuery njudge.ProblemListQuery
 
+	RegisterService njudge.RegisterService
+
 	e *echo.Echo
 }
 

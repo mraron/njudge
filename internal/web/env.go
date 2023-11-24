@@ -41,6 +41,8 @@ func (s *Server) SetupDataAccess() {
 		s.ProblemInfoQuery = memory.NewProblemInfoQuery(s.Submissions)
 		s.ProblemListQuery = memory.NewProblemListQuery(s.ProblemStore, s.Problems, s.Tags, s.Categories)
 
+		s.RegisterService = njudge.NewRegisterService(s.Users)
+
 		t := njudge.NewTag("constructive")
 		t, _ = s.Tags.Insert(context.Background(), *t)
 

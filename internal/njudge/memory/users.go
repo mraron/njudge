@@ -33,11 +33,26 @@ func (m *Users) Get(ctx context.Context, ID int) (*njudge.User, error) {
 	return nil, njudge.ErrorUserNotFound
 }
 
+func (m *Users) getByName(ctx context.Context, name string) (*njudge.User, error) {
+	for ind := range m.data {
+		if m.data[ind].Name == name {
+			res := m.data[ind]
+			return &res, nil
+		}
+	}
+
+	return nil, njudge.ErrorUserNotFound
+}
+
 func (m *Users) GetByName(ctx context.Context, name string) (*njudge.User, error) {
 	m.Lock()
 	defer m.Unlock()
+	return m.getByName(ctx, name)
+}
+
+func (m *Users) getByEmail(ctx context.Context, email string) (*njudge.User, error) {
 	for ind := range m.data {
-		if m.data[ind].Name == name {
+		if m.data[ind].Email == email {
 			res := m.data[ind]
 			return &res, nil
 		}
@@ -49,19 +64,20 @@ func (m *Users) GetByName(ctx context.Context, name string) (*njudge.User, error
 func (m *Users) GetByEmail(ctx context.Context, email string) (*njudge.User, error) {
 	m.Lock()
 	defer m.Unlock()
-	for ind := range m.data {
-		if m.data[ind].Email == email {
-			res := m.data[ind]
-			return &res, nil
-		}
-	}
-
-	return nil, njudge.ErrorUserNotFound
+	return m.getByEmail(ctx, email)
 }
 
 func (m *Users) Insert(ctx context.Context, u njudge.User) (*njudge.User, error) {
 	m.Lock()
 	defer m.Unlock()
+
+	if _, err := m.getByName(ctx, u.Name); err == nil {
+		return nil, njudge.ErrorSameName
+	}
+	if _, err := m.getByEmail(ctx, u.Email); err == nil {
+		return nil, njudge.ErrorSameEmail
+	}
+
 	u.ID = m.nextId
 	m.nextId++
 	m.data = append(m.data, u)

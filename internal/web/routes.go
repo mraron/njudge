@@ -63,14 +63,14 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	u.POST("/login", user.PostLogin(s.Users))
 	u.GET("/logout", user.Logout())
 	u.GET("/register", user.GetRegister())
-	u.POST("/register", user.Register(s.Server, s.DB, s.MailService))
+	u.POST("/register", user.Register(s.Server, s.RegisterService, s.MailService))
 	u.GET("/activate", user.GetActivateInfo())
-	u.GET("/activate/:name/:key", user.Activate(s.DB))
+	u.GET("/activate/:name/:key", user.Activate(s.Users))
 
 	u.GET("/forgotten_password", user.GetForgottenPassword()).Name = "GetForgottenPassword"
-	u.POST("/forgotten_password", user.PostForgottenPassword(s.Server, s.DB, s.MailService))
-	u.GET("/forgotten_password_form/:name/:key", user.GetForgottenPasswordForm(s.DB)).Name = "GetForgottenPasswordForm"
-	u.POST("/forgotten_password_form", user.PostForgottenPasswordForm(s.DB)).Name = "PostForgottenPasswordForm"
+	u.POST("/forgotten_password", user.PostForgottenPassword(s.Server, s.Users, s.MailService))
+	u.GET("/forgotten_password_form/:name/:key", user.GetForgottenPasswordForm()).Name = "GetForgottenPasswordForm"
+	u.POST("/forgotten_password_form", user.PostForgottenPasswordForm(s.Users)).Name = "PostForgottenPasswordForm"
 
 	pr := u.Group("/profile", profile.SetProfileMiddleware(s.DB))
 	pr.GET("/:name/", profile.GetProfile(s.DB))
