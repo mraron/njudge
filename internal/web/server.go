@@ -33,16 +33,18 @@ type Server struct {
 	MailService   email.Service
 	PartialsStore partials.Store
 
-	Categories       njudge.Categories
-	Tags             njudge.Tags
-	Problems         njudge.Problems
-	Users            njudge.Users
-	Submissions      njudge.Submissions
-	ProblemInfoQuery njudge.ProblemInfoQuery
-	ProblemQuery     njudge.ProblemQuery
-	ProblemListQuery njudge.ProblemListQuery
+	Categories          njudge.Categories
+	Tags                njudge.Tags
+	Problems            njudge.Problems
+	Users               njudge.Users
+	Submissions         njudge.Submissions
+	ProblemInfoQuery    njudge.ProblemInfoQuery
+	ProblemQuery        njudge.ProblemQuery
+	ProblemListQuery    njudge.ProblemListQuery
+	SubmissionListQuery njudge.SubmissionListQuery
 
 	RegisterService njudge.RegisterService
+	SubmitService   njudge.SubmitService
 
 	e *echo.Echo
 }

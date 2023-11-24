@@ -25,17 +25,21 @@ type Renderer struct {
 	templates     map[string]*template.Template
 	cfg           config.Server
 	problemStore  problems.Store
+	users         njudge.Users
+	problems      njudge.Problems
 	tags          njudge.Tags
 	partialsStore partials.Store
 
 	sync.RWMutex
 }
 
-func New(cfg config.Server, problemStore problems.Store, tags njudge.Tags, partialsStore partials.Store) *Renderer {
+func New(cfg config.Server, problemStore problems.Store, users njudge.Users, ps njudge.Problems, tags njudge.Tags, partialsStore partials.Store) *Renderer {
 	renderer := &Renderer{
 		templates:     make(map[string]*template.Template),
 		cfg:           cfg,
 		problemStore:  problemStore,
+		users:         users,
+		problems:      ps,
 		tags:          tags,
 		partialsStore: partialsStore,
 	}
@@ -114,7 +118,7 @@ func (t *Renderer) Update() error {
 			} else {
 				tmpl, err := template.New(info.Name()).
 					Funcs(contextFuncs(nil)).
-					Funcs(statelessFuncs(t.problemStore, t.tags, t.partialsStore)).
+					Funcs(statelessFuncs(t.problemStore, t.users, t.problems, t.tags, t.partialsStore)).
 					ParseFS(usedFS, append(layoutFiles, path)...)
 
 				if err != nil {

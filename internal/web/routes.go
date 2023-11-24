@@ -31,25 +31,26 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 
 	e.Static("/static", "static")
 
-	/*e.GET("/submission/:id", handlers.GetSubmission(services.NewSQLSubmission(s.DB.DB))).Name = "getSubmission"
-	e.GET("/submission/rejudge/:id", handlers.RejudgeSubmission(services.NewSQLSubmission(s.DB.DB)), user.RequireLoginMiddleware()).Name = "rejudgeSubmission"
-	e.GET("/task_archive", taskarchive.Get(s.DB, s.ProblemStore))
-	*/
+	e.GET("/submission/:id", handlers.GetSubmission(s.Submissions)).Name = "getSubmission"
+	e.GET("/submission/rejudge/:id", handlers.RejudgeSubmission(s.Submissions), user.RequireLoginMiddleware()).Name = "rejudgeSubmission"
+	/*e.GET("/task_archive", taskarchive.Get(s.DB, s.ProblemStore))
+	 */
 	ps := e.Group("/problemset", problemset.SetNameMiddleware())
 	ps.GET("/:name/", problemset.GetProblemList(s.ProblemStore, s.Problems, s.Categories, s.ProblemListQuery, s.ProblemInfoQuery))
-	/*ps.POST("/:name/submit", problemset.PostSubmit(services.NewSQLSubmitService(s.DB.DB, s.ProblemStore)), user.RequireLoginMiddleware())
-	ps.GET("/status/", problemset.GetStatus(services.NewSQLStatusPageService(s.DB.DB))).Name = "getProblemsetStatus"
-	*/
+	ps.POST("/:name/submit", problemset.PostSubmit(s.SubmitService), user.RequireLoginMiddleware())
+	ps.GET("/status/", problemset.GetStatus(s.SubmissionListQuery)).Name = "getProblemsetStatus"
+
 	psProb := ps.Group("/:name/:problem", problemset.RenameProblemMiddleware(s.ProblemStore),
 		problemset.SetProblemMiddleware(s.ProblemStore, s.ProblemQuery, s.ProblemInfoQuery))
 	psProb.GET("/", problemset.GetProblem()).Name = "getProblemMain"
 	psProb.GET("/problem", problemset.GetProblem())
-	/*psProb.GET("/status", problemset.GetProblemStatus(services.NewSQLStatusPageService(s.DB.DB)))
+	psProb.GET("/status", problemset.GetProblemStatus(s.SubmissionListQuery, s.ProblemStore))
 	psProb.GET("/submit", problemset.GetProblemSubmit())
-	psProb.GET("/ranklist", problemset.GetProblemRanklist(s.DB))
-	psProb.POST("/tags", problemset.PostProblemTag(services.NewSQLTagsService(s.DB.DB)))
-	psProb.GET("/delete_tag/:id", problemset.DeleteProblemTag(services.NewSQLTagsService(s.DB.DB)))
-	*/
+	psProb.GET("/ranklist", problemset.GetProblemRanklist(s.SubmissionListQuery))
+
+	psProb.POST("/tags", problemset.PostProblemTag(s.Tags, s.Problems))
+	psProb.GET("/delete_tag/:id", problemset.DeleteProblemTag(s.Tags, s.Problems))
+
 	psProb.GET("/pdf/:language/", problemset.GetProblemPDF())
 	psProb.GET("/attachment/:attachment/", problemset.GetProblemAttachment())
 	psProb.GET("/:file", problemset.GetProblemFile())
@@ -72,9 +73,9 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	u.GET("/forgotten_password_form/:name/:key", user.GetForgottenPasswordForm()).Name = "GetForgottenPasswordForm"
 	u.POST("/forgotten_password_form", user.PostForgottenPasswordForm(s.Users)).Name = "PostForgottenPasswordForm"
 
-	pr := u.Group("/profile", profile.SetProfileMiddleware(s.DB))
-	pr.GET("/:name/", profile.GetProfile(s.DB))
-	//pr.GET("/:name/submissions/", profile.GetSubmissions(services.NewSQLStatusPageService(s.DB.DB)))
+	pr := u.Group("/profile", profile.SetProfileMiddleware(s.Users))
+	pr.GET("/:name/", profile.GetProfile(s.SubmissionListQuery))
+	pr.GET("/:name/submissions/", profile.GetSubmissions(s.SubmissionListQuery))
 
 	prs := pr.Group("/:name/settings", user.RequireLoginMiddleware(), profile.PrivateMiddleware())
 	prs.GET("/", profile.GetSettings())

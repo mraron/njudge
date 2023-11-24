@@ -25,6 +25,7 @@ type Submission struct {
 	Submitted time.Time
 	Status    problems.Status
 	Judged    null.Time
+	Score     float32
 }
 
 func NewSubmission(u User, p Problem, language language.Language) (*Submission, error) {
@@ -52,6 +53,19 @@ func (s *Submission) SetSource(src []byte) {
 	s.Source = src
 }
 
+func (s *Submission) MarkForRejudge() {
+	s.Judged.Valid = false
+	s.Started = false
+}
+
+func (s *Submission) GetUser(ctx context.Context, us Users) (*User, error) {
+	return us.Get(ctx, s.UserID)
+}
+
+func (s *Submission) GetProblem(ctx context.Context, ps Problems) (*Problem, error) {
+	return ps.Get(ctx, s.ProblemID)
+}
+
 var ErrorSubmissionNotFound = errors.New("njudge: submission not found")
 
 type Submissions interface {
@@ -60,4 +74,18 @@ type Submissions interface {
 	Insert(ctx context.Context, s Submission) (*Submission, error)
 	Delete(ctx context.Context, ID int) error
 	Update(ctx context.Context, s Submission) error
+}
+
+var ErrorUnsupportedLanguage = errors.New("njudge: unsupported language")
+
+type SubmitRequest struct {
+	UserID     int
+	Problemset string
+	Problem    string
+	Language   string
+	Source     []byte
+}
+
+type SubmitService interface {
+	Submit(ctx context.Context, subRequest SubmitRequest) (*Submission, error)
 }

@@ -7,20 +7,14 @@ import (
 	"mime"
 	"net/http"
 	"path/filepath"
-	"sort"
 	"strconv"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/njudge"
-	"github.com/mraron/njudge/internal/web/domain/problem"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
-	"github.com/mraron/njudge/internal/web/models"
-	"github.com/mraron/njudge/internal/web/services"
 	"github.com/mraron/njudge/pkg/problems"
-	"github.com/volatiletech/sqlboiler/v4/queries"
 )
 
 func GetProblem() echo.HandlerFunc {
@@ -106,29 +100,41 @@ func GetProblemAttachment() echo.HandlerFunc {
 	}
 }
 
-func GetProblemRanklist(DB *sqlx.DB) echo.HandlerFunc {
+func GetProblemRanklist(slist njudge.SubmissionListQuery) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		problemset, problemName := c.Param("name"), c.Param("problem")
-		prob := c.Get("problem").(problem.Problem)
+		prob := c.Get("problem").(njudge.Problem)
+		sdata := c.Get("problemStoredData").(njudge.ProblemStoredData)
 
-		sbs := make([]*models.Submission, 0)
-
-		//@TODO something better?
-		if err := queries.Raw("SELECT DISTINCT ON (s1.user_id) s1.* FROM (SELECT s1.user_id, MAX(s1.score) as score FROM submissions s1 WHERE problemset=$1 AND problem=$2 GROUP BY s1.user_id) s2 INNER JOIN submissions s1 ON s1.user_id=s2.user_id AND s1.score=s2.score AND s1.problemset=$1 AND s1.problem=$2", problemset, problemName).Bind(c.Request().Context(), DB, &sbs); err != nil {
+		submissions, err := slist.GetSubmissionList(c.Request().Context(), njudge.SubmissionListRequest{
+			Problemset: problemset,
+			Problem:    problemName,
+			SortDir:    njudge.SortDESC,
+			SortField:  njudge.SubmissionSortFieldScore,
+		})
+		if err != nil {
 			return err
 		}
 
-		sort.Slice(sbs, func(i, j int) bool {
-			return sbs[i].Score.Float32 > sbs[j].Score.Float32
-		})
+		hadUser := make(map[int]bool)
+		res := make([]njudge.Submission, 0)
+		for ind := range submissions.Submissions {
+			if _, ok := hadUser[submissions.Submissions[ind].UserID]; ok {
+				continue
+			}
 
-		c.Set("title", tr.Translate("Results - %s (%s)", tr.TranslateContent(prob.Titles()).String(), prob.Name()))
+			res = append(res, submissions.Submissions[ind])
+			hadUser[submissions.Submissions[ind].UserID] = true
+		}
+
+		c.Set("title", tr.Translate("Results - %s (%s)", tr.TranslateContent(sdata.Titles()).String(), sdata.Name()))
 		return c.Render(http.StatusOK, "problemset/problem/ranklist", struct {
-			Problem     problem.Problem
-			Submissions []*models.Submission
-		}{prob, sbs})
+			Problem           njudge.Problem
+			ProblemStoredData njudge.ProblemStoredData
+			Submissions       []njudge.Submission
+		}{prob, sdata, res})
 	}
 }
 
@@ -136,18 +142,20 @@ func GetProblemSubmit() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		prob := c.Get("problem").(problem.Problem)
-		stats := c.Get("problemStats").(problem.StatsData)
+		p := c.Get("problem").(njudge.Problem)
+		prob := c.Get("problemStoredData").(njudge.ProblemStoredData)
+		info := c.Get("problemInfo").(njudge.ProblemInfo)
 
 		c.Set("title", tr.Translate("Submit - %s (%s)", tr.TranslateContent(prob.Titles()).String(), prob.Name()))
 		return c.Render(http.StatusOK, "problemset/problem/submit", struct {
-			problem.Problem
-			problem.StatsData
-		}{Problem: prob, StatsData: stats})
+			njudge.Problem
+			njudge.ProblemStoredData
+			njudge.ProblemInfo
+		}{Problem: p, ProblemStoredData: prob, ProblemInfo: info})
 	}
 }
 
-func GetProblemStatus(statusPageService services.StatusPageService) echo.HandlerFunc {
+func GetProblemStatus(slist njudge.SubmissionListQuery, pstore problems.Store) echo.HandlerFunc {
 	type request struct {
 		AC     string `query:"ac"`
 		UserID int    `query:"user_id"`
@@ -159,7 +167,11 @@ func GetProblemStatus(statusPageService services.StatusPageService) echo.Handler
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		prob := c.Get("problem").(problem.Problem)
+		prob := c.Get("problem").(njudge.Problem)
+		sdata, err := prob.WithStoredData(pstore)
+		if err != nil {
+			return err
+		}
 
 		data := request{}
 		if err := c.Bind(&data); err != nil {
@@ -170,36 +182,46 @@ func GetProblemStatus(statusPageService services.StatusPageService) echo.Handler
 			data.Page = 1
 		}
 
-		statusReq := services.StatusPageRequest{
-			Pagination: pagination.Data{
-				Page:      data.Page,
-				PerPage:   20,
-				SortDir:   "DESC",
-				SortField: "id",
-			},
+		statusReq := njudge.SubmissionListRequest{
+
+			Page:      data.Page,
+			PerPage:   20,
+			SortDir:   njudge.SortDESC,
+			SortField: njudge.SubmissionSortFieldID,
+
 			Problemset: data.Problemset,
 			Problem:    data.Problem,
 
-			UserID:    0,
-			GETValues: c.Request().URL.Query(),
+			UserID: 0,
 		}
 
 		if data.AC == "1" {
-			ac := problems.VerdictAC
+			ac := njudge.VerdictAC
 			statusReq.Verdict = &ac
 		}
 
-		statusPage, err := statusPageService.GetStatusPage(c.Request().Context(), statusReq)
+		submissionList, err := slist.GetPagedSubmissionList(c.Request().Context(), statusReq)
 		if err != nil {
 			return err
 		}
 
-		c.Set("title", tr.Translate("Submissions - %s (%s)", tr.TranslateContent(prob.Titles()).String(), prob.Name()))
-		return c.Render(http.StatusOK, "problemset/problem/status", statusPage)
+		qu := (*c.Request().URL).Query()
+		links, err := pagination.Links(submissionList.PaginationData.Page, submissionList.PaginationData.PerPage, int64(submissionList.PaginationData.Count), qu)
+		if err != nil {
+			return err
+		}
+
+		result := StatusPage{
+			Submissions: submissionList.Submissions,
+			Pages:       links,
+		}
+
+		c.Set("title", tr.Translate("Submissions - %s (%s)", tr.TranslateContent(sdata.Titles()).String(), sdata.Name()))
+		return c.Render(http.StatusOK, "problemset/problem/status", result)
 	}
 }
 
-func PostProblemTag(tgs services.TagsService) echo.HandlerFunc {
+func PostProblemTag(tags njudge.Tags, problems njudge.Problems) echo.HandlerFunc {
 	type request struct {
 		TagID int `form:"tagID"`
 	}
@@ -214,16 +236,25 @@ func PostProblemTag(tgs services.TagsService) echo.HandlerFunc {
 			return helpers.UnauthorizedError(c)
 		}
 
-		pr := c.Get("problem").(problem.Problem)
-		if err := tgs.Add(c.Request().Context(), data.TagID, pr.ID, u.ID); err != nil {
+		tg, err := tags.Get(c.Request().Context(), data.TagID)
+		if err != nil {
 			return err
 		}
 
-		return c.Redirect(http.StatusFound, c.Echo().Reverse("getProblemMain", pr.Problemset, pr.ProblemRel.Problem))
+		pr := c.Get("problem").(njudge.Problem)
+		if err := pr.AddTag(*tg, u.ID); err != nil {
+			return err
+		}
+
+		if err := problems.Update(c.Request().Context(), pr); err != nil {
+			return err
+		}
+
+		return c.Redirect(http.StatusFound, c.Echo().Reverse("getProblemMain", pr.Problemset, pr.Problem))
 	}
 }
 
-func DeleteProblemTag(tgs services.TagsService) echo.HandlerFunc {
+func DeleteProblemTag(tags njudge.Tags, problems njudge.Problems) echo.HandlerFunc {
 	type request struct {
 		TagID int `param:"id"`
 	}
@@ -238,11 +269,20 @@ func DeleteProblemTag(tgs services.TagsService) echo.HandlerFunc {
 			return helpers.UnauthorizedError(c)
 		}
 
-		pr := c.Get("problem").(problem.Problem)
-		if err := tgs.Delete(c.Request().Context(), data.TagID, pr.ID, u.ID); err != nil {
+		tg, err := tags.Get(c.Request().Context(), data.TagID)
+		if err != nil {
 			return err
 		}
 
-		return c.Redirect(http.StatusFound, c.Echo().Reverse("getProblemMain", pr.Problemset, pr.ProblemRel.Problem))
+		pr := c.Get("problem").(njudge.Problem)
+		if err := pr.DeleteTag(*tg); err != nil {
+			return err
+		}
+
+		if err := problems.Update(c.Request().Context(), pr); err != nil {
+			return err
+		}
+
+		return c.Redirect(http.StatusFound, c.Echo().Reverse("getProblemMain", pr.Problemset, pr.Problem))
 	}
 }

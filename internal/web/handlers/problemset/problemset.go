@@ -12,7 +12,6 @@ import (
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
 	"github.com/mraron/njudge/internal/web/helpers/ui"
-	"github.com/mraron/njudge/internal/web/services"
 	"github.com/mraron/njudge/pkg/problems"
 )
 
@@ -214,7 +213,12 @@ func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categori
 	}
 }
 
-func GetStatus(statusPageService services.StatusPageService) echo.HandlerFunc {
+type StatusPage struct {
+	Pages       []pagination.Link
+	Submissions []njudge.Submission
+}
+
+func GetStatus(slist njudge.SubmissionListQuery) echo.HandlerFunc {
 	type request struct {
 		AC         string `query:"ac"`
 		UserID     int    `query:"user_id"`
@@ -234,35 +238,43 @@ func GetStatus(statusPageService services.StatusPageService) echo.HandlerFunc {
 			data.Page = 1
 		}
 
-		statusReq := services.StatusPageRequest{
-			Pagination: pagination.Data{
-				Page:      data.Page,
-				PerPage:   20,
-				SortDir:   "DESC",
-				SortField: "id",
-			},
+		statusReq := njudge.SubmissionListRequest{
+			Page:       data.Page,
+			PerPage:    20,
+			SortDir:    njudge.SortDESC,
+			SortField:  njudge.SubmissionSortFieldID,
 			Problemset: data.Problemset,
 			Problem:    data.Problem,
 			UserID:     data.UserID,
-			GETValues:  c.Request().URL.Query(),
 		}
 
 		if data.AC == "1" {
-			ac := problems.VerdictAC
+			ac := njudge.VerdictAC
 			statusReq.Verdict = &ac
 		}
 
-		statusPage, err := statusPageService.GetStatusPage(c.Request().Context(), statusReq)
+		submissionList, err := slist.GetPagedSubmissionList(c.Request().Context(), statusReq)
 		if err != nil {
 			return err
 		}
 
+		qu := (*c.Request().URL).Query()
+		links, err := pagination.Links(submissionList.PaginationData.Page, submissionList.PaginationData.PerPage, int64(submissionList.PaginationData.Count), qu)
+		if err != nil {
+			return err
+		}
+
+		result := StatusPage{
+			Submissions: submissionList.Submissions,
+			Pages:       links,
+		}
+
 		c.Set("title", tr.Translate("Submissions"))
-		return c.Render(http.StatusOK, "status.gohtml", statusPage)
+		return c.Render(http.StatusOK, "status.gohtml", result)
 	}
 }
 
-func PostSubmit(subService services.SubmitService) echo.HandlerFunc {
+func PostSubmit(subService njudge.SubmitService) echo.HandlerFunc {
 	type request struct {
 		Problemset     string `param:"name"`
 		ProblemName    string `form:"problem"`
@@ -300,7 +312,7 @@ func PostSubmit(subService services.SubmitService) echo.HandlerFunc {
 			}
 		}
 
-		sub, err := subService.Submit(c.Request().Context(), services.SubmitRequest{
+		sub, err := subService.Submit(c.Request().Context(), njudge.SubmitRequest{
 			UserID:     u.ID,
 			Problemset: data.Problemset,
 			Problem:    data.ProblemName,

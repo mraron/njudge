@@ -21,6 +21,7 @@ import (
 	"github.com/mraron/njudge/internal/njudge/memory"
 	"github.com/mraron/njudge/internal/web/helpers/templates"
 	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
+	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/quasoft/memstore"
 	"github.com/volatiletech/sqlboiler/v4/boil"
@@ -28,6 +29,7 @@ import (
 
 func (s *Server) SetupDataAccess() {
 	s.ProblemStore = problems.NewFsStore(s.ProblemsDir)
+	s.ProblemStore.Update()
 
 	if s.Mode == "demo" {
 		s.PartialsStore = partials.Empty{}
@@ -40,8 +42,10 @@ func (s *Server) SetupDataAccess() {
 		s.ProblemQuery = memory.NewProblemQuery(s.Problems)
 		s.ProblemInfoQuery = memory.NewProblemInfoQuery(s.Submissions)
 		s.ProblemListQuery = memory.NewProblemListQuery(s.ProblemStore, s.Problems, s.Tags, s.Categories)
+		s.SubmissionListQuery = memory.NewSubmissionListQuery(s.Submissions, s.Problems)
 
 		s.RegisterService = njudge.NewRegisterService(s.Users)
+		s.SubmitService = memory.NewSubmitService(s.Submissions, s.Users, s.Problems, s.ProblemStore)
 
 		t := njudge.NewTag("constructive")
 		t, _ = s.Tags.Insert(context.Background(), *t)
@@ -52,10 +56,18 @@ func (s *Server) SetupDataAccess() {
 		u, _ := njudge.NewUser("mraron", "email@email.com", "admin")
 		u.SetPassword("abc")
 		u.Activate()
-		s.Users.Insert(context.Background(), *u)
+		u, _ = s.Users.Insert(context.Background(), *u)
 
 		s.Problems.Insert(context.Background(), njudge.NewProblem("main", "is1"))
-		s.Problems.Insert(context.Background(), p)
+		prob, _ := s.Problems.Insert(context.Background(), p)
+
+		sub, _ := njudge.NewSubmission(*u, *prob, language.DefaultStore.Get("cpp14"))
+		sub.SetSource([]byte("#include<bits/stdc++.h>"))
+		sub.Verdict = njudge.VerdictAC
+		sdata, _ := prob.WithStoredData(s.ProblemStore)
+		ss, _ := sdata.StatusSkeleton("")
+		sub.Status = *ss
+		sub, _ = s.Submissions.Insert(context.Background(), *sub)
 	} else {
 		panic("not supported yet :P")
 	}
@@ -160,7 +172,7 @@ func (s *Server) setupEcho() {
 		}
 	}
 
-	s.e.Renderer = templates.New(s.Server, s.ProblemStore, s.Tags, s.PartialsStore)
+	s.e.Renderer = templates.New(s.Server, s.ProblemStore, s.Users, s.Problems, s.Tags, s.PartialsStore)
 
 	var (
 		store sessions.Store

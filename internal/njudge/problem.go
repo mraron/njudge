@@ -98,6 +98,7 @@ func (p *Problem) DeleteTag(t Tag) error {
 
 type Problems interface {
 	Get(ctx context.Context, ID int) (*Problem, error)
+	GetByNames(ctx context.Context, problemset, problem string) (*Problem, error)
 	GetAll(ctx context.Context) ([]Problem, error)
 	Insert(ctx context.Context, p Problem) (*Problem, error)
 	Delete(ctx context.Context, ID int) error

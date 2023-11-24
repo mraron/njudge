@@ -26,7 +26,7 @@
     </div>
 {{end}}
 
-{{$status := parseStatus .Data.Status}}
+{{$status := .Data.Status}}
 
 {{if not $status.Compiled}}
     <div class="card">

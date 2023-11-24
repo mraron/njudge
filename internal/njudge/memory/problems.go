@@ -23,6 +23,21 @@ func NewProblems() *Problems {
 	}
 }
 
+func (m *Problems) GetByNames(ctx context.Context, problemset, problem string) (*njudge.Problem, error) {
+	m.Lock()
+	defer m.Unlock()
+	for ind := range m.data {
+		if m.data[ind].Problemset == problemset && m.data[ind].Problem == problem {
+			res := m.data[ind]
+			res.Tags = make([]njudge.ProblemTag, len(res.Tags))
+			copy(res.Tags, m.data[ind].Tags)
+			return &res, nil
+		}
+	}
+
+	return nil, njudge.ErrorProblemNotFound
+}
+
 func (m *Problems) Get(ctx context.Context, ID int) (*njudge.Problem, error) {
 	m.Lock()
 	defer m.Unlock()

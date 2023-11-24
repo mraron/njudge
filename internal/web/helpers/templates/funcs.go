@@ -20,7 +20,6 @@ import (
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/helpers/roles"
 	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
-	"github.com/mraron/njudge/internal/web/models"
 	"github.com/mraron/njudge/pkg/problems"
 	"golang.org/x/text/message"
 )
@@ -61,10 +60,13 @@ func contextFuncs(c echo.Context) template.FuncMap {
 		"Tr": func(key message.Reference, args ...interface{}) string {
 			return c.Get(i18n.TranslatorContextKey).(i18n.Translator).Translate(key, args...)
 		},
+		"ctx": func() context.Context {
+			return c.Request().Context()
+		},
 	}
 }
 
-func statelessFuncs(store problems.Store, tags njudge.Tags, store2 partials.Store) template.FuncMap {
+func statelessFuncs(store problems.Store, users njudge.Users, ps njudge.Problems, tags njudge.Tags, store2 partials.Store) template.FuncMap {
 	return template.FuncMap{
 		"translateContent": i18n.TranslateContent,
 		"problem":          store.Get,
@@ -111,7 +113,7 @@ func statelessFuncs(store problems.Store, tags njudge.Tags, store2 partials.Stor
 
 			return ""
 		},
-		"gravatarHash": func(user *models.User) string {
+		"gravatarHash": func(user njudge.User) string {
 			return fmt.Sprintf("%x", md5.Sum([]byte(strings.ToLower(strings.TrimSpace(user.Email)))))
 		},
 		"dict": func(values ...interface{}) (map[string]interface{}, error) {
@@ -142,5 +144,11 @@ func statelessFuncs(store problems.Store, tags njudge.Tags, store2 partials.Stor
 			return context.TODO()
 		},
 		"verdict": problem.VerdictFromProblemsVerdictName,
+		"Problems": func() njudge.Problems {
+			return ps
+		},
+		"Users": func() njudge.Users {
+			return users
+		},
 	}
 }

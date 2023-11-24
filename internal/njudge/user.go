@@ -75,7 +75,7 @@ type User struct {
 	Email                string
 	ActivationInfo       UserActivationInfo
 	Role                 string
-	Points               float64
+	Points               float32
 	Settings             UserSettings
 	Created              time.Time
 	ForgottenPasswordKey *ForgottenPasswordKey

@@ -56,11 +56,13 @@
             <div class="col-6">{{divide .Data.ProblemStoredData.MemoryLimit 1048576}} MiB</div>
             {{end}}
             {{$userInfo := .Data.ProblemInfo.UserInfo}}
+            
             {{$solvedStatus := 0}}
             {{if logged}}
-            {{$solvedStatus := $userInfo.SolvedStatus}}
+            {{$solvedStatus = $userInfo.SolvedStatus}}
             {{end}}
-            {{if or (not logged) (or (eq $solvedStatus 3) user.ShowUnsolvedTags)}}
+            
+            {{if or (not logged) (or (eq $solvedStatus 3) user.Settings.ShowUnsolvedTags)}}
             {{if or .Data.Tags (eq $solvedStatus 3)}}
             <div class="col-6">{{Tr "Tags"}}:</div>
             <div class="col-6">
@@ -87,11 +89,11 @@
     <div class="card-body">
         {{if logged}}
             <form action="/problemset/{{get "problemset"}}/submit" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="problem" value="{{.Data.Problem.Name}}">
+            <input type="hidden" name="problem" value="{{.Data.ProblemStoredData.Name}}">
             <input type="file" name="source" id="fileInput">
-            <br>{{$lastLang := .Data.LastLanguage}}
+            <br>{{$lastLang := .Data.ProblemInfo.UserInfo.LastLanguage}}
             <select name="language" class="custom-select form-control" id="languagesList">
-                {{range $l := .Data.Problem.Languages}}
+                {{range $l := .Data.ProblemStoredData.Languages}}
                     <option value="{{$l.Id}}"{{if eq $lastLang $l.Id}} selected="selected"{{end}}>{{$l.Name}}</option>
                 {{end}}
             </select>
