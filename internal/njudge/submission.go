@@ -10,6 +10,40 @@ import (
 	"github.com/volatiletech/null/v8"
 )
 
+var SubmissionFields = struct {
+	ID string
+
+	UserID    string
+	ProblemID string
+	Language  string
+	Source    string
+	Private   string
+
+	Started   string
+	Verdict   string
+	Ontest    string
+	Submitted string
+	Status    string
+	Judged    string
+	Score     string
+}{
+	ID:        "id",
+	UserID:    "user_id",
+	ProblemID: "problem_id",
+	Language:  "language",
+	Source:    "source",
+	Private:   "private",
+	Started:   "started",
+	Verdict:   "verdict",
+	Ontest:    "ontest",
+	Submitted: "submitted",
+	Status:    "status",
+	Judged:    "judged",
+	Score:     "score",
+}
+
+var SubmissionRejudgeFields = []string{SubmissionFields.Judged, SubmissionFields.Started}
+
 type Submission struct {
 	ID int
 
@@ -73,7 +107,7 @@ type Submissions interface {
 	GetAll(ctx context.Context) ([]Submission, error)
 	Insert(ctx context.Context, s Submission) (*Submission, error)
 	Delete(ctx context.Context, ID int) error
-	Update(ctx context.Context, s Submission) error
+	Update(ctx context.Context, s Submission, fields []string) error
 }
 
 var ErrorUnsupportedLanguage = errors.New("njudge: unsupported language")

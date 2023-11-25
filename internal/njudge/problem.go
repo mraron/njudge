@@ -21,6 +21,26 @@ var (
 	ErrorProblemTagNotFound = errors.New("njudge: problem tag not found")
 )
 
+func Fields(s ...string) []string {
+	return s
+}
+
+var ProblemFields = struct {
+	ID          string
+	Problemset  string
+	Problem     string
+	Category    string
+	SolverCount string
+	Tags        string
+}{
+	ID:          "id",
+	Problemset:  "problemset",
+	Problem:     "problem",
+	Category:    "category",
+	SolverCount: "category",
+	Tags:        "tags",
+}
+
 type Problem struct {
 	ID          int
 	Problemset  string
@@ -101,7 +121,7 @@ type Problems interface {
 	GetAll(ctx context.Context) ([]Problem, error)
 	Insert(ctx context.Context, p Problem) (*Problem, error)
 	Delete(ctx context.Context, ID int) error
-	Update(ctx context.Context, p Problem) error
+	Update(ctx context.Context, p Problem, fields []string) error
 }
 
 type ProblemStoredData interface {

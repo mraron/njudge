@@ -55,7 +55,7 @@ func RejudgeSubmission(s njudge.Submissions) echo.HandlerFunc {
 		}
 
 		sub.MarkForRejudge()
-		if err := s.Update(c.Request().Context(), *sub); err != nil {
+		if err := s.Update(c.Request().Context(), *sub, njudge.SubmissionRejudgeFields); err != nil {
 			return err
 		}
 

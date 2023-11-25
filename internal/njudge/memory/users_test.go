@@ -13,7 +13,7 @@ func TestUsers(t *testing.T) {
 	u, err := njudge.NewUser("mraron", "asd@bsd.com", "user")
 	assert.Nil(t, err)
 
-	m := memory.NewUsers()
+	var m njudge.Users = memory.NewUsers()
 	u, err = m.Insert(context.TODO(), *u)
 	assert.Nil(t, err)
 	assert.Greater(t, u.ID, 0)
@@ -36,7 +36,7 @@ func TestUsers(t *testing.T) {
 	assert.Equal(t, u2.Name, "dummy")
 
 	u2.Name = "dummy2"
-	err = m.Update(context.TODO(), *u2)
+	err = m.Update(context.TODO(), *u2, njudge.Fields(njudge.UserFields.Name))
 	assert.Nil(t, err)
 
 	u2, _ = m.Get(context.TODO(), u2.ID)
@@ -58,7 +58,7 @@ func TestUsersUnique(t *testing.T) {
 	u2, err := njudge.NewUser("mraron", "csd@bsd.com", "user")
 	assert.Nil(t, err)
 
-	m := memory.NewUsers()
+	var m njudge.Users = memory.NewUsers()
 	_, err = m.Insert(context.TODO(), *u1)
 	assert.Nil(t, err)
 	_, err = m.Insert(context.TODO(), *u2)

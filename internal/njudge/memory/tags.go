@@ -130,7 +130,7 @@ func (ts *TagsService) Add(ctx context.Context, tagID int, problemID int, userID
 	}
 
 	p.AddTag(*t, userID)
-	return ts.problems.Update(ctx, *p)
+	return ts.problems.Update(ctx, *p, njudge.Fields(njudge.ProblemFields.Tags))
 }
 
 func (ts *TagsService) Delete(ctx context.Context, tagID int, problemID int, userID int) error {
@@ -156,5 +156,5 @@ func (ts *TagsService) Delete(ctx context.Context, tagID int, problemID int, use
 		return err
 	}
 
-	return ts.problems.Update(ctx, *p)
+	return ts.problems.Update(ctx, *p, njudge.Fields(njudge.ProblemFields.Tags))
 }

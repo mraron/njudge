@@ -2,6 +2,7 @@ package memory
 
 import (
 	"context"
+	"slices"
 	"sync"
 
 	"github.com/mraron/njudge/internal/njudge"
@@ -100,12 +101,33 @@ func (m *Users) Delete(ctx context.Context, ID int) error {
 	return njudge.ErrorUserNotFound
 }
 
-func (m *Users) Update(ctx context.Context, user njudge.User) error {
+func (m *Users) Update(ctx context.Context, user njudge.User, fields []string) error {
 	m.Lock()
 	defer m.Unlock()
 	for ind := range m.data {
 		if m.data[ind].ID == user.ID {
-			m.data[ind] = user
+			if slices.Contains(fields, njudge.UserFields.Name) {
+				m.data[ind].Name = user.Name
+			}
+			if slices.Contains(fields, njudge.UserFields.Password) {
+				m.data[ind].Password = user.Password
+			}
+			if slices.Contains(fields, njudge.UserFields.ActivationInfo) {
+				m.data[ind].ActivationInfo = user.ActivationInfo
+			}
+			if slices.Contains(fields, njudge.UserFields.Role) {
+				m.data[ind].Role = user.Role
+			}
+			if slices.Contains(fields, njudge.UserFields.Points) {
+				m.data[ind].Points = user.Points
+			}
+			if slices.Contains(fields, njudge.UserFields.Settings) {
+				m.data[ind].Settings = user.Settings
+			}
+			if slices.Contains(fields, njudge.UserFields.ForgottenPasswordKey) {
+				m.data[ind].ForgottenPasswordKey = user.ForgottenPasswordKey
+			}
+
 			return nil
 		}
 	}

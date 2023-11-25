@@ -2,6 +2,7 @@ package memory
 
 import (
 	"context"
+	"slices"
 	"sync"
 
 	"github.com/mraron/njudge/internal/njudge"
@@ -97,19 +98,35 @@ func (m *Problems) Delete(ctx context.Context, id int) error {
 	return njudge.ErrorProblemNotFound
 }
 
-func (m *Problems) Update(ctx context.Context, p njudge.Problem) error {
+func (m *Problems) Update(ctx context.Context, p njudge.Problem, fields []string) error {
 	m.Lock()
 	defer m.Unlock()
 	for ind := range m.data {
 		if m.data[ind].ID == p.ID {
-			for tagInd := range p.Tags {
-				if p.Tags[tagInd].ID == 0 {
-					p.Tags[tagInd].ID = m.nextProblemTagId
-					m.nextProblemTagId++
+			if slices.Contains(fields, njudge.ProblemFields.Tags) {
+				for tagInd := range p.Tags {
+					if p.Tags[tagInd].ID == 0 {
+						p.Tags[tagInd].ID = m.nextProblemTagId
+						m.nextProblemTagId++
+					}
 				}
+
+				m.data[ind].Tags = p.Tags
 			}
 
-			m.data[ind] = p
+			if slices.Contains(fields, njudge.ProblemFields.Problemset) {
+				m.data[ind].Problemset = p.Problemset
+			}
+			if slices.Contains(fields, njudge.ProblemFields.Problem) {
+				m.data[ind].Problem = p.Problem
+			}
+			if slices.Contains(fields, njudge.ProblemFields.SolverCount) {
+				m.data[ind].SolverCount = p.SolverCount
+			}
+			if slices.Contains(fields, njudge.ProblemFields.Category) {
+				m.data[ind].Category = p.Category
+			}
+
 			return nil
 		}
 	}

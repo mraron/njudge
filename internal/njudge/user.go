@@ -68,6 +68,30 @@ func (f *ForgottenPasswordKey) IsValid() bool {
 	return time.Now().Before(f.ValidUntil)
 }
 
+var UserFields = struct {
+	ID                   string
+	Name                 string
+	Password             string
+	Email                string
+	ActivationInfo       string
+	Role                 string
+	Points               string
+	Settings             string
+	Created              string
+	ForgottenPasswordKey string
+}{
+	ID:                   "id",
+	Name:                 "name",
+	Password:             "password",
+	Email:                "email",
+	ActivationInfo:       "activated",
+	Role:                 "role",
+	Points:               "points",
+	Settings:             "settings",
+	Created:              "created",
+	ForgottenPasswordKey: "forgotten_password_key",
+}
+
 type User struct {
 	ID                   int
 	Name                 string
@@ -166,5 +190,5 @@ type Users interface {
 	GetByEmail(ctx context.Context, email string) (*User, error)
 	Insert(ctx context.Context, u User) (*User, error)
 	Delete(ctx context.Context, ID int) error
-	Update(ctx context.Context, user User) error
+	Update(ctx context.Context, user User, fields []string) error
 }

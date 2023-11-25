@@ -51,7 +51,7 @@ func PostForgottenPassword(cfg config.Server, users njudge.Users, mailService em
 		} else if err == nil { // We must not expose that an email is not registered
 			if u.ForgottenPasswordKey == nil || !u.ForgottenPasswordKey.IsValid() {
 				u.SetForgottenPasswordKey(njudge.NewForgottenPasswordKey(1 * time.Hour))
-				if err := users.Update(c.Request().Context(), *u); err != nil {
+				if err := users.Update(c.Request().Context(), *u, njudge.Fields(njudge.UserFields.ForgottenPasswordKey)); err != nil {
 					return err
 				}
 
@@ -148,7 +148,7 @@ func PostForgottenPasswordForm(users njudge.Users) echo.HandlerFunc {
 				u.ForgottenPasswordKey = nil
 				u.SetPassword(data.Password1)
 
-				if err := users.Update(c.Request().Context(), *u); err == nil {
+				if err := users.Update(c.Request().Context(), *u, njudge.Fields(njudge.UserFields.ForgottenPasswordKey, njudge.UserFields.Password)); err == nil {
 					helpers.SetFlash(c, "ForgottenPasswordFormMessage", tr.Translate("Password changed succesfully! You can login with your new password."))
 				} else {
 					return err

@@ -2,6 +2,7 @@ package memory
 
 import (
 	"context"
+	"slices"
 	"sync"
 
 	"github.com/mraron/njudge/internal/njudge"
@@ -67,12 +68,48 @@ func (m *Submissions) Delete(ctx context.Context, ID int) error {
 	return njudge.ErrorSubmissionNotFound
 }
 
-func (m *Submissions) Update(ctx context.Context, s njudge.Submission) error {
+func (m *Submissions) Update(ctx context.Context, s njudge.Submission, fields []string) error {
 	m.Lock()
 	defer m.Unlock()
 	for ind := range m.data {
 		if m.data[ind].ID == s.ID {
-			m.data[ind] = s
+			if slices.Contains(fields, njudge.SubmissionFields.UserID) {
+				m.data[ind].UserID = s.UserID
+			}
+			if slices.Contains(fields, njudge.SubmissionFields.ProblemID) {
+				m.data[ind].ProblemID = s.ProblemID
+			}
+			if slices.Contains(fields, njudge.SubmissionFields.Language) {
+				m.data[ind].Language = s.Language
+			}
+			if slices.Contains(fields, njudge.SubmissionFields.Source) {
+				m.data[ind].Source = s.Source
+			}
+			if slices.Contains(fields, njudge.SubmissionFields.Private) {
+				m.data[ind].Private = s.Private
+			}
+			if slices.Contains(fields, njudge.SubmissionFields.Started) {
+				m.data[ind].Started = s.Started
+			}
+			if slices.Contains(fields, njudge.SubmissionFields.Verdict) {
+				m.data[ind].Verdict = s.Verdict
+			}
+			if slices.Contains(fields, njudge.SubmissionFields.Ontest) {
+				m.data[ind].Ontest = s.Ontest
+			}
+			if slices.Contains(fields, njudge.SubmissionFields.Submitted) {
+				m.data[ind].Submitted = s.Submitted
+			}
+			if slices.Contains(fields, njudge.SubmissionFields.Status) {
+				m.data[ind].Status = s.Status
+			}
+			if slices.Contains(fields, njudge.SubmissionFields.Judged) {
+				m.data[ind].Judged = s.Judged
+			}
+			if slices.Contains(fields, njudge.SubmissionFields.Score) {
+				m.data[ind].Score = s.Score
+			}
+
 			return nil
 		}
 	}

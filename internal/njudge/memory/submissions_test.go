@@ -12,7 +12,7 @@ import (
 )
 
 func TestSubmissions(t *testing.T) {
-	mp := memory.NewProblems()
+	var mp njudge.Problems = memory.NewProblems()
 	p, _ := mp.Insert(context.TODO(), njudge.NewProblem("main", "aplusb"))
 
 	mu := memory.NewUsers()
@@ -20,7 +20,7 @@ func TestSubmissions(t *testing.T) {
 	u, _ := njudge.NewUser("mraron", "asd@bsd", "admin")
 	u, _ = mu.Insert(context.TODO(), *u)
 
-	ms := memory.NewSubmissions()
+	var ms njudge.Submissions = memory.NewSubmissions()
 	s, err := njudge.NewSubmission(*u, *p, language.DefaultStore.Get("cpp14"))
 	assert.Nil(t, err)
 	s, err = ms.Insert(context.TODO(), *s)
@@ -31,7 +31,7 @@ func TestSubmissions(t *testing.T) {
 	s, _ = ms.Get(context.TODO(), 1)
 	assert.Empty(t, s.Source)
 	s.SetSource([]byte("hehe"))
-	_ = ms.Update(context.TODO(), *s)
+	_ = ms.Update(context.TODO(), *s, njudge.Fields(njudge.SubmissionFields.Source))
 	s, _ = ms.Get(context.TODO(), 1)
 	assert.NotEmpty(t, s.Source)
 

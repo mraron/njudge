@@ -19,7 +19,7 @@ func TestMemoryProblems(t *testing.T) {
 	assert.Nil(t, err)
 
 	p.SetCategory(njudge.Category{ID: 5})
-	err = m.Update(context.TODO(), *p)
+	err = m.Update(context.TODO(), *p, njudge.Fields(njudge.ProblemFields.Category))
 	assert.Nil(t, err)
 
 	p, err = m.Get(context.TODO(), currID)
@@ -56,7 +56,7 @@ func TestProblemTags(t *testing.T) {
 	p, err := m.Insert(context.TODO(), prob)
 	assert.Nil(t, err)
 	p.AddTag(njudge.Tag{ID: 5, Name: "greedy"}, 1)
-	err = m.Update(context.TODO(), *p)
+	err = m.Update(context.TODO(), *p, njudge.Fields(njudge.ProblemFields.Tags))
 	assert.Nil(t, err)
 
 	res, err := m.Get(context.TODO(), 1)
@@ -66,7 +66,7 @@ func TestProblemTags(t *testing.T) {
 	assert.Equal(t, res.Tags[1].ID, 2)
 
 	res.DeleteTag(njudge.Tag{ID: 6, Name: "dp"})
-	assert.Nil(t, m.Update(context.TODO(), *res))
+	assert.Nil(t, m.Update(context.TODO(), *res, njudge.Fields(njudge.ProblemFields.Tags)))
 
 	res, err = m.Get(context.TODO(), 1)
 	assert.Nil(t, err)

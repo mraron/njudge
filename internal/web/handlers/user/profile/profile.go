@@ -130,7 +130,7 @@ func PostSettingsChangePassword(us njudge.Users) echo.HandlerFunc {
 		}
 
 		u.SetPassword(data.PasswordNew1)
-		if err := us.Update(c.Request().Context(), *u); err != nil {
+		if err := us.Update(c.Request().Context(), *u, njudge.Fields(njudge.UserFields.Password)); err != nil {
 			return err
 		}
 
@@ -156,7 +156,7 @@ func PostSettingsMisc(us njudge.Users) echo.HandlerFunc {
 		}
 
 		u.Settings.ShowUnsolvedTags = data.ShowTagsForUnsolvedBool
-		if err := us.Update(c.Request().Context(), *u); err != nil {
+		if err := us.Update(c.Request().Context(), *u, njudge.Fields(njudge.UserFields.Settings)); err != nil {
 			return err
 		}
 
