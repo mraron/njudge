@@ -92,3 +92,28 @@ func (p *ProblemQuery) GetProblem(ctx context.Context, problemset string, proble
 
 	return nil, njudge.ErrorProblemNotFound
 }
+
+func (p *ProblemQuery) GetProblemsWithCategory(ctx context.Context, f njudge.CategoryFilter) ([]njudge.Problem, error) {
+	problems, err := p.pp.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	res := make([]njudge.Problem, 0)
+	for ind := range problems {
+		ok := true
+		switch f.Type {
+		case njudge.CategoryFilterEmpty:
+			ok = problems[ind].Category == nil
+		case njudge.CategoryFilterID:
+			ok = problems[ind].Category != nil && problems[ind].Category.ID == f.Value.(int)
+		default:
+		}
+
+		if ok {
+			res = append(res, problems[ind])
+		}
+	}
+
+	return res, nil
+}

@@ -221,7 +221,7 @@ func GetProblemStatus(slist njudge.SubmissionListQuery, pstore problems.Store) e
 	}
 }
 
-func PostProblemTag(tags njudge.Tags, problems njudge.Problems) echo.HandlerFunc {
+func PostProblemTag(tgs njudge.TagsService) echo.HandlerFunc {
 	type request struct {
 		TagID int `form:"tagID"`
 	}
@@ -236,17 +236,8 @@ func PostProblemTag(tags njudge.Tags, problems njudge.Problems) echo.HandlerFunc
 			return helpers.UnauthorizedError(c)
 		}
 
-		tg, err := tags.Get(c.Request().Context(), data.TagID)
-		if err != nil {
-			return err
-		}
-
 		pr := c.Get("problem").(njudge.Problem)
-		if err := pr.AddTag(*tg, u.ID); err != nil {
-			return err
-		}
-
-		if err := problems.Update(c.Request().Context(), pr); err != nil {
+		if err := tgs.Add(c.Request().Context(), data.TagID, pr.ID, u.ID); err != nil {
 			return err
 		}
 
@@ -254,7 +245,7 @@ func PostProblemTag(tags njudge.Tags, problems njudge.Problems) echo.HandlerFunc
 	}
 }
 
-func DeleteProblemTag(tags njudge.Tags, problems njudge.Problems) echo.HandlerFunc {
+func DeleteProblemTag(tgs njudge.TagsService) echo.HandlerFunc {
 	type request struct {
 		TagID int `param:"id"`
 	}
@@ -269,17 +260,8 @@ func DeleteProblemTag(tags njudge.Tags, problems njudge.Problems) echo.HandlerFu
 			return helpers.UnauthorizedError(c)
 		}
 
-		tg, err := tags.Get(c.Request().Context(), data.TagID)
-		if err != nil {
-			return err
-		}
-
 		pr := c.Get("problem").(njudge.Problem)
-		if err := pr.DeleteTag(*tg); err != nil {
-			return err
-		}
-
-		if err := problems.Update(c.Request().Context(), pr); err != nil {
+		if err := tgs.Delete(c.Request().Context(), data.TagID, pr.ID, u.ID); err != nil {
 			return err
 		}
 

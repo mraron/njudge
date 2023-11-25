@@ -91,3 +91,70 @@ func (m *Tags) Update(ctx context.Context, user njudge.Tag) error {
 	}
 	return njudge.ErrorTagNotFound
 }
+
+type TagsService struct {
+	tags             njudge.Tags
+	problems         njudge.Problems
+	problemInfoQuery njudge.ProblemInfoQuery
+}
+
+func NewTagsService(tags njudge.Tags, problems njudge.Problems, problemInfoQuery njudge.ProblemInfoQuery) *TagsService {
+	return &TagsService{
+		tags:             tags,
+		problems:         problems,
+		problemInfoQuery: problemInfoQuery,
+	}
+}
+
+func (ts *TagsService) Add(ctx context.Context, tagID int, problemID int, userID int) error {
+	p, err := ts.problems.Get(ctx, problemID)
+	if err != nil {
+		return err
+	}
+	t, err := ts.tags.Get(ctx, tagID)
+	if err != nil {
+		return err
+	}
+
+	if p.HasTag(*t) {
+		return nil
+	}
+
+	pinfo, err := ts.problemInfoQuery.GetProblemData(ctx, p.ID, userID)
+	if err != nil {
+		return err
+	}
+
+	if pinfo.UserInfo.SolvedStatus != njudge.Solved {
+		return njudge.ErrorUnableToModifyProblemTags
+	}
+
+	p.AddTag(*t, userID)
+	return ts.problems.Update(ctx, *p)
+}
+
+func (ts *TagsService) Delete(ctx context.Context, tagID int, problemID int, userID int) error {
+	p, err := ts.problems.Get(ctx, problemID)
+	if err != nil {
+		return err
+	}
+	t, err := ts.tags.Get(ctx, tagID)
+	if err != nil {
+		return err
+	}
+
+	pinfo, err := ts.problemInfoQuery.GetProblemData(ctx, p.ID, userID)
+	if err != nil {
+		return err
+	}
+
+	if pinfo.UserInfo.SolvedStatus != njudge.Solved {
+		return njudge.ErrorUnableToModifyProblemTags
+	}
+
+	if err := p.DeleteTag(*t); err != nil {
+		return err
+	}
+
+	return ts.problems.Update(ctx, *p)
+}

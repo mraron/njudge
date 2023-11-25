@@ -42,6 +42,23 @@ func (m *Categories) GetAll(ctx context.Context) ([]njudge.Category, error) {
 	return res, nil
 }
 
+func (m *Categories) GetAllWithParent(ctx context.Context, parentID int) ([]njudge.Category, error) {
+	m.Lock()
+	defer m.Unlock()
+	res := make([]njudge.Category, 0)
+	for ind := range m.data {
+		if parentID > 0 {
+			if m.data[ind].ParentID.Valid && m.data[ind].ParentID.Int == parentID {
+				res = append(res, m.data[ind])
+			}
+		} else if !m.data[ind].ParentID.Valid {
+			res = append(res, m.data[ind])
+		}
+	}
+
+	return res, nil
+}
+
 func (m *Categories) GetByName(ctx context.Context, name string) (*njudge.Category, error) {
 	m.Lock()
 	defer m.Unlock()

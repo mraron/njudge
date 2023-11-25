@@ -45,13 +45,23 @@ func (s *Server) SetupDataAccess() {
 		s.SubmissionListQuery = memory.NewSubmissionListQuery(s.Submissions, s.Problems)
 
 		s.RegisterService = njudge.NewRegisterService(s.Users)
-		s.SubmitService = memory.NewSubmitService(s.Submissions, s.Users, s.Problems, s.ProblemStore)
+		s.SubmitService = memory.NewSubmitService(s.Submissions, s.Users, s.ProblemQuery, s.ProblemStore)
+		s.TagsService = memory.NewTagsService(s.Tags, s.Problems, s.ProblemInfoQuery)
+
+		nt1 := njudge.NewCategory("NT1", nil)
+		nt1, _ = s.Categories.Insert(context.Background(), *nt1)
+		nt1_2021 := njudge.NewCategory("2021", nt1)
+		nt1_2021, _ = s.Categories.Insert(context.Background(), *nt1_2021)
 
 		t := njudge.NewTag("constructive")
 		t, _ = s.Tags.Insert(context.Background(), *t)
 
+		t2 := njudge.NewTag("dp")
+		t2, _ = s.Tags.Insert(context.Background(), *t2)
+
 		p := njudge.NewProblem("main", "NT21_Atvagas")
 		p.AddTag(*t, 1)
+		p.SetCategory(*nt1_2021)
 
 		u, _ := njudge.NewUser("mraron", "email@email.com", "admin")
 		u.SetPassword("abc")

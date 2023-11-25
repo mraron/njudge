@@ -45,6 +45,7 @@ type Server struct {
 
 	RegisterService njudge.RegisterService
 	SubmitService   njudge.SubmitService
+	TagsService     njudge.TagsService
 
 	e *echo.Echo
 }

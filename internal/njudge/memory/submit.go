@@ -11,21 +11,21 @@ import (
 type SubmitService struct {
 	submissions  njudge.Submissions
 	users        njudge.Users
-	problems     njudge.Problems
+	problemQuery njudge.ProblemQuery
 	problemStore problems.Store
 }
 
-func NewSubmitService(submissions njudge.Submissions, users njudge.Users, problems njudge.Problems, problemStore problems.Store) *SubmitService {
+func NewSubmitService(submissions njudge.Submissions, users njudge.Users, problemQuery njudge.ProblemQuery, problemStore problems.Store) *SubmitService {
 	return &SubmitService{
 		submissions:  submissions,
 		users:        users,
-		problems:     problems,
+		problemQuery: problemQuery,
 		problemStore: problemStore,
 	}
 }
 
 func (s *SubmitService) Submit(ctx context.Context, req njudge.SubmitRequest) (*njudge.Submission, error) {
-	pr, err := s.problems.GetByNames(ctx, req.Problemset, req.Problem)
+	pr, err := s.problemQuery.GetProblem(ctx, req.Problemset, req.Problem)
 	if err != nil {
 		return nil, err
 	}

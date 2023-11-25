@@ -35,3 +35,12 @@ type ProblemTag struct {
 	UserID    int
 	Added     time.Time
 }
+
+var (
+	ErrorUnableToModifyProblemTags = errors.New("njudge: user can't modify tags")
+)
+
+type TagsService interface {
+	Add(ctx context.Context, tagID int, problemID int, userID int) error
+	Delete(ctx context.Context, tagID int, problemID int, userID int) error
+}

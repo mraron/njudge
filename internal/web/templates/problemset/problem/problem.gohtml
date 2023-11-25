@@ -66,7 +66,7 @@
             {{if or .Data.Tags (eq $solvedStatus 3)}}
             <div class="col-6">{{Tr "Tags"}}:</div>
             <div class="col-6">
-            {{range $i := .Data.Tags}}<span class="badge badge-secondary">{{$i.Tag.Name}}{{if (eq $solvedStatus 3)}} <a href="delete_tag/{{$i.ID}}" style="color:#fff;">&times;</a>{{end}}</span> {{end}}
+            {{range $i := .Data.Tags}}<span class="badge badge-secondary">{{$i.Tag.Name}}{{if (eq $solvedStatus 3)}} <a href="delete_tag/{{$i.Tag.ID}}" style="color:#fff;">&times;</a>{{end}}</span> {{end}}
             {{if (eq $solvedStatus 3)}}
             <span class="badge badge-secondary"><a href="#" class="text-reset text-decoration-none" data-toggle="modal" data-target="#tagModal">+</a></span>
             {{end}}
