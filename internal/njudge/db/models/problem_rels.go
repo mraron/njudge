@@ -82,15 +82,18 @@ var ProblemRelWhere = struct {
 var ProblemRelRels = struct {
 	Category           string
 	ProblemProblemTags string
+	ProblemSubmissions string
 }{
 	Category:           "Category",
 	ProblemProblemTags: "ProblemProblemTags",
+	ProblemSubmissions: "ProblemSubmissions",
 }
 
 // problemRelR is where relationships are stored.
 type problemRelR struct {
 	Category           *ProblemCategory `boil:"Category" json:"Category" toml:"Category" yaml:"Category"`
 	ProblemProblemTags ProblemTagSlice  `boil:"ProblemProblemTags" json:"ProblemProblemTags" toml:"ProblemProblemTags" yaml:"ProblemProblemTags"`
+	ProblemSubmissions SubmissionSlice  `boil:"ProblemSubmissions" json:"ProblemSubmissions" toml:"ProblemSubmissions" yaml:"ProblemSubmissions"`
 }
 
 // NewStruct creates a new relationship struct
@@ -110,6 +113,13 @@ func (r *problemRelR) GetProblemProblemTags() ProblemTagSlice {
 		return nil
 	}
 	return r.ProblemProblemTags
+}
+
+func (r *problemRelR) GetProblemSubmissions() SubmissionSlice {
+	if r == nil {
+		return nil
+	}
+	return r.ProblemSubmissions
 }
 
 // problemRelL is where Load methods for each relationship are stored.
@@ -446,6 +456,20 @@ func (o *ProblemRel) ProblemProblemTags(mods ...qm.QueryMod) problemTagQuery {
 	return ProblemTags(queryMods...)
 }
 
+// ProblemSubmissions retrieves all the submission's Submissions with an executor via problem_id column.
+func (o *ProblemRel) ProblemSubmissions(mods ...qm.QueryMod) submissionQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"submissions\".\"problem_id\"=?", o.ID),
+	)
+
+	return Submissions(queryMods...)
+}
+
 // LoadCategory allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
 func (problemRelL) LoadCategory(ctx context.Context, e boil.ContextExecutor, singular bool, maybeProblemRel interface{}, mods queries.Applicator) error {
@@ -684,6 +708,120 @@ func (problemRelL) LoadProblemProblemTags(ctx context.Context, e boil.ContextExe
 	return nil
 }
 
+// LoadProblemSubmissions allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (problemRelL) LoadProblemSubmissions(ctx context.Context, e boil.ContextExecutor, singular bool, maybeProblemRel interface{}, mods queries.Applicator) error {
+	var slice []*ProblemRel
+	var object *ProblemRel
+
+	if singular {
+		var ok bool
+		object, ok = maybeProblemRel.(*ProblemRel)
+		if !ok {
+			object = new(ProblemRel)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeProblemRel)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeProblemRel))
+			}
+		}
+	} else {
+		s, ok := maybeProblemRel.(*[]*ProblemRel)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeProblemRel)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeProblemRel))
+			}
+		}
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &problemRelR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &problemRelR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`submissions`),
+		qm.WhereIn(`submissions.problem_id in ?`, args...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load submissions")
+	}
+
+	var resultSlice []*Submission
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice submissions")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on submissions")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for submissions")
+	}
+
+	if len(submissionAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.ProblemSubmissions = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &submissionR{}
+			}
+			foreign.R.Problem = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.ProblemID {
+				local.R.ProblemSubmissions = append(local.R.ProblemSubmissions, foreign)
+				if foreign.R == nil {
+					foreign.R = &submissionR{}
+				}
+				foreign.R.Problem = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // SetCategoryG of the problemRel to the related item.
 // Sets o.R.Category to related.
 // Adds o to related.R.CategoryProblemRels.
@@ -833,6 +971,68 @@ func (o *ProblemRel) AddProblemProblemTags(ctx context.Context, exec boil.Contex
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &problemTagR{
+				Problem: o,
+			}
+		} else {
+			rel.R.Problem = o
+		}
+	}
+	return nil
+}
+
+// AddProblemSubmissionsG adds the given related objects to the existing relationships
+// of the problem_rel, optionally inserting them as new records.
+// Appends related to o.R.ProblemSubmissions.
+// Sets related.R.Problem appropriately.
+// Uses the global database handle.
+func (o *ProblemRel) AddProblemSubmissionsG(ctx context.Context, insert bool, related ...*Submission) error {
+	return o.AddProblemSubmissions(ctx, boil.GetContextDB(), insert, related...)
+}
+
+// AddProblemSubmissions adds the given related objects to the existing relationships
+// of the problem_rel, optionally inserting them as new records.
+// Appends related to o.R.ProblemSubmissions.
+// Sets related.R.Problem appropriately.
+func (o *ProblemRel) AddProblemSubmissions(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Submission) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.ProblemID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"submissions\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"problem_id"}),
+				strmangle.WhereClause("\"", "\"", 2, submissionPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.ProblemID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &problemRelR{
+			ProblemSubmissions: related,
+		}
+	} else {
+		o.R.ProblemSubmissions = append(o.R.ProblemSubmissions, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &submissionR{
 				Problem: o,
 			}
 		} else {

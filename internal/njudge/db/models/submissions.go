@@ -24,87 +24,82 @@ import (
 
 // Submission is an object representing the database table.
 type Submission struct {
-	ID         int          `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Status     string       `boil:"status" json:"status" toml:"status" yaml:"status"`
-	Ontest     null.String  `boil:"ontest" json:"ontest,omitempty" toml:"ontest" yaml:"ontest,omitempty"`
-	UserID     int          `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
-	Problemset string       `boil:"problemset" json:"problemset" toml:"problemset" yaml:"problemset"`
-	Problem    string       `boil:"problem" json:"problem" toml:"problem" yaml:"problem"`
-	Language   string       `boil:"language" json:"language" toml:"language" yaml:"language"`
-	Private    bool         `boil:"private" json:"private" toml:"private" yaml:"private"`
-	Verdict    int          `boil:"verdict" json:"verdict" toml:"verdict" yaml:"verdict"`
-	Source     []byte       `boil:"source" json:"source" toml:"source" yaml:"source"`
-	Started    bool         `boil:"started" json:"started" toml:"started" yaml:"started"`
-	Submitted  time.Time    `boil:"submitted" json:"submitted" toml:"submitted" yaml:"submitted"`
-	Judged     null.Time    `boil:"judged" json:"judged,omitempty" toml:"judged" yaml:"judged,omitempty"`
-	Score      null.Float32 `boil:"score" json:"score,omitempty" toml:"score" yaml:"score,omitempty"`
+	ID        int          `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Status    string       `boil:"status" json:"status" toml:"status" yaml:"status"`
+	Ontest    null.String  `boil:"ontest" json:"ontest,omitempty" toml:"ontest" yaml:"ontest,omitempty"`
+	UserID    int          `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	Language  string       `boil:"language" json:"language" toml:"language" yaml:"language"`
+	Private   bool         `boil:"private" json:"private" toml:"private" yaml:"private"`
+	Verdict   int          `boil:"verdict" json:"verdict" toml:"verdict" yaml:"verdict"`
+	Source    []byte       `boil:"source" json:"source" toml:"source" yaml:"source"`
+	Started   bool         `boil:"started" json:"started" toml:"started" yaml:"started"`
+	Submitted time.Time    `boil:"submitted" json:"submitted" toml:"submitted" yaml:"submitted"`
+	Judged    null.Time    `boil:"judged" json:"judged,omitempty" toml:"judged" yaml:"judged,omitempty"`
+	Score     null.Float32 `boil:"score" json:"score,omitempty" toml:"score" yaml:"score,omitempty"`
+	ProblemID int          `boil:"problem_id" json:"problem_id" toml:"problem_id" yaml:"problem_id"`
 
 	R *submissionR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L submissionL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var SubmissionColumns = struct {
-	ID         string
-	Status     string
-	Ontest     string
-	UserID     string
-	Problemset string
-	Problem    string
-	Language   string
-	Private    string
-	Verdict    string
-	Source     string
-	Started    string
-	Submitted  string
-	Judged     string
-	Score      string
+	ID        string
+	Status    string
+	Ontest    string
+	UserID    string
+	Language  string
+	Private   string
+	Verdict   string
+	Source    string
+	Started   string
+	Submitted string
+	Judged    string
+	Score     string
+	ProblemID string
 }{
-	ID:         "id",
-	Status:     "status",
-	Ontest:     "ontest",
-	UserID:     "user_id",
-	Problemset: "problemset",
-	Problem:    "problem",
-	Language:   "language",
-	Private:    "private",
-	Verdict:    "verdict",
-	Source:     "source",
-	Started:    "started",
-	Submitted:  "submitted",
-	Judged:     "judged",
-	Score:      "score",
+	ID:        "id",
+	Status:    "status",
+	Ontest:    "ontest",
+	UserID:    "user_id",
+	Language:  "language",
+	Private:   "private",
+	Verdict:   "verdict",
+	Source:    "source",
+	Started:   "started",
+	Submitted: "submitted",
+	Judged:    "judged",
+	Score:     "score",
+	ProblemID: "problem_id",
 }
 
 var SubmissionTableColumns = struct {
-	ID         string
-	Status     string
-	Ontest     string
-	UserID     string
-	Problemset string
-	Problem    string
-	Language   string
-	Private    string
-	Verdict    string
-	Source     string
-	Started    string
-	Submitted  string
-	Judged     string
-	Score      string
+	ID        string
+	Status    string
+	Ontest    string
+	UserID    string
+	Language  string
+	Private   string
+	Verdict   string
+	Source    string
+	Started   string
+	Submitted string
+	Judged    string
+	Score     string
+	ProblemID string
 }{
-	ID:         "submissions.id",
-	Status:     "submissions.status",
-	Ontest:     "submissions.ontest",
-	UserID:     "submissions.user_id",
-	Problemset: "submissions.problemset",
-	Problem:    "submissions.problem",
-	Language:   "submissions.language",
-	Private:    "submissions.private",
-	Verdict:    "submissions.verdict",
-	Source:     "submissions.source",
-	Started:    "submissions.started",
-	Submitted:  "submissions.submitted",
-	Judged:     "submissions.judged",
-	Score:      "submissions.score",
+	ID:        "submissions.id",
+	Status:    "submissions.status",
+	Ontest:    "submissions.ontest",
+	UserID:    "submissions.user_id",
+	Language:  "submissions.language",
+	Private:   "submissions.private",
+	Verdict:   "submissions.verdict",
+	Source:    "submissions.source",
+	Started:   "submissions.started",
+	Submitted: "submissions.submitted",
+	Judged:    "submissions.judged",
+	Score:     "submissions.score",
+	ProblemID: "submissions.problem_id",
 }
 
 // Generated where
@@ -219,52 +214,60 @@ func (w whereHelpernull_Float32) IsNull() qm.QueryMod    { return qmhelper.Where
 func (w whereHelpernull_Float32) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var SubmissionWhere = struct {
-	ID         whereHelperint
-	Status     whereHelperstring
-	Ontest     whereHelpernull_String
-	UserID     whereHelperint
-	Problemset whereHelperstring
-	Problem    whereHelperstring
-	Language   whereHelperstring
-	Private    whereHelperbool
-	Verdict    whereHelperint
-	Source     whereHelper__byte
-	Started    whereHelperbool
-	Submitted  whereHelpertime_Time
-	Judged     whereHelpernull_Time
-	Score      whereHelpernull_Float32
+	ID        whereHelperint
+	Status    whereHelperstring
+	Ontest    whereHelpernull_String
+	UserID    whereHelperint
+	Language  whereHelperstring
+	Private   whereHelperbool
+	Verdict   whereHelperint
+	Source    whereHelper__byte
+	Started   whereHelperbool
+	Submitted whereHelpertime_Time
+	Judged    whereHelpernull_Time
+	Score     whereHelpernull_Float32
+	ProblemID whereHelperint
 }{
-	ID:         whereHelperint{field: "\"submissions\".\"id\""},
-	Status:     whereHelperstring{field: "\"submissions\".\"status\""},
-	Ontest:     whereHelpernull_String{field: "\"submissions\".\"ontest\""},
-	UserID:     whereHelperint{field: "\"submissions\".\"user_id\""},
-	Problemset: whereHelperstring{field: "\"submissions\".\"problemset\""},
-	Problem:    whereHelperstring{field: "\"submissions\".\"problem\""},
-	Language:   whereHelperstring{field: "\"submissions\".\"language\""},
-	Private:    whereHelperbool{field: "\"submissions\".\"private\""},
-	Verdict:    whereHelperint{field: "\"submissions\".\"verdict\""},
-	Source:     whereHelper__byte{field: "\"submissions\".\"source\""},
-	Started:    whereHelperbool{field: "\"submissions\".\"started\""},
-	Submitted:  whereHelpertime_Time{field: "\"submissions\".\"submitted\""},
-	Judged:     whereHelpernull_Time{field: "\"submissions\".\"judged\""},
-	Score:      whereHelpernull_Float32{field: "\"submissions\".\"score\""},
+	ID:        whereHelperint{field: "\"submissions\".\"id\""},
+	Status:    whereHelperstring{field: "\"submissions\".\"status\""},
+	Ontest:    whereHelpernull_String{field: "\"submissions\".\"ontest\""},
+	UserID:    whereHelperint{field: "\"submissions\".\"user_id\""},
+	Language:  whereHelperstring{field: "\"submissions\".\"language\""},
+	Private:   whereHelperbool{field: "\"submissions\".\"private\""},
+	Verdict:   whereHelperint{field: "\"submissions\".\"verdict\""},
+	Source:    whereHelper__byte{field: "\"submissions\".\"source\""},
+	Started:   whereHelperbool{field: "\"submissions\".\"started\""},
+	Submitted: whereHelpertime_Time{field: "\"submissions\".\"submitted\""},
+	Judged:    whereHelpernull_Time{field: "\"submissions\".\"judged\""},
+	Score:     whereHelpernull_Float32{field: "\"submissions\".\"score\""},
+	ProblemID: whereHelperint{field: "\"submissions\".\"problem_id\""},
 }
 
 // SubmissionRels is where relationship names are stored.
 var SubmissionRels = struct {
-	User string
+	Problem string
+	User    string
 }{
-	User: "User",
+	Problem: "Problem",
+	User:    "User",
 }
 
 // submissionR is where relationships are stored.
 type submissionR struct {
-	User *User `boil:"User" json:"User" toml:"User" yaml:"User"`
+	Problem *ProblemRel `boil:"Problem" json:"Problem" toml:"Problem" yaml:"Problem"`
+	User    *User       `boil:"User" json:"User" toml:"User" yaml:"User"`
 }
 
 // NewStruct creates a new relationship struct
 func (*submissionR) NewStruct() *submissionR {
 	return &submissionR{}
+}
+
+func (r *submissionR) GetProblem() *ProblemRel {
+	if r == nil {
+		return nil
+	}
+	return r.Problem
 }
 
 func (r *submissionR) GetUser() *User {
@@ -278,9 +281,9 @@ func (r *submissionR) GetUser() *User {
 type submissionL struct{}
 
 var (
-	submissionAllColumns            = []string{"id", "status", "ontest", "user_id", "problemset", "problem", "language", "private", "verdict", "source", "started", "submitted", "judged", "score"}
-	submissionColumnsWithoutDefault = []string{"status", "user_id", "problemset", "problem", "language", "private", "verdict", "source", "started", "submitted"}
-	submissionColumnsWithDefault    = []string{"id", "ontest", "judged", "score"}
+	submissionAllColumns            = []string{"id", "status", "ontest", "user_id", "language", "private", "verdict", "source", "started", "submitted", "judged", "score", "problem_id"}
+	submissionColumnsWithoutDefault = []string{"status", "user_id", "language", "private", "verdict", "source", "started", "submitted"}
+	submissionColumnsWithDefault    = []string{"id", "ontest", "judged", "score", "problem_id"}
 	submissionPrimaryKeyColumns     = []string{"id"}
 	submissionGeneratedColumns      = []string{}
 )
@@ -583,6 +586,17 @@ func (q submissionQuery) Exists(ctx context.Context, exec boil.ContextExecutor) 
 	return count > 0, nil
 }
 
+// Problem pointed to by the foreign key.
+func (o *Submission) Problem(mods ...qm.QueryMod) problemRelQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("\"id\" = ?", o.ProblemID),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	return ProblemRels(queryMods...)
+}
+
 // User pointed to by the foreign key.
 func (o *Submission) User(mods ...qm.QueryMod) userQuery {
 	queryMods := []qm.QueryMod{
@@ -592,6 +606,126 @@ func (o *Submission) User(mods ...qm.QueryMod) userQuery {
 	queryMods = append(queryMods, mods...)
 
 	return Users(queryMods...)
+}
+
+// LoadProblem allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for an N-1 relationship.
+func (submissionL) LoadProblem(ctx context.Context, e boil.ContextExecutor, singular bool, maybeSubmission interface{}, mods queries.Applicator) error {
+	var slice []*Submission
+	var object *Submission
+
+	if singular {
+		var ok bool
+		object, ok = maybeSubmission.(*Submission)
+		if !ok {
+			object = new(Submission)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeSubmission)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeSubmission))
+			}
+		}
+	} else {
+		s, ok := maybeSubmission.(*[]*Submission)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeSubmission)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeSubmission))
+			}
+		}
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &submissionR{}
+		}
+		args = append(args, object.ProblemID)
+
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &submissionR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ProblemID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ProblemID)
+
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`problem_rels`),
+		qm.WhereIn(`problem_rels.id in ?`, args...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load ProblemRel")
+	}
+
+	var resultSlice []*ProblemRel
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice ProblemRel")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for problem_rels")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for problem_rels")
+	}
+
+	if len(problemRelAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.Problem = foreign
+		if foreign.R == nil {
+			foreign.R = &problemRelR{}
+		}
+		foreign.R.ProblemSubmissions = append(foreign.R.ProblemSubmissions, object)
+		return nil
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if local.ProblemID == foreign.ID {
+				local.R.Problem = foreign
+				if foreign.R == nil {
+					foreign.R = &problemRelR{}
+				}
+				foreign.R.ProblemSubmissions = append(foreign.R.ProblemSubmissions, local)
+				break
+			}
+		}
+	}
+
+	return nil
 }
 
 // LoadUser allows an eager lookup of values, cached into the
@@ -709,6 +843,61 @@ func (submissionL) LoadUser(ctx context.Context, e boil.ContextExecutor, singula
 				break
 			}
 		}
+	}
+
+	return nil
+}
+
+// SetProblemG of the submission to the related item.
+// Sets o.R.Problem to related.
+// Adds o to related.R.ProblemSubmissions.
+// Uses the global database handle.
+func (o *Submission) SetProblemG(ctx context.Context, insert bool, related *ProblemRel) error {
+	return o.SetProblem(ctx, boil.GetContextDB(), insert, related)
+}
+
+// SetProblem of the submission to the related item.
+// Sets o.R.Problem to related.
+// Adds o to related.R.ProblemSubmissions.
+func (o *Submission) SetProblem(ctx context.Context, exec boil.ContextExecutor, insert bool, related *ProblemRel) error {
+	var err error
+	if insert {
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	}
+
+	updateQuery := fmt.Sprintf(
+		"UPDATE \"submissions\" SET %s WHERE %s",
+		strmangle.SetParamNames("\"", "\"", 1, []string{"problem_id"}),
+		strmangle.WhereClause("\"", "\"", 2, submissionPrimaryKeyColumns),
+	)
+	values := []interface{}{related.ID, o.ID}
+
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, values)
+	}
+	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	o.ProblemID = related.ID
+	if o.R == nil {
+		o.R = &submissionR{
+			Problem: related,
+		}
+	} else {
+		o.R.Problem = related
+	}
+
+	if related.R == nil {
+		related.R = &problemRelR{
+			ProblemSubmissions: SubmissionSlice{o},
+		}
+	} else {
+		related.R.ProblemSubmissions = append(related.R.ProblemSubmissions, o)
 	}
 
 	return nil

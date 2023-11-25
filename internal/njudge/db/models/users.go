@@ -32,6 +32,7 @@ type User struct {
 	Role             string       `boil:"role" json:"role" toml:"role" yaml:"role"`
 	Points           null.Float32 `boil:"points" json:"points,omitempty" toml:"points" yaml:"points,omitempty"`
 	ShowUnsolvedTags bool         `boil:"show_unsolved_tags" json:"show_unsolved_tags" toml:"show_unsolved_tags" yaml:"show_unsolved_tags"`
+	Registered       null.Time    `boil:"registered" json:"registered,omitempty" toml:"registered" yaml:"registered,omitempty"`
 
 	R *userR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -46,6 +47,7 @@ var UserColumns = struct {
 	Role             string
 	Points           string
 	ShowUnsolvedTags string
+	Registered       string
 }{
 	ID:               "id",
 	Name:             "name",
@@ -55,6 +57,7 @@ var UserColumns = struct {
 	Role:             "role",
 	Points:           "points",
 	ShowUnsolvedTags: "show_unsolved_tags",
+	Registered:       "registered",
 }
 
 var UserTableColumns = struct {
@@ -66,6 +69,7 @@ var UserTableColumns = struct {
 	Role             string
 	Points           string
 	ShowUnsolvedTags string
+	Registered       string
 }{
 	ID:               "users.id",
 	Name:             "users.name",
@@ -75,6 +79,7 @@ var UserTableColumns = struct {
 	Role:             "users.role",
 	Points:           "users.points",
 	ShowUnsolvedTags: "users.show_unsolved_tags",
+	Registered:       "users.registered",
 }
 
 // Generated where
@@ -88,6 +93,7 @@ var UserWhere = struct {
 	Role             whereHelperstring
 	Points           whereHelpernull_Float32
 	ShowUnsolvedTags whereHelperbool
+	Registered       whereHelpernull_Time
 }{
 	ID:               whereHelperint{field: "\"users\".\"id\""},
 	Name:             whereHelperstring{field: "\"users\".\"name\""},
@@ -97,6 +103,7 @@ var UserWhere = struct {
 	Role:             whereHelperstring{field: "\"users\".\"role\""},
 	Points:           whereHelpernull_Float32{field: "\"users\".\"points\""},
 	ShowUnsolvedTags: whereHelperbool{field: "\"users\".\"show_unsolved_tags\""},
+	Registered:       whereHelpernull_Time{field: "\"users\".\"registered\""},
 }
 
 // UserRels is where relationship names are stored.
@@ -147,9 +154,9 @@ func (r *userR) GetSubmissions() SubmissionSlice {
 type userL struct{}
 
 var (
-	userAllColumns            = []string{"id", "name", "password", "email", "activation_key", "role", "points", "show_unsolved_tags"}
+	userAllColumns            = []string{"id", "name", "password", "email", "activation_key", "role", "points", "show_unsolved_tags", "registered"}
 	userColumnsWithoutDefault = []string{"name", "password", "email", "role"}
-	userColumnsWithDefault    = []string{"id", "activation_key", "points", "show_unsolved_tags"}
+	userColumnsWithDefault    = []string{"id", "activation_key", "points", "show_unsolved_tags", "registered"}
 	userPrimaryKeyColumns     = []string{"id"}
 	userGeneratedColumns      = []string{}
 )
