@@ -4,12 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
+
+	"github.com/mraron/njudge/internal/njudge/db/models"
 	"github.com/mraron/njudge/internal/web/domain/problem"
 	"github.com/mraron/njudge/internal/web/domain/submission"
-	"github.com/mraron/njudge/internal/web/models"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/volatiletech/sqlboiler/v4/boil"
-	"time"
 )
 
 var ErrorUnsupportedLanguage = errors.New("unsupported language")

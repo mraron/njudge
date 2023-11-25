@@ -17,6 +17,7 @@ import (
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/providers/google"
 	"github.com/mraron/njudge/internal/njudge"
+	"github.com/mraron/njudge/internal/njudge/db"
 	"github.com/mraron/njudge/internal/njudge/email"
 	"github.com/mraron/njudge/internal/njudge/memory"
 	"github.com/mraron/njudge/internal/web/helpers/templates"
@@ -39,6 +40,7 @@ func (s *Server) SetupDataAccess() {
 		s.Problems = memory.NewProblems()
 		s.Submissions = memory.NewSubmissions()
 		s.Users = memory.NewUsers()
+
 		s.ProblemQuery = memory.NewProblemQuery(s.Problems)
 		s.ProblemInfoQuery = memory.NewProblemInfoQuery(s.Submissions)
 		s.ProblemListQuery = memory.NewProblemListQuery(s.ProblemStore, s.Problems, s.Tags, s.Categories)
@@ -79,7 +81,22 @@ func (s *Server) SetupDataAccess() {
 		sub.Status = *ss
 		sub, _ = s.Submissions.Insert(context.Background(), *sub)
 	} else {
-		panic("not supported yet :P")
+		s.PartialsStore = partials.NewCached(s.DB.DB, 1*time.Minute)
+
+		s.Categories = db.NewCategories(s.DB.DB)
+		s.Tags = db.NewTags(s.DB.DB)
+		s.Problems = db.NewProblems()
+		s.Submissions = db.NewSubmissions(s.DB.DB)
+		s.Users = db.NewUsers(s.DB.DB)
+
+		s.ProblemQuery = memory.NewProblemQuery(s.Problems)
+		s.ProblemInfoQuery = memory.NewProblemInfoQuery(s.Submissions)
+		s.ProblemListQuery = memory.NewProblemListQuery(s.ProblemStore, s.Problems, s.Tags, s.Categories)
+		s.SubmissionListQuery = memory.NewSubmissionListQuery(s.Submissions, s.Problems)
+
+		s.RegisterService = njudge.NewRegisterService(s.Users)
+		s.SubmitService = memory.NewSubmitService(s.Submissions, s.Users, s.ProblemQuery, s.ProblemStore)
+		s.TagsService = memory.NewTagsService(s.Tags, s.Problems, s.ProblemInfoQuery)
 	}
 }
 
@@ -101,8 +118,10 @@ func (s *Server) SetupEnvironment() {
 		)
 	}
 
-	//TODO
-	//s.ConnectToDB()
+	if s.Mode != "demo" {
+		s.ConnectToDB()
+	}
+
 	s.SetupDataAccess()
 	s.Keys.MustParse()
 

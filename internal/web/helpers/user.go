@@ -6,8 +6,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/mraron/njudge/internal/njudge/db/models"
 	"github.com/mraron/njudge/internal/web/domain/problem"
-	"github.com/mraron/njudge/internal/web/models"
 	"github.com/mraron/njudge/pkg/problems"
 
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"

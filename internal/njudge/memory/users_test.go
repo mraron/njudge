@@ -36,7 +36,7 @@ func TestUsers(t *testing.T) {
 	assert.Equal(t, u2.Name, "dummy")
 
 	u2.Name = "dummy2"
-	err = m.Update(context.TODO(), *u2, njudge.Fields(njudge.UserFields.Name))
+	err = m.Update(context.TODO(), u2, njudge.Fields(njudge.UserFields.Name))
 	assert.Nil(t, err)
 
 	u2, _ = m.Get(context.TODO(), u2.ID)

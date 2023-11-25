@@ -6,7 +6,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/mraron/njudge/internal/web/models"
+	"github.com/mraron/njudge/internal/njudge/db/models"
 
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"

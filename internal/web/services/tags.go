@@ -4,11 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
+
+	"github.com/mraron/njudge/internal/njudge/db/models"
 	"github.com/mraron/njudge/internal/web/domain/problem"
 	"github.com/mraron/njudge/internal/web/helpers"
-	"github.com/mraron/njudge/internal/web/models"
 	"github.com/volatiletech/sqlboiler/v4/boil"
-	"time"
 )
 
 type TagsService interface {

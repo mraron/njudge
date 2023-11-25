@@ -1,6 +1,7 @@
 package problemset
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"sort"
@@ -207,6 +208,24 @@ func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categori
 		sort.Slice(result.CategoryFilterOptions, func(i, j int) bool {
 			return result.CategoryFilterOptions[i].Name < result.CategoryFilterOptions[j].Name
 		})
+
+		for ind := range result.Problems {
+			if result.Problems[ind].Category != nil {
+				cid := result.Problems[ind].Category.ID
+				for {
+					if _, ok := par[cid]; ok {
+						cid = par[cid]
+					} else {
+						break
+					}
+				}
+
+				result.Problems[ind].CategoryLink = ui.Link{
+					Text: categoryNameByID[cid],
+					Href: fmt.Sprintf("/task_archive#category%d", result.Problems[ind].ID),
+				}
+			}
+		}
 
 		c.Set("title", tr.Translate("Problems"))
 		return c.Render(http.StatusOK, "problemset/list", result)

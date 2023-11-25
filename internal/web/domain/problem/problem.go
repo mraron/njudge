@@ -2,15 +2,16 @@ package problem
 
 import (
 	"errors"
-	"github.com/mraron/njudge/internal/web/domain/submission"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
-	"github.com/mraron/njudge/internal/web/helpers/ui"
-	"github.com/mraron/njudge/internal/web/models"
-	"github.com/mraron/njudge/pkg/problems"
-	"github.com/mraron/njudge/pkg/problems/config/polygon"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/mraron/njudge/internal/njudge/db/models"
+	"github.com/mraron/njudge/internal/web/domain/submission"
+	"github.com/mraron/njudge/internal/web/helpers/i18n"
+	"github.com/mraron/njudge/internal/web/helpers/ui"
+	"github.com/mraron/njudge/pkg/problems"
+	"github.com/mraron/njudge/pkg/problems/config/polygon"
 )
 
 var (

@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/mraron/njudge/internal/web/models"
+	"github.com/mraron/njudge/internal/njudge/db/models"
 
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )

@@ -12,12 +12,15 @@ type Users struct {
 	sync.Mutex
 	nextId int
 	data   []njudge.User
+
+	nextForgottenPasswordKeyID int
 }
 
 func NewUsers() *Users {
 	return &Users{
-		nextId: 1,
-		data:   make([]njudge.User, 0),
+		nextId:                     1,
+		data:                       make([]njudge.User, 0),
+		nextForgottenPasswordKeyID: 1,
 	}
 }
 
@@ -101,7 +104,7 @@ func (m *Users) Delete(ctx context.Context, ID int) error {
 	return njudge.ErrorUserNotFound
 }
 
-func (m *Users) Update(ctx context.Context, user njudge.User, fields []string) error {
+func (m *Users) Update(ctx context.Context, user *njudge.User, fields []string) error {
 	m.Lock()
 	defer m.Unlock()
 	for ind := range m.data {
@@ -126,6 +129,11 @@ func (m *Users) Update(ctx context.Context, user njudge.User, fields []string) e
 			}
 			if slices.Contains(fields, njudge.UserFields.ForgottenPasswordKey) {
 				m.data[ind].ForgottenPasswordKey = user.ForgottenPasswordKey
+				if user.ForgottenPasswordKey.ID == 0 {
+					m.data[ind].ForgottenPasswordKey.ID = m.nextForgottenPasswordKeyID
+					m.nextForgottenPasswordKeyID++
+				}
+				user.ForgottenPasswordKey.ID = m.data[ind].ForgottenPasswordKey.ID
 			}
 
 			return nil

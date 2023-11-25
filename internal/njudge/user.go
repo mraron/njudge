@@ -52,6 +52,7 @@ type UserSettings struct {
 }
 
 type ForgottenPasswordKey struct {
+	ID         int
 	UserID     int
 	Key        string
 	ValidUntil time.Time
@@ -190,5 +191,5 @@ type Users interface {
 	GetByEmail(ctx context.Context, email string) (*User, error)
 	Insert(ctx context.Context, u User) (*User, error)
 	Delete(ctx context.Context, ID int) error
-	Update(ctx context.Context, user User, fields []string) error
+	Update(ctx context.Context, user *User, fields []string) error
 }

@@ -4,9 +4,9 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/mraron/njudge/internal/njudge/db/models"
 	"github.com/mraron/njudge/internal/web/extmodels"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
-	"github.com/mraron/njudge/internal/web/models"
 
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/web/handlers"

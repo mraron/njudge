@@ -4,8 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+
+	"github.com/mraron/njudge/internal/njudge/db/models"
 	"github.com/mraron/njudge/internal/web/domain/submission"
-	"github.com/mraron/njudge/internal/web/models"
 )
 
 type SQLSubmission struct {

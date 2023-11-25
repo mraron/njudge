@@ -4,17 +4,18 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/mraron/njudge/internal/web/domain/problem"
-	"github.com/mraron/njudge/pkg/problems"
 	"log"
 	"net/http"
 	"strconv"
 	"sync"
 	"time"
 
+	"github.com/mraron/njudge/internal/web/domain/problem"
+	"github.com/mraron/njudge/pkg/problems"
+
 	"github.com/mraron/njudge/internal/judge"
+	"github.com/mraron/njudge/internal/njudge/db/models"
 	"github.com/mraron/njudge/internal/web/helpers/config"
-	"github.com/mraron/njudge/internal/web/models"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"

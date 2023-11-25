@@ -2,8 +2,9 @@ package services
 
 import (
 	"context"
+
+	"github.com/mraron/njudge/internal/njudge/db/models"
 	"github.com/mraron/njudge/internal/web/domain/submission"
-	"github.com/mraron/njudge/internal/web/models"
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 )

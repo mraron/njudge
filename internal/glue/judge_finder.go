@@ -2,7 +2,7 @@ package glue
 
 import (
 	"github.com/mraron/njudge/internal/judge"
-	"github.com/mraron/njudge/internal/web/models"
+	"github.com/mraron/njudge/internal/njudge/db/models"
 )
 
 type JudgeFinder interface {

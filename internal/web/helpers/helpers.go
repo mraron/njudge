@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/mraron/njudge/internal/njudge/db/models"
 	"github.com/mraron/njudge/internal/web/helpers/config"
-	"github.com/mraron/njudge/internal/web/models"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"

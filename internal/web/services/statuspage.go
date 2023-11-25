@@ -3,12 +3,13 @@ package services
 import (
 	"context"
 	"database/sql"
+	"net/url"
+
+	"github.com/mraron/njudge/internal/njudge/db/models"
 	"github.com/mraron/njudge/internal/web/domain/submission"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
-	"github.com/mraron/njudge/internal/web/models"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"net/url"
 )
 
 type StatusPageRequest struct {

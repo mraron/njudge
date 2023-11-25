@@ -3,18 +3,19 @@ package services
 import (
 	"context"
 	"database/sql"
+	"net/url"
+	"strings"
+	"unicode"
+
+	"github.com/mraron/njudge/internal/njudge/db/models"
 	"github.com/mraron/njudge/internal/web/domain/problem"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
-	"github.com/mraron/njudge/internal/web/models"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
-	"net/url"
-	"strings"
-	"unicode"
 )
 
 type ProblemListRequest struct {

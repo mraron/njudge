@@ -7,9 +7,9 @@ import (
 	"io/ioutil"
 	"log"
 
+	"github.com/mraron/njudge/internal/njudge/db/models"
 	"github.com/mraron/njudge/internal/web"
 	"github.com/mraron/njudge/internal/web/helpers/config"
-	"github.com/mraron/njudge/internal/web/models"
 
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/spf13/cobra"

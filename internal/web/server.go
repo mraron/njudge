@@ -6,7 +6,6 @@ import (
 
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/njudge/email"
-	"github.com/mraron/njudge/internal/web/services"
 
 	"github.com/mraron/njudge/internal/web/helpers/config"
 	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
@@ -62,8 +61,7 @@ func (s *Server) Run() {
 }
 
 func (s *Server) Submit(uid int, problemset, problem, language string, source []byte) (int, error) {
-	subService := services.NewSQLSubmitService(s.DB.DB, s.ProblemStore)
-	sub, err := subService.Submit(context.Background(), services.SubmitRequest{
+	sub, err := s.SubmitService.Submit(context.Background(), njudge.SubmitRequest{
 		UserID:     uid,
 		Problemset: problemset,
 		Problem:    problem,
