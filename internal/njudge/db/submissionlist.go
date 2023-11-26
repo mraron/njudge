@@ -22,43 +22,41 @@ func NewSubmissionListQuery(db *sql.DB) *SubmissionListQuery {
 }
 
 func (s *SubmissionListQuery) getSubmissionList(ctx context.Context, req njudge.SubmissionListRequest, mods ...qm.QueryMod) (*njudge.SubmissionList, int64, error) {
-	mods = append(mods, qm.OrderBy(string(req.SortField)+" "+string(req.SortDir)))
-
+	filterMods := []qm.QueryMod{}
 	if req.UserID > 0 {
-		mods = append(mods, models.SubmissionWhere.UserID.EQ(req.UserID))
+		filterMods = append(filterMods, models.SubmissionWhere.UserID.EQ(req.UserID))
 	}
 
 	if req.Verdict != nil {
-		mods = append(mods, models.SubmissionWhere.Verdict.EQ(int(*req.Verdict)))
+		filterMods = append(filterMods, models.SubmissionWhere.Verdict.EQ(int(*req.Verdict)))
 	}
 
 	if req.Problemset != "" || req.Problem != "" {
-		mods = append(
-			mods,
+		filterMods = append(
+			filterMods,
 			qm.InnerJoin("problem_rels pr on pr.id = submissions.problem_id"),
 		)
 	}
 	if req.Problemset != "" {
-		mods = append(
-			mods,
+		filterMods = append(
+			filterMods,
 			qm.Where("pr.problemset=?", req.Problemset),
 		)
 	}
 
 	if req.Problem != "" {
-		mods = append(
-			mods,
+		filterMods = append(
+			filterMods,
 			qm.Where("pr.problem=?", req.Problem),
 		)
 	}
 
-	res, err := NewSubmissions(s.db).getAll(ctx, mods...)
+	res, err := NewSubmissions(s.db).getAll(ctx, append(mods, filterMods...)...)
 	if err != nil {
 		return nil, -1, err
 	}
 
-	mods = append(mods, qm.GroupBy("submissions.id"))
-	cnt, err := models.Submissions(mods...).Count(ctx, s.db)
+	cnt, err := models.Submissions(filterMods...).Count(ctx, s.db)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return nil, -1, err
 	}
@@ -77,6 +75,7 @@ func (s *SubmissionListQuery) GetPagedSubmissionList(ctx context.Context, req nj
 	submissions, cnt, err := s.getSubmissionList(
 		ctx,
 		req,
+		qm.OrderBy(string(req.SortField)+" "+string(req.SortDir)),
 		qm.Limit(req.PerPage),
 		qm.Offset((req.Page-1)*req.PerPage),
 	)

@@ -278,7 +278,7 @@ func GetStatus(slist njudge.SubmissionListQuery) echo.HandlerFunc {
 		}
 
 		qu := (*c.Request().URL).Query()
-		links, err := pagination.Links(submissionList.PaginationData.Page, submissionList.PaginationData.PerPage, int64(submissionList.PaginationData.Count), qu)
+		links, err := pagination.LinksWithCountLimit(submissionList.PaginationData.Page, submissionList.PaginationData.PerPage, int64(submissionList.PaginationData.Count), qu, 5)
 		if err != nil {
 			return err
 		}

@@ -119,7 +119,8 @@ func (us *Users) Insert(ctx context.Context, u njudge.User) (*njudge.User, error
 }
 
 func (us *Users) Delete(ctx context.Context, ID int) error {
-	panic("not implemented") // TODO: Implement
+	_, err := models.Users(models.UserWhere.ID.EQ(ID)).DeleteAll(ctx, us.db)
+	return err
 }
 
 // updates the user's given fields
@@ -134,19 +135,19 @@ func (us *Users) Update(ctx context.Context, u *njudge.User, fields []string) er
 	for ind := range fields {
 		switch fields[ind] {
 		case njudge.UserFields.Name:
-			whitelist = append(whitelist, models.UserTableColumns.Name)
+			whitelist = append(whitelist, models.UserColumns.Name)
 		case njudge.UserFields.Password:
-			whitelist = append(whitelist, models.UserTableColumns.Password)
+			whitelist = append(whitelist, models.UserColumns.Password)
 		case njudge.UserFields.Email:
-			whitelist = append(whitelist, models.UserTableColumns.Email)
+			whitelist = append(whitelist, models.UserColumns.Email)
 		case njudge.UserFields.ActivationInfo:
-			whitelist = append(whitelist, models.UserTableColumns.ActivationKey)
+			whitelist = append(whitelist, models.UserColumns.ActivationKey)
 		case njudge.UserFields.Role:
-			whitelist = append(whitelist, models.UserTableColumns.Role)
+			whitelist = append(whitelist, models.UserColumns.Role)
 		case njudge.UserFields.Points:
-			whitelist = append(whitelist, models.UserTableColumns.Points)
+			whitelist = append(whitelist, models.UserColumns.Points)
 		case njudge.UserFields.Settings:
-			whitelist = append(whitelist, models.UserTableColumns.ShowUnsolvedTags)
+			whitelist = append(whitelist, models.UserColumns.ShowUnsolvedTags)
 		}
 	}
 

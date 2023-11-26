@@ -87,3 +87,20 @@ alter table users
 --
 
 alter table forgotten_password_keys ADD constraint forgotten_password_keys_user_id_unique UNIQUE (user_id);
+
+---
+--- Modify problem_tags
+---
+
+BEGIN TRANSACTION
+
+alter table public.problem_tags
+    drop constraint unique_problem_tag;
+
+alter table public.problem_tags
+    drop column id;
+
+alter table public.problem_tags
+    add primary key (problem_id, tag_id);
+
+COMMIT;

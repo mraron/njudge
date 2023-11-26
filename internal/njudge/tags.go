@@ -29,7 +29,6 @@ type Tags interface {
 }
 
 type ProblemTag struct {
-	ID        int
 	ProblemID int
 	Tag       Tag
 	UserID    int

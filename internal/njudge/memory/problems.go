@@ -12,15 +12,12 @@ type Problems struct {
 	sync.Mutex
 	nextId int
 	data   []njudge.Problem
-
-	nextProblemTagId int
 }
 
 func NewProblems() *Problems {
 	return &Problems{
-		nextId:           1,
-		data:             make([]njudge.Problem, 0),
-		nextProblemTagId: 1,
+		nextId: 1,
+		data:   make([]njudge.Problem, 0),
 	}
 }
 
@@ -73,11 +70,6 @@ func (m *Problems) Insert(ctx context.Context, p njudge.Problem) (*njudge.Proble
 	p.ID = m.nextId
 	m.nextId++
 
-	for ind := range p.Tags {
-		p.Tags[ind].ID = m.nextProblemTagId
-		m.nextProblemTagId++
-	}
-
 	m.data = append(m.data, p)
 
 	res := m.data[len(m.data)-1]
@@ -104,13 +96,6 @@ func (m *Problems) Update(ctx context.Context, p njudge.Problem, fields []string
 	for ind := range m.data {
 		if m.data[ind].ID == p.ID {
 			if slices.Contains(fields, njudge.ProblemFields.Tags) {
-				for tagInd := range p.Tags {
-					if p.Tags[tagInd].ID == 0 {
-						p.Tags[tagInd].ID = m.nextProblemTagId
-						m.nextProblemTagId++
-					}
-				}
-
 				m.data[ind].Tags = p.Tags
 			}
 

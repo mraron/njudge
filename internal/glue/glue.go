@@ -211,13 +211,18 @@ func (s *Server) runJudger() {
 					Id:       strconv.Itoa(sub.ID),
 					Problem:  p.Problem,
 					Language: sub.Language,
-					Source:   sub.Source}, fmt.Sprintf("http://glue:%s/callback/%d", s.Port, sub.ID)); err != nil {
+					Source:   sub.Source,
+				}, fmt.Sprintf("http://glue:%s/callback/%d", s.Port, sub.ID)); err != nil {
 				log.Print("Trying to submit to server", j.Host, j.Port, "Error", err)
 				continue
 			}
 
 			sub.Started = true
-			if err := s.Submissions.Update(context.Background(), sub, njudge.Fields(njudge.SubmissionFields.Started)); err != nil {
+			if err := s.Submissions.Update(
+				context.Background(),
+				sub,
+				njudge.Fields(njudge.SubmissionFields.Started),
+			); err != nil {
 				log.Print(err)
 				continue
 			}

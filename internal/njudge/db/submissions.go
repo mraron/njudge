@@ -7,6 +7,8 @@ import (
 
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/njudge/db/models"
+	"github.com/volatiletech/null/v8"
+	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
@@ -18,6 +20,37 @@ func NewSubmissions(db *sql.DB) *Submissions {
 	return &Submissions{
 		db: db,
 	}
+}
+
+func (ss *Submissions) toModel(ctx context.Context, s njudge.Submission) (*models.Submission, error) {
+	res := &models.Submission{
+		ID: s.ID,
+
+		UserID:    s.UserID,
+		ProblemID: s.ProblemID,
+		Language:  s.Language,
+		Source:    s.Source,
+		Private:   s.Private,
+
+		Started:   s.Started,
+		Verdict:   int(s.Verdict),
+		Ontest:    s.Ontest,
+		Submitted: s.Submitted,
+		Judged:    s.Judged,
+		Score:     null.Float32From(s.Score),
+	}
+
+	var (
+		statusBytes []byte
+		err         error
+	)
+
+	if statusBytes, err = json.Marshal(s.Status); err != nil {
+		return nil, err
+	}
+	res.Status = string(statusBytes)
+
+	return res, nil
 }
 
 func (ss *Submissions) toNjudge(ctx context.Context, s *models.Submission) (*njudge.Submission, error) {
@@ -84,13 +117,61 @@ func (ss *Submissions) GetAll(ctx context.Context) ([]njudge.Submission, error) 
 }
 
 func (ss *Submissions) Insert(ctx context.Context, s njudge.Submission) (*njudge.Submission, error) {
-	panic("not implemented") // TODO: Implement
+	dbobj, err := ss.toModel(ctx, s)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := dbobj.Insert(ctx, ss.db, boil.Infer()); err != nil {
+		return nil, err
+	}
+
+	s.ID = dbobj.ID
+	return &s, nil
 }
 
 func (ss *Submissions) Delete(ctx context.Context, ID int) error {
-	panic("not implemented") // TODO: Implement
+	_, err := models.Submissions(models.SubmissionWhere.ID.EQ(ID)).DeleteAll(ctx, ss.db)
+	return err
 }
 
 func (ss *Submissions) Update(ctx context.Context, s njudge.Submission, fields []string) error {
-	panic("not implemented") // TODO: Implement
+	whitelist := []string{}
+	for _, field := range fields {
+		switch field {
+		case njudge.SubmissionFields.UserID:
+			whitelist = append(whitelist, models.SubmissionColumns.UserID)
+		case njudge.SubmissionFields.ProblemID:
+			whitelist = append(whitelist, models.SubmissionColumns.ProblemID)
+		case njudge.SubmissionFields.Language:
+			whitelist = append(whitelist, models.SubmissionColumns.Language)
+		case njudge.SubmissionFields.Source:
+			whitelist = append(whitelist, models.SubmissionColumns.Source)
+		case njudge.SubmissionFields.Private:
+			whitelist = append(whitelist, models.SubmissionColumns.Private)
+
+		case njudge.SubmissionFields.Started:
+			whitelist = append(whitelist, models.SubmissionColumns.Started)
+		case njudge.SubmissionFields.Verdict:
+			whitelist = append(whitelist, models.SubmissionColumns.Verdict)
+		case njudge.SubmissionFields.Ontest:
+			whitelist = append(whitelist, models.SubmissionColumns.Ontest)
+		case njudge.SubmissionFields.Submitted:
+			whitelist = append(whitelist, models.SubmissionColumns.Submitted)
+		case njudge.SubmissionFields.Judged:
+			whitelist = append(whitelist, models.SubmissionColumns.Judged)
+		case njudge.SubmissionFields.Score:
+			whitelist = append(whitelist, models.SubmissionColumns.Score)
+		case njudge.SubmissionFields.Status:
+			whitelist = append(whitelist, models.SubmissionColumns.Status)
+		}
+	}
+
+	dbobj, err := ss.toModel(ctx, s)
+	if err != nil {
+		return err
+	}
+
+	_, err = dbobj.Update(ctx, ss.db, boil.Whitelist(whitelist...))
+	return err
 }

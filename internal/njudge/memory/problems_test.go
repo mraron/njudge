@@ -62,8 +62,6 @@ func TestProblemTags(t *testing.T) {
 	res, err := m.Get(context.TODO(), 1)
 	assert.Nil(t, err)
 	assert.Equal(t, len(res.Tags), 2)
-	assert.Equal(t, res.Tags[0].ID, 1)
-	assert.Equal(t, res.Tags[1].ID, 2)
 
 	res.DeleteTag(njudge.Tag{ID: 6, Name: "dp"})
 	assert.Nil(t, m.Update(context.TODO(), *res, njudge.Fields(njudge.ProblemFields.Tags)))
@@ -71,5 +69,5 @@ func TestProblemTags(t *testing.T) {
 	res, err = m.Get(context.TODO(), 1)
 	assert.Nil(t, err)
 	assert.Equal(t, len(res.Tags), 1)
-	assert.Equal(t, res.Tags[0].ID, 2)
+	assert.Equal(t, res.Tags[0].Tag.ID, 5)
 }
