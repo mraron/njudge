@@ -1,3 +1,6 @@
+--
+-- Replace (problemset, problem) with problem_id in submissions table
+--
 alter table submissions
     add problem_id integer default 0 not null;
 
@@ -5,7 +8,6 @@ UPDATE submissions SET problem_id = (
     SELECT id from problem_rels pr 
     WHERE pr.problemset = submissions.problemset 
     and pr.problem = submissions.problem
-
 );
 
 alter table submissions
@@ -18,9 +20,15 @@ alter table submissions
 alter table submissions
     drop column problem;
 
+--
+-- Add unique constraint in problem_rels on columns (problemset, problem)
+--
 ALTER TABLE problem_rels
     ADD CONSTRAINT problem_rels_unique_problemset_problem UNIQUE (problemset, problem);
 
+--
+-- Modify foregin key to cascade
+--
 alter table forgotten_password_keys
     drop constraint forgotten_password_keys_user_fkey;
 
@@ -29,10 +37,16 @@ alter table forgotten_password_keys
         foreign key (user_id) references users
             on delete cascade;
 
--- Remove duplications
+--
+-- PL/PgSQL script to remove duplicates
+--
 BEGIN TRANSACTION;
-DELETE from users WHERE name IN (SELECT name FROM users GROUP BY name HAVING count(*) > 1) and activation_key IS NOT NULL;
-                                                                                                                  ;DO
+
+DELETE from users 
+WHERE name IN (SELECT name FROM users GROUP BY name HAVING count(*) > 1) 
+and activation_key IS NOT NULL;
+
+;DO
 $$
 DECLARE
    rec   record;
@@ -54,14 +68,22 @@ BEGIN
 END
 $$;
 
--- SELECT name FROM users GROUP BY name HAVING count(*) > 1;
--- SELECT id, name, email FROM users WHERE email in (SELECT email FROM users GROUP BY email HAVING count(*) > 1);
-
 COMMIT;
 
+-- 
+-- Add unique constraints to users
+--
 ALTER TABLE users ADD CONSTRAINT users_name_unique UNIQUE (name);
 ALTER TABLE users ADD CONSTRAINT users_email_unique UNIQUE (email);
 
-alter table public.users
+--
+-- Add registered column
+--
+alter table users
     add registered timestamp with time zone default CURRENT_TIMESTAMP;
 
+--
+-- Add unique constraint on user_id in forgotten_pasword_keys
+--
+
+alter table forgotten_password_keys ADD constraint forgotten_password_keys_user_id_unique UNIQUE (user_id);
