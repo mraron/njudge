@@ -13,7 +13,7 @@ services:
       - POSTGRES_PASSWORD=postgres
     volumes:
       - db:/var/lib/postgresql/data
-      - ./internal/migrations/1_init.up.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      - ./internal/njudge/db/migrations/1_init.up.sql:/docker-entrypoint-initdb.d/create_tables.sql
   web:
     build:
       context: .
