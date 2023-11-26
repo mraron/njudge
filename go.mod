@@ -1,6 +1,6 @@
 module github.com/mraron/njudge
 
-go 1.18
+go 1.21
 
 require (
 	cloud.google.com/go/compute v1.6.1 // indirect
