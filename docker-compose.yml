@@ -1,6 +1,7 @@
 version: "2.3"
 services:
   base:
+    image: ${COMPOSE_PROJECT_NAME}-base
     build: .
   db:
     image: postgres:14.1-alpine
@@ -23,9 +24,6 @@ services:
       - 5555:5555
     env_file:
       - web.env
-    depends_on:
-      - base
-      - db
     volumes:
       - type: volume
         source: problems
@@ -41,8 +39,6 @@ services:
       dockerfile: internal/judge/Dockerfile
     env_file:
       - judge.env
-    depends_on:
-      - base
     volumes:
       - type: volume
         source: problems
@@ -57,9 +53,6 @@ services:
       dockerfile: internal/glue/Dockerfile
     env_file:
       - glue.env
-    depends_on:
-      - base
-      - db
     networks:
       - default
 volumes:
