@@ -22,6 +22,7 @@ Disclaimer: it's possible to run the system without docker, but it's much more o
 First, build the containers:
 
 ```
+docker-compose build base
 docker-compose build
 ```
 
