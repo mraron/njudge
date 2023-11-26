@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2023-11-27
+
+### Added
+- Functionality to reset passwords (e5b4b2)
+
+### Fixed
+- Crash in Codeforces Feedback problems (6782c6)
+- Activating email (text<->html) (41dac0)
+
+## Changed
+- Updated to sqlboiler v4.15 and go 1.21
+- Database was refactored 
+- Business logic was refactored (added in-memory persistance)
+
+The previous two changes are from 65ec4f to 19c523
+
 ## [0.2.0] - 2023-06-14
 
 ### Added
@@ -79,6 +95,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Crash when admin panel is visited without logging in
 - Workflow
 
-[unreleased]: https://github.com/mraron/njudge/compare/v0.2.0...HEAD
+[unreleased]: https://github.com/mraron/njudge/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/mraron/njudge/releases/tag/v0.3.0
 [0.2.0]: https://github.com/mraron/njudge/releases/tag/v0.2.0
 [0.1.0]: https://github.com/mraron/njudge/releases/tag/v0.1.0
