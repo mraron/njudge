@@ -151,8 +151,10 @@ func (us *Users) Update(ctx context.Context, u *njudge.User, fields []string) er
 		}
 	}
 
-	if _, err := dbobj.Update(ctx, tx, boil.Whitelist(whitelist...)); err != nil {
-		return multierr.Combine(err, tx.Rollback())
+	if len(whitelist) > 0 {
+		if _, err := dbobj.Update(ctx, tx, boil.Whitelist(whitelist...)); err != nil {
+			return multierr.Combine(err, tx.Rollback())
+		}
 	}
 
 	if u.ForgottenPasswordKey != nil {
@@ -176,6 +178,11 @@ func (us *Users) Update(ctx context.Context, u *njudge.User, fields []string) er
 			}
 
 			u.ForgottenPasswordKey.ID = key.ID
+		}
+	} else {
+		_, err = models.ForgottenPasswordKeys(models.ForgottenPasswordKeyWhere.UserID.EQ(u.ID)).DeleteAll(ctx, tx)
+		if err != nil {
+			return multierr.Combine(err, tx.Rollback())
 		}
 	}
 
