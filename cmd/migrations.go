@@ -1,12 +1,13 @@
 package cmd
 
 import (
-	"github.com/golang-migrate/migrate/v4/source/iofs"
-	"github.com/mraron/njudge/internal/migrations"
-	"github.com/mraron/njudge/internal/web"
-	"github.com/mraron/njudge/internal/web/helpers/config"
 	"log"
 	"os"
+
+	"github.com/golang-migrate/migrate/v4/source/iofs"
+	"github.com/mraron/njudge/internal/njudge/db/migrations"
+	"github.com/mraron/njudge/internal/web"
+	"github.com/mraron/njudge/internal/web/helpers/config"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"

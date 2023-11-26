@@ -1,5 +1,5 @@
 {{define "submissionStatus"}}
-{{$status := parseStatus .Status}}
+{{$status := .Status}}
 {{if eq $status.FeedbackType 0}}
     {{if .Judged.Valid}}
         {{if eq .Verdict 0}}
@@ -71,12 +71,13 @@
     <tr id="submission{{.ID}}">
         <td><a href="/submission/{{.ID}}">{{.ID}}</a></td>
         <td>{{.Submitted.Local.Year}}. {{fixedLen (month2int .Submitted.Local.Month) 2}}. {{fixedLen .Submitted.Local.Day 2}} {{fixedLen .Submitted.Local.Hour 2}}:{{fixedLen .Submitted.Local.Minute 2}}:{{fixedLen .Submitted.Local.Second 2}}</td>
-        {{$userName := (.User.OneG contextTODO).Name}}
+        {{$userName := (.GetUser ctx Users).Name}}
+        {{$problem := (.GetProblem ctx Problems)}}
         <td><a href="/user/profile/{{$userName}}/">{{$userName}}</a></td>
-        <td><a href="/problemset/{{.Problemset}}/{{.Problem}}/">{{(get "translator").TranslateContent ((problem .Problem).Titles)}}</a></td>
+        <td><a href="/problemset/{{$problem.Problemset}}/{{$problem.Problem}}/">{{(get "translator").TranslateContent ((problem $problem.Problem).Titles)}}</a></td>
         <td>{{.Language}}</td>
         <td>
-            {{$status := parseStatus .Status}}
+            {{$status := .Status}}
             {{template "submissionStatus" .}}
         </td>
         <td>{{if and .Judged.Valid (ne .Verdict 998)}}{{(index $status.Feedback 0).MaxTimeSpent}}{{end}}</td>

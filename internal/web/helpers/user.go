@@ -4,15 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 
-	"github.com/mraron/njudge/internal/web/domain/problem"
-	"github.com/mraron/njudge/internal/web/models"
-	"github.com/mraron/njudge/pkg/problems"
+	"github.com/mraron/njudge/internal/njudge/db/models"
 
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
+/*
 func HasUserSolved(DB *sql.DB, userID int, problemSet, problemName string) (problem.SolvedStatus, error) {
 	solvedStatus := problem.Unattempted
 
@@ -37,7 +35,7 @@ func HasUserSolved(DB *sql.DB, userID int, problemSet, problemName string) (prob
 	}
 
 	return solvedStatus, nil
-}
+}*/
 
 func GetUserLastLanguage(ctx context.Context, DB *sql.DB, userID int) (string, error) {
 	if userID > 0 {

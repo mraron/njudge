@@ -1,6 +1,6 @@
 {{template "header" .}}
 {{template "problem_menu" "problem"}}
-{{$title := ((get "translator").TranslateContent .Data.Problem.Titles ).Value | toString}}
+{{$title := ((get "translator").TranslateContent .Data.ProblemStoredData.Titles ).Value | toString}}
 {{$locale := (get "translator").LocaleName}}
 <div class="modal fade" id="tagModal" tabindex="-1" aria-labelledby="tagModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -31,9 +31,9 @@
 
 <div class="row">
 <div class="col-12 col-lg-9">
-{{if $htmls := .Data.Problem.Statements.FilterByType "text/html"}}
+{{if $htmls := .Data.ProblemStoredData.Statements.FilterByType "text/html"}}
     {{str2html (translateContent $locale $htmls).String}}
-{{else if $pdfs := .Data.Problem.Statements.FilterByType "application/pdf"}}
+{{else if $pdfs := .Data.ProblemStoredData.Statements.FilterByType "application/pdf"}}
     <embed src="pdf/{{(translateContent $locale $pdfs).Locale}}/" width="100%" height="800px"/>
 {{end}}
 </div>
@@ -46,21 +46,27 @@
     <div class="card-body">
         <div class="row">
             <div class="col-6">{{Tr "Identifier"}}:</div>
-            <div class="col-6">{{.Data.Problem.Name}}</div>
+            <div class="col-6">{{.Data.ProblemStoredData.Name}}</div>
             <div class="col-6">{{Tr "Title"}}:</div>
             <div class="col-6">{{$title}}</div>
-            {{if ne .Data.Problem.GetTaskType.Name "outputonly" }}
+            {{if ne .Data.ProblemStoredData.GetTaskType.Name "outputonly" }}
             <div class="col-6">{{Tr "Time limit"}}:</div>
-            <div class="col-6">{{.Data.Problem.TimeLimit}} ms</div>
+            <div class="col-6">{{.Data.ProblemStoredData.TimeLimit}} ms</div>
             <div class="col-6">{{Tr "Memory limit"}}:</div>
-            <div class="col-6">{{divide .Data.Problem.MemoryLimit 1048576}} MiB</div>
+            <div class="col-6">{{divide .Data.ProblemStoredData.MemoryLimit 1048576}} MiB</div>
             {{end}}
-            {{$solvedStatus := .Data.SolvedStatus}}
-            {{if or (not logged) (or (eq $solvedStatus 3) user.ShowUnsolvedTags)}}
+            {{$userInfo := .Data.ProblemInfo.UserInfo}}
+            
+            {{$solvedStatus := 0}}
+            {{if logged}}
+            {{$solvedStatus = $userInfo.SolvedStatus}}
+            {{end}}
+            
+            {{if or (not logged) (or (eq $solvedStatus 3) user.Settings.ShowUnsolvedTags)}}
             {{if or .Data.Tags (eq $solvedStatus 3)}}
             <div class="col-6">{{Tr "Tags"}}:</div>
             <div class="col-6">
-            {{range $i := .Data.Tags}}<span class="badge badge-secondary">{{$i.Name}}{{if (eq $solvedStatus 3)}} <a href="delete_tag/{{$i.ID}}" style="color:#fff;">&times;</a>{{end}}</span> {{end}}
+            {{range $i := .Data.Tags}}<span class="badge badge-secondary">{{$i.Tag.Name}}{{if (eq $solvedStatus 3)}} <a href="delete_tag/{{$i.Tag.ID}}" style="color:#fff;">&times;</a>{{end}}</span> {{end}}
             {{if (eq $solvedStatus 3)}}
             <span class="badge badge-secondary"><a href="#" class="text-reset text-decoration-none" data-toggle="modal" data-target="#tagModal">+</a></span>
             {{end}}
@@ -68,7 +74,7 @@
             {{end}}
             {{end}}
             <div class="col-6">{{Tr "Task type"}}:</div>
-            <div class="col-6">{{.Data.Problem.GetTaskType.Name}}</div>
+            <div class="col-6">{{.Data.ProblemStoredData.GetTaskType.Name}}</div>
         </div>
     </div>
 </div>
@@ -83,11 +89,11 @@
     <div class="card-body">
         {{if logged}}
             <form action="/problemset/{{get "problemset"}}/submit" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="problem" value="{{.Data.Problem.Name}}">
+            <input type="hidden" name="problem" value="{{.Data.ProblemStoredData.Name}}">
             <input type="file" name="source" id="fileInput">
-            <br>{{$lastLang := .Data.LastLanguage}}
+            <br>{{$lastLang := .Data.ProblemInfo.UserInfo.LastLanguage}}
             <select name="language" class="custom-select form-control" id="languagesList">
-                {{range $l := .Data.Problem.Languages}}
+                {{range $l := .Data.ProblemStoredData.Languages}}
                     <option value="{{$l.Id}}"{{if eq $lastLang $l.Id}} selected="selected"{{end}}>{{$l.Name}}</option>
                 {{end}}
             </select>
@@ -101,14 +107,14 @@
         {{end}}
     </div>
 </div>
-{{if .Data.Submissions}}
+{{if .Data.ProblemInfo.UserInfo}}
 <br>
 <div class="card table-responsive">
     <div class="card-header" style="border-bottom: 0px;">
         <i class="fas fa-history"></i> {{Tr "Last submissions"}}
     </div>
     <table class="card-body table" style="margin: 0px;">
-        {{range $s := .Data.Submissions}}
+        {{range $s := .Data.ProblemInfo.UserInfo.Submissions}}
             <tr>
                 <td><a href="/submission/{{$s.ID}}">{{$s.ID}}</a></td>
                 <td>{{.Submitted.Local.Year}}. {{fixedLen (month2int .Submitted.Local.Month) 2}}. {{fixedLen .Submitted.Local.Day 2}} {{fixedLen .Submitted.Local.Hour 2}}:{{fixedLen .Submitted.Local.Minute 2}}:{{fixedLen .Submitted.Local.Second 2}}</td>
@@ -119,17 +125,17 @@
 </div>
 
 {{end}}
-{{if or .Data.Problem.Attachments (.Data.Problem.Statements.FilterByType "application/pdf")}}
+{{if or .Data.ProblemStoredData.Attachments (.Data.ProblemStoredData.Statements.FilterByType "application/pdf")}}
 <br>
 <div class="card">
     <div class="card-header">
         <i class="fas fa-paperclip"></i> {{Tr "Attachments"}}
     </div>
     <div class="card-body">
-        {{range $a := .Data.Problem.Attachments}}
+        {{range $a := .Data.ProblemStoredData.Attachments}}
             <a href="attachment/{{$a.Name}}/"><i class="fas fa-file"></i> {{Tr "File"}} ({{$a.Name}})</a><br>
         {{end}}
-        {{range $loc := (.Data.Problem.Statements.FilterByType "application/pdf").Locales}}
+        {{range $loc := (.Data.ProblemStoredData.Statements.FilterByType "application/pdf").Locales}}
             <a href="pdf/{{$loc}}/"><i class="fas fa-file-pdf"></i> {{Tr "Statement"}} ({{$loc}})</a><br>
         {{end}}
 

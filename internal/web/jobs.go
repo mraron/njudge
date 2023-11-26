@@ -2,10 +2,11 @@ package web
 
 import (
 	"context"
-	"github.com/mraron/njudge/internal/web/models"
 	"log"
 	"math"
 	"time"
+
+	"github.com/mraron/njudge/internal/njudge/db/models"
 
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
@@ -14,7 +15,8 @@ import (
 
 func (s *Server) StartBackgroundJobs() {
 	go s.runUpdateProblems()
-	go s.runStatisticsUpdate()
+	//TODO
+	//go s.runStatisticsUpdate()
 }
 
 func (s *Server) runUpdateProblems() {

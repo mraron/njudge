@@ -1,10 +1,10 @@
-output="internal/web/models"
+output="internal/njudge/db/models"
 wipe=true
 no-context=false
 no-tests=true
 add-global-variants=true
 [psql]
-  dbname = "njudge"
+  dbname = "postgres"
   host   = "localhost"
   port   = 5600
   user   = "postgres"

@@ -1,20 +1,18 @@
 package problemset
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"sort"
 	"strconv"
 	"strings"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
-	"github.com/mraron/njudge/internal/web/domain/problem"
+	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
 	"github.com/mraron/njudge/internal/web/helpers/ui"
-	"github.com/mraron/njudge/internal/web/models"
-	"github.com/mraron/njudge/internal/web/services"
 	"github.com/mraron/njudge/pkg/problems"
 )
 
@@ -24,14 +22,17 @@ type CategoryFilterOption struct {
 	Selected bool
 }
 
-type StatProblem struct {
-	problem.Problem
-	problem.StatsData
+type Problem struct {
+	njudge.Problem
+	njudge.ProblemStoredData
+	njudge.ProblemInfo
+
+	CategoryLink ui.Link
 }
 
 type ProblemList struct {
 	Pages        []pagination.Link
-	Problems     []StatProblem
+	Problems     []Problem
 	SolverSorter ui.SortColumn
 
 	Filtered bool
@@ -41,11 +42,11 @@ type ProblemList struct {
 	CategoryFilterOptions []CategoryFilterOption
 }
 
-func GetProblemList(DB *sqlx.DB, problemListService services.ProblemListService, problemRepo problem.Repository, problemStatsService services.ProblemStatsService) echo.HandlerFunc {
+func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categories, problemListQuery njudge.ProblemListQuery, pinfo njudge.ProblemInfoQuery) echo.HandlerFunc {
 	type request struct {
 		Page  int `query:"page"`
-		Order string
-		By    string
+		Order njudge.SortDirection
+		By    njudge.ProblemSortField
 
 		TitleFilter    string `query:"title"`
 		CategoryFilter int    `query:"category"`
@@ -64,24 +65,21 @@ func GetProblemList(DB *sqlx.DB, problemListService services.ProblemListService,
 			data.Page = 1
 		}
 
-		data.Order, data.By = "DESC", "id"
+		data.Order, data.By = njudge.SortDESC, njudge.ProblemSortFieldID
 		if c.QueryParam("by") == "solver_count" {
-			data.By = "solver_count"
+			data.By = njudge.ProblemSortFieldSolverCount
 		}
 		if c.QueryParam("order") == "ASC" {
-			data.Order = "ASC"
+			data.Order = njudge.SortASC
 		}
 
-		listRequest := services.ProblemListRequest{
-			Problemset: data.Problemset,
-			Pagination: pagination.Data{
-				Page:      data.Page,
-				PerPage:   20,
-				SortDir:   data.Order,
-				SortField: data.By,
-			},
+		listRequest := njudge.ProblemListRequest{
+			Problemset:  data.Problemset,
+			Page:        data.Page,
+			PerPage:     20,
+			SortDir:     data.Order,
+			SortField:   data.By,
 			TitleFilter: data.TitleFilter,
-			GETData:     c.Request().URL.Query(),
 		}
 
 		if data.TagFilter != "" {
@@ -90,37 +88,49 @@ func GetProblemList(DB *sqlx.DB, problemListService services.ProblemListService,
 
 		if data.CategoryFilter != 0 {
 			if data.CategoryFilter == -1 {
-				listRequest.CategoryFilter = problem.NewCategoryEmptyFilter()
+				listRequest.CategoryFilter = njudge.NewCategoryEmptyFilter()
 			} else {
-				listRequest.CategoryFilter = problem.NewCategoryIDFilter(data.CategoryFilter)
+				listRequest.CategoryFilter = njudge.NewCategoryIDFilter(data.CategoryFilter)
 			}
 		}
 
-		problemList, err := problemListService.GetProblemList(c.Request().Context(), listRequest)
+		problemList, err := problemListQuery.GetProblemList(c.Request().Context(), listRequest)
 		if err != nil {
 			return err
 		}
 
-		result := ProblemList{
-			Pages: problemList.Pages,
+		u := *c.Request().URL
+		links, err := pagination.Links(problemList.PaginationData.Page, problemList.PaginationData.PerPage, int64(problemList.PaginationData.Count), u.Query())
+		if err != nil {
+			return err
 		}
+		result := ProblemList{
+			Pages: links,
+		}
+
 		for ind := range problemList.Problems {
-			p, err := problemRepo.Get(c.Request().Context(), problemList.Problems[ind].ID)
+			p, err := ps.Get(c.Request().Context(), problemList.Problems[ind].ID)
 			if err != nil {
 				return err
 			}
-			stat, err := problemStatsService.GetStatsData(c.Request().Context(), *p, c.Get("userID").(int))
+			info, err := pinfo.GetProblemData(c.Request().Context(), p.ID, c.Get("userID").(int))
+			if err != nil {
+				return err
+			}
+			data, err := p.WithStoredData(store)
 			if err != nil {
 				return err
 			}
 
-			result.Problems = append(result.Problems, StatProblem{
-				Problem:   *p,
-				StatsData: *stat,
+			result.Problems = append(result.Problems, Problem{
+				Problem:           *p,
+				ProblemInfo:       *info,
+				ProblemStoredData: data,
 			})
 		}
 
-		sortOrder, qu := "", c.Request().URL.Query()
+		sortOrder, u := "", *c.Request().URL
+		qu := u.Query()
 		if qu.Get("by") == "solver_count" {
 			sortOrder = qu.Get("order")
 			if qu.Get("order") == "DESC" {
@@ -155,7 +165,7 @@ func GetProblemList(DB *sqlx.DB, problemListService services.ProblemListService,
 			Selected: emptySelected,
 		})
 
-		categories, err := models.ProblemCategories().All(c.Request().Context(), DB)
+		categories, err := cs.GetAll(c.Request().Context())
 		if err != nil {
 			return err
 		}
@@ -199,12 +209,35 @@ func GetProblemList(DB *sqlx.DB, problemListService services.ProblemListService,
 			return result.CategoryFilterOptions[i].Name < result.CategoryFilterOptions[j].Name
 		})
 
+		for ind := range result.Problems {
+			if result.Problems[ind].Category != nil {
+				cid := result.Problems[ind].Category.ID
+				for {
+					if _, ok := par[cid]; ok {
+						cid = par[cid]
+					} else {
+						break
+					}
+				}
+
+				result.Problems[ind].CategoryLink = ui.Link{
+					Text: categoryNameByID[cid],
+					Href: fmt.Sprintf("/task_archive#category%d", result.Problems[ind].ID),
+				}
+			}
+		}
+
 		c.Set("title", tr.Translate("Problems"))
 		return c.Render(http.StatusOK, "problemset/list", result)
 	}
 }
 
-func GetStatus(statusPageService services.StatusPageService) echo.HandlerFunc {
+type StatusPage struct {
+	Pages       []pagination.Link
+	Submissions []njudge.Submission
+}
+
+func GetStatus(slist njudge.SubmissionListQuery) echo.HandlerFunc {
 	type request struct {
 		AC         string `query:"ac"`
 		UserID     int    `query:"user_id"`
@@ -224,35 +257,43 @@ func GetStatus(statusPageService services.StatusPageService) echo.HandlerFunc {
 			data.Page = 1
 		}
 
-		statusReq := services.StatusPageRequest{
-			Pagination: pagination.Data{
-				Page:      data.Page,
-				PerPage:   20,
-				SortDir:   "DESC",
-				SortField: "id",
-			},
+		statusReq := njudge.SubmissionListRequest{
+			Page:       data.Page,
+			PerPage:    20,
+			SortDir:    njudge.SortDESC,
+			SortField:  njudge.SubmissionSortFieldID,
 			Problemset: data.Problemset,
 			Problem:    data.Problem,
 			UserID:     data.UserID,
-			GETValues:  c.Request().URL.Query(),
 		}
 
 		if data.AC == "1" {
-			ac := problems.VerdictAC
+			ac := njudge.VerdictAC
 			statusReq.Verdict = &ac
 		}
 
-		statusPage, err := statusPageService.GetStatusPage(c.Request().Context(), statusReq)
+		submissionList, err := slist.GetPagedSubmissionList(c.Request().Context(), statusReq)
 		if err != nil {
 			return err
 		}
 
+		qu := (*c.Request().URL).Query()
+		links, err := pagination.LinksWithCountLimit(submissionList.PaginationData.Page, submissionList.PaginationData.PerPage, int64(submissionList.PaginationData.Count), qu, 5)
+		if err != nil {
+			return err
+		}
+
+		result := StatusPage{
+			Submissions: submissionList.Submissions,
+			Pages:       links,
+		}
+
 		c.Set("title", tr.Translate("Submissions"))
-		return c.Render(http.StatusOK, "status.gohtml", statusPage)
+		return c.Render(http.StatusOK, "status.gohtml", result)
 	}
 }
 
-func PostSubmit(subService services.SubmitService) echo.HandlerFunc {
+func PostSubmit(subService njudge.SubmitService) echo.HandlerFunc {
 	type request struct {
 		Problemset     string `param:"name"`
 		ProblemName    string `form:"problem"`
@@ -260,7 +301,7 @@ func PostSubmit(subService services.SubmitService) echo.HandlerFunc {
 		SubmissionCode string `form:"submissionCode"`
 	}
 	return func(c echo.Context) error {
-		u := c.Get("user").(*models.User)
+		u := c.Get("user").(*njudge.User)
 
 		data := request{}
 		if err := c.Bind(&data); err != nil {
@@ -290,7 +331,7 @@ func PostSubmit(subService services.SubmitService) echo.HandlerFunc {
 			}
 		}
 
-		sub, err := subService.Submit(c.Request().Context(), services.SubmitRequest{
+		sub, err := subService.Submit(c.Request().Context(), njudge.SubmitRequest{
 			UserID:     u.ID,
 			Problemset: data.Problemset,
 			Problem:    data.ProblemName,

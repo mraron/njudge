@@ -3,9 +3,10 @@ package api
 import (
 	"context"
 	"database/sql"
-	"github.com/mraron/njudge/internal/web/helpers/pagination"
-	"github.com/mraron/njudge/internal/web/models"
 	"strconv"
+
+	"github.com/mraron/njudge/internal/njudge/db/models"
+	"github.com/mraron/njudge/internal/web/helpers/pagination"
 
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"

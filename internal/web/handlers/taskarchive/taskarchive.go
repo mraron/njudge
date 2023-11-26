@@ -1,16 +1,11 @@
 package taskarchive
 
 import (
-	"github.com/volatiletech/null/v8"
-	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"net/http"
 
-	"github.com/mraron/njudge/internal/web/domain/problem"
-	"github.com/mraron/njudge/internal/web/helpers"
+	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
-	"github.com/mraron/njudge/internal/web/models"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/pkg/problems"
 )
@@ -24,31 +19,28 @@ type TreeNode struct {
 	Type         string
 	Name         string
 	Link         string
-	SolvedStatus problem.SolvedStatus
+	SolvedStatus njudge.SolvedStatus
 	Children     []TreeNode
 }
 
-func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
+func Get(cats njudge.Categories, problemQuery njudge.ProblemQuery, problemInfoQuery njudge.ProblemInfoQuery, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		u := c.Get("user").(*models.User)
+		u := c.Get("user").(*njudge.User)
 
-		lst, err := models.ProblemCategories(models.ProblemCategoryWhere.ParentID.IsNull()).All(c.Request().Context(), DB)
+		lst, err := cats.GetAllWithParent(c.Request().Context(), 0)
 		if err != nil {
 			return err
 		}
 
 		taskArchive := TaskArchive{Roots: make([]TreeNode, 0)}
 
-		var dfs func(category *models.ProblemCategory, node *TreeNode) error
+		var dfs func(category njudge.Category, node *TreeNode) error
 		id := 1000
 
-		dfs = func(root *models.ProblemCategory, tree *TreeNode) error {
-			problemList, err := models.ProblemRels(models.ProblemRelWhere.CategoryID.EQ(null.Int{
-				Int:   root.ID,
-				Valid: true,
-			}), qm.OrderBy("problem")).All(c.Request().Context(), DB)
+		dfs = func(root njudge.Category, tree *TreeNode) error {
+			problemList, err := problemQuery.GetProblemsWithCategory(c.Request().Context(), njudge.NewCategoryIDFilter(root.ID))
 			if err != nil {
 				return err
 			}
@@ -64,10 +56,11 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 				}
 
 				if u != nil {
-					elem.SolvedStatus, err = helpers.HasUserSolved(DB.DB, u.ID, p.Problemset, p.Problem)
+					pinfo, err := problemInfoQuery.GetProblemData(c.Request().Context(), p.ID, u.ID)
 					if err != nil {
 						return err
 					}
+					elem.SolvedStatus = pinfo.UserInfo.SolvedStatus
 				}
 
 				tree.Children = append(tree.Children, elem)
@@ -75,11 +68,7 @@ func Get(DB *sqlx.DB, problemStore problems.Store) echo.HandlerFunc {
 				id++
 			}
 
-			subCategories, err := models.ProblemCategories(models.ProblemCategoryWhere.ParentID.EQ(null.Int{
-				Int:   root.ID,
-				Valid: true,
-			}), qm.OrderBy("name")).All(c.Request().Context(), DB)
-
+			subCategories, err := cats.GetAllWithParent(c.Request().Context(), root.ID)
 			if err != nil {
 				return err
 			}

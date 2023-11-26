@@ -1,6 +1,6 @@
 {
     "port": "3000",
-    "DBName": "njudge",
+    "DBName": "postgres",
     "DBAccount": "postgres",
     "DBPassword": "postgres",
     "DBHost": "db"  

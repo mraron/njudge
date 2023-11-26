@@ -4,8 +4,8 @@
 <form action="/problemset/{{get "problemset"}}/submit" method="post" >
 <div class="form-group">
     <label for="problem" class="font-weight-bold">{{Tr "Problem"}}</label>
-    <input type="hidden" name="problem" value="{{.Data.Problem.Name}}">
-    <div id="problem">{{(translateContent "hungarian" .Data.Problem.Titles).String}}</div>
+    <input type="hidden" name="problem" value="{{.Data.Problem.Problem}}">
+    <div id="problem">{{(translateContent "hungarian" .Data.ProblemStoredData.Titles).String}}</div>
 </div>
 <div class="form-group">
     <label for="submissionCode" class="font-weight-bolder">{{Tr "Code"}}</label>
@@ -14,9 +14,9 @@
 </div>
 <div class="form-group">
     <label for="languagesList" class="font-weight-bolder">{{Tr "Language"}}</label>
-    {{$lastLang := .Data.LastLanguage}}
+    {{$lastLang := .Data.ProblemInfo.UserInfo.LastLanguage}}
     <select name="language" class="custom-select form-control" id="languagesList">
-        {{range $l := .Data.Problem.Languages}}
+        {{range $l := .Data.ProblemStoredData.Languages}}
             <option value="{{$l.Id}}"{{if eq $lastLang $l.Id}} selected="selected"{{end}}>{{$l.Name}}</option>
         {{end}}
     </select>

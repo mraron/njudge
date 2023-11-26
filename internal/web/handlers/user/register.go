@@ -2,21 +2,16 @@ package user
 
 import (
 	"bytes"
-	"fmt"
+	"errors"
 	"net/http"
 	"unicode"
 
-	"github.com/mraron/njudge/internal/web/domain/email"
-	"github.com/mraron/njudge/internal/web/helpers"
+	"github.com/mraron/njudge/internal/njudge"
+	"github.com/mraron/njudge/internal/njudge/email"
 	"github.com/mraron/njudge/internal/web/helpers/config"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
-	"github.com/mraron/njudge/internal/web/models"
-	"github.com/mraron/njudge/internal/web/services"
-	"github.com/volatiletech/sqlboiler/v4/boil"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type RegistrationPageData struct {
@@ -27,7 +22,7 @@ type RegistrationPageData struct {
 
 func GetRegister() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if u := c.Get("user").(*models.User); u != nil {
+		if u := c.Get("user").(*njudge.User); u != nil {
 			return c.Render(http.StatusOK, "error", "Már be vagy lépve...")
 		}
 
@@ -35,7 +30,7 @@ func GetRegister() echo.HandlerFunc {
 	}
 }
 
-func Register(cfg config.Server, DB *sqlx.DB, mailService services.MailService) echo.HandlerFunc {
+func Register(cfg config.Server, registerService njudge.RegisterService, mailService email.Service) echo.HandlerFunc {
 	type request struct {
 		Name      string `form:"name"`
 		Email     string `form:"email"`
@@ -50,116 +45,99 @@ func Register(cfg config.Server, DB *sqlx.DB, mailService services.MailService) 
 			return err
 		}
 
-		var (
-			errStrings = make([]string, 0)
-			key        = helpers.GenerateActivationKey(32)
-			err        error
-		)
-
-		if u := c.Get("user").(*models.User); u != nil {
+		if u := c.Get("user").(*njudge.User); u != nil {
 			return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
 		}
 
-		used := func(col, value, msg string) {
-			if err != nil {
-				u := ""
-				err = DB.Get(&u, "SELECT name FROM users WHERE "+col+"=$1", value)
-				if u != "" {
-					errStrings = append(errStrings, msg)
+		register := func() ([]string, error) {
+			var (
+				errMessages = make([]string, 0)
+				err         error
+			)
+
+			required := func(value, msg string) {
+				if c.FormValue(value) == "" {
+					errMessages = append(errMessages, msg)
 				}
 			}
-		}
 
-		required := func(value, msg string) {
-			if c.FormValue(value) == "" {
-				errStrings = append(errStrings, msg)
-			}
-		}
-
-		alphaNumeric := func(value, msg string) {
-			for _, r := range value {
-				if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
-					errStrings = append(errStrings, msg)
-					return
-				}
-			}
-		}
-
-		used("name", data.Name, tr.Translate("The nickname is already registered."))
-		used("email", data.Email, tr.Translate("The email is already registered."))
-
-		required("name", tr.Translate("The nickname field is required."))
-		required("password", tr.Translate("The password field is required."))
-		required("password2", tr.Translate("The password confirmation field is required."))
-		required("email", tr.Translate("The email field is required."))
-
-		alphaNumeric(data.Name, tr.Translate("The nickname can only consist of alphanumeric characters: letters (including non-latin characters such as 'á' or 'ű') and digits."))
-
-		if data.Password != data.Password2 {
-			errStrings = append(errStrings, tr.Translate("The two passwords don't match."))
-		}
-
-		if err != nil {
-			return err
-		}
-
-		if len(errStrings) > 0 {
-			return c.Render(http.StatusOK, "user/register", RegistrationPageData{
-				ErrorStrings: errStrings,
-				Name:         data.Name,
-				Email:        data.Email,
-			})
-		}
-
-		mustPanic := func(err error) {
-			if err != nil {
-				panic(err)
-			}
-		}
-
-		transaction := func() {
-			tx, err := DB.Begin()
-			defer func() {
-				if p := recover(); p != nil {
-					tx.Rollback()
-
-					var ok bool
-					if err, ok = p.(error); !ok {
-						err = fmt.Errorf("can't cast to error: %v", err)
+			alphaNumeric := func(value, msg string) {
+				for _, r := range value {
+					if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
+						errMessages = append(errMessages, msg)
+						return
 					}
 				}
-			}()
+			}
 
-			mustPanic(err)
+			required("name", tr.Translate("The nickname field is required."))
+			required("password", tr.Translate("The password field is required."))
+			required("password2", tr.Translate("The password confirmation field is required."))
+			required("email", tr.Translate("The email field is required."))
 
-			hashed, err := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
-			mustPanic(err)
+			alphaNumeric(data.Name, tr.Translate("The nickname can only consist of alphanumeric characters: letters (including non-latin characters such as 'á' or 'ű') and digits."))
 
-			_, err = tx.Exec("INSERT INTO users (name,password,email,activation_key,role) VALUES ($1,$2,$3,$4,$5)", data.Name, hashed, data.Email, key, "user")
-			mustPanic(err)
+			if data.Password != data.Password2 {
+				errMessages = append(errMessages, tr.Translate("The two passwords don't match."))
+			}
+
+			if len(errMessages) > 0 {
+				return errMessages, nil
+			}
+
+			u, err := registerService.Register(c.Request().Context(), njudge.RegisterRequest{
+				Name:     data.Name,
+				Email:    data.Email,
+				Password: data.Password,
+			})
+
+			if errors.Is(err, njudge.ErrorSameName) {
+				errMessages = append(errMessages, tr.Translate("The nickname is already registered."))
+			}
+			if errors.Is(err, njudge.ErrorSameEmail) {
+				errMessages = append(errMessages, tr.Translate("The email is already registered."))
+			}
+			if err != nil {
+				return errMessages, err
+			}
+
+			if len(errMessages) > 0 {
+				return errMessages, nil
+			}
 
 			m := email.Mail{}
 			m.Recipients = []string{c.FormValue("email")}
 			m.Subject = tr.Translate("Activate your account")
 
 			message := &bytes.Buffer{}
-			mustPanic(c.Echo().Renderer.Render(message, "mail/activation", struct {
+			err = c.Echo().Renderer.Render(message, "mail/activation", struct {
 				Name          string
 				URL           string
 				ActivationKey string
 			}{
 				c.FormValue("name"),
 				cfg.Url,
-				key,
-			}, nil))
+				u.ActivationInfo.Key,
+			}, nil)
+			if err != nil {
+				return errMessages, err
+			}
 			m.Message = message.String()
 
-			mustPanic(mailService.Send(c.Request().Context(), m))
+			if err = mailService.Send(c.Request().Context(), m); err != nil {
+				return errMessages, err
+			}
 
-			mustPanic(tx.Commit())
+			return nil, nil
 		}
 
-		if transaction(); err != nil {
+		if errMessages, err := register(); err == nil && len(errMessages) > 0 {
+			return c.Render(http.StatusOK, "user/register", RegistrationPageData{
+				ErrorStrings: errMessages,
+				Name:         data.Name,
+				Email:        data.Email,
+			})
+		} else if err != nil {
 			return err
 		}
 
@@ -171,7 +149,7 @@ func GetActivateInfo() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		if u := c.Get("user").(*models.User); u != nil {
+		if u := c.Get("user").(*njudge.User); u != nil {
 			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
 		}
 
@@ -179,7 +157,7 @@ func GetActivateInfo() echo.HandlerFunc {
 	}
 }
 
-func Activate(DB *sqlx.DB) echo.HandlerFunc {
+func Activate(users njudge.Users) echo.HandlerFunc {
 	type request struct {
 		Name string `param:"name"`
 		Key  string `param:"key"`
@@ -192,25 +170,25 @@ func Activate(DB *sqlx.DB) echo.HandlerFunc {
 
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		if u := c.Get("user").(*models.User); u != nil {
+		if u := c.Get("user").(*njudge.User); u != nil {
 			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
 		}
 
-		user, err := models.Users(models.UserWhere.Name.EQ(data.Name)).One(c.Request().Context(), DB)
+		user, err := users.GetByName(c.Request().Context(), data.Name)
 		if err != nil {
 			return err
 		}
 
-		if !user.ActivationKey.Valid {
+		if user.ActivationInfo.Activated {
 			return c.Render(http.StatusOK, "error.gohtml", tr.Translate("This account has already been activated."))
 		}
 
-		if user.ActivationKey.String != data.Key {
+		if user.ActivationInfo.Key != data.Key {
 			return c.Render(http.StatusOK, "error.gohtml", tr.Translate("Wrong activation key. Are you sure you've clicked on the right link?"))
 		}
 
-		user.ActivationKey.Valid = false
-		if _, err := user.Update(c.Request().Context(), DB, boil.Whitelist(models.UserColumns.ActivationKey)); err != nil {
+		user.Activate()
+		if err := users.Update(c.Request().Context(), user, njudge.Fields(njudge.UserFields.ActivationInfo)); err != nil {
 			return err
 		}
 

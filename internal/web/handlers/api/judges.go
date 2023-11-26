@@ -3,9 +3,10 @@ package api
 import (
 	"context"
 	"database/sql"
-	"github.com/mraron/njudge/internal/web/extmodels"
+
+	"github.com/mraron/njudge/internal/njudge/db/models"
+	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
-	"github.com/mraron/njudge/internal/web/models"
 
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -23,7 +24,7 @@ func (JudgeDataProvider) Identifier() string {
 	return "id"
 }
 
-func (dp JudgeDataProvider) List(data *pagination.Data) ([]*extmodels.Judge, error) {
+func (dp JudgeDataProvider) List(data *pagination.Data) ([]*helpers.Judge, error) {
 	qms := make([]QueryMod, 0)
 	if data.SortField != "" {
 		qms = append(qms, OrderBy(data.SortField+" "+data.SortDir))
@@ -39,9 +40,9 @@ func (dp JudgeDataProvider) List(data *pagination.Data) ([]*extmodels.Judge, err
 		return nil, err
 	}
 
-	lst := make([]*extmodels.Judge, len(orig))
+	lst := make([]*helpers.Judge, len(orig))
 	for i := 0; i < len(orig); i++ {
-		elem := extmodels.NewJudgeFromModelsJudge(orig[i])
+		elem := helpers.NewJudgeFromModelsJudge(orig[i])
 		lst[i] = elem
 	}
 
@@ -52,17 +53,17 @@ func (dp JudgeDataProvider) Count() (int64, error) {
 	return models.Judges().Count(context.TODO(), dp.DB)
 }
 
-func (dp JudgeDataProvider) Get(id string) (*extmodels.Judge, error) {
+func (dp JudgeDataProvider) Get(id string) (*helpers.Judge, error) {
 	elem, err := models.Judges(Where("id = ?", id)).One(context.TODO(), dp.DB)
 	if err != nil {
 		return nil, err
 	}
 
-	res := extmodels.NewJudgeFromModelsJudge(elem)
+	res := helpers.NewJudgeFromModelsJudge(elem)
 	return res, nil
 }
 
-func (dp JudgeDataProvider) Insert(elem *extmodels.Judge) error {
+func (dp JudgeDataProvider) Insert(elem *helpers.Judge) error {
 	model := models.Judge{}
 	model.Host = elem.Host
 	model.Port = elem.Port
@@ -82,7 +83,7 @@ func (dp JudgeDataProvider) Delete(id string) error {
 	return err
 }
 
-func (dp JudgeDataProvider) Update(id string, elem *extmodels.Judge) error {
+func (dp JudgeDataProvider) Update(id string, elem *helpers.Judge) error {
 	model, err := models.Judges(Where("id=?", id)).One(context.TODO(), dp.DB)
 	if err != nil {
 		return err

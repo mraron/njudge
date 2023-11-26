@@ -3,8 +3,10 @@ package partials
 import (
 	"context"
 	"database/sql"
-	"github.com/mraron/njudge/internal/web/models"
+	"errors"
 	"time"
+
+	"github.com/mraron/njudge/internal/njudge/db/models"
 
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
@@ -43,4 +45,10 @@ func (pc *Cached) Get(name string) (string, error) {
 	}
 
 	return pc.cache[name], nil
+}
+
+type Empty struct{}
+
+func (e Empty) Get(name string) (string, error) {
+	return "", errors.New("unknown")
 }

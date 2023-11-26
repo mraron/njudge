@@ -1,18 +1,15 @@
 package user
 
 import (
-	"context"
-	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
+	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/web/helpers"
-	"github.com/mraron/njudge/internal/web/models"
-	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
-func currentUser(c echo.Context, DB *sqlx.DB) (*models.User, error) {
+func currentUser(c echo.Context, us njudge.Users) (*njudge.User, error) {
 	var (
-		u   *models.User
+		u   *njudge.User
 		err error
 	)
 
@@ -24,14 +21,16 @@ func currentUser(c echo.Context, DB *sqlx.DB) (*models.User, error) {
 	if _, ok := storage.Values["id"]; !ok {
 		return nil, nil
 	}
-	u, err = models.Users(Where("id=?", storage.Values["id"])).One(context.TODO(), DB)
+
+	id := storage.Values["id"].(int)
+	u, err = us.Get(c.Request().Context(), id)
 	return u, err
 }
 
-func SetUserMiddleware(DB *sqlx.DB) func(echo.HandlerFunc) echo.HandlerFunc {
+func SetUserMiddleware(us njudge.Users) func(echo.HandlerFunc) echo.HandlerFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			user, err := currentUser(c, DB)
+			user, err := currentUser(c, us)
 			c.Set("user", user)
 
 			if user != nil {
@@ -52,7 +51,7 @@ func SetUserMiddleware(DB *sqlx.DB) func(echo.HandlerFunc) echo.HandlerFunc {
 func RequireLoginMiddleware() func(echo.HandlerFunc) echo.HandlerFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			if c.Get("user").(*models.User) == nil {
+			if c.Get("user").(*njudge.User) == nil {
 				return helpers.LoginRequired(c)
 			}
 

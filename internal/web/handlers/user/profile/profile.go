@@ -1,66 +1,51 @@
 package profile
 
 import (
-	"github.com/volatiletech/sqlboiler/v4/boil"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
 
-	"github.com/jmoiron/sqlx"
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/labstack/echo/v4"
-	"github.com/mraron/njudge/internal/web/domain/submission"
+	"github.com/mraron/njudge/internal/njudge"
+	"github.com/mraron/njudge/internal/web/handlers/problemset"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
-	"github.com/mraron/njudge/internal/web/models"
-	"github.com/mraron/njudge/internal/web/services"
-	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
-func GetProfile(DB *sqlx.DB) echo.HandlerFunc {
+func GetProfile(slist njudge.SubmissionListQuery) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		u := c.Get("profile").(*models.User)
-		var (
-			solved, attempted models.SubmissionSlice
-			err               error
-		)
+		u := c.Get("profile").(*njudge.User)
 
-		solved, err = models.Submissions(Select("max(submissions.id) as id, problemset, problem"),
-			Where("user_id = ?", u.ID), Where("verdict = ?", 0),
-			GroupBy("submissions.problemset, submissions.problem"),
-		).All(c.Request().Context(), DB)
+		solved, err := slist.GetSolvedSubmissionList(c.Request().Context(), u.ID)
 		if err != nil {
 			return err
 		}
 
-		attempted, err = models.Submissions(Select("max(submissions.id) as id, problemset, problem"),
-			Where("user_id = ?", u.ID), Where("verdict <> ?", 0),
-			Where("not exists(select id from submissions as other where other.user_id = ? and "+
-				"verdict = 0 and other.problem = submissions.problem and other.problemset=submissions.problemset)", u.ID),
-			GroupBy("submissions.problemset, submissions.problem"),
-		).All(c.Request().Context(), DB)
+		attempted, err := slist.GetAttemptedSubmissionList(c.Request().Context(), u.ID)
 		if err != nil {
 			return err
 		}
 
 		c.Set("title", tr.Translate("%s's profile", u.Name))
 		return c.Render(http.StatusOK, "user/profile/main", struct {
-			User                       *models.User
-			SolvedProblems             models.SubmissionSlice
-			AttemptedNotSolvedProblems models.SubmissionSlice
-		}{u, solved, attempted})
+			User                       *njudge.User
+			SolvedProblems             []njudge.Submission
+			AttemptedNotSolvedProblems []njudge.Submission
+		}{u, solved.Submissions, attempted.Submissions})
 	}
 }
 
-func GetSubmissions(statusPageService services.StatusPageService) echo.HandlerFunc {
+func GetSubmissions(slist njudge.SubmissionListQuery) echo.HandlerFunc {
 	type request struct {
 		Page int `query:"page"`
 	}
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		u := c.Get("profile").(*models.User)
+		u := c.Get("profile").(*njudge.User)
 
 		data := request{}
 		if err := c.Bind(&data); err != nil {
@@ -71,42 +56,50 @@ func GetSubmissions(statusPageService services.StatusPageService) echo.HandlerFu
 			data.Page = 1
 		}
 
-		statusReq := services.StatusPageRequest{
-			Pagination: pagination.Data{
-				Page:      data.Page,
-				PerPage:   20,
-				SortDir:   "DESC",
-				SortField: "id",
-			},
+		statusReq := njudge.SubmissionListRequest{
+			Page:      data.Page,
+			PerPage:   20,
+			SortDir:   njudge.SortDESC,
+			SortField: njudge.SubmissionSortFieldID,
 			UserID:    u.ID,
-			GETValues: c.Request().URL.Query(),
 		}
 
-		statusPage, err := statusPageService.GetStatusPage(c.Request().Context(), statusReq)
+		submissionList, err := slist.GetPagedSubmissionList(c.Request().Context(), statusReq)
 		if err != nil {
 			return err
 		}
 
+		qu := (*c.Request().URL).Query()
+		links, err := pagination.Links(submissionList.PaginationData.Page, submissionList.PaginationData.PerPage, int64(submissionList.PaginationData.Count), qu)
+		if err != nil {
+			return err
+		}
+
+		result := problemset.StatusPage{
+			Submissions: submissionList.Submissions,
+			Pages:       links,
+		}
+
 		c.Set("title", tr.Translate("%s's submissions", u.Name))
 		return c.Render(http.StatusOK, "user/profile/submissions", struct {
-			User       *models.User
-			StatusPage *submission.StatusPage
-		}{u, statusPage})
+			User       *njudge.User
+			StatusPage problemset.StatusPage
+		}{u, result})
 	}
 }
 
-func GetSettings(DB *sqlx.DB) echo.HandlerFunc {
+func GetSettings() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := c.Get("user").(*models.User)
+		u := c.Get("user").(*njudge.User)
 
 		helpers.DeleteFlash(c, "ChangePassword")
 		return c.Render(http.StatusOK, "user/profile/settings", struct {
-			User *models.User
+			User *njudge.User
 		}{u})
 	}
 }
 
-func PostSettingsChangePassword(DB *sqlx.DB) echo.HandlerFunc {
+func PostSettingsChangePassword(us njudge.Users) echo.HandlerFunc {
 	type request struct {
 		PasswordOld  string `form:"passwordOld"`
 		PasswordNew1 string `form:"passwordNew1"`
@@ -114,7 +107,7 @@ func PostSettingsChangePassword(DB *sqlx.DB) echo.HandlerFunc {
 	}
 	return func(c echo.Context) error {
 		tr := c.Get("translator").(i18n.Translator)
-		u := c.Get("user").(*models.User)
+		u := c.Get("user").(*njudge.User)
 
 		data := request{}
 		if err := c.Bind(&data); err != nil {
@@ -136,13 +129,8 @@ func PostSettingsChangePassword(DB *sqlx.DB) echo.HandlerFunc {
 			return c.Redirect(http.StatusFound, "../")
 		}
 
-		res, err := bcrypt.GenerateFromPassword([]byte(data.PasswordNew1), bcrypt.DefaultCost)
-		if err != nil {
-			return err
-		}
-
-		u.Password = string(res)
-		if _, err = u.Update(c.Request().Context(), DB, boil.Whitelist(models.UserColumns.Password)); err != nil {
+		u.SetPassword(data.PasswordNew1)
+		if err := us.Update(c.Request().Context(), u, njudge.Fields(njudge.UserFields.Password)); err != nil {
 			return err
 		}
 
@@ -150,14 +138,14 @@ func PostSettingsChangePassword(DB *sqlx.DB) echo.HandlerFunc {
 	}
 }
 
-func PostSettingsMisc(DB *sqlx.DB) echo.HandlerFunc {
+func PostSettingsMisc(us njudge.Users) echo.HandlerFunc {
 	type request struct {
 		ShowTagsForUnsolved string `form:"showTagsForUnsolved"`
 
 		ShowTagsForUnsolvedBool bool
 	}
 	return func(c echo.Context) error {
-		u := c.Get("user").(*models.User)
+		u := c.Get("user").(*njudge.User)
 
 		data := request{}
 		if err := c.Bind(&data); err != nil {
@@ -167,8 +155,8 @@ func PostSettingsMisc(DB *sqlx.DB) echo.HandlerFunc {
 			data.ShowTagsForUnsolvedBool = true
 		}
 
-		u.ShowUnsolvedTags = data.ShowTagsForUnsolvedBool
-		if _, err := u.Update(c.Request().Context(), DB, boil.Whitelist(models.UserColumns.ShowUnsolvedTags)); err != nil {
+		u.Settings.ShowUnsolvedTags = data.ShowTagsForUnsolvedBool
+		if err := us.Update(c.Request().Context(), u, njudge.Fields(njudge.UserFields.Settings)); err != nil {
 			return err
 		}
 

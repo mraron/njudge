@@ -3,9 +3,10 @@ package glue
 import (
 	"context"
 	"database/sql"
-	"github.com/mraron/njudge/internal/judge"
-	"github.com/mraron/njudge/internal/web/models"
 	"log"
+
+	"github.com/mraron/njudge/internal/judge"
+	"github.com/mraron/njudge/internal/njudge/db/models"
 
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"go.uber.org/multierr"

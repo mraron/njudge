@@ -3,39 +3,38 @@ package templates
 import (
 	"context"
 	"crypto/md5"
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"github.com/mraron/njudge/internal/web/domain/problem"
-	"github.com/mraron/njudge/internal/web/helpers"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
-	"github.com/mraron/njudge/internal/web/helpers/roles"
-	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
-	"github.com/mraron/njudge/internal/web/models"
-	"github.com/mraron/njudge/pkg/problems"
-	"golang.org/x/text/message"
 	"html/template"
 	"math"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/mraron/njudge/internal/njudge"
+	"github.com/mraron/njudge/internal/web/helpers"
+	"github.com/mraron/njudge/internal/web/helpers/i18n"
+	"github.com/mraron/njudge/internal/web/helpers/roles"
+	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
+	"github.com/mraron/njudge/pkg/problems"
+	"golang.org/x/text/message"
 )
 
 func contextFuncs(c echo.Context) template.FuncMap {
 	return template.FuncMap{
 		"logged": func() bool {
-			if _, ok := c.Get("user").(*models.User); ok {
-				return nil != c.Get("user").(*models.User)
+			if _, ok := c.Get("user").(*njudge.User); ok {
+				return nil != c.Get("user").(*njudge.User)
 			}
 
 			return false
 		},
-		"user": func() *models.User {
-			if _, ok := c.Get("user").(*models.User); ok {
-				return c.Get("user").(*models.User)
+		"user": func() *njudge.User {
+			if _, ok := c.Get("user").(*njudge.User); ok {
+				return c.Get("user").(*njudge.User)
 			}
 
 			return nil
@@ -60,10 +59,13 @@ func contextFuncs(c echo.Context) template.FuncMap {
 		"Tr": func(key message.Reference, args ...interface{}) string {
 			return c.Get(i18n.TranslatorContextKey).(i18n.Translator).Translate(key, args...)
 		},
+		"ctx": func() context.Context {
+			return c.Request().Context()
+		},
 	}
 }
 
-func statelessFuncs(store problems.Store, db *sql.DB, store2 partials.Store) template.FuncMap {
+func statelessFuncs(store problems.Store, users njudge.Users, ps njudge.Problems, tags njudge.Tags, store2 partials.Store) template.FuncMap {
 	return template.FuncMap{
 		"translateContent": i18n.TranslateContent,
 		"problem":          store.Get,
@@ -110,7 +112,7 @@ func statelessFuncs(store problems.Store, db *sql.DB, store2 partials.Store) tem
 
 			return ""
 		},
-		"gravatarHash": func(user *models.User) string {
+		"gravatarHash": func(user njudge.User) string {
 			return fmt.Sprintf("%x", md5.Sum([]byte(strings.ToLower(strings.TrimSpace(user.Email)))))
 		},
 		"dict": func(values ...interface{}) (map[string]interface{}, error) {
@@ -134,12 +136,18 @@ func statelessFuncs(store problems.Store, db *sql.DB, store2 partials.Store) tem
 		"roundTo": func(num float64, digs int) float64 {
 			return math.Round(num*100) / 100
 		},
-		"tags": func() (models.TagSlice, error) {
-			return models.Tags().All(context.Background(), db)
+		"tags": func() ([]njudge.Tag, error) {
+			return tags.GetAll(context.Background())
 		},
 		"contextTODO": func() context.Context {
 			return context.TODO()
 		},
-		"verdict": problem.VerdictFromProblemsVerdictName,
+		"verdict": njudge.VerdictFromProblemsVerdictName,
+		"Problems": func() njudge.Problems {
+			return ps
+		},
+		"Users": func() njudge.Users {
+			return users
+		},
 	}
 }

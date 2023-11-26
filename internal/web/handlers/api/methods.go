@@ -1,13 +1,14 @@
 package api
 
 import (
-	"github.com/mraron/njudge/internal/web/helpers"
-	"github.com/mraron/njudge/internal/web/helpers/pagination"
-	"github.com/mraron/njudge/internal/web/helpers/roles"
-	"github.com/mraron/njudge/internal/web/models"
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"github.com/mraron/njudge/internal/njudge/db/models"
+	"github.com/mraron/njudge/internal/web/helpers"
+	"github.com/mraron/njudge/internal/web/helpers/pagination"
+	"github.com/mraron/njudge/internal/web/helpers/roles"
 
 	"github.com/labstack/echo/v4"
 )

@@ -1,10 +1,7 @@
 package templates
 
 import (
-	"database/sql"
 	"fmt"
-	"github.com/fsnotify/fsnotify"
-	"github.com/mraron/njudge/internal/web/templates"
 	"html/template"
 	"io"
 	"io/fs"
@@ -13,6 +10,10 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+
+	"github.com/fsnotify/fsnotify"
+	"github.com/mraron/njudge/internal/njudge"
+	"github.com/mraron/njudge/internal/web/templates"
 
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/web/helpers/config"
@@ -24,18 +25,22 @@ type Renderer struct {
 	templates     map[string]*template.Template
 	cfg           config.Server
 	problemStore  problems.Store
-	db            *sql.DB
+	users         njudge.Users
+	problems      njudge.Problems
+	tags          njudge.Tags
 	partialsStore partials.Store
 
 	sync.RWMutex
 }
 
-func New(cfg config.Server, problemStore problems.Store, db *sql.DB, partialsStore partials.Store) *Renderer {
+func New(cfg config.Server, problemStore problems.Store, users njudge.Users, ps njudge.Problems, tags njudge.Tags, partialsStore partials.Store) *Renderer {
 	renderer := &Renderer{
 		templates:     make(map[string]*template.Template),
 		cfg:           cfg,
 		problemStore:  problemStore,
-		db:            db,
+		users:         users,
+		problems:      ps,
+		tags:          tags,
 		partialsStore: partialsStore,
 	}
 
@@ -43,7 +48,7 @@ func New(cfg config.Server, problemStore problems.Store, db *sql.DB, partialsSto
 		log.Println("template parsing error:", err)
 	}
 
-	if cfg.Mode == "development" {
+	if cfg.Mode == "development" || cfg.Mode == "demo" {
 		renderer.startWatcher()
 	}
 
@@ -113,7 +118,7 @@ func (t *Renderer) Update() error {
 			} else {
 				tmpl, err := template.New(info.Name()).
 					Funcs(contextFuncs(nil)).
-					Funcs(statelessFuncs(t.problemStore, t.db, t.partialsStore)).
+					Funcs(statelessFuncs(t.problemStore, t.users, t.problems, t.tags, t.partialsStore)).
 					ParseFS(usedFS, append(layoutFiles, path)...)
 
 				if err != nil {
