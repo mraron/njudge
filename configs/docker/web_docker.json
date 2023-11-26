@@ -5,7 +5,7 @@
   "url": "http://localhost:5555",
   "problemsDir": "/njudge_problems",
   "templatesDir": "./internal/web/templates",
-  "DBName": "njudge",
+  "DBName": "postgres",
   "DBAccount": "postgres",
   "DBPassword": "postgres",
   "DBHost": "db",
