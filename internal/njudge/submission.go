@@ -123,3 +123,7 @@ type SubmitRequest struct {
 type SubmitService interface {
 	Submit(ctx context.Context, subRequest SubmitRequest) (*Submission, error)
 }
+
+type SubmissionsQuery interface {
+	GetUnstarted(ctx context.Context, limit int) ([]Submission, error)
+}

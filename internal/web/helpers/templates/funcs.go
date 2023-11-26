@@ -15,7 +15,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/mraron/njudge/internal/njudge"
-	"github.com/mraron/njudge/internal/web/domain/problem"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/helpers/roles"
@@ -143,7 +142,7 @@ func statelessFuncs(store problems.Store, users njudge.Users, ps njudge.Problems
 		"contextTODO": func() context.Context {
 			return context.TODO()
 		},
-		"verdict": problem.VerdictFromProblemsVerdictName,
+		"verdict": njudge.VerdictFromProblemsVerdictName,
 		"Problems": func() njudge.Problems {
 			return ps
 		},

@@ -64,6 +64,10 @@ func (cs *Categories) GetAll(ctx context.Context) ([]njudge.Category, error) {
 }
 
 func (cs *Categories) GetAllWithParent(ctx context.Context, parentID int) ([]njudge.Category, error) {
+	if parentID == 0 {
+		return cs.getAll(ctx, models.ProblemCategoryWhere.ParentID.IsNull())
+	}
+
 	return cs.getAll(ctx, models.ProblemCategoryWhere.ParentID.EQ(null.Int{
 		Valid: true,
 		Int:   parentID,

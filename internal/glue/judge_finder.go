@@ -6,19 +6,19 @@ import (
 )
 
 type JudgeFinder interface {
-	FindJudge([]*models.Judge, *models.Submission) (*models.Judge, error)
+	FindJudge(judges []*models.Judge, problem string) (*models.Judge, error)
 }
 
 type FindJudgerNaive struct{}
 
-func (FindJudgerNaive) FindJudge(judges []*models.Judge, sub *models.Submission) (*models.Judge, error) {
+func (FindJudgerNaive) FindJudge(judges []*models.Judge, problem string) (*models.Judge, error) {
 	for _, j := range judges {
 		st, err := judge.ParseServerStatus(j.State)
 		if err != nil {
 			return nil, err
 		}
 
-		if j.Online && st.SupportsProblem(sub.Problem) {
+		if j.Online && st.SupportsProblem(problem) {
 			return j, nil
 		}
 	}

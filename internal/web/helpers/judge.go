@@ -1,4 +1,4 @@
-package extmodels
+package helpers
 
 import (
 	"github.com/mraron/njudge/internal/judge"

@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	"errors"
 
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/njudge/db/models"
@@ -40,12 +39,7 @@ func (us *Users) toNjudge(ctx context.Context, u *models.User) (*njudge.User, er
 		},
 	}
 
-	key, err := u.ForgottenPasswordKeys().One(ctx, us.db)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return nil, err
-	}
-
-	if err == nil {
+	if key := u.R.ForgottenPasswordKey; key != nil {
 		res.ForgottenPasswordKey = &njudge.ForgottenPasswordKey{
 			ID:         key.ID,
 			UserID:     u.ID,
@@ -59,7 +53,7 @@ func (us *Users) toNjudge(ctx context.Context, u *models.User) (*njudge.User, er
 
 // converts to *models.User, ignoring forgotten password fkey
 func (us *Users) toModel(u njudge.User) *models.User {
-	return &models.User{
+	res := &models.User{
 		ID:               u.ID,
 		Name:             u.Name,
 		Password:         string(u.Password),
@@ -69,10 +63,11 @@ func (us *Users) toModel(u njudge.User) *models.User {
 		Points:           null.Float32From(u.Points),
 		ShowUnsolvedTags: u.Settings.ShowUnsolvedTags,
 	}
+	return res
 }
 
 func (us *Users) get(ctx context.Context, mods ...qm.QueryMod) (*njudge.User, error) {
-	dbobj, err := models.Users(mods...).One(ctx, us.db)
+	dbobj, err := models.Users(append(mods, qm.Load(models.UserRels.ForgottenPasswordKey))...).One(ctx, us.db)
 	if err != nil {
 		return nil, MaskNotFoundError(err, njudge.ErrorUserNotFound)
 	}
@@ -110,12 +105,12 @@ func (us *Users) Insert(ctx context.Context, u njudge.User) (*njudge.User, error
 	}
 
 	if u.ForgottenPasswordKey != nil {
-		key := models.ForgottenPasswordKey{
+		key := &models.ForgottenPasswordKey{
 			Key:   u.ForgottenPasswordKey.Key,
 			Valid: u.ForgottenPasswordKey.ValidUntil,
 		}
 
-		if err := key.Insert(ctx, tx, boil.Infer()); err != nil {
+		if err := dbobj.SetForgottenPasswordKey(ctx, tx, true, key); err != nil {
 			return nil, multierr.Combine(err, tx.Rollback())
 		}
 	}
@@ -161,21 +156,21 @@ func (us *Users) Update(ctx context.Context, u *njudge.User, fields []string) er
 
 	if u.ForgottenPasswordKey != nil {
 		if u.ForgottenPasswordKey.ID != 0 {
-			key := models.ForgottenPasswordKey{
+			key := &models.ForgottenPasswordKey{
 				Key:   u.ForgottenPasswordKey.Key,
 				Valid: u.ForgottenPasswordKey.ValidUntil,
 			}
 
-			if _, err := key.Update(ctx, tx, boil.Whitelist(models.ForgottenPasswordKeyColumns.Key, models.ForgottenPasswordKeyColumns.Valid)); err != nil {
+			if err := dbobj.SetForgottenPasswordKey(ctx, tx, false, key); err != nil {
 				return multierr.Combine(err, tx.Rollback())
 			}
 		} else {
-			key := models.ForgottenPasswordKey{
+			key := &models.ForgottenPasswordKey{
 				Key:   u.ForgottenPasswordKey.Key,
 				Valid: u.ForgottenPasswordKey.ValidUntil,
 			}
 
-			if err := key.Insert(ctx, tx, boil.Infer()); err != nil {
+			if err := dbobj.SetForgottenPasswordKey(ctx, tx, true, key); err != nil {
 				return multierr.Combine(err, tx.Rollback())
 			}
 

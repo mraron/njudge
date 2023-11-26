@@ -10,17 +10,18 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mraron/njudge/internal/web/domain/problem"
+	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/pkg/problems"
 
 	"github.com/mraron/njudge/internal/judge"
+	"github.com/mraron/njudge/internal/njudge/db"
 	"github.com/mraron/njudge/internal/njudge/db/models"
+	"github.com/mraron/njudge/internal/njudge/memory"
 	"github.com/mraron/njudge/internal/web/helpers/config"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/volatiletech/sqlboiler/v4/boil"
-	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
+	"github.com/volatiletech/null/v8"
 )
 
 type Config struct {
@@ -35,6 +36,11 @@ type Server struct {
 	DB            *sql.DB
 	JudgesUpdater JudgesUpdater
 	JudgeFinder   JudgeFinder
+
+	Submissions njudge.Submissions
+	Problems    njudge.Problems
+
+	SubmissionsQuery njudge.SubmissionsQuery
 
 	judges      []*models.Judge
 	judgesMutex sync.RWMutex
@@ -58,7 +64,9 @@ func (s *Server) ConnectToDB() {
 		panic(err)
 	}
 
-	boil.SetDB(s.DB)
+	s.Submissions = db.NewSubmissions(s.DB)
+	s.Problems = db.NewProblems(s.DB)
+	s.SubmissionsQuery = memory.NewSubmissionsQuery(s.Submissions)
 }
 
 func (s *Server) Run() {
@@ -104,21 +112,50 @@ func (s *Server) runServer() {
 		if st.Done {
 			var (
 				verdict problems.VerdictName
-				score   float64 = 0.0
+				score   float32 = 0.0
 			)
 
 			if !st.Status.Compiled {
-				verdict = problems.VerdictName(problem.VerdictCE)
+				verdict = problems.VerdictName(njudge.VerdictCE)
 			} else {
 				verdict = st.Status.Feedback[0].Verdict()
-				score = st.Status.Feedback[0].Score()
+				score = float32(st.Status.Feedback[0].Score())
 			}
 
-			if _, err := s.DB.Exec("UPDATE submissions SET verdict=$1, status=$2, ontest=NULL, judged=$3, score=$5 WHERE id=$4", verdict, st.Status, time.Now(), id, score); err != nil {
+			sub := njudge.Submission{
+				ID:      id,
+				Verdict: njudge.Verdict(verdict),
+				Status:  st.Status,
+				Ontest: null.String{
+					Valid:  false,
+					String: "",
+				},
+				Judged: null.NewTime(time.Now(), true),
+				Score:  score,
+			}
+
+			if err := s.Submissions.Update(c.Request().Context(), sub, njudge.Fields(
+				njudge.SubmissionFields.Verdict,
+				njudge.SubmissionFields.Status,
+				njudge.SubmissionFields.Ontest,
+				njudge.SubmissionFields.Judged,
+				njudge.SubmissionFields.Score,
+			)); err != nil {
 				return err
 			}
 		} else {
-			if _, err := s.DB.Exec("UPDATE submissions SET ontest=$1, status=$2, verdict=$3 WHERE id=$4", st.Test, st.Status, problem.VerdictRU, id); err != nil {
+			sub := njudge.Submission{
+				ID:      id,
+				Verdict: njudge.VerdictRU,
+				Status:  st.Status,
+				Ontest:  null.NewString(st.Test, true),
+			}
+
+			if err := s.Submissions.Update(c.Request().Context(), sub, njudge.Fields(
+				njudge.SubmissionFields.Verdict,
+				njudge.SubmissionFields.Status,
+				njudge.SubmissionFields.Ontest,
+			)); err != nil {
 				log.Print("can't realtime update status", err)
 			}
 		}
@@ -133,7 +170,7 @@ func (s *Server) runJudger() {
 	for {
 		time.Sleep(1 * time.Second)
 
-		ss, err := models.Submissions(Where("started=?", false), OrderBy("id ASC"), Limit(1)).All(context.Background(), s.DB)
+		ss, err := s.SubmissionsQuery.GetUnstarted(context.Background(), 5)
 		if err != nil {
 			log.Print("judger query error", err)
 			continue
@@ -144,8 +181,14 @@ func (s *Server) runJudger() {
 		}
 
 		for _, sub := range ss {
+			p, err := s.Problems.Get(context.Background(), sub.ProblemID)
+			if err != nil {
+				log.Print(err)
+				continue
+			}
+
 			s.judgesMutex.RLock()
-			j, err := s.JudgeFinder.FindJudge(s.judges, sub)
+			j, err := s.JudgeFinder.FindJudge(s.judges, p.Problem)
 			if err != nil {
 				log.Print(err)
 				continue
@@ -163,12 +206,18 @@ func (s *Server) runJudger() {
 			}
 
 			client := judge.NewClient(st.Url)
-			if err := client.SubmitCallback(context.TODO(), judge.Submission{Id: strconv.Itoa(sub.ID), Problem: sub.Problem, Language: sub.Language, Source: sub.Source}, "http://glue:"+s.Port+"/callback/"+strconv.Itoa(sub.ID)); err != nil {
+			if err := client.SubmitCallback(context.Background(),
+				judge.Submission{
+					Id:       strconv.Itoa(sub.ID),
+					Problem:  p.Problem,
+					Language: sub.Language,
+					Source:   sub.Source}, fmt.Sprintf("http://glue:%s/callback/%d", s.Port, sub.ID)); err != nil {
 				log.Print("Trying to submit to server", j.Host, j.Port, "Error", err)
 				continue
 			}
 
-			if _, err := s.DB.Exec("UPDATE submissions SET started=true WHERE id=$1", sub.ID); err != nil {
+			sub.Started = true
+			if err := s.Submissions.Update(context.Background(), sub, njudge.Fields(njudge.SubmissionFields.Started)); err != nil {
 				log.Print(err)
 				continue
 			}

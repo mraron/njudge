@@ -5,7 +5,6 @@ import (
 
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/mraron/njudge/internal/njudge/db/models"
-	"github.com/mraron/njudge/internal/web/extmodels"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 
 	"github.com/labstack/echo/v4"
@@ -104,11 +103,11 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 		v1.DELETE("/partials/:name", api.Delete[models.Partial](partialDataProvider))
 
 		judgeDataProvider := api.JudgeDataProvider{DB: s.DB.DB}
-		v1.GET("/judges", api.GetList[extmodels.Judge](judgeDataProvider))
-		v1.POST("/judges", api.Post[extmodels.Judge](judgeDataProvider))
-		v1.GET("/judges/:id", api.Get[extmodels.Judge](judgeDataProvider))
-		v1.PUT("/judges/:id", api.Put[extmodels.Judge](judgeDataProvider))
-		v1.DELETE("/judges/:id", api.Delete[extmodels.Judge](judgeDataProvider))
+		v1.GET("/judges", api.GetList[helpers.Judge](judgeDataProvider))
+		v1.POST("/judges", api.Post[helpers.Judge](judgeDataProvider))
+		v1.GET("/judges/:id", api.Get[helpers.Judge](judgeDataProvider))
+		v1.PUT("/judges/:id", api.Put[helpers.Judge](judgeDataProvider))
+		v1.DELETE("/judges/:id", api.Delete[helpers.Judge](judgeDataProvider))
 
 		userDataProvider := api.UserDataProvider{DB: s.DB.DB}
 		v1.GET("/users", api.GetList[models.User](userDataProvider))

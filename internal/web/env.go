@@ -85,14 +85,14 @@ func (s *Server) SetupDataAccess() {
 
 		s.Categories = db.NewCategories(s.DB.DB)
 		s.Tags = db.NewTags(s.DB.DB)
-		s.Problems = db.NewProblems()
+		s.Problems = db.NewProblems(s.DB.DB)
 		s.Submissions = db.NewSubmissions(s.DB.DB)
 		s.Users = db.NewUsers(s.DB.DB)
 
-		s.ProblemQuery = memory.NewProblemQuery(s.Problems)
-		s.ProblemInfoQuery = memory.NewProblemInfoQuery(s.Submissions)
+		s.ProblemQuery = s.Problems.(*db.Problems)
+		s.ProblemInfoQuery = s.Problems.(*db.Problems)
 		s.ProblemListQuery = memory.NewProblemListQuery(s.ProblemStore, s.Problems, s.Tags, s.Categories)
-		s.SubmissionListQuery = memory.NewSubmissionListQuery(s.Submissions, s.Problems)
+		s.SubmissionListQuery = db.NewSubmissionListQuery(s.DB.DB)
 
 		s.RegisterService = njudge.NewRegisterService(s.Users)
 		s.SubmitService = memory.NewSubmitService(s.Submissions, s.Users, s.ProblemQuery, s.ProblemStore)

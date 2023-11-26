@@ -2,6 +2,7 @@ package memory
 
 import (
 	"context"
+	"sort"
 
 	"github.com/mraron/njudge/internal/njudge"
 )
@@ -116,4 +117,38 @@ func (p *ProblemQuery) GetProblemsWithCategory(ctx context.Context, f njudge.Cat
 	}
 
 	return res, nil
+}
+
+type SubmissionsQuery struct {
+	submissions njudge.Submissions
+}
+
+func NewSubmissionsQuery(submissions njudge.Submissions) *SubmissionsQuery {
+	return &SubmissionsQuery{
+		submissions: submissions,
+	}
+}
+
+func (s *SubmissionsQuery) GetUnstarted(ctx context.Context, limit int) ([]njudge.Submission, error) {
+	submissions, err := s.submissions.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	unstarted := make([]njudge.Submission, 0)
+	for ind := range submissions {
+		if !submissions[ind].Started {
+			unstarted = append(unstarted, submissions[ind])
+		}
+	}
+
+	sort.Slice(unstarted, func(i, j int) bool {
+		return unstarted[i].Submitted.Before(unstarted[j].Submitted)
+	})
+
+	if len(unstarted) < limit {
+		limit = len(unstarted)
+	}
+
+	return unstarted[:limit], nil
 }

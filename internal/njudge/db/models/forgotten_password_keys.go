@@ -581,7 +581,7 @@ func (forgottenPasswordKeyL) LoadUser(ctx context.Context, e boil.ContextExecuto
 		if foreign.R == nil {
 			foreign.R = &userR{}
 		}
-		foreign.R.ForgottenPasswordKeys = append(foreign.R.ForgottenPasswordKeys, object)
+		foreign.R.ForgottenPasswordKey = object
 		return nil
 	}
 
@@ -592,7 +592,7 @@ func (forgottenPasswordKeyL) LoadUser(ctx context.Context, e boil.ContextExecuto
 				if foreign.R == nil {
 					foreign.R = &userR{}
 				}
-				foreign.R.ForgottenPasswordKeys = append(foreign.R.ForgottenPasswordKeys, local)
+				foreign.R.ForgottenPasswordKey = local
 				break
 			}
 		}
@@ -603,7 +603,7 @@ func (forgottenPasswordKeyL) LoadUser(ctx context.Context, e boil.ContextExecuto
 
 // SetUserG of the forgottenPasswordKey to the related item.
 // Sets o.R.User to related.
-// Adds o to related.R.ForgottenPasswordKeys.
+// Adds o to related.R.ForgottenPasswordKey.
 // Uses the global database handle.
 func (o *ForgottenPasswordKey) SetUserG(ctx context.Context, insert bool, related *User) error {
 	return o.SetUser(ctx, boil.GetContextDB(), insert, related)
@@ -611,7 +611,7 @@ func (o *ForgottenPasswordKey) SetUserG(ctx context.Context, insert bool, relate
 
 // SetUser of the forgottenPasswordKey to the related item.
 // Sets o.R.User to related.
-// Adds o to related.R.ForgottenPasswordKeys.
+// Adds o to related.R.ForgottenPasswordKey.
 func (o *ForgottenPasswordKey) SetUser(ctx context.Context, exec boil.ContextExecutor, insert bool, related *User) error {
 	var err error
 	if insert {
@@ -647,10 +647,10 @@ func (o *ForgottenPasswordKey) SetUser(ctx context.Context, exec boil.ContextExe
 
 	if related.R == nil {
 		related.R = &userR{
-			ForgottenPasswordKeys: ForgottenPasswordKeySlice{o},
+			ForgottenPasswordKey: o,
 		}
 	} else {
-		related.R.ForgottenPasswordKeys = append(related.R.ForgottenPasswordKeys, o)
+		related.R.ForgottenPasswordKey = o
 	}
 
 	return nil

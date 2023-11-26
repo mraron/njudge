@@ -108,20 +108,20 @@ var UserWhere = struct {
 
 // UserRels is where relationship names are stored.
 var UserRels = struct {
-	ForgottenPasswordKeys string
-	ProblemTags           string
-	Submissions           string
+	ForgottenPasswordKey string
+	ProblemTags          string
+	Submissions          string
 }{
-	ForgottenPasswordKeys: "ForgottenPasswordKeys",
-	ProblemTags:           "ProblemTags",
-	Submissions:           "Submissions",
+	ForgottenPasswordKey: "ForgottenPasswordKey",
+	ProblemTags:          "ProblemTags",
+	Submissions:          "Submissions",
 }
 
 // userR is where relationships are stored.
 type userR struct {
-	ForgottenPasswordKeys ForgottenPasswordKeySlice `boil:"ForgottenPasswordKeys" json:"ForgottenPasswordKeys" toml:"ForgottenPasswordKeys" yaml:"ForgottenPasswordKeys"`
-	ProblemTags           ProblemTagSlice           `boil:"ProblemTags" json:"ProblemTags" toml:"ProblemTags" yaml:"ProblemTags"`
-	Submissions           SubmissionSlice           `boil:"Submissions" json:"Submissions" toml:"Submissions" yaml:"Submissions"`
+	ForgottenPasswordKey *ForgottenPasswordKey `boil:"ForgottenPasswordKey" json:"ForgottenPasswordKey" toml:"ForgottenPasswordKey" yaml:"ForgottenPasswordKey"`
+	ProblemTags          ProblemTagSlice       `boil:"ProblemTags" json:"ProblemTags" toml:"ProblemTags" yaml:"ProblemTags"`
+	Submissions          SubmissionSlice       `boil:"Submissions" json:"Submissions" toml:"Submissions" yaml:"Submissions"`
 }
 
 // NewStruct creates a new relationship struct
@@ -129,11 +129,11 @@ func (*userR) NewStruct() *userR {
 	return &userR{}
 }
 
-func (r *userR) GetForgottenPasswordKeys() ForgottenPasswordKeySlice {
+func (r *userR) GetForgottenPasswordKey() *ForgottenPasswordKey {
 	if r == nil {
 		return nil
 	}
-	return r.ForgottenPasswordKeys
+	return r.ForgottenPasswordKey
 }
 
 func (r *userR) GetProblemTags() ProblemTagSlice {
@@ -459,16 +459,13 @@ func (q userQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool,
 	return count > 0, nil
 }
 
-// ForgottenPasswordKeys retrieves all the forgotten_password_key's ForgottenPasswordKeys with an executor.
-func (o *User) ForgottenPasswordKeys(mods ...qm.QueryMod) forgottenPasswordKeyQuery {
-	var queryMods []qm.QueryMod
-	if len(mods) != 0 {
-		queryMods = append(queryMods, mods...)
+// ForgottenPasswordKey pointed to by the foreign key.
+func (o *User) ForgottenPasswordKey(mods ...qm.QueryMod) forgottenPasswordKeyQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("\"user_id\" = ?", o.ID),
 	}
 
-	queryMods = append(queryMods,
-		qm.Where("\"forgotten_password_keys\".\"user_id\"=?", o.ID),
-	)
+	queryMods = append(queryMods, mods...)
 
 	return ForgottenPasswordKeys(queryMods...)
 }
@@ -501,9 +498,9 @@ func (o *User) Submissions(mods ...qm.QueryMod) submissionQuery {
 	return Submissions(queryMods...)
 }
 
-// LoadForgottenPasswordKeys allows an eager lookup of values, cached into the
-// loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (userL) LoadForgottenPasswordKeys(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
+// LoadForgottenPasswordKey allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-1 relationship.
+func (userL) LoadForgottenPasswordKey(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
 	var slice []*User
 	var object *User
 
@@ -566,16 +563,16 @@ func (userL) LoadForgottenPasswordKeys(ctx context.Context, e boil.ContextExecut
 
 	results, err := query.QueryContext(ctx, e)
 	if err != nil {
-		return errors.Wrap(err, "failed to eager load forgotten_password_keys")
+		return errors.Wrap(err, "failed to eager load ForgottenPasswordKey")
 	}
 
 	var resultSlice []*ForgottenPasswordKey
 	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice forgotten_password_keys")
+		return errors.Wrap(err, "failed to bind eager loaded slice ForgottenPasswordKey")
 	}
 
 	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results in eager load on forgotten_password_keys")
+		return errors.Wrap(err, "failed to close results of eager load for forgotten_password_keys")
 	}
 	if err = results.Err(); err != nil {
 		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for forgotten_password_keys")
@@ -588,21 +585,24 @@ func (userL) LoadForgottenPasswordKeys(ctx context.Context, e boil.ContextExecut
 			}
 		}
 	}
-	if singular {
-		object.R.ForgottenPasswordKeys = resultSlice
-		for _, foreign := range resultSlice {
-			if foreign.R == nil {
-				foreign.R = &forgottenPasswordKeyR{}
-			}
-			foreign.R.User = object
-		}
+
+	if len(resultSlice) == 0 {
 		return nil
 	}
 
-	for _, foreign := range resultSlice {
-		for _, local := range slice {
+	if singular {
+		foreign := resultSlice[0]
+		object.R.ForgottenPasswordKey = foreign
+		if foreign.R == nil {
+			foreign.R = &forgottenPasswordKeyR{}
+		}
+		foreign.R.User = object
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
 			if local.ID == foreign.UserID {
-				local.R.ForgottenPasswordKeys = append(local.R.ForgottenPasswordKeys, foreign)
+				local.R.ForgottenPasswordKey = foreign
 				if foreign.R == nil {
 					foreign.R = &forgottenPasswordKeyR{}
 				}
@@ -843,64 +843,60 @@ func (userL) LoadSubmissions(ctx context.Context, e boil.ContextExecutor, singul
 	return nil
 }
 
-// AddForgottenPasswordKeysG adds the given related objects to the existing relationships
-// of the user, optionally inserting them as new records.
-// Appends related to o.R.ForgottenPasswordKeys.
-// Sets related.R.User appropriately.
+// SetForgottenPasswordKeyG of the user to the related item.
+// Sets o.R.ForgottenPasswordKey to related.
+// Adds o to related.R.User.
 // Uses the global database handle.
-func (o *User) AddForgottenPasswordKeysG(ctx context.Context, insert bool, related ...*ForgottenPasswordKey) error {
-	return o.AddForgottenPasswordKeys(ctx, boil.GetContextDB(), insert, related...)
+func (o *User) SetForgottenPasswordKeyG(ctx context.Context, insert bool, related *ForgottenPasswordKey) error {
+	return o.SetForgottenPasswordKey(ctx, boil.GetContextDB(), insert, related)
 }
 
-// AddForgottenPasswordKeys adds the given related objects to the existing relationships
-// of the user, optionally inserting them as new records.
-// Appends related to o.R.ForgottenPasswordKeys.
-// Sets related.R.User appropriately.
-func (o *User) AddForgottenPasswordKeys(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*ForgottenPasswordKey) error {
+// SetForgottenPasswordKey of the user to the related item.
+// Sets o.R.ForgottenPasswordKey to related.
+// Adds o to related.R.User.
+func (o *User) SetForgottenPasswordKey(ctx context.Context, exec boil.ContextExecutor, insert bool, related *ForgottenPasswordKey) error {
 	var err error
-	for _, rel := range related {
-		if insert {
-			rel.UserID = o.ID
-			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
-				return errors.Wrap(err, "failed to insert into foreign table")
-			}
-		} else {
-			updateQuery := fmt.Sprintf(
-				"UPDATE \"forgotten_password_keys\" SET %s WHERE %s",
-				strmangle.SetParamNames("\"", "\"", 1, []string{"user_id"}),
-				strmangle.WhereClause("\"", "\"", 2, forgottenPasswordKeyPrimaryKeyColumns),
-			)
-			values := []interface{}{o.ID, rel.ID}
 
-			if boil.IsDebug(ctx) {
-				writer := boil.DebugWriterFrom(ctx)
-				fmt.Fprintln(writer, updateQuery)
-				fmt.Fprintln(writer, values)
-			}
-			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
-				return errors.Wrap(err, "failed to update foreign table")
-			}
+	if insert {
+		related.UserID = o.ID
 
-			rel.UserID = o.ID
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
 		}
+	} else {
+		updateQuery := fmt.Sprintf(
+			"UPDATE \"forgotten_password_keys\" SET %s WHERE %s",
+			strmangle.SetParamNames("\"", "\"", 1, []string{"user_id"}),
+			strmangle.WhereClause("\"", "\"", 2, forgottenPasswordKeyPrimaryKeyColumns),
+		)
+		values := []interface{}{o.ID, related.ID}
+
+		if boil.IsDebug(ctx) {
+			writer := boil.DebugWriterFrom(ctx)
+			fmt.Fprintln(writer, updateQuery)
+			fmt.Fprintln(writer, values)
+		}
+		if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+			return errors.Wrap(err, "failed to update foreign table")
+		}
+
+		related.UserID = o.ID
 	}
 
 	if o.R == nil {
 		o.R = &userR{
-			ForgottenPasswordKeys: related,
+			ForgottenPasswordKey: related,
 		}
 	} else {
-		o.R.ForgottenPasswordKeys = append(o.R.ForgottenPasswordKeys, related...)
+		o.R.ForgottenPasswordKey = related
 	}
 
-	for _, rel := range related {
-		if rel.R == nil {
-			rel.R = &forgottenPasswordKeyR{
-				User: o,
-			}
-		} else {
-			rel.R.User = o
+	if related.R == nil {
+		related.R = &forgottenPasswordKeyR{
+			User: o,
 		}
+	} else {
+		related.R.User = o
 	}
 	return nil
 }
