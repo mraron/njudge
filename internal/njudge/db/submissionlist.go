@@ -56,6 +56,18 @@ func (s *SubmissionListQuery) getSubmissionList(ctx context.Context, req njudge.
 		return nil, -1, err
 	}
 
+	if req.SortField != "" {
+		inv := req.SortDir == njudge.SortDESC
+		sort.Slice(res, func(i, j int) bool {
+			switch req.SortField {
+			case njudge.SubmissionSortFieldScore:
+				return inv != (res[i].Score < res[j].Score)
+			default:
+				return inv != (res[i].ID < res[j].ID)
+			}
+		})
+	}
+
 	cnt, err := models.Submissions(filterMods...).Count(ctx, s.db)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return nil, -1, err
