@@ -3,7 +3,9 @@ package db
 import (
 	"context"
 	"database/sql"
+	"errors"
 
+	"github.com/lib/pq"
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/njudge/db/models"
 	"github.com/volatiletech/null/v8"
@@ -101,7 +103,18 @@ func (us *Users) Insert(ctx context.Context, u njudge.User) (*njudge.User, error
 	}
 
 	if err := dbobj.Insert(ctx, tx, boil.Infer()); err != nil {
-		return nil, multierr.Combine(err, tx.Rollback())
+		pgerr := &pq.Error{}
+		if errors.As(err, &pgerr) {
+			if pgerr.Code == "23505" {
+				if pgerr.Constraint == "users_name_unique" {
+					return nil, errors.Join(njudge.ErrorSameName, err, tx.Rollback())
+				}
+				if pgerr.Constraint == "users_email_unique" {
+					return nil, errors.Join(njudge.ErrorSameEmail, err, tx.Rollback())
+				}
+			}
+		}
+		return nil, errors.Join(err, tx.Rollback())
 	}
 
 	if u.ForgottenPasswordKey != nil {
@@ -115,7 +128,7 @@ func (us *Users) Insert(ctx context.Context, u njudge.User) (*njudge.User, error
 		}
 	}
 
-	return nil, tx.Commit()
+	return &u, tx.Commit()
 }
 
 func (us *Users) Delete(ctx context.Context, ID int) error {

@@ -97,12 +97,11 @@ func Register(cfg config.Server, registerService njudge.RegisterService, mailSer
 			if errors.Is(err, njudge.ErrorSameEmail) {
 				errMessages = append(errMessages, tr.Translate("The email is already registered."))
 			}
-			if err != nil {
-				return errMessages, err
-			}
-
 			if len(errMessages) > 0 {
 				return errMessages, nil
+			}
+			if err != nil {
+				return nil, err
 			}
 
 			m := email.Mail{}
