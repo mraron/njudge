@@ -9,7 +9,7 @@
 // go generate, note that "the generator is run in the package's source
 // directory".
 //
-// Original source: https://github.com/dys2p/eco/tree/main/language/gotext-update-templates
+// Modified version for njudge, original source: https://github.com/dys2p/eco/blob/main/lang/gotext-update-templates/main.go
 package main
 
 import (
