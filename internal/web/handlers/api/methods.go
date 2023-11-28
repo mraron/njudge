@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/mraron/njudge/internal/njudge/db/models"
+	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
 	"github.com/mraron/njudge/internal/web/helpers/roles"
@@ -33,7 +33,7 @@ type WritableProvider[T any] interface {
 
 func GetList[T any](dp Provider[T]) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := c.Get("user").(*models.User)
+		u := c.Get("user").(*njudge.User)
 
 		if !roles.Can(roles.Role(u.Role), roles.ActionView, roles.Entity(dp.EndpointURL())) {
 			return helpers.UnauthorizedError(c)
@@ -65,7 +65,7 @@ func GetList[T any](dp Provider[T]) echo.HandlerFunc {
 
 func Get[T any](dp Provider[T]) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := c.Get("user").(*models.User)
+		u := c.Get("user").(*njudge.User)
 		if !roles.Can(roles.Role(u.Role), roles.ActionView, roles.Entity(dp.EndpointURL())) {
 			return helpers.UnauthorizedError(c)
 		}
@@ -86,7 +86,7 @@ func Get[T any](dp Provider[T]) echo.HandlerFunc {
 
 func Post[T any](dp WritableProvider[T]) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := c.Get("user").(*models.User)
+		u := c.Get("user").(*njudge.User)
 		if !roles.Can(roles.Role(u.Role), roles.ActionCreate, roles.Entity(dp.EndpointURL())) {
 			return helpers.UnauthorizedError(c)
 		}
@@ -106,7 +106,7 @@ func Post[T any](dp WritableProvider[T]) echo.HandlerFunc {
 
 func Put[T any](dp WritableProvider[T]) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := c.Get("user").(*models.User)
+		u := c.Get("user").(*njudge.User)
 		if !roles.Can(roles.Role(u.Role), roles.ActionEdit, roles.Entity(dp.EndpointURL())) {
 			return helpers.UnauthorizedError(c)
 		}
@@ -134,7 +134,7 @@ func Put[T any](dp WritableProvider[T]) echo.HandlerFunc {
 
 func Delete[T any](dp WritableProvider[T]) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := c.Get("user").(*models.User)
+		u := c.Get("user").(*njudge.User)
 		if !roles.Can(roles.Role(u.Role), roles.ActionDelete, roles.Entity(dp.EndpointURL())) {
 			return helpers.UnauthorizedError(c)
 		}
