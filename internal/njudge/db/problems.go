@@ -38,7 +38,7 @@ func (ps *Problems) catToNjudge(p *models.ProblemCategory) *njudge.Category {
 
 func (ps *Problems) problemTagsToNjudge(pts models.ProblemTagSlice) []njudge.ProblemTag {
 	res := make([]njudge.ProblemTag, len(pts))
-	for ind := range res {
+	for ind := range pts {
 		res[ind].Tag = njudge.Tag{
 			ID:   pts[ind].R.Tag.ID,
 			Name: pts[ind].R.Tag.Name,
@@ -95,7 +95,12 @@ func (ps *Problems) Get(ctx context.Context, ID int) (*njudge.Problem, error) {
 }
 
 func (ps *Problems) getAll(ctx context.Context, mods ...qm.QueryMod) ([]njudge.Problem, error) {
-	problems, err := models.ProblemRels(append(mods, qm.Load(models.ProblemRelRels.Category))...).All(ctx, ps.db)
+	problems, err := models.ProblemRels(
+		append(
+			mods,
+			qm.Load(models.ProblemRelRels.Category),
+			qm.Load("ProblemProblemTags.Tag"),
+		)...).All(ctx, ps.db)
 	if err != nil {
 		return nil, err
 	}

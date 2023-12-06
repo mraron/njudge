@@ -6,6 +6,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/njudge/db/models"
 
 	"github.com/volatiletech/null/v8"
@@ -42,9 +43,9 @@ func (s *Server) runStatisticsUpdate() {
 		userPoints := make(map[int]float64)
 		for _, p := range probs {
 			solvedBy, err := models.Submissions(
-				qm.Distinct("user_id"),
-				qm.Where("verdict = 0"),
-				qm.Where("problem_id = ?", p.ID),
+				qm.Distinct(models.SubmissionColumns.UserID),
+				models.SubmissionWhere.Verdict.EQ(int(njudge.VerdictAC)),
+				models.SubmissionWhere.ProblemID.EQ(p.ID),
 			).All(context.Background(), s.DB)
 
 			if err != nil {
@@ -59,7 +60,9 @@ func (s *Server) runStatisticsUpdate() {
 					userPoints[uid.UserID] += points
 				}
 
-				if _, err = s.DB.Exec("UPDATE problem_rels SET solver_count = (SELECT COUNT(distinct user_id) from submissions where problemset = problem_rels.problemset and problem = problem_rels.problem and verdict = 0) WHERE problem_id=$1", p.ID); err != nil {
+				if _, err = s.DB.Exec(`UPDATE problem_rels
+SET solver_count = (SELECT COUNT(distinct user_id) from submissions WHERE submissions.problem_id = problem_rels.id and verdict = 0)
+WHERE id=$1`, p.ID); err != nil {
 					log.Print(err)
 					continue
 				}

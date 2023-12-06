@@ -85,6 +85,10 @@ func (p *ProblemListQuery) filterTags(ctx context.Context, req njudge.ProblemLis
 func (p *ProblemListQuery) filterCategory(ctx context.Context, req njudge.ProblemListRequest, pr njudge.Problem) (bool, error) {
 	switch req.CategoryFilter.Type {
 	case njudge.CategoryFilterID:
+		if pr.Category == nil {
+			return false, nil
+		}
+
 		categories, err := p.cs.GetAll(ctx)
 		if err != nil {
 			return false, err
@@ -97,10 +101,10 @@ func (p *ProblemListQuery) filterCategory(ctx context.Context, req njudge.Proble
 			}
 		}
 
-		curr := req.CategoryFilter.Value.(int)
+		curr := pr.Category.ID
 		found := false
 		for {
-			if curr == pr.Category.ID {
+			if curr == req.CategoryFilter.Value.(int) {
 				found = true
 				break
 			}
