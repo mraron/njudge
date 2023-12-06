@@ -108,18 +108,16 @@
         submission.listView().fields([
             nga.field('id'),
             nga.field('user_id', 'reference').targetEntity(user).label('Felhasználó').targetField(nga.field('name')),
-            nga.field('problemset'),
-            nga.field('problem'),
+            nga.field('problem_id', 'reference').targetEntity(problem_rel).label('Feladat').targetField(nga.field('problem')),
             nga.field('language'),
-            nga.field('ontest'),
+            nga.field('score'),
             nga.field('verdict'),
         ]).listActions(['show']);
 
         submission.showView().fields([
             nga.field('id'),
             nga.field('user_id', 'reference').targetEntity(user).label('Felhasználó').targetField(nga.field('name')),
-            nga.field('problemset'),
-            nga.field('problem'),
+            nga.field('problem_id', 'reference').targetEntity(problem_rel).label('Feladat').targetField(nga.field('problem')),
             nga.field('language'),
             nga.field('ontest'),
             nga.field('verdict'),
