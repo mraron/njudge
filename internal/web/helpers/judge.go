@@ -27,6 +27,7 @@ func NewJudgeFromModelsJudge(j *models.Judge) *Judge {
 		res.Name = "placeholder"
 		res.Load = server.Load
 		res.ProblemList = server.ProblemList
+		res.LanguageList = server.LanguageList
 		res.Uptime = server.Uptime
 	}
 
