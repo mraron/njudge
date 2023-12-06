@@ -92,7 +92,7 @@ alter table forgotten_password_keys ADD constraint forgotten_password_keys_user_
 --- Modify problem_tags
 ---
 
-BEGIN TRANSACTION
+BEGIN TRANSACTION;
 
 alter table public.problem_tags
     drop constraint unique_problem_tag;
