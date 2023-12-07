@@ -41,7 +41,7 @@
 <div class="col-12 col-lg-3">
 <div class="card">
     <div class="card-header">
-        <i class="fas fa-info"></i> {{Tr "Information"}}
+        <i class="bi bi-info-circle"></i> {{Tr "Information"}}
     </div>
     <div class="card-body">
         <div class="row">
@@ -84,7 +84,7 @@
 <br>
 <div class="card">
     <div class="card-header">
-        <i class="fas fa-paper-plane"></i> {{Tr "Submit solution"}}
+        <i class="bi bi-send"></i> {{Tr "Submit solution"}}
     </div>
     <div class="card-body">
         {{if logged}}
@@ -111,7 +111,7 @@
 <br>
 <div class="card table-responsive">
     <div class="card-header" style="border-bottom: 0px;">
-        <i class="fas fa-history"></i> {{Tr "Last submissions"}}
+        <i class="bi bi-clock-history"></i> {{Tr "Last submissions"}}
     </div>
     <table class="card-body table" style="margin: 0px;">
         {{range $s := .Data.ProblemInfo.UserInfo.Submissions}}
@@ -129,14 +129,14 @@
 <br>
 <div class="card">
     <div class="card-header">
-        <i class="fas fa-paperclip"></i> {{Tr "Attachments"}}
+        <i class="bi bi-paperclip"></i> {{Tr "Attachments"}}
     </div>
     <div class="card-body">
         {{range $a := .Data.ProblemStoredData.Attachments}}
-            <a href="attachment/{{$a.Name}}/"><i class="fas fa-file"></i> {{Tr "File"}} ({{$a.Name}})</a><br>
+            <a href="attachment/{{$a.Name}}/"><i class="bi bi-file-earmark-text-fill"></i> {{Tr "File"}} ({{$a.Name}})</a><br>
         {{end}}
         {{range $loc := (.Data.ProblemStoredData.Statements.FilterByType "application/pdf").Locales}}
-            <a href="pdf/{{$loc}}/"><i class="fas fa-file-pdf"></i> {{Tr "Statement"}} ({{$loc}})</a><br>
+            <a href="pdf/{{$loc}}/"><i class="bi bi-file-earmark-pdf-fill"></i> {{Tr "Statement"}} ({{$loc}})</a><br>
         {{end}}
 
     </div>

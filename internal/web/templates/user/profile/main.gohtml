@@ -9,12 +9,12 @@
             </div>
             <div class="col">
                 <div class="card">
-                    <div class="card-header"><i class="fas fa-check"></i> {{Tr "Solved problems"}} ({{len .Data.SolvedProblems}})</div>
+                    <div class="card-header"><i class="bi bi-check-lg"></i> {{Tr "Solved problems"}} ({{len .Data.SolvedProblems}})</div>
                     <div class="card-body">{{range $i := .Data.SolvedProblems}}<a href="/submission/{{$i.ID}}">{{($i.GetProblem ctx Problems).Problem}}</a> {{end}}</div>
                 </div>
                 <br>
                 <div class="card">
-                    <div class="card-header"><i class="fas fa-times"></i> {{Tr "Attempted problems"}} ({{len .Data.AttemptedNotSolvedProblems}}):</div>
+                    <div class="card-header"><i class="bi bi-x-lg"></i> {{Tr "Attempted problems"}} ({{len .Data.AttemptedNotSolvedProblems}}):</div>
                     <div class="card-body">{{range $i := .Data.AttemptedNotSolvedProblems}}<a href="/submission/{{$i.ID}}">{{($i.GetProblem ctx Problems).Problem}}</a> {{end}}</div>
                 </div>
             </div>

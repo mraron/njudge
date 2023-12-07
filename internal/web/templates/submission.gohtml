@@ -2,7 +2,7 @@
 
 {{if logged}}
     {{if canView (user).Role "submissions/rejudge"}}
-        <a class="btn btn-secondary" href="/submission/rejudge/{{.Data.ID}}"><i class="fas fa-sync"></i> {{Tr "Rejudge"}}</a>
+        <a class="btn btn-secondary" href="/submission/rejudge/{{.Data.ID}}"><i class="bi bi-arrow-clockwise"></i> {{Tr "Rejudge"}}</a>
         <br>
         <br>
     {{end}}
@@ -19,8 +19,8 @@
 {{if ne .Data.Language "zip"}}
     <div class="source-block">
         <div class="source-actions">
-            <button id="source-expand" class="btn" data-target="source-code"><i class="fa fa-arrows-alt-v"></i></button>
-            <button id="source-copy" class="btn" data-target="source-code"><i class="fa fa-copy"></i></button>
+            <button id="source-expand" class="btn" data-target="source-code"><i class="bi bi-arrows-expand"></i></button>
+            <button id="source-copy" class="btn" data-target="source-code"><i class="bi bi-copy"></i></button>
         </div>
         <pre id="source-code" style="max-height: 400px;" data-expanded="false"><code class="{{.Data.Language}}">{{toString .Data.Source}}</code></pre>
     </div>
@@ -30,7 +30,7 @@
 
 {{if not $status.Compiled}}
     <div class="card">
-        <div class="card-header bg-warning"><i class="fas fa-exclamation-triangle"></i> {{Tr "Compilation error"}}</div>
+        <div class="card-header bg-warning"><i class="bi bi-exclamation-triangle"></i> {{Tr "Compilation error"}}</div>
         <div class="card-body">
             <pre><code class="nohighlight">{{$status.CompilerOutput}}</code></pre>
         </div>
@@ -42,9 +42,9 @@
         {{range $i, $e := $testset.Testcases}}
             {{$ind := add $i 1}}
             <div class="card">
-                <div class="card-header {{if and (eq $e.VerdictName 0) ($status.Compiled)}}bg-success{{else}}bg-danger{{end}}"><span class="fas fa-{{if and (eq $e.VerdictName 0) ($status.Compiled)}}check{{else}}times{{end}}"></span> {{$ind}} - {{if $status.Compiled}}{{(verdict $e.VerdictName).String | Tr}}{{else}}{{Tr "Compilation error"}}{{end}}</div>
+                <div class="card-header {{if and (eq $e.VerdictName 0) ($status.Compiled)}}bg-success{{else}}bg-danger{{end}}"><span class="bi bi-{{if and (eq $e.VerdictName 0) ($status.Compiled)}}check-lg{{else}}x-lg{{end}}"></span> {{$ind}} - {{if $status.Compiled}}{{(verdict $e.VerdictName).String | Tr}}{{else}}{{Tr "Compilation error"}}{{end}}</div>
                 <div class="card-body">
-                    <span class="fas fa-hdd"></span> {{Tr "Memory"}}: {{$e.MemoryUsed}}KiB <br><span class="fas fa-clock"></span> {{Tr "Time"}}: {{$e.TimeSpent}}<br><br>
+                    <span class="bi bi-memory"></span> {{Tr "Memory"}}: {{$e.MemoryUsed}}KiB <br><span class="bi bi-clock"></span> {{Tr "Time"}}: {{$e.TimeSpent}}<br><br>
                     {{Tr "Program's output"}}:
                     <pre><code class="nohighlight">{{$e.Output}}</code></pre>
                     {{Tr "Expected output"}}:
@@ -76,9 +76,9 @@
                     <tr>
                         <td class="align-middle text-center" rowspan="{{add (len $g.Testcases) 1}}">
                             {{if eq $g.FirstNonAC -1}}
-                                <i class="fas fa-check text-success"></i>
+                                <i class="bi bi-check-lg text-success"></i>
                             {{else}}
-                                <i class="fas fa-times text-danger"></i>
+                                <i class="bi bi-x-lg text-danger"></i>
                             {{end}}
                         </td>
                         <td class="align-middle text-center" rowspan="{{add (len $g.Testcases) 1}}">

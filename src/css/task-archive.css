@@ -9,18 +9,18 @@
 }
 
 .problemcategory-header .collapse-toggle:after {
-    font-family: 'Font Awesome 5 Pro';
-    content: "\f0d7";
+    font-family: 'bootstrap-icons';
+    content: "\F229";
     float: left;
     color: grey;
-    font-size: small;
+    font-size: 0.7em;
     line-height: 2em;
     vertical-align: middle;
     padding-right: 0.5em;
 }
 
 .problemcategory-header .collapse-toggle.collapsed:after {
-    content: "\f0da";
+    content: "\F231";
 }
 
 .problemcategory-body {
