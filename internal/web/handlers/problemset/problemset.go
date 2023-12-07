@@ -222,7 +222,7 @@ func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categori
 
 				result.Problems[ind].CategoryLink = ui.Link{
 					Text: categoryNameByID[cid],
-					Href: fmt.Sprintf("/task_archive#category%d", result.Problems[ind].ID),
+					Href: fmt.Sprintf("/task_archive#category%d", result.Problems[ind].Category.ID),
 				}
 			}
 		}
