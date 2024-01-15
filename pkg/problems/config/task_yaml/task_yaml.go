@@ -235,7 +235,10 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 		if isSum {
 			group.Scoring = problems.ScoringSum
 		} else {
-			group.Scoring = problems.ScoringGroup
+			group.Scoring = problems.ScoringMin
+			for ind := range tcByGroup[subtask] {
+				tcByGroup[subtask][ind].MaxScore = tcByGroup[subtask][len(tcByGroup[subtask])-1].MaxScore
+			}
 		}
 
 		group.Testcases = append(group.Testcases, tcByGroup[subtask]...)
