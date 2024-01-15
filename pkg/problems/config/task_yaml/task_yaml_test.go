@@ -1,11 +1,12 @@
 package task_yaml
 
 import (
+	"strings"
+	"testing"
+
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
-	"strings"
-	"testing"
 )
 
 func TestGen(t *testing.T) {
@@ -191,6 +192,13 @@ func TestStatusSkeleton(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	assert.Equal(t, problems.ScoringMin, st.Feedback[0].Groups[0].Scoring)
+	assert.Equal(t, problems.ScoringMin, st.Feedback[0].Groups[1].Scoring)
+	assert.Equal(t, problems.ScoringMin, st.Feedback[0].Groups[2].Scoring)
+
+	assert.Equal(t, 80.0, st.Feedback[0].Groups[1].Testcases[0].MaxScore)
+	assert.Equal(t, 80.0, st.Feedback[0].Groups[1].Testcases[1].MaxScore)
+	assert.Equal(t, 80.0, st.Feedback[0].Groups[1].Testcases[2].MaxScore)
 
 	if len(st.Feedback[0].Testcases()) != 9 {
 		t.Error("wrong no of tests")
