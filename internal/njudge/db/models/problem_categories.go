@@ -27,6 +27,7 @@ type ProblemCategory struct {
 	ID       int      `boil:"id" json:"id" toml:"id" yaml:"id"`
 	Name     string   `boil:"name" json:"name" toml:"name" yaml:"name"`
 	ParentID null.Int `boil:"parent_id" json:"parent_id,omitempty" toml:"parent_id" yaml:"parent_id,omitempty"`
+	Visible  bool     `boil:"visible" json:"visible" toml:"visible" yaml:"visible"`
 
 	R *problemCategoryR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L problemCategoryL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -36,20 +37,24 @@ var ProblemCategoryColumns = struct {
 	ID       string
 	Name     string
 	ParentID string
+	Visible  string
 }{
 	ID:       "id",
 	Name:     "name",
 	ParentID: "parent_id",
+	Visible:  "visible",
 }
 
 var ProblemCategoryTableColumns = struct {
 	ID       string
 	Name     string
 	ParentID string
+	Visible  string
 }{
 	ID:       "problem_categories.id",
 	Name:     "problem_categories.name",
 	ParentID: "problem_categories.parent_id",
+	Visible:  "problem_categories.visible",
 }
 
 // Generated where
@@ -96,10 +101,12 @@ var ProblemCategoryWhere = struct {
 	ID       whereHelperint
 	Name     whereHelperstring
 	ParentID whereHelpernull_Int
+	Visible  whereHelperbool
 }{
 	ID:       whereHelperint{field: "\"problem_categories\".\"id\""},
 	Name:     whereHelperstring{field: "\"problem_categories\".\"name\""},
 	ParentID: whereHelpernull_Int{field: "\"problem_categories\".\"parent_id\""},
+	Visible:  whereHelperbool{field: "\"problem_categories\".\"visible\""},
 }
 
 // ProblemCategoryRels is where relationship names are stored.
@@ -150,9 +157,9 @@ func (r *problemCategoryR) GetCategoryProblemRels() ProblemRelSlice {
 type problemCategoryL struct{}
 
 var (
-	problemCategoryAllColumns            = []string{"id", "name", "parent_id"}
+	problemCategoryAllColumns            = []string{"id", "name", "parent_id", "visible"}
 	problemCategoryColumnsWithoutDefault = []string{"name"}
-	problemCategoryColumnsWithDefault    = []string{"id", "parent_id"}
+	problemCategoryColumnsWithDefault    = []string{"id", "parent_id", "visible"}
 	problemCategoryPrimaryKeyColumns     = []string{"id"}
 	problemCategoryGeneratedColumns      = []string{}
 )

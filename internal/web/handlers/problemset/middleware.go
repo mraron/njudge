@@ -1,11 +1,12 @@
 package problemset
 
 import (
+	"errors"
 	"fmt"
+	"github.com/labstack/echo/v4"
 	"net/http"
 	"strings"
 
-	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/pkg/problems"
 	"golang.org/x/exp/slices"
@@ -47,6 +48,9 @@ func SetProblemMiddleware(store problems.Store, ps njudge.ProblemQuery, pinfo nj
 			problemset, problemName := c.Param("name"), c.Param("problem")
 			p, err := ps.GetProblem(c.Request().Context(), problemset, problemName)
 			if err != nil {
+				if errors.Is(err, njudge.ErrorProblemNotFound) {
+					return c.JSON(http.StatusNotFound, err.Error())
+				}
 				return err
 			}
 			c.Set("problem", *p)
@@ -65,5 +69,22 @@ func SetProblemMiddleware(store problems.Store, ps njudge.ProblemQuery, pinfo nj
 
 			return next(c)
 		}
+	}
+}
+
+func VisibilityMiddleware() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			p := c.Get("problem").(njudge.Problem)
+			if !p.Visible {
+				u := c.Get("user").(*njudge.User)
+				if u == nil || u.Role != "admin" {
+					return c.JSON(http.StatusNotFound, njudge.ErrorProblemNotFound.Error())
+				}
+			}
+
+			return next(c)
+		}
+
 	}
 }

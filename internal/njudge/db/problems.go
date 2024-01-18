@@ -57,6 +57,7 @@ func (ps *Problems) toNjudge(p *models.ProblemRel) (*njudge.Problem, error) {
 		Problem:     p.Problem,
 		Category:    ps.catToNjudge(p.R.Category),
 		SolverCount: p.SolverCount,
+		Visible:     p.Visible,
 		Tags:        ps.problemTagsToNjudge(p.R.ProblemProblemTags),
 	}, nil
 }
@@ -67,6 +68,7 @@ func (ps *Problems) toModel(p njudge.Problem) (*models.ProblemRel, error) {
 		Problemset:  p.Problemset,
 		Problem:     p.Problem,
 		SolverCount: p.SolverCount,
+		Visible:     p.Visible,
 	}
 
 	if p.Category != nil {
@@ -84,7 +86,7 @@ func (ps *Problems) get(ctx context.Context, mods ...qm.QueryMod) (*njudge.Probl
 			qm.Load("ProblemProblemTags.Tag"),
 		)...).One(ctx, ps.db)
 	if err != nil {
-		return nil, err
+		return nil, MaskNotFoundError(err, njudge.ErrorProblemNotFound)
 	}
 
 	return ps.toNjudge(problem)
@@ -102,7 +104,7 @@ func (ps *Problems) getAll(ctx context.Context, mods ...qm.QueryMod) ([]njudge.P
 			qm.Load("ProblemProblemTags.Tag"),
 		)...).All(ctx, ps.db)
 	if err != nil {
-		return nil, err
+		return nil, MaskNotFoundError(err, njudge.ErrorProblemNotFound)
 	}
 
 	res := make([]njudge.Problem, len(problems))

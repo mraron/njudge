@@ -80,6 +80,7 @@ func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categori
 			SortDir:     data.Order,
 			SortField:   data.By,
 			TitleFilter: data.TitleFilter,
+			User:        c.Get("user").(*njudge.User),
 		}
 
 		if data.TagFilter != "" {

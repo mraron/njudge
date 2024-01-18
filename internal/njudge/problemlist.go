@@ -27,6 +27,7 @@ type ProblemListRequest struct {
 	TitleFilter    string
 	TagFilter      []string
 	CategoryFilter CategoryFilter
+	User           *User
 }
 
 func (r ProblemListRequest) IsFiltered() bool {

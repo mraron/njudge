@@ -21,6 +21,7 @@ type TreeNode struct {
 	Link         string
 	SolvedStatus njudge.SolvedStatus
 	Children     []TreeNode
+	Visible      bool
 }
 
 func Get(cats njudge.Categories, problemQuery njudge.ProblemQuery, problemInfoQuery njudge.ProblemInfoQuery, problemStore problems.Store) echo.HandlerFunc {
@@ -53,6 +54,7 @@ func Get(cats njudge.Categories, problemQuery njudge.ProblemQuery, problemInfoQu
 					Link:         c.Echo().Reverse("getProblemMain", p.Problemset, p.Problem),
 					Children:     make([]TreeNode, 0),
 					SolvedStatus: -1,
+					Visible:      p.Visible,
 				}
 
 				if u != nil {
@@ -74,6 +76,12 @@ func Get(cats njudge.Categories, problemQuery njudge.ProblemQuery, problemInfoQu
 			}
 
 			for _, cat := range subCategories {
+				if !cat.Visible {
+					if u == nil || u.Role != "admin" {
+						continue
+					}
+				}
+
 				tree.Children = append(tree.Children, TreeNode{
 					ID:           cat.ID,
 					Type:         "category",
@@ -81,6 +89,7 @@ func Get(cats njudge.Categories, problemQuery njudge.ProblemQuery, problemInfoQu
 					Link:         "",
 					Children:     make([]TreeNode, 0),
 					SolvedStatus: -1,
+					Visible:      cat.Visible,
 				})
 
 				if err := dfs(cat, &tree.Children[len(tree.Children)-1]); err != nil {
@@ -92,6 +101,11 @@ func Get(cats njudge.Categories, problemQuery njudge.ProblemQuery, problemInfoQu
 		}
 
 		for _, start := range lst {
+			if !start.Visible {
+				if u == nil || u.Role != "admin" {
+					continue
+				}
+			}
 			taskArchive.Roots = append(taskArchive.Roots, TreeNode{
 				ID:           start.ID,
 				Type:         "category",
@@ -99,6 +113,7 @@ func Get(cats njudge.Categories, problemQuery njudge.ProblemQuery, problemInfoQu
 				Link:         "",
 				Children:     make([]TreeNode, 0),
 				SolvedStatus: -1,
+				Visible:      start.Visible,
 			})
 
 			if dfs(start, &taskArchive.Roots[len(taskArchive.Roots)-1]) != nil {
