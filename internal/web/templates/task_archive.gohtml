@@ -5,10 +5,10 @@
     {{else}}
         {{range $c := .Children}}
             {{if eq $c.Type "problem"}}
-                <a href="{{$c.Link}}">{{$c.Name}} {{if eq $c.SolvedStatus 3}}<i class="bi bi-check-lg text-success"></i>{{end}}{{if eq $c.SolvedStatus 1}}<i class="bi bi-x-lg text-danger"></i>{{end}}</a><br>
+                <a href="{{$c.Link}}">{{if not $c.Visible}}<i class="bi bi-eye-slash"></i> {{end}}{{$c.Name}} {{if eq $c.SolvedStatus 3}}<i class="bi bi-check-lg text-success"></i>{{end}}{{if eq $c.SolvedStatus 1}}<i class="bi bi-x-lg text-danger"></i>{{end}}</a><br>
             {{else}}
                 <div class="problemcategory-header">
-                    <a class="collapse-toggle" data-toggle="collapse" href="#category{{$c.ID}}">{{$c.Name}}</a>
+                    <a class="collapse-toggle" data-toggle="collapse" href="#category{{$c.ID}}">{{if not $c.Visible}}<i class="bi bi-eye-slash"></i> {{end}}{{$c.Name}}</a>
                 </div>
                 <div class="collapse show problemcategory-body" id="category{{$c.ID}}" data-nparent="#category{{$id}}">
                     {{template "ta_tree_view" $c}}
@@ -20,11 +20,11 @@
     <div class="card">
         {{$first := true}}
         {{range $root := .Data.Roots}}
-                <div class="{{if not $first}}card-footer{{end}} card-header">{{$root.Name}}</div>
+                <div class="{{if not $first}}card-footer{{end}} card-header{{if not $root.Visible}} bg-warning{{end}}">{{$root.Name}}</div>
                 <div class="card-body" id="top_category{{$root.ID}}">
                     {{range $c := $root.Children}}
                         <div class="problemcategory-header">
-                            <a class="collapse-toggle collapsed" data-toggle="collapse" href="#category{{$c.ID}}">{{$c.Name}}</a>
+                            <a class="collapse-toggle collapsed" data-toggle="collapse" href="#category{{$c.ID}}">{{if not $c.Visible}}<i class="bi bi-eye-slash"></i> {{end}}{{$c.Name}}</a>
                         </div>
                         <div class="collapse problemcategory-body" id="category{{$c.ID}}">
                             {{template "ta_tree_view" $c}}

@@ -31,14 +31,18 @@ var ProblemFields = struct {
 	Problem     string
 	Category    string
 	SolverCount string
-	Tags        string
+	Visible     string
+
+	Tags string
 }{
 	ID:          "id",
 	Problemset:  "problemset",
 	Problem:     "problem",
 	Category:    "category",
-	SolverCount: "category",
-	Tags:        "tags",
+	SolverCount: "solver_count",
+	Visible:     "visible",
+
+	Tags: "tags",
 }
 
 type Problem struct {
@@ -47,6 +51,7 @@ type Problem struct {
 	Problem     string
 	Category    *Category
 	SolverCount int
+	Visible     bool
 
 	Tags []ProblemTag
 }

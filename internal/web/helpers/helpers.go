@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"errors"
-	"math/rand"
 	"net/http"
 	"time"
 
@@ -12,21 +11,6 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 )
-
-func GenerateActivationKey(length int) string {
-	var (
-		alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678901234567890123456789"
-		ans      = make([]byte, length)
-	)
-
-	src := rand.NewSource(time.Now().UnixNano())
-
-	for i := 0; i < length; i++ {
-		ans[i] = alphabet[(int(src.Int63()))%len(alphabet)]
-	}
-
-	return string(ans)
-}
 
 func CensorUserPassword(user *models.User) {
 	user.Password = "***CENSORED***"

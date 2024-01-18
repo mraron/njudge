@@ -10,6 +10,7 @@ import (
 type Category struct {
 	ID       int
 	Name     string
+	Visible  bool
 	ParentID null.Int
 }
 

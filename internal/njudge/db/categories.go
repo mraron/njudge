@@ -34,6 +34,7 @@ func (cs *Categories) toNjudge(c *models.ProblemCategory) njudge.Category {
 	return njudge.Category{
 		ID:       c.ID,
 		Name:     c.Name,
+		Visible:  c.Visible,
 		ParentID: c.ParentID,
 	}
 }
@@ -41,6 +42,7 @@ func (cs *Categories) toNjudge(c *models.ProblemCategory) njudge.Category {
 func (cs *Categories) toModel(c njudge.Category) *models.ProblemCategory {
 	return &models.ProblemCategory{
 		Name:     c.Name,
+		Visible:  c.Visible,
 		ParentID: c.ParentID,
 	}
 }

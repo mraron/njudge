@@ -29,6 +29,7 @@ type ProblemRel struct {
 	ID          int      `boil:"id" json:"id" toml:"id" yaml:"id"`
 	CategoryID  null.Int `boil:"category_id" json:"category_id,omitempty" toml:"category_id" yaml:"category_id,omitempty"`
 	SolverCount int      `boil:"solver_count" json:"solver_count" toml:"solver_count" yaml:"solver_count"`
+	Visible     bool     `boil:"visible" json:"visible" toml:"visible" yaml:"visible"`
 
 	R *problemRelR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L problemRelL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -40,12 +41,14 @@ var ProblemRelColumns = struct {
 	ID          string
 	CategoryID  string
 	SolverCount string
+	Visible     string
 }{
 	Problemset:  "problemset",
 	Problem:     "problem",
 	ID:          "id",
 	CategoryID:  "category_id",
 	SolverCount: "solver_count",
+	Visible:     "visible",
 }
 
 var ProblemRelTableColumns = struct {
@@ -54,12 +57,14 @@ var ProblemRelTableColumns = struct {
 	ID          string
 	CategoryID  string
 	SolverCount string
+	Visible     string
 }{
 	Problemset:  "problem_rels.problemset",
 	Problem:     "problem_rels.problem",
 	ID:          "problem_rels.id",
 	CategoryID:  "problem_rels.category_id",
 	SolverCount: "problem_rels.solver_count",
+	Visible:     "problem_rels.visible",
 }
 
 // Generated where
@@ -70,12 +75,14 @@ var ProblemRelWhere = struct {
 	ID          whereHelperint
 	CategoryID  whereHelpernull_Int
 	SolverCount whereHelperint
+	Visible     whereHelperbool
 }{
 	Problemset:  whereHelperstring{field: "\"problem_rels\".\"problemset\""},
 	Problem:     whereHelperstring{field: "\"problem_rels\".\"problem\""},
 	ID:          whereHelperint{field: "\"problem_rels\".\"id\""},
 	CategoryID:  whereHelpernull_Int{field: "\"problem_rels\".\"category_id\""},
 	SolverCount: whereHelperint{field: "\"problem_rels\".\"solver_count\""},
+	Visible:     whereHelperbool{field: "\"problem_rels\".\"visible\""},
 }
 
 // ProblemRelRels is where relationship names are stored.
@@ -126,9 +133,9 @@ func (r *problemRelR) GetProblemSubmissions() SubmissionSlice {
 type problemRelL struct{}
 
 var (
-	problemRelAllColumns            = []string{"problemset", "problem", "id", "category_id", "solver_count"}
+	problemRelAllColumns            = []string{"problemset", "problem", "id", "category_id", "solver_count", "visible"}
 	problemRelColumnsWithoutDefault = []string{"problemset", "problem"}
-	problemRelColumnsWithDefault    = []string{"id", "category_id", "solver_count"}
+	problemRelColumnsWithDefault    = []string{"id", "category_id", "solver_count", "visible"}
 	problemRelPrimaryKeyColumns     = []string{"id"}
 	problemRelGeneratedColumns      = []string{}
 )

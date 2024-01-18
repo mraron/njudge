@@ -123,6 +123,15 @@ func (p *ProblemListQuery) filterCategory(ctx context.Context, req njudge.Proble
 	}
 }
 
+func (p *ProblemListQuery) filterInvisible(ctx context.Context, req njudge.ProblemListRequest, pr njudge.Problem) (bool, error) {
+	if !pr.Visible {
+		if req.User == nil || req.User.Role != "admin" {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
 func (p *ProblemListQuery) GetProblemList(ctx context.Context, req njudge.ProblemListRequest) (*njudge.ProblemList, error) {
 	allProblems, err := p.ps.GetAll(ctx)
 	if err != nil {
@@ -134,6 +143,7 @@ func (p *ProblemListQuery) GetProblemList(ctx context.Context, req njudge.Proble
 		p.filterTags,
 		p.filterTitle,
 		p.filterCategory,
+		p.filterInvisible,
 	}
 
 	problems := make([]njudge.Problem, 0)
