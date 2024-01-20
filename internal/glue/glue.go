@@ -16,7 +16,6 @@ import (
 	"github.com/mraron/njudge/internal/judge"
 	"github.com/mraron/njudge/internal/njudge/db"
 	"github.com/mraron/njudge/internal/njudge/db/models"
-	"github.com/mraron/njudge/internal/njudge/memory"
 	"github.com/mraron/njudge/internal/web/helpers/config"
 
 	"github.com/labstack/echo/v4"
@@ -66,7 +65,7 @@ func (s *Server) ConnectToDB() {
 
 	s.Submissions = db.NewSubmissions(s.DB)
 	s.Problems = db.NewProblems(s.DB)
-	s.SubmissionsQuery = memory.NewSubmissionsQuery(s.Submissions)
+	s.SubmissionsQuery = s.Submissions.(*db.Submissions)
 }
 
 func (s *Server) Run() {
