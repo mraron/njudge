@@ -175,3 +175,20 @@ func (ss *Submissions) Update(ctx context.Context, s njudge.Submission, fields [
 	_, err = dbobj.Update(ctx, ss.db, boil.Whitelist(whitelist...))
 	return err
 }
+
+func (ss *Submissions) GetUnstarted(ctx context.Context, limit int) ([]njudge.Submission, error) {
+	objs, err := models.Submissions(models.SubmissionWhere.Started.EQ(false), qm.Limit(limit)).All(ctx, ss.db)
+	if err != nil {
+		return nil, err
+	}
+	res := make([]njudge.Submission, len(objs))
+	for ind := range objs {
+		var curr *njudge.Submission
+		if curr, err = ss.toNjudge(ctx, objs[ind]); err != nil {
+			return nil, err
+		}
+		res[ind] = *curr
+	}
+
+	return res, nil
+}

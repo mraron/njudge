@@ -37,6 +37,7 @@ type Server struct {
 	Problems            njudge.Problems
 	Users               njudge.Users
 	Submissions         njudge.Submissions
+	SolvedStatusQuery   njudge.SolvedStatusQuery
 	ProblemInfoQuery    njudge.ProblemInfoQuery
 	ProblemQuery        njudge.ProblemQuery
 	ProblemListQuery    njudge.ProblemListQuery

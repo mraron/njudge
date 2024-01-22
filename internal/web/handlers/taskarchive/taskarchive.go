@@ -24,7 +24,7 @@ type TreeNode struct {
 	Visible      bool
 }
 
-func Get(cats njudge.Categories, problemQuery njudge.ProblemQuery, problemInfoQuery njudge.ProblemInfoQuery, problemStore problems.Store) echo.HandlerFunc {
+func Get(cats njudge.Categories, problemQuery njudge.ProblemQuery, solvedStatusQuery njudge.SolvedStatusQuery, problemStore problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
@@ -58,11 +58,11 @@ func Get(cats njudge.Categories, problemQuery njudge.ProblemQuery, problemInfoQu
 				}
 
 				if u != nil {
-					pinfo, err := problemInfoQuery.GetProblemData(c.Request().Context(), p.ID, u.ID)
+					solvedStatus, err := solvedStatusQuery.GetSolvedStatus(c.Request().Context(), p.ID, u.ID)
 					if err != nil {
 						return err
 					}
-					elem.SolvedStatus = pinfo.UserInfo.SolvedStatus
+					elem.SolvedStatus = solvedStatus
 				}
 
 				tree.Children = append(tree.Children, elem)
