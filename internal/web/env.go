@@ -3,6 +3,7 @@ package web
 import (
 	"context"
 	"fmt"
+	"github.com/mraron/njudge/internal/njudge/cached"
 	"log"
 	"net/http"
 	"strconv"
@@ -85,7 +86,11 @@ func (s *Server) SetupDataAccess() {
 
 		s.Categories = db.NewCategories(s.DB.DB)
 		s.Tags = db.NewTags(s.DB.DB)
-		s.Problems = db.NewProblems(s.DB.DB)
+		s.SolvedStatusQuery = cached.NewSolvedStatusQuery(db.NewSolvedStatusQuery(s.DB.DB), 30*time.Second)
+		s.Problems = db.NewProblems(
+			s.DB.DB,
+			s.SolvedStatusQuery,
+		)
 		s.Submissions = db.NewSubmissions(s.DB.DB)
 		s.Users = db.NewUsers(s.DB.DB)
 

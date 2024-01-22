@@ -191,6 +191,10 @@ type ProblemInfoQuery interface {
 	GetProblemData(ctx context.Context, problemID, userID int) (*ProblemInfo, error)
 }
 
+type SolvedStatusQuery interface {
+	GetSolvedStatus(ctx context.Context, problemID, userID int) (SolvedStatus, error)
+}
+
 type ProblemQuery interface {
 	GetProblem(ctx context.Context, problemset, problem string) (*Problem, error)
 	GetProblemsWithCategory(ctx context.Context, f CategoryFilter) ([]Problem, error)

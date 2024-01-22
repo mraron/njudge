@@ -4,10 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/mraron/njudge/pkg/problems"
 
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/njudge/db/models"
-	"github.com/mraron/njudge/pkg/problems"
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -15,12 +15,14 @@ import (
 )
 
 type Problems struct {
-	db *sql.DB
+	db                *sql.DB
+	solvedStatusQuery njudge.SolvedStatusQuery
 }
 
-func NewProblems(db *sql.DB) *Problems {
+func NewProblems(db *sql.DB, solvedStatusQuery njudge.SolvedStatusQuery) *Problems {
 	return &Problems{
-		db: db,
+		db:                db,
+		solvedStatusQuery: solvedStatusQuery,
 	}
 }
 
@@ -222,37 +224,6 @@ func (ps *Problems) GetProblemsWithCategory(ctx context.Context, f njudge.Catego
 	}
 }
 
-func (ps *Problems) hasUserSolved(ctx context.Context, userID, problemID int) (njudge.SolvedStatus, error) {
-	solvedStatus := njudge.Unattempted
-
-	cnt, err := models.Submissions(
-		models.SubmissionWhere.ProblemID.EQ(problemID),
-		models.SubmissionWhere.Verdict.EQ(int(problems.VerdictAC)),
-		models.SubmissionWhere.UserID.EQ(userID),
-	).Count(ctx, ps.db)
-
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return njudge.Unknown, err
-	} else {
-		if cnt > 0 {
-			solvedStatus = njudge.Solved
-		} else {
-			cnt, err := models.Submissions(
-				models.SubmissionWhere.ProblemID.EQ(problemID),
-				models.SubmissionWhere.UserID.EQ(userID),
-			).Count(ctx, ps.db)
-
-			if err != nil && !errors.Is(err, sql.ErrNoRows) {
-				return njudge.Unknown, err
-			} else if cnt > 0 {
-				solvedStatus = njudge.Attempted
-			}
-		}
-	}
-
-	return solvedStatus, nil
-}
-
 func (ps *Problems) getUserLastLanguage(ctx context.Context, userID int) (string, error) {
 	if userID > 0 {
 		sub, err := models.Submissions(
@@ -282,7 +253,7 @@ func (ps *Problems) GetProblemData(ctx context.Context, problemID int, userID in
 	if userID > 0 {
 		res.UserInfo = &njudge.ProblemUserInfo{}
 
-		if res.UserInfo.SolvedStatus, err = ps.hasUserSolved(ctx, userID, problemID); err != nil {
+		if res.UserInfo.SolvedStatus, err = ps.solvedStatusQuery.GetSolvedStatus(ctx, problemID, userID); err != nil {
 			return nil, err
 		}
 
@@ -301,4 +272,43 @@ func (ps *Problems) GetProblemData(ctx context.Context, problemID int, userID in
 	}
 
 	return &res, nil
+}
+
+type SolvedStatusQuery struct {
+	db *sql.DB
+}
+
+func NewSolvedStatusQuery(db *sql.DB) *SolvedStatusQuery {
+	return &SolvedStatusQuery{db: db}
+}
+
+func (ss *SolvedStatusQuery) GetSolvedStatus(ctx context.Context, problemID, userID int) (njudge.SolvedStatus, error) {
+	solvedStatus := njudge.Unattempted
+
+	cnt, err := models.Submissions(
+		models.SubmissionWhere.ProblemID.EQ(problemID),
+		models.SubmissionWhere.Verdict.EQ(int(problems.VerdictAC)),
+		models.SubmissionWhere.UserID.EQ(userID),
+	).Count(ctx, ss.db)
+
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return njudge.Unknown, err
+	} else {
+		if cnt > 0 {
+			solvedStatus = njudge.Solved
+		} else {
+			cnt, err := models.Submissions(
+				models.SubmissionWhere.ProblemID.EQ(problemID),
+				models.SubmissionWhere.UserID.EQ(userID),
+			).Count(ctx, ss.db)
+
+			if err != nil && !errors.Is(err, sql.ErrNoRows) {
+				return njudge.Unknown, err
+			} else if cnt > 0 {
+				solvedStatus = njudge.Attempted
+			}
+		}
+	}
+
+	return solvedStatus, nil
 }

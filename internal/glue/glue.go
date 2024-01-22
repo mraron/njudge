@@ -64,7 +64,7 @@ func (s *Server) ConnectToDB() {
 	}
 
 	s.Submissions = db.NewSubmissions(s.DB)
-	s.Problems = db.NewProblems(s.DB)
+	s.Problems = db.NewProblems(s.DB, db.NewSolvedStatusQuery(s.DB))
 	s.SubmissionsQuery = s.Submissions.(*db.Submissions)
 }
 
