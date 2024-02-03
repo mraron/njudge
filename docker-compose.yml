@@ -1,8 +1,5 @@
 version: "2.3"
 services:
-  base:
-    image: ${COMPOSE_PROJECT_NAME}-base
-    build: .
   db:
     image: postgres:14.1-alpine
     restart: always
@@ -15,11 +12,7 @@ services:
       - db:/var/lib/postgresql/data
       - ./internal/njudge/db/migrations/1_init.up.sql:/docker-entrypoint-initdb.d/create_tables.sql
   web:
-    build:
-      context: .
-      args:
-        - PROJECT_NAME=${COMPOSE_PROJECT_NAME}
-      dockerfile: internal/web/Dockerfile
+    image: njudge-web
     ports:
       - 5555:5555
     env_file:
@@ -31,12 +24,8 @@ services:
     networks:
       - default
   judge:
+    image: njudge-judge
     privileged: true
-    build:
-      context: .
-      args:
-        - PROJECT_NAME=${COMPOSE_PROJECT_NAME}
-      dockerfile: internal/judge/Dockerfile
     env_file:
       - judge.env
     volumes:
@@ -46,11 +35,7 @@ services:
     networks:
       - default
   glue:
-    build:
-      context: .
-      args:
-        - PROJECT_NAME=${COMPOSE_PROJECT_NAME}
-      dockerfile: internal/glue/Dockerfile
+    image: njudge-glue
     env_file:
       - glue.env
     networks:
