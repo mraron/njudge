@@ -23,13 +23,13 @@ func StoreAllExcept(s Store, except []string) []Language {
 	return res
 }
 
-type LanguageWrapper struct {
+type Wrapper struct {
 	id string
 	Language
 }
 
-func (lw LanguageWrapper) Id() string {
-	return lw.id
+func (w Wrapper) Id() string {
+	return w.id
 }
 
 type ListStore struct {
@@ -41,7 +41,7 @@ func NewListStore() *ListStore {
 }
 
 func (m *ListStore) Register(id string, l Language) {
-	m.langList = append(m.langList, LanguageWrapper{id, l})
+	m.langList = append(m.langList, Wrapper{id, l})
 }
 
 func (m *ListStore) List() []Language {

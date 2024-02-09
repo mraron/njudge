@@ -2,11 +2,11 @@ package polygon
 
 import (
 	"fmt"
+	"github.com/mraron/njudge/pkg/problems/evaluation/checker"
 	"path/filepath"
 	"time"
 
 	"github.com/mraron/njudge/pkg/problems"
-	"github.com/mraron/njudge/pkg/problems/checker"
 )
 
 type Test struct {

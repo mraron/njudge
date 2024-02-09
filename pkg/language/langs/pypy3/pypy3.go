@@ -1,6 +1,9 @@
 package pypy3
 
 import (
+	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/mraron/njudge/pkg/language/sandbox"
+	"golang.org/x/net/context"
 	"io"
 	"time"
 
@@ -21,30 +24,28 @@ func (pypy3) DefaultFileName() string {
 	return "main.py"
 }
 
-func (pypy3) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) error {
-	return nil
-}
-
-func (pypy3) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
+func (pypy3) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
 	_, err := io.Copy(w, r.Source)
 	return err
 }
 
-func (pypy3) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (language.Status, error) {
-	stat := language.Status{}
-	stat.Verdict = language.VerdictXX
+func (pypy3) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (*sandbox.Status, error) {
+	stat := sandbox.Status{}
+	stat.Verdict = sandbox.VerdictXX
 
-	if err := s.CreateFile("a.out", binary); err != nil {
-		return stat, err
+	if err := sandbox.CreateFileFromSource(s, "a.out", binary); err != nil {
+		return nil, err
 	}
 
-	if st, err := s.Env().TimeLimit(tl).MemoryLimit(ml/1024).Stdin(stdin).Stdout(stdout).WorkingDirectory(s.Pwd()).Run("/usr/bin/pypy3 a.out", true); err != nil {
-		return st, err
-	} else {
-		stat = st
+	rc := sandbox.RunConfig{
+		InheritEnv:       true,
+		TimeLimit:        tl,
+		MemoryLimit:      memory.Amount(ml) * memory.KiB,
+		Stdin:            stdin,
+		Stdout:           stdout,
+		WorkingDirectory: s.Pwd(),
 	}
-
-	return stat, nil
+	return s.Run(context.TODO(), rc, "/usr/bin/pypy3", "a.out")
 }
 
 func init() {

@@ -1,6 +1,9 @@
 package cpp
 
 import (
+	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/mraron/njudge/pkg/language/sandbox"
+	"testing"
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
@@ -51,25 +54,27 @@ int main() {
 `
 	shortSleep = `#include<unistd.h>
 int main() {
-	sleep(1);
+	usleep(100);
 }
 `
 )
 
-func (c Cpp) Test(s language.Sandbox) error {
-	for _, test := range []language.LanguageTest{
-		{latest, aplusb, language.VerdictOK, "1 2", "3\n", 1 * time.Second, 128 * 1024 * 1024},
-		{latest, compilerError, language.VerdictCE, "", "", 1 * time.Second, 128 * 1024 * 1024},
-		{latest, print, language.VerdictOK, "", "Hello world", 1 * time.Second, 128 * 1024 * 1024},
-		{latest, timelimitExceeded, language.VerdictTL, "", "", 100 * time.Millisecond, 128 * 1024 * 1024},
-		{latest, runtimeError, language.VerdictRE | language.VerdictTL, "", "", 1000 * time.Millisecond, 128 * 1024 * 1024},
-		{latest, runtimeErrorDiv0, language.VerdictRE, "", "", 1000 * time.Millisecond, 128 * 1024 * 1024},
-		{latest, longSleep, language.VerdictTL, "", "", 2 * time.Second, 128 * 1024 * 1024},
-		{latest, shortSleep, language.VerdictOK, "", "", 2 * time.Second, 128 * 1024 * 1024},
+func (c Cpp) Test(t *testing.T, s sandbox.Sandbox) error {
+	for _, test := range []language.Test{
+		{c.id + "_latest_aplusb", c, aplusb, sandbox.VerdictOK, "1 2", "3\n", 1 * time.Second, 128 * memory.MiB},
+		{c.id + "_latest_ce", c, compilerError, sandbox.VerdictCE, "", "", 1 * time.Second, 128 * memory.MiB},
+		{c.id + "_latest_hello", c, print, sandbox.VerdictOK, "", "Hello world", 1 * time.Second, 128 * memory.MiB},
+		{c.id + "_latest_tl", c, timelimitExceeded, sandbox.VerdictTL, "", "", 100 * time.Millisecond, 128 * memory.MiB},
+		{c.id + "_latest_retl", c, runtimeError, sandbox.VerdictRE | sandbox.VerdictTL, "", "", 1000 * time.Millisecond, 128 * memory.MiB},
+		{c.id + "_latest_rediv0", c, runtimeErrorDiv0, sandbox.VerdictRE, "", "", 1000 * time.Millisecond, 128 * memory.MiB},
+		{c.id + "_latest_slepptl", c, longSleep, sandbox.VerdictTL, "", "", 100 * time.Millisecond, 128 * memory.MiB},
+		{c.id + "_latest_sleepok", c, shortSleep, sandbox.VerdictOK, "", "", 200 * time.Millisecond, 128 * memory.MiB},
 	} {
-		if err := test.Run(s); err != nil {
-			return err
-		}
+		t.Run(test.Name, func(t *testing.T) {
+			if err := test.Run(s); err != nil {
+				t.Error(err)
+			}
+		})
 	}
 
 	return nil

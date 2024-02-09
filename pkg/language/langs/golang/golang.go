@@ -1,8 +1,12 @@
 package golang
 
 import (
+	"github.com/mraron/njudge/pkg/language/langs/cpp"
+	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/mraron/njudge/pkg/language/sandbox"
+	"golang.org/x/net/context"
 	"io"
-	"os/exec"
+	"io/fs"
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
@@ -22,51 +26,43 @@ func (golang) DefaultFileName() string {
 	return "main.go"
 }
 
-func (golang) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) error {
-	cmd := exec.Command("gccgo", "-x", "go", "-o", "/dev/stdout", "-")
-
-	cmd.Stdin = r
-	cmd.Stdout = w
-	cmd.Stderr = e
-
-	cmd.Dir = wd
-
-	return cmd.Run()
-}
-
-func (golang) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
-	err := s.CreateFile("main.go", r.Source)
+func (golang) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
+	err := sandbox.CreateFileFromSource(s, "main.go", r.Source)
 	if err != nil {
 		return err
 	}
 
-	if _, err := s.AddArg("--open-files=2048").SetMaxProcesses(-1).Env().SetEnv("GOCACHE=/tmp").TimeLimit(10*time.Second).MemoryLimit(4*256000).Stdout(e).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/gccgo main.go", false); err != nil {
+	rc := sandbox.RunConfig{
+		MaxProcesses:     -1,
+		InheritEnv:       true,
+		Env:              []string{"GOCACHE=/tmp"},
+		TimeLimit:        10 * time.Second,
+		MemoryLimit:      1 * memory.GiB,
+		Stdout:           e,
+		Stderr:           e,
+		WorkingDirectory: s.Pwd(),
+		Args:             []string{"--open-files=2048"},
+	}
+	if _, err := s.Run(context.TODO(), rc, "/usr/bin/gccgo", "main.go"); err != nil {
 		return err
 	}
 
-	bin, err := s.GetFile("a.out")
+	bin, err := s.Open("a.out")
 	if err != nil {
 		return err
 	}
+	defer func(bin fs.File) {
+		_ = bin.Close()
+	}(bin)
 
 	_, err = io.Copy(w, bin)
 
 	return err
 }
 
-func (golang) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (language.Status, error) {
-	stat := language.Status{}
-	stat.Verdict = language.VerdictXX
+func (golang) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (*sandbox.Status, error) {
+	return cpp.RunBinary("a.out")(s, binary, stdin, stdout, tl, ml)
 
-	if err := s.CreateFile("a.out", binary); err != nil {
-		return stat, err
-	}
-
-	if err := s.MakeExecutable("a.out"); err != nil {
-		return stat, err
-	}
-
-	return s.SetMaxProcesses(-1).Stdin(stdin).Stdout(stdout).TimeLimit(tl).MemoryLimit(ml/1024).Run("a.out", true)
 }
 
 func init() {

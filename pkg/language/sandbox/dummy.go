@@ -1,36 +1,121 @@
 package sandbox
 
 import (
-	"bytes"
+	"errors"
+	"golang.org/x/net/context"
 	"io"
-	"io/ioutil"
-	"log"
+	"log/slog"
 	"os"
 	"os/exec"
-	"path/filepath"
+	"strconv"
 	"strings"
-	"sync"
 	"time"
+)
 
-	"github.com/mraron/njudge/pkg/language"
+var (
+	DummyPattern = "dummy_sandbox*"
+
+	dummyID = 0
 )
 
 type Dummy struct {
-	logger *log.Logger
-	tmpdir string
-	env    []string
-	tl     time.Duration
+	ID  int
+	Dir string
 
-	stdin          io.Reader
-	stdout, stderr io.Writer
+	OsFS
 
-	workingDir string
+	Logger *slog.Logger
 }
 
-func NewDummy() *Dummy {
-	return &Dummy{}
+type DummyOption func(*Dummy) error
+
+func NewDummy(opts ...DummyOption) (*Dummy, error) {
+	dummyID += 1
+	res := &Dummy{
+		ID: dummyID,
+	}
+	for _, opt := range opts {
+		err := opt(res)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if res.Logger == nil {
+		res.Logger = slog.New(slog.NewJSONHandler(io.Discard, nil))
+	}
+	return res, nil
 }
 
+func (d *Dummy) Id() string {
+	return strconv.Itoa(d.ID)
+}
+
+func (d *Dummy) Init(ctx context.Context) error {
+	var err error
+	if d.Dir, err = os.MkdirTemp("", DummyPattern); err != nil {
+		return err
+	}
+	d.OsFS = OsFS{base: d.Dir}
+
+	d.Logger.Info("init dummy sandbox", "dir", d.Dir)
+	return nil
+}
+
+func (d *Dummy) Run(ctx context.Context, config RunConfig, command string, commandArgs ...string) (*Status, error) {
+	logger := d.Logger
+	if config.RunID != "" {
+		logger = d.Logger.With("run_id", config.RunID)
+	}
+
+	started := time.Now()
+	ctxWithTimeout, cancelFunc := context.WithTimeout(ctx, config.TimeLimit)
+	defer cancelFunc()
+	commandMerged := append([]string{command}, commandArgs...)
+	cmd := exec.CommandContext(ctxWithTimeout, "bash", "-c", strings.Join(commandMerged, " "))
+	cmd.Stdin = config.Stdin
+	cmd.Stdout = config.Stdout
+	cmd.Stderr = config.Stderr
+	cmd.Dir = config.WorkingDirectory
+	cmd.Env = append(config.Env, "PATH="+os.Getenv("PATH")+":"+d.Dir)
+
+	if config.MaxProcesses > 0 {
+		logger.Warn("dummy doesn't support MaxProcesses")
+	}
+	if !config.InheritEnv {
+		logger.Warn("dummy always inherits environment")
+	}
+	if config.MemoryLimit > 0 {
+		logger.Warn("dummy doesn't support memory limit")
+	}
+	if len(config.DirectoryMaps) > 0 {
+		logger.Warn("dummy doesn't support directory mapping")
+	}
+
+	st := Status{
+		Verdict: VerdictOK,
+	}
+
+	err := cmd.Run()
+	st.Time = time.Since(started)
+	if err != nil {
+		if errors.Is(err, context.Canceled) {
+			st.Verdict = VerdictTL
+		} else if strings.HasPrefix(err.Error(), "exit status") || strings.HasPrefix(err.Error(), "signal:") { // TODO
+			st.Verdict = VerdictRE
+		}
+		st.ExitCode = err.(*exec.ExitError).ExitCode()
+	}
+
+	return &st, nil
+}
+
+func (d *Dummy) Cleanup(ctx context.Context) error {
+	d.Logger.Info("cleanup dummy sandbox", "dir", d.Dir)
+	return os.RemoveAll(d.Dir)
+
+}
+
+/*
 func (s Dummy) Id() string {
 	return s.tmpdir
 }
@@ -50,7 +135,7 @@ func (s Dummy) Pwd() string {
 	return s.tmpdir
 }
 
-func (s *Dummy) CreateFile(name string, r io.Reader) error {
+func (s *Dummy) CreateFilePopulated(name string, r io.Reader) error {
 	filename := filepath.Join(s.tmpdir, name)
 	s.logger.Print("Creating file ", filename)
 
@@ -69,13 +154,12 @@ func (s *Dummy) CreateFile(name string, r io.Reader) error {
 	return f.Close()
 }
 
-func (s Dummy) GetFile(name string) (io.Reader, error) {
-	f, err := ioutil.ReadFile(filepath.Join(s.Pwd(), name))
-	if err != nil {
-		return nil, err
-	}
+func (s *Dummy) Create(name string) (io.WriteCloser, error) {
+	return os.Create(filepath.Join(s.Pwd(), name))
+}
 
-	return bytes.NewBuffer(f), nil
+func (s Dummy) Open(name string) (fs.File, error) {
+	return os.Open(filepath.Join(s.Pwd(), name))
 }
 
 func (s Dummy) MakeExecutable(name string) error {
@@ -87,62 +171,62 @@ func (s Dummy) MakeExecutable(name string) error {
 	return err
 }
 
-func (s *Dummy) SetMaxProcesses(i int) language.Sandbox {
+func (s *Dummy) SetMaxProcesses(i int) Sandbox {
 	return s
 }
 
-func (s *Dummy) Env() language.Sandbox {
+func (s *Dummy) Env() Sandbox {
 	s.env = os.Environ()
 	return s
 }
 
-func (s *Dummy) SetEnv(env string) language.Sandbox {
+func (s *Dummy) SetEnv(env string) Sandbox {
 	s.env = append(s.env, env+"="+os.Getenv(env))
 	return s
 }
 
-func (s *Dummy) AddArg(string) language.Sandbox {
+func (s *Dummy) AddArg(string) Sandbox {
 	return s
 }
 
-func (s *Dummy) TimeLimit(tl time.Duration) language.Sandbox {
+func (s *Dummy) TimeLimit(tl time.Duration) Sandbox {
 	s.tl = tl
 	return s
 }
 
-func (s *Dummy) MemoryLimit(int) language.Sandbox {
+func (s *Dummy) MemoryLimit(int) Sandbox {
 	return s
 }
 
-func (s *Dummy) Stdin(reader io.Reader) language.Sandbox {
+func (s *Dummy) Stdin(reader io.Reader) Sandbox {
 	s.stdin = reader
 	return s
 }
 
-func (s *Dummy) Stderr(writer io.Writer) language.Sandbox {
+func (s *Dummy) Stderr(writer io.Writer) Sandbox {
 	s.stderr = writer
 	return s
 }
 
-func (s *Dummy) Stdout(writer io.Writer) language.Sandbox {
+func (s *Dummy) Stdout(writer io.Writer) Sandbox {
 	s.stdout = writer
 	return s
 }
 
-func (s *Dummy) MapDir(x string, y string, i []string, b bool) language.Sandbox {
+func (s *Dummy) MapDir(x string, y string, i []string, b bool) Sandbox {
 	return s
 }
 
-func (s *Dummy) WorkingDirectory(dir string) language.Sandbox {
+func (s *Dummy) WorkingDirectory(dir string) Sandbox {
 	s.workingDir = dir
 	return s
 }
 
-func (s *Dummy) Verbose() language.Sandbox {
+func (s *Dummy) Verbose() Sandbox {
 	return s
 }
 
-func (s *Dummy) Run(prg string, needStatus bool) (language.Status, error) {
+func (s *Dummy) Run(prg string, needStatus bool) (Status, error) {
 	cmd := exec.Command("bash", "-c", prg)
 	cmd.Stdin = s.stdin
 	cmd.Stdout = s.stdout
@@ -151,17 +235,17 @@ func (s *Dummy) Run(prg string, needStatus bool) (language.Status, error) {
 	cmd.Env = append(s.env, "PATH="+os.Getenv("PATH")+":"+s.tmpdir)
 
 	var (
-		st               language.Status
+		st               Status
 		errKill, errWait error
 		finish           = make(chan bool, 1)
 		wg               sync.WaitGroup
 	)
 
-	st.Verdict = language.VerdictOK
+	st.Verdict = VerdictOK
 
 	start := time.NewTimer(s.tl)
 	if err := cmd.Start(); err != nil {
-		st.Verdict = language.VerdictXX
+		st.Verdict = VerdictXX
 		return st, err
 	}
 	defer start.Stop()
@@ -175,9 +259,9 @@ func (s *Dummy) Run(prg string, needStatus bool) (language.Status, error) {
 
 	select {
 	case <-start.C:
-		st.Verdict = language.VerdictTL
+		st.Verdict = VerdictTL
 		if errKill = cmd.Process.Kill(); errKill != nil {
-			st.Verdict = language.VerdictXX
+			st.Verdict = VerdictXX
 		}
 	case <-finish:
 	}
@@ -185,8 +269,8 @@ func (s *Dummy) Run(prg string, needStatus bool) (language.Status, error) {
 	wg.Wait()
 
 	if errWait != nil && (strings.HasPrefix(errWait.Error(), "exit status") || strings.HasPrefix(errWait.Error(), "signal:")) {
-		if st.Verdict == language.VerdictOK {
-			st.Verdict = language.VerdictRE
+		if st.Verdict == VerdictOK {
+			st.Verdict = VerdictRE
 		}
 		errWait = nil
 	}
@@ -201,3 +285,4 @@ func (s *Dummy) Run(prg string, needStatus bool) (language.Status, error) {
 func (s *Dummy) Cleanup() error {
 	return os.RemoveAll(s.tmpdir)
 }
+*/

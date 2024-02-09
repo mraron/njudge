@@ -1,8 +1,11 @@
 package cpp
 
 import (
-	"bytes"
+	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/mraron/njudge/pkg/language/sandbox"
+	"golang.org/x/net/context"
 	"io"
+	"io/fs"
 	"strings"
 	"time"
 
@@ -27,15 +30,15 @@ func (c Cpp) DefaultFileName() string {
 	return "main.cpp"
 }
 
-func (c Cpp) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
-	err := s.CreateFile("main.cpp", r.Source)
+func (c Cpp) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
+	err := sandbox.CreateFileFromSource(s, "main.cpp", r.Source)
 	if err != nil {
 		return err
 	}
 
 	params := "main.cpp"
 	for _, f := range extras {
-		err := s.CreateFile(f.Name, f.Source)
+		err := sandbox.CreateFileFromSource(s, f.Name, f.Source)
 		if err != nil {
 			return err
 		}
@@ -46,34 +49,56 @@ func (c Cpp) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Writ
 		}
 	}
 
-	errorStream := &bytes.Buffer{}
-	if _, err := s.SetMaxProcesses(200).Env().TimeLimit(10*time.Second).MemoryLimit(2560000).Stdout(errorStream).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/g++ -std="+c.ver+" -O2 -static -DONLINE_JUDGE "+params, false); err != nil {
-		e.Write(errorStream.Bytes())
+	rc := sandbox.RunConfig{
+		MaxProcesses:     200,
+		InheritEnv:       true,
+		TimeLimit:        10 * time.Second,
+		MemoryLimit:      256 * memory.MiB,
+		Stdout:           e,
+		Stderr:           e,
+		WorkingDirectory: s.Pwd(),
+	}
+	if _, err := s.Run(context.TODO(), rc, "/usr/bin/g++", sandbox.SplitArgs("-std="+c.ver+" -O2 -static -DONLINE_JUDGE "+params)...); err != nil {
 		return err
 	}
 
-	bin, err := s.GetFile("a.out")
+	bin, err := s.Open("a.out")
 	if err != nil {
 		return err
 	}
+	defer func(bin fs.File) {
+		_ = bin.Close()
+	}(bin)
 
 	_, err = io.Copy(w, bin)
 	return err
 }
 
-func (Cpp) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (language.Status, error) {
-	stat := language.Status{}
-	stat.Verdict = language.VerdictXX
+func (Cpp) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (*sandbox.Status, error) {
+	return RunBinary("a.out")(s, binary, stdin, stdout, tl, ml)
+}
 
-	if err := s.CreateFile("a.out", binary); err != nil {
-		return stat, err
+func RunBinary(binaryName string) func(sandbox.Sandbox, io.Reader, io.Reader, io.Writer, time.Duration, int) (*sandbox.Status, error) {
+	return func(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (*sandbox.Status, error) {
+		stat := sandbox.Status{}
+		stat.Verdict = sandbox.VerdictXX
+
+		if err := sandbox.CreateFileFromSource(s, "a.out", binary); err != nil {
+			return nil, err
+		}
+
+		if err := s.MakeExecutable("a.out"); err != nil {
+			return nil, err
+		}
+
+		rc := sandbox.RunConfig{
+			Stdin:       stdin,
+			Stdout:      stdout,
+			TimeLimit:   tl,
+			MemoryLimit: memory.Amount(ml) * memory.KiB,
+		}
+		return s.Run(context.TODO(), rc, "a.out")
 	}
-
-	if err := s.MakeExecutable("a.out"); err != nil {
-		return stat, err
-	}
-
-	return s.Stdin(stdin).Stdout(stdout).TimeLimit(tl).MemoryLimit(ml/1024).Run("a.out", true)
 }
 
 func New(id, name, ver string) language.Language {

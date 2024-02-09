@@ -2,8 +2,11 @@ package java
 
 import (
 	"bytes"
-	"errors"
+	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/mraron/njudge/pkg/language/sandbox"
+	"golang.org/x/net/context"
 	"io"
+	"io/fs"
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
@@ -38,55 +41,76 @@ func (j *Java) DefaultFileName() string {
 	return j.sourceName
 }
 
-func (*Java) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) error {
-	return errors.New("can't insecure compile java")
-}
-
-func (j *Java) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
-	err := s.CreateFile(j.sourceName, r.Source)
+func (j *Java) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
+	err := sandbox.CreateFileFromSource(s, j.sourceName, r.Source)
 	if err != nil {
 		return err
 	}
 
 	classPath := "."
 	for ind := range j.jars {
-		if err := s.CreateFile(j.jars[ind].Name, bytes.NewBuffer(j.jars[ind].Contents)); err != nil {
+		if err := sandbox.CreateFileFromSource(s, j.jars[ind].Name, bytes.NewBuffer(j.jars[ind].Contents)); err != nil {
 			return err
 		}
 		classPath += ":" + j.jars[ind].Name
 	}
 
-	if _, err := s.AddArg("--open-files=2048").SetMaxProcesses(-1).Env().TimeLimit(10*time.Second).MemoryLimit(4*256000).Stdout(e).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/javac -cp "+classPath+" "+j.sourceName, false); err != nil {
+	rc := sandbox.RunConfig{
+		MaxProcesses: -1,
+		DirectoryMaps: []sandbox.DirectoryMap{
+			{"/etc", "/etc", nil},
+		},
+		InheritEnv:       true,
+		TimeLimit:        10 * time.Second,
+		MemoryLimit:      1 * memory.GiB,
+		Stdout:           e,
+		Stderr:           e,
+		WorkingDirectory: s.Pwd(),
+		Args:             []string{"--open-files=2048"},
+	}
+	if _, err := s.Run(context.TODO(), rc, "/usr/bin/javac", sandbox.SplitArgs("-cp "+classPath+" "+j.sourceName)...); err != nil {
 		return err
 	}
 
-	bin, err := s.GetFile(j.className)
+	bin, err := s.Open(j.className)
 	if err != nil {
 		return err
 	}
+	defer func(bin fs.File) {
+		_ = bin.Close()
+	}(bin)
 
 	_, err = io.Copy(w, bin)
 
 	return err
 }
 
-func (j *Java) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (language.Status, error) {
-	stat := language.Status{}
-	stat.Verdict = language.VerdictXX
-
-	if err := s.CreateFile(j.className, binary); err != nil {
-		return stat, err
+func (j *Java) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (*sandbox.Status, error) {
+	if err := sandbox.CreateFileFromSource(s, j.className, binary); err != nil {
+		return nil, err
 	}
 
 	classPath := "."
 	for ind := range j.jars {
-		if err := s.CreateFile(j.jars[ind].Name, bytes.NewBuffer(j.jars[ind].Contents)); err != nil {
-			return stat, err
+		if err := sandbox.CreateFileFromSource(s, j.jars[ind].Name, bytes.NewBuffer(j.jars[ind].Contents)); err != nil {
+			return nil, err
 		}
 		classPath += ":" + j.jars[ind].Name
 	}
 
-	return s.SetMaxProcesses(-1).Env().Stdin(stdin).Stdout(stdout).TimeLimit(tl).MemoryLimit(ml/1024).WorkingDirectory(s.Pwd()).Run("/usr/bin/java -cp "+classPath+" "+j.execName, true)
+	rc := sandbox.RunConfig{
+		MaxProcesses: -1,
+		DirectoryMaps: []sandbox.DirectoryMap{
+			{"/etc", "/etc", nil},
+		},
+		InheritEnv:       true,
+		Stdin:            stdin,
+		Stdout:           stdout,
+		TimeLimit:        tl,
+		MemoryLimit:      memory.Amount(ml) * memory.KiB,
+		WorkingDirectory: s.Pwd(),
+	}
+	return s.Run(context.TODO(), rc, "/usr/bin/java", sandbox.SplitArgs("-cp "+classPath+" "+j.execName)...)
 }
 
 func init() {

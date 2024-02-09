@@ -1,6 +1,9 @@
 package pascal
 
 import (
+	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/mraron/njudge/pkg/language/sandbox"
+	"testing"
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
@@ -11,13 +14,15 @@ const print = `begin
 end.
 `
 
-func (p pascal) Test(s language.Sandbox) error {
-	for _, test := range []language.LanguageTest{
-		{p, print, language.VerdictOK, "", "Hello world\n", 1 * time.Second, 128 * 1024 * 1024},
+func (p pascal) Test(t *testing.T, s sandbox.Sandbox) error {
+	for _, test := range []language.Test{
+		{"pascal_print", p, print, sandbox.VerdictOK, "", "Hello world\n", 1 * time.Second, 128 * memory.MiB},
 	} {
-		if err := test.Run(s); err != nil {
-			return err
-		}
+		t.Run(test.Name, func(t *testing.T) {
+			if err := test.Run(s); err != nil {
+				t.Error(err)
+			}
+		})
 	}
 
 	return nil

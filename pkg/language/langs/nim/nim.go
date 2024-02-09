@@ -1,8 +1,12 @@
 package nim
 
 import (
-	"errors"
+	"github.com/mraron/njudge/pkg/language/langs/cpp"
+	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/mraron/njudge/pkg/language/sandbox"
+	"golang.org/x/net/context"
 	"io"
+	"io/fs"
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
@@ -22,45 +26,48 @@ func (nim) DefaultFileName() string {
 	return "main.nim"
 }
 
-func (nim) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) error {
-	return errors.New("not supported")
-}
-
-func (nim) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
-	err := s.CreateFile("main.nim", r.Source)
+func (nim) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
+	err := sandbox.CreateFileFromSource(s, "main.nim", r.Source)
 	if err != nil {
 		return err
 	}
 
-	s.MapDir("/etc", "/etc", []string{}, true)
+	rc := sandbox.RunConfig{
+		MaxProcesses:     -1,
+		InheritEnv:       true,
+		TimeLimit:        10 * time.Second,
+		MemoryLimit:      256 * memory.MiB,
+		Stdout:           e,
+		Stderr:           e,
+		WorkingDirectory: s.Pwd(),
+		DirectoryMaps: []sandbox.DirectoryMap{
+			{
+				Inside:  "/etc",
+				Outside: "/etc",
+				Options: []sandbox.DirectoryMapOption{sandbox.NoExec},
+			},
+		},
+	}
 
-	if _, err := s.SetMaxProcesses(-1).Env().TimeLimit(10*time.Second).MemoryLimit(256000).Stdout(e).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/nim compile -d:release --nimcache=. main.nim", false); err != nil {
+	if _, err := s.Run(context.TODO(), rc, "/usr/bin/nim", sandbox.SplitArgs("compile -d:release --nimcache=. main.nim")...); err != nil {
 		return err
 	}
 
-	bin, err := s.GetFile("main")
+	bin, err := s.Open("main")
 	if err != nil {
 		return err
 	}
+	defer func(bin fs.File) {
+		_ = bin.Close()
+	}(bin)
 
 	_, err = io.Copy(w, bin)
 
 	return err
 }
 
-func (nim) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (language.Status, error) {
-	stat := language.Status{}
-	stat.Verdict = language.VerdictXX
-
-	if err := s.CreateFile("a.out", binary); err != nil {
-		return stat, err
-	}
-
-	if err := s.MakeExecutable("a.out"); err != nil {
-		return stat, err
-	}
-
-	return s.SetMaxProcesses(-1).Stdin(stdin).Stdout(stdout).TimeLimit(tl).MemoryLimit(ml/1024).Run("a.out", true)
+func (nim) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (*sandbox.Status, error) {
+	return cpp.RunBinary("a.out")(s, binary, stdin, stdout, tl, ml)
 }
 
 func init() {

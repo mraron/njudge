@@ -1,9 +1,12 @@
 package cython3
 
 import (
-	"bytes"
-	"errors"
+	"github.com/mraron/njudge/pkg/language/langs/cpp"
+	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/mraron/njudge/pkg/language/sandbox"
+	"golang.org/x/net/context"
 	"io"
+	"io/fs"
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
@@ -24,49 +27,44 @@ func (c cython3) DefaultFileName() string {
 	return "main.py"
 }
 
-func (c cython3) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) error {
-	return errors.New("not supported")
-}
-
-func (c cython3) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
-	err := s.CreateFile("main.py", r.Source)
+func (c cython3) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
+	err := sandbox.CreateFileFromSource(s, "main.py", r.Source)
 	if err != nil {
 		return err
 	}
 
-	errorStream := &bytes.Buffer{}
-	if _, err := s.SetMaxProcesses(200).Env().TimeLimit(10*time.Second).MemoryLimit(2560000).Stdout(errorStream).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/cython3 -3 --embed -o main.c main.py", false); err != nil {
-		e.Write(errorStream.Bytes())
+	rc := sandbox.RunConfig{
+		MaxProcesses:     200,
+		InheritEnv:       true,
+		TimeLimit:        10 * time.Second,
+		MemoryLimit:      256 * memory.MiB,
+		Stdout:           e,
+		Stderr:           e,
+		WorkingDirectory: s.Pwd(),
+	}
+	if _, err := s.Run(context.TODO(), rc, "/usr/bin/cython3", sandbox.SplitArgs("-3 --embed -o main.c main.py")...); err != nil {
 		return err
 	}
 
-	if _, err := s.SetMaxProcesses(200).Env().TimeLimit(10*time.Second).MemoryLimit(2560000).Stdout(errorStream).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/gcc -O2 -I/usr/include/python3.8 -o main main.c -lpython3.8 -lpthread -lm -lutil -ldl", false); err != nil {
-		e.Write(errorStream.Bytes())
+	if _, err := s.Run(context.TODO(), rc, "/usr/bin/gcc", sandbox.SplitArgs("-O2 -I/usr/include/python3.8 -o main main.c -lpython3.8 -lpthread -lm -lutil -ldl")...); err != nil {
 		return err
 	}
 
-	bin, err := s.GetFile("main")
+	bin, err := s.Open("main")
 	if err != nil {
 		return err
 	}
+	defer func(bin fs.File) {
+		_ = bin.Close()
+	}(bin)
 
 	_, err = io.Copy(w, bin)
 	return err
 }
 
-func (cython3) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (language.Status, error) {
-	stat := language.Status{}
-	stat.Verdict = language.VerdictXX
+func (cython3) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (*sandbox.Status, error) {
+	return cpp.RunBinary("a.out")(s, binary, stdin, stdout, tl, ml)
 
-	if err := s.CreateFile("a.out", binary); err != nil {
-		return stat, err
-	}
-
-	if err := s.MakeExecutable("a.out"); err != nil {
-		return stat, err
-	}
-
-	return s.Stdin(stdin).Stdout(stdout).TimeLimit(tl).MemoryLimit(ml/1024).Run("a.out", true)
 }
 
 func init() {

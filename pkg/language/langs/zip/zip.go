@@ -1,6 +1,7 @@
 package zip
 
 import (
+	"github.com/mraron/njudge/pkg/language/sandbox"
 	"io"
 	"time"
 
@@ -21,19 +22,15 @@ func (zip) DefaultFileName() string {
 	return "main.zip"
 }
 
-func (zip) InsecureCompile(s string, r io.Reader, w1 io.Writer, w2 io.Writer) error {
+func (zip) Compile(s sandbox.Sandbox, src language.File, bin io.Writer, cerr io.Writer, extras []language.File) error {
 	return nil
 }
 
-func (zip) Compile(s language.Sandbox, src language.File, bin io.Writer, cerr io.Writer, extras []language.File) error {
-	return nil
+func (zip) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (*sandbox.Status, error) {
+	return &sandbox.Status{}, nil
 }
 
-func (zip) Run(s language.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, mem int) (language.Status, error) {
-	return language.Status{}, nil
-}
-
-func (zip) Test(language.Sandbox) error {
+func (zip) Test(sandbox.Sandbox) error {
 	return nil
 }
 

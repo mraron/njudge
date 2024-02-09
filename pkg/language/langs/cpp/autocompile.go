@@ -3,8 +3,8 @@ package cpp
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
-	"log"
+	"github.com/mraron/njudge/pkg/language/sandbox"
+	"golang.org/x/net/context"
 	"os"
 	"path/filepath"
 
@@ -13,7 +13,7 @@ import (
 	"go.uber.org/multierr"
 )
 
-func AutoCompile(fs afero.Fs, s language.Sandbox, workDir, src, dst string) error {
+func AutoCompile(ctx context.Context, fs afero.Fs, s sandbox.Sandbox, workDir, src, dst string) error {
 	if src == "" {
 		return nil
 	}
@@ -22,26 +22,28 @@ func AutoCompile(fs afero.Fs, s language.Sandbox, workDir, src, dst string) erro
 		if binary, err := fs.Create(dst); err == nil {
 			if file, err := fs.Open(src); err == nil {
 				var buf bytes.Buffer
-				if err := s.Init(log.New(ioutil.Discard, "", 0)); err != nil {
+				if err := s.Init(ctx); err != nil {
 					return multierr.Combine(err, binary.Close(), file.Close())
 				}
-				defer s.Cleanup()
+				defer func(s sandbox.Sandbox, ctx context.Context) {
+					_ = s.Cleanup(ctx)
+				}(s, ctx)
 
-				conts, err := afero.ReadFile(fs, src)
+				contents, err := afero.ReadFile(fs, src)
 				if err != nil {
 					return multierr.Combine(err, file.Close(), binary.Close())
 				}
 
 				var headers []language.File
-				for _, header := range ExtractHeaderNames(fs, workDir, conts) {
-					headerConts, err := afero.ReadFile(fs, filepath.Join(workDir, header))
+				for _, header := range ExtractHeaderNames(fs, workDir, contents) {
+					headerContents, err := afero.ReadFile(fs, filepath.Join(workDir, header))
 					if err != nil {
 						return multierr.Combine(err, file.Close(), binary.Close())
 					}
 
 					headers = append(headers, language.File{
 						Name:   header,
-						Source: bytes.NewReader(headerConts),
+						Source: bytes.NewReader(headerContents),
 					})
 				}
 

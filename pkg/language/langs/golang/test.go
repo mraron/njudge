@@ -1,6 +1,9 @@
 package golang
 
 import (
+	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/mraron/njudge/pkg/language/sandbox"
+	"testing"
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
@@ -59,18 +62,20 @@ func main() {
 }`
 )
 
-func (g golang) Test(s language.Sandbox) error {
-	for _, test := range []language.LanguageTest{
-		{g, aplusb, language.VerdictOK, "1 2", "3\n", 1 * time.Second, 2 * 512 * 1024 * 1024},
-		{g, ce, language.VerdictCE, "", "", 1 * time.Second, 2 * 512 * 1024 * 1024},
-		{g, print, language.VerdictOK, "", "Hello world\n", 1 * time.Second, 2 * 512 * 1024 * 1024},
-		{g, tl, language.VerdictTL, "", "", 100 * time.Millisecond, 2 * 512 * 1024 * 1024},
-		{g, re, language.VerdictRE | language.VerdictTL, "", "", 1000 * time.Millisecond, 2 * 512 * 1024 * 1024},
-		{g, rediv0, language.VerdictRE, "", "", 1000 * time.Millisecond, 2 * 512 * 1024 * 1024},
+func (g golang) Test(t *testing.T, s sandbox.Sandbox) error {
+	for _, test := range []language.Test{
+		{"golang_aplusb", g, aplusb, sandbox.VerdictOK, "1 2", "3\n", 1 * time.Second, 128 * memory.MiB},
+		{"golang_ce", g, ce, sandbox.VerdictCE, "", "", 1 * time.Second, 128 * memory.MiB},
+		{"golang_print", g, print, sandbox.VerdictOK, "", "Hello world\n", 1 * time.Second, 128 * memory.MiB},
+		{"golang_tl", g, tl, sandbox.VerdictTL, "", "", 100 * time.Millisecond, 128 * memory.MiB},
+		{"golang_re", g, re, sandbox.VerdictRE | sandbox.VerdictTL, "", "", 1000 * time.Millisecond, 128 * memory.MiB},
+		{"golang_rediv0", g, rediv0, sandbox.VerdictRE, "", "", 1000 * time.Millisecond, 128 * memory.MiB},
 	} {
-		if err := test.Run(s); err != nil {
-			return err
-		}
+		t.Run(test.Name, func(t *testing.T) {
+			if err := test.Run(s); err != nil {
+				t.Error(err)
+			}
+		})
 	}
 
 	return nil
