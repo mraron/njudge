@@ -3,6 +3,7 @@ package checker
 import (
 	"bytes"
 	"fmt"
+	"golang.org/x/net/context"
 	"os/exec"
 	"strings"
 	"syscall"
@@ -25,7 +26,8 @@ func (Testlib) Name() string {
 	return "testlib"
 }
 
-func (t Testlib) Check(tc *problems.Testcase) error {
+func (t Testlib) Check(ctx context.Context, testcase *problems.Testcase) error {
+	tc := testcase
 	output := &bytes.Buffer{}
 
 	args := []string{t.path, tc.InputPath, tc.OutputPath, tc.AnswerPath}

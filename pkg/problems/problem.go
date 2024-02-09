@@ -3,6 +3,7 @@ package problems
 
 import (
 	"github.com/mraron/njudge/pkg/language"
+	"golang.org/x/net/context"
 )
 
 type File struct {
@@ -34,7 +35,7 @@ type Judgeable interface {
 }
 
 type Checker interface {
-	Check(testcase *Testcase) error
+	Check(ctx context.Context, testcase *Testcase) error
 }
 
 func Truncate(s string) string {

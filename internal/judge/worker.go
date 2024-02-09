@@ -1,9 +1,11 @@
 package judge
 
 import (
-	"bytes"
 	"context"
 	"fmt"
+	"github.com/mraron/njudge/pkg/problems/evaluation"
+	context2 "golang.org/x/net/context"
+	"io"
 
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/language/sandbox"
@@ -14,10 +16,10 @@ import (
 
 type Worker struct {
 	id              int
-	sandboxProvider *language.SandboxProvider
+	sandboxProvider *sandbox.ChanProvider
 }
 
-func NewWorker(id int, sandboxProvider *language.SandboxProvider) *Worker {
+func NewWorker(id int, sandboxProvider *sandbox.ChanProvider) *Worker {
 	return &Worker{id: id, sandboxProvider: sandboxProvider}
 }
 
@@ -25,42 +27,38 @@ func (w Worker) Judge(ctx context.Context, plogger *zap.Logger, p problems.Judge
 	logger := plogger.With(zap.Int("worker", w.id))
 	logger.Info("started to judge")
 
-	sandboxes := language.NewSandboxProvider()
+	sandboxes := sandbox.NewSandboxProvider()
 	for i := 0; i < 2; i++ {
-		var sandbox language.Sandbox
-		sandbox, err = w.sandboxProvider.Get()
+		var s sandbox.Sandbox
+		s, err = w.sandboxProvider.Get()
 		if err != nil {
 			logger.Error("can't get sandbox", zap.Error(err))
 			return
 		}
-		defer w.sandboxProvider.Put(sandbox)
+		defer w.sandboxProvider.Put(s)
 
-		err = sandbox.Init(zap.NewStdLog(logger))
+		err = s.Init(context2.TODO())
 		if err != nil {
 			return
 		}
-		sandboxes.Put(sandbox)
+		sandboxes.Put(s)
 
-		defer func(sandbox language.Sandbox) {
-			err = multierr.Append(err, sandbox.Cleanup())
-		}(sandbox)
+		defer func(sandbox sandbox.Sandbox) {
+			err = multierr.Append(err, sandbox.Cleanup(context2.TODO()))
+		}(s)
 	}
 
-	var (
-		tt     problems.TaskType = p.GetTaskType()
-		stderr bytes.Buffer      = bytes.Buffer{}
-	)
+	tt := p.GetTaskType()
 
 	logger.Info("compiling")
-
 	compileSandbox := sandboxes.MustGet()
-	bin, err := tt.Compile(p, compileSandbox, lang, bytes.NewReader(src), &stderr)
+	compileRes, err := tt.Compile(context.Background(), p, evaluation.NewByteSolution(lang, src), compileSandbox)
 	sandboxes.Put(compileSandbox)
 
 	if err != nil {
 		logger.Error("compilation error", zap.Error(err))
 		st.Compiled = false
-		st.CompilerOutput = err.Error() + "\n" + truncate(stderr.String(), 1024)
+		st.CompilerOutput = err.Error() + "\n" + truncate(compileRes.CompilationMessage, 1024)
 
 		return st, nil
 	}
@@ -76,7 +74,14 @@ func (w Worker) Judge(ctx context.Context, plogger *zap.Logger, p problems.Judge
 	)
 
 	go func() {
-		st, errRun = tt.Run(p, sandboxes, lang, bin, testNotifier, statusNotifier)
+		skeleton, _ := p.StatusSkeleton("")
+
+		bin, _ := io.ReadAll(compileRes.CompiledFile)
+		defer compileRes.CompiledFile.Close()
+
+		st, errRun = tt.Evaluate(context.Background(), *skeleton, evaluation.NewByteSolution(lang, bin), sandboxes, evaluation.IgnoreStatusUpdate{})
+		close(testNotifier)
+		close(statusNotifier)
 		waiter <- struct{}{}
 	}()
 
@@ -109,20 +114,20 @@ type IsolateWorkerProvider struct {
 	minSandboxId, maxSandboxId int
 	sandboxIdUsed              map[int]struct{}
 	workers                    chan *Worker
-	workerCount int
+	workerCount                int
 }
 
 func NewIsolateWorkerProvider(minSandboxId, maxSandboxId, workerCount int) (*IsolateWorkerProvider, error) {
 	wp := &IsolateWorkerProvider{
-		minSandboxId: minSandboxId,
-		maxSandboxId: maxSandboxId,
-		workerCount: workerCount,
-		workers: make(chan *Worker, workerCount),
+		minSandboxId:  minSandboxId,
+		maxSandboxId:  maxSandboxId,
+		workerCount:   workerCount,
+		workers:       make(chan *Worker, workerCount),
 		sandboxIdUsed: make(map[int]struct{}),
 	}
 
 	for i := 0; i < wp.workerCount; i++ {
-		provider := language.NewSandboxProvider()
+		provider := sandbox.NewSandboxProvider()
 		if err := wp.populateProvider(provider, 2); err != nil {
 			return nil, err
 		}
@@ -141,10 +146,11 @@ func (wp *IsolateWorkerProvider) Put(w *Worker) {
 	wp.workers <- w
 }
 
-func (wp *IsolateWorkerProvider) populateProvider(provider *language.SandboxProvider, cnt int) error {
+func (wp *IsolateWorkerProvider) populateProvider(provider *sandbox.ChanProvider, cnt int) error {
 	for i := wp.minSandboxId; i <= wp.maxSandboxId; i++ {
 		if _, ok := wp.sandboxIdUsed[i]; !ok {
-			provider.Put(sandbox.NewIsolate(i))
+			s, _ := sandbox.NewIsolate(i)
+			provider.Put(s)
 			cnt -= 1
 			wp.sandboxIdUsed[i] = struct{}{}
 		}
@@ -160,7 +166,6 @@ func (wp *IsolateWorkerProvider) populateProvider(provider *language.SandboxProv
 
 	return nil
 }
-
 
 func truncate(s string, to int) string {
 	if len(s) < to {

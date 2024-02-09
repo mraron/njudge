@@ -18,10 +18,10 @@ import (
 	_ "github.com/mraron/njudge/pkg/problems/config/polygon"
 	_ "github.com/mraron/njudge/pkg/problems/config/problem_yaml"
 	_ "github.com/mraron/njudge/pkg/problems/config/task_yaml"
-	_ "github.com/mraron/njudge/pkg/problems/tasktype/batch"
-	_ "github.com/mraron/njudge/pkg/problems/tasktype/communication"
-	_ "github.com/mraron/njudge/pkg/problems/tasktype/output_only"
-	_ "github.com/mraron/njudge/pkg/problems/tasktype/stub"
+	_ "github.com/mraron/njudge/pkg/problems/evaluation/batch"
+	_ "github.com/mraron/njudge/pkg/problems/evaluation/communication"
+	_ "github.com/mraron/njudge/pkg/problems/evaluation/output_only"
+	_ "github.com/mraron/njudge/pkg/problems/evaluation/stub"
 )
 
 type Server struct {

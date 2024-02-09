@@ -1,6 +1,7 @@
 package polygon
 
 import (
+	"github.com/mraron/njudge/pkg/problems/evaluation"
 	"path/filepath"
 
 	"github.com/mraron/njudge/pkg/language"
@@ -144,18 +145,20 @@ func (p Problem) Files() []problems.File {
 }
 
 func (p Problem) GetTaskType() problems.TaskType {
-	if p.Assets.Interactor.Source.Path != "" {
-		p.TaskType = "communication"
-	}
+	return problems.NewTaskType("batch", evaluation.CompileCopyFile{}, evaluation.NewLinearEvaluator(evaluation.ACRunner{}))
+	/*
+		if p.Assets.Interactor.Source.Path != "" {
+			p.TaskType = "communication"
+		}
 
-	if p.TaskType == "" {
-		p.TaskType = "batch"
-	}
+		if p.TaskType == "" {
+			p.TaskType = "batch"
+		}
 
-	tt, err := problems.GetTaskType(p.TaskType)
-	if err != nil {
-		panic(err)
-	}
+		tt, err := problems.GetTaskType(p.TaskType)
+		if err != nil {
+			panic(err)
+		}
 
-	return tt
+		return tt*/
 }

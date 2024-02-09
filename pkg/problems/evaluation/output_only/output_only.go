@@ -3,13 +3,14 @@ package output_only
 import (
 	"archive/zip"
 	"bytes"
+	"github.com/mraron/njudge/pkg/language/sandbox"
 	"io"
 	"io/ioutil"
 	"path/filepath"
 
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
-	"github.com/mraron/njudge/pkg/problems/tasktype/batch"
+	"github.com/mraron/njudge/pkg/problems/evaluation/batch"
 	"go.uber.org/multierr"
 )
 
@@ -31,7 +32,7 @@ func New() OutputOnly {
 		return nil
 	}
 
-	oo.Batch.RunF = func(rc *batch.RunContext, g *problems.Group, t *problems.Testcase) (language.Status, error) {
+	oo.Batch.RunF = func(rc *batch.RunContext, g *problems.Group, t *problems.Testcase) (sandbox.Status, error) {
 		var (
 			f     io.ReadCloser
 			err   error
@@ -55,14 +56,14 @@ func New() OutputOnly {
 				rc.Stdout = &bytes.Buffer{}
 				rc.Stdout.Write(conts)
 
-				return language.Status{Verdict: language.VerdictOK}, nil
+				return sandbox.Status{Verdict: sandbox.VerdictOK}, nil
 			}
 		}
 
-		return language.Status{Verdict: language.VerdictRE}, err
+		return sandbox.Status{Verdict: sandbox.VerdictRE}, err
 	}
 
-	oo.Batch.CheckFailF = func(rc *batch.RunContext, s language.Status, g *problems.Group, t *problems.Testcase) error {
+	oo.Batch.CheckFailF = func(rc *batch.RunContext, s sandbox.Status, g *problems.Group, t *problems.Testcase) error {
 		t.VerdictName = problems.VerdictPE
 		return nil
 	}
@@ -74,7 +75,7 @@ func (o OutputOnly) Name() string {
 	return "outputonly"
 }
 
-func (o OutputOnly) Compile(jinfo problems.Judgeable, s language.Sandbox, l language.Language, src io.Reader, errw io.Writer) (io.Reader, error) {
+func (o OutputOnly) Compile(jinfo problems.Judgeable, s sandbox.Sandbox, l language.Language, src io.Reader, errw io.Writer) (io.Reader, error) {
 	zipContents, err := ioutil.ReadAll(src)
 	if err != nil {
 		errw.Write([]byte(err.Error()))
@@ -90,8 +91,4 @@ func (o OutputOnly) Compile(jinfo problems.Judgeable, s language.Sandbox, l lang
 	}
 
 	return bytes.NewReader(zipContents), nil
-}
-
-func init() {
-	problems.RegisterTaskType(New())
 }

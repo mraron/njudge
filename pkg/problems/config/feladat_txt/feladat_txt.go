@@ -4,6 +4,9 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"github.com/mraron/njudge/pkg/problems/evaluation"
+	"github.com/mraron/njudge/pkg/problems/evaluation/checker"
+	context2 "golang.org/x/net/context"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -16,7 +19,6 @@ import (
 
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
-	"github.com/mraron/njudge/pkg/problems/checker"
 )
 
 type Problem struct {
@@ -140,12 +142,7 @@ func (p Problem) Files() []problems.File {
 }
 
 func (p Problem) GetTaskType() problems.TaskType {
-	tt, err := problems.GetTaskType("batch")
-	if err != nil {
-		panic(err)
-	}
-
-	return tt
+	return problems.NewTaskType("batch", evaluation.CompileCopyFile{}, evaluation.NewLinearEvaluator(evaluation.ACRunner{}))
 }
 
 func Parse(fs afero.Fs, path string) (problems.Problem, error) {
@@ -229,7 +226,8 @@ func Parse(fs afero.Fs, path string) (problems.Problem, error) {
 	}
 	p.StatementList = append(p.StatementList, problems.BytesData{Loc: "hungarian", Val: feladat_pdf, Typ: "application/pdf"})
 
-	if err := cpp.AutoCompile(fs, sandbox.NewDummy(), path, filepath.Join(path, "ellen.cpp"), filepath.Join(path, "ellen")); err != nil {
+	box, _ := sandbox.NewDummy()
+	if err := cpp.AutoCompile(context2.TODO(), fs, box, path, filepath.Join(path, "ellen.cpp"), filepath.Join(path, "ellen")); err != nil {
 		return nil, err
 	}
 

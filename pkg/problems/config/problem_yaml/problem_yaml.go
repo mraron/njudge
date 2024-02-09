@@ -7,8 +7,10 @@ import (
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/mraron/njudge/pkg/problems"
-	"github.com/mraron/njudge/pkg/problems/checker"
+	"github.com/mraron/njudge/pkg/problems/evaluation"
+	checker2 "github.com/mraron/njudge/pkg/problems/evaluation/checker"
 	"github.com/spf13/afero"
+	context2 "golang.org/x/net/context"
 	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
@@ -221,14 +223,14 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 
 func (p Problem) Checker() problems.Checker {
 	if p.Tests.Checker.Type == "" || p.Tests.Checker.Type == "whitediff" {
-		return checker.Whitediff{}
+		return checker2.Whitediff{}
 	} else if p.Tests.Checker.Type == "testlib" {
-		return checker.NewTestlib(filepath.Join(p.Path, p.Tests.Checker.Path))
+		return checker2.NewTestlib(filepath.Join(p.Path, p.Tests.Checker.Path))
 	} else if p.Tests.Checker.Type == "taskyaml" {
-		return checker.NewTaskYAML(filepath.Join(p.Path, p.Tests.Checker.Path))
+		return checker2.NewTaskYAML(filepath.Join(p.Path, p.Tests.Checker.Path))
 	}
 
-	return checker.Noop{}
+	return checker2.Noop{}
 }
 
 func (p Problem) Files() []problems.File {
@@ -236,17 +238,19 @@ func (p Problem) Files() []problems.File {
 }
 
 func (p Problem) GetTaskType() problems.TaskType {
-	tasktype := "batch"
-	if p.Tests.TaskType != "" {
-		tasktype = p.Tests.TaskType
-	}
+	return problems.NewTaskType("batch", evaluation.CompileCopyFile{}, evaluation.NewLinearEvaluator(evaluation.ACRunner{}))
+	/*
+		tasktype := "batch"
+		if p.Tests.TaskType != "" {
+			tasktype = p.Tests.TaskType
+		}
 
-	tt, err := problems.GetTaskType(tasktype)
-	if err != nil {
-		panic(err)
-	}
+		tt, err := problems.GetTaskType(tasktype)
+		if err != nil {
+			panic(err)
+		}
 
-	return tt
+		return tt*/
 }
 
 type config struct {
@@ -320,7 +324,8 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 
 		if strings.HasSuffix(p.Tests.Checker.Path, ".cpp") {
 			binaryName := strings.TrimSuffix(p.Tests.Checker.Path, filepath.Ext(p.Tests.Checker.Path))
-			if err := cpp.AutoCompile(fs, sandbox.NewDummy(), path, filepath.Join(path, p.Tests.Checker.Path), filepath.Join(path, binaryName)); err != nil {
+			s, _ := sandbox.NewDummy()
+			if err := cpp.AutoCompile(context2.TODO(), fs, s, path, filepath.Join(path, p.Tests.Checker.Path), filepath.Join(path, binaryName)); err != nil {
 				return nil, err
 			}
 

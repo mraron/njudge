@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"golang.org/x/net/context"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -56,7 +57,8 @@ func (Ellen) Name() string {
 	return "feladattxt"
 }
 
-func (f Ellen) Check(tc *problems.Testcase) error {
+func (f Ellen) Check(ctx context.Context, testcase *problems.Testcase) error {
+	tc := testcase
 	testind := strconv.Itoa(tc.Index)
 
 	dir, err := ioutil.TempDir("/tmp", "feladat_txt_checker")

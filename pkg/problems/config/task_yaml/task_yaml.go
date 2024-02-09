@@ -2,9 +2,11 @@ package task_yaml
 
 import (
 	"bufio"
-	"bytes"
 	"errors"
 	"fmt"
+	"github.com/mraron/njudge/pkg/problems/evaluation"
+	checker2 "github.com/mraron/njudge/pkg/problems/evaluation/checker"
+	context2 "golang.org/x/net/context"
 	"io"
 	"os"
 	"path/filepath"
@@ -18,10 +20,6 @@ import (
 
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
-	"github.com/mraron/njudge/pkg/problems/checker"
-	"github.com/mraron/njudge/pkg/problems/tasktype/batch"
-	"github.com/mraron/njudge/pkg/problems/tasktype/communication"
-	"go.uber.org/multierr"
 	"gopkg.in/yaml.v3"
 )
 
@@ -249,14 +247,14 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 
 func (p Problem) Checker() problems.Checker {
 	if p.tasktype == "communication" { // manager already printed the result
-		return checker.Noop{}
+		return checker2.Noop{}
 	}
 
 	if p.whiteDiffChecker {
-		return checker.Whitediff{}
+		return checker2.Whitediff{}
 	}
 
-	return checker.NewTaskYAML(filepath.Join(p.Path, "check", "checker"))
+	return checker2.NewTaskYAML(filepath.Join(p.Path, "check", "checker"))
 }
 
 func (p Problem) Files() []problems.File {
@@ -264,64 +262,72 @@ func (p Problem) Files() []problems.File {
 }
 
 func (p Problem) GetTaskType() problems.TaskType {
-	var (
-		tt  problems.TaskType
-		err error
+	return problems.NewTaskType(
+		"batch",
+		evaluation.CompileCheckSupported{},
+		evaluation.NewLinearEvaluator(
+			evaluation.NewBasicRunner(evaluation.BasicRunnerWithChecker(p.Checker())),
+		),
 	)
+	/*
+		var (
+			tt  problems.TaskType
+			err error
+		)
 
-	if p.tasktype == "outputonly" {
-		tt, err = problems.GetTaskType("outputonly")
-	} else if p.tasktype == "batch" {
-		tt, err = problems.GetTaskType("batch")
-	} else if p.tasktype == "stub" {
-		tt, err = problems.GetTaskType("stub")
-	} else if p.tasktype == "communication" {
-		res := communication.New()
-		res.RunInteractorF = func(rc *batch.RunContext, utoi, itou *os.File, g *problems.Group, tc *problems.Testcase) (language.Status, error) {
-			input, err := os.Open(tc.InputPath)
-			if err != nil {
-				return language.Status{}, multierr.Combine(err, input.Close())
+		if p.tasktype == "outputonly" {
+			tt, err = problems.GetTaskType("outputonly")
+		} else if p.tasktype == "batch" {
+			tt, err = problems.GetTaskType("batch")
+		} else if p.tasktype == "stub" {
+			tt, err = problems.GetTaskType("stub")
+		} else if p.tasktype == "communication" {
+			res := communication.New()
+			res.RunInteractorF = func(rc *batch.RunContext, utoi, itou *os.File, g *problems.Group, tc *problems.Testcase) (language.Status, error) {
+				input, err := os.Open(tc.InputPath)
+				if err != nil {
+					return language.Status{}, multierr.Combine(err, input.Close())
+				}
+				defer input.Close()
+
+				sbox := rc.Store["interactorSandbox"].(language.Sandbox).Stdin(input).Stdout(rc.Stdout).TimeLimit(2 * tc.TimeLimit).MemoryLimit(1024 * 1024)
+				sbox.MapDir("/fifo", filepath.Dir(itou.Name()), []string{"rw"}, false)
+
+				st, err := sbox.Run(fmt.Sprintf("interactor %s %s", filepath.Join("/fifo", filepath.Base(utoi.Name())), filepath.Join("/fifo", filepath.Base(itou.Name()))), true)
+				if err != nil {
+					return st, err
+				}
+				itou.Close()
+
+				fmt.Fscanf(rc.Stdout, "%f", &tc.Score)
+				if tc.Score == 0 {
+					tc.VerdictName = problems.VerdictWA
+				} else if tc.Score < 1.0 {
+					tc.VerdictName = problems.VerdictPC
+				} else {
+					tc.VerdictName = problems.VerdictAC
+				}
+
+				tc.Score *= tc.MaxScore
+
+				// For compatibility create a file named out
+				return st, multierr.Combine(err, rc.Store["interactorSandbox"].(language.Sandbox).CreateFile("out", bytes.NewBuffer([]byte{})))
 			}
-			defer input.Close()
 
-			sbox := rc.Store["interactorSandbox"].(language.Sandbox).Stdin(input).Stdout(rc.Stdout).TimeLimit(2 * tc.TimeLimit).MemoryLimit(1024 * 1024)
-			sbox.MapDir("/fifo", filepath.Dir(itou.Name()), []string{"rw"}, false)
-
-			st, err := sbox.Run(fmt.Sprintf("interactor %s %s", filepath.Join("/fifo", filepath.Base(utoi.Name())), filepath.Join("/fifo", filepath.Base(itou.Name()))), true)
-			if err != nil {
-				return st, err
-			}
-			itou.Close()
-
-			fmt.Fscanf(rc.Stdout, "%f", &tc.Score)
-			if tc.Score == 0 {
-				tc.VerdictName = problems.VerdictWA
-			} else if tc.Score < 1.0 {
-				tc.VerdictName = problems.VerdictPC
-			} else {
-				tc.VerdictName = problems.VerdictAC
+			res.RunUserF = func(rc *batch.RunContext, utoi, itou *os.File, g *problems.Group, tc *problems.Testcase) (language.Status, error) {
+				res, err := rc.Lang.Run(rc.Sandbox, bytes.NewReader(rc.Binary), itou, utoi, tc.TimeLimit, tc.MemoryLimit)
+				utoi.Close()
+				return res, err
 			}
 
-			tc.Score *= tc.MaxScore
-
-			// For compatibility create a file named out
-			return st, multierr.Combine(err, rc.Store["interactorSandbox"].(language.Sandbox).CreateFile("out", bytes.NewBuffer([]byte{})))
+			tt = res
 		}
 
-		res.RunUserF = func(rc *batch.RunContext, utoi, itou *os.File, g *problems.Group, tc *problems.Testcase) (language.Status, error) {
-			res, err := rc.Lang.Run(rc.Sandbox, bytes.NewReader(rc.Binary), itou, utoi, tc.TimeLimit, tc.MemoryLimit)
-			utoi.Close()
-			return res, err
+		if err != nil {
+			panic(err)
 		}
 
-		tt = res
-	}
-
-	if err != nil {
-		panic(err)
-	}
-
-	return tt
+		return tt*/
 }
 
 func parseGen(r io.Reader) (int, [][2]interface{}, error) {
@@ -468,12 +474,14 @@ func Parser(fs afero.Fs, path string) (problems.Problem, error) {
 		managerPath := filepath.Join(checkPath, "manager")
 
 		if exists(checkerCppPath) {
-			if err := cpp.AutoCompile(fs, sandbox.NewDummy(), checkPath, checkerCppPath, checkerPath); err != nil {
+			s, _ := sandbox.NewDummy()
+			if err := cpp.AutoCompile(context2.TODO(), fs, s, checkPath, checkerCppPath, checkerPath); err != nil {
 				return nil, err
 			}
 		} else if exists(managerCppPath) {
 			p.tasktype = "communication"
-			if err := cpp.AutoCompile(fs, sandbox.NewDummy(), checkPath, managerCppPath, managerPath); err != nil {
+			s, _ := sandbox.NewDummy()
+			if err := cpp.AutoCompile(context2.TODO(), fs, s, checkPath, managerCppPath, managerPath); err != nil {
 				return nil, err
 			}
 

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/mraron/njudge/pkg/language/runner"
 	"github.com/mraron/njudge/pkg/problems"
+	"golang.org/x/net/context"
 )
 
 // TaskYAML checker format is used by CMS as described in
@@ -29,7 +30,8 @@ func (t *TaskYAML) Name() string {
 	return "taskyaml"
 }
 
-func (t *TaskYAML) Check(tc *problems.Testcase) error {
+func (t *TaskYAML) Check(ctx context.Context, testcase *problems.Testcase) error {
+	tc := testcase
 	stdout, stderr := bytes.Buffer{}, bytes.Buffer{}
 
 	t.executable.Stdout(&stdout)

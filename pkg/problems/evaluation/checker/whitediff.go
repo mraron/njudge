@@ -1,6 +1,7 @@
 package checker
 
 import (
+	"golang.org/x/net/context"
 	"io"
 	"os"
 	"strings"
@@ -19,7 +20,9 @@ func (Whitediff) Name() string {
 	return "whitediff"
 }
 
-func (Whitediff) Check(tc *problems.Testcase) error {
+func (Whitediff) Check(ctx context.Context, testcase *problems.Testcase) error {
+	tc := testcase
+
 	ans, err := os.Open(tc.AnswerPath)
 	if err != nil {
 		return multierr.Combine(err, ans.Close())

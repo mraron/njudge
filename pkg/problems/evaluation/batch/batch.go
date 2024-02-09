@@ -3,6 +3,7 @@ package batch
 import (
 	"bytes"
 	"fmt"
+	"github.com/mraron/njudge/pkg/language/sandbox"
 	"io"
 	"io/ioutil"
 	"os"
@@ -16,9 +17,9 @@ type Batch struct {
 	PrepareFilesF func(*CompileContext) (language.File, []language.File, error)
 
 	InitF      func(*RunContext) error
-	RunF       func(*RunContext, *problems.Group, *problems.Testcase) (language.Status, error)
-	CheckOKF   func(*RunContext, language.Status, *problems.Group, *problems.Testcase) error
-	CheckFailF func(*RunContext, language.Status, *problems.Group, *problems.Testcase) error
+	RunF       func(*RunContext, *problems.Group, *problems.Testcase) (sandbox.Status, error)
+	CheckOKF   func(*RunContext, sandbox.Status, *problems.Group, *problems.Testcase) error
+	CheckFailF func(*RunContext, sandbox.Status, *problems.Group, *problems.Testcase) error
 	CleanupF   func(*RunContext) error
 }
 
@@ -43,8 +44,8 @@ func truncate(s string) string {
 
 type RunContext struct {
 	Problem         problems.Judgeable
-	SandboxProvider *language.SandboxProvider
-	Sandbox         language.Sandbox
+	SandboxProvider *sandbox.ChanProvider
+	Sandbox         sandbox.Sandbox
 	Lang            language.Language
 	Binary          []byte
 	TestChan        chan string
@@ -56,7 +57,7 @@ type RunContext struct {
 
 type CompileContext struct {
 	Problem problems.Judgeable
-	Sandbox language.Sandbox
+	Sandbox sandbox.Sandbox
 	Lang    language.Language
 	Source  io.Reader
 	Binary  io.Writer
@@ -82,27 +83,27 @@ func Init(*RunContext) error {
 	return nil
 }
 
-func Run(ctx *RunContext, group *problems.Group, testcase *problems.Testcase) (language.Status, error) {
+func Run(ctx *RunContext, group *problems.Group, testcase *problems.Testcase) (sandbox.Status, error) {
 	inputFile, _ := ctx.Problem.InputOutputFiles()
 	testLocation, answerLocation := testcase.InputPath, testcase.AnswerPath
 	input, err := os.Open(testLocation)
 	if err != nil {
 		testcase.VerdictName = problems.VerdictXX
-		return language.Status{}, err
+		return sandbox.Status{}, err
 	}
 	defer input.Close()
 
 	answerFile, err := os.Open(answerLocation)
 	if err != nil {
 		testcase.VerdictName = problems.VerdictXX
-		return language.Status{}, err
+		return sandbox.Status{}, err
 	}
 	defer answerFile.Close()
 
 	if inputFile != "" {
-		if err := ctx.Sandbox.CreateFile(inputFile, input); err != nil {
+		if err := sandbox.CreateFileFromSource(ctx.Sandbox, inputFile, input); err != nil {
 			testcase.VerdictName = problems.VerdictXX
-			return language.Status{}, err
+			return sandbox.Status{}, err
 		}
 		input = nil
 	}
@@ -111,16 +112,16 @@ func Run(ctx *RunContext, group *problems.Group, testcase *problems.Testcase) (l
 
 	if err != nil {
 		testcase.VerdictName = problems.VerdictXX
-		return res, err
+		return *res, err
 	}
 
 	testcase.MemoryUsed = res.Memory
 	testcase.TimeSpent = res.Time
 
-	return res, nil
+	return *res, nil
 }
 
-func CheckOK(ctx *RunContext, res language.Status, group *problems.Group, testcase *problems.Testcase) error {
+func CheckOK(ctx *RunContext, res sandbox.Status, group *problems.Group, testcase *problems.Testcase) error {
 	programOutput := ctx.Stdout.String()
 	answerContents, err := ioutil.ReadFile(testcase.AnswerPath)
 	if err != nil {
@@ -148,7 +149,7 @@ func CheckOK(ctx *RunContext, res language.Status, group *problems.Group, testca
 
 	testcase.OutputPath = tmpfile.Name()
 
-	err = ctx.Problem.Checker().Check(testcase)
+	err = ctx.Problem.Checker().Check(nil, testcase)
 
 	testcase.Output = truncate(programOutput)
 	testcase.ExpectedOutput = truncate(string(answerContents))
@@ -156,7 +157,7 @@ func CheckOK(ctx *RunContext, res language.Status, group *problems.Group, testca
 	return err
 }
 
-func CheckFail(ctx *RunContext, res language.Status, group *problems.Group, testcase *problems.Testcase) error {
+func CheckFail(ctx *RunContext, res sandbox.Status, group *problems.Group, testcase *problems.Testcase) error {
 	answerContents, err := ioutil.ReadFile(testcase.AnswerPath)
 	if err != nil {
 		testcase.VerdictName = problems.VerdictXX
@@ -164,13 +165,13 @@ func CheckFail(ctx *RunContext, res language.Status, group *problems.Group, test
 	}
 
 	switch res.Verdict {
-	case language.VerdictRE:
+	case sandbox.VerdictRE:
 		testcase.VerdictName = problems.VerdictRE
-	case language.VerdictXX:
+	case sandbox.VerdictXX:
 		testcase.VerdictName = problems.VerdictXX
-	case language.VerdictML:
+	case sandbox.VerdictML:
 		testcase.VerdictName = problems.VerdictML
-	case language.VerdictTL:
+	case sandbox.VerdictTL:
 		testcase.VerdictName = problems.VerdictTL
 	}
 
@@ -189,7 +190,7 @@ func (b Batch) Name() string {
 	return "batch"
 }
 
-func (b Batch) Compile(jinfo problems.Judgeable, sandbox language.Sandbox, lang language.Language, src io.Reader, dest io.Writer) (io.Reader, error) {
+func (b Batch) Compile(jinfo problems.Judgeable, sandbox sandbox.Sandbox, lang language.Language, src io.Reader, dest io.Writer) (io.Reader, error) {
 	file, extras, err := b.PrepareFilesF(&CompileContext{
 		Problem: jinfo,
 		Sandbox: sandbox,
@@ -209,26 +210,26 @@ func (b Batch) Compile(jinfo problems.Judgeable, sandbox language.Sandbox, lang 
 	return buf, nil
 }
 
-func (b Batch) Run(judging problems.Judgeable, sp *language.SandboxProvider, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
+func (b Batch) Run(judging problems.Judgeable, sp *sandbox.ChanProvider, lang language.Language, bin io.Reader, testNotifier chan string, statusNotifier chan problems.Status) (problems.Status, error) {
 	var (
 		ans            problems.Status
 		skeleton       *problems.Status
 		binaryContents []byte
 		err            error
-		sandbox        language.Sandbox
+		s              sandbox.Sandbox
 	)
 
 	if skeleton, err = judging.StatusSkeleton(""); err != nil {
 		return ans, err
 	}
 
-	sandbox, err = sp.Get()
+	s, err = sp.Get()
 	if err != nil {
 		ans.Compiled = false
 		ans.CompilerOutput = err.Error()
 		return ans, err
 	}
-	defer sp.Put(sandbox)
+	defer sp.Put(s)
 
 	binaryContents, err = ioutil.ReadAll(bin)
 	if err != nil {
@@ -258,7 +259,7 @@ func (b Batch) Run(judging problems.Judgeable, sp *language.SandboxProvider, lan
 	ctx := RunContext{
 		Problem:         judging,
 		SandboxProvider: sp,
-		Sandbox:         sandbox,
+		Sandbox:         s,
 		Lang:            lang,
 		Binary:          binaryContents,
 		TestChan:        testNotifier,
@@ -324,7 +325,7 @@ func (b Batch) Run(judging problems.Judgeable, sp *language.SandboxProvider, lan
 					if err != nil {
 						tc.VerdictName = problems.VerdictXX
 						return ans, err
-					} else if res.Verdict == language.VerdictOK {
+					} else if res.Verdict == sandbox.VerdictOK {
 						if err := b.CheckOKF(&ctx, res, group, tc); err != nil {
 							tc.VerdictName = problems.VerdictXX
 							return ans, err
@@ -357,8 +358,4 @@ func (b Batch) Run(judging problems.Judgeable, sp *language.SandboxProvider, lan
 	}
 
 	return ans, Cleanup(&ctx)
-}
-
-func init() {
-	problems.RegisterTaskType(New())
 }

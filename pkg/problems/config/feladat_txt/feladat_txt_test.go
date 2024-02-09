@@ -6,7 +6,7 @@ import (
 
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/config/feladat_txt"
-	_ "github.com/mraron/njudge/pkg/problems/tasktype/batch"
+	_ "github.com/mraron/njudge/pkg/problems/evaluation/batch"
 	"github.com/spf13/afero"
 )
 

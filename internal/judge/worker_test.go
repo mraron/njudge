@@ -11,7 +11,6 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/mraron/njudge/internal/judge"
-	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/mraron/njudge/pkg/problems"
 	"go.uber.org/zap"
@@ -73,9 +72,11 @@ func TestWorker(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			sbp := language.NewSandboxProvider()
-			sbp.Put(sandbox.NewDummy())
-			sbp.Put(sandbox.NewDummy())
+			sbp := sandbox.NewSandboxProvider()
+			s1, _ := sandbox.NewDummy()
+			sbp.Put(s1)
+			s2, _ := sandbox.NewDummy()
+			sbp.Put(s2)
 
 			ch := make(chan judge.Response)
 			cb := judge.NewChanCallback(ch)

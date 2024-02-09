@@ -134,7 +134,7 @@ func TestTaskYAML_Check(t1 *testing.T) {
 				path:       tt.fields.path,
 				executable: tt.fields.executable,
 			}
-			if err := t.Check(tt.tc); (err != nil) != tt.wantErr {
+			if err := t.Check(nil, tt.tc); (err != nil) != tt.wantErr {
 				t1.Errorf("task_yaml.Check() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if tt.tc.VerdictName != tt.wantVerdictName {

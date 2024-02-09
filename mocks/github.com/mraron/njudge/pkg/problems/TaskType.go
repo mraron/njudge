@@ -3,6 +3,7 @@
 package problems
 
 import (
+	"github.com/mraron/njudge/pkg/language/sandbox"
 	io "io"
 
 	language "github.com/mraron/njudge/pkg/language"
@@ -25,15 +26,15 @@ func (_m *TaskType) EXPECT() *TaskType_Expecter {
 }
 
 // Compile provides a mock function with given fields: _a0, _a1, _a2, _a3, _a4
-func (_m *TaskType) Compile(_a0 problems.Judgeable, _a1 language.Sandbox, _a2 language.Language, _a3 io.Reader, _a4 io.Writer) (io.Reader, error) {
+func (_m *TaskType) Compile(_a0 problems.Judgeable, _a1 sandbox.Sandbox, _a2 language.Language, _a3 io.Reader, _a4 io.Writer) (io.Reader, error) {
 	ret := _m.Called(_a0, _a1, _a2, _a3, _a4)
 
 	var r0 io.Reader
 	var r1 error
-	if rf, ok := ret.Get(0).(func(problems.Judgeable, language.Sandbox, language.Language, io.Reader, io.Writer) (io.Reader, error)); ok {
+	if rf, ok := ret.Get(0).(func(problems.Judgeable, sandbox.Sandbox, language.Language, io.Reader, io.Writer) (io.Reader, error)); ok {
 		return rf(_a0, _a1, _a2, _a3, _a4)
 	}
-	if rf, ok := ret.Get(0).(func(problems.Judgeable, language.Sandbox, language.Language, io.Reader, io.Writer) io.Reader); ok {
+	if rf, ok := ret.Get(0).(func(problems.Judgeable, sandbox.Sandbox, language.Language, io.Reader, io.Writer) io.Reader); ok {
 		r0 = rf(_a0, _a1, _a2, _a3, _a4)
 	} else {
 		if ret.Get(0) != nil {
@@ -41,7 +42,7 @@ func (_m *TaskType) Compile(_a0 problems.Judgeable, _a1 language.Sandbox, _a2 la
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(problems.Judgeable, language.Sandbox, language.Language, io.Reader, io.Writer) error); ok {
+	if rf, ok := ret.Get(1).(func(problems.Judgeable, sandbox.Sandbox, language.Language, io.Reader, io.Writer) error); ok {
 		r1 = rf(_a0, _a1, _a2, _a3, _a4)
 	} else {
 		r1 = ret.Error(1)
@@ -65,9 +66,9 @@ func (_e *TaskType_Expecter) Compile(_a0 interface{}, _a1 interface{}, _a2 inter
 	return &TaskType_Compile_Call{Call: _e.mock.On("Compile", _a0, _a1, _a2, _a3, _a4)}
 }
 
-func (_c *TaskType_Compile_Call) Run(run func(_a0 problems.Judgeable, _a1 language.Sandbox, _a2 language.Language, _a3 io.Reader, _a4 io.Writer)) *TaskType_Compile_Call {
+func (_c *TaskType_Compile_Call) Run(run func(_a0 problems.Judgeable, _a1 sandbox.Sandbox, _a2 language.Language, _a3 io.Reader, _a4 io.Writer)) *TaskType_Compile_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(problems.Judgeable), args[1].(language.Sandbox), args[2].(language.Language), args[3].(io.Reader), args[4].(io.Writer))
+		run(args[0].(problems.Judgeable), args[1].(sandbox.Sandbox), args[2].(language.Language), args[3].(io.Reader), args[4].(io.Writer))
 	})
 	return _c
 }
@@ -77,7 +78,7 @@ func (_c *TaskType_Compile_Call) Return(_a0 io.Reader, _a1 error) *TaskType_Comp
 	return _c
 }
 
-func (_c *TaskType_Compile_Call) RunAndReturn(run func(problems.Judgeable, language.Sandbox, language.Language, io.Reader, io.Writer) (io.Reader, error)) *TaskType_Compile_Call {
+func (_c *TaskType_Compile_Call) RunAndReturn(run func(problems.Judgeable, sandbox.Sandbox, language.Language, io.Reader, io.Writer) (io.Reader, error)) *TaskType_Compile_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -124,21 +125,21 @@ func (_c *TaskType_Name_Call) RunAndReturn(run func() string) *TaskType_Name_Cal
 }
 
 // Run provides a mock function with given fields: _a0, _a1, _a2, _a3, _a4, _a5
-func (_m *TaskType) Run(_a0 problems.Judgeable, _a1 *language.SandboxProvider, _a2 language.Language, _a3 io.Reader, _a4 chan string, _a5 chan problems.Status) (problems.Status, error) {
+func (_m *TaskType) Run(_a0 problems.Judgeable, _a1 *sandbox.ChanProvider, _a2 language.Language, _a3 io.Reader, _a4 chan string, _a5 chan problems.Status) (problems.Status, error) {
 	ret := _m.Called(_a0, _a1, _a2, _a3, _a4, _a5)
 
 	var r0 problems.Status
 	var r1 error
-	if rf, ok := ret.Get(0).(func(problems.Judgeable, *language.SandboxProvider, language.Language, io.Reader, chan string, chan problems.Status) (problems.Status, error)); ok {
+	if rf, ok := ret.Get(0).(func(problems.Judgeable, *sandbox.ChanProvider, language.Language, io.Reader, chan string, chan problems.Status) (problems.Status, error)); ok {
 		return rf(_a0, _a1, _a2, _a3, _a4, _a5)
 	}
-	if rf, ok := ret.Get(0).(func(problems.Judgeable, *language.SandboxProvider, language.Language, io.Reader, chan string, chan problems.Status) problems.Status); ok {
+	if rf, ok := ret.Get(0).(func(problems.Judgeable, *sandbox.ChanProvider, language.Language, io.Reader, chan string, chan problems.Status) problems.Status); ok {
 		r0 = rf(_a0, _a1, _a2, _a3, _a4, _a5)
 	} else {
 		r0 = ret.Get(0).(problems.Status)
 	}
 
-	if rf, ok := ret.Get(1).(func(problems.Judgeable, *language.SandboxProvider, language.Language, io.Reader, chan string, chan problems.Status) error); ok {
+	if rf, ok := ret.Get(1).(func(problems.Judgeable, *sandbox.ChanProvider, language.Language, io.Reader, chan string, chan problems.Status) error); ok {
 		r1 = rf(_a0, _a1, _a2, _a3, _a4, _a5)
 	} else {
 		r1 = ret.Error(1)
@@ -163,9 +164,9 @@ func (_e *TaskType_Expecter) Run(_a0 interface{}, _a1 interface{}, _a2 interface
 	return &TaskType_Run_Call{Call: _e.mock.On("Run", _a0, _a1, _a2, _a3, _a4, _a5)}
 }
 
-func (_c *TaskType_Run_Call) Run(run func(_a0 problems.Judgeable, _a1 *language.SandboxProvider, _a2 language.Language, _a3 io.Reader, _a4 chan string, _a5 chan problems.Status)) *TaskType_Run_Call {
+func (_c *TaskType_Run_Call) Run(run func(_a0 problems.Judgeable, _a1 *sandbox.ChanProvider, _a2 language.Language, _a3 io.Reader, _a4 chan string, _a5 chan problems.Status)) *TaskType_Run_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(problems.Judgeable), args[1].(*language.SandboxProvider), args[2].(language.Language), args[3].(io.Reader), args[4].(chan string), args[5].(chan problems.Status))
+		run(args[0].(problems.Judgeable), args[1].(*sandbox.ChanProvider), args[2].(language.Language), args[3].(io.Reader), args[4].(chan string), args[5].(chan problems.Status))
 	})
 	return _c
 }
@@ -175,7 +176,7 @@ func (_c *TaskType_Run_Call) Return(_a0 problems.Status, _a1 error) *TaskType_Ru
 	return _c
 }
 
-func (_c *TaskType_Run_Call) RunAndReturn(run func(problems.Judgeable, *language.SandboxProvider, language.Language, io.Reader, chan string, chan problems.Status) (problems.Status, error)) *TaskType_Run_Call {
+func (_c *TaskType_Run_Call) RunAndReturn(run func(problems.Judgeable, *sandbox.ChanProvider, language.Language, io.Reader, chan string, chan problems.Status) (problems.Status, error)) *TaskType_Run_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -26,9 +26,11 @@ var TestProblemArgs struct {
 var TestProblemCmd = &cobra.Command{
 	Use: "testproblem",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		sp := language.NewSandboxProvider()
-		sp.Put(sandbox.NewIsolate(50))
-		sp.Put(sandbox.NewIsolate(51))
+		sp := sandbox.NewSandboxProvider()
+		s1, _ := sandbox.NewIsolate(50)
+		sp.Put(s1)
+		s2, _ := sandbox.NewIsolate(51)
+		sp.Put(s2)
 		w := judge.NewWorker(1, sp)
 
 		logger, err := zap.NewDevelopment()
