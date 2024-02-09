@@ -20,8 +20,8 @@ import (
 	"testing"
 )
 
-var isolateInstalled = flag.Bool("isolate", true, "run isolate tests")
-var allLanguages = flag.Bool("all_languages", true, "run all languages")
+var isolateInstalled = flag.Bool("isolate", false, "run isolate tests")
+var allLanguages = flag.Bool("all_languages", false, "run all languages")
 
 func TestIsolateWithCpp17(t *testing.T) {
 	if !*isolateInstalled {
