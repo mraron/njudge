@@ -2,11 +2,11 @@ package evaluation
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/mraron/njudge/pkg/problems"
-	"golang.org/x/net/context"
 	"io"
 	"testing/iotest"
 )
@@ -57,11 +57,11 @@ func (c Compile) Compile(ctx context.Context, problem problems.Judgeable, soluti
 
 	// TODO add ctx to language
 	stderr, bin := &bytes.Buffer{}, &bytes.Buffer{}
-	stderrTruncater := iotest.TruncateWriter(stderr, 1<<16)
+	stderrTruncated := iotest.TruncateWriter(stderr, 1<<16)
 	if err := lang.Compile(sandbox, language.File{
-		Name:   lang.DefaultFileName(),
+		Name:   lang.DefaultFilename(),
 		Source: f,
-	}, bin, stderrTruncater, nil); err != nil {
+	}, bin, stderrTruncated, nil); err != nil {
 		return &problems.CompilationResult{
 			CompiledFile:       nil,
 			CompilationMessage: stderr.String(),

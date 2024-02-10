@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/mraron/njudge/pkg/language/runner"
 	"github.com/mraron/njudge/pkg/problems"
-	"go.uber.org/multierr"
 	"io"
 	"testing"
 )
@@ -115,7 +114,7 @@ func TestTaskYAML_Check(t1 *testing.T) {
 				executable: runner.NewFunction(func(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) (int, error) {
 					_, err := stdout.Write([]byte("1.0"))
 					_, err2 := stderr.Write([]byte("checker output"))
-					return 0, multierr.Combine(err, err2)
+					return 0, errors.Join(err, err2)
 				}),
 			},
 			tc: &problems.Testcase{

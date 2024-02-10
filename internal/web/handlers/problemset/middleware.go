@@ -3,13 +3,13 @@ package problemset
 import (
 	"errors"
 	"fmt"
-	"github.com/labstack/echo/v4"
 	"net/http"
+	"slices"
 	"strings"
 
+	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/pkg/problems"
-	"golang.org/x/exp/slices"
 )
 
 func SetNameMiddleware() func(echo.HandlerFunc) echo.HandlerFunc {

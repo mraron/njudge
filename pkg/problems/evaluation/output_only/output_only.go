@@ -3,6 +3,7 @@ package output_only
 import (
 	"archive/zip"
 	"bytes"
+	"errors"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"io"
 	"io/ioutil"
@@ -11,7 +12,6 @@ import (
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/evaluation/batch"
-	"go.uber.org/multierr"
 )
 
 type OutputOnly struct {
@@ -49,7 +49,7 @@ func New() OutputOnly {
 
 				conts, err = io.ReadAll(f)
 				if err != nil {
-					err = multierr.Combine(err, f.Close())
+					err = errors.Join(err, f.Close())
 					break
 				}
 

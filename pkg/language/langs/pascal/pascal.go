@@ -1,10 +1,10 @@
 package pascal
 
 import (
+	"context"
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
-	"golang.org/x/net/context"
 	"io"
 	"io/fs"
 	"time"
@@ -18,11 +18,11 @@ func (pascal) Id() string {
 	return "pascal"
 }
 
-func (pascal) Name() string {
+func (pascal) DisplayName() string {
 	return "Pascal"
 }
 
-func (pascal) DefaultFileName() string {
+func (pascal) DefaultFilename() string {
 	return "main.pas"
 }
 
@@ -64,7 +64,7 @@ func (pascal) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.Writ
 	return err
 }
 
-func (pascal) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (*sandbox.Status, error) {
+func (pascal) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 	return cpp.RunBinary("a.out")(s, binary, stdin, stdout, tl, ml)
 }
 

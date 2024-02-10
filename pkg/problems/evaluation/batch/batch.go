@@ -3,6 +3,7 @@ package batch
 import (
 	"bytes"
 	"fmt"
+	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"io"
 	"io/ioutil"
@@ -76,7 +77,7 @@ func PrepareFiles(ctx *CompileContext) (language.File, []language.File, error) {
 		return language.File{}, nil, fmt.Errorf("language %s is not supported", ctx.Lang.Id())
 	}
 
-	return language.File{Name: ctx.Lang.DefaultFileName(), Source: ctx.Source}, nil, nil
+	return language.File{Name: ctx.Lang.DefaultFilename(), Source: ctx.Source}, nil, nil
 }
 
 func Init(*RunContext) error {
@@ -108,7 +109,7 @@ func Run(ctx *RunContext, group *problems.Group, testcase *problems.Testcase) (s
 		input = nil
 	}
 
-	res, err := ctx.Lang.Run(ctx.Sandbox, bytes.NewReader(ctx.Binary), input, ctx.Stdout, testcase.TimeLimit, testcase.MemoryLimit)
+	res, err := ctx.Lang.Run(ctx.Sandbox, bytes.NewReader(ctx.Binary), input, ctx.Stdout, testcase.TimeLimit, memory.Amount(testcase.MemoryLimit))
 
 	if err != nil {
 		testcase.VerdictName = problems.VerdictXX

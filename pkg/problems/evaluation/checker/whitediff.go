@@ -1,14 +1,14 @@
 package checker
 
 import (
-	"golang.org/x/net/context"
+	"context"
+	"errors"
 	"io"
 	"os"
 	"strings"
 
 	"github.com/karrick/gobls"
 	"github.com/mraron/njudge/pkg/problems"
-	"go.uber.org/multierr"
 )
 
 // Whitediff is the [default checker] built into CMS
@@ -25,13 +25,13 @@ func (Whitediff) Check(ctx context.Context, testcase *problems.Testcase) error {
 
 	ans, err := os.Open(tc.AnswerPath)
 	if err != nil {
-		return multierr.Combine(err, ans.Close())
+		return errors.Join(err, ans.Close())
 	}
 	defer ans.Close()
 
 	out, err := os.Open(tc.OutputPath)
 	if err != nil {
-		return multierr.Combine(err, out.Close())
+		return errors.Join(err, out.Close())
 	}
 	defer out.Close()
 
@@ -100,8 +100,8 @@ func DoWhitediff(a io.Reader, b io.Reader) (float64, error) {
 	}
 
 	if eq {
-		return 1, multierr.Combine(x.Err(), y.Err())
+		return 1, errors.Join(x.Err(), y.Err())
 	}
 
-	return 0, multierr.Combine(x.Err(), y.Err())
+	return 0, errors.Join(x.Err(), y.Err())
 }

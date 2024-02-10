@@ -1,9 +1,9 @@
 package python3
 
 import (
+	"context"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
-	"golang.org/x/net/context"
 	"io"
 	"time"
 
@@ -16,11 +16,11 @@ func (python3) Id() string {
 	return "python3"
 }
 
-func (python3) Name() string {
+func (python3) DisplayName() string {
 	return "Python 3"
 }
 
-func (python3) DefaultFileName() string {
+func (python3) DefaultFilename() string {
 	return "main.py"
 }
 
@@ -29,7 +29,7 @@ func (python3) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.Wri
 	return err
 }
 
-func (python3) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (*sandbox.Status, error) {
+func (python3) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 	if err := sandbox.CreateFileFromSource(s, "a.out", binary); err != nil {
 		return nil, err
 	}

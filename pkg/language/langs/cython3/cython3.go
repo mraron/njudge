@@ -1,10 +1,10 @@
 package cython3
 
 import (
+	"context"
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
-	"golang.org/x/net/context"
 	"io"
 	"io/fs"
 	"time"
@@ -19,11 +19,11 @@ func (c cython3) Id() string {
 	return "cython3"
 }
 
-func (c cython3) Name() string {
+func (c cython3) DisplayName() string {
 	return "Cython3"
 }
 
-func (c cython3) DefaultFileName() string {
+func (c cython3) DefaultFilename() string {
 	return "main.py"
 }
 
@@ -62,7 +62,7 @@ func (c cython3) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.W
 	return err
 }
 
-func (cython3) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (*sandbox.Status, error) {
+func (cython3) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 	return cpp.RunBinary("a.out")(s, binary, stdin, stdout, tl, ml)
 
 }

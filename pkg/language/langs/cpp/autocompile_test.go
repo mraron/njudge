@@ -1,7 +1,7 @@
 package cpp_test
 
 import (
-	context2 "golang.org/x/net/context"
+	"context"
 	"testing"
 
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
@@ -24,7 +24,7 @@ int main() {x*****asdasd=2;}`), 0644)
 int x = 11;
 #endif //_TESZT_H`), 0644)
 
-	if err := cpp.AutoCompile(context2.TODO(), fs, s, "./headers", "main.cpp", "main"); err != nil {
+	if err := cpp.AutoCompile(context.TODO(), fs, s, "./headers", "main.cpp", "main"); err != nil {
 		t.Error(err)
 	}
 
@@ -33,7 +33,7 @@ int x = 11;
 	}
 
 	_ = afero.WriteFile(fs, "main", []byte(""), 0644)
-	if err := cpp.AutoCompile(context2.TODO(), fs, s, "./headers", "main.cpp", "main"); err != nil {
+	if err := cpp.AutoCompile(context.TODO(), fs, s, "./headers", "main.cpp", "main"); err != nil {
 		t.Error(err)
 	}
 
@@ -42,17 +42,17 @@ int x = 11;
 	}
 
 	_ = afero.WriteFile(fs, "main_not_executable", []byte("has"), 0766)
-	if err := cpp.AutoCompile(context2.TODO(), fs, s, "./headers", "main_syntaxerror.cpp", "main_not_executable"); err != nil {
+	if err := cpp.AutoCompile(context.TODO(), fs, s, "./headers", "main_syntaxerror.cpp", "main_not_executable"); err != nil {
 		t.Error(err)
 	}
 
 	_ = fs.Chmod("main_not_executable", 0666)
-	if err := cpp.AutoCompile(context2.TODO(), fs, s, "./headers", "main_syntaxerror.cpp", "main_not_executable"); err == nil {
+	if err := cpp.AutoCompile(context.TODO(), fs, s, "./headers", "main_syntaxerror.cpp", "main_not_executable"); err == nil {
 		t.Error("No error?")
 	}
 
 	_ = afero.WriteFile(fs, "main", []byte(""), 0777)
-	if err := cpp.AutoCompile(context2.TODO(), fs, s, "./headers", "main_syntaxerror.cpp", "main"); err == nil {
+	if err := cpp.AutoCompile(context.TODO(), fs, s, "./headers", "main_syntaxerror.cpp", "main"); err == nil {
 		t.Error("Compiled fine???")
 	}
 }

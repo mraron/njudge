@@ -2,9 +2,9 @@ package sandbox
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"github.com/mraron/njudge/pkg/language/memory"
-	"golang.org/x/net/context"
 	"io"
 	"log/slog"
 	"os"

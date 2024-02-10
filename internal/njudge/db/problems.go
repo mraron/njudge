@@ -11,7 +11,6 @@ import (
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"go.uber.org/multierr"
 )
 
 type Problems struct {
@@ -171,12 +170,12 @@ func (ps *Problems) Update(ctx context.Context, p njudge.Problem, fields []strin
 	if !updateTags || len(fields) > 1 {
 		updateObj, err := ps.toModel(p)
 		if err != nil {
-			return multierr.Combine(err, tx.Rollback())
+			return errors.Join(err, tx.Rollback())
 		}
 
 		_, err = updateObj.Update(ctx, tx, boil.Whitelist(whitelist...))
 		if err != nil {
-			return multierr.Combine(err, tx.Rollback())
+			return errors.Join(err, tx.Rollback())
 		}
 	}
 	if updateTags {
@@ -185,11 +184,11 @@ func (ps *Problems) Update(ctx context.Context, p njudge.Problem, fields []strin
 			qm.Load("ProblemProblemTags.Tag"),
 		).One(ctx, tx)
 		if err != nil {
-			return multierr.Combine(err, tx.Rollback())
+			return errors.Join(err, tx.Rollback())
 		}
 		for _, oldTag := range updateObj.R.ProblemProblemTags {
 			if _, err = oldTag.Delete(ctx, tx); err != nil {
-				return multierr.Combine(err, tx.Rollback())
+				return errors.Join(err, tx.Rollback())
 			}
 		}
 		for _, newTag := range p.Tags {
@@ -201,7 +200,7 @@ func (ps *Problems) Update(ctx context.Context, p njudge.Problem, fields []strin
 			}
 
 			if err = ptag.Insert(ctx, tx, boil.Infer()); err != nil {
-				return multierr.Combine(err, tx.Rollback())
+				return errors.Join(err, tx.Rollback())
 			}
 		}
 	}

@@ -1,9 +1,9 @@
 package cpp
 
 import (
+	"context"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
-	"golang.org/x/net/context"
 	"io"
 	"io/fs"
 	"strings"
@@ -13,20 +13,20 @@ import (
 )
 
 type Cpp struct {
-	id   string
+	ID   string
 	name string
 	ver  string
 }
 
 func (c Cpp) Id() string {
-	return c.id
+	return c.ID
 }
 
-func (c Cpp) Name() string {
+func (c Cpp) DisplayName() string {
 	return c.name
 }
 
-func (c Cpp) DefaultFileName() string {
+func (c Cpp) DefaultFilename() string {
 	return "main.cpp"
 }
 
@@ -74,12 +74,12 @@ func (c Cpp) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.Write
 	return err
 }
 
-func (Cpp) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (*sandbox.Status, error) {
+func (Cpp) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 	return RunBinary("a.out")(s, binary, stdin, stdout, tl, ml)
 }
 
-func RunBinary(binaryName string) func(sandbox.Sandbox, io.Reader, io.Reader, io.Writer, time.Duration, int) (*sandbox.Status, error) {
-	return func(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (*sandbox.Status, error) {
+func RunBinary(binaryName string) func(sandbox.Sandbox, io.Reader, io.Reader, io.Writer, time.Duration, memory.Amount) (*sandbox.Status, error) {
+	return func(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 		stat := sandbox.Status{}
 		stat.Verdict = sandbox.VerdictXX
 

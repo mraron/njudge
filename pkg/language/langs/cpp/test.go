@@ -61,14 +61,14 @@ int main() {
 
 func (c Cpp) Test(t *testing.T, s sandbox.Sandbox) error {
 	for _, test := range []language.Test{
-		{c.id + "_latest_aplusb", c, aplusb, sandbox.VerdictOK, "1 2", "3\n", 1 * time.Second, 128 * memory.MiB},
-		{c.id + "_latest_ce", c, compilerError, sandbox.VerdictCE, "", "", 1 * time.Second, 128 * memory.MiB},
-		{c.id + "_latest_hello", c, print, sandbox.VerdictOK, "", "Hello world", 1 * time.Second, 128 * memory.MiB},
-		{c.id + "_latest_tl", c, timelimitExceeded, sandbox.VerdictTL, "", "", 100 * time.Millisecond, 128 * memory.MiB},
-		{c.id + "_latest_retl", c, runtimeError, sandbox.VerdictRE | sandbox.VerdictTL, "", "", 1000 * time.Millisecond, 128 * memory.MiB},
-		{c.id + "_latest_rediv0", c, runtimeErrorDiv0, sandbox.VerdictRE, "", "", 1000 * time.Millisecond, 128 * memory.MiB},
-		{c.id + "_latest_slepptl", c, longSleep, sandbox.VerdictTL, "", "", 100 * time.Millisecond, 128 * memory.MiB},
-		{c.id + "_latest_sleepok", c, shortSleep, sandbox.VerdictOK, "", "", 200 * time.Millisecond, 128 * memory.MiB},
+		{c.Id() + "_latest_aplusb", c, aplusb, sandbox.VerdictOK, "1 2", "3\n", 1 * time.Second, 128 * memory.MiB},
+		{c.Id() + "_latest_ce", c, compilerError, sandbox.VerdictCE, "", "", 1 * time.Second, 128 * memory.MiB},
+		{c.Id() + "_latest_hello", c, print, sandbox.VerdictOK, "", "Hello world", 1 * time.Second, 128 * memory.MiB},
+		{c.Id() + "_latest_tl", c, timelimitExceeded, sandbox.VerdictTL, "", "", 100 * time.Millisecond, 128 * memory.MiB},
+		{c.Id() + "_latest_retl", c, runtimeError, sandbox.VerdictRE | sandbox.VerdictTL, "", "", 1000 * time.Millisecond, 128 * memory.MiB},
+		{c.Id() + "_latest_rediv0", c, runtimeErrorDiv0, sandbox.VerdictRE, "", "", 1000 * time.Millisecond, 128 * memory.MiB},
+		{c.Id() + "_latest_slepptl", c, longSleep, sandbox.VerdictTL, "", "", 100 * time.Millisecond, 128 * memory.MiB},
+		{c.Id() + "_latest_sleepok", c, shortSleep, sandbox.VerdictOK, "", "", 200 * time.Millisecond, 128 * memory.MiB},
 	} {
 		t.Run(test.Name, func(t *testing.T) {
 			if err := test.Run(s); err != nil {

@@ -19,10 +19,10 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"slices"
 	"strings"
 	"text/template/parse"
 
-	"golang.org/x/exp/slices"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message/pipeline"
 )

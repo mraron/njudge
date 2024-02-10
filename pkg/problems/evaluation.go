@@ -1,9 +1,9 @@
 package problems
 
 import (
+	"context"
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/language/sandbox"
-	"golang.org/x/net/context"
 	"io"
 )
 

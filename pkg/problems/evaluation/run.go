@@ -2,10 +2,11 @@ package evaluation
 
 import (
 	"bytes"
+	"context"
 	"github.com/mraron/njudge/pkg/language"
+	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/mraron/njudge/pkg/problems"
-	"golang.org/x/net/context"
 	"io"
 	"os"
 )
@@ -140,7 +141,7 @@ func (r *BasicRunner) Run(ctx context.Context, sandboxProvider sandbox.Provider,
 		_ = sandboxOutput.Close()
 	}(sandboxInput, sandboxOutput)
 
-	status, err := r.lang.Run(s, bytes.NewBuffer(r.bin), sandboxInput, sandboxOutput, testcase.TimeLimit, testcase.MemoryLimit)
+	status, err := r.lang.Run(s, bytes.NewBuffer(r.bin), sandboxInput, sandboxOutput, testcase.TimeLimit, memory.Amount(testcase.MemoryLimit))
 
 	testcase.OutputPath = (sandboxOutput.(*os.File)).Name()
 	testcase.TimeSpent = status.Time

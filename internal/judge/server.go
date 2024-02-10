@@ -2,6 +2,7 @@ package judge
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,7 +13,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/shirou/gopsutil/load"
-	"go.uber.org/multierr"
 	"go.uber.org/zap"
 
 	"github.com/mraron/njudge/pkg/language"
@@ -84,7 +84,7 @@ func NewServer(cfg ServerConfig) (*Server, error) {
 		minSandboxId, err1 = strconv.Atoi(splitted[0])
 		maxSandboxId, err2 = strconv.Atoi(splitted[1])
 		if err1 != nil || err2 != nil {
-			return nil, multierr.Combine(err1, err2)
+			return nil, errors.Join(err1, err2)
 		}
 	}
 

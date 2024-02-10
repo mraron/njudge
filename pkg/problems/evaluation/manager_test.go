@@ -1,10 +1,10 @@
 package evaluation_test
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/mraron/njudge/pkg/problems/evaluation"
-	"golang.org/x/net/context"
 	"testing"
 	"time"
 )

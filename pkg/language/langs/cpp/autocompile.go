@@ -2,15 +2,15 @@ package cpp
 
 import (
 	"bytes"
+	"context"
+	"errors"
 	"fmt"
 	"github.com/mraron/njudge/pkg/language/sandbox"
-	"golang.org/x/net/context"
 	"os"
 	"path/filepath"
 
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/spf13/afero"
-	"go.uber.org/multierr"
 )
 
 func AutoCompile(ctx context.Context, fs afero.Fs, s sandbox.Sandbox, workDir, src, dst string) error {
@@ -23,7 +23,7 @@ func AutoCompile(ctx context.Context, fs afero.Fs, s sandbox.Sandbox, workDir, s
 			if file, err := fs.Open(src); err == nil {
 				var buf bytes.Buffer
 				if err := s.Init(ctx); err != nil {
-					return multierr.Combine(err, binary.Close(), file.Close())
+					return errors.Join(err, binary.Close(), file.Close())
 				}
 				defer func(s sandbox.Sandbox, ctx context.Context) {
 					_ = s.Cleanup(ctx)
@@ -31,14 +31,14 @@ func AutoCompile(ctx context.Context, fs afero.Fs, s sandbox.Sandbox, workDir, s
 
 				contents, err := afero.ReadFile(fs, src)
 				if err != nil {
-					return multierr.Combine(err, file.Close(), binary.Close())
+					return errors.Join(err, file.Close(), binary.Close())
 				}
 
 				var headers []language.File
 				for _, header := range ExtractHeaderNames(fs, workDir, contents) {
 					headerContents, err := afero.ReadFile(fs, filepath.Join(workDir, header))
 					if err != nil {
-						return multierr.Combine(err, file.Close(), binary.Close())
+						return errors.Join(err, file.Close(), binary.Close())
 					}
 
 					headers = append(headers, language.File{
@@ -51,16 +51,16 @@ func AutoCompile(ctx context.Context, fs afero.Fs, s sandbox.Sandbox, workDir, s
 					Name:   filepath.Base(src),
 					Source: file,
 				}, binary, &buf, headers); err != nil {
-					return multierr.Combine(err, binary.Close(), file.Close(), fmt.Errorf("compile error: %v", buf.String()))
+					return errors.Join(err, binary.Close(), file.Close(), fmt.Errorf("compile error: %v", buf.String()))
 				}
 
 				if err := fs.Chmod(dst, 0755); err != nil {
-					return multierr.Combine(err, binary.Close(), file.Close())
+					return errors.Join(err, binary.Close(), file.Close())
 				}
 
-				return multierr.Combine(binary.Close(), file.Close())
+				return errors.Join(binary.Close(), file.Close())
 			} else {
-				return multierr.Combine(err, binary.Close())
+				return errors.Join(err, binary.Close())
 			}
 		} else {
 			return err

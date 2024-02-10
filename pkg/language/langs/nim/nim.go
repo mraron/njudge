@@ -1,10 +1,10 @@
 package nim
 
 import (
+	"context"
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
-	"golang.org/x/net/context"
 	"io"
 	"io/fs"
 	"time"
@@ -18,11 +18,11 @@ func (nim) Id() string {
 	return "nim"
 }
 
-func (nim) Name() string {
+func (nim) DisplayName() string {
 	return "Nim"
 }
 
-func (nim) DefaultFileName() string {
+func (nim) DefaultFilename() string {
 	return "main.nim"
 }
 
@@ -66,7 +66,7 @@ func (nim) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.Writer,
 	return err
 }
 
-func (nim) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (*sandbox.Status, error) {
+func (nim) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 	return cpp.RunBinary("a.out")(s, binary, stdin, stdout, tl, ml)
 }
 

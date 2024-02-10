@@ -1,8 +1,8 @@
 package evaluation
 
 import (
+	"context"
 	"github.com/mraron/njudge/pkg/problems"
-	"golang.org/x/net/context"
 )
 
 type IgnoreStatusUpdate struct{}

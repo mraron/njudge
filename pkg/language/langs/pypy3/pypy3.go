@@ -1,9 +1,9 @@
 package pypy3
 
 import (
+	"context"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
-	"golang.org/x/net/context"
 	"io"
 	"time"
 
@@ -16,11 +16,11 @@ func (pypy3) Id() string {
 	return "pypy3"
 }
 
-func (pypy3) Name() string {
+func (pypy3) DisplayName() string {
 	return "PyPy 3"
 }
 
-func (pypy3) DefaultFileName() string {
+func (pypy3) DefaultFilename() string {
 	return "main.py"
 }
 
@@ -29,7 +29,7 @@ func (pypy3) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.Write
 	return err
 }
 
-func (pypy3) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (*sandbox.Status, error) {
+func (pypy3) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 	stat := sandbox.Status{}
 	stat.Verdict = sandbox.VerdictXX
 

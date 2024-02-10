@@ -2,11 +2,11 @@ package feladat_txt
 
 import (
 	"bufio"
+	"context"
 	"errors"
 	"fmt"
 	"github.com/mraron/njudge/pkg/problems/evaluation"
 	"github.com/mraron/njudge/pkg/problems/evaluation/checker"
-	context2 "golang.org/x/net/context"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -62,7 +62,7 @@ func (p Problem) InputOutputFiles() (string, string) {
 }
 
 func (p Problem) Languages() []language.Language {
-	return language.StoreAllExcept(language.DefaultStore, []string{"zip"})
+	return language.ListExcept(language.DefaultStore, []string{"zip"})
 }
 
 func (p Problem) Attachments() problems.Attachments {
@@ -227,7 +227,7 @@ func Parse(fs afero.Fs, path string) (problems.Problem, error) {
 	p.StatementList = append(p.StatementList, problems.BytesData{Loc: "hungarian", Val: feladat_pdf, Typ: "application/pdf"})
 
 	box, _ := sandbox.NewDummy()
-	if err := cpp.AutoCompile(context2.TODO(), fs, box, path, filepath.Join(path, "ellen.cpp"), filepath.Join(path, "ellen")); err != nil {
+	if err := cpp.AutoCompile(context.TODO(), fs, box, path, filepath.Join(path, "ellen.cpp"), filepath.Join(path, "ellen")); err != nil {
 		return nil, err
 	}
 

@@ -1,9 +1,9 @@
 package polygon
 
 import (
+	"context"
 	"encoding/xml"
 	"errors"
-	context2 "golang.org/x/net/context"
 	"os"
 	"path/filepath"
 	"strings"
@@ -117,13 +117,13 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 			}
 
 			s, _ := sandbox.NewDummy()
-			if err := cpp.AutoCompile(context2.TODO(), fs, s, workingDirectory, filepath.Join(p.Path, checkerPath), filepath.Join(p.Path, "check")); err != nil {
+			if err := cpp.AutoCompile(context.TODO(), fs, s, workingDirectory, filepath.Join(p.Path, checkerPath), filepath.Join(p.Path, "check")); err != nil {
 				return nil, err
 			}
 
 			if p.Assets.Interactor.Source.Path != "" {
 				s, _ := sandbox.NewDummy()
-				if err := cpp.AutoCompile(context2.TODO(), fs, s, workingDirectory, filepath.Join(p.Path, p.Assets.Interactor.Source.Path), filepath.Join(p.Path, "files/interactor")); err != nil {
+				if err := cpp.AutoCompile(context.TODO(), fs, s, workingDirectory, filepath.Join(p.Path, p.Assets.Interactor.Source.Path), filepath.Join(p.Path, "files/interactor")); err != nil {
 					return nil, err
 				}
 			}

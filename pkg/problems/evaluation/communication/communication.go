@@ -1,8 +1,9 @@
 package communication
 
 import (
+	"context"
+	"errors"
 	"github.com/mraron/njudge/pkg/language/sandbox"
-	"golang.org/x/net/context"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -11,7 +12,6 @@ import (
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/evaluation/batch"
 	"github.com/mraron/njudge/pkg/problems/evaluation/stub"
-	"go.uber.org/multierr"
 )
 
 type Communication struct {
@@ -146,7 +146,7 @@ func New() *Communication {
 		tc.MemoryUsed = res.Memory
 		tc.TimeSpent = res.Time
 
-		//err = multierr.Combine(err, os.Remove(filepath.Join("/tmp", dir, "fifo1")), os.Remove(filepath.Join("/tmp", dir, "fifo2")))
+		//err = errors.Join(err, os.Remove(filepath.Join("/tmp", dir, "fifo1")), os.Remove(filepath.Join("/tmp", dir, "fifo2")))
 
 		if err != nil {
 			return sandbox.Status{}, err
@@ -160,7 +160,7 @@ func New() *Communication {
 
 		rc.Stdout.Write(conts)
 
-		return res, multierr.Combine(errInteractor, err)
+		return res, errors.Join(errInteractor, err)
 	}
 
 	c.Batch.CleanupF = func(rc *batch.RunContext) error {

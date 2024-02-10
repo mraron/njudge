@@ -2,9 +2,9 @@ package java
 
 import (
 	"bytes"
+	"context"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
-	"golang.org/x/net/context"
 	"io"
 	"io/fs"
 	"time"
@@ -33,11 +33,11 @@ func (*Java) Id() string {
 	return "java"
 }
 
-func (*Java) Name() string {
+func (*Java) DisplayName() string {
 	return "Java"
 }
 
-func (j *Java) DefaultFileName() string {
+func (j *Java) DefaultFilename() string {
 	return j.sourceName
 }
 
@@ -85,7 +85,7 @@ func (j *Java) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.Wri
 	return err
 }
 
-func (j *Java) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (*sandbox.Status, error) {
+func (j *Java) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 	if err := sandbox.CreateFileFromSource(s, j.className, binary); err != nil {
 		return nil, err
 	}

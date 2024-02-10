@@ -1,8 +1,8 @@
 package checker
 
 import (
+	"context"
 	"github.com/mraron/njudge/pkg/problems"
-	"golang.org/x/net/context"
 )
 
 // Noop doesn't perform any checking

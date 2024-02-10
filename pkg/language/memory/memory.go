@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-// Amount represents x amount of memory.
+// Amount represents an amount of bytes of memory.
 type Amount int64
 
 const (

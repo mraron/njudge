@@ -2,10 +2,10 @@ package checker
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"github.com/mraron/njudge/pkg/language/runner"
 	"github.com/mraron/njudge/pkg/problems"
-	"golang.org/x/net/context"
 )
 
 // TaskYAML checker format is used by CMS as described in

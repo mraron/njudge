@@ -2,11 +2,11 @@ package judge
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
-	"go.uber.org/multierr"
 	"go.uber.org/zap"
 )
 
@@ -92,7 +92,7 @@ func (j *Queue) Run() {
 
 			st.Compiled = false
 			st.CompilerOutput = "internal error: " + err.Error()
-			return multierr.Combine(sub.c.Callback(Response{"", st, true, err.Error()}), err)
+			return errors.Join(sub.c.Callback(Response{"", st, true, err.Error()}), err)
 		} else {
 			return sub.c.Callback(Response{"", st, true, ""})
 		}

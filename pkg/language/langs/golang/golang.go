@@ -1,10 +1,10 @@
 package golang
 
 import (
+	"context"
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
-	"golang.org/x/net/context"
 	"io"
 	"io/fs"
 	"time"
@@ -18,11 +18,11 @@ func (golang) Id() string {
 	return "golang"
 }
 
-func (golang) Name() string {
+func (golang) DisplayName() string {
 	return "Go"
 }
 
-func (golang) DefaultFileName() string {
+func (golang) DefaultFilename() string {
 	return "main.go"
 }
 
@@ -60,7 +60,7 @@ func (golang) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.Writ
 	return err
 }
 
-func (golang) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (*sandbox.Status, error) {
+func (golang) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 	return cpp.RunBinary("a.out")(s, binary, stdin, stdout, tl, ml)
 
 }

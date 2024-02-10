@@ -1,16 +1,17 @@
 package problem_yaml
 
 import (
+	"bytes"
+	"context"
 	"fmt"
-	"github.com/gomarkdown/markdown"
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/evaluation"
-	checker2 "github.com/mraron/njudge/pkg/problems/evaluation/checker"
+	"github.com/mraron/njudge/pkg/problems/evaluation/checker"
 	"github.com/spf13/afero"
-	context2 "golang.org/x/net/context"
+	"github.com/yuin/goldmark"
 	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
@@ -110,7 +111,7 @@ func (p Problem) Languages() []language.Language {
 		return []language.Language{language.DefaultStore.Get("zip")}
 	}
 
-	return language.StoreAllExcept(language.DefaultStore, []string{"zip"})
+	return language.ListExcept(language.DefaultStore, []string{"zip"})
 }
 
 func (p Problem) Attachments() problems.Attachments {
@@ -223,14 +224,14 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 
 func (p Problem) Checker() problems.Checker {
 	if p.Tests.Checker.Type == "" || p.Tests.Checker.Type == "whitediff" {
-		return checker2.Whitediff{}
+		return checker.Whitediff{}
 	} else if p.Tests.Checker.Type == "testlib" {
-		return checker2.NewTestlib(filepath.Join(p.Path, p.Tests.Checker.Path))
+		return checker.NewTestlib(filepath.Join(p.Path, p.Tests.Checker.Path))
 	} else if p.Tests.Checker.Type == "taskyaml" {
-		return checker2.NewTaskYAML(filepath.Join(p.Path, p.Tests.Checker.Path))
+		return checker.NewTaskYAML(filepath.Join(p.Path, p.Tests.Checker.Path))
 	}
 
-	return checker2.Noop{}
+	return checker.Noop{}
 }
 
 func (p Problem) Files() []problems.File {
@@ -315,7 +316,11 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 			}
 
 			if val.Type == "text/markdown" {
-				contents = markdown.ToHTML(contents, nil, nil)
+				res := &bytes.Buffer{}
+				if err := goldmark.Convert(contents, res); err != nil {
+					return nil, err
+				}
+				contents = res.Bytes()
 				val.Type = problems.DataTypeHTML
 			}
 
@@ -325,7 +330,7 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 		if strings.HasSuffix(p.Tests.Checker.Path, ".cpp") {
 			binaryName := strings.TrimSuffix(p.Tests.Checker.Path, filepath.Ext(p.Tests.Checker.Path))
 			s, _ := sandbox.NewDummy()
-			if err := cpp.AutoCompile(context2.TODO(), fs, s, path, filepath.Join(path, p.Tests.Checker.Path), filepath.Join(path, binaryName)); err != nil {
+			if err := cpp.AutoCompile(context.TODO(), fs, s, path, filepath.Join(path, p.Tests.Checker.Path), filepath.Join(path, binaryName)); err != nil {
 				return nil, err
 			}
 

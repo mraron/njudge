@@ -1,9 +1,9 @@
 package sandbox
 
 import (
+	"context"
 	"errors"
 	"github.com/mraron/njudge/pkg/language/memory"
-	"golang.org/x/net/context"
 	"io"
 	"io/fs"
 	"os"

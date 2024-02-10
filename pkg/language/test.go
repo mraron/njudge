@@ -2,10 +2,10 @@ package language
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
-	"golang.org/x/net/context"
 	"testing"
 	"time"
 )
@@ -35,7 +35,7 @@ func (test Test) Run(s sandbox.Sandbox) error {
 	bin := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 
-	err = test.Language.Compile(s, File{test.Language.DefaultFileName(), src}, bin, stderr, []File{})
+	err = test.Language.Compile(s, File{test.Language.DefaultFilename(), src}, bin, stderr, []File{})
 	stderrContent := stderr.String()
 
 	if (test.ExpectedVerdict&sandbox.VerdictCE == 0 && err != nil) || (test.ExpectedVerdict&sandbox.VerdictCE != 0 && err == nil && stderrContent == "") {
@@ -54,7 +54,7 @@ func (test Test) Run(s sandbox.Sandbox) error {
 		}
 
 		output := &bytes.Buffer{}
-		status, err := test.Language.Run(s, bin, bytes.NewBufferString(test.Input), output, test.TimeLimit, int(test.MemoryLimit))
+		status, err := test.Language.Run(s, bin, bytes.NewBufferString(test.Input), output, test.TimeLimit, test.MemoryLimit)
 
 		outputContent := output.String()
 		if status.Verdict&test.ExpectedVerdict == 0 || err != nil || outputContent != test.ExpectedOutput {

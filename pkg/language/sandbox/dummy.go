@@ -1,8 +1,8 @@
 package sandbox
 
 import (
+	"context"
 	"errors"
-	"golang.org/x/net/context"
 	"io"
 	"log/slog"
 	"os"

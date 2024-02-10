@@ -2,9 +2,9 @@ package checker
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
-	"golang.org/x/net/context"
 	"io/ioutil"
 	"os"
 	"os/exec"

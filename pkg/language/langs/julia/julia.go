@@ -1,9 +1,9 @@
 package julia
 
 import (
+	"context"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
-	"golang.org/x/net/context"
 	"io"
 	"time"
 
@@ -16,10 +16,10 @@ func (julia) Id() string {
 	return "julia"
 }
 
-func (julia) Name() string {
+func (julia) DisplayName() string {
 	return "Julia"
 }
-func (julia) DefaultFileName() string {
+func (julia) DefaultFilename() string {
 	return "main.jl"
 }
 
@@ -28,7 +28,7 @@ func (julia) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.Write
 	return err
 }
 
-func (julia) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (*sandbox.Status, error) {
+func (julia) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 	stat := sandbox.Status{}
 	stat.Verdict = sandbox.VerdictXX
 

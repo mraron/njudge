@@ -1,9 +1,9 @@
 package csharp
 
 import (
+	"context"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
-	"golang.org/x/net/context"
 	"io"
 	"io/fs"
 	"time"
@@ -17,11 +17,11 @@ func (csharp) Id() string {
 	return "csharp"
 }
 
-func (csharp) Name() string {
+func (csharp) DisplayName() string {
 	return "C# (mono)"
 }
 
-func (csharp) DefaultFileName() string {
+func (csharp) DefaultFilename() string {
 	return "main.cs"
 }
 
@@ -57,7 +57,7 @@ func (csharp) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.Writ
 	return err
 }
 
-func (csharp) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (*sandbox.Status, error) {
+func (csharp) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 	stat := sandbox.Status{}
 	stat.Verdict = sandbox.VerdictXX
 

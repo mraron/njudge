@@ -2,9 +2,8 @@ package judge
 
 import (
 	"encoding/json"
+	"slices"
 	"time"
-
-	"golang.org/x/exp/slices"
 )
 
 type ServerStatus struct {

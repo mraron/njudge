@@ -2,11 +2,11 @@ package task_yaml
 
 import (
 	"bufio"
+	"context"
 	"errors"
 	"fmt"
 	"github.com/mraron/njudge/pkg/problems/evaluation"
-	checker2 "github.com/mraron/njudge/pkg/problems/evaluation/checker"
-	context2 "golang.org/x/net/context"
+	"github.com/mraron/njudge/pkg/problems/evaluation/checker"
 	"io"
 	"os"
 	"path/filepath"
@@ -247,14 +247,14 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 
 func (p Problem) Checker() problems.Checker {
 	if p.tasktype == "communication" { // manager already printed the result
-		return checker2.Noop{}
+		return checker.Noop{}
 	}
 
 	if p.whiteDiffChecker {
-		return checker2.Whitediff{}
+		return checker.Whitediff{}
 	}
 
-	return checker2.NewTaskYAML(filepath.Join(p.Path, "check", "checker"))
+	return checker.NewTaskYAML(filepath.Join(p.Path, "check", "checker"))
 }
 
 func (p Problem) Files() []problems.File {
@@ -286,7 +286,7 @@ func (p Problem) GetTaskType() problems.TaskType {
 			res.RunInteractorF = func(rc *batch.RunContext, utoi, itou *os.File, g *problems.Group, tc *problems.Testcase) (language.Status, error) {
 				input, err := os.Open(tc.InputPath)
 				if err != nil {
-					return language.Status{}, multierr.Combine(err, input.Close())
+					return language.Status{}, errors.Join(err, input.Close())
 				}
 				defer input.Close()
 
@@ -311,7 +311,7 @@ func (p Problem) GetTaskType() problems.TaskType {
 				tc.Score *= tc.MaxScore
 
 				// For compatibility create a file named out
-				return st, multierr.Combine(err, rc.Store["interactorSandbox"].(language.Sandbox).CreateFile("out", bytes.NewBuffer([]byte{})))
+				return st, errors.Join(err, rc.Store["interactorSandbox"].(language.Sandbox).CreateFile("out", bytes.NewBuffer([]byte{})))
 			}
 
 			res.RunUserF = func(rc *batch.RunContext, utoi, itou *os.File, g *problems.Group, tc *problems.Testcase) (language.Status, error) {
@@ -475,13 +475,13 @@ func Parser(fs afero.Fs, path string) (problems.Problem, error) {
 
 		if exists(checkerCppPath) {
 			s, _ := sandbox.NewDummy()
-			if err := cpp.AutoCompile(context2.TODO(), fs, s, checkPath, checkerCppPath, checkerPath); err != nil {
+			if err := cpp.AutoCompile(context.TODO(), fs, s, checkPath, checkerCppPath, checkerPath); err != nil {
 				return nil, err
 			}
 		} else if exists(managerCppPath) {
 			p.tasktype = "communication"
 			s, _ := sandbox.NewDummy()
-			if err := cpp.AutoCompile(context2.TODO(), fs, s, checkPath, managerCppPath, managerPath); err != nil {
+			if err := cpp.AutoCompile(context.TODO(), fs, s, checkPath, managerCppPath, managerPath); err != nil {
 				return nil, err
 			}
 

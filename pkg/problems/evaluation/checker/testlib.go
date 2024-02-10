@@ -2,8 +2,8 @@ package checker
 
 import (
 	"bytes"
+	"context"
 	"fmt"
-	"golang.org/x/net/context"
 	"os/exec"
 	"strings"
 	"syscall"

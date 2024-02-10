@@ -2,8 +2,8 @@
 package problems
 
 import (
+	"context"
 	"github.com/mraron/njudge/pkg/language"
-	"golang.org/x/net/context"
 )
 
 type File struct {

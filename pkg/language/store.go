@@ -3,7 +3,7 @@ package language
 import (
 	"sort"
 
-	"golang.org/x/exp/slices"
+	"slices"
 )
 
 type Store interface {
@@ -12,8 +12,8 @@ type Store interface {
 	Get(id string) Language
 }
 
-func StoreAllExcept(s Store, except []string) []Language {
-	res := []Language{}
+func ListExcept(s Store, except []string) []Language {
+	var res []Language
 	for _, elem := range s.List() {
 		if !slices.Contains(except, elem.Id()) {
 			res = append(res, elem)

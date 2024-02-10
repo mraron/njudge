@@ -3,13 +3,13 @@ package glue
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"log"
 
 	"github.com/mraron/njudge/internal/judge"
 	"github.com/mraron/njudge/internal/njudge/db/models"
 
 	"github.com/volatiletech/sqlboiler/v4/boil"
-	"go.uber.org/multierr"
 )
 
 type JudgesUpdater interface {
@@ -35,7 +35,7 @@ func (o *JudgesUpdaterFromDB) UpdateJudges(ctx context.Context) ([]*models.Judge
 			judges[ind].Ping = -1
 
 			_, err2 := judges[ind].Update(ctx, o.DB, boil.Infer())
-			judgesError = multierr.Combine(judgesError, err, err2)
+			judgesError = errors.Join(judgesError, err, err2)
 		}
 
 		judges[ind].Online = true

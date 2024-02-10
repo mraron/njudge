@@ -1,9 +1,9 @@
 package evaluation
 
 import (
+	"context"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/mraron/njudge/pkg/problems"
-	"golang.org/x/net/context"
 	"strconv"
 )
 

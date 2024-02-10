@@ -128,7 +128,7 @@ func (p Problem) Languages() []language.Language {
 		return []language.Language{language.DefaultStore.Get("zip")}
 	}
 
-	return language.StoreAllExcept(language.DefaultStore, []string{"zip"})
+	return language.ListExcept(language.DefaultStore, []string{"zip"})
 }
 
 func (p Problem) Files() []problems.File {

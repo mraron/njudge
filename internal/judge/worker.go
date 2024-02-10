@@ -2,15 +2,14 @@ package judge
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/mraron/njudge/pkg/problems/evaluation"
-	context2 "golang.org/x/net/context"
 	"io"
 
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/mraron/njudge/pkg/problems"
-	"go.uber.org/multierr"
 	"go.uber.org/zap"
 )
 
@@ -37,14 +36,14 @@ func (w Worker) Judge(ctx context.Context, plogger *zap.Logger, p problems.Judge
 		}
 		defer w.sandboxProvider.Put(s)
 
-		err = s.Init(context2.TODO())
+		err = s.Init(context.TODO())
 		if err != nil {
 			return
 		}
 		sandboxes.Put(s)
 
 		defer func(sandbox sandbox.Sandbox) {
-			err = multierr.Append(err, sandbox.Cleanup(context2.TODO()))
+			err = errors.Join(err, sandbox.Cleanup(context.TODO()))
 		}(s)
 	}
 
@@ -95,7 +94,7 @@ func (w Worker) Judge(ctx context.Context, plogger *zap.Logger, p problems.Judge
 	}
 
 	<-waiter
-	err = multierr.Combine(err, errRun)
+	err = errors.Join(err, errRun)
 	if err == nil {
 		logger.Info("successful judging")
 	} else {
