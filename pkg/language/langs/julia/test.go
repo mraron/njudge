@@ -9,11 +9,11 @@ import (
 	"github.com/mraron/njudge/pkg/language"
 )
 
-const print = `println("Hello world")`
+const TestCodeHelloWorld = `println("Hello world")`
 
 func (j julia) Test(t *testing.T, s sandbox.Sandbox) error {
 	for _, test := range []language.Test{
-		{"julia_print", j, print, sandbox.VerdictOK, "", "Hello world\n", 1 * time.Second, 128 * memory.MiB},
+		{Name: j.ID() + "_print", Language: j, Source: TestCodeHelloWorld, ExpectedVerdict: sandbox.VerdictOK, ExpectedOutput: "Hello world\n", TimeLimit: 1 * time.Second, MemoryLimit: 128 * memory.MiB},
 	} {
 		t.Run(test.Name, func(t *testing.T) {
 			if err := test.Run(s); err != nil {

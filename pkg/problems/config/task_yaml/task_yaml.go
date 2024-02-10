@@ -109,7 +109,7 @@ func (p Problem) Languages() []language.Language {
 		if p.tasktype == "stub" {
 			hasStub := false
 			for _, f := range p.files {
-				if f.Role == "stub_"+val.Id() || (f.Role == "stub_cpp" && strings.HasPrefix(val.Id(), "cpp")) {
+				if f.Role == "stub_"+val.ID() || (f.Role == "stub_cpp" && strings.HasPrefix(val.ID(), "cpp")) {
 					hasStub = true
 					break
 				}
@@ -119,7 +119,7 @@ func (p Problem) Languages() []language.Language {
 				lst2 = append(lst2, val)
 			}
 		} else {
-			if val.Id() != "zip" {
+			if val.ID() != "zip" {
 				lst2 = append(lst2, val)
 			}
 		}

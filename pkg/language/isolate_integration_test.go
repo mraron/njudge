@@ -20,15 +20,15 @@ import (
 	"testing"
 )
 
-var isolateInstalled = flag.Bool("isolate", false, "run isolate tests")
-var allLanguages = flag.Bool("all_languages", false, "run all languages")
+var useIsolate = flag.Bool("isolate", false, "run isolate integration tests")
+var testAllLanguages = flag.Bool("all_languages", false, "run tests for all languages")
 
 func TestIsolateWithCpp17(t *testing.T) {
-	if !*isolateInstalled {
+	if !*useIsolate {
 		t.Skip("-isolate is not set")
 	}
-	if *allLanguages {
-		t.Skip("running all languages instead")
+	if *testAllLanguages {
+		t.Skip("running all languages instead (which includes cpp17)")
 	}
 
 	s, err := sandbox.NewIsolate(555)
@@ -41,10 +41,10 @@ func TestIsolateWithCpp17(t *testing.T) {
 }
 
 func TestIsolateWithAllLanguages(t *testing.T) {
-	if !*isolateInstalled {
+	if !*useIsolate {
 		t.Skip("-isolate is not set")
 	}
-	if !*allLanguages {
+	if !*testAllLanguages {
 		t.Skip("-all_languages is not set")
 	}
 
@@ -53,7 +53,7 @@ func TestIsolateWithAllLanguages(t *testing.T) {
 		t.Error(err)
 	}
 	for _, lang := range language.DefaultStore.List() {
-		t.Logf("Running %s", lang.Id())
+		t.Logf("Running %s", lang.ID())
 		l := lang.(language.Wrapper).Language
 		if _, ok := l.(language.Testable); ok {
 			if err := l.(language.Testable).Test(t, s); err != nil {

@@ -2,11 +2,9 @@ package nim
 
 import (
 	"context"
-	"github.com/mraron/njudge/pkg/language/langs/cpp"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"io"
-	"io/fs"
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
@@ -14,7 +12,7 @@ import (
 
 type nim struct{}
 
-func (nim) Id() string {
+func (nim) ID() string {
 	return "nim"
 }
 
@@ -26,10 +24,10 @@ func (nim) DefaultFilename() string {
 	return "main.nim"
 }
 
-func (nim) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
-	err := sandbox.CreateFileFromSource(s, "main.nim", r.Source)
+func (nim) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
+	err := sandbox.CreateFileFromSource(s, f.Name, f.Source)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	rc := sandbox.RunConfig{
@@ -37,8 +35,8 @@ func (nim) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.Writer,
 		InheritEnv:       true,
 		TimeLimit:        10 * time.Second,
 		MemoryLimit:      256 * memory.MiB,
-		Stdout:           e,
-		Stderr:           e,
+		Stdout:           stderr,
+		Stderr:           stderr,
 		WorkingDirectory: s.Pwd(),
 		DirectoryMaps: []sandbox.DirectoryMap{
 			{
@@ -49,25 +47,15 @@ func (nim) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.Writer,
 		},
 	}
 
-	if _, err := s.Run(context.TODO(), rc, "/usr/bin/nim", sandbox.SplitArgs("compile -d:release --nimcache=. main.nim")...); err != nil {
-		return err
+	if _, err := s.Run(context.TODO(), rc, "/usr/bin/nim", sandbox.SplitArgs("compile -d:release --nimcache=. "+f.Name)...); err != nil {
+		return nil, err
 	}
 
-	bin, err := s.Open("main")
-	if err != nil {
-		return err
-	}
-	defer func(bin fs.File) {
-		_ = bin.Close()
-	}(bin)
-
-	_, err = io.Copy(w, bin)
-
-	return err
+	return sandbox.ExtractFile(s, "main")
 }
 
-func (nim) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
-	return cpp.RunBinary("a.out")(s, binary, stdin, stdout, tl, ml)
+func (nim) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
+	return sandbox.RunBinary(context.TODO(), s, binary, stdin, stdout, tl, ml)
 }
 
 func init() {

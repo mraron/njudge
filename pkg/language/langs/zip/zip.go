@@ -11,7 +11,7 @@ import (
 
 type zip struct{}
 
-func (zip) Id() string {
+func (zip) ID() string {
 	return "zip"
 }
 
@@ -23,11 +23,11 @@ func (zip) DefaultFilename() string {
 	return "main.zip"
 }
 
-func (zip) Compile(s sandbox.Sandbox, src language.File, bin io.Writer, cerr io.Writer, extras []language.File) error {
-	return nil
+func (zip) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
+	return nil, nil
 }
 
-func (zip) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
+func (zip) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 	return &sandbox.Status{}, nil
 }
 

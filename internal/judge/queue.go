@@ -68,7 +68,7 @@ func (q *Queue) SupportedProblems() ([]string, error) {
 func (q *Queue) SupportedLanguages() ([]string, error) {
 	res := []string{}
 	for _, val := range q.languageStore.List() {
-		res = append(res, val.Id())
+		res = append(res, val.ID())
 	}
 
 	return res, nil

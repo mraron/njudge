@@ -15,7 +15,7 @@ import (
 )
 
 type Batch struct {
-	PrepareFilesF func(*CompileContext) (language.File, []language.File, error)
+	PrepareFilesF func(*CompileContext) (sandbox.File, []sandbox.File, error)
 
 	InitF      func(*RunContext) error
 	RunF       func(*RunContext, *problems.Group, *problems.Testcase) (sandbox.Status, error)
@@ -64,20 +64,20 @@ type CompileContext struct {
 	Binary  io.Writer
 }
 
-func PrepareFiles(ctx *CompileContext) (language.File, []language.File, error) {
+func PrepareFiles(ctx *CompileContext) (sandbox.File, []sandbox.File, error) {
 	lst, found := ctx.Problem.Languages(), false
 
 	for _, l := range lst {
-		if l.Id() == ctx.Lang.Id() {
+		if l.ID() == ctx.Lang.ID() {
 			found = true
 		}
 	}
 
 	if !found {
-		return language.File{}, nil, fmt.Errorf("language %s is not supported", ctx.Lang.Id())
+		return sandbox.File{}, nil, fmt.Errorf("language %s is not supported", ctx.Lang.ID())
 	}
 
-	return language.File{Name: ctx.Lang.DefaultFilename(), Source: ctx.Source}, nil, nil
+	return sandbox.File{Name: ctx.Lang.DefaultFilename(), Source: ctx.Source}, nil, nil
 }
 
 func Init(*RunContext) error {
@@ -109,7 +109,10 @@ func Run(ctx *RunContext, group *problems.Group, testcase *problems.Testcase) (s
 		input = nil
 	}
 
-	res, err := ctx.Lang.Run(ctx.Sandbox, bytes.NewReader(ctx.Binary), input, ctx.Stdout, testcase.TimeLimit, memory.Amount(testcase.MemoryLimit))
+	res, err := ctx.Lang.Run(ctx.Sandbox, sandbox.File{
+		"a.out",
+		bytes.NewReader(ctx.Binary),
+	}, input, ctx.Stdout, testcase.TimeLimit, memory.Amount(testcase.MemoryLimit))
 
 	if err != nil {
 		testcase.VerdictName = problems.VerdictXX
@@ -204,7 +207,7 @@ func (b Batch) Compile(jinfo problems.Judgeable, sandbox sandbox.Sandbox, lang l
 	}
 
 	buf := &bytes.Buffer{}
-	if err := lang.Compile(sandbox, file, buf, dest, extras); err != nil {
+	if _, err := lang.Compile(sandbox, file, dest, extras); err != nil {
 		return nil, err
 	}
 

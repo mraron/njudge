@@ -5,7 +5,6 @@ import (
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"io"
-	"io/fs"
 	"strings"
 	"time"
 
@@ -13,13 +12,34 @@ import (
 )
 
 type Cpp struct {
-	ID   string
+	id   string
 	name string
-	ver  string
+
+	compileArgs []string
 }
 
-func (c Cpp) Id() string {
-	return c.ID
+type Option func(*Cpp)
+
+func WithCompileArgs(args []string) Option {
+	return func(cpp *Cpp) {
+		cpp.compileArgs = make([]string, len(args))
+		copy(cpp.compileArgs, args)
+	}
+}
+
+func New(ID, name string, opts ...Option) *Cpp {
+	res := &Cpp{
+		id:   ID,
+		name: name,
+	}
+	for _, opt := range opts {
+		opt(res)
+	}
+	return res
+}
+
+func (c Cpp) ID() string {
+	return c.id
 }
 
 func (c Cpp) DisplayName() string {
@@ -30,17 +50,17 @@ func (c Cpp) DefaultFilename() string {
 	return "main.cpp"
 }
 
-func (c Cpp) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
-	err := sandbox.CreateFileFromSource(s, "main.cpp", r.Source)
+func (c Cpp) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
+	err := sandbox.CreateFileFromSource(s, f.Name, f.Source)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	params := "main.cpp"
 	for _, f := range extras {
 		err := sandbox.CreateFileFromSource(s, f.Name, f.Source)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if !strings.HasSuffix(f.Name, ".h") {
@@ -54,60 +74,32 @@ func (c Cpp) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.Write
 		InheritEnv:       true,
 		TimeLimit:        10 * time.Second,
 		MemoryLimit:      256 * memory.MiB,
-		Stdout:           e,
-		Stderr:           e,
+		Stdout:           stderr,
+		Stderr:           stderr,
 		WorkingDirectory: s.Pwd(),
 	}
-	if _, err := s.Run(context.TODO(), rc, "/usr/bin/g++", sandbox.SplitArgs("-std="+c.ver+" -O2 -static -DONLINE_JUDGE "+params)...); err != nil {
-		return err
+
+	if _, err := s.Run(
+		context.TODO(),
+		rc,
+		"/usr/bin/g++",
+		sandbox.SplitArgs(strings.Join(c.compileArgs, " ")+" "+params)...,
+	); err != nil {
+		return nil, err
 	}
 
-	bin, err := s.Open("a.out")
-	if err != nil {
-		return err
-	}
-	defer func(bin fs.File) {
-		_ = bin.Close()
-	}(bin)
-
-	_, err = io.Copy(w, bin)
-	return err
+	return sandbox.ExtractFile(s, "a.out")
 }
 
-func (Cpp) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
-	return RunBinary("a.out")(s, binary, stdin, stdout, tl, ml)
+func (Cpp) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
+	return sandbox.RunBinary(context.TODO(), s, binary, stdin, stdout, tl, ml)
 }
 
-func RunBinary(binaryName string) func(sandbox.Sandbox, io.Reader, io.Reader, io.Writer, time.Duration, memory.Amount) (*sandbox.Status, error) {
-	return func(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
-		stat := sandbox.Status{}
-		stat.Verdict = sandbox.VerdictXX
+var DefaultCompileArgs = []string{"-O2", "-static", "-DONLINE_JUDGE"}
 
-		if err := sandbox.CreateFileFromSource(s, "a.out", binary); err != nil {
-			return nil, err
-		}
-
-		if err := s.MakeExecutable("a.out"); err != nil {
-			return nil, err
-		}
-
-		rc := sandbox.RunConfig{
-			Stdin:       stdin,
-			Stdout:      stdout,
-			TimeLimit:   tl,
-			MemoryLimit: memory.Amount(ml) * memory.KiB,
-		}
-		return s.Run(context.TODO(), rc, "a.out")
-	}
-}
-
-func New(id, name, ver string) language.Language {
-	return Cpp{id, name, ver}
-}
-
-var Std11 = New("cpp11", "C++ 11", "c++11").(Cpp)
-var Std14 = New("cpp14", "C++ 14", "c++14").(Cpp)
-var Std17 = New("cpp17", "C++ 17", "c++17").(Cpp)
+var Std11 = New("cpp11", "C++ 11", WithCompileArgs(append(DefaultCompileArgs, "-std=c++11")))
+var Std14 = New("cpp14", "C++ 14", WithCompileArgs(append(DefaultCompileArgs, "-std=c++14")))
+var Std17 = New("cpp17", "C++ 17", WithCompileArgs(append(DefaultCompileArgs, "-std=c++17")))
 
 var latest = Std17
 

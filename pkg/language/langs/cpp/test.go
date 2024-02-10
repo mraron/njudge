@@ -10,30 +10,30 @@ import (
 )
 
 const (
-	aplusb = `#include<iostream>
+	TestCodeAplusb = `#include<iostream>
 using namespace std;
 int main() {
 	int a,b;
 	cin>>a>>b;
 	cout<<a+b<<"\n";
 }`
-	compilerError = `#include<lol>
+	TestCodeCompileError = `#include<lol>
 lmao;
 int main(a,b,c);
 `
-	print = `#include<iostream>
+	TestCodeHelloWorld = `#include<iostream>
 using namespace std;
 int main() {
 	cout<<"Hello world";
 	return 0;
 }`
-	timelimitExceeded = `#include<iostream>
+	TestCodeTimeLimit = `#include<iostream>
 using namespace std;
 int main() {
 	int n=0;
 	while(1) n++; 
 }`
-	runtimeError = `#include<iostream>
+	TestCodeRuntimeError = `#include<iostream>
 using namespace std;
 void dfs(int x){
 	dfs(x+1);
@@ -42,17 +42,17 @@ void dfs(int x){
 int main() {
 	dfs(-10000);
 }`
-	runtimeErrorDiv0 = `#include<iostream>
+	TestCodeRuntimeErrorDiv0 = `#include<iostream>
 using namespace std;
 int main() {
 	cerr<<(1/0);
 }`
-	longSleep = `#include<unistd.h>
+	TestCodeLongSleep = `#include<unistd.h>
 int main() {
 	sleep(20);
 }
 `
-	shortSleep = `#include<unistd.h>
+	TestCodeShortSleep = `#include<unistd.h>
 int main() {
 	usleep(100);
 }
@@ -61,14 +61,14 @@ int main() {
 
 func (c Cpp) Test(t *testing.T, s sandbox.Sandbox) error {
 	for _, test := range []language.Test{
-		{c.Id() + "_latest_aplusb", c, aplusb, sandbox.VerdictOK, "1 2", "3\n", 1 * time.Second, 128 * memory.MiB},
-		{c.Id() + "_latest_ce", c, compilerError, sandbox.VerdictCE, "", "", 1 * time.Second, 128 * memory.MiB},
-		{c.Id() + "_latest_hello", c, print, sandbox.VerdictOK, "", "Hello world", 1 * time.Second, 128 * memory.MiB},
-		{c.Id() + "_latest_tl", c, timelimitExceeded, sandbox.VerdictTL, "", "", 100 * time.Millisecond, 128 * memory.MiB},
-		{c.Id() + "_latest_retl", c, runtimeError, sandbox.VerdictRE | sandbox.VerdictTL, "", "", 1000 * time.Millisecond, 128 * memory.MiB},
-		{c.Id() + "_latest_rediv0", c, runtimeErrorDiv0, sandbox.VerdictRE, "", "", 1000 * time.Millisecond, 128 * memory.MiB},
-		{c.Id() + "_latest_slepptl", c, longSleep, sandbox.VerdictTL, "", "", 100 * time.Millisecond, 128 * memory.MiB},
-		{c.Id() + "_latest_sleepok", c, shortSleep, sandbox.VerdictOK, "", "", 200 * time.Millisecond, 128 * memory.MiB},
+		{Name: c.ID() + "_latest_aplusb", Language: c, Source: TestCodeAplusb, ExpectedVerdict: sandbox.VerdictOK, Input: "1 2", ExpectedOutput: "3\n", TimeLimit: 1 * time.Second, MemoryLimit: 128 * memory.MiB},
+		{Name: c.ID() + "_latest_ce", Language: c, Source: TestCodeCompileError, ExpectedVerdict: sandbox.VerdictCE, TimeLimit: 1 * time.Second, MemoryLimit: 128 * memory.MiB},
+		{Name: c.ID() + "_latest_hello", Language: c, Source: TestCodeHelloWorld, ExpectedVerdict: sandbox.VerdictOK, ExpectedOutput: "Hello world", TimeLimit: 1 * time.Second, MemoryLimit: 128 * memory.MiB},
+		{Name: c.ID() + "_latest_tl", Language: c, Source: TestCodeTimeLimit, ExpectedVerdict: sandbox.VerdictTL, TimeLimit: 100 * time.Millisecond, MemoryLimit: 128 * memory.MiB},
+		{Name: c.ID() + "_latest_retl", Language: c, Source: TestCodeRuntimeError, ExpectedVerdict: sandbox.VerdictRE | sandbox.VerdictTL, TimeLimit: 1000 * time.Millisecond, MemoryLimit: 128 * memory.MiB},
+		{Name: c.ID() + "_latest_rediv0", Language: c, Source: TestCodeRuntimeErrorDiv0, ExpectedVerdict: sandbox.VerdictRE, TimeLimit: 1000 * time.Millisecond, MemoryLimit: 128 * memory.MiB},
+		{Name: c.ID() + "_latest_slepptl", Language: c, Source: TestCodeLongSleep, ExpectedVerdict: sandbox.VerdictTL, TimeLimit: 100 * time.Millisecond, MemoryLimit: 128 * memory.MiB},
+		{Name: c.ID() + "_latest_sleepok", Language: c, Source: TestCodeShortSleep, ExpectedVerdict: sandbox.VerdictOK, TimeLimit: 200 * time.Millisecond, MemoryLimit: 128 * memory.MiB},
 	} {
 		t.Run(test.Name, func(t *testing.T) {
 			if err := test.Run(s); err != nil {

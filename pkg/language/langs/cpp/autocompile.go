@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/mraron/njudge/pkg/language"
 	"github.com/spf13/afero"
 )
 
@@ -34,23 +33,23 @@ func AutoCompile(ctx context.Context, fs afero.Fs, s sandbox.Sandbox, workDir, s
 					return errors.Join(err, file.Close(), binary.Close())
 				}
 
-				var headers []language.File
+				var headers []sandbox.File
 				for _, header := range ExtractHeaderNames(fs, workDir, contents) {
 					headerContents, err := afero.ReadFile(fs, filepath.Join(workDir, header))
 					if err != nil {
 						return errors.Join(err, file.Close(), binary.Close())
 					}
 
-					headers = append(headers, language.File{
+					headers = append(headers, sandbox.File{
 						Name:   header,
 						Source: bytes.NewReader(headerContents),
 					})
 				}
 
-				if err := Std17.Compile(s, language.File{
+				if _, err := Std17.Compile(s, sandbox.File{
 					Name:   filepath.Base(src),
 					Source: file,
-				}, binary, &buf, headers); err != nil {
+				}, &buf, nil); err != nil {
 					return errors.Join(err, binary.Close(), file.Close(), fmt.Errorf("compile error: %v", buf.String()))
 				}
 

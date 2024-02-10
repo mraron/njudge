@@ -32,10 +32,9 @@ func (test Test) Run(s sandbox.Sandbox) error {
 	}
 
 	src := bytes.NewBufferString(test.Source)
-	bin := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 
-	err = test.Language.Compile(s, File{test.Language.DefaultFilename(), src}, bin, stderr, []File{})
+	compiledBinary, err := test.Language.Compile(s, sandbox.File{test.Language.DefaultFilename(), src}, stderr, nil)
 	stderrContent := stderr.String()
 
 	if (test.ExpectedVerdict&sandbox.VerdictCE == 0 && err != nil) || (test.ExpectedVerdict&sandbox.VerdictCE != 0 && err == nil && stderrContent == "") {
@@ -54,7 +53,7 @@ func (test Test) Run(s sandbox.Sandbox) error {
 		}
 
 		output := &bytes.Buffer{}
-		status, err := test.Language.Run(s, bin, bytes.NewBufferString(test.Input), output, test.TimeLimit, test.MemoryLimit)
+		status, err := test.Language.Run(s, *compiledBinary, bytes.NewBufferString(test.Input), output, test.TimeLimit, test.MemoryLimit)
 
 		outputContent := output.String()
 		if status.Verdict&test.ExpectedVerdict == 0 || err != nil || outputContent != test.ExpectedOutput {

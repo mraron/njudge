@@ -1,3 +1,7 @@
+// Package language is used to compile and run untrusted user code securely.
+// The heavy lifting is done by the great [isolate] library.
+//
+// [isolate]: https://github.com/ioi/isolate
 package language
 
 import (
@@ -7,15 +11,11 @@ import (
 	"time"
 )
 
-type File struct {
-	Name   string
-	Source io.Reader
-}
-
+// Language is @TODO
 type Language interface {
-	Id() string
+	ID() string
 	DisplayName() string
 	DefaultFilename() string
-	Compile(s sandbox.Sandbox, f File, binary io.Writer, stderr io.Writer, extras []File) error
-	Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error)
+	Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) //TODO remove extras?
+	Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error)
 }

@@ -9,14 +9,14 @@ import (
 	"github.com/mraron/njudge/pkg/language"
 )
 
-const print = `begin
+const TestCodeHelloWorld = `begin
     writeln('Hello world');
 end.
 `
 
 func (p pascal) Test(t *testing.T, s sandbox.Sandbox) error {
 	for _, test := range []language.Test{
-		{"pascal_print", p, print, sandbox.VerdictOK, "", "Hello world\n", 1 * time.Second, 128 * memory.MiB},
+		{Name: p.ID() + "_print", Language: p, Source: TestCodeHelloWorld, ExpectedVerdict: sandbox.VerdictOK, ExpectedOutput: "Hello world\n", TimeLimit: 1 * time.Second, MemoryLimit: 128 * memory.MiB},
 	} {
 		t.Run(test.Name, func(t *testing.T) {
 			if err := test.Run(s); err != nil {

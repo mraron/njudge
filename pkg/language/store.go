@@ -15,7 +15,7 @@ type Store interface {
 func ListExcept(s Store, except []string) []Language {
 	var res []Language
 	for _, elem := range s.List() {
-		if !slices.Contains(except, elem.Id()) {
+		if !slices.Contains(except, elem.ID()) {
 			res = append(res, elem)
 		}
 	}
@@ -24,16 +24,16 @@ func ListExcept(s Store, except []string) []Language {
 }
 
 type Wrapper struct {
-	id string
+	IDWrapper string
 	Language
 }
 
-func (w Wrapper) Id() string {
-	return w.id
+func (w Wrapper) ID() string {
+	return w.IDWrapper
 }
 
 type ListStore struct {
-	langList []Language
+	LanguageList []Language
 }
 
 func NewListStore() *ListStore {
@@ -41,29 +41,29 @@ func NewListStore() *ListStore {
 }
 
 func (m *ListStore) Register(id string, l Language) {
-	m.langList = append(m.langList, Wrapper{id, l})
+	m.LanguageList = append(m.LanguageList, Wrapper{id, l})
 }
 
 func (m *ListStore) List() []Language {
-	ans := make([]Language, len(m.langList))
+	ans := make([]Language, len(m.LanguageList))
 
 	ind := 0
-	for _, val := range m.langList {
+	for _, val := range m.LanguageList {
 		ans[ind] = val
 		ind++
 	}
 
 	sort.Slice(ans, func(i, j int) bool {
-		return ans[i].Id() < ans[j].Id()
+		return ans[i].ID() < ans[j].ID()
 	})
 
 	return ans
 }
 
 func (m *ListStore) Get(id string) Language {
-	for ind := range m.langList {
-		if m.langList[ind].Id() == id {
-			return m.langList[ind]
+	for ind := range m.LanguageList {
+		if m.LanguageList[ind].ID() == id {
+			return m.LanguageList[ind]
 		}
 	}
 

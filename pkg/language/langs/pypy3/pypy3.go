@@ -12,7 +12,7 @@ import (
 
 type pypy3 struct{}
 
-func (pypy3) Id() string {
+func (pypy3) ID() string {
 	return "pypy3"
 }
 
@@ -24,28 +24,27 @@ func (pypy3) DefaultFilename() string {
 	return "main.py"
 }
 
-func (pypy3) Compile(s sandbox.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
-	_, err := io.Copy(w, r.Source)
-	return err
+func (pypy3) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
+	return &f, nil
 }
 
-func (pypy3) Run(s sandbox.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
+func (pypy3) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 	stat := sandbox.Status{}
 	stat.Verdict = sandbox.VerdictXX
 
-	if err := sandbox.CreateFileFromSource(s, "a.out", binary); err != nil {
+	if err := sandbox.CreateFileFromSource(s, binary.Name, binary.Source); err != nil {
 		return nil, err
 	}
 
 	rc := sandbox.RunConfig{
 		InheritEnv:       true,
 		TimeLimit:        tl,
-		MemoryLimit:      memory.Amount(ml) * memory.KiB,
+		MemoryLimit:      ml,
 		Stdin:            stdin,
 		Stdout:           stdout,
 		WorkingDirectory: s.Pwd(),
 	}
-	return s.Run(context.TODO(), rc, "/usr/bin/pypy3", "a.out")
+	return s.Run(context.TODO(), rc, "/usr/bin/pypy3", binary.Name)
 }
 
 func init() {

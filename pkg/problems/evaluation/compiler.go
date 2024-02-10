@@ -44,7 +44,7 @@ func (c CompileCopyFile) Compile(ctx context.Context, problem problems.Judgeable
 
 type Compile struct{}
 
-func (c Compile) Compile(ctx context.Context, problem problems.Judgeable, solution problems.Solution, sandbox sandbox.Sandbox) (*problems.CompilationResult, error) {
+func (c Compile) Compile(ctx context.Context, problem problems.Judgeable, solution problems.Solution, s sandbox.Sandbox) (*problems.CompilationResult, error) {
 	lang := solution.GetLanguage()
 
 	f, err := solution.GetFile(ctx)
@@ -58,10 +58,10 @@ func (c Compile) Compile(ctx context.Context, problem problems.Judgeable, soluti
 	// TODO add ctx to language
 	stderr, bin := &bytes.Buffer{}, &bytes.Buffer{}
 	stderrTruncated := iotest.TruncateWriter(stderr, 1<<16)
-	if err := lang.Compile(sandbox, language.File{
+	if _, err := lang.Compile(s, sandbox.File{
 		Name:   lang.DefaultFilename(),
 		Source: f,
-	}, bin, stderrTruncated, nil); err != nil {
+	}, stderrTruncated, nil); err != nil {
 		return &problems.CompilationResult{
 			CompiledFile:       nil,
 			CompilationMessage: stderr.String(),
@@ -80,7 +80,7 @@ func (c CompileCheckSupported) Compile(ctx context.Context, problem problems.Jud
 	lst, found := problem.Languages(), false
 
 	for _, l := range lst {
-		if l.Id() == solution.GetLanguage().Id() {
+		if l.ID() == solution.GetLanguage().ID() {
 			found = true
 		}
 	}
@@ -89,7 +89,7 @@ func (c CompileCheckSupported) Compile(ctx context.Context, problem problems.Jud
 		return &problems.CompilationResult{
 			CompiledFile:       nil,
 			CompilationMessage: "",
-		}, fmt.Errorf("language is not supported: %s", solution.GetLanguage().Id())
+		}, fmt.Errorf("language is not supported: %s", solution.GetLanguage().ID())
 	}
 
 	return Compile{}.Compile(ctx, problem, solution, sandbox)

@@ -40,7 +40,7 @@ func (s *SubmitService) Submit(ctx context.Context, req njudge.SubmitRequest) (*
 		foundLang language.Language
 	)
 	for _, lang := range sdata.Languages() {
-		if lang.Id() == req.Language {
+		if lang.ID() == req.Language {
 			found = true
 			foundLang = lang
 			break

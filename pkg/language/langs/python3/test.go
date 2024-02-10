@@ -10,27 +10,27 @@ import (
 )
 
 const (
-	aplusb = `inp = input().split(' ')
+	TestCodeAplusb = `inp = input().split(' ')
 a,b = int(inp[0]), int(inp[1]) 
 print(a+b)`
-	ce    = `inp = input(()`
-	print = `print("Hello world")`
-	tl    = `x = 0
+	TestCodeSyntaxError = `inp = input(()`
+	TestCodeHelloWorld  = `print("Hello world")`
+	TestCodeTimeLimit   = `x = 0
 while True:
 	x = x+1`
-	re = `x = [1,2,3]
+	TestCodeRuntimeError = `x = [1,2,3]
 print(x[4])`
-	rediv0 = `print(1/0)`
+	TestCodeRuntimeErrorDiv0 = `print(1/0)`
 )
 
 func (p python3) Test(t *testing.T, s sandbox.Sandbox) error {
 	for _, test := range []language.Test{
-		{"python3_aplusb", p, aplusb, sandbox.VerdictOK, "1 2", "3\n", 1 * time.Second, 128 * memory.MiB},
-		{"python3_re", p, ce, sandbox.VerdictRE, "", "", 1 * time.Second, 128 * memory.MiB},
-		{"python3_print", p, print, sandbox.VerdictOK, "", "Hello world\n", 1 * time.Second, 128 * memory.MiB},
-		{"python3_tl", p, tl, sandbox.VerdictTL, "", "", 100 * time.Millisecond, 128 * memory.MiB},
-		{"python3_re", p, re, sandbox.VerdictRE, "", "", 1000 * time.Millisecond, 128 * memory.MiB},
-		{"python3_rediv0", p, rediv0, sandbox.VerdictRE, "", "", 1000 * time.Millisecond, 128 * memory.MiB},
+		{Name: p.ID() + "_aplusb", Language: p, Source: TestCodeAplusb, ExpectedVerdict: sandbox.VerdictOK, Input: "1 2", ExpectedOutput: "3\n", TimeLimit: 1 * time.Second, MemoryLimit: 128 * memory.MiB},
+		{Name: p.ID() + "_re", Language: p, Source: TestCodeSyntaxError, ExpectedVerdict: sandbox.VerdictRE, TimeLimit: 1 * time.Second, MemoryLimit: 128 * memory.MiB},
+		{Name: p.ID() + "_print", Language: p, Source: TestCodeHelloWorld, ExpectedVerdict: sandbox.VerdictOK, ExpectedOutput: "Hello world\n", TimeLimit: 1 * time.Second, MemoryLimit: 128 * memory.MiB},
+		{Name: p.ID() + "_tl", Language: p, Source: TestCodeTimeLimit, ExpectedVerdict: sandbox.VerdictTL, TimeLimit: 100 * time.Millisecond, MemoryLimit: 128 * memory.MiB},
+		{Name: p.ID() + "_re", Language: p, Source: TestCodeRuntimeError, ExpectedVerdict: sandbox.VerdictRE, TimeLimit: 1000 * time.Millisecond, MemoryLimit: 128 * memory.MiB},
+		{Name: p.ID() + "_rediv0", Language: p, Source: TestCodeRuntimeErrorDiv0, ExpectedVerdict: sandbox.VerdictRE, TimeLimit: 1000 * time.Millisecond, MemoryLimit: 128 * memory.MiB},
 	} {
 		t.Run(test.Name, func(t *testing.T) {
 			if err := test.Run(s); err != nil {

@@ -1,6 +1,7 @@
 package sandbox
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"github.com/mraron/njudge/pkg/language/memory"
@@ -38,6 +39,47 @@ func CreateFileFromSource(fs FS, name string, source io.Reader) error {
 		return err
 	}
 	return nil
+}
+
+func ExtractFile(s FS, name string) (*File, error) {
+	bin, err := s.Open(name)
+	if err != nil {
+		return nil, err
+	}
+	defer func(bin fs.File) {
+		_ = bin.Close()
+	}(bin)
+
+	binaryContent, err := io.ReadAll(bin)
+	if err != nil {
+		return nil, err
+	}
+
+	return &File{
+		Name:   name,
+		Source: bytes.NewBuffer(binaryContent),
+	}, nil
+}
+
+func RunBinary(ctx context.Context, s Sandbox, binary File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*Status, error) {
+	stat := Status{}
+	stat.Verdict = VerdictXX
+
+	if err := CreateFileFromSource(s, binary.Name, binary.Source); err != nil {
+		return nil, err
+	}
+
+	if err := s.MakeExecutable(binary.Name); err != nil {
+		return nil, err
+	}
+
+	rc := RunConfig{
+		Stdin:       stdin,
+		Stdout:      stdout,
+		TimeLimit:   tl,
+		MemoryLimit: ml,
+	}
+	return s.Run(ctx, rc, binary.Name)
 }
 
 func SplitArgs(s string) []string {
@@ -166,4 +208,9 @@ func (sp *ChanProvider) Put(s Sandbox) {
 type Provider interface {
 	Get() (Sandbox, error)
 	Put(s Sandbox)
+}
+
+type File struct {
+	Name   string
+	Source io.Reader
 }
