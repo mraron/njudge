@@ -2,6 +2,7 @@ package sandbox
 
 import "time"
 
+// Verdict is the overall outcome of running a program.
 type Verdict int
 
 const (
@@ -31,6 +32,7 @@ func (v Verdict) String() string {
 	return "??"
 }
 
+// Status contains information about how a program ran.
 type Status struct {
 	Verdict  Verdict
 	Signal   int

@@ -23,7 +23,7 @@ print(x[4])`
 	TestCodeRuntimeErrorDiv0 = `print(1/0)`
 )
 
-func (p python3) Test(t *testing.T, s sandbox.Sandbox) error {
+func (p Python3) Test(t *testing.T, s sandbox.Sandbox) error {
 	for _, test := range []language.Test{
 		{Name: p.ID() + "_aplusb", Language: p, Source: TestCodeAplusb, ExpectedVerdict: sandbox.VerdictOK, Input: "1 2", ExpectedOutput: "3\n", TimeLimit: 1 * time.Second, MemoryLimit: 128 * memory.MiB},
 		{Name: p.ID() + "_re", Language: p, Source: TestCodeSyntaxError, ExpectedVerdict: sandbox.VerdictRE, TimeLimit: 1 * time.Second, MemoryLimit: 128 * memory.MiB},

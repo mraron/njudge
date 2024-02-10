@@ -10,21 +10,21 @@ import (
 	"github.com/mraron/njudge/pkg/language"
 )
 
-type pascal struct{}
+type Pascal struct{}
 
-func (pascal) ID() string {
+func (Pascal) ID() string {
 	return "pascal"
 }
 
-func (pascal) DisplayName() string {
+func (Pascal) DisplayName() string {
 	return "Pascal"
 }
 
-func (pascal) DefaultFilename() string {
+func (Pascal) DefaultFilename() string {
 	return "main.pas"
 }
 
-func (pascal) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
+func (Pascal) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
 	err := sandbox.CreateFileFromSource(s, f.Name, f.Source)
 	if err != nil {
 		return nil, err
@@ -52,10 +52,10 @@ func (pascal) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extra
 	return sandbox.ExtractFile(s, "main")
 }
 
-func (pascal) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
+func (Pascal) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 	return sandbox.RunBinary(context.TODO(), s, binary, stdin, stdout, tl, ml)
 }
 
 func init() {
-	language.DefaultStore.Register("pascal", pascal{})
+	language.DefaultStore.Register("pascal", Pascal{})
 }

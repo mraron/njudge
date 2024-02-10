@@ -7,6 +7,9 @@ import (
 	"path/filepath"
 )
 
+// OsFS implements an FS with and underlying base path.
+// All of its methods are executed as if the current working directory is this base path.
+// Should be only created via NewOsFS
 type OsFS struct {
 	base string
 

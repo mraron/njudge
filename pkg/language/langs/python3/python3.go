@@ -10,25 +10,25 @@ import (
 	"github.com/mraron/njudge/pkg/language"
 )
 
-type python3 struct{}
+type Python3 struct{}
 
-func (python3) ID() string {
+func (Python3) ID() string {
 	return "python3"
 }
 
-func (python3) DisplayName() string {
+func (Python3) DisplayName() string {
 	return "Python 3"
 }
 
-func (python3) DefaultFilename() string {
+func (Python3) DefaultFilename() string {
 	return "main.py"
 }
 
-func (python3) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
+func (Python3) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
 	return &f, nil
 }
 
-func (python3) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
+func (Python3) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 	if err := sandbox.CreateFileFromSource(s, binary.Name, binary.Source); err != nil {
 		return nil, err
 	}
@@ -45,5 +45,5 @@ func (python3) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdo
 }
 
 func init() {
-	language.DefaultStore.Register("python3", python3{})
+	language.DefaultStore.Register("python3", Python3{})
 }

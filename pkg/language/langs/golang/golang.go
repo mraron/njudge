@@ -10,21 +10,21 @@ import (
 	"github.com/mraron/njudge/pkg/language"
 )
 
-type golang struct{}
+type Golang struct{}
 
-func (golang) ID() string {
+func (Golang) ID() string {
 	return "golang"
 }
 
-func (golang) DisplayName() string {
+func (Golang) DisplayName() string {
 	return "Go"
 }
 
-func (golang) DefaultFilename() string {
+func (Golang) DefaultFilename() string {
 	return "main.go"
 }
 
-func (golang) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
+func (Golang) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
 	err := sandbox.CreateFileFromSource(s, f.Name, f.Source)
 	if err != nil {
 		return nil, err
@@ -48,10 +48,10 @@ func (golang) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extra
 	return sandbox.ExtractFile(s, "a.out")
 }
 
-func (golang) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
+func (Golang) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 	return sandbox.RunBinary(context.TODO(), s, binary, stdin, stdout, tl, ml)
 }
 
 func init() {
-	language.DefaultStore.Register("golang", golang{})
+	language.DefaultStore.Register("golang", Golang{})
 }

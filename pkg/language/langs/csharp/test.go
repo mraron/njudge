@@ -16,7 +16,7 @@ const TestCodeHelloWorld = `class Hello {
 	}
 }`
 
-func (c csharp) Test(t *testing.T, s sandbox.Sandbox) error {
+func (c CSharp) Test(t *testing.T, s sandbox.Sandbox) error {
 	for _, test := range []language.Test{
 		{Name: c.ID() + "_print", Language: c, Source: TestCodeHelloWorld, ExpectedVerdict: sandbox.VerdictOK, Input: "", ExpectedOutput: "Hello world\n", TimeLimit: 1 * time.Second, MemoryLimit: 128 * memory.MiB},
 	} {

@@ -1,5 +1,6 @@
-// Package language is used to compile and run untrusted user code securely.
+// Package language is used to compile and run untrusted code securely.
 // The heavy lifting is done by the great [isolate] library.
+// This library comes with a lot of built-in languages, and it's easy to implement your own languages.
 //
 // [isolate]: https://github.com/ioi/isolate
 package language
@@ -11,7 +12,8 @@ import (
 	"time"
 )
 
-// Language is @TODO
+// Language is the main building block of this package, it's used to compile a source file
+// and then run the resulting binary.
 type Language interface {
 	ID() string
 	DisplayName() string

@@ -10,7 +10,7 @@ import (
 	"github.com/mraron/njudge/pkg/language"
 )
 
-func (c cython3) Test(t *testing.T, s sandbox.Sandbox) error {
+func (c Cython3) Test(t *testing.T, s sandbox.Sandbox) error {
 	for _, test := range []language.Test{
 		{Name: c.ID() + "_aplusb", Language: c, Source: python3.TestCodeAplusb, ExpectedVerdict: sandbox.VerdictOK, Input: "1 2\n", ExpectedOutput: "3\n", TimeLimit: 1500 * time.Millisecond, MemoryLimit: 128 * memory.MiB},
 		{Name: c.ID() + "_ce", Language: c, Source: python3.TestCodeSyntaxError, ExpectedVerdict: sandbox.VerdictCE, TimeLimit: 1 * time.Second, MemoryLimit: 128 * memory.MiB},

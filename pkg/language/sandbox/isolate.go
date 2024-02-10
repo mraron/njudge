@@ -15,16 +15,15 @@ import (
 	"time"
 )
 
-func getEnv(key, fallback string) string {
-	if value, ok := os.LookupEnv(key); ok {
-		return value
-	}
-	return fallback
-}
+// IsolateRoot is the root directory structure isolate is using.
+var IsolateRoot = "/var/local/lib/isolate/"
 
-var IsolateRoot = getEnv("ISOLATE_ROOT", "/var/local/lib/isolate/")
-var IsolateMetafilePattern = "isolate_metafile"
+// IsolateMetafilePattern is the pattern in which metafiles are created.
+var IsolateMetafilePattern = "isolate_metafile*"
 
+// Isolate is a Sandbox implementation which calls isolate's command line program.
+// It's required that isolate is installed on the system for it to work.
+// This is the preferred way of sandboxing in njudge.
 type Isolate struct {
 	ID int
 

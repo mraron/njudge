@@ -12,12 +12,15 @@ import (
 	"time"
 )
 
-var (
-	DummyPattern = "dummy_sandbox*"
+// DummyPattern is the pattern in which Dummy creates its temporary directory.
+const DummyPattern = "dummy_sandbox*"
 
+var (
 	dummyID = 0
 )
 
+// Dummy is a very straightforward implementation of a Sandbox.
+// It creates a temporary directory and executes the commands without many precautions.
 type Dummy struct {
 	ID  int
 	Dir string

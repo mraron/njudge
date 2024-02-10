@@ -6,12 +6,15 @@ import (
 	"slices"
 )
 
+// Store is an interface which is used to capture the notion of storing languages.
+// Via it's Store.Register method it's possible to override the underlying ID of the language for the outside world.
 type Store interface {
 	Register(id string, l Language)
 	List() []Language
 	Get(id string) Language
 }
 
+// ListExcept returns a slice of languages except some.
 func ListExcept(s Store, except []string) []Language {
 	var res []Language
 	for _, elem := range s.List() {
@@ -23,6 +26,7 @@ func ListExcept(s Store, except []string) []Language {
 	return res
 }
 
+// Wrapper overrides a Language's ID.
 type Wrapper struct {
 	IDWrapper string
 	Language
@@ -32,6 +36,7 @@ func (w Wrapper) ID() string {
 	return w.IDWrapper
 }
 
+// ListStore is a basic implementation (and probably only realistic, so maybe an interface is not really necessary) of a Store.
 type ListStore struct {
 	LanguageList []Language
 }
@@ -70,6 +75,7 @@ func (m *ListStore) Get(id string) Language {
 	return nil
 }
 
+// DefaultStore is a store which all Language objects should register themselves in.
 var DefaultStore Store
 
 func init() {

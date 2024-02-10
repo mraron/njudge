@@ -10,22 +10,22 @@ import (
 	"github.com/mraron/njudge/pkg/language"
 )
 
-type cython3 struct {
+type Cython3 struct {
 }
 
-func (c cython3) ID() string {
+func (c Cython3) ID() string {
 	return "cython3"
 }
 
-func (c cython3) DisplayName() string {
+func (c Cython3) DisplayName() string {
 	return "Cython3"
 }
 
-func (c cython3) DefaultFilename() string {
+func (c Cython3) DefaultFilename() string {
 	return "main.py"
 }
 
-func (c cython3) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
+func (c Cython3) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
 	err := sandbox.CreateFileFromSource(s, f.Name, f.Source)
 	if err != nil {
 		return nil, err
@@ -51,11 +51,11 @@ func (c cython3) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, ex
 	return sandbox.ExtractFile(s, "a.out")
 }
 
-func (cython3) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
+func (Cython3) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 	return sandbox.RunBinary(context.TODO(), s, binary, stdin, stdout, tl, ml)
 
 }
 
 func init() {
-	language.DefaultStore.Register("cython3", cython3{})
+	language.DefaultStore.Register("cython3", Cython3{})
 }

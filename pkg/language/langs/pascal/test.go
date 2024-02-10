@@ -14,7 +14,7 @@ const TestCodeHelloWorld = `begin
 end.
 `
 
-func (p pascal) Test(t *testing.T, s sandbox.Sandbox) error {
+func (p Pascal) Test(t *testing.T, s sandbox.Sandbox) error {
 	for _, test := range []language.Test{
 		{Name: p.ID() + "_print", Language: p, Source: TestCodeHelloWorld, ExpectedVerdict: sandbox.VerdictOK, ExpectedOutput: "Hello world\n", TimeLimit: 1 * time.Second, MemoryLimit: 128 * memory.MiB},
 	} {

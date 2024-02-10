@@ -62,7 +62,7 @@ func main() {
 }`
 )
 
-func (g golang) Test(t *testing.T, s sandbox.Sandbox) error {
+func (g Golang) Test(t *testing.T, s sandbox.Sandbox) error {
 	for _, test := range []language.Test{
 		{Name: g.ID() + "_aplusb", Language: g, Source: TestCodeAplusb, ExpectedVerdict: sandbox.VerdictOK, Input: "1 2", ExpectedOutput: "3\n", TimeLimit: 1 * time.Second, MemoryLimit: 128 * memory.MiB},
 		{Name: g.ID() + "_ce", Language: g, Source: TestCodeCompilationError, ExpectedVerdict: sandbox.VerdictCE, TimeLimit: 1 * time.Second, MemoryLimit: 128 * memory.MiB},

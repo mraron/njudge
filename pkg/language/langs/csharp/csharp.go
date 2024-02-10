@@ -10,21 +10,21 @@ import (
 	"github.com/mraron/njudge/pkg/language"
 )
 
-type csharp struct{}
+type CSharp struct{}
 
-func (csharp) ID() string {
+func (CSharp) ID() string {
 	return "csharp"
 }
 
-func (csharp) DisplayName() string {
+func (CSharp) DisplayName() string {
 	return "C# (mono)"
 }
 
-func (csharp) DefaultFilename() string {
+func (CSharp) DefaultFilename() string {
 	return "main.cs"
 }
 
-func (csharp) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
+func (CSharp) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
 	err := sandbox.CreateFileFromSource(s, f.Name, f.Source)
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (csharp) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extra
 	return sandbox.ExtractFile(s, "main.exe")
 }
 
-func (csharp) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
+func (CSharp) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 	stat := sandbox.Status{}
 	stat.Verdict = sandbox.VerdictXX
 
@@ -67,5 +67,5 @@ func (csharp) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdou
 }
 
 func init() {
-	language.DefaultStore.Register("csharp", csharp{})
+	language.DefaultStore.Register("csharp", CSharp{})
 }
