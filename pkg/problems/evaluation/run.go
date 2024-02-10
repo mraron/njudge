@@ -141,7 +141,7 @@ func (r *BasicRunner) Run(ctx context.Context, sandboxProvider sandbox.Provider,
 		_ = sandboxOutput.Close()
 	}(sandboxInput, sandboxOutput)
 
-	status, err := r.lang.Run(s, sandbox.File{
+	status, err := r.lang.Run(context.TODO(), s, sandbox.File{
 		"a.out", //@TODO
 		bytes.NewBuffer(r.bin),
 	}, sandboxInput, sandboxOutput, testcase.TimeLimit, memory.Amount(testcase.MemoryLimit))

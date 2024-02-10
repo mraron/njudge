@@ -2,7 +2,8 @@ package polygon
 
 import (
 	"fmt"
-	"github.com/mraron/njudge/pkg/problems/evaluation/checker"
+	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/mraron/njudge/pkg/problems/executable/checker"
 	"path/filepath"
 	"time"
 
@@ -97,7 +98,7 @@ func (ts Testset) Testset(path string) problems.Testset {
 			testcase.Testset = ts.Name
 			testcase.Group = group.Name
 			testcase.TimeLimit = time.Duration(ts.TimeLimit) * time.Millisecond
-			testcase.MemoryLimit = ts.MemoryLimit
+			testcase.MemoryLimit = memory.Amount(ts.MemoryLimit)
 
 			if group.Scoring == problems.ScoringMin {
 				testcase.MaxScore = grp.Points

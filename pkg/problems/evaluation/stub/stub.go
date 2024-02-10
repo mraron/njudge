@@ -2,6 +2,7 @@ package stub
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"io"
@@ -58,7 +59,7 @@ func (s Stub) Compile(jinfo problems.Judgeable, sbox sandbox.Sandbox, lang langu
 
 	buf := &bytes.Buffer{}
 
-	_, err := lang.Compile(sbox, sandbox.File{Name: "main", Source: src}, dest, nil)
+	_, err := lang.Compile(context.TODO(), sbox, sandbox.File{Name: "main", Source: src}, dest, nil)
 	if err != nil {
 		return nil, err
 	}

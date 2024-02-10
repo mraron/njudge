@@ -2,12 +2,12 @@ package cpp_test
 
 import (
 	"bytes"
+	"context"
 	"github.com/mraron/njudge/pkg/language/internal/testutils"
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/net/context"
 	"io"
 	"testing"
 	"testing/iotest"
@@ -72,13 +72,13 @@ func TestExtraFiles(t *testing.T) {
 				t.Error(err)
 			}
 
-			bin, err := cpp.Std17.Compile(s, tc.source, io.Discard, tc.extras)
+			bin, err := cpp.Std17.Compile(context.TODO(), s, tc.source, io.Discard, tc.extras)
 			if err != nil {
 				t.Error(err)
 			}
 
 			stdout := &bytes.Buffer{}
-			st, err := cpp.Std17.Run(s, *bin, iotest.ErrReader(io.EOF), stdout, 1*time.Second, 512*memory.MiB)
+			st, err := cpp.Std17.Run(context.TODO(), s, *bin, iotest.ErrReader(io.EOF), stdout, 1*time.Second, 512*memory.MiB)
 			if err != nil {
 				t.Error(err)
 			}

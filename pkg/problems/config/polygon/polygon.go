@@ -1,6 +1,7 @@
 package polygon
 
 import (
+	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/problems/evaluation"
 	"path/filepath"
 
@@ -98,8 +99,8 @@ func (p Problem) PDFStatements() problems.Contents {
 	return p.GeneratedStatementList.FilterByType(problems.DataTypePDF)
 }
 
-func (p Problem) MemoryLimit() int {
-	return p.Judging.Testsets[0].MemoryLimit
+func (p Problem) MemoryLimit() memory.Amount {
+	return memory.Amount(p.Judging.Testsets[0].MemoryLimit)
 }
 
 func (p Problem) TimeLimit() int {

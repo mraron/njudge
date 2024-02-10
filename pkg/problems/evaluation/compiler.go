@@ -58,7 +58,7 @@ func (c Compile) Compile(ctx context.Context, problem problems.Judgeable, soluti
 	// TODO add ctx to language
 	stderr, bin := &bytes.Buffer{}, &bytes.Buffer{}
 	stderrTruncated := iotest.TruncateWriter(stderr, 1<<16)
-	if _, err := lang.Compile(s, sandbox.File{
+	if _, err := lang.Compile(context.TODO(), s, sandbox.File{
 		Name:   lang.DefaultFilename(),
 		Source: f,
 	}, stderrTruncated, nil); err != nil {

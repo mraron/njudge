@@ -159,7 +159,7 @@ func (i *Isolate) Run(ctx context.Context, config RunConfig, toRun string, toRun
 			fallthrough
 		case "cg-mem":
 			mem, _ := strconv.Atoi(lst[1])
-			st.Memory += mem
+			st.Memory += memory.Amount(mem) * memory.KiB
 		case "time":
 			tmp, _ := strconv.ParseFloat(lst[1], 32)
 			st.Time = time.Duration(tmp*1000) * time.Millisecond

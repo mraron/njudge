@@ -24,11 +24,11 @@ func (Python3) DefaultFilename() string {
 	return "main.py"
 }
 
-func (Python3) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
+func (Python3) Compile(ctx context.Context, s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
 	return &f, nil
 }
 
-func (Python3) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
+func (Python3) Run(ctx context.Context, s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 	if err := sandbox.CreateFileFromSource(s, binary.Name, binary.Source); err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (Python3) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdo
 		Stdout:           stdout,
 		WorkingDirectory: s.Pwd(),
 	}
-	return s.Run(context.TODO(), rc, "/usr/bin/python3", binary.Name)
+	return s.Run(ctx, rc, "/usr/bin/python3", binary.Name)
 }
 
 func init() {

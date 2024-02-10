@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/mraron/njudge/pkg/language/runner"
 	"github.com/mraron/njudge/pkg/problems"
+	"github.com/mraron/njudge/pkg/problems/executable"
 )
 
 // TaskYAML checker format is used by CMS as described in
@@ -16,13 +16,13 @@ import (
 type TaskYAML struct {
 	path string
 
-	executable runner.Executable
+	exec executable.Executable
 }
 
 func NewTaskYAML(path string) *TaskYAML {
 	return &TaskYAML{
-		path:       path,
-		executable: runner.NewStdlib(path),
+		path: path,
+		exec: executable.NewStdlib(path),
 	}
 }
 
@@ -34,10 +34,7 @@ func (t *TaskYAML) Check(ctx context.Context, testcase *problems.Testcase) error
 	tc := testcase
 	stdout, stderr := bytes.Buffer{}, bytes.Buffer{}
 
-	t.executable.Stdout(&stdout)
-	t.executable.Stderr(&stderr)
-
-	if err := t.executable.Run([]string{tc.InputPath, tc.AnswerPath, tc.OutputPath}); err != nil {
+	if _, err := t.exec.Execute(nil, &stdout, &stderr, tc.InputPath, tc.AnswerPath, tc.OutputPath); err != nil {
 		return fmt.Errorf("can't check task_yaml task: %w", err)
 	}
 	if _, err := fmt.Fscanf(&stdout, "%f", &tc.Score); err != nil {

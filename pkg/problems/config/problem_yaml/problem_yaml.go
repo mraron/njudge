@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
+	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/evaluation"
-	"github.com/mraron/njudge/pkg/problems/evaluation/checker"
+	checker2 "github.com/mraron/njudge/pkg/problems/executable/checker"
 	"github.com/spf13/afero"
 	"github.com/yuin/goldmark"
 	"gopkg.in/yaml.v3"
@@ -94,8 +95,8 @@ func (p Problem) Statements() problems.Contents {
 	return p.GeneratedStatementList
 }
 
-func (p Problem) MemoryLimit() int {
-	return p.Tests.MemoryLimit * 1024 * 1024
+func (p Problem) MemoryLimit() memory.Amount {
+	return memory.Amount(p.Tests.MemoryLimit * 1024 * 1024)
 }
 
 func (p Problem) TimeLimit() int {
@@ -224,14 +225,14 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 
 func (p Problem) Checker() problems.Checker {
 	if p.Tests.Checker.Type == "" || p.Tests.Checker.Type == "whitediff" {
-		return checker.Whitediff{}
+		return checker2.Whitediff{}
 	} else if p.Tests.Checker.Type == "testlib" {
-		return checker.NewTestlib(filepath.Join(p.Path, p.Tests.Checker.Path))
+		return checker2.NewTestlib(filepath.Join(p.Path, p.Tests.Checker.Path))
 	} else if p.Tests.Checker.Type == "taskyaml" {
-		return checker.NewTaskYAML(filepath.Join(p.Path, p.Tests.Checker.Path))
+		return checker2.NewTaskYAML(filepath.Join(p.Path, p.Tests.Checker.Path))
 	}
 
-	return checker.Noop{}
+	return checker2.Noop{}
 }
 
 func (p Problem) Files() []problems.File {

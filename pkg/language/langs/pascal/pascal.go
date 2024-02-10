@@ -24,7 +24,7 @@ func (Pascal) DefaultFilename() string {
 	return "main.pas"
 }
 
-func (Pascal) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
+func (Pascal) Compile(ctx context.Context, s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
 	err := sandbox.CreateFileFromSource(s, f.Name, f.Source)
 	if err != nil {
 		return nil, err
@@ -45,15 +45,15 @@ func (Pascal) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extra
 			},
 		},
 	}
-	if _, err := s.Run(context.TODO(), rc, "/usr/bin/fpc", sandbox.SplitArgs("-Mobjfpc -O2 -Xss "+f.Name)...); err != nil {
+	if _, err := s.Run(ctx, rc, "/usr/bin/fpc", sandbox.SplitArgs("-Mobjfpc -O2 -Xss "+f.Name)...); err != nil {
 		return nil, err
 	}
 
 	return sandbox.ExtractFile(s, "main")
 }
 
-func (Pascal) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
-	return sandbox.RunBinary(context.TODO(), s, binary, stdin, stdout, tl, ml)
+func (Pascal) Run(ctx context.Context, s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
+	return sandbox.RunBinary(ctx, s, binary, stdin, stdout, tl, ml)
 }
 
 func init() {

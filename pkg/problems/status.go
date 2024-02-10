@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/mraron/njudge/pkg/language/memory"
 	"math"
 	"time"
 )
@@ -128,9 +129,9 @@ type Testcase struct {
 	ExpectedOutput string
 	CheckerOutput  string
 	TimeSpent      time.Duration
-	MemoryUsed     int
+	MemoryUsed     memory.Amount
 	TimeLimit      time.Duration
-	MemoryLimit    int
+	MemoryLimit    memory.Amount
 }
 
 // Testset represents some set of tests, for example pretests and system tests should be testsets.
@@ -187,7 +188,7 @@ func (ts *Testset) SetTimeLimit(tl time.Duration) {
 	}
 }
 
-func (ts *Testset) SetMemoryLimit(ml int) {
+func (ts *Testset) SetMemoryLimit(ml memory.Amount) {
 	for _, tc := range ts.Testcases() {
 		tc.MemoryLimit = ml
 	}
@@ -225,8 +226,8 @@ func (ts Testset) FirstNonAC() int {
 	return -1
 }
 
-func (ts Testset) MaxMemoryUsage() int {
-	mx := 0
+func (ts Testset) MaxMemoryUsage() memory.Amount {
+	mx := memory.Amount(0)
 	for _, g := range ts.Groups {
 		if mx < g.MaxMemoryUsage() {
 			mx = g.MaxMemoryUsage()
@@ -265,7 +266,7 @@ func (g *Group) SetTimeLimit(tl time.Duration) {
 	}
 }
 
-func (g *Group) SetMemoryLimit(ml int) {
+func (g *Group) SetMemoryLimit(ml memory.Amount) {
 	for ind := range g.Testcases {
 		g.Testcases[ind].MemoryLimit = ml
 	}
@@ -328,8 +329,8 @@ func (g Group) IsAC() bool {
 	return g.FirstNonAC() == -1
 }
 
-func (g Group) MaxMemoryUsage() int {
-	mx := 0
+func (g Group) MaxMemoryUsage() memory.Amount {
+	mx := memory.Amount(0)
 	for _, val := range g.Testcases {
 		if mx < val.MemoryUsed {
 			mx = val.MemoryUsed

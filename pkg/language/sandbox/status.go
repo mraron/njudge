@@ -1,6 +1,9 @@
 package sandbox
 
-import "time"
+import (
+	"github.com/mraron/njudge/pkg/language/memory"
+	"time"
+)
 
 // Verdict is the overall outcome of running a program.
 type Verdict int
@@ -36,7 +39,7 @@ func (v Verdict) String() string {
 type Status struct {
 	Verdict  Verdict
 	Signal   int
-	Memory   int
 	Time     time.Duration
+	Memory   memory.Amount
 	ExitCode int
 }

@@ -2,6 +2,7 @@ package batch
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
@@ -109,7 +110,7 @@ func Run(ctx *RunContext, group *problems.Group, testcase *problems.Testcase) (s
 		input = nil
 	}
 
-	res, err := ctx.Lang.Run(ctx.Sandbox, sandbox.File{
+	res, err := ctx.Lang.Run(context.TODO(), ctx.Sandbox, sandbox.File{
 		"a.out",
 		bytes.NewReader(ctx.Binary),
 	}, input, ctx.Stdout, testcase.TimeLimit, memory.Amount(testcase.MemoryLimit))
@@ -207,7 +208,7 @@ func (b Batch) Compile(jinfo problems.Judgeable, sandbox sandbox.Sandbox, lang l
 	}
 
 	buf := &bytes.Buffer{}
-	if _, err := lang.Compile(sandbox, file, dest, extras); err != nil {
+	if _, err := lang.Compile(context.TODO(), sandbox, file, dest, extras); err != nil {
 		return nil, err
 	}
 

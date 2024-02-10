@@ -82,7 +82,7 @@ func (j *Java) DefaultFilename() string {
 	return j.className + ".java"
 }
 
-func (j *Java) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
+func (j *Java) Compile(ctx context.Context, s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
 	renamed, className, err := j.Rename(f)
 	if err != nil {
 		return nil, err
@@ -114,14 +114,14 @@ func (j *Java) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extr
 		WorkingDirectory: s.Pwd(),
 		Args:             []string{"--open-files=2048"},
 	}
-	if _, err := s.Run(context.TODO(), rc, "/usr/bin/javac", sandbox.SplitArgs("-cp "+classPath+" "+renamed.Name)...); err != nil {
+	if _, err := s.Run(ctx, rc, "/usr/bin/javac", sandbox.SplitArgs("-cp "+classPath+" "+renamed.Name)...); err != nil {
 		return nil, err
 	}
 
 	return sandbox.ExtractFile(s, className+".class")
 }
 
-func (j *Java) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
+func (j *Java) Run(ctx context.Context, s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 	if err := sandbox.CreateFileFromSource(s, binary.Name, binary.Source); err != nil {
 		return nil, err
 	}
@@ -147,7 +147,7 @@ func (j *Java) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdo
 		MemoryLimit:      ml,
 		WorkingDirectory: s.Pwd(),
 	}
-	return s.Run(context.TODO(), rc, "/usr/bin/java", sandbox.SplitArgs("-cp "+classPath+" "+execName)...)
+	return s.Run(ctx, rc, "/usr/bin/java", sandbox.SplitArgs("-cp "+classPath+" "+execName)...)
 }
 
 func init() {

@@ -50,7 +50,7 @@ func (w Worker) Judge(ctx context.Context, plogger *zap.Logger, p problems.Judge
 	tt := p.GetTaskType()
 
 	logger.Info("compiling")
-	compileSandbox := sandboxes.MustGet()
+	compileSandbox, _ := sandboxes.Get()
 	compileRes, err := tt.Compile(context.Background(), p, evaluation.NewByteSolution(lang, src), compileSandbox)
 	sandboxes.Put(compileSandbox)
 

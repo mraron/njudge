@@ -4,6 +4,7 @@ package problems
 import (
 	"context"
 	"github.com/mraron/njudge/pkg/language"
+	"github.com/mraron/njudge/pkg/language/memory"
 )
 
 type File struct {
@@ -16,7 +17,7 @@ type Problem interface {
 	Name() string
 	Titles() Contents
 	Statements() Contents
-	MemoryLimit() int
+	MemoryLimit() memory.Amount
 	TimeLimit() int
 
 	Attachments() Attachments

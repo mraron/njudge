@@ -2,8 +2,8 @@ package checker
 
 import (
 	"errors"
-	"github.com/mraron/njudge/pkg/language/runner"
 	"github.com/mraron/njudge/pkg/problems"
+	executable2 "github.com/mraron/njudge/pkg/problems/executable"
 	"io"
 	"testing"
 )
@@ -11,7 +11,7 @@ import (
 func TestTaskYAML_Check(t1 *testing.T) {
 	type fields struct {
 		path       string
-		executable runner.Executable
+		executable executable2.Executable
 	}
 
 	tests := []struct {
@@ -27,7 +27,7 @@ func TestTaskYAML_Check(t1 *testing.T) {
 			name: "wrong answer",
 			fields: fields{
 				path: "",
-				executable: runner.NewFunction(func(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) (int, error) {
+				executable: executable2.NewFunction(func(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) (int, error) {
 					_, err := stdout.Write([]byte("0.0"))
 					return 0, err
 				}),
@@ -44,7 +44,7 @@ func TestTaskYAML_Check(t1 *testing.T) {
 			name: "partially correct",
 			fields: fields{
 				path: "",
-				executable: runner.NewFunction(func(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) (int, error) {
+				executable: executable2.NewFunction(func(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) (int, error) {
 					_, err := stdout.Write([]byte("0.5"))
 					return 0, err
 				}),
@@ -61,7 +61,7 @@ func TestTaskYAML_Check(t1 *testing.T) {
 			name: "accepted",
 			fields: fields{
 				path: "",
-				executable: runner.NewFunction(func(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) (int, error) {
+				executable: executable2.NewFunction(func(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) (int, error) {
 					_, err := stdout.Write([]byte("1.0"))
 					return 0, err
 				}),
@@ -78,7 +78,7 @@ func TestTaskYAML_Check(t1 *testing.T) {
 			name: "executable crash",
 			fields: fields{
 				path: "",
-				executable: runner.NewFunction(func(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) (int, error) {
+				executable: executable2.NewFunction(func(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) (int, error) {
 					return 0, errors.New("")
 				}),
 			},
@@ -94,7 +94,7 @@ func TestTaskYAML_Check(t1 *testing.T) {
 			name: "wrong format",
 			fields: fields{
 				path: "",
-				executable: runner.NewFunction(func(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) (int, error) {
+				executable: executable2.NewFunction(func(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) (int, error) {
 					_, err := stdout.Write([]byte("xxx"))
 					return 0, err
 				}),
@@ -111,7 +111,7 @@ func TestTaskYAML_Check(t1 *testing.T) {
 			name: "checker output",
 			fields: fields{
 				path: "",
-				executable: runner.NewFunction(func(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) (int, error) {
+				executable: executable2.NewFunction(func(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) (int, error) {
 					_, err := stdout.Write([]byte("1.0"))
 					_, err2 := stderr.Write([]byte("checker output"))
 					return 0, errors.Join(err, err2)
@@ -130,8 +130,8 @@ func TestTaskYAML_Check(t1 *testing.T) {
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
 			t := &TaskYAML{
-				path:       tt.fields.path,
-				executable: tt.fields.executable,
+				path: tt.fields.path,
+				exec: tt.fields.executable,
 			}
 			if err := t.Check(nil, tt.tc); (err != nil) != tt.wantErr {
 				t1.Errorf("task_yaml.Check() error = %v, wantErr %v", err, tt.wantErr)

@@ -5,8 +5,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/problems/evaluation"
-	"github.com/mraron/njudge/pkg/problems/evaluation/checker"
+	checker2 "github.com/mraron/njudge/pkg/problems/executable/checker"
 	"io"
 	"os"
 	"path/filepath"
@@ -81,8 +82,8 @@ func (p Problem) PDFStatements() problems.Contents {
 	return p.StatementList.FilterByType(problems.DataTypePDF)
 }
 
-func (p Problem) MemoryLimit() int {
-	return 1024 * 1024 * p.TaskYAML.MemoryLimit
+func (p Problem) MemoryLimit() memory.Amount {
+	return memory.Amount(1024 * 1024 * p.TaskYAML.MemoryLimit)
 }
 
 func (p Problem) TimeLimit() int {
@@ -247,14 +248,14 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 
 func (p Problem) Checker() problems.Checker {
 	if p.tasktype == "communication" { // manager already printed the result
-		return checker.Noop{}
+		return checker2.Noop{}
 	}
 
 	if p.whiteDiffChecker {
-		return checker.Whitediff{}
+		return checker2.Whitediff{}
 	}
 
-	return checker.NewTaskYAML(filepath.Join(p.Path, "check", "checker"))
+	return checker2.NewTaskYAML(filepath.Join(p.Path, "check", "checker"))
 }
 
 func (p Problem) Files() []problems.File {

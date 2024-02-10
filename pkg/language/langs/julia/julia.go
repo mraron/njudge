@@ -23,11 +23,11 @@ func (julia) DefaultFilename() string {
 	return "main.jl"
 }
 
-func (julia) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
+func (julia) Compile(ctx context.Context, s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
 	return &f, nil
 }
 
-func (julia) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
+func (julia) Run(ctx context.Context, s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 	stat := sandbox.Status{}
 	stat.Verdict = sandbox.VerdictXX
 
@@ -45,7 +45,7 @@ func (julia) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout
 		WorkingDirectory: s.Pwd(),
 	}
 
-	return s.Run(context.TODO(), rc, "/usr/local/bin/julia", binary.Name)
+	return s.Run(ctx, rc, "/usr/local/bin/julia", binary.Name)
 }
 
 func init() {

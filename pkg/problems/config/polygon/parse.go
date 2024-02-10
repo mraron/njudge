@@ -81,7 +81,7 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 					// problem-properties.json might be outdated. problem.xml should take priority
 					jsonStmt.InputFile, jsonStmt.OutputFile = p.InputOutputFiles()
 					jsonStmt.TimeLimit = p.TimeLimit()
-					jsonStmt.MemoryLimit = p.MemoryLimit()
+					jsonStmt.MemoryLimit = int(p.MemoryLimit())
 
 					p.JSONStatementList = append(p.JSONStatementList, *jsonStmt)
 

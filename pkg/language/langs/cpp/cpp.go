@@ -50,7 +50,7 @@ func (c Cpp) DefaultFilename() string {
 	return "main.cpp"
 }
 
-func (c Cpp) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
+func (c Cpp) Compile(ctx context.Context, s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
 	err := sandbox.CreateFileFromSource(s, f.Name, f.Source)
 	if err != nil {
 		return nil, err
@@ -80,7 +80,7 @@ func (c Cpp) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras
 	}
 
 	if _, err := s.Run(
-		context.TODO(),
+		ctx,
 		rc,
 		"/usr/bin/g++",
 		sandbox.SplitArgs(strings.Join(c.compileArgs, " ")+" "+params)...,
@@ -91,8 +91,8 @@ func (c Cpp) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras
 	return sandbox.ExtractFile(s, "a.out")
 }
 
-func (Cpp) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
-	return sandbox.RunBinary(context.TODO(), s, binary, stdin, stdout, tl, ml)
+func (Cpp) Run(ctx context.Context, s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
+	return sandbox.RunBinary(ctx, s, binary, stdin, stdout, tl, ml)
 }
 
 var DefaultCompileArgs = []string{"-O2", "-static", "-DONLINE_JUDGE"}

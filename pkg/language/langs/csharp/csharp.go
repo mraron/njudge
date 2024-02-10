@@ -24,7 +24,7 @@ func (CSharp) DefaultFilename() string {
 	return "main.cs"
 }
 
-func (CSharp) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
+func (CSharp) Compile(ctx context.Context, s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
 	err := sandbox.CreateFileFromSource(s, f.Name, f.Source)
 	if err != nil {
 		return nil, err
@@ -39,14 +39,14 @@ func (CSharp) Compile(s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extra
 		Stdout:        stderr,
 		Stderr:        stderr,
 	}
-	if _, err := s.Run(context.TODO(), rc, "/usr/bin/mcs", sandbox.SplitArgs("-out:main.exe -optimize+ "+f.Name)...); err != nil {
+	if _, err := s.Run(ctx, rc, "/usr/bin/mcs", sandbox.SplitArgs("-out:main.exe -optimize+ "+f.Name)...); err != nil {
 		return nil, err
 	}
 
 	return sandbox.ExtractFile(s, "main.exe")
 }
 
-func (CSharp) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
+func (CSharp) Run(ctx context.Context, s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
 	stat := sandbox.Status{}
 	stat.Verdict = sandbox.VerdictXX
 
@@ -63,7 +63,7 @@ func (CSharp) Run(s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdou
 		MemoryLimit:      ml,
 		WorkingDirectory: s.Pwd(),
 	}
-	return s.Run(context.TODO(), rc, "/usr/bin/mono", "main.exe")
+	return s.Run(ctx, rc, "/usr/bin/mono", "main.exe")
 }
 
 func init() {

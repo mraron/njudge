@@ -48,7 +48,7 @@ func AutoCompile(ctx context.Context, fs afero.Fs, s sandbox.Sandbox, workDir, s
 				}
 
 				var resBinary *sandbox.File
-				if resBinary, err = Std17.Compile(s, sandbox.File{
+				if resBinary, err = Std17.Compile(context.TODO(), s, sandbox.File{
 					Name:   filepath.Base(src),
 					Source: file,
 				}, &errorStream, headers); err != nil {

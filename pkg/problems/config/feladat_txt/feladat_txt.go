@@ -5,8 +5,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/problems/evaluation"
-	"github.com/mraron/njudge/pkg/problems/evaluation/checker"
+	"github.com/mraron/njudge/pkg/problems/executable/checker"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -49,8 +50,8 @@ func (p Problem) Statements() problems.Contents {
 	return p.StatementList
 }
 
-func (p Problem) MemoryLimit() int {
-	return 1024 * p.MemoryLimitKB
+func (p Problem) MemoryLimit() memory.Amount {
+	return memory.Amount(p.MemoryLimitKB) * memory.KiB
 }
 
 func (p Problem) TimeLimit() int {
