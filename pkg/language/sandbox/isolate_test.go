@@ -42,7 +42,7 @@ func TestIsolate_Run(t *testing.T) {
 	if *verbose {
 		opts = append(opts, sandbox.IsolateOptionUseLogger(slog.Default()))
 	}
-	s, err := sandbox.NewIsolate(555, opts...)
+	s, err := sandbox.NewIsolate(558, opts...)
 	assert.Nil(t, err)
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {

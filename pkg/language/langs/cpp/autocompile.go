@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/mraron/njudge/pkg/language/sandbox"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -20,7 +21,7 @@ func AutoCompile(ctx context.Context, fs afero.Fs, s sandbox.Sandbox, workDir, s
 	if st, err := fs.Stat(dst); os.IsNotExist(err) || st.Size() == 0 || st.Mode()&0100 != 0100 {
 		if binary, err := fs.Create(dst); err == nil {
 			if file, err := fs.Open(src); err == nil {
-				var buf bytes.Buffer
+				var errorStream bytes.Buffer
 				if err := s.Init(ctx); err != nil {
 					return errors.Join(err, binary.Close(), file.Close())
 				}
@@ -46,11 +47,16 @@ func AutoCompile(ctx context.Context, fs afero.Fs, s sandbox.Sandbox, workDir, s
 					})
 				}
 
-				if _, err := Std17.Compile(s, sandbox.File{
+				var resBinary *sandbox.File
+				if resBinary, err = Std17.Compile(s, sandbox.File{
 					Name:   filepath.Base(src),
 					Source: file,
-				}, &buf, nil); err != nil {
-					return errors.Join(err, binary.Close(), file.Close(), fmt.Errorf("compile error: %v", buf.String()))
+				}, &errorStream, headers); err != nil {
+					return errors.Join(err, binary.Close(), file.Close(), fmt.Errorf("compile error: %v", errorStream.String()))
+				}
+
+				if _, err = io.Copy(binary, resBinary.Source); err != nil {
+					return errors.Join(err, binary.Close(), file.Close())
 				}
 
 				if err := fs.Chmod(dst, 0755); err != nil {

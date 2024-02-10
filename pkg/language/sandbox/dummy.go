@@ -25,6 +25,8 @@ type Dummy struct {
 	OsFS
 
 	Logger *slog.Logger
+
+	inited bool
 }
 
 type DummyOption func(*Dummy) error
@@ -55,13 +57,18 @@ func (d *Dummy) Init(ctx context.Context) error {
 	if d.Dir, err = os.MkdirTemp("", DummyPattern); err != nil {
 		return err
 	}
-	d.OsFS = OsFS{base: d.Dir}
 
 	d.Logger.Info("init dummy sandbox", "dir", d.Dir)
+	d.inited = true
+	d.OsFS = NewOsFS(d.Dir)
 	return nil
 }
 
 func (d *Dummy) Run(ctx context.Context, config RunConfig, command string, commandArgs ...string) (*Status, error) {
+	if !d.inited {
+		return nil, ErrorSandboxNotInitialized
+	}
+
 	logger := d.Logger
 	if config.RunID != "" {
 		logger = d.Logger.With("run_id", config.RunID)
@@ -111,6 +118,8 @@ func (d *Dummy) Run(ctx context.Context, config RunConfig, command string, comma
 
 func (d *Dummy) Cleanup(ctx context.Context) error {
 	d.Logger.Info("cleanup dummy sandbox", "dir", d.Dir)
+	d.inited = false
+	d.OsFS = OsFS{}
 	return os.RemoveAll(d.Dir)
 
 }

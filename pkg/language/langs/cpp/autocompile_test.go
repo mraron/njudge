@@ -2,6 +2,8 @@ package cpp_test
 
 import (
 	"context"
+	"github.com/stretchr/testify/assert"
+	"os"
 	"testing"
 
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
@@ -11,7 +13,8 @@ import (
 
 func TestAutoCompile(t *testing.T) {
 	fs := afero.NewMemMapFs()
-	s, _ := sandbox.NewDummy()
+	s, err := sandbox.NewDummy()
+	assert.Nil(t, err)
 
 	_ = afero.WriteFile(fs, "main.cpp", []byte(`#include "teszt.h"
 int main() {x*=2;}`), 0644)
@@ -28,18 +31,21 @@ int x = 11;
 		t.Error(err)
 	}
 
-	if fileInfo, err := fs.Stat("main"); err != nil || fileInfo.Mode()&0100 != 0100 || fileInfo.Size() == 0 {
-		t.Error("no execbit or wrong size")
-	}
+	var fileInfo os.FileInfo
+	fileInfo, err = fs.Stat("main")
+	assert.Nil(t, err)
+	assert.Equal(t, os.FileMode(0100), fileInfo.Mode()&0100, "no execbit")
+	assert.NotEqual(t, 0, fileInfo.Size(), "wrong size")
 
 	_ = afero.WriteFile(fs, "main", []byte(""), 0644)
 	if err := cpp.AutoCompile(context.TODO(), fs, s, "./headers", "main.cpp", "main"); err != nil {
 		t.Error(err)
 	}
 
-	if fileInfo, err := fs.Stat("main"); err != nil || fileInfo.Mode()&0100 != 0100 || fileInfo.Size() == 0 {
-		t.Error("no execbit or wrong size")
-	}
+	fileInfo, err = fs.Stat("main")
+	assert.Nil(t, err)
+	assert.Equal(t, os.FileMode(0100), fileInfo.Mode()&0100, "no execbit")
+	assert.NotEqual(t, 0, fileInfo.Size(), "wrong size")
 
 	_ = afero.WriteFile(fs, "main_not_executable", []byte("has"), 0766)
 	if err := cpp.AutoCompile(context.TODO(), fs, s, "./headers", "main_syntaxerror.cpp", "main_not_executable"); err != nil {

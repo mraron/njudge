@@ -18,9 +18,9 @@ type Test struct {
 	Name            string
 	Language        Language
 	Source          string
-	ExpectedVerdict sandbox.Verdict
 	Input           string
 	ExpectedOutput  string
+	ExpectedVerdict sandbox.Verdict
 	TimeLimit       time.Duration
 	MemoryLimit     memory.Amount
 }

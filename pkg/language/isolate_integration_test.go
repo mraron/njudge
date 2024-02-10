@@ -1,8 +1,8 @@
 package language_test
 
 import (
-	"flag"
 	"github.com/mraron/njudge/pkg/language"
+	"github.com/mraron/njudge/pkg/language/internal/testutils"
 
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
 	_ "github.com/mraron/njudge/pkg/language/langs/csharp"
@@ -20,14 +20,11 @@ import (
 	"testing"
 )
 
-var useIsolate = flag.Bool("isolate", false, "run isolate integration tests")
-var testAllLanguages = flag.Bool("all_languages", false, "run tests for all languages")
-
 func TestIsolateWithCpp17(t *testing.T) {
-	if !*useIsolate {
+	if !*testutils.UseIsolate {
 		t.Skip("-isolate is not set")
 	}
-	if *testAllLanguages {
+	if *testutils.AllLanguages {
 		t.Skip("running all languages instead (which includes cpp17)")
 	}
 
@@ -41,10 +38,10 @@ func TestIsolateWithCpp17(t *testing.T) {
 }
 
 func TestIsolateWithAllLanguages(t *testing.T) {
-	if !*useIsolate {
+	if !*testutils.UseIsolate {
 		t.Skip("-isolate is not set")
 	}
-	if !*testAllLanguages {
+	if !*testutils.AllLanguages {
 		t.Skip("-all_languages is not set")
 	}
 

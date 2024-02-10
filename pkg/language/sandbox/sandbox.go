@@ -14,6 +14,8 @@ import (
 	"time"
 )
 
+var ErrorSandboxNotInitialized = errors.New("initialize the sandbox first")
+
 type FS interface {
 	Pwd() string
 	Create(name string) (io.WriteCloser, error)

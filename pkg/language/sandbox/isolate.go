@@ -31,6 +31,8 @@ type Isolate struct {
 	OsFS
 
 	Logger *slog.Logger
+
+	inited bool
 }
 
 type IsolateOption func(*Isolate) error
@@ -45,9 +47,6 @@ func IsolateOptionUseLogger(logger *slog.Logger) IsolateOption {
 func NewIsolate(ID int, opts ...IsolateOption) (*Isolate, error) {
 	res := &Isolate{
 		ID: ID,
-		OsFS: OsFS{
-			base: filepath.Join(IsolateRoot, strconv.Itoa(ID), "box"),
-		},
 	}
 	for _, opt := range opts {
 		if err := opt(res); err != nil {
@@ -61,11 +60,11 @@ func NewIsolate(ID int, opts ...IsolateOption) (*Isolate, error) {
 	return res, nil
 }
 
-func (i Isolate) Id() string {
+func (i *Isolate) Id() string {
 	return "isolate" + strconv.Itoa(i.ID)
 }
 
-func (i Isolate) Init(ctx context.Context) error {
+func (i *Isolate) Init(ctx context.Context) error {
 	// cleanup because the previous invocation might not have cleaned up
 	if err := i.Cleanup(ctx); err != nil {
 		return err
@@ -73,10 +72,12 @@ func (i Isolate) Init(ctx context.Context) error {
 
 	cmd := []string{"isolate", "--cg", "-b", strconv.Itoa(i.ID), "--init"}
 	i.Logger.Info("running init", "cmd", cmd)
+	i.inited = true
+	i.OsFS = NewOsFS(filepath.Join(IsolateRoot, strconv.Itoa(i.ID), "box"))
 	return exec.CommandContext(ctx, cmd[0], cmd[1:]...).Run()
 }
 
-func (i Isolate) buildArgs(config RunConfig) ([]string, error) {
+func (i *Isolate) buildArgs(config RunConfig) ([]string, error) {
 	args := []string{"isolate", "--cg", "-b", strconv.Itoa(i.ID)}
 	if config.MaxProcesses > 0 {
 		args = append(args, fmt.Sprintf("--processes=%d", config.MaxProcesses))
@@ -111,7 +112,11 @@ func (i Isolate) buildArgs(config RunConfig) ([]string, error) {
 	return args, nil
 }
 
-func (i Isolate) Run(ctx context.Context, config RunConfig, toRun string, toRunArgs ...string) (*Status, error) {
+func (i *Isolate) Run(ctx context.Context, config RunConfig, toRun string, toRunArgs ...string) (*Status, error) {
+	if !i.inited {
+		return nil, ErrorSandboxNotInitialized
+	}
+
 	logger := i.Logger
 	if config.RunID != "" {
 		logger = i.Logger.With("run_id", config.RunID)
@@ -181,9 +186,11 @@ func (i Isolate) Run(ctx context.Context, config RunConfig, toRun string, toRunA
 	return &st, nil
 }
 
-func (i Isolate) Cleanup(ctx context.Context) error {
+func (i *Isolate) Cleanup(ctx context.Context) error {
 	cmd := []string{"isolate", "--cg", "-b", strconv.Itoa(i.ID), "--cleanup"}
 
 	i.Logger.Info("running cleanup ", "cmd", cmd)
+	i.inited = false
+	i.OsFS = OsFS{}
 	return exec.CommandContext(ctx, cmd[0], cmd[1:]...).Run()
 }
