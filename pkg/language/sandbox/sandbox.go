@@ -30,13 +30,13 @@ type FS interface {
 	fs.FS
 }
 
-// CreateFileFromSource is a convenience method for creating a file inside a sandbox with the given content.
-func CreateFileFromSource(fs FS, name string, source io.Reader) error {
-	if err := syscall.Unlink(filepath.Join(fs.Pwd(), name)); err != nil && !errors.Is(err, os.ErrNotExist) {
+// CreateFile is a convenience method for creating a file inside a sandbox with the given content.
+func CreateFile(fs FS, c File) error {
+	if err := syscall.Unlink(filepath.Join(fs.Pwd(), c.Name)); err != nil && !errors.Is(err, os.ErrNotExist) {
 		return err
 	}
 
-	f, err := fs.Create(name)
+	f, err := fs.Create(c.Name)
 	if err != nil {
 		return err
 	}
@@ -44,10 +44,10 @@ func CreateFileFromSource(fs FS, name string, source io.Reader) error {
 		_ = f.Close()
 	}(f)
 
-	if _, err = io.Copy(f, source); err != nil {
+	if _, err = io.Copy(f, c.Source); err != nil {
 		return err
 	}
-	return nil
+	return c.Source.Close()
 }
 
 // ExtractFile is a convenience method for getting the content of a file from inside the sandbox.
@@ -67,7 +67,7 @@ func ExtractFile(s FS, name string) (*File, error) {
 
 	return &File{
 		Name:   name,
-		Source: bytes.NewBuffer(binaryContent),
+		Source: io.NopCloser(bytes.NewBuffer(binaryContent)),
 	}, nil
 }
 
@@ -76,7 +76,7 @@ func RunBinary(ctx context.Context, s Sandbox, binary File, stdin io.Reader, std
 	stat := Status{}
 	stat.Verdict = VerdictXX
 
-	if err := CreateFileFromSource(s, binary.Name, binary.Source); err != nil {
+	if err := CreateFile(s, binary); err != nil {
 		return nil, err
 	}
 
@@ -152,7 +152,7 @@ type Sandbox interface {
 // Provider can be used to store Sandboxes
 type Provider interface {
 	Get() (Sandbox, error)
-	Put(s Sandbox)
+	Put(s Sandbox) Provider
 }
 
 type ChanProvider struct {
@@ -167,12 +167,13 @@ func (sp *ChanProvider) Get() (Sandbox, error) {
 	return <-sp.sandboxes, nil
 }
 
-func (sp *ChanProvider) Put(s Sandbox) {
+func (sp *ChanProvider) Put(s Sandbox) Provider {
 	sp.sandboxes <- s
+	return sp
 }
 
 // File is a named io.Reader which emulates a file.
 type File struct {
 	Name   string
-	Source io.Reader
+	Source io.ReadCloser
 }

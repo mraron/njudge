@@ -25,7 +25,7 @@ func (CSharp) DefaultFilename() string {
 }
 
 func (CSharp) Compile(ctx context.Context, s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
-	err := sandbox.CreateFileFromSource(s, f.Name, f.Source)
+	err := sandbox.CreateFile(s, f)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (CSharp) Run(ctx context.Context, s sandbox.Sandbox, binary sandbox.File, s
 	stat := sandbox.Status{}
 	stat.Verdict = sandbox.VerdictXX
 
-	if err := sandbox.CreateFileFromSource(s, binary.Name, binary.Source); err != nil {
+	if err := sandbox.CreateFile(s, binary); err != nil {
 		return nil, err
 	}
 

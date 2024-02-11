@@ -26,7 +26,7 @@ func (c Cython3) DefaultFilename() string {
 }
 
 func (c Cython3) Compile(ctx context.Context, s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
-	err := sandbox.CreateFileFromSource(s, f.Name, f.Source)
+	err := sandbox.CreateFile(s, f)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (c Cython3) Compile(ctx context.Context, s sandbox.Sandbox, f sandbox.File,
 		return nil, err
 	}
 
-	if _, err := s.Run(context.TODO(), rc, "/usr/bin/gcc", sandbox.SplitArgs("-O2 -I/usr/include/python3.8 main.c -lpython3.8 -lpthread -lm -lutil -ldl")...); err != nil {
+	if _, err := s.Run(ctx, rc, "/usr/bin/gcc", sandbox.SplitArgs("-O2 -I/usr/include/python3.8 main.c -lpython3.8 -lpthread -lm -lutil -ldl")...); err != nil {
 		return nil, err
 	}
 

@@ -1,6 +1,7 @@
 package problems_test
 
 import (
+	"github.com/stretchr/testify/assert"
 	"path/filepath"
 	"testing"
 
@@ -32,33 +33,33 @@ func (d dummyProblemConfig) parser() problems.ConfigParser {
 func TestFSStore(t *testing.T) {
 	config := newDummyProblemConfig("feladat.xhtml")
 	configStore := problems.NewConfigList()
-	configStore.Register("dummy", config.parser(), config.identifier())
+	assert.Nil(t, configStore.Register("dummy", config.parser(), config.identifier()))
 
 	f := afero.NewMemMapFs()
-	f.MkdirAll("problems/aplusb", 0755)
-	afero.WriteFile(f, "problems/aplusb/feladat.xhtml", []byte("lalal"), 0644)
-	f.MkdirAll("problems/aplusb2", 0755)
-	afero.WriteFile(f, "problems/aplusb2/feladat.xhtml", []byte("lalal"), 0644)
-	f.MkdirAll("problems/aplusb2/aplusb3", 0755)
-	afero.WriteFile(f, "problems/aplusb2/aplusb3/feladat.xhtml", []byte("lalal"), 0644)
+	_ = f.MkdirAll("problems/aplusb", 0755)
+	_ = afero.WriteFile(f, "problems/aplusb/feladat.xhtml", []byte("lalal"), 0644)
+	_ = f.MkdirAll("problems/aplusb2", 0755)
+	_ = afero.WriteFile(f, "problems/aplusb2/feladat.xhtml", []byte("lalal"), 0644)
+	_ = f.MkdirAll("problems/aplusb2/aplusb3", 0755)
+	_ = afero.WriteFile(f, "problems/aplusb2/aplusb3/feladat.xhtml", []byte("lalal"), 0644)
 
-	f.MkdirAll("problems/prefixed", 0755)
-	afero.WriteFile(f, "problems/prefixed/.njudge_prefix", []byte("XX"), 0644)
-	f.MkdirAll("problems/prefixed/first", 0755)
-	afero.WriteFile(f, "problems/prefixed/first/feladat.xhtml", []byte("lalal"), 0644)
-	f.MkdirAll("problems/prefixed/second", 0755)
-	afero.WriteFile(f, "problems/prefixed/second/feladat.xhtml", []byte("lalal"), 0644)
-	f.MkdirAll("problems/prefixed/third", 0755)
-	f.MkdirAll("problems/prefixed/.hidden", 0755)
-	afero.WriteFile(f, "problems/prefixed/.hidden/feladat.xhtml", []byte("lalal"), 0644)
-	f.MkdirAll("problems/prefixed/ignored", 0755)
-	afero.WriteFile(f, "problems/prefixed/ignored/feladat.xhtml", []byte("lalal"), 0644)
-	afero.WriteFile(f, "problems/prefixed/ignored/.njudge_ignore", []byte("lalal"), 0644)
+	_ = f.MkdirAll("problems/prefixed", 0755)
+	_ = afero.WriteFile(f, "problems/prefixed/.njudge_prefix", []byte("XX"), 0644)
+	_ = f.MkdirAll("problems/prefixed/first", 0755)
+	_ = afero.WriteFile(f, "problems/prefixed/first/feladat.xhtml", []byte("lalal"), 0644)
+	_ = f.MkdirAll("problems/prefixed/second", 0755)
+	_ = afero.WriteFile(f, "problems/prefixed/second/feladat.xhtml", []byte("lalal"), 0644)
+	_ = f.MkdirAll("problems/prefixed/third", 0755)
+	_ = f.MkdirAll("problems/prefixed/.hidden", 0755)
+	_ = afero.WriteFile(f, "problems/prefixed/.hidden/feladat.xhtml", []byte("lalal"), 0644)
+	_ = f.MkdirAll("problems/prefixed/ignored", 0755)
+	_ = afero.WriteFile(f, "problems/prefixed/ignored/feladat.xhtml", []byte("lalal"), 0644)
+	_ = afero.WriteFile(f, "problems/prefixed/ignored/.njudge_ignore", []byte("lalal"), 0644)
 
-	f.MkdirAll("problems/recursive", 0755)
-	afero.WriteFile(f, "problems/recursive/.njudge_ignore", []byte("lalal"), 0644)
-	f.MkdirAll("problems/recursive/nono", 0755)
-	afero.WriteFile(f, "problems/recursive/nono/feladat.xhtml", []byte("lalal"), 0644)
+	_ = f.MkdirAll("problems/recursive", 0755)
+	_ = afero.WriteFile(f, "problems/recursive/.njudge_ignore", []byte("lalal"), 0644)
+	_ = f.MkdirAll("problems/recursive/nono", 0755)
+	_ = afero.WriteFile(f, "problems/recursive/nono/feladat.xhtml", []byte("lalal"), 0644)
 
 	store := problems.NewFsStore("problems/", problems.FsStoreUseFs(f), problems.FsStoreUseConfigStore(configStore))
 	if err := store.Update(); err != nil {

@@ -54,12 +54,12 @@ func (s Stub) Compile(jinfo problems.Judgeable, sbox sandbox.Sandbox, lang langu
 			return nil, err
 		}
 
-		language_files = append(language_files, sandbox.File{Name: n.Name, Source: bytes.NewBuffer(conts)})
+		language_files = append(language_files, sandbox.File{Name: n.Name, Source: io.NopCloser(bytes.NewBuffer(conts))})
 	}
 
 	buf := &bytes.Buffer{}
 
-	_, err := lang.Compile(context.TODO(), sbox, sandbox.File{Name: "main", Source: src}, dest, nil)
+	_, err := lang.Compile(context.TODO(), sbox, sandbox.File{Name: "main", Source: io.NopCloser(src)}, dest, nil)
 	if err != nil {
 		return nil, err
 	}

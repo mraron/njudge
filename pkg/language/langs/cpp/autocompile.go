@@ -43,7 +43,7 @@ func AutoCompile(ctx context.Context, fs afero.Fs, s sandbox.Sandbox, workDir, s
 
 					headers = append(headers, sandbox.File{
 						Name:   header,
-						Source: bytes.NewReader(headerContents),
+						Source: io.NopCloser(bytes.NewReader(headerContents)),
 					})
 				}
 

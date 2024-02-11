@@ -270,6 +270,7 @@ func (p Problem) GetTaskType() problems.TaskType {
 			evaluation.NewBasicRunner(evaluation.BasicRunnerWithChecker(p.Checker())),
 		),
 	)
+	// TODO outputonly, stub, communication
 	/*
 		var (
 			tt  problems.TaskType

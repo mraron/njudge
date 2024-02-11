@@ -27,8 +27,11 @@ func (b *BytesSolution) GetLanguage() language.Language {
 	return b.lang
 }
 
-func (b *BytesSolution) GetFile(ctx context.Context) (io.ReadCloser, error) {
-	return io.NopCloser(bytes.NewBuffer(b.src)), nil
+func (b *BytesSolution) GetFile(ctx context.Context) (sandbox.File, error) {
+	return sandbox.File{
+		Name:   b.lang.DefaultFilename(),
+		Source: io.NopCloser(bytes.NewBuffer(b.src)),
+	}, nil
 }
 
 type CompileCopyFile struct {
@@ -37,7 +40,7 @@ type CompileCopyFile struct {
 func (c CompileCopyFile) Compile(ctx context.Context, problem problems.Judgeable, solution problems.Solution, sandbox sandbox.Sandbox) (*problems.CompilationResult, error) {
 	f, err := solution.GetFile(ctx)
 	return &problems.CompilationResult{
-		CompiledFile:       f,
+		CompiledFile:       &f,
 		CompilationMessage: "",
 	}, err
 }
@@ -51,16 +54,12 @@ func (c Compile) Compile(ctx context.Context, problem problems.Judgeable, soluti
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		_ = f.Close()
-	}()
 
-	// TODO add ctx to language
-	stderr, bin := &bytes.Buffer{}, &bytes.Buffer{}
+	stderr, res := &bytes.Buffer{}, &sandbox.File{}
 	stderrTruncated := iotest.TruncateWriter(stderr, 1<<16)
-	if _, err := lang.Compile(context.TODO(), s, sandbox.File{
+	if res, err = lang.Compile(ctx, s, sandbox.File{
 		Name:   lang.DefaultFilename(),
-		Source: f,
+		Source: f.Source,
 	}, stderrTruncated, nil); err != nil {
 		return &problems.CompilationResult{
 			CompiledFile:       nil,
@@ -69,7 +68,7 @@ func (c Compile) Compile(ctx context.Context, problem problems.Judgeable, soluti
 	}
 
 	return &problems.CompilationResult{
-		CompiledFile:       io.NopCloser(bin),
+		CompiledFile:       res,
 		CompilationMessage: stderr.String(),
 	}, nil
 }

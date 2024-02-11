@@ -49,18 +49,18 @@ func TestExtraFiles(t *testing.T) {
 	}{
 		{
 			name:   "only_header",
-			source: sandbox.File{Name: "main.cpp", Source: bytes.NewBufferString(TestCodeExtraFilesMain)},
+			source: sandbox.File{Name: "main.cpp", Source: io.NopCloser(bytes.NewBufferString(TestCodeExtraFilesMain))},
 			extras: []sandbox.File{
-				{"extra.h", bytes.NewBufferString(TestCodeExtraSource)},
+				{"extra.h", io.NopCloser(bytes.NewBufferString(TestCodeExtraSource))},
 			},
 			wantStdout: "Hello world\n",
 		},
 		{
 			name:   "source_and_header",
-			source: sandbox.File{Name: "main.cpp", Source: bytes.NewBufferString(TestCodeExtraFilesMain)},
+			source: sandbox.File{Name: "main.cpp", Source: io.NopCloser(bytes.NewBufferString(TestCodeExtraFilesMain))},
 			extras: []sandbox.File{
-				{"extra.h", bytes.NewBufferString(TestCodeExtraHeader)},
-				{"extra.cpp", bytes.NewBufferString(TestCodeExtraSource)},
+				{"extra.h", io.NopCloser(bytes.NewBufferString(TestCodeExtraHeader))},
+				{"extra.cpp", io.NopCloser(bytes.NewBufferString(TestCodeExtraSource))},
 			},
 			wantStdout: "Hello world\n",
 		},

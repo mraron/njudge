@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-// VerdictName represents the verdict of a testcase i.e the outcome which happened in result of running the testcase (or the lack of running it in the case of VerdictDR)
+// VerdictName represents the verdict of a testcase i.e. the outcome which happened in result of running the testcase (or the lack of running it in the case of VerdictDR)
 type VerdictName int
 
 const (
@@ -141,14 +141,14 @@ type Testset struct {
 	Groups []Group
 }
 
-func (ts Testset) Verdict() VerdictName {
+func (ts *Testset) Verdict() VerdictName {
 	if ts.IsAC() {
 		return VerdictAC
 	}
-	return VerdictName(ts.IndexTestcase(ts.FirstNonAC()).VerdictName)
+	return ts.IndexTestcase(ts.FirstNonAC()).VerdictName
 }
 
-func (ts Testset) IndexTestcase(ind int) *Testcase {
+func (ts *Testset) IndexTestcase(ind int) *Testcase {
 	curr := 1
 	tcs := ts.Testcases()
 	for idx := range tcs {
@@ -162,7 +162,7 @@ func (ts Testset) IndexTestcase(ind int) *Testcase {
 	return &Testcase{VerdictName: VerdictDR}
 }
 
-func (ts Testset) Testcases() (testcases []*Testcase) {
+func (ts *Testset) Testcases() (testcases []*Testcase) {
 	testcaseCount := 0
 	for i := range ts.Groups {
 		testcaseCount += len(ts.Groups[i].Testcases)
@@ -198,7 +198,7 @@ func (ts *Testset) SetMemoryLimit(ml memory.Amount) {
 	}
 }
 
-func (ts Testset) Score() (res float64) {
+func (ts *Testset) Score() (res float64) {
 	for _, g := range ts.Groups {
 		res += g.Score()
 	}
@@ -206,7 +206,7 @@ func (ts Testset) Score() (res float64) {
 	return
 }
 
-func (ts Testset) MaxScore() (res float64) {
+func (ts *Testset) MaxScore() (res float64) {
 	for _, g := range ts.Groups {
 		res += g.MaxScore()
 	}
@@ -214,7 +214,7 @@ func (ts Testset) MaxScore() (res float64) {
 	return
 }
 
-func (ts Testset) FirstNonAC() int {
+func (ts *Testset) FirstNonAC() int {
 	until := 0
 	for _, g := range ts.Groups {
 		if g.FirstNonAC() != -1 {
@@ -226,7 +226,7 @@ func (ts Testset) FirstNonAC() int {
 	return -1
 }
 
-func (ts Testset) MaxMemoryUsage() memory.Amount {
+func (ts *Testset) MaxMemoryUsage() memory.Amount {
 	mx := memory.Amount(0)
 	for _, g := range ts.Groups {
 		if mx < g.MaxMemoryUsage() {
@@ -237,11 +237,11 @@ func (ts Testset) MaxMemoryUsage() memory.Amount {
 	return mx
 }
 
-func (ts Testset) IsAC() bool {
+func (ts *Testset) IsAC() bool {
 	return ts.FirstNonAC() == -1
 }
 
-func (ts Testset) MaxTimeSpent() time.Duration {
+func (ts *Testset) MaxTimeSpent() time.Duration {
 	mx := time.Duration(0)
 	for _, g := range ts.Groups {
 		if mx < g.MaxTimeSpent() {
@@ -272,7 +272,7 @@ func (g *Group) SetMemoryLimit(ml memory.Amount) {
 	}
 }
 
-func (g Group) Score() float64 {
+func (g *Group) Score() float64 {
 	sum := 0.0
 	for _, val := range g.Testcases {
 		sum += val.Score
@@ -303,7 +303,7 @@ func (g Group) Score() float64 {
 	return -1.0
 }
 
-func (g Group) MaxScore() float64 {
+func (g *Group) MaxScore() float64 {
 	sum := 0.0
 	for _, val := range g.Testcases {
 		sum += val.MaxScore
@@ -315,7 +315,7 @@ func (g Group) MaxScore() float64 {
 	return sum
 }
 
-func (g Group) FirstNonAC() int {
+func (g *Group) FirstNonAC() int {
 	for ind, val := range g.Testcases {
 		if val.VerdictName != VerdictAC && val.VerdictName != VerdictDR {
 			return ind + 1
@@ -325,11 +325,11 @@ func (g Group) FirstNonAC() int {
 	return -1
 }
 
-func (g Group) IsAC() bool {
+func (g *Group) IsAC() bool {
 	return g.FirstNonAC() == -1
 }
 
-func (g Group) MaxMemoryUsage() memory.Amount {
+func (g *Group) MaxMemoryUsage() memory.Amount {
 	mx := memory.Amount(0)
 	for _, val := range g.Testcases {
 		if mx < val.MemoryUsed {
@@ -340,7 +340,7 @@ func (g Group) MaxMemoryUsage() memory.Amount {
 	return mx
 }
 
-func (g Group) MaxTimeSpent() time.Duration {
+func (g *Group) MaxTimeSpent() time.Duration {
 	mx := time.Duration(0)
 	for _, val := range g.Testcases {
 		if mx < val.TimeSpent {
@@ -361,7 +361,7 @@ type Status struct {
 	Feedback       []Testset
 }
 
-func (v Status) Value() (driver.Value, error) {
+func (v *Status) Value() (driver.Value, error) {
 	buf := &bytes.Buffer{}
 
 	enc := json.NewEncoder(buf)

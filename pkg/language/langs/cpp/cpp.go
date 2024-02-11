@@ -51,21 +51,21 @@ func (c Cpp) DefaultFilename() string {
 }
 
 func (c Cpp) Compile(ctx context.Context, s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
-	err := sandbox.CreateFileFromSource(s, f.Name, f.Source)
+	err := sandbox.CreateFile(s, f)
 	if err != nil {
 		return nil, err
 	}
 
-	params := "main.cpp"
-	for _, f := range extras {
-		err := sandbox.CreateFileFromSource(s, f.Name, f.Source)
+	params := f.Name
+	for _, extra := range extras {
+		err := sandbox.CreateFile(s, extra)
 		if err != nil {
 			return nil, err
 		}
 
-		if !strings.HasSuffix(f.Name, ".h") {
+		if !strings.HasSuffix(extra.Name, ".h") {
 			params += " "
-			params += f.Name
+			params += extra.Name
 		}
 	}
 

@@ -16,7 +16,7 @@ import (
 type TaskYAML struct {
 	path string
 
-	exec executable.Executable
+	exec problems.Executable
 }
 
 func NewTaskYAML(path string) *TaskYAML {

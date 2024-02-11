@@ -78,10 +78,13 @@ func (d *Dummy) Run(ctx context.Context, config RunConfig, command string, comma
 	}
 
 	started := time.Now()
-	ctxWithTimeout, cancelFunc := context.WithTimeout(ctx, config.TimeLimit)
-	defer cancelFunc()
+	if config.TimeLimit > 0 {
+		ctxWithTimeout, cancelFunc := context.WithTimeout(ctx, config.TimeLimit)
+		defer cancelFunc()
+		ctx = ctxWithTimeout
+	}
 	commandMerged := append([]string{command}, commandArgs...)
-	cmd := exec.CommandContext(ctxWithTimeout, "bash", "-c", strings.Join(commandMerged, " "))
+	cmd := exec.CommandContext(ctx, "bash", "-c", strings.Join(commandMerged, " "))
 	cmd.Stdin = config.Stdin
 	cmd.Stdout = config.Stdout
 	cmd.Stderr = config.Stderr
@@ -108,7 +111,7 @@ func (d *Dummy) Run(ctx context.Context, config RunConfig, command string, comma
 	err := cmd.Run()
 	st.Time = time.Since(started)
 	if err != nil {
-		if errors.Is(err, context.Canceled) {
+		if errors.Is(err, context.DeadlineExceeded) { //TODO validate
 			st.Verdict = VerdictTL
 		} else if strings.HasPrefix(err.Error(), "exit status") || strings.HasPrefix(err.Error(), "signal:") { // TODO
 			st.Verdict = VerdictRE

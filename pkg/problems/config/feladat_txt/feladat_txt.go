@@ -143,7 +143,11 @@ func (p Problem) Files() []problems.File {
 }
 
 func (p Problem) GetTaskType() problems.TaskType {
-	return problems.NewTaskType("batch", evaluation.CompileCopyFile{}, evaluation.NewLinearEvaluator(evaluation.ACRunner{}))
+	return problems.NewTaskType(
+		"batch",
+		evaluation.CompileCheckSupported{},
+		evaluation.NewLinearEvaluator(evaluation.NewBasicRunner(evaluation.BasicRunnerWithChecker(p.Checker()))),
+	)
 }
 
 func Parse(fs afero.Fs, path string) (problems.Problem, error) {

@@ -58,7 +58,7 @@ func (j *Java) Rename(source sandbox.File) (*sandbox.File, string, error) {
 	if err != nil {
 		return nil, "", err
 	}
-	source.Source = bytes.NewBuffer(src)
+	source.Source = io.NopCloser(bytes.NewBuffer(src))
 
 	lst := classRegexp.FindSubmatch(src)
 	if len(lst) <= 1 {
@@ -88,14 +88,14 @@ func (j *Java) Compile(ctx context.Context, s sandbox.Sandbox, f sandbox.File, s
 		return nil, err
 	}
 
-	err = sandbox.CreateFileFromSource(s, renamed.Name, renamed.Source)
+	err = sandbox.CreateFile(s, *renamed)
 	if err != nil {
 		return nil, err
 	}
 
 	classPath := "."
 	for ind := range j.jars {
-		if err := sandbox.CreateFileFromSource(s, j.jars[ind].Name, bytes.NewBuffer(j.jars[ind].Contents)); err != nil {
+		if err := sandbox.CreateFile(s, sandbox.File{Name: j.jars[ind].Name, Source: io.NopCloser(bytes.NewBuffer(j.jars[ind].Contents))}); err != nil {
 			return nil, err
 		}
 		classPath += ":" + j.jars[ind].Name
@@ -122,13 +122,13 @@ func (j *Java) Compile(ctx context.Context, s sandbox.Sandbox, f sandbox.File, s
 }
 
 func (j *Java) Run(ctx context.Context, s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
-	if err := sandbox.CreateFileFromSource(s, binary.Name, binary.Source); err != nil {
+	if err := sandbox.CreateFile(s, binary); err != nil {
 		return nil, err
 	}
 
 	classPath := "."
 	for ind := range j.jars {
-		if err := sandbox.CreateFileFromSource(s, j.jars[ind].Name, bytes.NewBuffer(j.jars[ind].Contents)); err != nil {
+		if err := sandbox.CreateFile(s, sandbox.File{Name: j.jars[ind].Name, Source: io.NopCloser(bytes.NewBuffer(j.jars[ind].Contents))}); err != nil {
 			return nil, err
 		}
 		classPath += ":" + j.jars[ind].Name

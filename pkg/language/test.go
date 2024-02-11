@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
+	"io"
 	"testing"
 	"time"
 )
@@ -38,7 +39,7 @@ func (test Test) Run(s sandbox.Sandbox) error {
 	src := bytes.NewBufferString(test.Source)
 	stderr := &bytes.Buffer{}
 
-	compiledBinary, err := test.Language.Compile(context.TODO(), s, sandbox.File{test.Language.DefaultFilename(), src}, stderr, nil)
+	compiledBinary, err := test.Language.Compile(context.TODO(), s, sandbox.File{Name: test.Language.DefaultFilename(), Source: io.NopCloser(src)}, stderr, nil)
 	stderrContent := stderr.String()
 
 	if (test.ExpectedVerdict&sandbox.VerdictCE == 0 && err != nil) || (test.ExpectedVerdict&sandbox.VerdictCE != 0 && err == nil && stderrContent == "") {

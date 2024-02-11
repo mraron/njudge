@@ -75,8 +75,7 @@ func (w Worker) Judge(ctx context.Context, plogger *zap.Logger, p problems.Judge
 	go func() {
 		skeleton, _ := p.StatusSkeleton("")
 
-		bin, _ := io.ReadAll(compileRes.CompiledFile)
-		defer compileRes.CompiledFile.Close()
+		bin, _ := io.ReadAll(compileRes.CompiledFile.Source)
 
 		st, errRun = tt.Evaluate(context.Background(), *skeleton, evaluation.NewByteSolution(lang, bin), sandboxes, evaluation.IgnoreStatusUpdate{})
 		close(testNotifier)

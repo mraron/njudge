@@ -32,7 +32,7 @@ func (PyPy3) Run(ctx context.Context, s sandbox.Sandbox, binary sandbox.File, st
 	stat := sandbox.Status{}
 	stat.Verdict = sandbox.VerdictXX
 
-	if err := sandbox.CreateFileFromSource(s, binary.Name, binary.Source); err != nil {
+	if err := sandbox.CreateFile(s, binary); err != nil {
 		return nil, err
 	}
 

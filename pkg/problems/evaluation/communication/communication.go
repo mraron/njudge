@@ -53,7 +53,7 @@ func New() *Communication {
 		}
 		defer f.Close()
 
-		sandbox.CreateFileFromSource(interactorSandbox, "interactor", f)
+		sandbox.CreateFile(interactorSandbox, sandbox.File{"interactor", f})
 		interactorSandbox.MakeExecutable("interactor")
 
 		rc.Store["interactorSandbox"] = interactorSandbox
@@ -71,7 +71,7 @@ func New() *Communication {
 		}
 		defer testFile.Close()
 
-		err = sandbox.CreateFileFromSource(interactorSandbox, "inp", testFile)
+		err = sandbox.CreateFile(interactorSandbox, sandbox.File{"inp", testFile})
 		if err != nil {
 			tc.VerdictName = problems.VerdictXX
 			return sandbox.Status{}, err

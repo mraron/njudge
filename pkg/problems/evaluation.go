@@ -4,17 +4,16 @@ import (
 	"context"
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/language/sandbox"
-	"io"
 )
 
 type CompilationResult struct {
-	CompiledFile       io.ReadCloser
+	CompiledFile       *sandbox.File
 	CompilationMessage string
 }
 
 type Solution interface {
 	GetLanguage() language.Language
-	GetFile(ctx context.Context) (io.ReadCloser, error)
+	GetFile(ctx context.Context) (sandbox.File, error)
 }
 
 type Compiler interface {

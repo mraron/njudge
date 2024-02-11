@@ -29,7 +29,7 @@ func (Python3) Compile(ctx context.Context, s sandbox.Sandbox, f sandbox.File, s
 }
 
 func (Python3) Run(ctx context.Context, s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
-	if err := sandbox.CreateFileFromSource(s, binary.Name, binary.Source); err != nil {
+	if err := sandbox.CreateFile(s, binary); err != nil {
 		return nil, err
 	}
 

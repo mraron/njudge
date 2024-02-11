@@ -1,6 +1,7 @@
 package problems
 
 import (
+	"github.com/mraron/njudge/pkg/language/memory"
 	"testing"
 	"time"
 )
@@ -101,7 +102,7 @@ func TestGroup_MaxMemoryUsage(t *testing.T) {
 	tests := []struct {
 		name   string
 		fields fields
-		want   int
+		want   memory.Amount
 	}{
 		{"last", fields{Testcases: []Testcase{{MemoryUsed: 0}, {MemoryUsed: 2}}}, 2},
 		{"first", fields{Testcases: []Testcase{{MemoryUsed: 4}, {MemoryUsed: 2}}}, 4},

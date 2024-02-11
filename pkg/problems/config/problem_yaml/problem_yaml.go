@@ -240,19 +240,20 @@ func (p Problem) Files() []problems.File {
 }
 
 func (p Problem) GetTaskType() problems.TaskType {
+	tasktype := "batch"
+	if p.Tests.TaskType != "" {
+		tasktype = p.Tests.TaskType
+	}
+
+	if tasktype == "batch" {
+		return problems.NewTaskType(
+			"batch",
+			evaluation.CompileCheckSupported{},
+			evaluation.NewLinearEvaluator(evaluation.NewBasicRunner()),
+		)
+	}
+	//TODO: outputonly, stub and comm
 	return problems.NewTaskType("batch", evaluation.CompileCopyFile{}, evaluation.NewLinearEvaluator(evaluation.ACRunner{}))
-	/*
-		tasktype := "batch"
-		if p.Tests.TaskType != "" {
-			tasktype = p.Tests.TaskType
-		}
-
-		tt, err := problems.GetTaskType(tasktype)
-		if err != nil {
-			panic(err)
-		}
-
-		return tt*/
 }
 
 type config struct {

@@ -25,7 +25,7 @@ func (nim) DefaultFilename() string {
 }
 
 func (nim) Compile(ctx context.Context, s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
-	err := sandbox.CreateFileFromSource(s, f.Name, f.Source)
+	err := sandbox.CreateFile(s, f)
 	if err != nil {
 		return nil, err
 	}

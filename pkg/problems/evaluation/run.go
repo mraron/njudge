@@ -3,12 +3,14 @@ package evaluation
 import (
 	"bytes"
 	"context"
+	"errors"
 	"github.com/mraron/njudge/pkg/language"
-	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/mraron/njudge/pkg/problems"
+	"github.com/spf13/afero"
 	"io"
 	"os"
+	"path/filepath"
 )
 
 type ACRunner struct{}
@@ -29,8 +31,11 @@ type BasicRunner struct {
 	outputFile string
 	checker    problems.Checker
 
-	lang language.Language
-	bin  []byte
+	lang    language.Language
+	binName string
+	bin     []byte
+
+	fs afero.Fs
 }
 
 type BasicRunnerOption func(r *BasicRunner)
@@ -48,9 +53,16 @@ func BasicRunnerWithChecker(c problems.Checker) BasicRunnerOption {
 	}
 }
 
+func BasicRunnerWithFs(fs afero.Fs) BasicRunnerOption {
+	return func(r *BasicRunner) {
+		r.fs = fs
+	}
+}
+
 func NewBasicRunner(options ...BasicRunnerOption) *BasicRunner {
 	res := &BasicRunner{
 		maxSizeInTestcase: 1 << 6,
+		fs:                afero.NewOsFs(),
 	}
 	for _, opt := range options {
 		opt(res)
@@ -61,63 +73,51 @@ func NewBasicRunner(options ...BasicRunnerOption) *BasicRunner {
 func (r *BasicRunner) SetSolution(ctx context.Context, solution problems.Solution) error {
 	r.lang = solution.GetLanguage()
 
-	rc, err := solution.GetFile(ctx)
+	file, err := solution.GetFile(ctx)
 	if err != nil {
 		return err
 	}
-	defer func() {
-		_ = rc.Close()
-	}()
 
-	r.bin, err = io.ReadAll(rc)
-	return err
+	r.binName = file.Name
+	r.bin, err = io.ReadAll(file.Source)
+	return errors.Join(err, file.Source.Close())
 }
 
 func (r *BasicRunner) prepareIO(s sandbox.Sandbox, testcase *problems.Testcase) (io.ReadCloser, io.WriteCloser, error) {
-	inputFile, err := os.Open(testcase.InputPath)
+	inputFile, err := r.fs.Open(testcase.InputPath)
 	if err != nil {
 		return nil, nil, err
 	}
-	defer func(inputFile *os.File) {
-		_ = inputFile.Close()
-	}(inputFile)
 
 	var (
 		sandboxInput  io.ReadCloser  = inputFile
 		sandboxOutput io.WriteCloser = nil
 	)
 	if r.inputFile != "" {
-		if err = sandbox.CreateFileFromSource(s, r.inputFile, inputFile); err != nil {
+		//TODO maybe link it with restricted permissions?
+		if err = sandbox.CreateFile(s, sandbox.File{Name: r.inputFile, Source: inputFile}); err != nil {
 			return nil, nil, err
 		}
-		if sandboxInput, err = s.Open(r.inputFile); err != nil {
-			return nil, nil, err
-		}
+		sandboxInput = nil
 	}
 
 	if r.outputFile == "" {
 		r.outputFile = "output"
-	}
-	if sandboxOutput, err = s.Create(r.outputFile); err != nil {
-		_ = sandboxInput.Close()
-		return nil, nil, err
+		if sandboxOutput, err = s.Create(r.outputFile); err != nil {
+			return sandboxInput, nil, err
+		}
 	}
 
 	return sandboxInput, sandboxOutput, nil
 }
 
-func (r *BasicRunner) getFilePrefix(name string) ([]byte, error) {
-	f, err := os.Open(name)
-	if err != nil {
-		return nil, err
-	}
-	defer func(f *os.File) {
-		_ = f.Close()
-	}(f)
-
+func (r *BasicRunner) getReadCloserPrefix(closer io.ReadCloser) ([]byte, error) {
 	buf := make([]byte, r.maxSizeInTestcase)
-	n, err := f.Read(buf)
-	if err != nil {
+	n, err := closer.Read(buf)
+	defer func(closer io.ReadCloser) {
+		_ = closer.Close()
+	}(closer)
+	if err != nil && !errors.Is(err, io.EOF) {
 		return nil, err
 	}
 
@@ -128,41 +128,81 @@ func (r *BasicRunner) getFilePrefix(name string) ([]byte, error) {
 	return buf, nil
 }
 
+func (r *BasicRunner) setOutputExpectedOutput(s sandbox.Sandbox, testcase *problems.Testcase) error {
+	var (
+		expectedOutput []byte
+		output         []byte
+
+		err error
+	)
+
+	answerFile, err := r.fs.Open(testcase.AnswerPath)
+	if err != nil {
+		return err
+	}
+	if expectedOutput, err = r.getReadCloserPrefix(answerFile); err != nil {
+		return err
+	}
+
+	outputFile, err := s.Open(filepath.Base(testcase.OutputPath))
+	if output, err = r.getReadCloserPrefix(outputFile); err != nil {
+		return err
+	}
+
+	testcase.ExpectedOutput = string(expectedOutput)
+	testcase.Output = string(output)
+	return nil
+}
+
 func (r *BasicRunner) Run(ctx context.Context, sandboxProvider sandbox.Provider, testcase *problems.Testcase) error {
 	s, err := sandboxProvider.Get()
 	if err != nil {
 		return err
 	}
 	defer sandboxProvider.Put(s)
+	if err = s.Init(ctx); err != nil {
+		return err
+	}
+	defer func(s sandbox.Sandbox, ctx context.Context) {
+		_ = s.Cleanup(ctx)
+	}(s, ctx)
 
 	sandboxInput, sandboxOutput, err := r.prepareIO(s, testcase)
+	if err != nil {
+		return err
+	}
 	defer func(sandboxInput io.ReadCloser, sandboxOutput io.WriteCloser) {
-		_ = sandboxInput.Close()
-		_ = sandboxOutput.Close()
+		if sandboxInput != nil {
+			_ = sandboxInput.Close()
+		}
+		if sandboxOutput != nil {
+			_ = sandboxOutput.Close()
+		}
 	}(sandboxInput, sandboxOutput)
 
-	status, err := r.lang.Run(context.TODO(), s, sandbox.File{
-		"a.out", //@TODO
-		bytes.NewBuffer(r.bin),
-	}, sandboxInput, sandboxOutput, testcase.TimeLimit, memory.Amount(testcase.MemoryLimit))
+	status, err := r.lang.Run(ctx, s, sandbox.File{
+		Name:   r.binName,
+		Source: io.NopCloser(bytes.NewBuffer(r.bin)),
+	}, sandboxInput, sandboxOutput, testcase.TimeLimit, testcase.MemoryLimit)
 
-	testcase.OutputPath = (sandboxOutput.(*os.File)).Name()
+	if sandboxOutput != nil {
+		testcase.OutputPath = (sandboxOutput.(*os.File)).Name()
+	} else {
+		testcase.OutputPath = filepath.Join(s.Pwd(), r.outputFile)
+		if _, err := os.Stat(testcase.OutputPath); errors.Is(err, os.ErrNotExist) {
+			if f, err := os.Create(testcase.OutputPath); err != nil {
+				return err
+			} else {
+				_ = f.Close()
+			}
+		}
+	}
 	testcase.TimeSpent = status.Time
-	testcase.MemoryLimit = status.Memory
+	testcase.MemoryUsed = status.Memory
 
-	var (
-		expectedOutput []byte
-		output         []byte
-	)
-	if expectedOutput, err = r.getFilePrefix(testcase.AnswerPath); err != nil {
+	if err = r.setOutputExpectedOutput(s, testcase); err != nil {
 		return err
 	}
-	if output, err = r.getFilePrefix(testcase.OutputPath); err != nil {
-		return err
-	}
-
-	testcase.ExpectedOutput = string(expectedOutput)
-	testcase.Output = string(output)
 
 	switch status.Verdict {
 	case sandbox.VerdictOK:

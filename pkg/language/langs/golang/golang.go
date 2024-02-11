@@ -25,7 +25,7 @@ func (Golang) DefaultFilename() string {
 }
 
 func (Golang) Compile(ctx context.Context, s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
-	err := sandbox.CreateFileFromSource(s, f.Name, f.Source)
+	err := sandbox.CreateFile(s, f)
 	if err != nil {
 		return nil, err
 	}

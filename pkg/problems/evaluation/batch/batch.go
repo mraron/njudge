@@ -78,7 +78,7 @@ func PrepareFiles(ctx *CompileContext) (sandbox.File, []sandbox.File, error) {
 		return sandbox.File{}, nil, fmt.Errorf("language %s is not supported", ctx.Lang.ID())
 	}
 
-	return sandbox.File{Name: ctx.Lang.DefaultFilename(), Source: ctx.Source}, nil, nil
+	return sandbox.File{Name: ctx.Lang.DefaultFilename(), Source: io.NopCloser(ctx.Source)}, nil, nil
 }
 
 func Init(*RunContext) error {
@@ -103,7 +103,7 @@ func Run(ctx *RunContext, group *problems.Group, testcase *problems.Testcase) (s
 	defer answerFile.Close()
 
 	if inputFile != "" {
-		if err := sandbox.CreateFileFromSource(ctx.Sandbox, inputFile, input); err != nil {
+		if err := sandbox.CreateFile(ctx.Sandbox, sandbox.File{inputFile, input}); err != nil {
 			testcase.VerdictName = problems.VerdictXX
 			return sandbox.Status{}, err
 		}
@@ -112,7 +112,7 @@ func Run(ctx *RunContext, group *problems.Group, testcase *problems.Testcase) (s
 
 	res, err := ctx.Lang.Run(context.TODO(), ctx.Sandbox, sandbox.File{
 		"a.out",
-		bytes.NewReader(ctx.Binary),
+		io.NopCloser(bytes.NewReader(ctx.Binary)),
 	}, input, ctx.Stdout, testcase.TimeLimit, memory.Amount(testcase.MemoryLimit))
 
 	if err != nil {

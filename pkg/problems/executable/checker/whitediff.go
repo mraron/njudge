@@ -3,8 +3,8 @@ package checker
 import (
 	"context"
 	"errors"
+	"github.com/spf13/afero"
 	"io"
-	"os"
 	"strings"
 
 	"github.com/karrick/gobls"
@@ -14,26 +14,54 @@ import (
 // Whitediff is the [default checker] built into CMS
 //
 // [default checker]: https://cms.readthedocs.io/en/v1.4/Task%20types.html#tasktypes-white-diff
-type Whitediff struct{}
+type Whitediff struct {
+	answerFs afero.Fs
+	outputFs afero.Fs
+}
+
+type WhitediffOption func(*Whitediff)
+
+func WhiteDiffWithFs(answerFs, outputFs afero.Fs) WhitediffOption {
+	return func(whitediff *Whitediff) {
+		whitediff.answerFs = answerFs
+		whitediff.outputFs = outputFs
+	}
+}
+
+func NewWhitediff(opts ...WhitediffOption) Whitediff {
+	res := Whitediff{
+		answerFs: afero.NewOsFs(),
+		outputFs: afero.NewOsFs(),
+	}
+	for _, opt := range opts {
+		opt(&res)
+	}
+
+	return res
+}
 
 func (Whitediff) Name() string {
 	return "whitediff"
 }
 
-func (Whitediff) Check(ctx context.Context, testcase *problems.Testcase) error {
+func (w Whitediff) Check(ctx context.Context, testcase *problems.Testcase) error {
 	tc := testcase
 
-	ans, err := os.Open(tc.AnswerPath)
+	ans, err := w.answerFs.Open(tc.AnswerPath)
 	if err != nil {
 		return errors.Join(err, ans.Close())
 	}
-	defer ans.Close()
+	defer func(ans afero.File) {
+		_ = ans.Close()
+	}(ans)
 
-	out, err := os.Open(tc.OutputPath)
+	out, err := w.outputFs.Open(tc.OutputPath)
 	if err != nil {
 		return errors.Join(err, out.Close())
 	}
-	defer out.Close()
+	defer func(out afero.File) {
+		_ = out.Close()
+	}(out)
 
 	outcome, err := DoWhitediff(ans, out)
 	tc.Score = outcome * tc.MaxScore

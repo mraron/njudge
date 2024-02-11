@@ -116,17 +116,17 @@ ayaya;
 		},
 	}
 
-	for ind := range tests {
-		t.Run(tests[ind].name, func(t *testing.T) {
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
 			fs := afero.NewMemMapFs()
-			afero.WriteFile(fs, filepath.Join(tests[ind].path, "feladat.txt"), []byte(tests[ind].configFile), 0777)
+			_ = afero.WriteFile(fs, filepath.Join(tc.path, "feladat.txt"), []byte(tc.configFile), 0777)
 
-			afero.WriteFile(fs, filepath.Join(tests[ind].path, "feladat.pdf"), []byte(""), 0777)
-			afero.WriteFile(fs, filepath.Join(tests[ind].path, "minta.zip"), []byte(""), 0777)
-			afero.WriteFile(fs, filepath.Join(tests[ind].path, "ellen.cpp"), []byte("main(){}"), 0777)
+			_ = afero.WriteFile(fs, filepath.Join(tc.path, "feladat.pdf"), []byte(""), 0777)
+			_ = afero.WriteFile(fs, filepath.Join(tc.path, "minta.zip"), []byte(""), 0777)
+			_ = afero.WriteFile(fs, filepath.Join(tc.path, "ellen.cpp"), []byte("main(){}"), 0777)
 
-			p, err := feladat_txt.Parse(fs, tests[ind].path)
-			tests[ind].check(t, p, err)
+			p, err := feladat_txt.Parse(fs, tc.path)
+			tc.check(t, p, err)
 		})
 	}
 
