@@ -3,6 +3,7 @@ package sandbox_test
 import (
 	"context"
 	"flag"
+	"github.com/mraron/njudge/pkg/language/internal/testutils"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/stretchr/testify/assert"
 	"log/slog"
@@ -13,6 +14,10 @@ import (
 var verbose = flag.Bool("verbose", false, "log sandbox")
 
 func TestIsolate_Run(t *testing.T) {
+	if !*testutils.UseIsolate {
+		t.Skip("-isolate is not set")
+	}
+
 	testcases := []struct {
 		name        string
 		config      sandbox.RunConfig
