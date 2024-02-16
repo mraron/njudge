@@ -15,11 +15,11 @@ import (
 
 type ACRunner struct{}
 
-func (a ACRunner) SetSolution(ctx context.Context, solution problems.Solution) error {
+func (a ACRunner) SetSolution(_ context.Context, _ problems.Solution) error {
 	return nil
 }
 
-func (a ACRunner) Run(ctx context.Context, sandboxProvider sandbox.Provider, testcase *problems.Testcase) error {
+func (a ACRunner) Run(_ context.Context, _ sandbox.Provider, testcase *problems.Testcase) error {
 	testcase.VerdictName = problems.VerdictAC
 	return nil
 }
