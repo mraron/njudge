@@ -70,6 +70,15 @@ func NewBasicRunner(options ...BasicRunnerOption) *BasicRunner {
 	return res
 }
 
+var defaultOutputFile = "output"
+
+func (r *BasicRunner) getOutputFile() string {
+	if r.outputFile == "" {
+		return defaultOutputFile
+	}
+	return r.outputFile
+}
+
 func (r *BasicRunner) SetSolution(ctx context.Context, solution problems.Solution) error {
 	r.lang = solution.GetLanguage()
 
@@ -102,8 +111,7 @@ func (r *BasicRunner) prepareIO(s sandbox.Sandbox, testcase *problems.Testcase) 
 	}
 
 	if r.outputFile == "" {
-		r.outputFile = "output"
-		if sandboxOutput, err = s.Create(r.outputFile); err != nil {
+		if sandboxOutput, err = s.Create(r.getOutputFile()); err != nil {
 			return sandboxInput, nil, err
 		}
 	}
@@ -188,7 +196,7 @@ func (r *BasicRunner) Run(ctx context.Context, sandboxProvider sandbox.Provider,
 	if sandboxOutput != nil {
 		testcase.OutputPath = (sandboxOutput.(*os.File)).Name()
 	} else {
-		testcase.OutputPath = filepath.Join(s.Pwd(), r.outputFile)
+		testcase.OutputPath = filepath.Join(s.Pwd(), r.getOutputFile())
 		if _, err := os.Stat(testcase.OutputPath); errors.Is(err, os.ErrNotExist) {
 			if f, err := os.Create(testcase.OutputPath); err != nil {
 				return err

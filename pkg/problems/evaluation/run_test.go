@@ -177,3 +177,31 @@ with open('kimenet', 'w') as w:
 		})
 	}
 }
+
+func TestBasicRunnerMultipleRuns(t *testing.T) {
+	s, err := sandbox.NewDummy()
+	assert.Nil(t, err)
+
+	fs := afero.NewMemMapFs()
+	assert.Nil(t, afero.WriteFile(fs, "input", []byte("1 2 3\n"), 0644))
+	assert.Nil(t, afero.WriteFile(fs, "answer", []byte("6\n"), 0644))
+
+	sol := evaluation.NewByteSolution(python3.Python3{}, []byte(`a,b,c = [int(x) for x in input().split()]
+print(a+b+c, '   \n')`))
+	br := evaluation.NewBasicRunner(
+		evaluation.BasicRunnerWithFs(fs),
+		evaluation.BasicRunnerWithChecker(checker.NewWhitediff(checker.WhiteDiffWithFs(fs, afero.NewOsFs()))),
+	)
+
+	assert.Nil(t, br.SetSolution(context.Background(), sol))
+	tc := &problems.Testcase{
+		InputPath:  "input",
+		AnswerPath: "answer",
+	}
+
+	assert.Nil(t, br.Run(context.Background(), sandbox.NewSandboxProvider().Put(s), tc))
+	assert.Equal(t, problems.VerdictAC, tc.VerdictName)
+	tc.VerdictName = problems.VerdictDR
+	assert.Nil(t, br.Run(context.Background(), sandbox.NewSandboxProvider().Put(s), tc))
+	assert.Equal(t, problems.VerdictAC, tc.VerdictName)
+}

@@ -8,8 +8,7 @@ import (
 )
 
 type LinearEvaluator struct {
-	testset string
-	runner  problems.Runner
+	runner problems.Runner
 }
 
 func NewLinearEvaluator(runner problems.Runner) *LinearEvaluator {
