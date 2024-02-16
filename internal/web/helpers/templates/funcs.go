@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/mraron/njudge/pkg/language/memory"
 	"html/template"
 	"math"
 	"strconv"
@@ -101,6 +102,9 @@ func statelessFuncs(store problems.Store, users njudge.Users, ps njudge.Problems
 		},
 		"divide": func(a, b int) int {
 			return a / b
+		},
+		"memoryInMiB": func(m memory.Amount) int {
+			return int(m / memory.MiB)
 		},
 		"toString": func(b interface{}) string {
 			switch b := b.(type) {

@@ -53,7 +53,7 @@
             <div class="col-6">{{Tr "Time limit"}}:</div>
             <div class="col-6">{{.Data.ProblemStoredData.TimeLimit}} ms</div>
             <div class="col-6">{{Tr "Memory limit"}}:</div>
-            <div class="col-6">{{divide .Data.ProblemStoredData.MemoryLimit 1048576}} MiB</div>
+            <div class="col-6">{{memoryInMiB .Data.ProblemStoredData.MemoryLimit}} MiB</div>
             {{end}}
             {{$userInfo := .Data.ProblemInfo.UserInfo}}
             
@@ -94,7 +94,7 @@
             <br>{{$lastLang := .Data.ProblemInfo.UserInfo.LastLanguage}}
             <select name="language" class="custom-select form-control" id="languagesList">
                 {{range $l := .Data.ProblemStoredData.Languages}}
-                    <option value="{{$l.Id}}"{{if eq $lastLang $l.Id}} selected="selected"{{end}}>{{$l.Name}}</option>
+                    <option value="{{$l.ID}}"{{if eq $lastLang $l.ID}} selected="selected"{{end}}>{{$l.DisplayName}}</option>
                 {{end}}
             </select>
             <br><br>
