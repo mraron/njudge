@@ -126,7 +126,7 @@ func (p Problem) Tags() []string {
 }
 
 func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
-	ans := problems.Status{Compiled: false, CompilerOutput: "status skeleton", FeedbackType: problems.FeedbackFromString(p.Tests.FeedbackType), Feedback: make([]problems.Testset, 0)}
+	ans := problems.Status{Compiled: false, CompilerOutput: "status skeleton", FeedbackType: problems.FeedbackTypeFromShortString(p.Tests.FeedbackType), Feedback: make([]problems.Testset, 0)}
 	ans.Feedback = append(ans.Feedback, problems.Testset{Name: "tests"})
 
 	getIthIO := func(typ string, index int, pattern string, gindex int, gpattern string, list []string) (string, error) {
@@ -253,7 +253,7 @@ func (p Problem) GetTaskType() problems.TaskType {
 }
 
 type config struct {
-	compileBinaries bool
+	compileBinaries bool //TODO respect this
 }
 
 func newConfig() *config {

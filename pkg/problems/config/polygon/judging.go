@@ -162,7 +162,7 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	return &problems.Status{
 		Compiled:       false,
 		CompilerOutput: "status skeleton",
-		FeedbackType:   problems.FeedbackFromString(p.FeedbackType),
+		FeedbackType:   problems.FeedbackTypeFromShortString(p.FeedbackType),
 		Feedback:       feedback,
 	}, nil
 }

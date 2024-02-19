@@ -53,7 +53,7 @@ var TestProblemCmd = &cobra.Command{
 			fmt.Println(test.Group, test.Index, test.VerdictName, test.Score, test.MaxScore)
 		}
 		fmt.Println(st.Feedback[0].Verdict(), st.Feedback[0].Score(), "/", st.Feedback[0].MaxScore())
-		fmt.Println(st.FeedbackType.String())
+		fmt.Println(st.FeedbackType)
 
 		if TestProblemArgs.Verbose > 0 {
 			res, err := json.Marshal(st)

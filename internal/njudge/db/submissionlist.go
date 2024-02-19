@@ -28,7 +28,7 @@ func (s *SubmissionListQuery) getSubmissionList(ctx context.Context, req njudge.
 	}
 
 	if req.Verdict != nil {
-		filterMods = append(filterMods, models.SubmissionWhere.Verdict.EQ(int(*req.Verdict)))
+		filterMods = append(filterMods, models.SubmissionWhere.Verdict.EQ(NjudgeVerdictToDatabase(*req.Verdict)))
 	}
 
 	if req.Problemset != "" || req.Problem != "" {

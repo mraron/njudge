@@ -33,7 +33,7 @@ func (ss *Submissions) toModel(ctx context.Context, s njudge.Submission) (*model
 		Private:   s.Private,
 
 		Started:   s.Started,
-		Verdict:   int(s.Verdict),
+		Verdict:   NjudgeVerdictToDatabase(s.Verdict),
 		Ontest:    s.Ontest,
 		Submitted: s.Submitted,
 		Judged:    s.Judged,
@@ -64,7 +64,7 @@ func (ss *Submissions) toNjudge(ctx context.Context, s *models.Submission) (*nju
 		Private:   s.Private,
 
 		Started:   s.Started,
-		Verdict:   njudge.Verdict(s.Verdict),
+		Verdict:   DatabaseVerdictToNjudge(s.Verdict),
 		Ontest:    s.Ontest,
 		Submitted: s.Submitted,
 		Judged:    s.Judged,

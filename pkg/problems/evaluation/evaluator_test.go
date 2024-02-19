@@ -92,7 +92,7 @@ func TestLinearEvaluator_Evaluate(t *testing.T) {
 				sandboxProvider:  sandbox.NewSandboxProvider().Put(s),
 				statusUpdater:    evaluation.IgnoreStatusUpdate{},
 			},
-			want:    []problems.VerdictName{0, 0, 0},
+			want:    []problems.VerdictName{problems.VerdictAC, problems.VerdictAC, problems.VerdictAC},
 			wantErr: assert.NoError,
 		},
 		{
@@ -168,7 +168,7 @@ print(a+b+3)`)),
 				sandboxProvider: sandbox.NewSandboxProvider().Put(s),
 				statusUpdater:   evaluation.IgnoreStatusUpdate{},
 			},
-			want:    []problems.VerdictName{0, 0, 1},
+			want:    []problems.VerdictName{problems.VerdictAC, problems.VerdictAC, problems.VerdictWA},
 			wantErr: assert.NoError,
 		},
 	}

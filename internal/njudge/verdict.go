@@ -5,22 +5,23 @@ import (
 	"github.com/mraron/njudge/pkg/problems"
 )
 
-type Verdict int
+type Verdict string
 
 const (
-	VerdictAC = Verdict(problems.VerdictAC)
-	VerdictWA = Verdict(problems.VerdictWA)
-	VerdictRE = Verdict(problems.VerdictRE)
-	VerdictTL = Verdict(problems.VerdictTL)
-	VerdictML = Verdict(problems.VerdictML)
-	VerdictXX = Verdict(problems.VerdictXX)
-	VerdictDR = Verdict(problems.VerdictDR)
-	VerdictPC = Verdict(problems.VerdictPC)
-	VerdictPE = Verdict(problems.VerdictPE)
+	VerdictUnknown = Verdict(problems.VerdictUnknown)
+	VerdictAC      = Verdict(problems.VerdictAC)
+	VerdictWA      = Verdict(problems.VerdictWA)
+	VerdictRE      = Verdict(problems.VerdictRE)
+	VerdictTL      = Verdict(problems.VerdictTL)
+	VerdictML      = Verdict(problems.VerdictML)
+	VerdictXX      = Verdict(problems.VerdictXX)
+	VerdictDR      = Verdict(problems.VerdictDR)
+	VerdictPC      = Verdict(problems.VerdictPC)
+	VerdictPE      = Verdict(problems.VerdictPE)
 
-	VerdictCE Verdict = 998
-	VerdictRU Verdict = 999
-	VerdictUP Verdict = 1000
+	VerdictCE Verdict = "CE"
+	VerdictRU Verdict = "RU"
+	VerdictUP Verdict = "UP"
 )
 
 func VerdictFromProblemsVerdictName(name problems.VerdictName) Verdict {

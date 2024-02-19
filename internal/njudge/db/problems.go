@@ -4,8 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/mraron/njudge/pkg/problems"
-
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/njudge/db/models"
 	"github.com/volatiletech/null/v8"
@@ -286,7 +284,7 @@ func (ss *SolvedStatusQuery) GetSolvedStatus(ctx context.Context, problemID, use
 
 	cnt, err := models.Submissions(
 		models.SubmissionWhere.ProblemID.EQ(problemID),
-		models.SubmissionWhere.Verdict.EQ(int(problems.VerdictAC)),
+		models.SubmissionWhere.Verdict.EQ(NjudgeVerdictToDatabase(njudge.VerdictAC)),
 		models.SubmissionWhere.UserID.EQ(userID),
 	).Count(ctx, ss.db)
 
