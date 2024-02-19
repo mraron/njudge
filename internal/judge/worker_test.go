@@ -19,14 +19,14 @@ import (
 func TestWorker(t *testing.T) {
 	tests := []struct {
 		Name              string
-		Judgeable         func() problems.Judgeable
+		Judgeable         func() problems.EvaluationInfo
 		JudgeReturnStatus problems.Status
 		JudgeReturnErr    error
 		Responses         []judge.Response
 	}{
 		{
 			"TestWorkerRunning",
-			func() problems.Judgeable {
+			func() problems.EvaluationInfo {
 				var tasktype problemsMock.TaskType
 				tasktype.On("Compile", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, nil)
 				tasktype.On("Run", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
@@ -52,7 +52,7 @@ func TestWorker(t *testing.T) {
 		},
 		{
 			"TestWorkerCompileError",
-			func() problems.Judgeable {
+			func() problems.EvaluationInfo {
 				var tasktype problemsMock.TaskType
 				tasktype.On("Compile", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
 					w := args.Get(4).(io.Writer)

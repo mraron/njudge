@@ -22,7 +22,7 @@ func NewWorker(id int, sandboxProvider *sandbox.ChanProvider) *Worker {
 	return &Worker{id: id, sandboxProvider: sandboxProvider}
 }
 
-func (w Worker) Judge(ctx context.Context, plogger *zap.Logger, p problems.Judgeable, src []byte, lang language.Language, c Callbacker) (st problems.Status, err error) {
+func (w Worker) Judge(ctx context.Context, plogger *zap.Logger, p problems.EvaluationInfo, src []byte, lang language.Language, c Callbacker) (st problems.Status, err error) {
 	logger := plogger.With(zap.Int("worker", w.id))
 	logger.Info("started to judge")
 
@@ -51,7 +51,7 @@ func (w Worker) Judge(ctx context.Context, plogger *zap.Logger, p problems.Judge
 
 	logger.Info("compiling")
 	compileSandbox, _ := sandboxes.Get()
-	compileRes, err := tt.Compile(context.Background(), p, evaluation.NewByteSolution(lang, src), compileSandbox)
+	compileRes, err := tt.Compile(context.Background(), evaluation.NewByteSolution(lang, src), compileSandbox)
 	sandboxes.Put(compileSandbox)
 
 	if err != nil {

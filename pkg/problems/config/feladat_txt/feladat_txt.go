@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/problems/evaluation"
+	"github.com/mraron/njudge/pkg/problems/evaluation/batch"
 	"github.com/mraron/njudge/pkg/problems/executable/checker"
 	"os"
 	"path/filepath"
@@ -138,16 +139,15 @@ func (p Problem) Checker() problems.Checker {
 	return checker.NewEllen(filepath.Join(p.Path, "ellen"), p.Path, p.TestCount, p.Points)
 }
 
-func (p Problem) Files() []problems.File {
-	return make([]problems.File, 0)
+func (p Problem) EvaluationFiles() []problems.EvaluationFile {
+	return make([]problems.EvaluationFile, 0)
 }
 
 func (p Problem) GetTaskType() problems.TaskType {
-	return problems.NewTaskType(
-		"batch",
-		evaluation.CompileCheckSupported{},
-		evaluation.NewLinearEvaluator(evaluation.NewBasicRunner(evaluation.BasicRunnerWithChecker(p.Checker()))),
-	)
+	return batch.New(evaluation.CompileCheckSupported{
+		List:         p.Languages(),
+		NextCompiler: evaluation.Compile{},
+	}, evaluation.BasicRunnerWithChecker(p.Checker()))
 }
 
 func Parse(fs afero.Fs, path string) (problems.Problem, error) {

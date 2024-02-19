@@ -1,4 +1,4 @@
-// Package problems contains utilities useful for parsing, displaying, judging (submission for) problems
+// Package problems contains utilities useful for parsing, displaying, judging (a submission for) problems
 package problems
 
 import (
@@ -6,12 +6,6 @@ import (
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/language/memory"
 )
-
-type File struct {
-	Name string
-	Role string
-	Path string
-}
 
 type Problem interface {
 	Name() string
@@ -23,15 +17,20 @@ type Problem interface {
 	Attachments() Attachments
 	Tags() []string
 
-	Judgeable
+	EvaluationInfo
 }
 
-type Judgeable interface {
-	Checker() Checker
+type EvaluationFile struct {
+	Name string
+	Role string
+	Path string
+}
+
+type EvaluationInfo interface {
 	InputOutputFiles() (string, string)
 	Languages() []language.Language
 	StatusSkeleton(testset string) (*Status, error)
-	Files() []File
+	EvaluationFiles() []EvaluationFile
 	GetTaskType() TaskType
 }
 

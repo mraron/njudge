@@ -17,7 +17,7 @@ type Solution interface {
 }
 
 type Compiler interface {
-	Compile(ctx context.Context, problem Judgeable, solution Solution, sandbox sandbox.Sandbox) (*CompilationResult, error)
+	Compile(ctx context.Context, solution Solution, sandbox sandbox.Sandbox) (*CompilationResult, error)
 }
 
 type StatusUpdater interface {

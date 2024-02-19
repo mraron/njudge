@@ -66,15 +66,15 @@ func (_c *Judgeable_Checker_Call) RunAndReturn(run func() problems.Checker) *Jud
 }
 
 // Files provides a mock function with given fields:
-func (_m *Judgeable) Files() []problems.File {
+func (_m *Judgeable) EvaluationFiles() []problems.EvaluationFile {
 	ret := _m.Called()
 
-	var r0 []problems.File
-	if rf, ok := ret.Get(0).(func() []problems.File); ok {
+	var r0 []problems.EvaluationFile
+	if rf, ok := ret.Get(0).(func() []problems.EvaluationFile); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]problems.File)
+			r0 = ret.Get(0).([]problems.EvaluationFile)
 		}
 	}
 
@@ -98,12 +98,12 @@ func (_c *Judgeable_Files_Call) Run(run func()) *Judgeable_Files_Call {
 	return _c
 }
 
-func (_c *Judgeable_Files_Call) Return(_a0 []problems.File) *Judgeable_Files_Call {
+func (_c *Judgeable_Files_Call) Return(_a0 []problems.EvaluationFile) *Judgeable_Files_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Judgeable_Files_Call) RunAndReturn(run func() []problems.File) *Judgeable_Files_Call {
+func (_c *Judgeable_Files_Call) RunAndReturn(run func() []problems.EvaluationFile) *Judgeable_Files_Call {
 	_c.Call.Return(run)
 	return _c
 }

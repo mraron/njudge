@@ -3,6 +3,9 @@ package polygon
 import (
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/problems/evaluation"
+	"github.com/mraron/njudge/pkg/problems/evaluation/batch"
+	"github.com/mraron/njudge/pkg/problems/evaluation/communication"
+	"github.com/mraron/njudge/pkg/problems/evaluation/output_only"
 	"path/filepath"
 
 	"github.com/mraron/njudge/pkg/language"
@@ -132,14 +135,14 @@ func (p Problem) Languages() []language.Language {
 	return language.ListExcept(language.DefaultStore, []string{"zip"})
 }
 
-func (p Problem) Files() []problems.File {
-	res := make([]problems.File, 0)
+func (p Problem) EvaluationFiles() []problems.EvaluationFile {
+	res := make([]problems.EvaluationFile, 0)
 	for _, stub := range p.Assets.Stubs {
-		res = append(res, problems.File{Name: stub.Name, Role: "stub_" + stub.Language, Path: filepath.Join(p.Path, stub.Path)})
+		res = append(res, problems.EvaluationFile{Name: stub.Name, Role: "stub_" + stub.Language, Path: filepath.Join(p.Path, stub.Path)})
 	}
 
 	if p.Assets.Interactor.Source.Path != "" {
-		res = append(res, problems.File{Name: "interactor", Role: "interactor", Path: filepath.Join(p.Path, "files", "interactor")})
+		res = append(res, problems.EvaluationFile{Name: "interactor", Role: "interactor", Path: filepath.Join(p.Path, "files", "interactor")})
 	}
 
 	return res
@@ -147,17 +150,19 @@ func (p Problem) Files() []problems.File {
 
 func (p Problem) GetTaskType() problems.TaskType {
 	if p.Assets.Interactor.Source.Path != "" {
-		return problems.NewTaskType("communication", evaluation.CompileCopyFile{}, evaluation.NewLinearEvaluator(evaluation.ACRunner{})) //TODO
+		return communication.New(evaluation.CompileCheckSupported{
+			List:         p.Languages(),
+			NextCompiler: evaluation.Compile{},
+		}, []byte("@TODO"), p.Checker())
 	}
-	if p.TaskType == "" || p.TaskType == "batch" {
-		return problems.NewTaskType(
-			"batch",
-			evaluation.CompileCheckSupported{},
-			evaluation.NewLinearEvaluator(
-				evaluation.NewBasicRunner(evaluation.BasicRunnerWithChecker(p.Checker())),
-			),
-		)
+	if p.TaskType == "outputonly" {
+		return output_only.New(p.Checker())
 	}
-	//TODO stub, outputonly
-	return problems.NewTaskType("batch", evaluation.CompileCopyFile{}, evaluation.NewLinearEvaluator(evaluation.ACRunner{}))
+	if p.TaskType == "stub" {
+		panic("TODO")
+	}
+	return batch.New(evaluation.CompileCheckSupported{
+		List:         p.Languages(),
+		NextCompiler: evaluation.Compile{},
+	}, evaluation.BasicRunnerWithChecker(p.Checker()))
 }

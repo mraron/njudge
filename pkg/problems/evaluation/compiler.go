@@ -8,6 +8,7 @@ import (
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/mraron/njudge/pkg/problems"
 	"io"
+	"os"
 	"testing/iotest"
 )
 
@@ -37,7 +38,7 @@ func (b *BytesSolution) GetFile(ctx context.Context) (sandbox.File, error) {
 type CompileCopyFile struct {
 }
 
-func (c CompileCopyFile) Compile(ctx context.Context, problem problems.Judgeable, solution problems.Solution, sandbox sandbox.Sandbox) (*problems.CompilationResult, error) {
+func (c CompileCopyFile) Compile(ctx context.Context, solution problems.Solution, sandbox sandbox.Sandbox) (*problems.CompilationResult, error) {
 	f, err := solution.GetFile(ctx)
 	return &problems.CompilationResult{
 		CompiledFile:       &f,
@@ -47,7 +48,7 @@ func (c CompileCopyFile) Compile(ctx context.Context, problem problems.Judgeable
 
 type Compile struct{}
 
-func (c Compile) Compile(ctx context.Context, problem problems.Judgeable, solution problems.Solution, s sandbox.Sandbox) (*problems.CompilationResult, error) {
+func (c Compile) CompileWithExtras(ctx context.Context, solution problems.Solution, s sandbox.Sandbox, extras []sandbox.File) (*problems.CompilationResult, error) {
 	lang := solution.GetLanguage()
 
 	f, err := solution.GetFile(ctx)
@@ -60,7 +61,7 @@ func (c Compile) Compile(ctx context.Context, problem problems.Judgeable, soluti
 	if res, err = lang.Compile(ctx, s, sandbox.File{
 		Name:   lang.DefaultFilename(),
 		Source: f.Source,
-	}, stderrTruncated, nil); err != nil {
+	}, stderrTruncated, extras); err != nil {
 		return &problems.CompilationResult{
 			CompiledFile:       nil,
 			CompilationMessage: stderr.String(),
@@ -73,12 +74,18 @@ func (c Compile) Compile(ctx context.Context, problem problems.Judgeable, soluti
 	}, nil
 }
 
-type CompileCheckSupported struct{}
+func (c Compile) Compile(ctx context.Context, solution problems.Solution, s sandbox.Sandbox) (*problems.CompilationResult, error) {
+	return c.CompileWithExtras(ctx, solution, s, nil)
+}
 
-func (c CompileCheckSupported) Compile(ctx context.Context, problem problems.Judgeable, solution problems.Solution, sandbox sandbox.Sandbox) (*problems.CompilationResult, error) {
-	lst, found := problem.Languages(), false
+type CompileCheckSupported struct {
+	List         []language.Language
+	NextCompiler problems.Compiler
+}
 
-	for _, l := range lst {
+func (c CompileCheckSupported) Compile(ctx context.Context, solution problems.Solution, sandbox sandbox.Sandbox) (*problems.CompilationResult, error) {
+	found := false
+	for _, l := range c.List {
 		if l.ID() == solution.GetLanguage().ID() {
 			found = true
 		}
@@ -91,5 +98,42 @@ func (c CompileCheckSupported) Compile(ctx context.Context, problem problems.Jud
 		}, fmt.Errorf("language is not supported: %s", solution.GetLanguage().ID())
 	}
 
-	return Compile{}.Compile(ctx, problem, solution, sandbox)
+	return c.NextCompiler.Compile(ctx, solution, sandbox)
+}
+
+type CompileWithStubs struct {
+	stubs map[string][]problems.EvaluationFile
+}
+
+func NewCompilerWithStubs() *CompileWithStubs {
+	return &CompileWithStubs{
+		make(map[string][]problems.EvaluationFile),
+	}
+}
+
+func (c *CompileWithStubs) AddStub(lang language.Language, stub problems.EvaluationFile) {
+	if _, ok := c.stubs[lang.ID()]; !ok {
+		c.stubs[lang.ID()] = make([]problems.EvaluationFile, 0)
+	}
+	c.stubs[lang.ID()] = append(c.stubs[lang.ID()], stub)
+}
+
+func (c *CompileWithStubs) Compile(ctx context.Context, solution problems.Solution, box sandbox.Sandbox) (*problems.CompilationResult, error) {
+	lang := solution.GetLanguage()
+	neededFiles := c.stubs[lang.ID()]
+	sandboxFiles := make([]sandbox.File, 0, len(neededFiles))
+	for ind := range neededFiles {
+		contents, err := os.ReadFile(neededFiles[ind].Path)
+		if err != nil {
+			return nil, err
+		}
+
+		sandboxFiles = append(sandboxFiles, sandbox.File{
+			Name:   neededFiles[ind].Name,
+			Source: io.NopCloser(bytes.NewBuffer(contents)),
+		})
+	}
+
+	return Compile{}.CompileWithExtras(ctx, solution, box, sandboxFiles)
+
 }

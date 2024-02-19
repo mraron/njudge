@@ -10,7 +10,9 @@ import (
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/evaluation"
-	checker2 "github.com/mraron/njudge/pkg/problems/executable/checker"
+	"github.com/mraron/njudge/pkg/problems/evaluation/batch"
+	"github.com/mraron/njudge/pkg/problems/evaluation/output_only"
+	"github.com/mraron/njudge/pkg/problems/executable/checker"
 	"github.com/spf13/afero"
 	"github.com/yuin/goldmark"
 	"gopkg.in/yaml.v3"
@@ -225,35 +227,29 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 
 func (p Problem) Checker() problems.Checker {
 	if p.Tests.Checker.Type == "" || p.Tests.Checker.Type == "whitediff" {
-		return checker2.Whitediff{}
+		return checker.Whitediff{}
 	} else if p.Tests.Checker.Type == "testlib" {
-		return checker2.NewTestlib(filepath.Join(p.Path, p.Tests.Checker.Path))
+		return checker.NewTestlib(filepath.Join(p.Path, p.Tests.Checker.Path))
 	} else if p.Tests.Checker.Type == "taskyaml" {
-		return checker2.NewTaskYAML(filepath.Join(p.Path, p.Tests.Checker.Path))
+		return checker.NewTaskYAML(filepath.Join(p.Path, p.Tests.Checker.Path))
 	}
 
-	return checker2.Noop{}
+	return checker.Noop{}
 }
 
-func (p Problem) Files() []problems.File {
-	return make([]problems.File, 0)
+func (p Problem) EvaluationFiles() []problems.EvaluationFile {
+	return make([]problems.EvaluationFile, 0)
 }
 
 func (p Problem) GetTaskType() problems.TaskType {
-	tasktype := "batch"
-	if p.Tests.TaskType != "" {
-		tasktype = p.Tests.TaskType
+	if p.Tests.TaskType == "outputonly" {
+		return output_only.New(p.Checker())
 	}
 
-	if tasktype == "batch" {
-		return problems.NewTaskType(
-			"batch",
-			evaluation.CompileCheckSupported{},
-			evaluation.NewLinearEvaluator(evaluation.NewBasicRunner()),
-		)
-	}
-	//TODO: outputonly, stub and comm
-	return problems.NewTaskType("batch", evaluation.CompileCopyFile{}, evaluation.NewLinearEvaluator(evaluation.ACRunner{}))
+	return batch.New(evaluation.CompileCheckSupported{
+		List:         p.Languages(),
+		NextCompiler: evaluation.Compile{},
+	}, evaluation.BasicRunnerWithChecker(p.Checker()))
 }
 
 type config struct {

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/problems/evaluation"
+	"github.com/mraron/njudge/pkg/problems/evaluation/batch"
 	checker2 "github.com/mraron/njudge/pkg/problems/executable/checker"
 	"io"
 	"os"
@@ -57,7 +58,7 @@ type Problem struct {
 
 	Path string
 
-	files            []problems.File
+	files            []problems.EvaluationFile
 	tasktype         string
 	whiteDiffChecker bool
 }
@@ -258,18 +259,15 @@ func (p Problem) Checker() problems.Checker {
 	return checker2.NewTaskYAML(filepath.Join(p.Path, "check", "checker"))
 }
 
-func (p Problem) Files() []problems.File {
+func (p Problem) EvaluationFiles() []problems.EvaluationFile {
 	return p.files
 }
 
 func (p Problem) GetTaskType() problems.TaskType {
-	return problems.NewTaskType(
-		"batch",
-		evaluation.CompileCheckSupported{},
-		evaluation.NewLinearEvaluator(
-			evaluation.NewBasicRunner(evaluation.BasicRunnerWithChecker(p.Checker())),
-		),
-	)
+	return batch.New(evaluation.CompileCheckSupported{
+		List:         p.Languages(),
+		NextCompiler: evaluation.Compile{},
+	}, evaluation.BasicRunnerWithChecker(p.Checker()))
 	// TODO outputonly, stub, communication
 	/*
 		var (
@@ -416,7 +414,7 @@ func Parser(fs afero.Fs, path string) (problems.Problem, error) {
 		InputPathPattern:  filepath.Join(path, "input", "input%d.txt"),
 		AnswerPathPattern: filepath.Join(path, "output", "output%d.txt"),
 		AttachmentList:    make(problems.Attachments, 0),
-		files:             make([]problems.File, 0),
+		files:             make([]problems.EvaluationFile, 0),
 	}
 
 	YAMLFile, err := fs.Open(filepath.Join(path, "task.yaml"))
@@ -487,7 +485,7 @@ func Parser(fs afero.Fs, path string) (problems.Problem, error) {
 				return nil, err
 			}
 
-			p.files = append(p.files, problems.File{Name: "manager.cpp", Role: "interactor", Path: managerPath})
+			p.files = append(p.files, problems.EvaluationFile{Name: "manager.cpp", Role: "interactor", Path: managerPath})
 		} else {
 			p.whiteDiffChecker = true
 		}
@@ -496,10 +494,10 @@ func Parser(fs afero.Fs, path string) (problems.Problem, error) {
 	if exists(solPath) {
 		if exists(filepath.Join(solPath, "grader.cpp")) {
 			p.tasktype = "batch"
-			p.files = append(p.files, problems.File{Name: "grader.cpp", Role: "stub_cpp", Path: filepath.Join(solPath, "grader.cpp")})
+			p.files = append(p.files, problems.EvaluationFile{Name: "grader.cpp", Role: "stub_cpp", Path: filepath.Join(solPath, "grader.cpp")})
 		} else if exists(filepath.Join(solPath, "stub.cpp")) {
 			p.tasktype = "communication"
-			p.files = append(p.files, problems.File{Name: "stub.cpp", Role: "stub_cpp", Path: filepath.Join(solPath, "stub.cpp")})
+			p.files = append(p.files, problems.EvaluationFile{Name: "stub.cpp", Role: "stub_cpp", Path: filepath.Join(solPath, "stub.cpp")})
 		}
 
 		var files []os.FileInfo
@@ -510,7 +508,7 @@ func Parser(fs afero.Fs, path string) (problems.Problem, error) {
 
 		for _, file := range files {
 			if !file.IsDir() && filepath.Ext(file.Name()) == ".h" && file.Name() != "testlib.h" {
-				p.files = append(p.files, problems.File{Name: file.Name(), Role: "stub_cpp", Path: filepath.Join(solPath, file.Name())})
+				p.files = append(p.files, problems.EvaluationFile{Name: file.Name(), Role: "stub_cpp", Path: filepath.Join(solPath, file.Name())})
 			}
 		}
 	}
