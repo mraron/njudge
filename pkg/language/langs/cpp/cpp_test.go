@@ -3,7 +3,7 @@ package cpp_test
 import (
 	"bytes"
 	"context"
-	"github.com/mraron/njudge/pkg/language/internal/testutils"
+	"github.com/mraron/njudge/pkg/internal/testutils"
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"

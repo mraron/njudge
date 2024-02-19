@@ -1,17 +1,34 @@
 package evaluation
 
 import (
+	"archive/zip"
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"github.com/mraron/njudge/pkg/language"
+	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/spf13/afero"
 	"io"
 	"os"
 	"path/filepath"
+	"syscall"
 )
+
+func setSolution(ctx context.Context, bin *string, dst *[]byte, solution problems.Solution) error {
+	file, err := solution.GetFile(ctx)
+	if err != nil {
+		return err
+	}
+
+	if bin != nil {
+		*bin = file.Name
+	}
+	*dst, err = io.ReadAll(file.Source)
+	return errors.Join(err, file.Source.Close())
+}
 
 type ACRunner struct{}
 
@@ -81,15 +98,7 @@ func (r *BasicRunner) getOutputFile() string {
 
 func (r *BasicRunner) SetSolution(ctx context.Context, solution problems.Solution) error {
 	r.lang = solution.GetLanguage()
-
-	file, err := solution.GetFile(ctx)
-	if err != nil {
-		return err
-	}
-
-	r.binName = file.Name
-	r.bin, err = io.ReadAll(file.Source)
-	return errors.Join(err, file.Source.Close())
+	return setSolution(ctx, &r.binName, &r.bin, solution)
 }
 
 func (r *BasicRunner) prepareIO(s sandbox.Sandbox, testcase *problems.Testcase) (io.ReadCloser, io.WriteCloser, error) {
@@ -162,6 +171,25 @@ func (r *BasicRunner) setOutputExpectedOutput(s sandbox.Sandbox, testcase *probl
 	return nil
 }
 
+func mapVerdict(status *sandbox.Status, testcase *problems.Testcase) bool {
+	switch status.Verdict {
+	case sandbox.VerdictOK:
+		testcase.VerdictName = problems.VerdictAC // checker can overwrite it
+		return true
+	case sandbox.VerdictTL:
+		testcase.VerdictName = problems.VerdictTL
+	case sandbox.VerdictML:
+		testcase.VerdictName = problems.VerdictML
+	case sandbox.VerdictRE:
+		testcase.VerdictName = problems.VerdictRE
+	case sandbox.VerdictXX:
+		testcase.VerdictName = problems.VerdictXX
+	case sandbox.VerdictCE:
+		panic("solution should've been already compiled")
+	}
+	return false
+}
+
 func (r *BasicRunner) Run(ctx context.Context, sandboxProvider sandbox.Provider, testcase *problems.Testcase) error {
 	s, err := sandboxProvider.Get()
 	if err != nil {
@@ -192,6 +220,9 @@ func (r *BasicRunner) Run(ctx context.Context, sandboxProvider sandbox.Provider,
 		Name:   r.binName,
 		Source: io.NopCloser(bytes.NewBuffer(r.bin)),
 	}, sandboxInput, sandboxOutput, testcase.TimeLimit, testcase.MemoryLimit)
+	if err != nil {
+		return err
+	}
 
 	if sandboxOutput != nil {
 		testcase.OutputPath = (sandboxOutput.(*os.File)).Name()
@@ -212,26 +243,221 @@ func (r *BasicRunner) Run(ctx context.Context, sandboxProvider sandbox.Provider,
 		return err
 	}
 
-	switch status.Verdict {
-	case sandbox.VerdictOK:
-		testcase.VerdictName = problems.VerdictAC // checker can overwrite it
-	case sandbox.VerdictTL:
-		testcase.VerdictName = problems.VerdictTL
+	if !mapVerdict(status, testcase) || r.checker == nil {
+		return nil
+	}
+	return r.checker.Check(ctx, testcase)
+}
+
+type ZipRunner struct {
+	checker problems.Checker
+	bin     []byte
+}
+
+func NewZipRunner(checker problems.Checker) *ZipRunner {
+	return &ZipRunner{checker: checker, bin: nil}
+}
+
+func (z *ZipRunner) SetSolution(ctx context.Context, solution problems.Solution) error {
+	return setSolution(ctx, nil, &z.bin, solution)
+}
+
+func (z *ZipRunner) Run(ctx context.Context, _ sandbox.Provider, testcase *problems.Testcase) error {
+	archive, err := zip.NewReader(bytes.NewReader(z.bin), int64(len(z.bin)))
+	if err != nil {
 		return err
-	case sandbox.VerdictML:
-		testcase.VerdictName = problems.VerdictML
-		return err
-	case sandbox.VerdictRE:
-		testcase.VerdictName = problems.VerdictRE
-		return err
-	case sandbox.VerdictXX:
-		testcase.VerdictName = problems.VerdictXX
-		return err
-	case sandbox.VerdictCE:
-		panic("solution should've been already compiled")
+	}
+	for _, f := range archive.File {
+		if f.Name == testcase.OutputPath {
+			fileHandle, err := f.Open()
+			if err != nil {
+				return err
+			}
+			defer func(fileHandle io.ReadCloser) {
+				_ = fileHandle.Close()
+			}(fileHandle)
+
+			tempFile, err := os.CreateTemp("", "njudge_zip_input")
+			if err != nil {
+				return err
+			}
+			defer func(tempFile *os.File, name string) {
+				_ = tempFile.Close()
+				_ = os.Remove(name)
+			}(tempFile, tempFile.Name())
+
+			_, err = io.CopyN(tempFile, fileHandle, 32*1024*1024) // 32MiB limit
+			if err != nil && !errors.Is(err, io.EOF) {
+				return err
+			}
+
+			testcase.OutputPath = tempFile.Name()
+			break
+		}
 	}
 
-	if r.checker == nil {
+	if z.checker == nil {
+		return nil
+	}
+	return z.checker.Check(ctx, testcase)
+}
+
+type InteractiveRunner struct {
+	lang        language.Language
+	userBinName string
+	userBin     []byte
+
+	interactorBin []byte
+
+	checker problems.Checker
+
+	fs afero.Fs
+}
+
+type InteractiveRunnerOption func(runner *InteractiveRunner)
+
+func InteractiveRunnerWithFs(fs afero.Fs) InteractiveRunnerOption {
+	return func(runner *InteractiveRunner) {
+		runner.fs = fs
+	}
+}
+
+func NewInteractiveRunner(interactorBinary []byte, checker problems.Checker, opts ...InteractiveRunnerOption) *InteractiveRunner {
+	res := &InteractiveRunner{
+		userBin:       nil,
+		interactorBin: interactorBinary,
+		checker:       checker,
+		fs:            afero.NewOsFs(),
+	}
+	for _, opt := range opts {
+		opt(res)
+	}
+	return res
+}
+
+func (r *InteractiveRunner) SetSolution(ctx context.Context, solution problems.Solution) error {
+	r.lang = solution.GetLanguage()
+	return setSolution(ctx, &r.userBinName, &r.userBin, solution)
+}
+
+func (r *InteractiveRunner) getSandboxes(provider sandbox.Provider) (userSandbox, interactorSandbox sandbox.Sandbox, err error) {
+	userSandbox, err = provider.Get()
+	if err != nil {
+		return
+	}
+	interactorSandbox, err = provider.Get()
+	return
+}
+
+func (r *InteractiveRunner) prepareFIFO(dir string, name string) (*os.File, error) {
+	if err := syscall.Mkfifo(filepath.Join(dir, name), 0666); err != nil {
+		return nil, err
+	}
+	return os.OpenFile(filepath.Join(dir, name), os.O_RDWR, 0666)
+}
+
+func (r *InteractiveRunner) Run(ctx context.Context, sandboxProvider sandbox.Provider, testcase *problems.Testcase) error {
+	userSandbox, interactorSandbox, err := r.getSandboxes(sandboxProvider)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = userSandbox.Cleanup(context.Background())
+		_ = interactorSandbox.Cleanup(context.Background())
+		sandboxProvider.Put(userSandbox)
+		sandboxProvider.Put(interactorSandbox)
+	}()
+	if err = userSandbox.Init(ctx); err != nil {
+		return err
+	}
+	if err = interactorSandbox.Init(ctx); err != nil {
+		return err
+	}
+
+	if err = sandbox.CreateFile(interactorSandbox, sandbox.File{
+		Name:   "interactor",
+		Source: io.NopCloser(bytes.NewBuffer(r.interactorBin)),
+	}); err != nil {
+		return err
+	}
+	if err = interactorSandbox.MakeExecutable("interactor"); err != nil {
+		return err
+	}
+
+	inputFile, err := r.fs.Open(testcase.InputPath)
+	if err != nil {
+		return err
+	}
+	if err = sandbox.CreateFile(interactorSandbox, sandbox.File{
+		Name:   "input",
+		Source: inputFile,
+	}); err != nil {
+		return err
+	}
+
+	dir, err := os.MkdirTemp("", "njudge_interactive_runner")
+	if err != nil {
+		return err
+	}
+	defer func(path string) {
+		_ = os.RemoveAll(path)
+	}(dir)
+
+	userStdin, err := r.prepareFIFO(dir, "fifo1")
+	if err != nil {
+		return err
+	}
+	defer func(userStdin *os.File) {
+		_ = userStdin.Close()
+	}(userStdin)
+	userStdout, err := r.prepareFIFO(dir, "fifo2")
+	if err != nil {
+		return err
+	}
+	defer func(userStdout *os.File) {
+		_ = userStdout.Close()
+	}(userStdout)
+
+	var (
+		userStatus, interactorStatus *sandbox.Status
+		userError, interactorError   error
+		done                         = make(chan struct{})
+	)
+
+	go func() {
+		userStatus, userError = r.lang.Run(ctx, userSandbox, sandbox.File{
+			Name:   r.userBinName,
+			Source: io.NopCloser(bytes.NewBuffer(r.userBin)),
+		}, userStdin, userStdout, testcase.TimeLimit, testcase.MemoryLimit)
+		done <- struct{}{}
+	}()
+
+	interactorStatus, interactorError = interactorSandbox.Run(ctx, sandbox.RunConfig{
+		RunID:            "interactor",
+		TimeLimit:        2 * testcase.TimeLimit,
+		MemoryLimit:      1 * memory.GiB,
+		Stdin:            userStdout,
+		Stdout:           userStdin,
+		Stderr:           os.Stderr,
+		InheritEnv:       true,
+		WorkingDirectory: interactorSandbox.Pwd(),
+	}, "interactor", "input", "output")
+	<-done
+
+	testcase.OutputPath = filepath.Join(interactorSandbox.Pwd(), "output")
+	testcase.TimeSpent = userStatus.Time
+	testcase.MemoryUsed = userStatus.Memory
+
+	if userError != nil || interactorError != nil {
+		return errors.Join(userError, interactorError)
+	}
+
+	if interactorStatus.Verdict != sandbox.VerdictOK {
+		testcase.VerdictName = problems.VerdictXX
+		return fmt.Errorf("interactor didn't return ok: %v", interactorStatus)
+	}
+
+	if !mapVerdict(userStatus, testcase) || r.checker == nil {
 		return nil
 	}
 	return r.checker.Check(ctx, testcase)

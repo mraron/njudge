@@ -3,7 +3,7 @@ package sandbox_test
 import (
 	"context"
 	"flag"
-	"github.com/mraron/njudge/pkg/language/internal/testutils"
+	"github.com/mraron/njudge/pkg/internal/testutils"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/stretchr/testify/assert"
 	"log/slog"

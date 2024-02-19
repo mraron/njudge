@@ -1,9 +1,8 @@
 package language_test
 
 import (
+	"github.com/mraron/njudge/pkg/internal/testutils"
 	"github.com/mraron/njudge/pkg/language"
-	"github.com/mraron/njudge/pkg/language/internal/testutils"
-
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
 	_ "github.com/mraron/njudge/pkg/language/langs/csharp"
 	_ "github.com/mraron/njudge/pkg/language/langs/cython3"

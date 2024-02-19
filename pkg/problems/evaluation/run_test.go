@@ -1,8 +1,13 @@
 package evaluation_test
 
 import (
+	"archive/zip"
+	"bytes"
 	"context"
+	"fmt"
+	"github.com/mraron/njudge/pkg/internal/testutils"
 	"github.com/mraron/njudge/pkg/language/langs/python3"
+	zipLang "github.com/mraron/njudge/pkg/language/langs/zip"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/evaluation"
@@ -10,6 +15,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 func TestBasicRunner_Run(t *testing.T) {
@@ -18,7 +24,15 @@ func TestBasicRunner_Run(t *testing.T) {
 		sandboxProvider sandbox.Provider
 		testcase        *problems.Testcase
 	}
-	s, err := sandbox.NewDummy()
+	var (
+		s   sandbox.Sandbox
+		err error
+	)
+	if *testutils.UseIsolate {
+		s, err = sandbox.NewDummy()
+	} else {
+		s, err = sandbox.NewIsolate(444)
+	}
 	assert.Nil(t, err)
 
 	fs := afero.NewMemMapFs()
@@ -179,7 +193,15 @@ with open('kimenet', 'w') as w:
 }
 
 func TestBasicRunnerMultipleRuns(t *testing.T) {
-	s, err := sandbox.NewDummy()
+	var (
+		s   sandbox.Sandbox
+		err error
+	)
+	if *testutils.UseIsolate {
+		s, err = sandbox.NewDummy()
+	} else {
+		s, err = sandbox.NewIsolate(444)
+	}
 	assert.Nil(t, err)
 
 	fs := afero.NewMemMapFs()
@@ -204,4 +226,143 @@ print(a+b+c, '   \n')`))
 	tc.VerdictName = problems.VerdictDR
 	assert.Nil(t, br.Run(context.Background(), sandbox.NewSandboxProvider().Put(s), tc))
 	assert.Equal(t, problems.VerdictAC, tc.VerdictName)
+}
+
+func TestZipRunner_Run(t *testing.T) {
+	fs := afero.NewMemMapFs()
+	assert.Nil(t, afero.WriteFile(fs, "input", []byte("hello_world?\n"), 0644))
+	assert.Nil(t, afero.WriteFile(fs, "answer", []byte("hello_world!\n"), 0644))
+
+	zipBuf := &bytes.Buffer{}
+	w := zip.NewWriter(zipBuf)
+	f, _ := w.Create("output1")
+	_, _ = f.Write([]byte("hello_world!"))
+	_ = w.Close()
+
+	type args struct {
+		ctx             context.Context
+		sandboxProvider sandbox.Provider
+		testcase        *problems.Testcase
+	}
+	tests := []struct {
+		name        string
+		solution    problems.Solution
+		checker     problems.Checker
+		args        args
+		wantErr     assert.ErrorAssertionFunc
+		wantVerdict problems.VerdictName
+	}{
+		{
+			name:     "zip_hello_world",
+			solution: evaluation.NewByteSolution(zipLang.Zip{}, zipBuf.Bytes()),
+			checker:  checker.NewWhitediff(checker.WhiteDiffWithFs(fs, afero.NewOsFs())),
+			args: args{
+				ctx:             context.TODO(),
+				sandboxProvider: nil,
+				testcase: &problems.Testcase{
+					Index:      1,
+					InputPath:  "input",
+					OutputPath: "output1",
+					AnswerPath: "answer",
+				},
+			},
+			wantErr:     assert.NoError,
+			wantVerdict: problems.VerdictAC,
+		},
+		{
+			name:     "zip_hello_world_wa",
+			solution: evaluation.NewByteSolution(zipLang.Zip{}, zipBuf.Bytes()),
+			checker:  checker.NewWhitediff(checker.WhiteDiffWithFs(fs, afero.NewOsFs())),
+			args: args{
+				ctx:             context.TODO(),
+				sandboxProvider: nil,
+				testcase: &problems.Testcase{
+					Index:      1,
+					InputPath:  "input",
+					OutputPath: "output1",
+					AnswerPath: "input", // WA because of this
+				},
+			},
+			wantErr:     assert.NoError,
+			wantVerdict: problems.VerdictWA,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			z := evaluation.NewZipRunner(tt.checker)
+			assert.Nil(t, z.SetSolution(context.TODO(), tt.solution))
+			tt.wantErr(t, z.Run(tt.args.ctx, tt.args.sandboxProvider, tt.args.testcase), fmt.Sprintf("Run(%v, %v, %v)", tt.args.ctx, tt.args.sandboxProvider, tt.args.testcase))
+			assert.Equal(t, tt.wantVerdict, tt.args.testcase.VerdictName)
+		})
+	}
+}
+
+func TestInteractiveRunner_Run(t *testing.T) {
+	type args struct {
+		ctx             context.Context
+		sandboxProvider sandbox.Provider
+		testcase        *problems.Testcase
+	}
+	var (
+		s1, s2 sandbox.Sandbox
+		err    error
+	)
+	if *testutils.UseIsolate {
+		s1, err = sandbox.NewDummy()
+		assert.Nil(t, err)
+		s2, err = sandbox.NewDummy()
+		assert.Nil(t, err)
+	} else {
+		s1, err = sandbox.NewIsolate(444)
+		assert.Nil(t, err)
+		s2, err = sandbox.NewIsolate(445)
+		assert.Nil(t, err)
+	}
+
+	fs := afero.NewMemMapFs()
+	assert.Nil(t, afero.WriteFile(fs, "input", []byte("11 12\n"), 0644))
+	assert.Nil(t, afero.WriteFile(fs, "answer", []byte("23\n"), 0644))
+	tests := []struct {
+		name        string
+		solution    problems.Solution
+		ir          *evaluation.InteractiveRunner
+		args        args
+		wantErr     assert.ErrorAssertionFunc
+		wantVerdict problems.VerdictName
+	}{
+		{
+			name: "aplusb_python_interactor",
+			solution: evaluation.NewByteSolution(python3.Python3{}, []byte(`a, b = list(map(int, input().split()))
+print(a+b)`)),
+			ir: evaluation.NewInteractiveRunner([]byte(`#!/usr/bin/python3
+import sys
+with open(sys.argv[1], 'r') as f:
+    a,b = list(map(int, f.readline().split()))
+
+print(a,b)
+res = input()
+with open(sys.argv[2], 'w') as f:
+    f.write(res)`), checker.NewWhitediff(checker.WhiteDiffWithFs(fs, afero.NewOsFs())), evaluation.InteractiveRunnerWithFs(fs)),
+			args: args{
+				ctx:             context.TODO(),
+				sandboxProvider: sandbox.NewSandboxProvider().Put(s1).Put(s2),
+				testcase: &problems.Testcase{
+					Index:      1,
+					InputPath:  "input",
+					OutputPath: "output",
+					AnswerPath: "answer",
+					TimeLimit:  1 * time.Second,
+				},
+			},
+			wantErr:     assert.NoError,
+			wantVerdict: problems.VerdictAC,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Nil(t, tt.ir.SetSolution(tt.args.ctx, tt.solution))
+			tt.wantErr(t, tt.ir.Run(tt.args.ctx, tt.args.sandboxProvider, tt.args.testcase), fmt.Sprintf("Run(%v, %v, %v)", tt.args.ctx, tt.args.sandboxProvider, tt.args.testcase))
+			assert.Equal(t, tt.wantVerdict, tt.args.testcase.VerdictName)
+		})
+	}
 }

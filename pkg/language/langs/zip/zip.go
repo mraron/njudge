@@ -10,32 +10,28 @@ import (
 	"github.com/mraron/njudge/pkg/language"
 )
 
-type zip struct{}
+type Zip struct{}
 
-func (zip) ID() string {
+func (Zip) ID() string {
 	return "zip"
 }
 
-func (zip) DisplayName() string {
+func (Zip) DisplayName() string {
 	return "ZIP archívum"
 }
 
-func (zip) DefaultFilename() string {
+func (Zip) DefaultFilename() string {
 	return "main.zip"
 }
 
-func (zip) Compile(ctx context.Context, s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
-	return nil, nil
+func (Zip) Compile(_ context.Context, _ sandbox.Sandbox, f sandbox.File, _ io.Writer, _ []sandbox.File) (*sandbox.File, error) {
+	return &f, nil
 }
 
-func (zip) Run(ctx context.Context, s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
+func (Zip) Run(_ context.Context, _ sandbox.Sandbox, _ sandbox.File, _ io.Reader, _ io.Writer, _ time.Duration, _ memory.Amount) (*sandbox.Status, error) {
 	return &sandbox.Status{}, nil
 }
 
-func (zip) Test(sandbox.Sandbox) error {
-	return nil
-}
-
 func init() {
-	language.DefaultStore.Register("zip", zip{})
+	language.DefaultStore.Register("zip", Zip{})
 }
