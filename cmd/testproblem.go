@@ -26,7 +26,7 @@ var TestProblemArgs struct {
 var TestProblemCmd = &cobra.Command{
 	Use: "testproblem",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		sp := sandbox.NewSandboxProvider()
+		sp := sandbox.NewProvider()
 		s1, _ := sandbox.NewIsolate(50)
 		sp.Put(s1)
 		s2, _ := sandbox.NewIsolate(51)
@@ -42,7 +42,7 @@ var TestProblemCmd = &cobra.Command{
 			return err
 		}
 
-		l := language.DefaultStore.Get(TestProblemArgs.Language)
+		l, _ := language.DefaultStore.Get(TestProblemArgs.Language)
 		src, err := os.ReadFile(TestProblemArgs.SolutionPath)
 		if err != nil {
 			return err

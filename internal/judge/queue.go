@@ -81,7 +81,7 @@ func (j *Queue) Run() {
 			return err
 		}
 
-		lang := j.languageStore.Get(sub.Language)
+		lang, _ := j.languageStore.Get(sub.Language)
 		if lang == nil {
 			return fmt.Errorf("no such language: %s", sub.Language)
 		}

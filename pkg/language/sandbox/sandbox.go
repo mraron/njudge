@@ -159,7 +159,7 @@ type ChanProvider struct {
 	sandboxes chan Sandbox
 }
 
-func NewSandboxProvider() *ChanProvider {
+func NewProvider() *ChanProvider {
 	return &ChanProvider{make(chan Sandbox, 100)}
 }
 

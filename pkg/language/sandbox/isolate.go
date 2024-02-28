@@ -73,7 +73,7 @@ func (i *Isolate) Init(ctx context.Context) error {
 	i.Logger.Info("running init", "cmd", cmd)
 	i.inited = true
 	i.OsFS = NewOsFS(filepath.Join(IsolateRoot, strconv.Itoa(i.ID), "box"))
-	return exec.CommandContext(ctx, cmd[0], cmd[1:]...).Run()
+	return exec.Command(cmd[0], cmd[1:]...).Run()
 }
 
 func (i *Isolate) buildArgs(config RunConfig) ([]string, error) {
@@ -111,7 +111,7 @@ func (i *Isolate) buildArgs(config RunConfig) ([]string, error) {
 	return args, nil
 }
 
-func (i *Isolate) Run(ctx context.Context, config RunConfig, toRun string, toRunArgs ...string) (*Status, error) {
+func (i *Isolate) Run(_ context.Context, config RunConfig, toRun string, toRunArgs ...string) (*Status, error) {
 	if !i.inited {
 		return nil, ErrorSandboxNotInitialized
 	}
@@ -141,7 +141,7 @@ func (i *Isolate) Run(ctx context.Context, config RunConfig, toRun string, toRun
 
 	logger.Info("built args", "args", args)
 
-	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
+	cmd := exec.Command(args[0], args[1:]...)
 	cmd.Stdin = config.Stdin
 	cmd.Stdout = config.Stdout
 	cmd.Stderr = config.Stderr
@@ -185,11 +185,11 @@ func (i *Isolate) Run(ctx context.Context, config RunConfig, toRun string, toRun
 	return &st, nil
 }
 
-func (i *Isolate) Cleanup(ctx context.Context) error {
+func (i *Isolate) Cleanup(_ context.Context) error {
 	cmd := []string{"isolate", "--cg", "-b", strconv.Itoa(i.ID), "--cleanup"}
 
 	i.Logger.Info("running cleanup ", "cmd", cmd)
 	i.inited = false
 	i.OsFS = OsFS{}
-	return exec.CommandContext(ctx, cmd[0], cmd[1:]...).Run()
+	return exec.Command(cmd[0], cmd[1:]...).Run()
 }

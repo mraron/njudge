@@ -1,17 +1,32 @@
 package language
 
 import (
+	"errors"
 	"sort"
 
 	"slices"
 )
+
+var ErrorLanguageNotFound = errors.New("language not found")
+
+type NotFoundError struct {
+	ID string
+}
+
+func (n NotFoundError) Error() string {
+	return "language not found: " + n.ID
+}
+
+func (n NotFoundError) Is(err error) bool {
+	return err == ErrorLanguageNotFound
+}
 
 // Store is an interface which is used to capture the notion of storing languages.
 // Via it's Store.Register method it's possible to override the underlying ID of the language for the outside world.
 type Store interface {
 	Register(id string, l Language)
 	List() []Language
-	Get(id string) Language
+	Get(id string) (Language, error)
 }
 
 // ListExcept returns a slice of languages except some.
@@ -65,14 +80,14 @@ func (m *ListStore) List() []Language {
 	return ans
 }
 
-func (m *ListStore) Get(id string) Language {
+func (m *ListStore) Get(id string) (Language, error) {
 	for ind := range m.LanguageList {
 		if m.LanguageList[ind].ID() == id {
-			return m.LanguageList[ind]
+			return m.LanguageList[ind], nil
 		}
 	}
 
-	return nil
+	return nil, NotFoundError{id}
 }
 
 // DefaultStore is a store which all Language objects should register themselves in.

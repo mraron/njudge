@@ -26,7 +26,7 @@ func (w Worker) Judge(ctx context.Context, plogger *zap.Logger, p problems.Evalu
 	logger := plogger.With(zap.Int("worker", w.id))
 	logger.Info("started to judge")
 
-	sandboxes := sandbox.NewSandboxProvider()
+	sandboxes := sandbox.NewProvider()
 	for i := 0; i < 2; i++ {
 		var s sandbox.Sandbox
 		s, err = w.sandboxProvider.Get()
@@ -125,7 +125,7 @@ func NewIsolateWorkerProvider(minSandboxId, maxSandboxId, workerCount int) (*Iso
 	}
 
 	for i := 0; i < wp.workerCount; i++ {
-		provider := sandbox.NewSandboxProvider()
+		provider := sandbox.NewProvider()
 		if err := wp.populateProvider(provider, 2); err != nil {
 			return nil, err
 		}

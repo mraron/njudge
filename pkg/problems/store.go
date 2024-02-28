@@ -14,15 +14,15 @@ import (
 
 var ErrorProblemNotFound = errors.New("problem not found")
 
-type ProblemNotFoundError struct {
+type NotFoundError struct {
 	Name string
 }
 
-func (perr ProblemNotFoundError) Error() string {
+func (perr NotFoundError) Error() string {
 	return "problem not found: " + perr.Name
 }
 
-func (perr ProblemNotFoundError) Is(target error) bool {
+func (perr NotFoundError) Is(target error) bool {
 	return target == ErrorProblemNotFound
 }
 
@@ -42,7 +42,7 @@ func (perr ProblemParseError) Is(target error) bool {
 }
 
 // Store is an interface which is used to access a bunch of problems for example from the filesystem
-type Store interface {
+type Store interface { //TODO rename these
 	List() ([]string, error)
 	Has(string) (bool, error)
 	Get(string) (Problem, error)
@@ -138,7 +138,7 @@ func (s *FsStore) Get(p string) (Problem, error) {
 		}
 	}
 
-	return nil, ProblemNotFoundError{p}
+	return nil, NotFoundError{p}
 }
 
 func (s *FsStore) MustGet(p string) Problem {

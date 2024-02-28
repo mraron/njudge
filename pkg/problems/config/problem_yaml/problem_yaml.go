@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
+	"github.com/mraron/njudge/pkg/language/langs/zip"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/mraron/njudge/pkg/problems"
@@ -111,7 +112,7 @@ func (p Problem) InputOutputFiles() (string, string) {
 
 func (p Problem) Languages() []language.Language {
 	if p.Tests.TaskType == "outputonly" {
-		return []language.Language{language.DefaultStore.Get("zip")}
+		return []language.Language{zip.Zip{}}
 	}
 
 	return language.ListExcept(language.DefaultStore, []string{"zip"})
@@ -227,7 +228,7 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 
 func (p Problem) Checker() problems.Checker {
 	if p.Tests.Checker.Type == "" || p.Tests.Checker.Type == "whitediff" {
-		return checker.Whitediff{}
+		return checker.NewWhitediff()
 	} else if p.Tests.Checker.Type == "testlib" {
 		return checker.NewTestlib(filepath.Join(p.Path, p.Tests.Checker.Path))
 	} else if p.Tests.Checker.Type == "taskyaml" {

@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/mraron/njudge/pkg/language/langs/zip"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/problems/evaluation"
 	"github.com/mraron/njudge/pkg/problems/evaluation/batch"
@@ -101,7 +102,7 @@ func (p Problem) Interactive() bool {
 
 func (p Problem) Languages() []language.Language {
 	if p.OutputOnly {
-		return []language.Language{language.DefaultStore.Get("zip")}
+		return []language.Language{zip.Zip{}}
 	}
 
 	lst1 := language.DefaultStore.List()
@@ -253,7 +254,7 @@ func (p Problem) Checker() problems.Checker {
 	}
 
 	if p.whiteDiffChecker {
-		return checker2.Whitediff{}
+		return checker2.NewWhitediff()
 	}
 
 	return checker2.NewTaskYAML(filepath.Join(p.Path, "check", "checker"))

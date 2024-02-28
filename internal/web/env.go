@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/mraron/njudge/internal/njudge/cached"
+	"github.com/mraron/njudge/pkg/language/langs/cpp"
 	"log"
 	"net/http"
 	"strconv"
@@ -23,7 +24,6 @@ import (
 	"github.com/mraron/njudge/internal/njudge/memory"
 	"github.com/mraron/njudge/internal/web/helpers/templates"
 	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
-	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/quasoft/memstore"
 	"github.com/volatiletech/sqlboiler/v4/boil"
@@ -74,7 +74,7 @@ func (s *Server) SetupDataAccess() {
 		s.Problems.Insert(context.Background(), njudge.NewProblem("main", "is1"))
 		prob, _ := s.Problems.Insert(context.Background(), p)
 
-		sub, _ := njudge.NewSubmission(*u, *prob, language.DefaultStore.Get("cpp14"))
+		sub, _ := njudge.NewSubmission(*u, *prob, cpp.Std14)
 		sub.SetSource([]byte("#include<bits/stdc++.h>"))
 		sub.Verdict = njudge.VerdictAC
 		sdata, _ := prob.WithStoredData(s.ProblemStore)

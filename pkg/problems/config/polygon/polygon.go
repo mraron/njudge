@@ -1,6 +1,7 @@
 package polygon
 
 import (
+	"github.com/mraron/njudge/pkg/language/langs/zip"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/problems/evaluation"
 	"github.com/mraron/njudge/pkg/problems/evaluation/batch"
@@ -129,7 +130,7 @@ func (p Problem) Tags() (lst []string) {
 
 func (p Problem) Languages() []language.Language {
 	if p.TaskType == "outputonly" {
-		return []language.Language{language.DefaultStore.Get("zip")}
+		return []language.Language{zip.Zip{}}
 	}
 
 	return language.ListExcept(language.DefaultStore, []string{"zip"})

@@ -72,7 +72,7 @@ func TestWorker(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			sbp := sandbox.NewSandboxProvider()
+			sbp := sandbox.NewProvider()
 			s1, _ := sandbox.NewDummy()
 			sbp.Put(s1)
 			s2, _ := sandbox.NewDummy()

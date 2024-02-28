@@ -56,7 +56,7 @@ print(a+b+c, '   \n')`)),
 			),
 			args: args{
 				ctx:             context.TODO(),
-				sandboxProvider: sandbox.NewSandboxProvider().Put(s),
+				sandboxProvider: sandbox.NewProvider().Put(s),
 				testcase: &problems.Testcase{
 					InputPath:  "input",
 					AnswerPath: "answer",
@@ -75,7 +75,7 @@ print(7)`)),
 			),
 			args: args{
 				ctx:             context.TODO(),
-				sandboxProvider: sandbox.NewSandboxProvider().Put(s),
+				sandboxProvider: sandbox.NewProvider().Put(s),
 				testcase: &problems.Testcase{
 					InputPath:  "input",
 					AnswerPath: "answer",
@@ -99,7 +99,7 @@ print(a+b+c, '   \n')`)),
 			),
 			args: args{
 				ctx:             context.TODO(),
-				sandboxProvider: sandbox.NewSandboxProvider().Put(s),
+				sandboxProvider: sandbox.NewProvider().Put(s),
 				testcase: &problems.Testcase{
 					InputPath:  "input",
 					AnswerPath: "answer",
@@ -124,7 +124,7 @@ with open('kimenet', 'w') as w:
 			),
 			args: args{
 				ctx:             context.TODO(),
-				sandboxProvider: sandbox.NewSandboxProvider().Put(s),
+				sandboxProvider: sandbox.NewProvider().Put(s),
 				testcase: &problems.Testcase{
 					InputPath:  "input",
 					AnswerPath: "answer",
@@ -148,7 +148,7 @@ print(a+b+c)`)),
 			),
 			args: args{
 				ctx:             context.TODO(),
-				sandboxProvider: sandbox.NewSandboxProvider().Put(s),
+				sandboxProvider: sandbox.NewProvider().Put(s),
 				testcase: &problems.Testcase{
 					InputPath:  "input",
 					AnswerPath: "answer",
@@ -171,7 +171,7 @@ with open('kimenet', 'w') as w:
 			),
 			args: args{
 				ctx:             context.TODO(),
-				sandboxProvider: sandbox.NewSandboxProvider().Put(s),
+				sandboxProvider: sandbox.NewProvider().Put(s),
 				testcase: &problems.Testcase{
 					InputPath:  "input",
 					AnswerPath: "answer",
@@ -221,10 +221,10 @@ print(a+b+c, '   \n')`))
 		AnswerPath: "answer",
 	}
 
-	assert.Nil(t, br.Run(context.Background(), sandbox.NewSandboxProvider().Put(s), tc))
+	assert.Nil(t, br.Run(context.Background(), sandbox.NewProvider().Put(s), tc))
 	assert.Equal(t, problems.VerdictAC, tc.VerdictName)
 	tc.VerdictName = problems.VerdictDR
-	assert.Nil(t, br.Run(context.Background(), sandbox.NewSandboxProvider().Put(s), tc))
+	assert.Nil(t, br.Run(context.Background(), sandbox.NewProvider().Put(s), tc))
 	assert.Equal(t, problems.VerdictAC, tc.VerdictName)
 }
 
@@ -345,7 +345,7 @@ with open(sys.argv[2], 'w') as f:
     f.write(res)`), checker.NewWhitediff(checker.WhiteDiffWithFs(fs, afero.NewOsFs())), evaluation.InteractiveRunnerWithFs(fs)),
 			args: args{
 				ctx:             context.TODO(),
-				sandboxProvider: sandbox.NewSandboxProvider().Put(s1).Put(s2),
+				sandboxProvider: sandbox.NewProvider().Put(s1).Put(s2),
 				testcase: &problems.Testcase{
 					Index:      1,
 					InputPath:  "input",
