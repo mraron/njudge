@@ -1,4 +1,4 @@
-package main
+package judge2
 
 import (
 	"context"

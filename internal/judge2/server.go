@@ -1,24 +1,20 @@
-package main
+package judge2
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/mraron/njudge/pkg/language"
-	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/mraron/njudge/pkg/problems"
-	slogecho "github.com/samber/slog-echo"
-	"log/slog"
-	"net/http"
-	"time"
-
 	_ "github.com/mraron/njudge/pkg/problems/config/feladat_txt"
 	_ "github.com/mraron/njudge/pkg/problems/config/polygon"
 	_ "github.com/mraron/njudge/pkg/problems/config/problem_yaml"
 	_ "github.com/mraron/njudge/pkg/problems/config/task_yaml"
+	slogecho "github.com/samber/slog-echo"
+	"log/slog"
+	"net/http"
 
 	_ "github.com/mraron/njudge/pkg/language/langs/python3"
 )
@@ -121,6 +117,7 @@ func (s Server) Run() error {
 	return e.Start(":" + s.Config.Port)
 }
 
+/*
 func main() {
 	s1, _ := sandbox.NewIsolate(104)
 	s2, _ := sandbox.NewIsolate(105)
@@ -188,5 +185,6 @@ func main() {
 	       return 0;
 	   }
 	   `),
-	   	}, nil))*/
+	   	}, nil))
 }
+*/
