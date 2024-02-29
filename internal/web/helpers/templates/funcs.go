@@ -69,7 +69,7 @@ func contextFuncs(c echo.Context) template.FuncMap {
 func statelessFuncs(store problems.Store, users njudge.Users, ps njudge.Problems, tags njudge.Tags, store2 partials.Store) template.FuncMap {
 	return template.FuncMap{
 		"translateContent": i18n.TranslateContent,
-		"problem":          store.Get,
+		"problem":          store.GetProblem,
 		"str2html": func(s string) template.HTML {
 			return template.HTML(s)
 		},

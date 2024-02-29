@@ -45,7 +45,7 @@ type RateLimitStatusUpdate struct {
 	limiter *rate.Limiter
 }
 
-func NewRateLimitStatusUpdater(innerUpdater problems.StatusUpdater, r rate.Limit) *RateLimitStatusUpdate {
+func NewRateLimitStatusUpdate(innerUpdater problems.StatusUpdater, r rate.Limit) *RateLimitStatusUpdate {
 	return &RateLimitStatusUpdate{
 		su:      innerUpdater,
 		limiter: rate.NewLimiter(r, 1),

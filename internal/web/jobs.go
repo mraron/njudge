@@ -25,7 +25,7 @@ func (s *Server) StartBackgroundJobs() {
 
 func (s *Server) runUpdateProblems() {
 	for {
-		if err := s.ProblemStore.Update(); err != nil {
+		if err := s.ProblemStore.UpdateProblems(); err != nil {
 			log.Print(err)
 		}
 

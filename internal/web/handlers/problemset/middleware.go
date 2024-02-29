@@ -24,7 +24,7 @@ func SetNameMiddleware() func(echo.HandlerFunc) echo.HandlerFunc {
 func RenameProblemMiddleware(problemStore problems.Store) func(echo.HandlerFunc) echo.HandlerFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			lst, err := problemStore.List()
+			lst, err := problemStore.ListProblems()
 			if err != nil {
 				return err
 			}

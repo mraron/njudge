@@ -31,7 +31,7 @@ import (
 
 func (s *Server) SetupDataAccess() {
 	s.ProblemStore = problems.NewFsStore(s.ProblemsDir)
-	s.ProblemStore.Update()
+	_ = s.ProblemStore.UpdateProblems()
 
 	if s.Mode == "demo" {
 		s.PartialsStore = partials.Empty{}

@@ -107,7 +107,7 @@ func (s Server) PostJudgeHandler() echo.HandlerFunc {
 
 func (s Server) Run() error {
 	go func() {
-		if err := s.ProblemStore.Update(); err != nil {
+		if err := s.ProblemStore.UpdateProblems(); err != nil {
 			s.Logger.Error("failed to update problemStore", err)
 		}
 	}()
@@ -127,7 +127,7 @@ func main() {
 	provider := sandbox.NewProvider().Put(s1).Put(s2)
 
 	problemStore := problems.NewFsStore("/home/aron/Projects/njudge/njudge_problems_git")
-	_ = problemStore.Update()
+	_ = problemStore.UpdateProblems()
 	languageStore := language.DefaultStore
 
 	judge := Judge{

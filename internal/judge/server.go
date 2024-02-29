@@ -95,7 +95,7 @@ func NewServer(cfg ServerConfig) (*Server, error) {
 	}
 
 	s.problemStore = problems.NewFsStore(cfg.ProblemsDir)
-	if err = s.problemStore.Update(); err != nil {
+	if err = s.problemStore.UpdateProblems(); err != nil {
 		s.logger.Info("failed to initialize problems", zap.Error(err))
 	}
 
@@ -116,7 +116,7 @@ func NewServer(cfg ServerConfig) (*Server, error) {
 func (s *Server) Run() {
 	go func() {
 		for {
-			if err := s.problemStore.Update(); err != nil {
+			if err := s.problemStore.UpdateProblems(); err != nil {
 				s.logger.Error("updating problems", zap.Error(err))
 			}
 

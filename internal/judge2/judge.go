@@ -32,7 +32,7 @@ type Judge struct {
 }
 
 func (j *Judge) Judge(ctx context.Context, sub Submission, callback ResultCallback) (*problems.Status, error) {
-	problem, err := j.ProblemStore.Get(sub.Problem)
+	problem, err := j.ProblemStore.GetProblem(sub.Problem)
 	if err != nil {
 		return nil, err
 	}
@@ -76,10 +76,10 @@ func (j *Judge) Judge(ctx context.Context, sub Submission, callback ResultCallba
 	}
 
 	innerUpdater, updates := evaluation.NewChanStatusUpdate()
-	updater := evaluation.NewRateLimitStatusUpdater(innerUpdater, rate.Every(j.RateLimit))
+	updater := evaluation.NewRateLimitStatusUpdate(innerUpdater, rate.Every(j.RateLimit))
 	done := make(chan struct{})
 	go func() {
-		ind := 1 //TODO?
+		ind := 1
 		for update := range updates {
 			_ = callback(Result{
 				Index:  ind,

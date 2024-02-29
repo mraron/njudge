@@ -62,7 +62,7 @@ func (j *Queue) Enqueue(ctx context.Context, sub Submission) (<-chan Response, e
 }
 
 func (q *Queue) SupportedProblems() ([]string, error) {
-	return q.problemStore.List()
+	return q.problemStore.ListProblems()
 }
 
 func (q *Queue) SupportedLanguages() ([]string, error) {
@@ -76,7 +76,7 @@ func (q *Queue) SupportedLanguages() ([]string, error) {
 
 func (j *Queue) Run() {
 	judge := func(worker *Worker, sub queueSubmission) error {
-		p, err := j.problemStore.Get(sub.Problem)
+		p, err := j.problemStore.GetProblem(sub.Problem)
 		if err != nil {
 			return err
 		}

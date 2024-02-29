@@ -50,7 +50,7 @@ func Get(cats njudge.Categories, problemQuery njudge.ProblemQuery, solvedStatusQ
 				elem := TreeNode{
 					ID:           id,
 					Type:         "problem",
-					Name:         tr.TranslateContent(problemStore.MustGet(p.Problem).Titles()).String(),
+					Name:         tr.TranslateContent(problemStore.MustGetProblem(p.Problem).Titles()).String(),
 					Link:         c.Echo().Reverse("getProblemMain", p.Problemset, p.Problem),
 					Children:     make([]TreeNode, 0),
 					SolvedStatus: -1,

@@ -62,38 +62,38 @@ func TestFSStore(t *testing.T) {
 	_ = afero.WriteFile(f, "problems/recursive/nono/feladat.xhtml", []byte("lalal"), 0644)
 
 	store := problems.NewFsStore("problems/", problems.FsStoreUseFs(f), problems.FsStoreUseConfigStore(configStore))
-	if err := store.Update(); err != nil {
+	if err := store.UpdateProblems(); err != nil {
 		t.Error(err)
 	}
-	if has, err := store.Has("aplusb"); !has || err != nil {
+	if has, err := store.HasProblem("aplusb"); !has || err != nil {
 		t.Error("aplusb", has, err)
 	}
-	if has, err := store.Has("aplusb2"); !has || err != nil {
+	if has, err := store.HasProblem("aplusb2"); !has || err != nil {
 		t.Error("aplusb2", has, err)
 	}
-	if has, err := store.Has("aplusb3"); has {
+	if has, err := store.HasProblem("aplusb3"); has {
 		t.Error("aplusb3", has, err)
 	}
 
-	if has, err := store.Has("XX_first"); !has || err != nil {
+	if has, err := store.HasProblem("XX_first"); !has || err != nil {
 		t.Error("XX_first", has, err)
 	}
-	if has, err := store.Has("XX_second"); !has || err != nil {
+	if has, err := store.HasProblem("XX_second"); !has || err != nil {
 		t.Error("XX_second", has, err)
 	}
-	if has, err := store.Has("XX_third"); has {
+	if has, err := store.HasProblem("XX_third"); has {
 		t.Error("XX_third", has, err)
 	}
-	if has, err := store.Has("XX_.hidden"); has {
+	if has, err := store.HasProblem("XX_.hidden"); has {
 		t.Error("XX_.hidden", has, err)
 	}
-	if has, err := store.Has("XX_hidden"); has {
+	if has, err := store.HasProblem("XX_hidden"); has {
 		t.Error("XX_hidden", has, err)
 	}
-	if has, err := store.Has("XX_ignored"); has {
+	if has, err := store.HasProblem("XX_ignored"); has {
 		t.Error("XX_ignored", has, err)
 	}
-	if has, err := store.Has("nono"); has {
+	if has, err := store.HasProblem("nono"); has {
 		t.Error("nono", has, err)
 	}
 }
