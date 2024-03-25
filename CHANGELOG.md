@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+# Fixed
+- User registration (8a00521)
+- Sorting was ignored for submission lists (6833e08)
+- Loading tags for problems, category filter in problemlist, solver_count query (63f405a)
+- Admin panel (661484b, 1ee0070)
+- Syntax of migration 10 (e35d4cc)
+- Category link in problem sets (d9a5c96)
+- Subtask scoring (6fee8f0)
+- Fix bug related to long lines and cms whitediff checker (7289bb8)
+
+# Added
+- Tests to validate task_yaml ScoringMin behaviour (67a068b)
+- Problem and category visibility (5452ee8)
+- Optimized submission queries for glue (888a0ae)
+- Cached solved status queries (18c5177)
+
+# Changed
+- bootstrap-icons (755b9cf)
+- Dependencies (74e7c2d, 7c3199e, a0bc370)
+
 ## [0.3.1] - 2023-11-28
 
 ### Fixed
