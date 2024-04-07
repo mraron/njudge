@@ -3,7 +3,7 @@ ARG PROJECT_NAME
 FROM ubuntu:22.04 as judge_deps
 RUN apt-get update && apt-get install -y wget gcc g++ git build-essential libcap-dev
 WORKDIR /app
-RUN git clone https://github.com/ioi/isolate.git
+RUN git clone --depth 1 --branch v1.10.1 https://github.com/ioi/isolate.git
 WORKDIR /app/isolate
 RUN make isolate
 
