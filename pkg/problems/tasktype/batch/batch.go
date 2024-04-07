@@ -304,11 +304,14 @@ func (b Batch) Run(judging problems.Judgeable, sp *language.SandboxProvider, lan
 
 				if _, ok := testCache[tc.InputPath]; ok {
 					tmpIndex, tmpGroup := tc.Index, tc.Group
+					maxScore := tc.MaxScore
 					*tc = *testCache[tc.InputPath]
 					tc.Index = tmpIndex
 					tc.Group = tmpGroup
-					tc.Score = 0.0
-					tc.MaxScore = 0.0
+					if tc.MaxScore > 0 {
+						tc.Score = tc.Score / tc.MaxScore * maxScore
+						tc.MaxScore = maxScore
+					}
 					continue
 				}
 				testCache[tc.InputPath] = tc
