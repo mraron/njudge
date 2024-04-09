@@ -16,6 +16,7 @@ func TestDoWhitediff(t *testing.T) {
 	for i := range longLine {
 		longLine[i] = 'a'
 	}
+	longLineWithEndl := append(longLine, '\n')
 
 	tests := []struct {
 		name    string
@@ -52,6 +53,8 @@ func TestDoWhitediff(t *testing.T) {
 		{"test_diff_wrong_line3", args{strings.NewReader("1\n\n2"), strings.NewReader("1\n2")}, 0.0, false},
 
 		{"test_long_line", args{strings.NewReader(string(longLine)), strings.NewReader(string(longLine))}, 1.0, false},
+
+		{"test_long_line_withendl", args{strings.NewReader(string(longLine)), strings.NewReader(string(longLineWithEndl))}, 1.0, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
