@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"io/fs"
+	"log/slog"
 	"strings"
 )
 
@@ -66,7 +67,15 @@ func NewGlueCmd(v *viper.Viper) *cobra.Command {
 		},
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			g, err := glue.New(judge.NewClient("http://localhost:8888"), glue.WithDatabaseOption(cfg.Database))
+			conn, err := cfg.Database.Connect()
+			if err != nil {
+				return err
+			}
+			g, err := glue.New(
+				judge.NewClient("http://localhost:8888"),
+				glue.WithDatabaseOption(conn),
+				glue.WithLogger(slog.Default()),
+			)
 			if err != nil {
 				return err
 			}

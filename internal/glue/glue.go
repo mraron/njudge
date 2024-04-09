@@ -2,10 +2,12 @@ package glue
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"github.com/mraron/njudge/internal/judge"
 	"github.com/mraron/njudge/internal/njudge/db"
-	"github.com/mraron/njudge/internal/web/helpers/config"
+	"io"
+	"log/slog"
 	"strconv"
 	"time"
 
@@ -18,6 +20,8 @@ import (
 type Glue struct {
 	Judge judge.Judger
 
+	Logger *slog.Logger
+
 	Submissions      njudge.Submissions
 	Problems         njudge.Problems
 	SubmissionsQuery njudge.SubmissionsQuery
@@ -25,13 +29,9 @@ type Glue struct {
 
 type Option func(*Glue) error
 
-func WithDatabaseOption(cfg config.Database) Option {
+func WithDatabaseOption(conn *sql.DB) Option {
 	return func(glue *Glue) error {
-		conn, err := cfg.Connect()
-		if err != nil {
-			return err
-		}
-		if err = conn.Ping(); err != nil {
+		if err := conn.Ping(); err != nil {
 			return err
 		}
 		glue.Submissions = db.NewSubmissions(conn)
@@ -41,9 +41,17 @@ func WithDatabaseOption(cfg config.Database) Option {
 	}
 }
 
+func WithLogger(logger *slog.Logger) Option {
+	return func(glue *Glue) error {
+		glue.Logger = logger.With("service", "glue")
+		return nil
+	}
+}
+
 func New(judge judge.Judger, opts ...Option) (*Glue, error) {
 	glue := &Glue{
-		Judge: judge,
+		Judge:  judge,
+		Logger: slog.New(slog.NewJSONHandler(io.Discard, nil)),
 	}
 	for _, opt := range opts {
 		if err := opt(glue); err != nil {
@@ -62,6 +70,7 @@ func (g *Glue) ProcessSubmission(ctx context.Context, sub njudge.Submission) err
 	); err != nil {
 		return err
 	}
+	g.Logger.Info("submission started", "id", sub.ID)
 
 	prob, err := g.Problems.Get(ctx, sub.ProblemID)
 	if err != nil {
@@ -85,6 +94,10 @@ func (g *Glue) ProcessSubmission(ctx context.Context, sub njudge.Submission) err
 			Status:  *result.Status,
 			Ontest:  null.NewString(result.Test, true),
 		}
+		g.Logger.Info(
+			fmt.Sprintf("callback %d received for submission", result.Index),
+			"id", sub.ID,
+		)
 
 		return g.Submissions.Update(ctx, sub, njudge.Fields(
 			njudge.SubmissionFields.Verdict,
@@ -107,6 +120,8 @@ func (g *Glue) ProcessSubmission(ctx context.Context, sub njudge.Submission) err
 		score = float32(status.Feedback[0].Score())
 	}
 
+	g.Logger.Info("finished judging submission", "id", sub.ID)
+
 	sub.Verdict = njudge.Verdict(verdict)
 	sub.Status = *status
 	sub.Ontest = null.NewString("", false)
@@ -124,10 +139,10 @@ func (g *Glue) ProcessSubmission(ctx context.Context, sub njudge.Submission) err
 
 func (g *Glue) Start(ctx context.Context) {
 	for {
+		g.Logger.Info("looking for submissions")
 		subs, err := g.SubmissionsQuery.GetUnstarted(ctx, 10)
 		if err != nil {
-			fmt.Println(err)
-			// log it
+			g.Logger.Error("looking for submissions", "error", err)
 			continue
 		}
 
@@ -138,7 +153,7 @@ func (g *Glue) Start(ctx context.Context) {
 				// and also a collection of judges
 				err := g.ProcessSubmission(ctx, s)
 				if err != nil {
-					fmt.Println(err)
+					g.Logger.Error("processing submission", "id", s.ID, "error", err)
 					return
 				}
 			}()

@@ -29,10 +29,10 @@ type Submission struct {
 }
 
 type Result struct {
-	Index  int              `json:"index,omitempty"`
-	Test   string           `json:"test,omitempty"`
+	Index  int              `json:"index"`
+	Test   string           `json:"test"`
 	Status *problems.Status `json:"status"`
-	Error  string           `json:"error,omitempty"`
+	Error  string           `json:"error"`
 }
 
 type Server struct {
