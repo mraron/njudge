@@ -28,7 +28,7 @@ func TestBasicRunner_Run(t *testing.T) {
 		s   sandbox.Sandbox
 		err error
 	)
-	if *testutils.UseIsolate {
+	if !*testutils.UseIsolate {
 		s, err = sandbox.NewDummy()
 	} else {
 		s, err = sandbox.NewIsolate(444)
@@ -197,7 +197,7 @@ func TestBasicRunnerMultipleRuns(t *testing.T) {
 		s   sandbox.Sandbox
 		err error
 	)
-	if *testutils.UseIsolate {
+	if !*testutils.UseIsolate {
 		s, err = sandbox.NewDummy()
 	} else {
 		s, err = sandbox.NewIsolate(444)
@@ -307,7 +307,7 @@ func TestInteractiveRunner_Run(t *testing.T) {
 		s1, s2 sandbox.Sandbox
 		err    error
 	)
-	if *testutils.UseIsolate {
+	if !*testutils.UseIsolate {
 		s1, err = sandbox.NewDummy()
 		assert.Nil(t, err)
 		s2, err = sandbox.NewDummy()
