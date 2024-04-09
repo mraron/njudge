@@ -37,12 +37,12 @@
     </div>
 {{end}}
 
-{{if eq $status.FeedbackType 0}}
+{{if eq $status.FeedbackType "FeedbackCF"}}
     {{range $testset := $status.Feedback}}
         {{range $i, $e := $testset.Testcases}}
             {{$ind := add $i 1}}
             <div class="card">
-                <div class="card-header {{if and (eq $e.VerdictName 0) ($status.Compiled)}}bg-success{{else}}bg-danger{{end}}"><span class="bi bi-{{if and (eq $e.VerdictName 0) ($status.Compiled)}}check-lg{{else}}x-lg{{end}}"></span> {{$ind}} - {{if $status.Compiled}}{{(verdict $e.VerdictName).String | Tr}}{{else}}{{Tr "Compilation error"}}{{end}}</div>
+                <div class="card-header {{if and (eq $e.VerdictName "AC") ($status.Compiled)}}bg-success{{else}}bg-danger{{end}}"><span class="bi bi-{{if and (eq $e.VerdictName "AC") ($status.Compiled)}}check-lg{{else}}x-lg{{end}}"></span> {{$ind}} - {{if $status.Compiled}}{{(verdict $e.VerdictName).String | Tr}}{{else}}{{Tr "Compilation error"}}{{end}}</div>
                 <div class="card-body">
                     <span class="bi bi-memory"></span> {{Tr "Memory"}}: {{$e.MemoryUsed}}KiB <br><span class="bi bi-clock"></span> {{Tr "Time"}}: {{$e.TimeSpent}}<br><br>
                     {{Tr "Program's output"}}:
@@ -58,7 +58,7 @@
     {{end}}
 {{end}}
 
-{{if or (eq $status.FeedbackType 1) (eq $status.FeedbackType 3)}}
+{{if or (eq $status.FeedbackType "FeedbackIOI") (eq $status.FeedbackType "FeedbackLazyIOI")}}
     <div class="table-responsive">
         <table class="table table-bordered table-sm">
             <thead>
@@ -91,8 +91,8 @@
                     {{range $t := $g.Testcases}}
                         <tr>
                             <td>{{$t.Index}}</td>
-                            <td {{if ne $g.Scoring 1}}colspan="2"{{end}}><span class="{{if eq $t.VerdictName 0}}text-success{{else}}text-info{{end}}">{{(verdict $t.VerdictName).String | Tr}}</span></td>
-                            {{if eq $g.Scoring 1}}
+                            <td {{if ne $g.Scoring "ScoringSum"}}colspan="2"{{end}}><span class="{{if eq $t.VerdictName "AC"}}text-success{{else}}text-info{{end}}">{{(verdict $t.VerdictName).String | Tr}}</span></td>
+                            {{if eq $g.Scoring "ScoringSum"}}
                                 <td>{{roundTo $t.Score 2}}/{{$t.MaxScore}}</td>
                             {{end}}
                             <td>{{$t.TimeSpent}}</td>
