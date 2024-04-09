@@ -2,6 +2,7 @@ package taskarchive
 
 import (
 	"net/http"
+	"sort"
 
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
@@ -45,6 +46,9 @@ func Get(cats njudge.Categories, problemQuery njudge.ProblemQuery, solvedStatusQ
 			if err != nil {
 				return err
 			}
+			sort.Slice(problemList, func(i, j int) bool {
+				return problemList[i].ID < problemList[j].ID
+			})
 
 			for _, p := range problemList {
 				elem := TreeNode{
@@ -75,6 +79,9 @@ func Get(cats njudge.Categories, problemQuery njudge.ProblemQuery, solvedStatusQ
 				return err
 			}
 
+			sort.Slice(subCategories, func(i, j int) bool {
+				return subCategories[i].Name < subCategories[j].Name
+			})
 			for _, cat := range subCategories {
 				if !cat.Visible {
 					if u == nil || u.Role != "admin" {
@@ -100,6 +107,9 @@ func Get(cats njudge.Categories, problemQuery njudge.ProblemQuery, solvedStatusQ
 			return nil
 		}
 
+		sort.Slice(lst, func(i, j int) bool {
+			return lst[i].Name < lst[j].Name
+		})
 		for _, start := range lst {
 			if !start.Visible {
 				if u == nil || u.Role != "admin" {
