@@ -66,7 +66,7 @@ func NewGlueCmd(v *viper.Viper) *cobra.Command {
 		},
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			g, err := glue.New(judge2.NewClient("http://localhost:8888"), glue.WithDatabaseOption(cfg.Database))
+			g, err := glue.New(judge.NewClient("http://localhost:8888"), glue.WithDatabaseOption(cfg.Database))
 			if err != nil {
 				return err
 			}

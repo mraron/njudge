@@ -1,19 +1,7 @@
 package cmd
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
-	"io"
-	"os"
-
-	"github.com/mraron/njudge/internal/judge"
-
-	"github.com/mraron/njudge/pkg/language"
-	"github.com/mraron/njudge/pkg/language/sandbox"
-	"github.com/mraron/njudge/pkg/problems"
 	"github.com/spf13/cobra"
-	"go.uber.org/zap"
 )
 
 var TestProblemArgs struct {
@@ -26,7 +14,8 @@ var TestProblemArgs struct {
 var TestProblemCmd = &cobra.Command{
 	Use: "testproblem",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		sp := sandbox.NewProvider()
+		//todo
+		/*sp := sandbox.NewProvider()
 		s1, _ := sandbox.NewIsolate(50)
 		sp.Put(s1)
 		s2, _ := sandbox.NewIsolate(51)
@@ -64,7 +53,8 @@ var TestProblemCmd = &cobra.Command{
 			fmt.Println(string(res))
 		}
 
-		return err
+		return err*/
+		return nil
 	},
 }
 

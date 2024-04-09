@@ -1,4 +1,4 @@
-package judge2
+package judge
 
 import (
 	"encoding/json"

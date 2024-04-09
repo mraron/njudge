@@ -103,11 +103,11 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 		v1.DELETE("/partials/:name", api.Delete[models.Partial](partialDataProvider))
 
 		judgeDataProvider := api.JudgeDataProvider{DB: s.DB}
-		v1.GET("/judges", api.GetList[helpers.Judge](judgeDataProvider))
-		v1.POST("/judges", api.Post[helpers.Judge](judgeDataProvider))
-		v1.GET("/judges/:id", api.Get[helpers.Judge](judgeDataProvider))
-		v1.PUT("/judges/:id", api.Put[helpers.Judge](judgeDataProvider))
-		v1.DELETE("/judges/:id", api.Delete[helpers.Judge](judgeDataProvider))
+		v1.GET("/judges", api.GetList[models.Judge](judgeDataProvider))
+		v1.POST("/judges", api.Post[models.Judge](judgeDataProvider))
+		v1.GET("/judges/:id", api.Get[models.Judge](judgeDataProvider))
+		v1.PUT("/judges/:id", api.Put[models.Judge](judgeDataProvider))
+		v1.DELETE("/judges/:id", api.Delete[models.Judge](judgeDataProvider))
 
 		userDataProvider := api.UserDataProvider{DB: s.DB}
 		v1.GET("/users", api.GetList[models.User](userDataProvider))

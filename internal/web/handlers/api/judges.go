@@ -5,7 +5,6 @@ import (
 	"database/sql"
 
 	"github.com/mraron/njudge/internal/njudge/db/models"
-	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/pagination"
 
 	"github.com/volatiletech/sqlboiler/v4/boil"
@@ -24,7 +23,7 @@ func (JudgeDataProvider) Identifier() string {
 	return "id"
 }
 
-func (dp JudgeDataProvider) List(data *pagination.Data) ([]*helpers.Judge, error) {
+func (dp JudgeDataProvider) List(data *pagination.Data) ([]*models.Judge, error) {
 	qms := make([]QueryMod, 0)
 	if data.SortField != "" {
 		qms = append(qms, OrderBy(data.SortField+" "+data.SortDir))
@@ -35,42 +34,19 @@ func (dp JudgeDataProvider) List(data *pagination.Data) ([]*helpers.Judge, error
 		qms = append(qms, Offset(data.PerPage*(data.Page-1)))
 	}
 
-	orig, err := models.Judges(qms...).All(context.TODO(), dp.DB)
-	if err != nil {
-		return nil, err
-	}
-
-	lst := make([]*helpers.Judge, len(orig))
-	for i := 0; i < len(orig); i++ {
-		elem := helpers.NewJudgeFromModelsJudge(orig[i])
-		lst[i] = elem
-	}
-
-	return lst, nil
+	return models.Judges(qms...).All(context.TODO(), dp.DB)
 }
 
 func (dp JudgeDataProvider) Count() (int64, error) {
 	return models.Judges().Count(context.TODO(), dp.DB)
 }
 
-func (dp JudgeDataProvider) Get(id string) (*helpers.Judge, error) {
-	elem, err := models.Judges(Where("id = ?", id)).One(context.TODO(), dp.DB)
-	if err != nil {
-		return nil, err
-	}
-
-	res := helpers.NewJudgeFromModelsJudge(elem)
-	return res, nil
+func (dp JudgeDataProvider) Get(id string) (*models.Judge, error) {
+	return models.Judges(Where("id = ?", id)).One(context.TODO(), dp.DB)
 }
 
-func (dp JudgeDataProvider) Insert(elem *helpers.Judge) error {
-	model := models.Judge{}
-	model.Host = elem.Host
-	model.Port = elem.Port
-
-	err := model.Insert(context.TODO(), dp.DB, boil.Infer())
-	elem.Id = int64(model.ID)
-	return err
+func (dp JudgeDataProvider) Insert(elem *models.Judge) error {
+	return elem.Insert(context.TODO(), dp.DB, boil.Infer())
 }
 
 func (dp JudgeDataProvider) Delete(id string) error {
@@ -83,14 +59,7 @@ func (dp JudgeDataProvider) Delete(id string) error {
 	return err
 }
 
-func (dp JudgeDataProvider) Update(id string, elem *helpers.Judge) error {
-	model, err := models.Judges(Where("id=?", id)).One(context.TODO(), dp.DB)
-	if err != nil {
-		return err
-	}
-
-	model.Host = elem.Host
-	model.Port = elem.Port
-	_, err = model.Update(context.TODO(), dp.DB, boil.Infer())
+func (dp JudgeDataProvider) Update(id string, elem *models.Judge) error {
+	_, err := elem.Update(context.TODO(), dp.DB, boil.Infer())
 	return err
 }

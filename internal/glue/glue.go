@@ -16,7 +16,7 @@ import (
 )
 
 type Glue struct {
-	Judge judge2.Judger
+	Judge judge.Judger
 
 	Submissions      njudge.Submissions
 	Problems         njudge.Problems
@@ -41,7 +41,7 @@ func WithDatabaseOption(cfg config.Database) Option {
 	}
 }
 
-func New(judge judge2.Judger, opts ...Option) (*Glue, error) {
+func New(judge judge.Judger, opts ...Option) (*Glue, error) {
 	glue := &Glue{
 		Judge: judge,
 	}
@@ -69,12 +69,12 @@ func (g *Glue) ProcessSubmission(ctx context.Context, sub njudge.Submission) err
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Minute)
-	status, err := g.Judge.Judge(ctx, judge2.Submission{
+	status, err := g.Judge.Judge(ctx, judge.Submission{
 		ID:       strconv.Itoa(sub.ID),
 		Problem:  prob.Problem,
 		Language: sub.Language,
 		Source:   sub.Source,
-	}, func(result judge2.Result) error {
+	}, func(result judge.Result) error {
 		if result.Status == nil {
 			return fmt.Errorf("received nil status, error: %v", result.Error)
 		}

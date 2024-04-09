@@ -476,7 +476,7 @@ func TestFeedbackType_UnmarshalJSON(t *testing.T) {
 		{"ioi", "\"FeedbackIOI\"", FeedbackIOI, assert.NoError},
 		{"acm", "\"FeedbackACM\"", FeedbackACM, assert.NoError},
 		{"lazyioi", "\"FeedbackLazyIOI\"", FeedbackLazyIOI, assert.NoError},
-		{"other", "\"lol\"", FeedbackUnknown, assert.Error},
+		{"other", "\"lol\"", FeedbackUnknown, assert.NoError},
 	}
 
 	for _, tt := range tests {

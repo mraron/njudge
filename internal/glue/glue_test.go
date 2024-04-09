@@ -17,10 +17,10 @@ import (
 )
 
 type TestJudger struct {
-	f func(ctx context.Context, sub judge2.Submission, callback judge2.ResultCallback) (*problems.Status, error)
+	f func(ctx context.Context, sub judge.Submission, callback judge.ResultCallback) (*problems.Status, error)
 }
 
-func (t TestJudger) Judge(ctx context.Context, sub judge2.Submission, callback judge2.ResultCallback) (*problems.Status, error) {
+func (t TestJudger) Judge(ctx context.Context, sub judge.Submission, callback judge.ResultCallback) (*problems.Status, error) {
 	return t.f(ctx, sub, callback)
 }
 
@@ -50,7 +50,7 @@ func (f FakeProblems) Update(ctx context.Context, p njudge.Problem, fields []str
 
 func TestGlue_ProcessSubmission(t *testing.T) {
 	type fields struct {
-		Judge       judge2.Judger
+		Judge       judge.Judger
 		Submissions njudge.Submissions
 		Problems    njudge.Problems
 	}
@@ -70,7 +70,7 @@ func TestGlue_ProcessSubmission(t *testing.T) {
 			name: "compilation error",
 			fields: fields{
 				Judge: TestJudger{
-					f: func(ctx context.Context, sub judge2.Submission, callback judge2.ResultCallback) (*problems.Status, error) {
+					f: func(ctx context.Context, sub judge.Submission, callback judge.ResultCallback) (*problems.Status, error) {
 						return &problems.Status{
 							Compiled:       false,
 							CompilerOutput: "compilation error",
@@ -94,8 +94,8 @@ func TestGlue_ProcessSubmission(t *testing.T) {
 		{
 			name: "error while running",
 			fields: fields{
-				Judge: TestJudger{f: func(ctx context.Context, sub judge2.Submission, callback judge2.ResultCallback) (*problems.Status, error) {
-					_ = callback(judge2.Result{
+				Judge: TestJudger{f: func(ctx context.Context, sub judge.Submission, callback judge.ResultCallback) (*problems.Status, error) {
+					_ = callback(judge.Result{
 						Index: 1,
 						Test:  "test1",
 						Status: &problems.Status{
@@ -147,7 +147,7 @@ func TestGlue_ProcessSubmission(t *testing.T) {
 		{
 			name: "no callback run RE",
 			fields: fields{
-				Judge: TestJudger{f: func(ctx context.Context, sub judge2.Submission, callback judge2.ResultCallback) (*problems.Status, error) {
+				Judge: TestJudger{f: func(ctx context.Context, sub judge.Submission, callback judge.ResultCallback) (*problems.Status, error) {
 					return &problems.Status{
 						Compiled:       true,
 						CompilerOutput: "",
@@ -219,7 +219,7 @@ func TestJudgeIntegration(t *testing.T) {
 	store := problems.NewFsStore("../judge/testdata")
 	_ = store.UpdateProblems()
 
-	judge := &judge2.Judge{
+	judge := &judge.Judge{
 		SandboxProvider: sandbox.NewProvider().Put(s1).Put(s2),
 		ProblemStore:    store,
 		LanguageStore:   language.DefaultStore,

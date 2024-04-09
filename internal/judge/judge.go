@@ -1,4 +1,4 @@
-package judge2
+package judge
 
 import (
 	"bufio"
@@ -32,7 +32,6 @@ type Judge struct {
 }
 
 func (j *Judge) Judge(ctx context.Context, sub Submission, callback ResultCallback) (*problems.Status, error) {
-	fmt.Println(sub)
 	problem, err := j.ProblemStore.GetProblem(sub.Problem)
 	if err != nil {
 		return nil, err

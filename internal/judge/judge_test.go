@@ -1,4 +1,4 @@
-package judge2
+package judge
 
 import (
 	"context"
@@ -102,4 +102,18 @@ print(a+b)
 	}, nil)
 	assert.Nil(t, res)
 	assert.ErrorIs(t, err, language.ErrorLanguageNotFound)
+
+	res, err = judge.Judge(context.Background(), Submission{
+		ID:       "",
+		Problem:  "aplusb",
+		Language: "cpp14",
+		Source: []byte(`int main() {}
+`),
+	}, func(result Result) error {
+		return nil
+	})
+	assert.NoError(t, err)
+	assert.NotNil(t, res)
+	assert.True(t, res.Compiled)
+
 }

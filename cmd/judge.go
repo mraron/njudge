@@ -92,16 +92,16 @@ func NewJudgeCmd(v *viper.Viper) *cobra.Command {
 				}
 			}
 
-			server := judge2.NewServer(
+			server := judge.NewServer(
 				slog.Default(),
-				&judge2.Judge{
+				&judge.Judge{
 					SandboxProvider: provider,
 					ProblemStore:    store,
 					LanguageStore:   language.DefaultStore,
 					RateLimit:       cfg.UpdateStatusLimitEvery,
 				},
 				store,
-				judge2.WithPortServerOption(cfg.Port),
+				judge.WithPortServerOption(cfg.Port),
 			)
 
 			return server.Run()
