@@ -3,6 +3,7 @@ package config
 import (
 	"crypto/rsa"
 	"crypto/x509"
+	"database/sql"
 	"encoding/pem"
 	"errors"
 	"fmt"
@@ -10,12 +11,26 @@ import (
 )
 
 type Database struct {
-	DBAccount  string
-	DBPassword string
-	DBHost     string
-	DBName     string
-	DBPort     int
-	DBSSLMode  bool
+	User     string `json:"user,omitempty"`
+	Password string `json:"password,omitempty"`
+	Host     string `json:"host,omitempty"`
+	Name     string `json:"name,omitempty"`
+	Port     int    `json:"port,omitempty"`
+	SSLMode  bool   `json:"ssl_mode,omitempty"`
+}
+
+func (db Database) Connect() (*sql.DB, error) {
+	SSLMode := "require"
+	if !db.SSLMode {
+		SSLMode = "disable"
+	}
+
+	if db.Port == 0 {
+		db.Port = 5432
+	}
+
+	connStr := fmt.Sprintf("user=%s password=%s host=%s dbname=%s port=%d sslmode=%s", db.User, db.Password, db.Host, db.Name, db.Port, SSLMode)
+	return sql.Open("postgres", connStr)
 }
 
 type Server struct {
@@ -50,7 +65,7 @@ type Server struct {
 		MailAccountPassword string `json:"mail_password" mapstructure:"mail_password"`
 	} `json:"smtp" mapstructure:"smtp"`
 
-	Database `mapstructure:",squash"`
+	Database `json:"database" mapstructure:"database"`
 
 	Keys Keys
 }

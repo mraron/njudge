@@ -32,6 +32,7 @@ type Judge struct {
 }
 
 func (j *Judge) Judge(ctx context.Context, sub Submission, callback ResultCallback) (*problems.Status, error) {
+	fmt.Println(sub)
 	problem, err := j.ProblemStore.GetProblem(sub.Problem)
 	if err != nil {
 		return nil, err
@@ -51,6 +52,9 @@ func (j *Judge) Judge(ctx context.Context, sub Submission, callback ResultCallba
 	res := problems.Status{}
 
 	compileSandbox, _ := provider.Get()
+	if err := compileSandbox.Init(ctx); err != nil {
+		return nil, err
+	}
 	taskType := problem.GetTaskType()
 	compilationResult, err := taskType.Compile(ctx, evaluation.NewByteSolution(lang, sub.Source), compileSandbox)
 	provider.Put(compileSandbox)
@@ -132,7 +136,7 @@ func (c Client) Judge(ctx context.Context, sub Submission, callback ResultCallba
 			}
 		}
 	}
-	_ = resp.Body.Close()
+	err = errors.Join(err, s.Err(), resp.Body.Close())
 	return res.Status, err
 }
 

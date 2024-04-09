@@ -15,6 +15,7 @@ import (
 	slogecho "github.com/samber/slog-echo"
 	"log/slog"
 	"net/http"
+	"time"
 
 	_ "github.com/mraron/njudge/pkg/language/langs/python3"
 )
@@ -103,8 +104,11 @@ func (s Server) PostJudgeHandler() echo.HandlerFunc {
 
 func (s Server) Run() error {
 	go func() {
-		if err := s.ProblemStore.UpdateProblems(); err != nil {
-			s.Logger.Error("failed to update problemStore", err)
+		for {
+			if err := s.ProblemStore.UpdateProblems(); err != nil {
+				s.Logger.Error("failed to update problemStore", err)
+			}
+			time.Sleep(30 * time.Second)
 		}
 	}()
 

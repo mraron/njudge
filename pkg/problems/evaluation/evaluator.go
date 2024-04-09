@@ -8,12 +8,12 @@ import (
 )
 
 type LinearEvaluator struct {
-	runner problems.Runner
+	Runner problems.Runner
 }
 
 func NewLinearEvaluator(runner problems.Runner) *LinearEvaluator {
 	return &LinearEvaluator{
-		runner: runner,
+		Runner: runner,
 	}
 }
 
@@ -41,7 +41,7 @@ func (le *LinearEvaluator) Evaluate(ctx context.Context, skeleton problems.Statu
 		err error
 	)
 
-	if err = le.runner.SetSolution(ctx, compiledSolution); err != nil {
+	if err = le.Runner.SetSolution(ctx, compiledSolution); err != nil {
 		return ans, err
 	}
 
@@ -88,7 +88,7 @@ func (le *LinearEvaluator) Evaluate(ctx context.Context, skeleton problems.Statu
 						return ans, err
 					}
 
-					if err := le.runner.Run(ctx, sandboxProvider, tc); err != nil {
+					if err := le.Runner.Run(ctx, sandboxProvider, tc); err != nil {
 						tc.VerdictName = problems.VerdictXX
 						return ans, err
 					} else if tc.VerdictName != problems.VerdictAC {

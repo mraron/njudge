@@ -162,15 +162,15 @@ func (s *Server) ConnectToDB() {
 	var err error
 
 	sslmode := "require"
-	if !s.DBSSLMode {
+	if !s.SSLMode {
 		sslmode = "disable"
 	}
 
-	if s.DBPort == 0 {
-		s.DBPort = 5432
+	if s.Database.Port == 0 {
+		s.Database.Port = 5432
 	}
 
-	connStr := fmt.Sprintf("user=%s password=%s host=%s dbname=%s port=%d sslmode=%s", s.DBAccount, s.DBPassword, s.DBHost, s.DBName, s.DBPort, sslmode)
+	connStr := fmt.Sprintf("user=%s password=%s host=%s dbname=%s port=%d sslmode=%s", s.User, s.Password, s.Host, s.Name, s.Database.Port, sslmode)
 	s.DB, err = sql.Open("postgres", connStr)
 	if err != nil {
 		panic(err)

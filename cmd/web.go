@@ -32,11 +32,11 @@ var WebCmd = &cobra.Command{
 
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := config.Server{}
-
 		err := viper.Unmarshal(&cfg)
 		if err != nil {
 			return err
 		}
+		fmt.Println(cfg)
 
 		s := web.Server{Server: cfg}
 		s.Run()

@@ -93,7 +93,7 @@ func (f *FeedbackType) UnmarshalJSON(i []byte) error {
 		*f = FeedbackLazyIOI
 	case "null":
 	default:
-		return fmt.Errorf("unknown FeedbackType: %q", i)
+		*f = FeedbackUnknown
 	}
 	return nil
 }
