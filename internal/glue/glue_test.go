@@ -12,6 +12,8 @@ import (
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/stretchr/testify/assert"
 	"github.com/volatiletech/null/v8"
+	"io"
+	"log/slog"
 	"testing"
 	"time"
 )
@@ -196,6 +198,7 @@ func TestGlue_ProcessSubmission(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := &glue.Glue{
 				Judge:            tt.fields.Judge,
+				Logger:           slog.New(slog.NewJSONHandler(io.Discard, nil)),
 				Submissions:      tt.fields.Submissions,
 				Problems:         tt.fields.Problems,
 				SubmissionsQuery: memory.NewSubmissionsQuery(tt.fields.Submissions),
