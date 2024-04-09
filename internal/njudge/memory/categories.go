@@ -8,7 +8,7 @@ import (
 )
 
 type Categories struct {
-	sync.Mutex
+	mutex  sync.Mutex
 	nextId int
 	data   []njudge.Category
 }
@@ -21,8 +21,8 @@ func NewCategories() *Categories {
 }
 
 func (m *Categories) Get(ctx context.Context, ID int) (*njudge.Category, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	for ind := range m.data {
 		if m.data[ind].ID == ID {
 			res := m.data[ind]
@@ -34,8 +34,8 @@ func (m *Categories) Get(ctx context.Context, ID int) (*njudge.Category, error) 
 }
 
 func (m *Categories) GetAll(ctx context.Context) ([]njudge.Category, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	res := make([]njudge.Category, len(m.data))
 	copy(res, m.data)
 
@@ -43,8 +43,8 @@ func (m *Categories) GetAll(ctx context.Context) ([]njudge.Category, error) {
 }
 
 func (m *Categories) GetAllWithParent(ctx context.Context, parentID int) ([]njudge.Category, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	res := make([]njudge.Category, 0)
 	for ind := range m.data {
 		if parentID > 0 {
@@ -60,8 +60,8 @@ func (m *Categories) GetAllWithParent(ctx context.Context, parentID int) ([]njud
 }
 
 func (m *Categories) GetByName(ctx context.Context, name string) (*njudge.Category, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	for ind := range m.data {
 		if m.data[ind].Name == name {
 			res := m.data[ind]
@@ -73,8 +73,8 @@ func (m *Categories) GetByName(ctx context.Context, name string) (*njudge.Catego
 }
 
 func (m *Categories) Insert(ctx context.Context, u njudge.Category) (*njudge.Category, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	u.ID = m.nextId
 	m.nextId++
 	m.data = append(m.data, u)
@@ -84,8 +84,8 @@ func (m *Categories) Insert(ctx context.Context, u njudge.Category) (*njudge.Cat
 }
 
 func (m *Categories) Delete(ctx context.Context, ID int) error {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	for ind := range m.data {
 		if m.data[ind].ID == ID {
 			m.data[ind] = m.data[len(m.data)-1]
@@ -98,8 +98,8 @@ func (m *Categories) Delete(ctx context.Context, ID int) error {
 }
 
 func (m *Categories) Update(ctx context.Context, cat njudge.Category) error {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	for ind := range m.data {
 		if m.data[ind].ID == cat.ID {
 			m.data[ind] = cat

@@ -9,7 +9,7 @@ import (
 )
 
 type Submissions struct {
-	sync.Mutex
+	mutex  sync.Mutex
 	nextId int
 	data   []njudge.Submission
 }
@@ -22,8 +22,8 @@ func NewSubmissions() *Submissions {
 }
 
 func (m *Submissions) Get(ctx context.Context, ID int) (*njudge.Submission, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	for ind := range m.data {
 		if m.data[ind].ID == ID {
 			res := m.data[ind]
@@ -34,8 +34,8 @@ func (m *Submissions) Get(ctx context.Context, ID int) (*njudge.Submission, erro
 	return nil, njudge.ErrorSubmissionNotFound
 }
 func (m *Submissions) GetAll(ctx context.Context) ([]njudge.Submission, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	res := make([]njudge.Submission, len(m.data))
 	copy(res, m.data)
 
@@ -43,8 +43,8 @@ func (m *Submissions) GetAll(ctx context.Context) ([]njudge.Submission, error) {
 }
 
 func (m *Submissions) Insert(ctx context.Context, s njudge.Submission) (*njudge.Submission, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	s.ID = m.nextId
 	m.nextId++
 
@@ -55,8 +55,8 @@ func (m *Submissions) Insert(ctx context.Context, s njudge.Submission) (*njudge.
 }
 
 func (m *Submissions) Delete(ctx context.Context, ID int) error {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	for ind := range m.data {
 		if m.data[ind].ID == ID {
 			m.data[ind] = m.data[len(m.data)-1]
@@ -69,8 +69,8 @@ func (m *Submissions) Delete(ctx context.Context, ID int) error {
 }
 
 func (m *Submissions) Update(ctx context.Context, s njudge.Submission, fields []string) error {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	for ind := range m.data {
 		if m.data[ind].ID == s.ID {
 			if slices.Contains(fields, njudge.SubmissionFields.UserID) {
