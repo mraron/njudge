@@ -3,7 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"github.com/mraron/njudge/internal/judge2"
+	"github.com/mraron/njudge/internal/judge"
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/mraron/njudge/pkg/problems"

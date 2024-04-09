@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/mraron/njudge/internal/glue"
-	"github.com/mraron/njudge/internal/judge2"
+	"github.com/mraron/njudge/internal/judge"
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/njudge/memory"
 	"github.com/mraron/njudge/pkg/language"
@@ -216,7 +216,7 @@ func TestGlue_ProcessSubmission(t *testing.T) {
 func TestJudgeIntegration(t *testing.T) {
 	s1, _ := sandbox.NewDummy()
 	s2, _ := sandbox.NewDummy()
-	store := problems.NewFsStore("../judge2/testdata")
+	store := problems.NewFsStore("../judge/testdata")
 	_ = store.UpdateProblems()
 
 	judge := &judge2.Judge{

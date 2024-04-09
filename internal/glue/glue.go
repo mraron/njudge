@@ -3,7 +3,7 @@ package glue
 import (
 	"context"
 	"fmt"
-	"github.com/mraron/njudge/internal/judge2"
+	"github.com/mraron/njudge/internal/judge"
 	"github.com/mraron/njudge/internal/njudge/db"
 	"github.com/mraron/njudge/internal/web/helpers/config"
 	"strconv"

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/mraron/njudge/internal/glue"
-	"github.com/mraron/njudge/internal/judge2"
+	"github.com/mraron/njudge/internal/judge"
 	"github.com/mraron/njudge/internal/web/helpers/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
