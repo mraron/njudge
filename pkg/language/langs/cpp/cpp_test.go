@@ -120,5 +120,5 @@ func TestCompileError(t *testing.T) {
 		Source: io.NopCloser(bytes.NewBufferString(TestCodeCompileError)),
 	}, io.Discard, nil)
 	assert.Nil(t, file)
-	assert.Nil(t, err)
+	assert.NotNil(t, err)
 }
