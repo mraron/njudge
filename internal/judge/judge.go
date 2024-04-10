@@ -1,12 +1,12 @@
 package judge
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/karrick/gobls"
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/mraron/njudge/pkg/problems"
@@ -134,7 +134,7 @@ func (c Client) Judge(ctx context.Context, sub Submission, callback ResultCallba
 		return nil, err
 	}
 
-	s := bufio.NewScanner(resp.Body)
+	s := gobls.NewScanner(resp.Body)
 	var res Result
 	for s.Scan() {
 		if err2 := json.Unmarshal(s.Bytes(), &res); err2 != nil {
