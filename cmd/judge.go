@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/viper"
 	"io/fs"
 	"log/slog"
+	"runtime"
 	"strings"
 	"time"
 )
@@ -24,6 +25,8 @@ type JudgeConfig struct {
 	IsolateSandboxRange []int
 
 	UpdateStatusLimitEvery time.Duration
+
+	Concurrency int
 }
 
 var DefaultJudgeConfig = JudgeConfig{
@@ -32,6 +35,7 @@ var DefaultJudgeConfig = JudgeConfig{
 	Isolate:                true,
 	IsolateSandboxRange:    []int{400, 444},
 	UpdateStatusLimitEvery: 5 * time.Second,
+	Concurrency:            4,
 }
 
 func NewJudgeCmd(v *viper.Viper) *cobra.Command {
@@ -61,7 +65,6 @@ func NewJudgeCmd(v *viper.Viper) *cobra.Command {
 
 			cmd.Flags().VisitAll(func(flag *pflag.Flag) {
 				configName := strings.ReplaceAll(flag.Name, "-", "")
-				fmt.Println(configName, flag.Changed, v.IsSet(configName))
 				if !flag.Changed && v.IsSet(configName) {
 					val := v.Get(configName)
 					_ = cmd.Flags().Set(flag.Name, fmt.Sprintf("%v", val))
@@ -72,8 +75,11 @@ func NewJudgeCmd(v *viper.Viper) *cobra.Command {
 		},
 
 		RunE: func(cmd *cobra.Command, args []string) error {
+			log := slog.Default()
+
 			store := problems.NewFsStore(cfg.ProblemsDir)
 			provider := sandbox.NewProvider()
+			sandboxCount := 0
 			if cfg.Isolate {
 				for i := cfg.IsolateSandboxRange[0]; i <= cfg.IsolateSandboxRange[1]; i++ {
 					s, err := sandbox.NewIsolate(i, sandbox.IsolateOptionUseLogger(slog.Default()))
@@ -81,6 +87,7 @@ func NewJudgeCmd(v *viper.Viper) *cobra.Command {
 						return err
 					}
 					provider.Put(s)
+					sandboxCount++
 				}
 			} else {
 				for i := 0; i < 10; i++ {
@@ -89,16 +96,31 @@ func NewJudgeCmd(v *viper.Viper) *cobra.Command {
 						return err
 					}
 					provider.Put(s)
+					sandboxCount++
 				}
 			}
 
+			if 2*cfg.Concurrency > sandboxCount {
+				log.Warn("sandbox count is low for concurrency")
+			}
+			if cfg.Concurrency > runtime.GOMAXPROCS(0) {
+				log.Warn("concurrency is higher than GOMAXPROCS")
+			}
+
+			tokens := make(chan struct{}, cfg.Concurrency)
+			for range cfg.Concurrency {
+				tokens <- struct{}{}
+			}
+
 			server := judge.NewServer(
-				slog.Default(),
+				log,
 				&judge.Judge{
 					SandboxProvider: provider,
 					ProblemStore:    store,
 					LanguageStore:   language.DefaultStore,
 					RateLimit:       cfg.UpdateStatusLimitEvery,
+					Tokens:          tokens,
+					Logger:          log,
 				},
 				store,
 				judge.WithPortServerOption(cfg.Port),
@@ -113,6 +135,7 @@ func NewJudgeCmd(v *viper.Viper) *cobra.Command {
 	cmd.Flags().BoolVar(&cfg.Isolate, "isolate", DefaultJudgeConfig.Isolate, "use isolate (otherwise dummy sandboxes are used which are NOT secure)")
 	cmd.Flags().IntSliceVar(&cfg.IsolateSandboxRange, "isolate-sandbox-range", DefaultJudgeConfig.IsolateSandboxRange, "inclusive interval of isolate sandbox IDs")
 	cmd.Flags().DurationVar(&cfg.UpdateStatusLimitEvery, "updateStatus-limit-every", DefaultJudgeConfig.UpdateStatusLimitEvery, "the rate of status updates for the clients")
+	cmd.Flags().IntVar(&cfg.Concurrency, "concurrency", DefaultJudgeConfig.Concurrency, "the maximum number of concurrently executed testcase")
 
 	return cmd
 }

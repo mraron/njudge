@@ -13,6 +13,7 @@ import (
 	"github.com/mraron/njudge/pkg/problems/evaluation"
 	"golang.org/x/time/rate"
 	"io"
+	"log/slog"
 	"mime"
 	"net/http"
 	"time"
@@ -29,9 +30,16 @@ type Judge struct {
 	ProblemStore    problems.Store
 	LanguageStore   language.Store
 	RateLimit       time.Duration
+
+	Tokens chan struct{}
+	Logger *slog.Logger
 }
 
 func (j *Judge) Judge(ctx context.Context, sub Submission, callback ResultCallback) (*problems.Status, error) {
+	if j.Logger == nil {
+		j.Logger = slog.New(slog.NewJSONHandler(io.Discard, nil))
+	}
+	j.Logger.Info("🏃\tjudging started", "submission_id", sub.ID)
 	problem, err := j.ProblemStore.GetProblem(sub.Problem)
 	if err != nil {
 		return nil, err
@@ -41,22 +49,16 @@ func (j *Judge) Judge(ctx context.Context, sub Submission, callback ResultCallba
 		return nil, err
 	}
 
-	provider := sandbox.NewProvider()
-	for i := 0; i < 2; i++ {
-		box, _ := j.SandboxProvider.Get()
-		provider.Put(box)
-		defer j.SandboxProvider.Put(box)
-	}
-
 	res := problems.Status{}
 
-	compileSandbox, _ := provider.Get()
+	j.Logger.Info("🏗️\tcompilation step", "submission_id", sub.ID)
+	compileSandbox, _ := j.SandboxProvider.Get()
 	if err := compileSandbox.Init(ctx); err != nil {
 		return nil, err
 	}
 	taskType := problem.GetTaskType()
 	compilationResult, err := taskType.Compile(ctx, evaluation.NewByteSolution(lang, sub.Source), compileSandbox)
-	provider.Put(compileSandbox)
+	j.SandboxProvider.Put(compileSandbox)
 	if err != nil {
 		return nil, err
 	}
@@ -78,6 +80,7 @@ func (j *Judge) Judge(ctx context.Context, sub Submission, callback ResultCallba
 		return nil, err
 	}
 
+	j.Logger.Info("🔥\tstart evaluation", "submission_id", sub.ID)
 	innerUpdater, updates := evaluation.NewChanStatusUpdate()
 	updater := evaluation.NewRateLimitStatusUpdate(innerUpdater, rate.Every(j.RateLimit))
 	done := make(chan struct{})
@@ -93,9 +96,20 @@ func (j *Judge) Judge(ctx context.Context, sub Submission, callback ResultCallba
 		}
 		close(done)
 	}()
-	res, err = taskType.Evaluate(ctx, *st, evaluation.NewByteSolution(lang, binary), provider, updater)
+
+	eval := taskType.Evaluator
+	if j.Tokens != nil {
+		j.Logger.Info("🔀\tusing parallel evaluation", "submission_id", sub.ID)
+		eval = &ParallelEvaluator{
+			Runner: taskType.Evaluator.(*evaluation.LinearEvaluator).Runner,
+			Tokens: j.Tokens,
+			Logger: j.Logger.With("submission_id", sub.ID),
+		}
+	}
+	res, err = eval.Evaluate(ctx, *st, evaluation.NewByteSolution(lang, binary), j.SandboxProvider, updater)
 	res.CompilerOutput = compilationResult.CompilationMessage
 	<-done
+	j.Logger.Info("🏁\tdone", "submission_id", sub.ID)
 	return &res, err
 }
 
