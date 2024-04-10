@@ -15,6 +15,7 @@ import (
 	"os"
 	"path/filepath"
 	"syscall"
+	"time"
 )
 
 func setSolution(ctx context.Context, bin *string, dst *[]byte, solution problems.Solution) error {
@@ -311,6 +312,8 @@ type InteractiveRunner struct {
 
 	checker problems.Checker
 
+	executor UserInteractorExecutor
+
 	fs afero.Fs
 }
 
@@ -328,6 +331,7 @@ func NewInteractiveRunner(interactorBinary []byte, checker problems.Checker, opt
 		interactorBin: interactorBinary,
 		checker:       checker,
 		fs:            afero.NewOsFs(),
+		executor:      PolygonUserInteractorExecute{},
 	}
 	for _, opt := range opts {
 		opt(res)
@@ -354,6 +358,30 @@ func (r *InteractiveRunner) prepareFIFO(dir string, name string) (*os.File, erro
 		return nil, err
 	}
 	return os.OpenFile(filepath.Join(dir, name), os.O_RDWR, 0666)
+}
+
+type UserInteractorExecutor interface {
+	ExecuteUser(ctx context.Context, userSandbox sandbox.Sandbox, language language.Language, userBin sandbox.File, userStdin, userStdout *os.File, timeLimit time.Duration, memoryLimit memory.Amount) (*sandbox.Status, error)
+	ExecuteInteractor(ctx context.Context, interactorSandbox sandbox.Sandbox, userStdin, userStdout *os.File, testcase *problems.Testcase) (*sandbox.Status, error)
+}
+
+type PolygonUserInteractorExecute struct{}
+
+func (p PolygonUserInteractorExecute) ExecuteUser(ctx context.Context, userSandbox sandbox.Sandbox, language language.Language, userBin sandbox.File, userStdin, userStdout *os.File, timeLimit time.Duration, memoryLimit memory.Amount) (*sandbox.Status, error) {
+	return language.Run(ctx, userSandbox, userBin, userStdin, userStdout, timeLimit, memoryLimit)
+}
+
+func (p PolygonUserInteractorExecute) ExecuteInteractor(ctx context.Context, interactorSandbox sandbox.Sandbox, userStdin, userStdout *os.File, testcase *problems.Testcase) (*sandbox.Status, error) {
+	return interactorSandbox.Run(ctx, sandbox.RunConfig{
+		RunID:            "interactor",
+		TimeLimit:        2 * testcase.TimeLimit,
+		MemoryLimit:      1 * memory.GiB,
+		Stdin:            userStdout,
+		Stdout:           userStdin,
+		Stderr:           io.Discard,
+		InheritEnv:       true,
+		WorkingDirectory: interactorSandbox.Pwd(),
+	}, "interactor", "input", "output")
 }
 
 func (r *InteractiveRunner) Run(ctx context.Context, sandboxProvider sandbox.Provider, testcase *problems.Testcase) error {
@@ -425,23 +453,14 @@ func (r *InteractiveRunner) Run(ctx context.Context, sandboxProvider sandbox.Pro
 	)
 
 	go func() {
-		userStatus, userError = r.lang.Run(ctx, userSandbox, sandbox.File{
+		userStatus, userError = r.executor.ExecuteUser(ctx, userSandbox, r.lang, sandbox.File{
 			Name:   r.userBinName,
 			Source: io.NopCloser(bytes.NewBuffer(r.userBin)),
 		}, userStdin, userStdout, testcase.TimeLimit, testcase.MemoryLimit)
 		done <- struct{}{}
 	}()
 
-	interactorStatus, interactorError = interactorSandbox.Run(ctx, sandbox.RunConfig{
-		RunID:            "interactor",
-		TimeLimit:        2 * testcase.TimeLimit,
-		MemoryLimit:      1 * memory.GiB,
-		Stdin:            userStdout,
-		Stdout:           userStdin,
-		Stderr:           os.Stderr,
-		InheritEnv:       true,
-		WorkingDirectory: interactorSandbox.Pwd(),
-	}, "interactor", "input", "output")
+	interactorStatus, interactorError = r.executor.ExecuteInteractor(ctx, interactorSandbox, userStdin, userStdout, testcase)
 	<-done
 
 	testcase.OutputPath = filepath.Join(interactorSandbox.Pwd(), "output")
