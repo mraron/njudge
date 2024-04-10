@@ -25,6 +25,15 @@ void extra() {
 std::cout<<"Hello world\n";
 }
 `
+	TestCodeCompileError = `#include<iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin>>n;
+    vector<int> t(n);
+    cout<<"Hello world!\n";    return 0;
+}`
 )
 
 func TestExtraFiles(t *testing.T) {
@@ -88,4 +97,28 @@ func TestExtraFiles(t *testing.T) {
 		})
 	}
 
+}
+
+func TestCompileError(t *testing.T) {
+	var (
+		s   sandbox.Sandbox
+		err error
+	)
+	if *testutils.UseIsolate {
+		s, err = sandbox.NewIsolate(557)
+	} else {
+		s, err = sandbox.NewDummy()
+	}
+	if err != nil {
+		t.Error(err)
+	}
+
+	_ = s.Init(context.TODO())
+
+	file, err := cpp.Std17.Compile(context.Background(), s, sandbox.File{
+		Name:   "main.cpp",
+		Source: io.NopCloser(bytes.NewBufferString(TestCodeCompileError)),
+	}, io.Discard, nil)
+	assert.Nil(t, file)
+	assert.Nil(t, err)
 }

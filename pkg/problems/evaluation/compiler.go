@@ -48,6 +48,14 @@ func (c CompileCopyFile) Compile(ctx context.Context, solution problems.Solution
 
 type Compile struct{}
 
+func truncate(s string, to int) string {
+	if len(s) < to {
+		return s
+	}
+
+	return s[:to-1] + "..."
+}
+
 func (c Compile) CompileWithExtras(ctx context.Context, solution problems.Solution, s sandbox.Sandbox, extras []sandbox.File) (*problems.CompilationResult, error) {
 	lang := solution.GetLanguage()
 
@@ -62,10 +70,13 @@ func (c Compile) CompileWithExtras(ctx context.Context, solution problems.Soluti
 		Name:   lang.DefaultFilename(),
 		Source: f.Source,
 	}, stderrTruncated, extras); err != nil {
+		if len(stderr.String()) == 0 {
+			return nil, err
+		}
 		return &problems.CompilationResult{
 			CompiledFile:       nil,
-			CompilationMessage: stderr.String(),
-		}, err
+			CompilationMessage: truncate(err.Error()+"\n"+stderr.String(), 2048),
+		}, nil
 	}
 
 	return &problems.CompilationResult{
