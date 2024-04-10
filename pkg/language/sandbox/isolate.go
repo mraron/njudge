@@ -156,7 +156,6 @@ func (i *Isolate) Run(_ context.Context, config RunConfig, toRun string, toRunAr
 		lst := strings.Split(sc.Text(), ":")
 		switch lst[0] {
 		case "max-rss":
-			fallthrough
 		case "cg-mem":
 			mem, _ := strconv.Atoi(lst[1])
 			st.Memory += memory.Amount(mem) * memory.KiB
