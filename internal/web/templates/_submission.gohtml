@@ -15,6 +15,8 @@
     {{else}}
         {{if eq .Verdict "UP"}}
             <span class="text-muted">{{Tr "Uploaded"}}</span>
+        {{else if eq .Verdict "XX"}}
+            <span class="text-danger">{{Tr "Internal error"}}</span>
         {{else}}
             <span class="text-info">
                 {{Tr "Running"}}{{if .Ontest.Valid}}{{$test := .Ontest.String}} {{Tr "on test %s" $test}} {{end}}
@@ -37,12 +39,14 @@
     {{else}}
         {{if eq .Verdict "UP"}}
             <span class="text-muted">{{Tr "Uploaded"}}</span>
+        {{else if eq .Verdict "XX"}}
+            <span class="text-danger">{{Tr "Internal error"}}</span>
         {{else}}
             <span class="text-info">{{Tr "Running"}}</span>
         {{end}}
     {{end}}
 {{end}}
-{{if eq $status.FeedbackType "FeedbackACM"}}
+{{if or (eq $status.FeedbackType "FeedbackACM") (eq $status.FeedbackType "")}}
     {{if .Judged.Valid}}
         {{if eq .Verdict "CE"}}
             {{Tr "Compilation error"}}
@@ -60,6 +64,8 @@
         {{else}}
             {{if eq .Verdict "UP"}}
                 <span class="text-muted">{{Tr "Uploaded"}}</span>
+            {{else if eq .Verdict "XX"}}
+                <span class="text-danger">{{Tr "Internal error"}}</span>
             {{else}}
                 <span class="text-info">{{Tr "Running"}}</span>
             {{end}}
@@ -80,7 +86,7 @@
             {{$status := .Status}}
             {{template "submissionStatus" .}}
         </td>
-        <td>{{if and .Judged.Valid (ne .Verdict "CE")}}{{(index $status.Feedback 0).MaxTimeSpent}}{{end}}</td>
-        <td>{{if and .Judged.Valid (ne .Verdict "CE")}}{{(index $status.Feedback 0).MaxMemoryUsage}} KiB{{end}}</td>
+        <td>{{if and .Judged.Valid $status.Feedback}}{{(index $status.Feedback 0).MaxTimeSpent}}{{end}}</td>
+        <td>{{if and .Judged.Valid $status.Feedback}}{{(index $status.Feedback 0).MaxMemoryUsage}} KiB{{end}}</td>
     </tr>
 {{end}}

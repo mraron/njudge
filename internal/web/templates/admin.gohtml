@@ -48,18 +48,12 @@
         const judge = nga.entity("judges").identifier(nga.field('id'));
         judge.listView().fields([
             nga.field('id'),
-            nga.field('name'),
-            nga.field('host'),
-            nga.field('port'),
-            nga.field('load'),
-            nga.field('uptime'),
-            nga.field('ping'),
+            nga.field('url'),
             nga.field('online'),
         ]).listActions(['edit','show']);
 
         judge.creationView().fields([
-            nga.field('host').validation({ required: true }),
-            nga.field('port').validation({ required: true })
+            nga.field('url').validation({ required: true })
         ]);
 
         judge.editionView().fields(judge.creationView().fields());
@@ -67,15 +61,10 @@
 
         judge.showView().fields([
             nga.field('id'),
-            nga.field('name'),
-            nga.field('host'),
-            nga.field('port'),
-            nga.field('load'),
+            nga.field('url'),
+            nga.field('online'),
             nga.field('problem_list', 'json'),
             nga.field('language_list', 'json'),
-            nga.field('uptime'),
-            nga.field('ping'),
-            nga.field('online'),
         ]).actions(['list', 'delete', 'edit']);
 
         const user = nga.entity("users").identifier(nga.field('id'));

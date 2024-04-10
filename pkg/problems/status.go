@@ -91,7 +91,8 @@ func (f *FeedbackType) UnmarshalJSON(i []byte) error {
 		*f = FeedbackACM
 	case "3", fmt.Sprintf("%q", FeedbackLazyIOI):
 		*f = FeedbackLazyIOI
-	case "null":
+	case "null", "\"\"":
+		fallthrough
 	default:
 		*f = FeedbackUnknown
 	}

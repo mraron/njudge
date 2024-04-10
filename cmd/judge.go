@@ -76,7 +76,7 @@ func NewJudgeCmd(v *viper.Viper) *cobra.Command {
 			provider := sandbox.NewProvider()
 			if cfg.Isolate {
 				for i := cfg.IsolateSandboxRange[0]; i <= cfg.IsolateSandboxRange[1]; i++ {
-					s, err := sandbox.NewIsolate(i)
+					s, err := sandbox.NewIsolate(i, sandbox.IsolateOptionUseLogger(slog.Default()))
 					if err != nil {
 						return err
 					}
@@ -84,7 +84,7 @@ func NewJudgeCmd(v *viper.Viper) *cobra.Command {
 				}
 			} else {
 				for i := 0; i < 10; i++ {
-					s, err := sandbox.NewDummy()
+					s, err := sandbox.NewDummy(sandbox.DummyWithLogger(slog.Default()))
 					if err != nil {
 						return err
 					}

@@ -70,7 +70,7 @@ func (g *Glue) ProcessSubmission(ctx context.Context, sub njudge.Submission) err
 	); err != nil {
 		return err
 	}
-	g.Logger.Info("submission started", "id", sub.ID)
+	g.Logger.Info("🟢\tstarted submission", "submission_id", sub.ID)
 
 	prob, err := g.Problems.Get(ctx, sub.ProblemID)
 	if err != nil {
@@ -95,8 +95,8 @@ func (g *Glue) ProcessSubmission(ctx context.Context, sub njudge.Submission) err
 			Ontest:  null.NewString(result.Test, true),
 		}
 		g.Logger.Info(
-			fmt.Sprintf("callback %d received for submission", result.Index),
-			"id", sub.ID,
+			fmt.Sprintf("↪️\tcallback %d received", result.Index),
+			"submission_id", sub.ID,
 		)
 
 		return g.Submissions.Update(ctx, sub, njudge.Fields(
@@ -120,7 +120,7 @@ func (g *Glue) ProcessSubmission(ctx context.Context, sub njudge.Submission) err
 		score = float32(status.Feedback[0].Score())
 	}
 
-	g.Logger.Info("finished judging submission", "id", sub.ID)
+	g.Logger.Info("🏁\tfinished judging", "submission_id", sub.ID)
 
 	sub.Verdict = njudge.Verdict(verdict)
 	sub.Status = *status
@@ -139,10 +139,10 @@ func (g *Glue) ProcessSubmission(ctx context.Context, sub njudge.Submission) err
 
 func (g *Glue) Start(ctx context.Context) {
 	for {
-		g.Logger.Info("looking for submissions")
-		subs, err := g.SubmissionsQuery.GetUnstarted(ctx, 10)
+		g.Logger.Info("🔎\tlooking for submissions")
+		subs, err := g.SubmissionsQuery.GetUnstarted(ctx, 20)
 		if err != nil {
-			g.Logger.Error("looking for submissions", "error", err)
+			g.Logger.Error("‼️\tlooking for submissions", "error", err)
 			continue
 		}
 
@@ -153,7 +153,14 @@ func (g *Glue) Start(ctx context.Context) {
 				// and also a collection of judges
 				err := g.ProcessSubmission(ctx, s)
 				if err != nil {
-					g.Logger.Error("processing submission", "id", s.ID, "error", err)
+					g.Logger.Error("‼️\tprocessing submission", "submission_id", s.ID, "error", err)
+
+					s.Verdict = njudge.VerdictXX
+					s.Judged = null.NewTime(time.Time{}, false)
+					s.Status = problems.Status{
+						Compiled: true,
+					}
+					_ = g.Submissions.Update(ctx, s, njudge.Fields(njudge.SubmissionFields.Verdict, njudge.SubmissionFields.Judged, njudge.SubmissionFields.Status))
 					return
 				}
 			}()

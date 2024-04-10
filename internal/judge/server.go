@@ -94,7 +94,8 @@ func (s Server) PostJudgeHandler() echo.HandlerFunc {
 				return enc.Encode(res)
 			}
 			if st == nil {
-				return err
+				initResponse(http.StatusInternalServerError)
+				return enc.Encode(res)
 			}
 		}
 		initResponse(http.StatusOK)

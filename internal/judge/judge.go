@@ -136,6 +136,9 @@ func (c Client) Judge(ctx context.Context, sub Submission, callback ResultCallba
 		}
 	}
 	err = errors.Join(err, s.Err(), resp.Body.Close())
+	if res.Error != "" {
+		err = errors.Join(err, errors.New(res.Error))
+	}
 	return res.Status, err
 }
 

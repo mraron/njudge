@@ -4,14 +4,15 @@ import (
 	"errors"
 	"fmt"
 	"github.com/mraron/njudge/internal/glue"
-	"github.com/mraron/njudge/internal/judge"
 	"github.com/mraron/njudge/internal/web/helpers/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"golang.org/x/net/context"
 	"io/fs"
 	"log/slog"
 	"strings"
+	"time"
 )
 
 type GlueConfig struct {
@@ -71,8 +72,15 @@ func NewGlueCmd(v *viper.Viper) *cobra.Command {
 			if err != nil {
 				return err
 			}
+			judges := glue.NewJudges(conn, slog.Default())
+			go func() {
+				for {
+					judges.Update(context.Background())
+					time.Sleep(10 * time.Second)
+				}
+			}()
 			g, err := glue.New(
-				judge.NewClient("http://localhost:8888"),
+				judges,
 				glue.WithDatabaseOption(conn),
 				glue.WithLogger(slog.Default()),
 			)

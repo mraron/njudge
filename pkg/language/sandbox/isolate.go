@@ -70,7 +70,7 @@ func (i *Isolate) Init(ctx context.Context) error {
 	}
 
 	cmd := []string{"isolate", "--cg", "-b", strconv.Itoa(i.ID), "--init"}
-	i.Logger.Info("running init", "cmd", cmd)
+	i.Logger.Info("✏️\trunning init", "cmd", cmd)
 	i.inited = true
 	i.OsFS = NewOsFS(filepath.Join(IsolateRoot, strconv.Itoa(i.ID), "box"))
 	return exec.Command(cmd[0], cmd[1:]...).Run()
@@ -139,7 +139,7 @@ func (i *Isolate) Run(_ context.Context, config RunConfig, toRun string, toRunAr
 	args = append(args, "--run", "-s", "--", toRun)
 	args = append(args, toRunArgs...)
 
-	logger.Info("built args", "args", args)
+	logger.Info("🛠️\tbuilt args", "args", args)
 
 	cmd := exec.Command(args[0], args[1:]...)
 	cmd.Stdin = config.Stdin
@@ -182,13 +182,14 @@ func (i *Isolate) Run(_ context.Context, config RunConfig, toRun string, toRunAr
 		return nil, fmt.Errorf("failed to scan metafile: %w", err)
 	}
 
+	logger.Info("🧾\tresult status", "status", st)
 	return &st, nil
 }
 
 func (i *Isolate) Cleanup(_ context.Context) error {
 	cmd := []string{"isolate", "--cg", "-b", strconv.Itoa(i.ID), "--cleanup"}
 
-	i.Logger.Info("running cleanup ", "cmd", cmd)
+	i.Logger.Info("🗑️\trunning cleanup", "cmd", cmd)
 	i.inited = false
 	i.OsFS = OsFS{}
 	return exec.Command(cmd[0], cmd[1:]...).Run()

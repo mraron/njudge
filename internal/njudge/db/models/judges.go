@@ -18,52 +18,48 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"github.com/volatiletech/sqlboiler/v4/queries/qmhelper"
+	"github.com/volatiletech/sqlboiler/v4/types"
 	"github.com/volatiletech/strmangle"
 )
 
 // Judge is an object representing the database table.
 type Judge struct {
-	ID     int    `boil:"id" json:"id" toml:"id" yaml:"id"`
-	State  string `boil:"state" json:"state" toml:"state" yaml:"state"`
-	Host   string `boil:"host" json:"host" toml:"host" yaml:"host"`
-	Port   string `boil:"port" json:"port" toml:"port" yaml:"port"`
-	Ping   int    `boil:"ping" json:"ping" toml:"ping" yaml:"ping"`
-	Online bool   `boil:"online" json:"online" toml:"online" yaml:"online"`
+	ID           int               `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Online       bool              `boil:"online" json:"online" toml:"online" yaml:"online"`
+	URL          string            `boil:"url" json:"url" toml:"url" yaml:"url"`
+	ProblemList  types.StringArray `boil:"problem_list" json:"problem_list,omitempty" toml:"problem_list" yaml:"problem_list,omitempty"`
+	LanguageList types.StringArray `boil:"language_list" json:"language_list,omitempty" toml:"language_list" yaml:"language_list,omitempty"`
 
 	R *judgeR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L judgeL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var JudgeColumns = struct {
-	ID     string
-	State  string
-	Host   string
-	Port   string
-	Ping   string
-	Online string
+	ID           string
+	Online       string
+	URL          string
+	ProblemList  string
+	LanguageList string
 }{
-	ID:     "id",
-	State:  "state",
-	Host:   "host",
-	Port:   "port",
-	Ping:   "ping",
-	Online: "online",
+	ID:           "id",
+	Online:       "online",
+	URL:          "url",
+	ProblemList:  "problem_list",
+	LanguageList: "language_list",
 }
 
 var JudgeTableColumns = struct {
-	ID     string
-	State  string
-	Host   string
-	Port   string
-	Ping   string
-	Online string
+	ID           string
+	Online       string
+	URL          string
+	ProblemList  string
+	LanguageList string
 }{
-	ID:     "judges.id",
-	State:  "judges.state",
-	Host:   "judges.host",
-	Port:   "judges.port",
-	Ping:   "judges.ping",
-	Online: "judges.online",
+	ID:           "judges.id",
+	Online:       "judges.online",
+	URL:          "judges.url",
+	ProblemList:  "judges.problem_list",
+	LanguageList: "judges.language_list",
 }
 
 // Generated where
@@ -77,20 +73,44 @@ func (w whereHelperbool) LTE(x bool) qm.QueryMod { return qmhelper.Where(w.field
 func (w whereHelperbool) GT(x bool) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
 func (w whereHelperbool) GTE(x bool) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
 
+type whereHelpertypes_StringArray struct{ field string }
+
+func (w whereHelpertypes_StringArray) EQ(x types.StringArray) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpertypes_StringArray) NEQ(x types.StringArray) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpertypes_StringArray) LT(x types.StringArray) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpertypes_StringArray) LTE(x types.StringArray) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpertypes_StringArray) GT(x types.StringArray) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpertypes_StringArray) GTE(x types.StringArray) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
+func (w whereHelpertypes_StringArray) IsNull() qm.QueryMod { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpertypes_StringArray) IsNotNull() qm.QueryMod {
+	return qmhelper.WhereIsNotNull(w.field)
+}
+
 var JudgeWhere = struct {
-	ID     whereHelperint
-	State  whereHelperstring
-	Host   whereHelperstring
-	Port   whereHelperstring
-	Ping   whereHelperint
-	Online whereHelperbool
+	ID           whereHelperint
+	Online       whereHelperbool
+	URL          whereHelperstring
+	ProblemList  whereHelpertypes_StringArray
+	LanguageList whereHelpertypes_StringArray
 }{
-	ID:     whereHelperint{field: "\"judges\".\"id\""},
-	State:  whereHelperstring{field: "\"judges\".\"state\""},
-	Host:   whereHelperstring{field: "\"judges\".\"host\""},
-	Port:   whereHelperstring{field: "\"judges\".\"port\""},
-	Ping:   whereHelperint{field: "\"judges\".\"ping\""},
-	Online: whereHelperbool{field: "\"judges\".\"online\""},
+	ID:           whereHelperint{field: "\"judges\".\"id\""},
+	Online:       whereHelperbool{field: "\"judges\".\"online\""},
+	URL:          whereHelperstring{field: "\"judges\".\"url\""},
+	ProblemList:  whereHelpertypes_StringArray{field: "\"judges\".\"problem_list\""},
+	LanguageList: whereHelpertypes_StringArray{field: "\"judges\".\"language_list\""},
 }
 
 // JudgeRels is where relationship names are stored.
@@ -110,9 +130,9 @@ func (*judgeR) NewStruct() *judgeR {
 type judgeL struct{}
 
 var (
-	judgeAllColumns            = []string{"id", "state", "host", "port", "ping", "online"}
-	judgeColumnsWithoutDefault = []string{"state", "host", "port"}
-	judgeColumnsWithDefault    = []string{"id", "ping", "online"}
+	judgeAllColumns            = []string{"id", "online", "url", "problem_list", "language_list"}
+	judgeColumnsWithoutDefault = []string{"url"}
+	judgeColumnsWithDefault    = []string{"id", "online", "problem_list", "language_list"}
 	judgePrimaryKeyColumns     = []string{"id"}
 	judgeGeneratedColumns      = []string{}
 )
