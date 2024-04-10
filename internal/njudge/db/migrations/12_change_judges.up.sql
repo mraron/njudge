@@ -1,6 +1,7 @@
 alter table public.judges
     add url text ;
 
+-- noinspection SqlWithoutWhere
 update public.judges set
     url = CONCAT(host, ':', port) ;
 

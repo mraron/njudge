@@ -44,7 +44,7 @@
             <div class="card">
                 <div class="card-header {{if and (eq $e.VerdictName "AC") ($status.Compiled)}}bg-success{{else}}bg-danger{{end}}"><span class="bi bi-{{if and (eq $e.VerdictName "AC") ($status.Compiled)}}check-lg{{else}}x-lg{{end}}"></span> {{$ind}} - {{if $status.Compiled}}{{(verdict $e.VerdictName).String | Tr}}{{else}}{{Tr "Compilation error"}}{{end}}</div>
                 <div class="card-body">
-                    <span class="bi bi-memory"></span> {{Tr "Memory"}}: {{$e.MemoryUsed}}KiB <br><span class="bi bi-clock"></span> {{Tr "Time"}}: {{$e.TimeSpent}}<br><br>
+                    <span class="bi bi-memory"></span> {{Tr "Memory"}}: {{memoryInKiB $e.MemoryUsed}}KiB <br><span class="bi bi-clock"></span> {{Tr "Time"}}: {{$e.TimeSpent}}<br><br>
                     {{Tr "Program's output"}}:
                     <pre><code class="nohighlight">{{$e.Output}}</code></pre>
                     {{Tr "Expected output"}}:
@@ -96,7 +96,7 @@
                                 <td>{{roundTo $t.Score 2}}/{{$t.MaxScore}}</td>
                             {{end}}
                             <td>{{$t.TimeSpent}}</td>
-                            <td>{{$t.MemoryUsed}} KiB</td>
+                            <td>{{memoryInKiB $t.MemoryUsed}} KiB</td>
                         </tr>
                     {{end}}
                 {{end}}

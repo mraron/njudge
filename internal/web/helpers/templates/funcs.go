@@ -106,6 +106,9 @@ func statelessFuncs(store problems.Store, users njudge.Users, ps njudge.Problems
 		"memoryInMiB": func(m memory.Amount) int {
 			return int(m / memory.MiB)
 		},
+		"memoryInKiB": func(m memory.Amount) int {
+			return int(m / memory.KiB)
+		},
 		"toString": func(b interface{}) string {
 			switch b := b.(type) {
 			case []byte:

@@ -19,11 +19,23 @@ const (
 )
 
 func (x *Amount) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%d", *x)), nil
+	return []byte(fmt.Sprintf("\"%dB\"", *x)), nil
 }
 
 func (x *Amount) UnmarshalJSON(bs []byte) error {
-	tmp, err := strconv.Atoi(string(bs))
+	if len(bs) == 0 {
+		return nil
+	}
+
+	if bs[0] != '"' {
+		tmp, err := strconv.Atoi(string(bs))
+		if err != nil {
+			return err
+		}
+		*x = Amount(tmp) * KiB
+		return nil
+	}
+	tmp, err := strconv.Atoi(string(bs[1 : len(bs)-2]))
 	if err != nil {
 		return err
 	}
