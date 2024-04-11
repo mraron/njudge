@@ -14,6 +14,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sync"
 	"syscall"
 	"time"
 )
@@ -390,19 +391,29 @@ func (p PolygonUserInteractorExecute) ExecuteInteractor(ctx context.Context, int
 	}, "interactor", "input", "output")
 }
 
-type TaskYAMLUserInteractorExecute struct {
+type interactorOutput struct {
 	checkerMessage *bytes.Buffer
 	scoreMul       *bytes.Buffer
+}
+
+type TaskYAMLUserInteractorExecute struct {
+	forChecker sync.Map
 }
 
 func (t *TaskYAMLUserInteractorExecute) Check(ctx context.Context, testcase *problems.Testcase) error {
 	if testcase.VerdictName != problems.VerdictAC {
 		return nil
 	}
-	testcase.CheckerOutput = t.checkerMessage.String()
+
+	val, ok := t.forChecker.Load(testcase.Index)
+	if !ok {
+		return errors.New("index not found in forChecker")
+	}
+	res := val.(*interactorOutput)
+	testcase.CheckerOutput = res.checkerMessage.String()
 
 	mul := 0.0
-	n, err := fmt.Fscanf(t.scoreMul, "%f", &mul)
+	n, err := fmt.Fscanf(res.scoreMul, "%f", &mul)
 	if err != nil {
 		return err
 	}
@@ -428,15 +439,18 @@ func (t *TaskYAMLUserInteractorExecute) ExecuteInteractor(ctx context.Context, i
 		return nil, err
 	}
 
-	t.checkerMessage = &bytes.Buffer{}
-	t.scoreMul = &bytes.Buffer{}
+	res := &interactorOutput{}
+	res.checkerMessage = &bytes.Buffer{}
+	res.scoreMul = &bytes.Buffer{}
+	t.forChecker.Store(testcase.Index, res)
+
 	return interactorSandbox.Run(ctx, sandbox.RunConfig{
 		RunID:            "interactor",
 		TimeLimit:        2 * testcase.TimeLimit,
 		MemoryLimit:      1 * memory.GiB,
 		Stdin:            inputFile,
-		Stdout:           t.scoreMul,
-		Stderr:           t.checkerMessage,
+		Stdout:           res.scoreMul,
+		Stderr:           res.checkerMessage,
 		InheritEnv:       true,
 		WorkingDirectory: interactorSandbox.Pwd(),
 		DirectoryMaps: []sandbox.DirectoryMap{
