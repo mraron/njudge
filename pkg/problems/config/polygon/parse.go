@@ -126,6 +126,10 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 				if err := cpp.AutoCompile(context.TODO(), fs, s, workingDirectory, filepath.Join(p.Path, p.Assets.Interactor.Source.Path), filepath.Join(p.Path, "files/interactor")); err != nil {
 					return nil, err
 				}
+				p.Assets.Interactor.binary, err = os.ReadFile(filepath.Join(p.Path, "files/interactor"))
+				if err != nil {
+					return nil, err
+				}
 			}
 		}
 

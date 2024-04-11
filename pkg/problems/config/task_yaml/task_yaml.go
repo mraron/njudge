@@ -104,23 +104,19 @@ func (p Problem) Interactive() bool {
 	return false
 }
 
-func (p Problem) probablyStubOf(f problems.EvaluationFile, lang language.Language) bool {
-	return f.Role == "stub_"+lang.ID() || (f.Role == "stub_cpp" && strings.HasPrefix(lang.ID(), "cpp"))
-}
-
 func (p Problem) Languages() []language.Language {
 	if p.OutputOnly {
 		return []language.Language{zip.Zip{}}
 	}
 
-	lst1 := language.DefaultStore.List()
+	lst1 := language.ListExcept(language.DefaultStore, []string{"zip"})
 
 	lst2 := make([]language.Language, 0, len(lst1))
 	for _, val := range lst1 {
 		if p.tasktype == "stub" || p.tasktype == "communication" {
 			hasStub := false
 			for _, f := range p.files {
-				if p.probablyStubOf(f, val) {
+				if f.StubOf(val) {
 					hasStub = true
 					break
 				}
@@ -130,12 +126,12 @@ func (p Problem) Languages() []language.Language {
 				lst2 = append(lst2, val)
 			}
 		} else {
-			if val.ID() != "zip" {
-				lst2 = append(lst2, val)
-			}
+			lst2 = append(lst2, val)
 		}
 	}
-
+	if p.tasktype == "communication" && len(lst2) == 0 {
+		return lst1
+	}
 	return lst2
 }
 
@@ -287,15 +283,12 @@ func (p Problem) makeCompiler() problems.Compiler {
 		compiler := evaluation.NewCompilerWithStubs()
 		for _, lang := range p.Languages() {
 			for _, file := range p.files {
-				if p.probablyStubOf(file, lang) {
+				if file.StubOf(lang) {
 					compiler.AddStub(lang, file)
 				}
 			}
 		}
-		return evaluation.CompileCheckSupported{
-			List:         p.Languages(),
-			NextCompiler: compiler,
-		}
+		return compiler
 	}
 	return evaluation.CompileCopyFile{}
 }

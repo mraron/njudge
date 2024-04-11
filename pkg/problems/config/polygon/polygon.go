@@ -7,6 +7,7 @@ import (
 	"github.com/mraron/njudge/pkg/problems/evaluation/batch"
 	"github.com/mraron/njudge/pkg/problems/evaluation/communication"
 	"github.com/mraron/njudge/pkg/problems/evaluation/output_only"
+	"github.com/mraron/njudge/pkg/problems/evaluation/stub"
 	"path/filepath"
 
 	"github.com/mraron/njudge/pkg/language"
@@ -47,6 +48,7 @@ type Checker struct {
 
 type Interactor struct {
 	Source Source `xml:"source"`
+	binary []byte
 }
 
 type Assets struct {
@@ -154,13 +156,21 @@ func (p Problem) GetTaskType() problems.TaskType {
 		return communication.New(evaluation.CompileCheckSupported{
 			List:         p.Languages(),
 			NextCompiler: evaluation.Compile{},
-		}, []byte("@TODO"), p.Checker())
+		}, p.Assets.Interactor.binary, p.Checker())
 	}
 	if p.TaskType == "outputonly" {
 		return output_only.New(p.Checker())
 	}
 	if p.TaskType == "stub" {
-		panic("TODO")
+		compiler := evaluation.NewCompilerWithStubs()
+		for _, lang := range p.Languages() {
+			for _, file := range p.EvaluationFiles() {
+				if file.StubOf(lang) {
+					compiler.AddStub(lang, file)
+				}
+			}
+		}
+		return stub.New(compiler, evaluation.BasicRunnerWithChecker(p.Checker()))
 	}
 	return batch.New(evaluation.CompileCheckSupported{
 		List:         p.Languages(),
