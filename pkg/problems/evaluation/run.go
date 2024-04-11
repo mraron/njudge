@@ -364,6 +364,9 @@ func (r *InteractiveRunner) prepareFIFO(dir string, name string) (*os.File, erro
 	if err := syscall.Mkfifo(filepath.Join(dir, name), 0666); err != nil {
 		return nil, err
 	}
+	if err := os.Chmod(filepath.Join(dir, name), 0666); err != nil {
+		return nil, err
+	}
 	return os.OpenFile(filepath.Join(dir, name), os.O_RDWR, 0666)
 }
 
@@ -455,12 +458,10 @@ func (t *TaskYAMLUserInteractorExecute) ExecuteInteractor(ctx context.Context, i
 		WorkingDirectory: interactorSandbox.Pwd(),
 		DirectoryMaps: []sandbox.DirectoryMap{
 			{
-				Inside:  filepath.Dir(userStdin.Name()),
-				Outside: filepath.Dir(userStdin.Name()),
+				Inside:  "/tmp",
+				Outside: "/tmp",
 				Options: []sandbox.DirectoryMapOption{
 					sandbox.AllowReadWrite,
-					sandbox.NoExec,
-					sandbox.Maybe,
 				},
 			},
 		},
@@ -513,6 +514,10 @@ func (r *InteractiveRunner) Run(ctx context.Context, sandboxProvider sandbox.Pro
 	defer func(path string) {
 		_ = os.RemoveAll(path)
 	}(dir)
+
+	if err = os.Chmod(dir, 0777); err != nil {
+		return err
+	}
 
 	userStdin, err := r.prepareFIFO(dir, "fifo1")
 	if err != nil {
