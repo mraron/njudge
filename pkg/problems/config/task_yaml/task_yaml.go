@@ -9,6 +9,9 @@ import (
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/problems/evaluation"
 	"github.com/mraron/njudge/pkg/problems/evaluation/batch"
+	"github.com/mraron/njudge/pkg/problems/evaluation/communication"
+	"github.com/mraron/njudge/pkg/problems/evaluation/output_only"
+	"github.com/mraron/njudge/pkg/problems/evaluation/stub"
 	checker2 "github.com/mraron/njudge/pkg/problems/executable/checker"
 	"io"
 	"os"
@@ -62,6 +65,7 @@ type Problem struct {
 	files            []problems.EvaluationFile
 	tasktype         string
 	whiteDiffChecker bool
+	managerBinary    []byte
 }
 
 func (p Problem) Name() string {
@@ -100,6 +104,10 @@ func (p Problem) Interactive() bool {
 	return false
 }
 
+func (p Problem) probablyStubOf(f problems.EvaluationFile, lang language.Language) bool {
+	return f.Role == "stub_"+lang.ID() || (f.Role == "stub_cpp" && strings.HasPrefix(lang.ID(), "cpp"))
+}
+
 func (p Problem) Languages() []language.Language {
 	if p.OutputOnly {
 		return []language.Language{zip.Zip{}}
@@ -109,10 +117,10 @@ func (p Problem) Languages() []language.Language {
 
 	lst2 := make([]language.Language, 0, len(lst1))
 	for _, val := range lst1 {
-		if p.tasktype == "stub" {
+		if p.tasktype == "stub" || p.tasktype == "communication" {
 			hasStub := false
 			for _, f := range p.files {
-				if f.Role == "stub_"+val.ID() || (f.Role == "stub_cpp" && strings.HasPrefix(val.ID(), "cpp")) {
+				if p.probablyStubOf(f, val) {
 					hasStub = true
 					break
 				}
@@ -264,71 +272,46 @@ func (p Problem) EvaluationFiles() []problems.EvaluationFile {
 	return p.files
 }
 
+func (p Problem) makeCompiler() problems.Compiler {
+	if p.tasktype == "outputonly" {
+		return evaluation.CompileCheckSupported{
+			List:         p.Languages(),
+			NextCompiler: evaluation.CompileCopyFile{},
+		}
+	} else if p.tasktype == "batch" {
+		return evaluation.CompileCheckSupported{
+			List:         p.Languages(),
+			NextCompiler: evaluation.Compile{},
+		}
+	} else if p.tasktype == "communication" || p.tasktype == "stub" {
+		compiler := evaluation.NewCompilerWithStubs()
+		for _, lang := range p.Languages() {
+			for _, file := range p.files {
+				if p.probablyStubOf(file, lang) {
+					compiler.AddStub(lang, file)
+				}
+			}
+		}
+		return evaluation.CompileCheckSupported{
+			List:         p.Languages(),
+			NextCompiler: compiler,
+		}
+	}
+	return evaluation.CompileCopyFile{}
+}
+
 func (p Problem) GetTaskType() problems.TaskType {
-	return batch.New(evaluation.CompileCheckSupported{
-		List:         p.Languages(),
-		NextCompiler: evaluation.Compile{},
-	}, evaluation.BasicRunnerWithChecker(p.Checker()))
-	// TODO outputonly, stub, communication
-	/*
-		var (
-			tt  problems.TaskType
-			err error
-		)
+	if p.tasktype == "communication" {
+		return communication.New(p.makeCompiler(), p.managerBinary, p.Checker(), evaluation.InteractiveRunnerWithExecutor(&evaluation.TaskYAMLUserInteractorExecute{}))
+	} else if p.tasktype == "batch" {
+		return batch.New(p.makeCompiler(), evaluation.BasicRunnerWithChecker(p.Checker()))
+	} else if p.tasktype == "stub" {
+		return stub.New(p.makeCompiler().(*evaluation.CompileWithStubs))
+	} else if p.tasktype == "outputonly" {
+		return output_only.New(p.Checker())
+	}
 
-		if p.tasktype == "outputonly" {
-			tt, err = problems.GetTaskType("outputonly")
-		} else if p.tasktype == "batch" {
-			tt, err = problems.GetTaskType("batch")
-		} else if p.tasktype == "stub" {
-			tt, err = problems.GetTaskType("stub")
-		} else if p.tasktype == "communication" {
-			res := communication.New()
-			res.RunInteractorF = func(rc *batch.RunContext, utoi, itou *os.File, g *problems.Group, tc *problems.Testcase) (language.Status, error) {
-				input, err := os.Open(tc.InputPath)
-				if err != nil {
-					return language.Status{}, errors.Join(err, input.Close())
-				}
-				defer input.Close()
-
-				sbox := rc.Store["interactorSandbox"].(language.Sandbox).Stdin(input).Stdout(rc.Stdout).TimeLimit(2 * tc.TimeLimit).MemoryLimit(1024 * 1024)
-				sbox.MapDir("/fifo", filepath.Dir(itou.Name()), []string{"rw"}, false)
-
-				st, err := sbox.Run(fmt.Sprintf("interactor %s %s", filepath.Join("/fifo", filepath.Base(utoi.Name())), filepath.Join("/fifo", filepath.Base(itou.Name()))), true)
-				if err != nil {
-					return st, err
-				}
-				itou.Close()
-
-				fmt.Fscanf(rc.Stdout, "%f", &tc.Score)
-				if tc.Score == 0 {
-					tc.VerdictName = problems.VerdictWA
-				} else if tc.Score < 1.0 {
-					tc.VerdictName = problems.VerdictPC
-				} else {
-					tc.VerdictName = problems.VerdictAC
-				}
-
-				tc.Score *= tc.MaxScore
-
-				// For compatibility create a file named out
-				return st, errors.Join(err, rc.Store["interactorSandbox"].(language.Sandbox).CreateFile("out", bytes.NewBuffer([]byte{})))
-			}
-
-			res.RunUserF = func(rc *batch.RunContext, utoi, itou *os.File, g *problems.Group, tc *problems.Testcase) (language.Status, error) {
-				res, err := rc.Lang.Run(rc.Sandbox, bytes.NewReader(rc.Binary), itou, utoi, tc.TimeLimit, tc.MemoryLimit)
-				utoi.Close()
-				return res, err
-			}
-
-			tt = res
-		}
-
-		if err != nil {
-			panic(err)
-		}
-
-		return tt*/
+	panic("unknown task type")
 }
 
 func parseGen(r io.Reader) (int, [][2]interface{}, error) {
@@ -483,6 +466,11 @@ func Parser(fs afero.Fs, path string) (problems.Problem, error) {
 			p.tasktype = "communication"
 			s, _ := sandbox.NewDummy()
 			if err := cpp.AutoCompile(context.TODO(), fs, s, checkPath, managerCppPath, managerPath); err != nil {
+				return nil, err
+			}
+
+			p.managerBinary, err = os.ReadFile(managerPath)
+			if err != nil {
 				return nil, err
 			}
 

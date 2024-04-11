@@ -5,10 +5,10 @@ import (
 	"github.com/mraron/njudge/pkg/problems/evaluation"
 )
 
-func New(compiler problems.Compiler, interactorBinary []byte, checker problems.Checker) problems.TaskType {
+func New(compiler problems.Compiler, interactorBinary []byte, checker problems.Checker, options ...evaluation.InteractiveRunnerOption) problems.TaskType {
 	return problems.NewTaskType(
 		"communication",
 		compiler,
-		evaluation.NewLinearEvaluator(evaluation.NewInteractiveRunner(interactorBinary, checker)),
+		evaluation.NewLinearEvaluator(evaluation.NewInteractiveRunner(interactorBinary, checker, options...)),
 	)
 }

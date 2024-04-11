@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 import sys
 a,b = map(int, input().split())
-with open(sys.argv[1], 'w') as f:
+with open(sys.argv[2], 'w') as f:
     print(a,b,file=f)
 res = 0
-with open(sys.argv[2], 'r') as f:
+with open(sys.argv[1], 'r') as f:
     res = int(f.readline())
 
 if res == a+b:

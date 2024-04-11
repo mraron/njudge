@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/mraron/njudge/pkg/internal/testutils"
+	"github.com/mraron/njudge/pkg/language/langs/cpp"
 	"github.com/mraron/njudge/pkg/language/langs/python3"
 	zipLang "github.com/mraron/njudge/pkg/language/langs/zip"
 	"github.com/mraron/njudge/pkg/language/sandbox"
@@ -318,21 +319,30 @@ func TestInteractiveRunner_Run(t *testing.T) {
 	)
 	if !*testutils.UseIsolate {
 		s1, err = sandbox.NewDummy()
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		s2, err = sandbox.NewDummy()
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 	} else {
 		s1, err = sandbox.NewIsolate(444)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		s2, err = sandbox.NewIsolate(445)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 	}
 
 	taskYAMLExecutor := &evaluation.TaskYAMLUserInteractorExecute{}
 
 	fs := afero.NewMemMapFs()
-	assert.Nil(t, afero.WriteFile(fs, "input", []byte("11 12\n"), 0644))
-	assert.Nil(t, afero.WriteFile(fs, "answer", []byte("23\n"), 0644))
+	assert.NoError(t, afero.WriteFile(fs, "input", []byte("11 12\n"), 0644))
+	assert.NoError(t, afero.WriteFile(fs, "answer", []byte("23\n"), 0644))
+
+	assert.NoError(t, afero.WriteFile(fs, "input_multi", []byte("1\n11 12\n"), 0644))
+	assert.NoError(t, afero.WriteFile(fs, "manager.cpp", mustReadFile("testdata/taskyaml_manager.cpp"), 0644))
+
+	compileSandbox, _ := sandbox.NewDummy()
+	assert.NoError(t, cpp.AutoCompile(context.TODO(), fs, compileSandbox, "", "manager.cpp", "manager"))
+	managerBinary, err := afero.ReadFile(fs, "manager")
+	assert.NoError(t, err)
+
 	tests := []struct {
 		name        string
 		solution    problems.Solution
@@ -343,10 +353,9 @@ func TestInteractiveRunner_Run(t *testing.T) {
 		wantScore   float64
 	}{
 		{
-			name: "aplusb_python_interactor_polygon",
-			solution: evaluation.NewByteSolution(python3.Python3{}, []byte(`a, b = list(map(int, input().split()))
-print(a+b)`)),
-			ir: evaluation.NewInteractiveRunner(mustReadFile("testdata/polygon_interactor.py"), checker.NewWhitediff(checker.WhiteDiffWithFs(fs, afero.NewOsFs())), evaluation.InteractiveRunnerWithFs(fs)),
+			name:     "aplusb_python_interactor_polygon",
+			solution: evaluation.NewByteSolution(python3.Python3{}, mustReadFile("testdata/aplusb_single.py")),
+			ir:       evaluation.NewInteractiveRunner(mustReadFile("testdata/polygon_interactor.py"), checker.NewWhitediff(checker.WhiteDiffWithFs(fs, afero.NewOsFs())), evaluation.InteractiveRunnerWithFs(fs)),
 			args: args{
 				ctx:             context.TODO(),
 				sandboxProvider: sandbox.NewProvider().Put(s1).Put(s2),
@@ -362,9 +371,8 @@ print(a+b)`)),
 			wantVerdict: problems.VerdictAC,
 		},
 		{
-			name: "aplusb_python_interactor_taskyaml",
-			solution: evaluation.NewByteSolution(python3.Python3{}, []byte(`a, b = list(map(int, input().split()))
-print(a+b)`)),
+			name:     "aplusb_python_interactor_taskyaml",
+			solution: evaluation.NewByteSolution(python3.Python3{}, mustReadFile("testdata/aplusb_single.py")),
 			ir: evaluation.NewInteractiveRunner(
 				mustReadFile("testdata/taskyaml_interactor.py"),
 				taskYAMLExecutor,
@@ -387,10 +395,35 @@ print(a+b)`)),
 			wantVerdict: problems.VerdictAC,
 			wantScore:   10.0,
 		},
+		{
+			name:     "aplusb_cpp_interactor_taskyaml",
+			solution: evaluation.NewByteSolution(python3.Python3{}, mustReadFile("testdata/aplusb_multi.py")),
+			ir: evaluation.NewInteractiveRunner(
+				managerBinary,
+				taskYAMLExecutor,
+				evaluation.InteractiveRunnerWithExecutor(taskYAMLExecutor),
+				evaluation.InteractiveRunnerWithFs(fs),
+			),
+			args: args{
+				ctx:             context.TODO(),
+				sandboxProvider: sandbox.NewProvider().Put(s1).Put(s2),
+				testcase: &problems.Testcase{
+					Index:      1,
+					InputPath:  "input_multi",
+					OutputPath: "output",
+					AnswerPath: "answer",
+					MaxScore:   10.0,
+					TimeLimit:  1 * time.Second,
+				},
+			},
+			wantErr:     assert.NoError,
+			wantVerdict: problems.VerdictAC,
+			wantScore:   10.0,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Nil(t, tt.ir.SetSolution(tt.args.ctx, tt.solution))
+			assert.NoError(t, tt.ir.SetSolution(tt.args.ctx, tt.solution))
 			tt.wantErr(t, tt.ir.Run(tt.args.ctx, tt.args.sandboxProvider, tt.args.testcase), fmt.Sprintf("Run(%v, %v, %v)", tt.args.ctx, tt.args.sandboxProvider, tt.args.testcase))
 			assert.Equal(t, tt.wantVerdict, tt.args.testcase.VerdictName)
 			assert.Equal(t, tt.wantScore, tt.args.testcase.Score)

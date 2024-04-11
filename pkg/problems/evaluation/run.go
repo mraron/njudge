@@ -391,7 +391,7 @@ func (p PolygonUserInteractorExecute) ExecuteInteractor(ctx context.Context, int
 		Stderr:           io.Discard,
 		InheritEnv:       true,
 		WorkingDirectory: interactorSandbox.Pwd(),
-	}, "interactor", "input", "output")
+	}, "interactor", "input.txt", "output.txt")
 }
 
 type interactorOutput struct {
@@ -437,7 +437,7 @@ func (t *TaskYAMLUserInteractorExecute) ExecuteUser(ctx context.Context, userSan
 }
 
 func (t *TaskYAMLUserInteractorExecute) ExecuteInteractor(ctx context.Context, interactorSandbox sandbox.Sandbox, userStdin, userStdout *os.File, testcase *problems.Testcase) (*sandbox.Status, error) {
-	inputFile, err := os.Open(filepath.Join(interactorSandbox.Pwd(), "input"))
+	inputFile, err := os.Open(filepath.Join(interactorSandbox.Pwd(), "input.txt"))
 	if err != nil {
 		return nil, err
 	}
@@ -465,7 +465,7 @@ func (t *TaskYAMLUserInteractorExecute) ExecuteInteractor(ctx context.Context, i
 				},
 			},
 		},
-	}, "interactor", userStdin.Name(), userStdout.Name())
+	}, "interactor", userStdout.Name(), userStdin.Name())
 }
 
 func (r *InteractiveRunner) Run(ctx context.Context, sandboxProvider sandbox.Provider, testcase *problems.Testcase) error {
@@ -501,7 +501,7 @@ func (r *InteractiveRunner) Run(ctx context.Context, sandboxProvider sandbox.Pro
 		return err
 	}
 	if err = sandbox.CreateFile(interactorSandbox, sandbox.File{
-		Name:   "input",
+		Name:   "input.txt",
 		Source: inputFile,
 	}); err != nil {
 		return err
@@ -551,7 +551,7 @@ func (r *InteractiveRunner) Run(ctx context.Context, sandboxProvider sandbox.Pro
 	interactorStatus, interactorError = r.executor.ExecuteInteractor(ctx, interactorSandbox, userStdin, userStdout, testcase)
 	<-done
 
-	testcase.OutputPath = filepath.Join(interactorSandbox.Pwd(), "output")
+	testcase.OutputPath = filepath.Join(interactorSandbox.Pwd(), "output.txt")
 	testcase.TimeSpent = userStatus.Time
 	testcase.MemoryUsed = userStatus.Memory
 
