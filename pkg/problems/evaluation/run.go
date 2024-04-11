@@ -325,6 +325,12 @@ func InteractiveRunnerWithFs(fs afero.Fs) InteractiveRunnerOption {
 	}
 }
 
+func InteractiveRunnerWithExecutor(executor UserInteractorExecutor) InteractiveRunnerOption {
+	return func(runner *InteractiveRunner) {
+		runner.executor = executor
+	}
+}
+
 func NewInteractiveRunner(interactorBinary []byte, checker problems.Checker, opts ...InteractiveRunnerOption) *InteractiveRunner {
 	res := &InteractiveRunner{
 		userBin:       nil,
@@ -382,6 +388,69 @@ func (p PolygonUserInteractorExecute) ExecuteInteractor(ctx context.Context, int
 		InheritEnv:       true,
 		WorkingDirectory: interactorSandbox.Pwd(),
 	}, "interactor", "input", "output")
+}
+
+type TaskYAMLUserInteractorExecute struct {
+	checkerMessage *bytes.Buffer
+	scoreMul       *bytes.Buffer
+}
+
+func (t *TaskYAMLUserInteractorExecute) Check(ctx context.Context, testcase *problems.Testcase) error {
+	if testcase.VerdictName != problems.VerdictAC {
+		return nil
+	}
+	testcase.CheckerOutput = t.checkerMessage.String()
+
+	mul := 0.0
+	n, err := fmt.Fscanf(t.scoreMul, "%f", &mul)
+	if err != nil {
+		return err
+	}
+	if n < 1 {
+		return errors.New("can't parse score multiplier")
+	}
+	testcase.Score = testcase.MaxScore * mul
+	if mul == 0.0 {
+		testcase.VerdictName = problems.VerdictWA
+	} else if mul < 1.0 {
+		testcase.VerdictName = problems.VerdictPC
+	}
+	return nil
+}
+
+func (t *TaskYAMLUserInteractorExecute) ExecuteUser(ctx context.Context, userSandbox sandbox.Sandbox, language language.Language, userBin sandbox.File, userStdin, userStdout *os.File, timeLimit time.Duration, memoryLimit memory.Amount) (*sandbox.Status, error) {
+	return language.Run(ctx, userSandbox, userBin, userStdin, userStdout, timeLimit, memoryLimit)
+}
+
+func (t *TaskYAMLUserInteractorExecute) ExecuteInteractor(ctx context.Context, interactorSandbox sandbox.Sandbox, userStdin, userStdout *os.File, testcase *problems.Testcase) (*sandbox.Status, error) {
+	inputFile, err := os.Open(filepath.Join(interactorSandbox.Pwd(), "input"))
+	if err != nil {
+		return nil, err
+	}
+
+	t.checkerMessage = &bytes.Buffer{}
+	t.scoreMul = &bytes.Buffer{}
+	return interactorSandbox.Run(ctx, sandbox.RunConfig{
+		RunID:            "interactor",
+		TimeLimit:        2 * testcase.TimeLimit,
+		MemoryLimit:      1 * memory.GiB,
+		Stdin:            inputFile,
+		Stdout:           t.scoreMul,
+		Stderr:           t.checkerMessage,
+		InheritEnv:       true,
+		WorkingDirectory: interactorSandbox.Pwd(),
+		DirectoryMaps: []sandbox.DirectoryMap{
+			{
+				Inside:  filepath.Dir(userStdin.Name()),
+				Outside: filepath.Dir(userStdin.Name()),
+				Options: []sandbox.DirectoryMapOption{
+					sandbox.AllowReadWrite,
+					sandbox.NoExec,
+					sandbox.Maybe,
+				},
+			},
+		},
+	}, "interactor", userStdin.Name(), userStdout.Name())
 }
 
 func (r *InteractiveRunner) Run(ctx context.Context, sandboxProvider sandbox.Provider, testcase *problems.Testcase) error {

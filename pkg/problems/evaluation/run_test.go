@@ -14,6 +14,7 @@ import (
 	"github.com/mraron/njudge/pkg/problems/executable/checker"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
+	"os"
 	"testing"
 	"time"
 )
@@ -297,6 +298,14 @@ func TestZipRunner_Run(t *testing.T) {
 	}
 }
 
+func mustReadFile(name string) []byte {
+	b, err := os.ReadFile(name)
+	if err != nil {
+		panic(err)
+	}
+	return b
+}
+
 func TestInteractiveRunner_Run(t *testing.T) {
 	type args struct {
 		ctx             context.Context
@@ -319,6 +328,8 @@ func TestInteractiveRunner_Run(t *testing.T) {
 		assert.Nil(t, err)
 	}
 
+	taskYAMLExecutor := &evaluation.TaskYAMLUserInteractorExecute{}
+
 	fs := afero.NewMemMapFs()
 	assert.Nil(t, afero.WriteFile(fs, "input", []byte("11 12\n"), 0644))
 	assert.Nil(t, afero.WriteFile(fs, "answer", []byte("23\n"), 0644))
@@ -329,20 +340,13 @@ func TestInteractiveRunner_Run(t *testing.T) {
 		args        args
 		wantErr     assert.ErrorAssertionFunc
 		wantVerdict problems.VerdictName
+		wantScore   float64
 	}{
 		{
-			name: "aplusb_python_interactor",
+			name: "aplusb_python_interactor_polygon",
 			solution: evaluation.NewByteSolution(python3.Python3{}, []byte(`a, b = list(map(int, input().split()))
 print(a+b)`)),
-			ir: evaluation.NewInteractiveRunner([]byte(`#!/usr/bin/python3
-import sys
-with open(sys.argv[1], 'r') as f:
-    a,b = list(map(int, f.readline().split()))
-
-print(a,b)
-res = input()
-with open(sys.argv[2], 'w') as f:
-    f.write(res)`), checker.NewWhitediff(checker.WhiteDiffWithFs(fs, afero.NewOsFs())), evaluation.InteractiveRunnerWithFs(fs)),
+			ir: evaluation.NewInteractiveRunner(mustReadFile("testdata/polygon_interactor.py"), checker.NewWhitediff(checker.WhiteDiffWithFs(fs, afero.NewOsFs())), evaluation.InteractiveRunnerWithFs(fs)),
 			args: args{
 				ctx:             context.TODO(),
 				sandboxProvider: sandbox.NewProvider().Put(s1).Put(s2),
@@ -357,12 +361,39 @@ with open(sys.argv[2], 'w') as f:
 			wantErr:     assert.NoError,
 			wantVerdict: problems.VerdictAC,
 		},
+		{
+			name: "aplusb_python_interactor_taskyaml",
+			solution: evaluation.NewByteSolution(python3.Python3{}, []byte(`a, b = list(map(int, input().split()))
+print(a+b)`)),
+			ir: evaluation.NewInteractiveRunner(
+				mustReadFile("testdata/taskyaml_interactor.py"),
+				taskYAMLExecutor,
+				evaluation.InteractiveRunnerWithExecutor(taskYAMLExecutor),
+				evaluation.InteractiveRunnerWithFs(fs),
+			),
+			args: args{
+				ctx:             context.TODO(),
+				sandboxProvider: sandbox.NewProvider().Put(s1).Put(s2),
+				testcase: &problems.Testcase{
+					Index:      1,
+					InputPath:  "input",
+					OutputPath: "output",
+					AnswerPath: "answer",
+					MaxScore:   10.0,
+					TimeLimit:  1 * time.Second,
+				},
+			},
+			wantErr:     assert.NoError,
+			wantVerdict: problems.VerdictAC,
+			wantScore:   10.0,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.Nil(t, tt.ir.SetSolution(tt.args.ctx, tt.solution))
 			tt.wantErr(t, tt.ir.Run(tt.args.ctx, tt.args.sandboxProvider, tt.args.testcase), fmt.Sprintf("Run(%v, %v, %v)", tt.args.ctx, tt.args.sandboxProvider, tt.args.testcase))
 			assert.Equal(t, tt.wantVerdict, tt.args.testcase.VerdictName)
+			assert.Equal(t, tt.wantScore, tt.args.testcase.Score)
 		})
 	}
 }
