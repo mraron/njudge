@@ -302,7 +302,8 @@ func (p Problem) makeCompiler() problems.Compiler {
 
 func (p Problem) GetTaskType() problems.TaskType {
 	if p.tasktype == "communication" {
-		return communication.New(p.makeCompiler(), p.managerBinary, p.Checker(), evaluation.InteractiveRunnerWithExecutor(&evaluation.TaskYAMLUserInteractorExecute{}))
+		eval := &evaluation.TaskYAMLUserInteractorExecute{}
+		return communication.New(p.makeCompiler(), p.managerBinary, eval, evaluation.InteractiveRunnerWithExecutor(eval))
 	} else if p.tasktype == "batch" {
 		return batch.New(p.makeCompiler(), evaluation.BasicRunnerWithChecker(p.Checker()))
 	} else if p.tasktype == "stub" {
