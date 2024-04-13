@@ -11,12 +11,12 @@ import (
 )
 
 type Database struct {
-	User     string `json:"user,omitempty"`
-	Password string `json:"password,omitempty"`
-	Host     string `json:"host,omitempty"`
-	Name     string `json:"name,omitempty"`
-	Port     int    `json:"port,omitempty"`
-	SSLMode  bool   `json:"ssl_mode,omitempty"`
+	User     string `mapstructure:"user" yaml:"user" json:"user"`
+	Password string `mapstructure:"password" yaml:"password" json:"password"`
+	Host     string `mapstructure:"host" yaml:"host" json:"host"`
+	Name     string `mapstructure:"name" yaml:"name" json:"name"`
+	Port     int    `mapstructure:"port" yaml:"port" json:"port"`
+	SSLMode  bool   `mapstructure:"ssl_mode" yaml:"ssl_mode" json:"ssl_mode"`
 }
 
 func (db Database) Connect() (*sql.DB, error) {

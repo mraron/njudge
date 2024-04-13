@@ -18,6 +18,6 @@ COPY --from=nimlang/nim:1.6.18 /usr/bin/nim /usr/bin/nim
 RUN ln -s /usr/local/julia/bin/julia /usr/local/bin/julia
 
 WORKDIR /app
-COPY configs/docker/judge_docker.json ./judge.json
+COPY configs/docker/judge.yaml ./judge.yaml
 
 CMD ["./njudge", "judge"]

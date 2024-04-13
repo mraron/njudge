@@ -13,20 +13,19 @@ import (
 	"io/fs"
 	"log/slog"
 	"runtime"
-	"strings"
 	"time"
 )
 
 type JudgeConfig struct {
-	Port        int
-	ProblemsDir string
+	Port        int    `mapstructure:"port" yaml:"port"`
+	ProblemsDir string `mapstructure:"problems_dir" yaml:"problems_dir"`
 
-	Isolate             bool
-	IsolateSandboxRange []int
+	Isolate             bool  `mapstructure:"isolate" yaml:"isolate"`
+	IsolateSandboxRange []int `mapstructure:"isolate_sandbox_range" yaml:"isolate_sandbox_range"`
 
-	UpdateStatusLimitEvery time.Duration
+	UpdateStatusLimitEvery time.Duration `mapstructure:"update_status_limit_every" yaml:"update_status_limit_every"`
 
-	Concurrency int
+	Concurrency int `mapstructure:"concurrency" yaml:"concurrency"`
 }
 
 var DefaultJudgeConfig = JudgeConfig{
@@ -48,10 +47,10 @@ func NewJudgeCmd(v *viper.Viper) *cobra.Command {
 			v.AddConfigPath(".")
 
 			v.SetDefault("port", DefaultJudgeConfig.Port)
-			v.SetDefault("problemsDir", DefaultJudgeConfig.ProblemsDir)
+			v.SetDefault("problems_dir", DefaultJudgeConfig.ProblemsDir)
 			v.SetDefault("isolate", DefaultJudgeConfig.Isolate)
-			v.SetDefault("isolateSandboxRange", DefaultJudgeConfig.IsolateSandboxRange)
-			v.SetDefault("updateStatusLimitEvery", DefaultJudgeConfig.UpdateStatusLimitEvery)
+			v.SetDefault("isolate_sandbox_range", DefaultJudgeConfig.IsolateSandboxRange)
+			v.SetDefault("update_status_limit_every", DefaultJudgeConfig.UpdateStatusLimitEvery)
 
 			v.AutomaticEnv()
 			v.SetEnvPrefix("njudge")
@@ -64,7 +63,7 @@ func NewJudgeCmd(v *viper.Viper) *cobra.Command {
 			}
 
 			cmd.Flags().VisitAll(func(flag *pflag.Flag) {
-				configName := strings.ReplaceAll(flag.Name, "-", "")
+				configName := flag.Name
 				if !flag.Changed && v.IsSet(configName) {
 					val := v.Get(configName)
 					_ = cmd.Flags().Set(flag.Name, fmt.Sprintf("%v", val))
@@ -131,10 +130,10 @@ func NewJudgeCmd(v *viper.Viper) *cobra.Command {
 	}
 
 	cmd.Flags().IntVar(&cfg.Port, "port", DefaultJudgeConfig.Port, "port to listen on")
-	cmd.Flags().StringVar(&cfg.ProblemsDir, "problems-dir", DefaultJudgeConfig.ProblemsDir, "directory of the problems")
+	cmd.Flags().StringVar(&cfg.ProblemsDir, "problems_dir", DefaultJudgeConfig.ProblemsDir, "directory of the problems")
 	cmd.Flags().BoolVar(&cfg.Isolate, "isolate", DefaultJudgeConfig.Isolate, "use isolate (otherwise dummy sandboxes are used which are NOT secure)")
-	cmd.Flags().IntSliceVar(&cfg.IsolateSandboxRange, "isolate-sandbox-range", DefaultJudgeConfig.IsolateSandboxRange, "inclusive interval of isolate sandbox IDs")
-	cmd.Flags().DurationVar(&cfg.UpdateStatusLimitEvery, "updateStatus-limit-every", DefaultJudgeConfig.UpdateStatusLimitEvery, "the rate of status updates for the clients")
+	cmd.Flags().IntSliceVar(&cfg.IsolateSandboxRange, "isolate_sandbox_range", DefaultJudgeConfig.IsolateSandboxRange, "inclusive interval of isolate sandbox IDs")
+	cmd.Flags().DurationVar(&cfg.UpdateStatusLimitEvery, "updateStatus_limit_every", DefaultJudgeConfig.UpdateStatusLimitEvery, "the rate of status updates for the clients")
 	cmd.Flags().IntVar(&cfg.Concurrency, "concurrency", DefaultJudgeConfig.Concurrency, "the maximum number of concurrently executed testcase")
 
 	return cmd

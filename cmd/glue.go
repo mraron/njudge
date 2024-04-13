@@ -11,7 +11,6 @@ import (
 	"golang.org/x/net/context"
 	"io/fs"
 	"log/slog"
-	"strings"
 	"time"
 )
 
@@ -26,7 +25,7 @@ var DefaultGlueConfig = GlueConfig{
 		Host:     "db",
 		Name:     "postgres",
 		Port:     5432,
-		SSLMode:  true,
+		SSLMode:  false,
 	},
 }
 
@@ -36,6 +35,7 @@ func NewGlueCmd(v *viper.Viper) *cobra.Command {
 		Use:   "glue",
 		Short: "start glue service",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			v.SetConfigType("yaml")
 			v.SetConfigFile("glue.yaml")
 			v.AddConfigPath(".")
 
@@ -44,7 +44,7 @@ func NewGlueCmd(v *viper.Viper) *cobra.Command {
 			v.SetDefault("db.host", DefaultGlueConfig.Database.Host)
 			v.SetDefault("db.name", DefaultGlueConfig.Database.Name)
 			v.SetDefault("db.port", DefaultGlueConfig.Database.Port)
-			v.SetDefault("db.sslmode", DefaultGlueConfig.Database.SSLMode)
+			v.SetDefault("db.ssl_mode", DefaultGlueConfig.Database.SSLMode)
 
 			v.AutomaticEnv()
 			v.SetEnvPrefix("njudge")
@@ -57,7 +57,7 @@ func NewGlueCmd(v *viper.Viper) *cobra.Command {
 			}
 
 			cmd.Flags().VisitAll(func(flag *pflag.Flag) {
-				configName := strings.ReplaceAll(flag.Name, "-", "")
+				configName := flag.Name
 				if !flag.Changed && v.IsSet(configName) {
 					val := v.Get(configName)
 					_ = cmd.Flags().Set(flag.Name, fmt.Sprintf("%v", val))
@@ -68,9 +68,20 @@ func NewGlueCmd(v *viper.Viper) *cobra.Command {
 		},
 
 		RunE: func(cmd *cobra.Command, args []string) error {
+			fmt.Println(cfg)
 			conn, err := cfg.Database.Connect()
 			if err != nil {
 				return err
+			}
+			for {
+				slog.Info("Trying to ping database...")
+				if err := conn.Ping(); err == nil {
+					slog.Info("OK, connected to database")
+					break
+				} else {
+					slog.Error("Failed to connect to database", "error", err)
+				}
+				time.Sleep(5 * time.Second)
 			}
 			judges := glue.NewJudges(conn, slog.Default())
 			go func() {
@@ -94,10 +105,10 @@ func NewGlueCmd(v *viper.Viper) *cobra.Command {
 
 	cmd.Flags().StringVar(&cfg.Database.User, "db.user", DefaultGlueConfig.Database.User, "database user")
 	cmd.Flags().StringVar(&cfg.Database.Password, "db.password", DefaultGlueConfig.Database.Password, "database password")
-	cmd.Flags().StringVar(&cfg.Database.Host, "db.host", DefaultGlueConfig.Database.Password, "database host")
+	cmd.Flags().StringVar(&cfg.Database.Host, "db.host", DefaultGlueConfig.Database.Host, "database host")
 	cmd.Flags().StringVar(&cfg.Database.Name, "db.name", DefaultGlueConfig.Database.Name, "database name")
 	cmd.Flags().IntVar(&cfg.Database.Port, "db.port", DefaultGlueConfig.Database.Port, "database port")
-	cmd.Flags().BoolVar(&cfg.Database.SSLMode, "db.sslmode", DefaultGlueConfig.Database.SSLMode, "database sslmode")
+	cmd.Flags().BoolVar(&cfg.Database.SSLMode, "db.ssl_mode", DefaultGlueConfig.Database.SSLMode, "database sslmode")
 
 	return cmd
 }
