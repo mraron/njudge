@@ -68,20 +68,9 @@ func NewGlueCmd(v *viper.Viper) *cobra.Command {
 		},
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println(cfg)
-			conn, err := cfg.Database.Connect()
+			conn, err := cfg.Database.ConnectAndPing(slog.Default())
 			if err != nil {
 				return err
-			}
-			for {
-				slog.Info("Trying to ping database...")
-				if err := conn.Ping(); err == nil {
-					slog.Info("OK, connected to database")
-					break
-				} else {
-					slog.Error("Failed to connect to database", "error", err)
-				}
-				time.Sleep(5 * time.Second)
 			}
 			judges := glue.NewJudges(conn, slog.Default())
 			go func() {

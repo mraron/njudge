@@ -25,9 +25,13 @@ type Judger interface {
 	Judge(ctx context.Context, sub Submission, callback ResultCallback) (*problems.Status, error)
 }
 
+type ProblemStore interface {
+	GetProblem(string) (problems.Problem, error)
+}
+
 type Judge struct {
 	SandboxProvider sandbox.Provider
-	ProblemStore    problems.Store
+	ProblemStore    ProblemStore
 	LanguageStore   language.Store
 	RateLimit       time.Duration
 

@@ -8,6 +8,8 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log/slog"
+	"time"
 )
 
 type Database struct {
@@ -31,6 +33,24 @@ func (db Database) Connect() (*sql.DB, error) {
 
 	connStr := fmt.Sprintf("user=%s password=%s host=%s dbname=%s port=%d sslmode=%s", db.User, db.Password, db.Host, db.Name, db.Port, SSLMode)
 	return sql.Open("postgres", connStr)
+}
+
+func (db Database) ConnectAndPing(log *slog.Logger) (*sql.DB, error) {
+	conn, err := db.Connect()
+	if err != nil {
+		return nil, err
+	}
+	for {
+		log.Info("Trying to ping database...")
+		if err := conn.Ping(); err == nil {
+			log.Info("OK, connected to database")
+			break
+		} else {
+			log.Error("Failed to connect to database", "error", err)
+		}
+		time.Sleep(5 * time.Second)
+	}
+	return conn, nil
 }
 
 type Server struct {

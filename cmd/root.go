@@ -31,7 +31,7 @@ func BindEnvs(iface interface{}, parts ...string) {
 
 var RootCmd = &cobra.Command{
 	Use:     "njudge",
-	Version: "v0.1.0",
+	Version: "v0.3.1",
 	Long:    "cli tool to manage njudge instance",
 }
 
