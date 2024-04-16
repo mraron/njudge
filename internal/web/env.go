@@ -2,8 +2,10 @@ package web
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"github.com/mraron/njudge/internal/njudge/cached"
+	"github.com/mraron/njudge/pkg/language/langs/cpp"
 	"log"
 	"net/http"
 	"strconv"
@@ -11,7 +13,6 @@ import (
 
 	"github.com/antonlindstrom/pgstore"
 	"github.com/gorilla/sessions"
-	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -23,7 +24,6 @@ import (
 	"github.com/mraron/njudge/internal/njudge/memory"
 	"github.com/mraron/njudge/internal/web/helpers/templates"
 	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
-	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/quasoft/memstore"
 	"github.com/volatiletech/sqlboiler/v4/boil"
@@ -31,7 +31,7 @@ import (
 
 func (s *Server) SetupDataAccess() {
 	s.ProblemStore = problems.NewFsStore(s.ProblemsDir)
-	s.ProblemStore.Update()
+	_ = s.ProblemStore.UpdateProblems()
 
 	if s.Mode == "demo" {
 		s.PartialsStore = partials.Empty{}
@@ -74,7 +74,7 @@ func (s *Server) SetupDataAccess() {
 		s.Problems.Insert(context.Background(), njudge.NewProblem("main", "is1"))
 		prob, _ := s.Problems.Insert(context.Background(), p)
 
-		sub, _ := njudge.NewSubmission(*u, *prob, language.DefaultStore.Get("cpp14"))
+		sub, _ := njudge.NewSubmission(*u, *prob, cpp.Std14)
 		sub.SetSource([]byte("#include<bits/stdc++.h>"))
 		sub.Verdict = njudge.VerdictAC
 		sdata, _ := prob.WithStoredData(s.ProblemStore)
@@ -82,22 +82,22 @@ func (s *Server) SetupDataAccess() {
 		sub.Status = *ss
 		sub, _ = s.Submissions.Insert(context.Background(), *sub)
 	} else {
-		s.PartialsStore = partials.NewCached(s.DB.DB, 1*time.Minute)
+		s.PartialsStore = partials.NewCached(s.DB, 1*time.Minute)
 
-		s.Categories = db.NewCategories(s.DB.DB)
-		s.Tags = db.NewTags(s.DB.DB)
-		s.SolvedStatusQuery = cached.NewSolvedStatusQuery(db.NewSolvedStatusQuery(s.DB.DB), 30*time.Second)
+		s.Categories = db.NewCategories(s.DB)
+		s.Tags = db.NewTags(s.DB)
+		s.SolvedStatusQuery = cached.NewSolvedStatusQuery(db.NewSolvedStatusQuery(s.DB), 30*time.Second)
 		s.Problems = db.NewProblems(
-			s.DB.DB,
+			s.DB,
 			s.SolvedStatusQuery,
 		)
-		s.Submissions = db.NewSubmissions(s.DB.DB)
-		s.Users = db.NewUsers(s.DB.DB)
+		s.Submissions = db.NewSubmissions(s.DB)
+		s.Users = db.NewUsers(s.DB)
 
 		s.ProblemQuery = s.Problems.(*db.Problems)
 		s.ProblemInfoQuery = s.Problems.(*db.Problems)
 		s.ProblemListQuery = memory.NewProblemListQuery(s.ProblemStore, s.Problems, s.Tags, s.Categories)
-		s.SubmissionListQuery = db.NewSubmissionListQuery(s.DB.DB)
+		s.SubmissionListQuery = db.NewSubmissionListQuery(s.DB)
 
 		s.RegisterService = njudge.NewRegisterService(s.Users)
 		s.SubmitService = memory.NewSubmitService(s.Submissions, s.Users, s.ProblemQuery, s.ProblemStore)
@@ -162,16 +162,16 @@ func (s *Server) ConnectToDB() {
 	var err error
 
 	sslmode := "require"
-	if !s.DBSSLMode {
+	if !s.SSLMode {
 		sslmode = "disable"
 	}
 
-	if s.DBPort == 0 {
-		s.DBPort = 5432
+	if s.Database.Port == 0 {
+		s.Database.Port = 5432
 	}
 
-	connStr := fmt.Sprintf("user=%s password=%s host=%s dbname=%s port=%d sslmode=%s", s.DBAccount, s.DBPassword, s.DBHost, s.DBName, s.DBPort, sslmode)
-	s.DB, err = sqlx.Open("postgres", connStr)
+	connStr := fmt.Sprintf("user=%s password=%s host=%s dbname=%s port=%d sslmode=%s", s.User, s.Password, s.Host, s.Name, s.Database.Port, sslmode)
+	s.DB, err = sql.Open("postgres", connStr)
 	if err != nil {
 		panic(err)
 	}
@@ -214,7 +214,7 @@ func (s *Server) setupEcho() {
 	)
 
 	if s.Mode == "development" || s.Mode == "production" {
-		store, err = pgstore.NewPGStoreFromPool(s.DB.DB, []byte(s.CookieSecret))
+		store, err = pgstore.NewPGStoreFromPool(s.DB, []byte(s.CookieSecret))
 		if err != nil {
 			panic(err)
 		}

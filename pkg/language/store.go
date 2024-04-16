@@ -1,21 +1,39 @@
 package language
 
 import (
+	"errors"
 	"sort"
 
-	"golang.org/x/exp/slices"
+	"slices"
 )
 
+var ErrorLanguageNotFound = errors.New("language not found")
+
+type NotFoundError struct {
+	ID string
+}
+
+func (n NotFoundError) Error() string {
+	return "language not found: " + n.ID
+}
+
+func (n NotFoundError) Is(err error) bool {
+	return err == ErrorLanguageNotFound
+}
+
+// Store is an interface which is used to capture the notion of storing languages.
+// Via it's Store.Register method it's possible to override the underlying ID of the language for the outside world.
 type Store interface {
 	Register(id string, l Language)
 	List() []Language
-	Get(id string) Language
+	Get(id string) (Language, error)
 }
 
-func StoreAllExcept(s Store, except []string) []Language {
-	res := []Language{}
+// ListExcept returns a slice of languages except some.
+func ListExcept(s Store, except []string) []Language {
+	var res []Language
 	for _, elem := range s.List() {
-		if !slices.Contains(except, elem.Id()) {
+		if !slices.Contains(except, elem.ID()) {
 			res = append(res, elem)
 		}
 	}
@@ -23,17 +41,19 @@ func StoreAllExcept(s Store, except []string) []Language {
 	return res
 }
 
-type LanguageWrapper struct {
-	id string
+// Wrapper overrides a Language's ID.
+type Wrapper struct {
+	IDWrapper string
 	Language
 }
 
-func (lw LanguageWrapper) Id() string {
-	return lw.id
+func (w Wrapper) ID() string {
+	return w.IDWrapper
 }
 
+// ListStore is a basic implementation (and probably only realistic, so maybe an interface is not really necessary) of a Store.
 type ListStore struct {
-	langList []Language
+	LanguageList []Language
 }
 
 func NewListStore() *ListStore {
@@ -41,35 +61,36 @@ func NewListStore() *ListStore {
 }
 
 func (m *ListStore) Register(id string, l Language) {
-	m.langList = append(m.langList, LanguageWrapper{id, l})
+	m.LanguageList = append(m.LanguageList, Wrapper{id, l})
 }
 
 func (m *ListStore) List() []Language {
-	ans := make([]Language, len(m.langList))
+	ans := make([]Language, len(m.LanguageList))
 
 	ind := 0
-	for _, val := range m.langList {
+	for _, val := range m.LanguageList {
 		ans[ind] = val
 		ind++
 	}
 
 	sort.Slice(ans, func(i, j int) bool {
-		return ans[i].Id() < ans[j].Id()
+		return ans[i].ID() < ans[j].ID()
 	})
 
 	return ans
 }
 
-func (m *ListStore) Get(id string) Language {
-	for ind := range m.langList {
-		if m.langList[ind].Id() == id {
-			return m.langList[ind]
+func (m *ListStore) Get(id string) (Language, error) {
+	for ind := range m.LanguageList {
+		if m.LanguageList[ind].ID() == id {
+			return m.LanguageList[ind], nil
 		}
 	}
 
-	return nil
+	return nil, NotFoundError{id}
 }
 
+// DefaultStore is a store which all Language objects should register themselves in.
 var DefaultStore Store
 
 func init() {

@@ -1,6 +1,7 @@
 package problem_yaml_test
 
 import (
+	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -50,14 +51,14 @@ func TestParsing(t *testing.T) {
 
 	fs := afero.NewMemMapFs()
 
-	afero.WriteFile(fs, "covering-HUN.pdf", []byte(""), 0777)
+	_ = afero.WriteFile(fs, "covering-HUN.pdf", []byte(""), 0777)
 
 	parser, identifier := problem_yaml.ParserAndIdentifier()
 
 	if identifier(fs, "./") {
 		t.Fatal("can identify???")
 	}
-	afero.WriteFile(fs, "problem.yaml", []byte(problemYAML), 0777)
+	_ = afero.WriteFile(fs, "problem.yaml", []byte(problemYAML), 0777)
 	if !identifier(fs, "./") {
 		t.Fatal("can't identify")
 	}
@@ -136,8 +137,8 @@ func TestParsing(t *testing.T) {
 		}
 	}`
 
-	afero.WriteFile(fs, "problem.yaml", []byte(problemYAML), 0777)
-	afero.WriteFile(fs, "minta.zip", []byte(""), 0777)
+	_ = afero.WriteFile(fs, "problem.yaml", []byte(problemYAML), 0777)
+	_ = afero.WriteFile(fs, "minta.zip", []byte(""), 0777)
 	p, err = parser(fs, "./")
 	if err != nil {
 		t.Fatal(err)
@@ -173,8 +174,8 @@ func TestParsing(t *testing.T) {
 		}
 	}`
 
-	afero.WriteFile(fs, "problem.yaml", []byte(problemYAML), 0777)
-	afero.WriteFile(fs, "minta.zip", []byte(""), 0777)
+	_ = afero.WriteFile(fs, "problem.yaml", []byte(problemYAML), 0777)
+	_ = afero.WriteFile(fs, "minta.zip", []byte(""), 0777)
 	p, err = parser(fs, "./")
 	if err != nil {
 		t.Fatal(err)
@@ -190,7 +191,7 @@ func TestParsing(t *testing.T) {
 	}
 
 	assert.Equal(t, sk.Feedback[0].Testcases()[0].TimeLimit, 1000*time.Millisecond)
-	assert.Equal(t, sk.Feedback[0].Testcases()[0].MemoryLimit, 100*1024*1024)
+	assert.Equal(t, sk.Feedback[0].Testcases()[0].MemoryLimit, 100*memory.MiB)
 	assert.Equal(t, sk.Feedback[0].Testcases()[0].Group, "base")
 	assert.Equal(t, sk.Feedback[0].Testcases()[0].InputPath, "tests/1.in")
 	assert.Equal(t, sk.Feedback[0].Testcases()[0].AnswerPath, "tests/1.out")

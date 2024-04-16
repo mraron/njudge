@@ -2,6 +2,7 @@ package web
 
 import (
 	"context"
+	"github.com/mraron/njudge/internal/njudge/db"
 	"log"
 	"math"
 	"time"
@@ -24,7 +25,7 @@ func (s *Server) StartBackgroundJobs() {
 
 func (s *Server) runUpdateProblems() {
 	for {
-		if err := s.ProblemStore.Update(); err != nil {
+		if err := s.ProblemStore.UpdateProblems(); err != nil {
 			log.Print(err)
 		}
 
@@ -44,7 +45,7 @@ func (s *Server) runStatisticsUpdate() {
 		for _, p := range probs {
 			solvedBy, err := models.Submissions(
 				qm.Distinct(models.SubmissionColumns.UserID),
-				models.SubmissionWhere.Verdict.EQ(int(njudge.VerdictAC)),
+				models.SubmissionWhere.Verdict.EQ(db.NjudgeVerdictToDatabase(njudge.VerdictAC)),
 				models.SubmissionWhere.ProblemID.EQ(p.ID),
 			).All(context.Background(), s.DB)
 

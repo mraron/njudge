@@ -1,13 +1,16 @@
 package golang
 
 import (
+	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/mraron/njudge/pkg/language/sandbox"
+	"testing"
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
 )
 
 const (
-	aplusb = `package main
+	TestCodeAplusb = `package main
 import (
 	"fmt"
 )
@@ -16,7 +19,7 @@ func main() {
 	fmt.Scanf("%d %d", &a, &b)
 	fmt.Println(a+b)
 }`
-	ce = `pkgace main
+	TestCodeCompilationError = `pkgace main
 import (
 	"fmt"
 )
@@ -24,21 +27,21 @@ func main() {
 	fmt.Println("lol")
 }
 `
-	print = `package main
+	TestCodeHelloWorld = `package main
 import (
 	"fmt"
 )
 func main() {
 	fmt.Println("Hello world")
 }`
-	tl = `package main
+	TestCodeTimeLimit = `package main
 func main() {
 	a := 0
 	for 1==1 {
 		a++
 	}
 }`
-	re = `package main
+	TestCodeRuntimeError = `package main
 func dfs(x int) {
 	dfs(x+1)
 	if x==1000000000 {
@@ -48,7 +51,7 @@ func dfs(x int) {
 func main() {
 	dfs(-1000)
 }`
-	rediv0 = `package main
+	TestCodeRuntimeErrorDiv0 = `package main
 import (
 	"fmt"
 )
@@ -59,18 +62,20 @@ func main() {
 }`
 )
 
-func (g golang) Test(s language.Sandbox) error {
-	for _, test := range []language.LanguageTest{
-		{g, aplusb, language.VerdictOK, "1 2", "3\n", 1 * time.Second, 2 * 512 * 1024 * 1024},
-		{g, ce, language.VerdictCE, "", "", 1 * time.Second, 2 * 512 * 1024 * 1024},
-		{g, print, language.VerdictOK, "", "Hello world\n", 1 * time.Second, 2 * 512 * 1024 * 1024},
-		{g, tl, language.VerdictTL, "", "", 100 * time.Millisecond, 2 * 512 * 1024 * 1024},
-		{g, re, language.VerdictRE | language.VerdictTL, "", "", 1000 * time.Millisecond, 2 * 512 * 1024 * 1024},
-		{g, rediv0, language.VerdictRE, "", "", 1000 * time.Millisecond, 2 * 512 * 1024 * 1024},
+func (g Golang) Test(t *testing.T, s sandbox.Sandbox) error {
+	for _, test := range []language.Test{
+		{Name: g.ID() + "_aplusb", Language: g, Source: TestCodeAplusb, ExpectedVerdict: sandbox.VerdictOK, Input: "1 2", ExpectedOutput: "3\n", TimeLimit: 1 * time.Second, MemoryLimit: 128 * memory.MiB},
+		{Name: g.ID() + "_ce", Language: g, Source: TestCodeCompilationError, ExpectedVerdict: sandbox.VerdictCE, TimeLimit: 1 * time.Second, MemoryLimit: 128 * memory.MiB},
+		{Name: g.ID() + "_print", Language: g, Source: TestCodeHelloWorld, ExpectedVerdict: sandbox.VerdictOK, ExpectedOutput: "Hello world\n", TimeLimit: 1 * time.Second, MemoryLimit: 128 * memory.MiB},
+		{Name: g.ID() + "_tl", Language: g, Source: TestCodeTimeLimit, ExpectedVerdict: sandbox.VerdictTL, TimeLimit: 100 * time.Millisecond, MemoryLimit: 128 * memory.MiB},
+		{Name: g.ID() + "_re", Language: g, Source: TestCodeRuntimeError, ExpectedVerdict: sandbox.VerdictRE | sandbox.VerdictTL, TimeLimit: 1000 * time.Millisecond, MemoryLimit: 128 * memory.MiB},
+		{Name: g.ID() + "_rediv0", Language: g, Source: TestCodeRuntimeErrorDiv0, ExpectedVerdict: sandbox.VerdictRE, TimeLimit: 1000 * time.Millisecond, MemoryLimit: 128 * memory.MiB},
 	} {
-		if err := test.Run(s); err != nil {
-			return err
-		}
+		t.Run(test.Name, func(t *testing.T) {
+			if err := test.Run(s); err != nil {
+				t.Error(err)
+			}
+		})
 	}
 
 	return nil

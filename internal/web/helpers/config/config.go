@@ -3,19 +3,54 @@ package config
 import (
 	"crypto/rsa"
 	"crypto/x509"
+	"database/sql"
 	"encoding/pem"
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log/slog"
+	"time"
 )
 
 type Database struct {
-	DBAccount  string
-	DBPassword string
-	DBHost     string
-	DBName     string
-	DBPort     int
-	DBSSLMode  bool
+	User     string `mapstructure:"user" yaml:"user" json:"user"`
+	Password string `mapstructure:"password" yaml:"password" json:"password"`
+	Host     string `mapstructure:"host" yaml:"host" json:"host"`
+	Name     string `mapstructure:"name" yaml:"name" json:"name"`
+	Port     int    `mapstructure:"port" yaml:"port" json:"port"`
+	SSLMode  bool   `mapstructure:"ssl_mode" yaml:"ssl_mode" json:"ssl_mode"`
+}
+
+func (db Database) Connect() (*sql.DB, error) {
+	SSLMode := "require"
+	if !db.SSLMode {
+		SSLMode = "disable"
+	}
+
+	if db.Port == 0 {
+		db.Port = 5432
+	}
+
+	connStr := fmt.Sprintf("user=%s password=%s host=%s dbname=%s port=%d sslmode=%s", db.User, db.Password, db.Host, db.Name, db.Port, SSLMode)
+	return sql.Open("postgres", connStr)
+}
+
+func (db Database) ConnectAndPing(log *slog.Logger) (*sql.DB, error) {
+	conn, err := db.Connect()
+	if err != nil {
+		return nil, err
+	}
+	for {
+		log.Info("Trying to ping database...")
+		if err := conn.Ping(); err == nil {
+			log.Info("OK, connected to database")
+			break
+		} else {
+			log.Error("Failed to connect to database", "error", err)
+		}
+		time.Sleep(5 * time.Second)
+	}
+	return conn, nil
 }
 
 type Server struct {
@@ -50,7 +85,7 @@ type Server struct {
 		MailAccountPassword string `json:"mail_password" mapstructure:"mail_password"`
 	} `json:"smtp" mapstructure:"smtp"`
 
-	Database `mapstructure:",squash"`
+	Database `json:"database" mapstructure:"database"`
 
 	Keys Keys
 }

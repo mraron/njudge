@@ -17,7 +17,7 @@
     {{$lastLang := .Data.ProblemInfo.UserInfo.LastLanguage}}
     <select name="language" class="custom-select form-control" id="languagesList">
         {{range $l := .Data.ProblemStoredData.Languages}}
-            <option value="{{$l.Id}}"{{if eq $lastLang $l.Id}} selected="selected"{{end}}>{{$l.Name}}</option>
+            <option value="{{$l.ID}}"{{if eq $lastLang $l.ID}} selected="selected"{{end}}>{{$l.DisplayName}}</option>
         {{end}}
     </select>
 </div>

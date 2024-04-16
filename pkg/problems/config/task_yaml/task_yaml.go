@@ -2,9 +2,17 @@ package task_yaml
 
 import (
 	"bufio"
-	"bytes"
+	"context"
 	"errors"
 	"fmt"
+	"github.com/mraron/njudge/pkg/language/langs/zip"
+	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/mraron/njudge/pkg/problems/evaluation"
+	"github.com/mraron/njudge/pkg/problems/evaluation/batch"
+	"github.com/mraron/njudge/pkg/problems/evaluation/communication"
+	"github.com/mraron/njudge/pkg/problems/evaluation/output_only"
+	"github.com/mraron/njudge/pkg/problems/evaluation/stub"
+	checker2 "github.com/mraron/njudge/pkg/problems/executable/checker"
 	"io"
 	"os"
 	"path/filepath"
@@ -18,10 +26,6 @@ import (
 
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
-	"github.com/mraron/njudge/pkg/problems/checker"
-	"github.com/mraron/njudge/pkg/problems/tasktype/batch"
-	"github.com/mraron/njudge/pkg/problems/tasktype/communication"
-	"go.uber.org/multierr"
 	"gopkg.in/yaml.v3"
 )
 
@@ -58,9 +62,10 @@ type Problem struct {
 
 	Path string
 
-	files            []problems.File
+	files            []problems.EvaluationFile
 	tasktype         string
 	whiteDiffChecker bool
+	managerBinary    []byte
 }
 
 func (p Problem) Name() string {
@@ -83,8 +88,8 @@ func (p Problem) PDFStatements() problems.Contents {
 	return p.StatementList.FilterByType(problems.DataTypePDF)
 }
 
-func (p Problem) MemoryLimit() int {
-	return 1024 * 1024 * p.TaskYAML.MemoryLimit
+func (p Problem) MemoryLimit() memory.Amount {
+	return memory.Amount(1024 * 1024 * p.TaskYAML.MemoryLimit)
 }
 
 func (p Problem) TimeLimit() int {
@@ -101,17 +106,17 @@ func (p Problem) Interactive() bool {
 
 func (p Problem) Languages() []language.Language {
 	if p.OutputOnly {
-		return []language.Language{language.DefaultStore.Get("zip")}
+		return []language.Language{zip.Zip{}}
 	}
 
-	lst1 := language.DefaultStore.List()
+	lst1 := language.ListExcept(language.DefaultStore, []string{"zip"})
 
 	lst2 := make([]language.Language, 0, len(lst1))
 	for _, val := range lst1 {
-		if p.tasktype == "stub" {
+		if p.tasktype == "stub" || p.tasktype == "communication" {
 			hasStub := false
 			for _, f := range p.files {
-				if f.Role == "stub_"+val.Id() || (f.Role == "stub_cpp" && strings.HasPrefix(val.Id(), "cpp")) {
+				if f.StubOf(val) {
 					hasStub = true
 					break
 				}
@@ -121,12 +126,12 @@ func (p Problem) Languages() []language.Language {
 				lst2 = append(lst2, val)
 			}
 		} else {
-			if val.Id() != "zip" {
-				lst2 = append(lst2, val)
-			}
+			lst2 = append(lst2, val)
 		}
 	}
-
+	if p.tasktype == "communication" && len(lst2) == 0 {
+		return lst1
+	}
 	return lst2
 }
 
@@ -249,79 +254,58 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 
 func (p Problem) Checker() problems.Checker {
 	if p.tasktype == "communication" { // manager already printed the result
-		return checker.Noop{}
+		return checker2.Noop{}
 	}
 
 	if p.whiteDiffChecker {
-		return checker.Whitediff{}
+		return checker2.NewWhitediff()
 	}
 
-	return checker.NewTaskYAML(filepath.Join(p.Path, "check", "checker"))
+	return checker2.NewTaskYAML(filepath.Join(p.Path, "check", "checker"))
 }
 
-func (p Problem) Files() []problems.File {
+func (p Problem) EvaluationFiles() []problems.EvaluationFile {
 	return p.files
 }
 
-func (p Problem) GetTaskType() problems.TaskType {
-	var (
-		tt  problems.TaskType
-		err error
-	)
-
+func (p Problem) makeCompiler() problems.Compiler {
 	if p.tasktype == "outputonly" {
-		tt, err = problems.GetTaskType("outputonly")
+		return evaluation.CompileCheckSupported{
+			List:         p.Languages(),
+			NextCompiler: evaluation.CompileCopyFile{},
+		}
 	} else if p.tasktype == "batch" {
-		tt, err = problems.GetTaskType("batch")
+		return evaluation.CompileCheckSupported{
+			List:         p.Languages(),
+			NextCompiler: evaluation.Compile{},
+		}
+	} else if p.tasktype == "communication" || p.tasktype == "stub" {
+		compiler := evaluation.NewCompilerWithStubs()
+		for _, lang := range p.Languages() {
+			for _, file := range p.files {
+				if file.StubOf(lang) {
+					compiler.AddStub(lang, file)
+				}
+			}
+		}
+		return compiler
+	}
+	return evaluation.CompileCopyFile{}
+}
+
+func (p Problem) GetTaskType() problems.TaskType {
+	if p.tasktype == "communication" {
+		eval := &evaluation.TaskYAMLUserInteractorExecute{}
+		return communication.New(p.makeCompiler(), p.managerBinary, eval, evaluation.InteractiveRunnerWithExecutor(eval))
+	} else if p.tasktype == "batch" {
+		return batch.New(p.makeCompiler(), evaluation.BasicRunnerWithChecker(p.Checker()))
 	} else if p.tasktype == "stub" {
-		tt, err = problems.GetTaskType("stub")
-	} else if p.tasktype == "communication" {
-		res := communication.New()
-		res.RunInteractorF = func(rc *batch.RunContext, utoi, itou *os.File, g *problems.Group, tc *problems.Testcase) (language.Status, error) {
-			input, err := os.Open(tc.InputPath)
-			if err != nil {
-				return language.Status{}, multierr.Combine(err, input.Close())
-			}
-			defer input.Close()
-
-			sbox := rc.Store["interactorSandbox"].(language.Sandbox).Stdin(input).Stdout(rc.Stdout).TimeLimit(2 * tc.TimeLimit).MemoryLimit(1024 * 1024)
-			sbox.MapDir("/fifo", filepath.Dir(itou.Name()), []string{"rw"}, false)
-
-			st, err := sbox.Run(fmt.Sprintf("interactor %s %s", filepath.Join("/fifo", filepath.Base(utoi.Name())), filepath.Join("/fifo", filepath.Base(itou.Name()))), true)
-			if err != nil {
-				return st, err
-			}
-			itou.Close()
-
-			fmt.Fscanf(rc.Stdout, "%f", &tc.Score)
-			if tc.Score == 0 {
-				tc.VerdictName = problems.VerdictWA
-			} else if tc.Score < 1.0 {
-				tc.VerdictName = problems.VerdictPC
-			} else {
-				tc.VerdictName = problems.VerdictAC
-			}
-
-			tc.Score *= tc.MaxScore
-
-			// For compatibility create a file named out
-			return st, multierr.Combine(err, rc.Store["interactorSandbox"].(language.Sandbox).CreateFile("out", bytes.NewBuffer([]byte{})))
-		}
-
-		res.RunUserF = func(rc *batch.RunContext, utoi, itou *os.File, g *problems.Group, tc *problems.Testcase) (language.Status, error) {
-			res, err := rc.Lang.Run(rc.Sandbox, bytes.NewReader(rc.Binary), itou, utoi, tc.TimeLimit, tc.MemoryLimit)
-			utoi.Close()
-			return res, err
-		}
-
-		tt = res
+		return stub.New(p.makeCompiler().(*evaluation.CompileWithStubs))
+	} else if p.tasktype == "outputonly" {
+		return output_only.New(p.Checker())
 	}
 
-	if err != nil {
-		panic(err)
-	}
-
-	return tt
+	panic("unknown task type")
 }
 
 func parseGen(r io.Reader) (int, [][2]interface{}, error) {
@@ -408,7 +392,7 @@ func Parser(fs afero.Fs, path string) (problems.Problem, error) {
 		InputPathPattern:  filepath.Join(path, "input", "input%d.txt"),
 		AnswerPathPattern: filepath.Join(path, "output", "output%d.txt"),
 		AttachmentList:    make(problems.Attachments, 0),
-		files:             make([]problems.File, 0),
+		files:             make([]problems.EvaluationFile, 0),
 	}
 
 	YAMLFile, err := fs.Open(filepath.Join(path, "task.yaml"))
@@ -468,16 +452,23 @@ func Parser(fs afero.Fs, path string) (problems.Problem, error) {
 		managerPath := filepath.Join(checkPath, "manager")
 
 		if exists(checkerCppPath) {
-			if err := cpp.AutoCompile(fs, sandbox.NewDummy(), checkPath, checkerCppPath, checkerPath); err != nil {
+			s, _ := sandbox.NewDummy()
+			if err := cpp.AutoCompile(context.TODO(), fs, s, checkPath, checkerCppPath, checkerPath); err != nil {
 				return nil, err
 			}
 		} else if exists(managerCppPath) {
 			p.tasktype = "communication"
-			if err := cpp.AutoCompile(fs, sandbox.NewDummy(), checkPath, managerCppPath, managerPath); err != nil {
+			s, _ := sandbox.NewDummy()
+			if err := cpp.AutoCompile(context.TODO(), fs, s, checkPath, managerCppPath, managerPath); err != nil {
 				return nil, err
 			}
 
-			p.files = append(p.files, problems.File{Name: "manager.cpp", Role: "interactor", Path: managerPath})
+			p.managerBinary, err = os.ReadFile(managerPath)
+			if err != nil {
+				return nil, err
+			}
+
+			p.files = append(p.files, problems.EvaluationFile{Name: "manager.cpp", Role: "interactor", Path: managerPath})
 		} else {
 			p.whiteDiffChecker = true
 		}
@@ -486,10 +477,10 @@ func Parser(fs afero.Fs, path string) (problems.Problem, error) {
 	if exists(solPath) {
 		if exists(filepath.Join(solPath, "grader.cpp")) {
 			p.tasktype = "batch"
-			p.files = append(p.files, problems.File{Name: "grader.cpp", Role: "stub_cpp", Path: filepath.Join(solPath, "grader.cpp")})
+			p.files = append(p.files, problems.EvaluationFile{Name: "grader.cpp", Role: "stub_cpp", Path: filepath.Join(solPath, "grader.cpp")})
 		} else if exists(filepath.Join(solPath, "stub.cpp")) {
 			p.tasktype = "communication"
-			p.files = append(p.files, problems.File{Name: "stub.cpp", Role: "stub_cpp", Path: filepath.Join(solPath, "stub.cpp")})
+			p.files = append(p.files, problems.EvaluationFile{Name: "stub.cpp", Role: "stub_cpp", Path: filepath.Join(solPath, "stub.cpp")})
 		}
 
 		var files []os.FileInfo
@@ -500,7 +491,7 @@ func Parser(fs afero.Fs, path string) (problems.Problem, error) {
 
 		for _, file := range files {
 			if !file.IsDir() && filepath.Ext(file.Name()) == ".h" && file.Name() != "testlib.h" {
-				p.files = append(p.files, problems.File{Name: file.Name(), Role: "stub_cpp", Path: filepath.Join(solPath, file.Name())})
+				p.files = append(p.files, problems.EvaluationFile{Name: file.Name(), Role: "stub_cpp", Path: filepath.Join(solPath, file.Name())})
 			}
 		}
 	}

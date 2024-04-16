@@ -1,14 +1,21 @@
 package problem_yaml
 
 import (
+	"bytes"
+	"context"
 	"fmt"
-	"github.com/gomarkdown/markdown"
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
+	"github.com/mraron/njudge/pkg/language/langs/zip"
+	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/mraron/njudge/pkg/problems"
-	"github.com/mraron/njudge/pkg/problems/checker"
+	"github.com/mraron/njudge/pkg/problems/evaluation"
+	"github.com/mraron/njudge/pkg/problems/evaluation/batch"
+	"github.com/mraron/njudge/pkg/problems/evaluation/output_only"
+	"github.com/mraron/njudge/pkg/problems/executable/checker"
 	"github.com/spf13/afero"
+	"github.com/yuin/goldmark"
 	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
@@ -91,8 +98,8 @@ func (p Problem) Statements() problems.Contents {
 	return p.GeneratedStatementList
 }
 
-func (p Problem) MemoryLimit() int {
-	return p.Tests.MemoryLimit * 1024 * 1024
+func (p Problem) MemoryLimit() memory.Amount {
+	return memory.Amount(p.Tests.MemoryLimit * 1024 * 1024)
 }
 
 func (p Problem) TimeLimit() int {
@@ -105,10 +112,10 @@ func (p Problem) InputOutputFiles() (string, string) {
 
 func (p Problem) Languages() []language.Language {
 	if p.Tests.TaskType == "outputonly" {
-		return []language.Language{language.DefaultStore.Get("zip")}
+		return []language.Language{zip.Zip{}}
 	}
 
-	return language.StoreAllExcept(language.DefaultStore, []string{"zip"})
+	return language.ListExcept(language.DefaultStore, []string{"zip"})
 }
 
 func (p Problem) Attachments() problems.Attachments {
@@ -120,7 +127,7 @@ func (p Problem) Tags() []string {
 }
 
 func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
-	ans := problems.Status{Compiled: false, CompilerOutput: "status skeleton", FeedbackType: problems.FeedbackFromString(p.Tests.FeedbackType), Feedback: make([]problems.Testset, 0)}
+	ans := problems.Status{Compiled: false, CompilerOutput: "status skeleton", FeedbackType: problems.FeedbackTypeFromShortString(p.Tests.FeedbackType), Feedback: make([]problems.Testset, 0)}
 	ans.Feedback = append(ans.Feedback, problems.Testset{Name: "tests"})
 
 	getIthIO := func(typ string, index int, pattern string, gindex int, gpattern string, list []string) (string, error) {
@@ -221,7 +228,7 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 
 func (p Problem) Checker() problems.Checker {
 	if p.Tests.Checker.Type == "" || p.Tests.Checker.Type == "whitediff" {
-		return checker.Whitediff{}
+		return checker.NewWhitediff()
 	} else if p.Tests.Checker.Type == "testlib" {
 		return checker.NewTestlib(filepath.Join(p.Path, p.Tests.Checker.Path))
 	} else if p.Tests.Checker.Type == "taskyaml" {
@@ -231,26 +238,23 @@ func (p Problem) Checker() problems.Checker {
 	return checker.Noop{}
 }
 
-func (p Problem) Files() []problems.File {
-	return make([]problems.File, 0)
+func (p Problem) EvaluationFiles() []problems.EvaluationFile {
+	return make([]problems.EvaluationFile, 0)
 }
 
 func (p Problem) GetTaskType() problems.TaskType {
-	tasktype := "batch"
-	if p.Tests.TaskType != "" {
-		tasktype = p.Tests.TaskType
+	if p.Tests.TaskType == "outputonly" {
+		return output_only.New(p.Checker())
 	}
 
-	tt, err := problems.GetTaskType(tasktype)
-	if err != nil {
-		panic(err)
-	}
-
-	return tt
+	return batch.New(evaluation.CompileCheckSupported{
+		List:         p.Languages(),
+		NextCompiler: evaluation.Compile{},
+	}, evaluation.BasicRunnerWithChecker(p.Checker()))
 }
 
 type config struct {
-	compileBinaries bool
+	compileBinaries bool //TODO respect this
 }
 
 func newConfig() *config {
@@ -311,7 +315,11 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 			}
 
 			if val.Type == "text/markdown" {
-				contents = markdown.ToHTML(contents, nil, nil)
+				res := &bytes.Buffer{}
+				if err := goldmark.Convert(contents, res); err != nil {
+					return nil, err
+				}
+				contents = res.Bytes()
 				val.Type = problems.DataTypeHTML
 			}
 
@@ -320,7 +328,8 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 
 		if strings.HasSuffix(p.Tests.Checker.Path, ".cpp") {
 			binaryName := strings.TrimSuffix(p.Tests.Checker.Path, filepath.Ext(p.Tests.Checker.Path))
-			if err := cpp.AutoCompile(fs, sandbox.NewDummy(), path, filepath.Join(path, p.Tests.Checker.Path), filepath.Join(path, binaryName)); err != nil {
+			s, _ := sandbox.NewDummy()
+			if err := cpp.AutoCompile(context.TODO(), fs, s, path, filepath.Join(path, p.Tests.Checker.Path), filepath.Join(path, binaryName)); err != nil {
 				return nil, err
 			}
 

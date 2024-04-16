@@ -2,11 +2,12 @@ package polygon
 
 import (
 	"fmt"
+	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/mraron/njudge/pkg/problems/executable/checker"
 	"path/filepath"
 	"time"
 
 	"github.com/mraron/njudge/pkg/problems"
-	"github.com/mraron/njudge/pkg/problems/checker"
 )
 
 type Test struct {
@@ -97,7 +98,7 @@ func (ts Testset) Testset(path string) problems.Testset {
 			testcase.Testset = ts.Name
 			testcase.Group = group.Name
 			testcase.TimeLimit = time.Duration(ts.TimeLimit) * time.Millisecond
-			testcase.MemoryLimit = ts.MemoryLimit
+			testcase.MemoryLimit = memory.Amount(ts.MemoryLimit)
 
 			if group.Scoring == problems.ScoringMin {
 				testcase.MaxScore = grp.Points
@@ -161,7 +162,7 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	return &problems.Status{
 		Compiled:       false,
 		CompilerOutput: "status skeleton",
-		FeedbackType:   problems.FeedbackFromString(p.FeedbackType),
+		FeedbackType:   problems.FeedbackTypeFromShortString(p.FeedbackType),
 		Feedback:       feedback,
 	}, nil
 }

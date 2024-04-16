@@ -6,65 +6,70 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/mraron/njudge/pkg/language/memory"
 	"math"
 	"time"
 )
 
-// VerdictName represents the verdict of a testcase i.e the outcome which happened in result of running the testcase (or the lack of running it in the case of VerdictDR)
-type VerdictName int
+// VerdictName represents the verdict of a testcase i.e. the outcome which happened in result of running the testcase (or the lack of running it in the case of VerdictDR)
+type VerdictName string
 
 const (
-	VerdictAC VerdictName = iota
-	VerdictWA
-	VerdictRE
-	VerdictTL
-	VerdictML
-	VerdictXX
-	VerdictDR
-	VerdictPC
-	VerdictPE
+	VerdictUnknown VerdictName = ""
+	VerdictAC      VerdictName = "AC"
+	VerdictWA      VerdictName = "WA"
+	VerdictRE      VerdictName = "RE"
+	VerdictTL      VerdictName = "TL"
+	VerdictML      VerdictName = "ML"
+	VerdictXX      VerdictName = "XX"
+	VerdictDR      VerdictName = "DR"
+	VerdictPC      VerdictName = "PC"
+	VerdictPE      VerdictName = "PE"
 )
 
-func (v VerdictName) String() string {
-	switch v {
-	case VerdictAC:
-		return "Elfogadva"
-	case VerdictWA:
-		return "Rossz válasz"
-	case VerdictRE:
-		return "Futási hiba"
-	case VerdictTL:
-		return "Időlimit túllépés"
-	case VerdictML:
-		return "Memória limit túllépés"
-	case VerdictXX:
-		return "Belső hiba"
-	case VerdictDR:
-		return "Nem futott"
-	case VerdictPC:
-		return "Részben elfogadva"
-	case VerdictPE:
-		return "Prezentációs hiba"
+func (v *VerdictName) UnmarshalJSON(i []byte) error {
+	switch string(i) {
+	case "0", fmt.Sprintf("%q", VerdictAC):
+		*v = VerdictAC
+	case "1", fmt.Sprintf("%q", VerdictWA):
+		*v = VerdictWA
+	case "2", fmt.Sprintf("%q", VerdictRE):
+		*v = VerdictRE
+	case "3", fmt.Sprintf("%q", VerdictTL):
+		*v = VerdictTL
+	case "4", fmt.Sprintf("%q", VerdictML):
+		*v = VerdictML
+	case "5", fmt.Sprintf("%q", VerdictXX):
+		*v = VerdictXX
+	case "6", fmt.Sprintf("%q", VerdictDR):
+		*v = VerdictDR
+	case "7", fmt.Sprintf("%q", VerdictPC):
+		*v = VerdictPC
+	case "8", fmt.Sprintf("%q", VerdictPE):
+		*v = VerdictPE
+	case "null":
+	default:
+		return fmt.Errorf("unknown VerdictName: %q", i)
 	}
-
-	return "..."
+	return nil
 }
 
 // FeedbackType is mainly for displaying to the end user.
 // In FeedbackCF we actually output the contestant's output and the jury's output,
 // too whereas in for example FeedbackACM we only use standard ACM feedback (just the verdict),
 // in FeedbackIOI we display all testcases along information about groups.
-type FeedbackType int
+type FeedbackType string
 
 const (
-	FeedbackCF FeedbackType = iota
-	FeedbackIOI
-	FeedbackACM
-	FeedbackLazyIOI
+	FeedbackUnknown FeedbackType = ""
+	FeedbackCF      FeedbackType = "FeedbackCF"
+	FeedbackIOI     FeedbackType = "FeedbackIOI"
+	FeedbackACM     FeedbackType = "FeedbackACM"
+	FeedbackLazyIOI FeedbackType = "FeedbackLazyIOI"
 )
 
-// FeedbackFromString parses a string into FeedbackType, the default is FEEDBACK_CF, "ioi" is for FeedbackIOI and "acm" is for FeedbackACM
-func FeedbackFromString(str string) FeedbackType {
+// FeedbackTypeFromShortString parses a string into FeedbackType, the default is FEEDBACK_CF, "ioi" is for FeedbackIOI and "acm" is for FeedbackACM
+func FeedbackTypeFromShortString(str string) FeedbackType {
 	if str == "ioi" {
 		return FeedbackIOI
 	} else if str == "acm" {
@@ -76,31 +81,36 @@ func FeedbackFromString(str string) FeedbackType {
 	return FeedbackCF
 }
 
-func (f FeedbackType) String() string {
-	switch f {
-	case FeedbackACM:
-		return "FeedbackACM"
-	case FeedbackCF:
-		return "FeedbackCF"
-	case FeedbackIOI:
-		return "FeedbackIOI"
-	case FeedbackLazyIOI:
-		return "FeedbackLazyIOI"
+func (f *FeedbackType) UnmarshalJSON(i []byte) error {
+	switch string(i) {
+	case "0", fmt.Sprintf("%q", FeedbackCF):
+		*f = FeedbackCF
+	case "1", fmt.Sprintf("%q", FeedbackIOI):
+		*f = FeedbackIOI
+	case "2", fmt.Sprintf("%q", FeedbackACM):
+		*f = FeedbackACM
+	case "3", fmt.Sprintf("%q", FeedbackLazyIOI):
+		*f = FeedbackLazyIOI
+	case "null", "\"\"":
+		fallthrough
+	default:
+		*f = FeedbackUnknown
 	}
-
-	return fmt.Sprintf("Feedback(%d)", f)
+	return nil
 }
 
 // ScoringType represents the scoring of a group of tests,
 //
 //   - ScoringGroup means that if there's a non-accepted (or partially accepted) testcase in the group then the whole group scores 0 points,
-//   - ScoringSum means that the score of the group is the sum of scores of individual scores.
-type ScoringType int
+//   - ScoringSum means that the score of the group is the sum of the scores.
+//   - ScoringMin means that the score of the group is the minimum of the scores.
+type ScoringType string
 
 const (
-	ScoringGroup ScoringType = iota
-	ScoringSum
-	ScoringMin
+	ScoringUnknown ScoringType = ""
+	ScoringGroup   ScoringType = "ScoringGroup"
+	ScoringSum     ScoringType = "ScoringSum"
+	ScoringMin     ScoringType = "ScoringMin"
 )
 
 func ScoringFromString(str string) ScoringType {
@@ -111,6 +121,21 @@ func ScoringFromString(str string) ScoringType {
 	}
 
 	return ScoringSum
+}
+
+func (s *ScoringType) UnmarshalJSON(i []byte) error {
+	switch string(i) {
+	case "0", fmt.Sprintf("%q", ScoringGroup):
+		*s = ScoringGroup
+	case "1", fmt.Sprintf("%q", ScoringSum):
+		*s = ScoringSum
+	case "2", fmt.Sprintf("%q", ScoringMin):
+		*s = ScoringMin
+	case "null":
+	default:
+		return fmt.Errorf("unknown ScoringType: %q", i)
+	}
+	return nil
 }
 
 // Testcase represents a testcase in the status of a submission.
@@ -128,9 +153,9 @@ type Testcase struct {
 	ExpectedOutput string
 	CheckerOutput  string
 	TimeSpent      time.Duration
-	MemoryUsed     int
+	MemoryUsed     memory.Amount
 	TimeLimit      time.Duration
-	MemoryLimit    int
+	MemoryLimit    memory.Amount
 }
 
 // Testset represents some set of tests, for example pretests and system tests should be testsets.
@@ -140,14 +165,14 @@ type Testset struct {
 	Groups []Group
 }
 
-func (ts Testset) Verdict() VerdictName {
+func (ts *Testset) Verdict() VerdictName {
 	if ts.IsAC() {
 		return VerdictAC
 	}
-	return VerdictName(ts.IndexTestcase(ts.FirstNonAC()).VerdictName)
+	return ts.IndexTestcase(ts.FirstNonAC()).VerdictName
 }
 
-func (ts Testset) IndexTestcase(ind int) *Testcase {
+func (ts *Testset) IndexTestcase(ind int) *Testcase {
 	curr := 1
 	tcs := ts.Testcases()
 	for idx := range tcs {
@@ -161,7 +186,7 @@ func (ts Testset) IndexTestcase(ind int) *Testcase {
 	return &Testcase{VerdictName: VerdictDR}
 }
 
-func (ts Testset) Testcases() (testcases []*Testcase) {
+func (ts *Testset) Testcases() (testcases []*Testcase) {
 	testcaseCount := 0
 	for i := range ts.Groups {
 		testcaseCount += len(ts.Groups[i].Testcases)
@@ -187,7 +212,7 @@ func (ts *Testset) SetTimeLimit(tl time.Duration) {
 	}
 }
 
-func (ts *Testset) SetMemoryLimit(ml int) {
+func (ts *Testset) SetMemoryLimit(ml memory.Amount) {
 	for _, tc := range ts.Testcases() {
 		tc.MemoryLimit = ml
 	}
@@ -197,7 +222,7 @@ func (ts *Testset) SetMemoryLimit(ml int) {
 	}
 }
 
-func (ts Testset) Score() (res float64) {
+func (ts *Testset) Score() (res float64) {
 	for _, g := range ts.Groups {
 		res += g.Score()
 	}
@@ -205,7 +230,7 @@ func (ts Testset) Score() (res float64) {
 	return
 }
 
-func (ts Testset) MaxScore() (res float64) {
+func (ts *Testset) MaxScore() (res float64) {
 	for _, g := range ts.Groups {
 		res += g.MaxScore()
 	}
@@ -213,7 +238,7 @@ func (ts Testset) MaxScore() (res float64) {
 	return
 }
 
-func (ts Testset) FirstNonAC() int {
+func (ts *Testset) FirstNonAC() int {
 	until := 0
 	for _, g := range ts.Groups {
 		if g.FirstNonAC() != -1 {
@@ -225,8 +250,8 @@ func (ts Testset) FirstNonAC() int {
 	return -1
 }
 
-func (ts Testset) MaxMemoryUsage() int {
-	mx := 0
+func (ts *Testset) MaxMemoryUsage() memory.Amount {
+	mx := memory.Amount(0)
 	for _, g := range ts.Groups {
 		if mx < g.MaxMemoryUsage() {
 			mx = g.MaxMemoryUsage()
@@ -236,11 +261,11 @@ func (ts Testset) MaxMemoryUsage() int {
 	return mx
 }
 
-func (ts Testset) IsAC() bool {
+func (ts *Testset) IsAC() bool {
 	return ts.FirstNonAC() == -1
 }
 
-func (ts Testset) MaxTimeSpent() time.Duration {
+func (ts *Testset) MaxTimeSpent() time.Duration {
 	mx := time.Duration(0)
 	for _, g := range ts.Groups {
 		if mx < g.MaxTimeSpent() {
@@ -265,13 +290,13 @@ func (g *Group) SetTimeLimit(tl time.Duration) {
 	}
 }
 
-func (g *Group) SetMemoryLimit(ml int) {
+func (g *Group) SetMemoryLimit(ml memory.Amount) {
 	for ind := range g.Testcases {
 		g.Testcases[ind].MemoryLimit = ml
 	}
 }
 
-func (g Group) Score() float64 {
+func (g *Group) Score() float64 {
 	sum := 0.0
 	for _, val := range g.Testcases {
 		sum += val.Score
@@ -302,7 +327,7 @@ func (g Group) Score() float64 {
 	return -1.0
 }
 
-func (g Group) MaxScore() float64 {
+func (g *Group) MaxScore() float64 {
 	sum := 0.0
 	for _, val := range g.Testcases {
 		sum += val.MaxScore
@@ -314,7 +339,7 @@ func (g Group) MaxScore() float64 {
 	return sum
 }
 
-func (g Group) FirstNonAC() int {
+func (g *Group) FirstNonAC() int {
 	for ind, val := range g.Testcases {
 		if val.VerdictName != VerdictAC && val.VerdictName != VerdictDR {
 			return ind + 1
@@ -324,12 +349,12 @@ func (g Group) FirstNonAC() int {
 	return -1
 }
 
-func (g Group) IsAC() bool {
+func (g *Group) IsAC() bool {
 	return g.FirstNonAC() == -1
 }
 
-func (g Group) MaxMemoryUsage() int {
-	mx := 0
+func (g *Group) MaxMemoryUsage() memory.Amount {
+	mx := memory.Amount(0)
 	for _, val := range g.Testcases {
 		if mx < val.MemoryUsed {
 			mx = val.MemoryUsed
@@ -339,7 +364,7 @@ func (g Group) MaxMemoryUsage() int {
 	return mx
 }
 
-func (g Group) MaxTimeSpent() time.Duration {
+func (g *Group) MaxTimeSpent() time.Duration {
 	mx := time.Duration(0)
 	for _, val := range g.Testcases {
 		if mx < val.TimeSpent {
@@ -360,7 +385,7 @@ type Status struct {
 	Feedback       []Testset
 }
 
-func (v Status) Value() (driver.Value, error) {
+func (v *Status) Value() (driver.Value, error) {
 	buf := &bytes.Buffer{}
 
 	enc := json.NewEncoder(buf)

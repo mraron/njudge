@@ -73,7 +73,7 @@ func (p *Problem) SetCategory(c Category) {
 }
 
 func (p *Problem) WithStoredData(store problems.Store) (ProblemStoredData, error) {
-	pp, err := store.Get(p.Problem)
+	pp, err := store.GetProblem(p.Problem)
 	if err != nil {
 		return nil, err
 	}

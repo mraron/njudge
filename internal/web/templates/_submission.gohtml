@@ -1,11 +1,11 @@
 {{define "submissionStatus"}}
 {{$status := .Status}}
-{{if eq $status.FeedbackType 0}}
+{{if eq $status.FeedbackType "FeedbackCF"}}
     {{if .Judged.Valid}}
-        {{if eq .Verdict 0}}
+        {{if eq .Verdict "AC"}}
             <span class="text-success">{{Tr "Accepted"}}</span>
         {{else}}
-            {{if eq .Verdict 998}}
+            {{if eq .Verdict "CE"}}
                 {{Tr "Compilation error"}}
             {{else}}
                 {{$testset := (index $status.Feedback 0)}}
@@ -13,8 +13,10 @@
             {{end}}
         {{end}}
     {{else}}
-        {{if eq .Verdict 8}}
+        {{if eq .Verdict "UP"}}
             <span class="text-muted">{{Tr "Uploaded"}}</span>
+        {{else if eq .Verdict "XX"}}
+            <span class="text-danger">{{Tr "Internal error"}}</span>
         {{else}}
             <span class="text-info">
                 {{Tr "Running"}}{{if .Ontest.Valid}}{{$test := .Ontest.String}} {{Tr "on test %s" $test}} {{end}}
@@ -22,10 +24,10 @@
         {{end}}
     {{end}}
 {{end}}
-{{if or (eq $status.FeedbackType 1) (eq $status.FeedbackType 3)}}
+{{if or (eq $status.FeedbackType "FeedbackIOI") (eq $status.FeedbackType  "FeedbackLazyIOI")}}
     {{if .Judged.Valid}}
         {{$testset := (index $status.Feedback 0)}}
-        {{if eq .Verdict 998}}
+        {{if eq .Verdict "CE"}}
             {{Tr "Compilation error"}}
         {{else}}
             {{if $testset.IsAC}}
@@ -35,16 +37,18 @@
             {{end}}
         {{end}}
     {{else}}
-        {{if eq .Verdict 8}}
+        {{if eq .Verdict "UP"}}
             <span class="text-muted">{{Tr "Uploaded"}}</span>
+        {{else if eq .Verdict "XX"}}
+            <span class="text-danger">{{Tr "Internal error"}}</span>
         {{else}}
             <span class="text-info">{{Tr "Running"}}</span>
         {{end}}
     {{end}}
 {{end}}
-{{if eq $status.FeedbackType 2}}
+{{if or (eq $status.FeedbackType "FeedbackACM") (eq $status.FeedbackType "")}}
     {{if .Judged.Valid}}
-        {{if eq .Verdict 998}}
+        {{if eq .Verdict "CE"}}
             {{Tr "Compilation error"}}
         {{else}}
             {{$testset := (index $status.Feedback 0)}}
@@ -55,14 +59,14 @@
             {{end}}
         {{end}}
     {{else}}
-        {{if ne $status.Compiled true}}
-            <span class="text-danger">{{Tr "Compilation error"}}</span>
+        {{if eq .Verdict "CE"}}
+            {{Tr "Compilation error"}}
+        {{else if eq .Verdict "UP"}}
+            <span class="text-muted">{{Tr "Uploaded"}}</span>
+        {{else if eq .Verdict "XX"}}
+            <span class="text-danger">{{Tr "Internal error"}}</span>
         {{else}}
-            {{if eq .Verdict 8}}
-                <span class="text-muted">{{Tr "Uploaded"}}</span>
-            {{else}}
-                <span class="text-info">{{Tr "Running"}}</span>
-            {{end}}
+            <span class="text-info">{{Tr "Running"}}</span>
         {{end}}
     {{end}}
 {{end}}
@@ -80,7 +84,7 @@
             {{$status := .Status}}
             {{template "submissionStatus" .}}
         </td>
-        <td>{{if and .Judged.Valid (ne .Verdict 998)}}{{(index $status.Feedback 0).MaxTimeSpent}}{{end}}</td>
-        <td>{{if and .Judged.Valid (ne .Verdict 998)}}{{(index $status.Feedback 0).MaxMemoryUsage}} KiB{{end}}</td>
+        <td>{{if and .Judged.Valid $status.Feedback}}{{(index $status.Feedback 0).MaxTimeSpent}}{{end}}</td>
+        <td>{{if and .Judged.Valid $status.Feedback}}{{memoryInKiB (index $status.Feedback 0).MaxMemoryUsage}} KiB{{end}}</td>
     </tr>
 {{end}}

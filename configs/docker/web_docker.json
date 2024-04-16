@@ -5,10 +5,14 @@
   "url": "http://localhost:5555",
   "problemsDir": "/njudge_problems",
   "templatesDir": "./internal/web/templates",
-  "DBName": "postgres",
-  "DBAccount": "postgres",
-  "DBPassword": "postgres",
-  "DBHost": "db",
+  "database": {
+    "user": "postgres",
+    "password": "postgres",
+    "host": "db",
+    "name": "postgres",
+    "port": 5432,
+    "ssl_mode": false
+  },
   "cookieSecret": "secret_for_c00kies",
   "customHead": "",
 

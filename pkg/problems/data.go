@@ -2,7 +2,6 @@ package problems
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 )
 
@@ -13,7 +12,7 @@ type Data interface {
 	IsText() bool
 	IsHTML() bool
 	IsPDF() bool
-	fmt.Stringer
+	String() string
 }
 
 type NamedData interface {

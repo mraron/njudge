@@ -66,7 +66,7 @@ func NewSubmission(u User, p Problem, language language.Language) (*Submission, 
 	return &Submission{
 		UserID:    u.ID,
 		ProblemID: p.ID,
-		Language:  language.Id(),
+		Language:  language.ID(),
 		Source:    []byte(""),
 		Private:   false,
 

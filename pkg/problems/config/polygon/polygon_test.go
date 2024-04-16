@@ -45,7 +45,7 @@ func testProblemXML(t *testing.T, p Problem) {
 	assert("title lang", p.Titles()[0].Locale(), "english")
 	assert("name", p.Name(), "fancyfence")
 	assert("path", p.Path, "problemxml/")
-	assert("tasktype", p.TaskType, "batch")
+	assert("evaluation", p.TaskType, "batch")
 	assert("feedbacktype", p.FeedbackType, "ioi")
 
 	if len(p.Judging.Testsets) != 1 {

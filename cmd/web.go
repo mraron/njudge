@@ -32,11 +32,11 @@ var WebCmd = &cobra.Command{
 
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := config.Server{}
-
 		err := viper.Unmarshal(&cfg)
 		if err != nil {
 			return err
 		}
+		fmt.Println(cfg)
 
 		s := web.Server{Server: cfg}
 		s.Run()
@@ -70,7 +70,7 @@ var SubmitCmd = &cobra.Command{
 		}
 
 		s.SetupEnvironment()
-		if err := s.ProblemStore.Update(); err != nil {
+		if err := s.ProblemStore.UpdateProblems(); err != nil {
 			return err
 		}
 
@@ -140,13 +140,13 @@ var PrefixCmd = &cobra.Command{
 		server.ConnectToDB()
 
 		withoutPrefixes := problems.NewFsStore(cfg.ProblemsDir, problems.FsStoreIgnorePrefix())
-		err = withoutPrefixes.Update()
+		err = withoutPrefixes.UpdateProblems()
 		if err != nil {
 			return nil
 		}
 
 		withPrefixes := problems.NewFsStore(cfg.ProblemsDir)
-		err = withPrefixes.Update()
+		err = withPrefixes.UpdateProblems()
 		if err != nil {
 			return nil
 		}

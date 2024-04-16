@@ -1,0 +1,9 @@
+shortname: "aplusb"
+tests:
+  task_type: "batch"
+  memory_limit: 64
+  time_limit: 1.0
+  input_pattern: "%d.in"
+  output_pattern: "%d.out"
+  test_count: 3
+  feedback_type: "ioi"

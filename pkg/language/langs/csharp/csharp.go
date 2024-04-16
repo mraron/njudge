@@ -1,62 +1,71 @@
 package csharp
 
 import (
-	"errors"
+	"context"
+	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/mraron/njudge/pkg/language/sandbox"
 	"io"
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
 )
 
-type csharp struct{}
+type CSharp struct{}
 
-func (csharp) Id() string {
+func (CSharp) ID() string {
 	return "csharp"
 }
 
-func (csharp) Name() string {
+func (CSharp) DisplayName() string {
 	return "C# (mono)"
 }
 
-func (csharp) DefaultFileName() string {
+func (CSharp) DefaultFilename() string {
 	return "main.cs"
 }
 
-func (csharp) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) error {
-	return errors.New("can't insecure compile c#")
+func (CSharp) Compile(ctx context.Context, s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
+	err := sandbox.CreateFile(s, f)
+	if err != nil {
+		return nil, err
+	}
+
+	rc := sandbox.RunConfig{
+		InheritEnv:    true,
+		DirectoryMaps: []sandbox.DirectoryMap{{"/etc", "/etc", nil}},
+		MaxProcesses:  -1,
+		TimeLimit:     10 * time.Second,
+		MemoryLimit:   1 * memory.GiB,
+		Stdout:        stderr,
+		Stderr:        stderr,
+	}
+	if _, err := s.Run(ctx, rc, "/usr/bin/mcs", sandbox.SplitArgs("-out:main.exe -optimize+ "+f.Name)...); err != nil {
+		return nil, err
+	}
+
+	return sandbox.ExtractFile(s, "main.exe")
 }
 
-func (csharp) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
-	err := s.CreateFile("main.cs", r.Source)
-	if err != nil {
-		return err
+func (CSharp) Run(ctx context.Context, s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
+	stat := sandbox.Status{}
+	stat.Verdict = sandbox.VerdictXX
+
+	if err := sandbox.CreateFile(s, binary); err != nil {
+		return nil, err
 	}
 
-	if _, err := s.Env().MapDir("/etc", "/etc", []string{}, false).SetMaxProcesses(-1).TimeLimit(10*time.Second).MemoryLimit(4*256000).Stdout(e).Stderr(e).Run("/usr/bin/mcs -out:main.exe -optimize+ main.cs", false); err != nil {
-		return err
+	rc := sandbox.RunConfig{
+		MaxProcesses:     -1,
+		InheritEnv:       true,
+		Stdin:            stdin,
+		Stdout:           stdout,
+		TimeLimit:        tl,
+		MemoryLimit:      ml,
+		WorkingDirectory: s.Pwd(),
 	}
-
-	bin, err := s.GetFile("main.exe")
-	if err != nil {
-		return err
-	}
-
-	_, err = io.Copy(w, bin)
-
-	return err
-}
-
-func (csharp) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (language.Status, error) {
-	stat := language.Status{}
-	stat.Verdict = language.VerdictXX
-
-	if err := s.CreateFile("main.exe", binary); err != nil {
-		return stat, err
-	}
-
-	return s.SetMaxProcesses(-1).Env().Stdin(stdin).Stdout(stdout).TimeLimit(tl).MemoryLimit(ml/1024).WorkingDirectory(s.Pwd()).Run("/usr/bin/mono main.exe", true)
+	return s.Run(ctx, rc, "/usr/bin/mono", "main.exe")
 }
 
 func init() {
-	language.DefaultStore.Register("csharp", csharp{})
+	language.DefaultStore.Register("csharp", CSharp{})
 }

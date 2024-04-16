@@ -11,7 +11,6 @@ import (
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"go.uber.org/multierr"
 )
 
 type Users struct {
@@ -124,7 +123,7 @@ func (us *Users) Insert(ctx context.Context, u njudge.User) (*njudge.User, error
 		}
 
 		if err := dbobj.SetForgottenPasswordKey(ctx, tx, true, key); err != nil {
-			return nil, multierr.Combine(err, tx.Rollback())
+			return nil, errors.Join(err, tx.Rollback())
 		}
 	}
 
@@ -166,7 +165,7 @@ func (us *Users) Update(ctx context.Context, u *njudge.User, fields []string) er
 
 	if len(whitelist) > 0 {
 		if _, err := dbobj.Update(ctx, tx, boil.Whitelist(whitelist...)); err != nil {
-			return multierr.Combine(err, tx.Rollback())
+			return errors.Join(err, tx.Rollback())
 		}
 	}
 
@@ -178,7 +177,7 @@ func (us *Users) Update(ctx context.Context, u *njudge.User, fields []string) er
 			}
 
 			if err := dbobj.SetForgottenPasswordKey(ctx, tx, false, key); err != nil {
-				return multierr.Combine(err, tx.Rollback())
+				return errors.Join(err, tx.Rollback())
 			}
 		} else {
 			key := &models.ForgottenPasswordKey{
@@ -187,7 +186,7 @@ func (us *Users) Update(ctx context.Context, u *njudge.User, fields []string) er
 			}
 
 			if err := dbobj.SetForgottenPasswordKey(ctx, tx, true, key); err != nil {
-				return multierr.Combine(err, tx.Rollback())
+				return errors.Join(err, tx.Rollback())
 			}
 
 			u.ForgottenPasswordKey.ID = key.ID
@@ -195,7 +194,7 @@ func (us *Users) Update(ctx context.Context, u *njudge.User, fields []string) er
 	} else {
 		_, err = models.ForgottenPasswordKeys(models.ForgottenPasswordKeyWhere.UserID.EQ(u.ID)).DeleteAll(ctx, tx)
 		if err != nil {
-			return multierr.Combine(err, tx.Rollback())
+			return errors.Join(err, tx.Rollback())
 		}
 	}
 

@@ -1,11 +1,14 @@
 package problems
 
 import (
+	"encoding/json"
+	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
 
-func TestFeedbackFromString(t *testing.T) {
+func TestFeedbackFromShortString(t *testing.T) {
 	type args struct {
 		str string
 	}
@@ -22,7 +25,7 @@ func TestFeedbackFromString(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := FeedbackFromString(tt.args.str); got != tt.want {
+			if got := FeedbackTypeFromShortString(tt.args.str); got != tt.want {
 				t.Errorf("FeedbackFromString() = %v, want %v", got, tt.want)
 			}
 		})
@@ -101,7 +104,7 @@ func TestGroup_MaxMemoryUsage(t *testing.T) {
 	tests := []struct {
 		name   string
 		fields fields
-		want   int
+		want   memory.Amount
 	}{
 		{"last", fields{Testcases: []Testcase{{MemoryUsed: 0}, {MemoryUsed: 2}}}, 2},
 		{"first", fields{Testcases: []Testcase{{MemoryUsed: 4}, {MemoryUsed: 2}}}, 4},
@@ -195,9 +198,9 @@ func TestGroup_Score(t *testing.T) {
 	}{
 		{"scoring sum ac", fields{Scoring: ScoringSum, Testcases: []Testcase{{Score: 0.1, MaxScore: 0.5}, {Score: 0.15, MaxScore: 0.5}}}, 0.25},
 		{"scoring sum wa", fields{Scoring: ScoringSum, Testcases: []Testcase{{VerdictName: VerdictWA, Score: 0.0, MaxScore: 0.5}, {Score: 0.15, MaxScore: 0.5}}}, 0.15},
-		{"scoring group ac", fields{Scoring: ScoringGroup, Testcases: []Testcase{{Score: 0.1, MaxScore: 0.5}, {Score: 0.5, MaxScore: 0.5}}}, 0.6},
-		{"scoring group pc", fields{Scoring: ScoringGroup, Testcases: []Testcase{{VerdictName: VerdictPC, Score: 0.1, MaxScore: 0.5}, {Score: 0.5, MaxScore: 0.5}}}, 0.6},
-		{"scoring group wa", fields{Scoring: ScoringGroup, Testcases: []Testcase{{VerdictName: VerdictWA, Score: 0.0, MaxScore: 0.5}, {Score: 0.5, MaxScore: 0.5}}}, 0},
+		{"scoring group ac", fields{Scoring: ScoringGroup, Testcases: []Testcase{{VerdictName: VerdictPC, Score: 0.1, MaxScore: 0.5}, {VerdictName: VerdictAC, Score: 0.5, MaxScore: 0.5}}}, 0.6},
+		{"scoring group pc", fields{Scoring: ScoringGroup, Testcases: []Testcase{{VerdictName: VerdictPC, Score: 0.1, MaxScore: 0.5}, {VerdictName: VerdictAC, Score: 0.5, MaxScore: 0.5}}}, 0.6},
+		{"scoring group wa", fields{Scoring: ScoringGroup, Testcases: []Testcase{{VerdictName: VerdictWA, Score: 0.0, MaxScore: 0.5}, {VerdictName: VerdictAC, Score: 0.5, MaxScore: 0.5}}}, 0},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -415,6 +418,98 @@ func TestTestset_FirstNonAC(t *testing.T) {
 			if got := ts.FirstNonAC(); got != tt.want {
 				t.Errorf("FirstNonAC() = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+func TestVerdictName_UnmarshalJSON(t *testing.T) {
+	tests := []struct {
+		name       string
+		jsonString string
+		want       VerdictName
+		wantErr    assert.ErrorAssertionFunc
+	}{
+		{"compatibility_ac", "0", VerdictAC, assert.NoError},
+		{"compatibility_wa", "1", VerdictWA, assert.NoError},
+		{"compatibility_re", "2", VerdictRE, assert.NoError},
+		{"compatibility_tl", "3", VerdictTL, assert.NoError},
+		{"compatibility_ml", "4", VerdictML, assert.NoError},
+		{"compatibility_xx", "5", VerdictXX, assert.NoError},
+		{"compatibility_dr", "6", VerdictDR, assert.NoError},
+		{"compatibility_pc", "7", VerdictPC, assert.NoError},
+		{"compatibility_pe", "8", VerdictPE, assert.NoError},
+		{"compatibility_null", "null", VerdictUnknown, assert.NoError},
+		{"ac", "\"AC\"", VerdictAC, assert.NoError},
+		{"wa", "\"WA\"", VerdictWA, assert.NoError},
+		{"re", "\"RE\"", VerdictRE, assert.NoError},
+		{"tl", "\"TL\"", VerdictTL, assert.NoError},
+		{"ml", "\"ML\"", VerdictML, assert.NoError},
+		{"xx", "\"XX\"", VerdictXX, assert.NoError},
+		{"dr", "\"DR\"", VerdictDR, assert.NoError},
+		{"pc", "\"PC\"", VerdictPC, assert.NoError},
+		{"pe", "\"PE\"", VerdictPE, assert.NoError},
+		{"other", "\"shalal\"", VerdictUnknown, assert.Error},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var res VerdictName
+			tt.wantErr(t, json.Unmarshal([]byte(tt.jsonString), &res))
+			assert.Equal(t, tt.want, res)
+		})
+	}
+}
+
+func TestFeedbackType_UnmarshalJSON(t *testing.T) {
+	tests := []struct {
+		name       string
+		jsonString string
+		want       FeedbackType
+		wantErr    assert.ErrorAssertionFunc
+	}{
+		{"compatibility_cf", "0", FeedbackCF, assert.NoError},
+		{"compatibility_ioi", "1", FeedbackIOI, assert.NoError},
+		{"compatibility_acm", "2", FeedbackACM, assert.NoError},
+		{"compatibility_lazyioi", "3", FeedbackLazyIOI, assert.NoError},
+		{"compatibility_null", "null", FeedbackUnknown, assert.NoError},
+		{"cf", "\"FeedbackCF\"", FeedbackCF, assert.NoError},
+		{"ioi", "\"FeedbackIOI\"", FeedbackIOI, assert.NoError},
+		{"acm", "\"FeedbackACM\"", FeedbackACM, assert.NoError},
+		{"lazyioi", "\"FeedbackLazyIOI\"", FeedbackLazyIOI, assert.NoError},
+		{"other", "\"lol\"", FeedbackUnknown, assert.NoError},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var res FeedbackType
+			tt.wantErr(t, json.Unmarshal([]byte(tt.jsonString), &res))
+			assert.Equal(t, tt.want, res)
+		})
+	}
+}
+
+func TestScoringType_UnmarshalJSON(t *testing.T) {
+	tests := []struct {
+		name       string
+		jsonString string
+		want       ScoringType
+		wantErr    assert.ErrorAssertionFunc
+	}{
+		{"compatibility_group", "0", ScoringGroup, assert.NoError},
+		{"compatibility_sum", "1", ScoringSum, assert.NoError},
+		{"compatibility_min", "2", ScoringMin, assert.NoError},
+		{"compatibility_null", "null", ScoringUnknown, assert.NoError},
+		{"group", "\"ScoringGroup\"", ScoringGroup, assert.NoError},
+		{"sum", "\"ScoringSum\"", ScoringSum, assert.NoError},
+		{"min", "\"ScoringMin\"", ScoringMin, assert.NoError},
+		{"other", "\"lol\"", ScoringUnknown, assert.Error},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var res ScoringType
+			tt.wantErr(t, json.Unmarshal([]byte(tt.jsonString), &res))
+			assert.Equal(t, tt.want, res)
 		})
 	}
 }

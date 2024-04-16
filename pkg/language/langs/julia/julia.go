@@ -1,6 +1,9 @@
 package julia
 
 import (
+	"context"
+	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/mraron/njudge/pkg/language/sandbox"
 	"io"
 	"time"
 
@@ -9,40 +12,40 @@ import (
 
 type julia struct{}
 
-func (julia) Id() string {
+func (julia) ID() string {
 	return "julia"
 }
 
-func (julia) Name() string {
+func (julia) DisplayName() string {
 	return "Julia"
 }
-func (julia) DefaultFileName() string {
+func (julia) DefaultFilename() string {
 	return "main.jl"
 }
-func (julia) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) error {
-	return nil
+
+func (julia) Compile(ctx context.Context, s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
+	return &f, nil
 }
 
-func (julia) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
-	_, err := io.Copy(w, r.Source)
-	return err
-}
+func (julia) Run(ctx context.Context, s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
+	stat := sandbox.Status{}
+	stat.Verdict = sandbox.VerdictXX
 
-func (julia) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (language.Status, error) {
-	stat := language.Status{}
-	stat.Verdict = language.VerdictXX
-
-	if err := s.CreateFile("a.out", binary); err != nil {
-		return stat, err
+	if err := sandbox.CreateFile(s, binary); err != nil {
+		return nil, err
 	}
 
-	if st, err := s.Env().SetMaxProcesses(100).TimeLimit(tl).MemoryLimit(ml/1024).Stdin(stdin).Stdout(stdout).WorkingDirectory(s.Pwd()).Run("/usr/local/bin/julia a.out", true); err != nil {
-		return st, err
-	} else {
-		stat = st
+	rc := sandbox.RunConfig{
+		InheritEnv:       true,
+		MaxProcesses:     100,
+		TimeLimit:        tl,
+		MemoryLimit:      ml,
+		Stdin:            stdin,
+		Stdout:           stdout,
+		WorkingDirectory: s.Pwd(),
 	}
 
-	return stat, nil
+	return s.Run(ctx, rc, "/usr/local/bin/julia", binary.Name)
 }
 
 func init() {

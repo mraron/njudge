@@ -2,11 +2,11 @@ package memory_test
 
 import (
 	"context"
+	"github.com/mraron/njudge/pkg/language/langs/cpp"
 	"testing"
 
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/njudge/memory"
-	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/stretchr/testify/assert"
 )
@@ -21,7 +21,7 @@ func TestSubmissions(t *testing.T) {
 	u, _ = mu.Insert(context.TODO(), *u)
 
 	var ms njudge.Submissions = memory.NewSubmissions()
-	s, err := njudge.NewSubmission(*u, *p, language.DefaultStore.Get("cpp14"))
+	s, err := njudge.NewSubmission(*u, *p, cpp.Std14)
 	assert.Nil(t, err)
 	s, err = ms.Insert(context.TODO(), *s)
 	assert.Nil(t, err)

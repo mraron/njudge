@@ -1,9 +1,9 @@
 package cached
 
 import (
+	"context"
 	"github.com/erni27/imcache"
 	"github.com/mraron/njudge/internal/njudge"
-	"golang.org/x/net/context"
 	"time"
 )
 

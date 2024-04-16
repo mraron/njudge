@@ -2,318 +2,194 @@ package sandbox
 
 import (
 	"bufio"
-	"bytes"
-	"errors"
+	"context"
 	"fmt"
-	"go.uber.org/multierr"
+	"github.com/mraron/njudge/pkg/language/memory"
 	"io"
-	"log"
+	"log/slog"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
-
-	"github.com/mraron/njudge/pkg/language"
 )
 
-func getEnv(key, fallback string) string {
-	if value, ok := os.LookupEnv(key); ok {
-		return value
-	}
-	return fallback
-}
+// IsolateRoot is the root directory structure isolate is using.
+var IsolateRoot = "/var/local/lib/isolate/"
 
-var IsolateRoot = getEnv("ISOLATE_ROOT", "/var/local/lib/isolate/")
+// IsolateMetafilePattern is the pattern in which metafiles are created.
+var IsolateMetafilePattern = "isolate_metafile*"
 
+// Isolate is a Sandbox implementation which calls isolate's command line program.
+// It's required that isolate is installed on the system for it to work.
+// This is the preferred way of sandboxing in njudge.
 type Isolate struct {
-	id   int
-	argv []string
+	ID int
 
-	stdin  io.Reader
-	stdout io.Writer
-	stderr io.Writer
-	wdir   string
+	OsFS
 
-	st language.Status
+	Logger *slog.Logger
 
-	logger *log.Logger
+	inited bool
 }
 
-func NewIsolate(id int) language.Sandbox {
-	return &Isolate{id: id}
-}
+type IsolateOption func(*Isolate) error
 
-func (s *Isolate) Id() string {
-	return "isolate" + strconv.Itoa(s.id)
-}
-
-func (s *Isolate) Pwd() string {
-	return filepath.Join(IsolateRoot, strconv.Itoa(s.id), "box")
-}
-
-func (s *Isolate) GetFile(name string) (io.Reader, error) {
-	f, err := os.ReadFile(filepath.Join(s.Pwd(), name))
-	if err != nil {
-		return nil, err
+func IsolateOptionUseLogger(logger *slog.Logger) IsolateOption {
+	return func(isolate *Isolate) error {
+		isolate.Logger = logger
+		return nil
 	}
-
-	return bytes.NewBuffer(f), nil
 }
 
-func (s *Isolate) ClearArguments() {
-	s.argv = make([]string, 0)
-	s.stdin = nil
-	s.stdout = nil
-	s.wdir = ""
-	s.st = language.Status{}
-}
-
-func (s *Isolate) init() error {
-	if err := s.Cleanup(); err != nil { //cleanup because the previous invocation might not have cleaned up
-		return err
+func NewIsolate(ID int, opts ...IsolateOption) (*Isolate, error) {
+	res := &Isolate{
+		ID: ID,
 	}
-
-	args := []string{"--cg", "-b", strconv.Itoa(s.id), "--init"}
-	s.logger.Print("Running init: isolate with args ", args)
-
-	err := exec.Command("isolate", args...).Run()
-	return err
-}
-
-func (s *Isolate) Init(l *log.Logger) error {
-	s.ClearArguments()
-	s.logger = l
-
-	return s.init()
-}
-
-func (s *Isolate) getPathToFile(name string) string {
-	return filepath.Join(s.Pwd(), name)
-}
-
-func (s *Isolate) CreateFile(name string, r io.Reader) error {
-	filename := s.getPathToFile(name)
-	s.logger.Print("Creating file ", filename)
-
-	if err := syscall.Unlink(filename); err != nil && !errors.Is(err, os.ErrNotExist) {
-		return err
-	}
-
-	f, err := os.Create(filename)
-	if err != nil {
-		s.logger.Print("Error occurred while creating file ", err)
-		return err
-	}
-
-	if _, err := io.Copy(f, r); err != nil {
-		s.logger.Print("Error occurred while populating it with its content: ", err)
-		return multierr.Combine(err, f.Close())
-	}
-
-	return f.Close()
-}
-
-func (s *Isolate) MakeExecutable(name string) error {
-	filename := s.getPathToFile(name)
-
-	err := os.Chmod(filename, 0755)
-	s.logger.Print("Making executable: ", filename, " error: ", err)
-
-	return err
-}
-
-func (s *Isolate) SetMaxProcesses(num int) language.Sandbox {
-	if num < 0 {
-		s.argv = append(s.argv, "--processes=100")
-	} else {
-		s.argv = append(s.argv, "--processes="+strconv.Itoa(num))
-	}
-
-	return s
-}
-
-func (s *Isolate) Env() language.Sandbox {
-	s.argv = append(s.argv, "--full-env")
-	return s
-}
-
-func (s *Isolate) SetEnv(e string) language.Sandbox {
-	s.argv = append(s.argv, fmt.Sprintf("--env=%s", e))
-	return s
-}
-
-func (s *Isolate) AddArg(a string) language.Sandbox {
-	s.argv = append(s.argv, a)
-	return s
-}
-
-func (s *Isolate) TimeLimit(tl time.Duration) language.Sandbox {
-	tl = tl / time.Millisecond
-	s.argv = append(s.argv, fmt.Sprintf("--time=%d.%d", tl/1000, tl%1000))
-	s.argv = append(s.argv, fmt.Sprintf("--wall-time=%d.%d", (2*tl+1000)/1000, (2*tl+1000)%1000))
-
-	return s
-}
-
-func (s *Isolate) MemoryLimit(ml int) language.Sandbox {
-	s.argv = append(s.argv, "--cg-mem="+strconv.Itoa(ml))
-	return s
-}
-
-func (s *Isolate) Verbose() language.Sandbox {
-	s.argv = append(s.argv, "-v")
-	return s
-}
-
-func (s *Isolate) Stdin(reader io.Reader) language.Sandbox {
-	s.stdin = reader
-	return s
-}
-
-func (s *Isolate) Stdout(writer io.Writer) language.Sandbox {
-	s.stdout = writer
-	return s
-}
-
-func (s *Isolate) Stderr(writer io.Writer) language.Sandbox {
-	s.stderr = writer
-	return s
-}
-
-func (s *Isolate) MapDir(src string, dest string, opts []string, checkExists bool) language.Sandbox {
-	if checkExists {
-		if _, err := os.Stat(src); os.IsNotExist(err) {
-			return s
-		}
-	}
-
-	format := fmt.Sprintf("--dir=%s=%s", src, dest)
 	for _, opt := range opts {
-		format += ":" + opt
+		if err := opt(res); err != nil {
+			return nil, err
+		}
 	}
-	s.argv = append(s.argv, format)
-
-	return s
+	if res.Logger == nil {
+		res.Logger = slog.New(slog.NewJSONHandler(io.Discard, nil))
+	}
+	res.Logger = res.Logger.With(slog.String("sandbox", res.Id()))
+	return res, nil
 }
 
-func (s *Isolate) WorkingDirectory(wd string) language.Sandbox {
-	s.wdir = wd
-	return s
+func (i *Isolate) Id() string {
+	return "isolate" + strconv.Itoa(i.ID)
 }
 
-func (s *Isolate) Run(args string, needStatus bool) (language.Status, error) {
-	var (
-		cmd *exec.Cmd
-		err error
+func (i *Isolate) Init(ctx context.Context) error {
+	// cleanup because the previous invocation might not have cleaned up
+	if err := i.Cleanup(ctx); err != nil {
+		return err
+	}
 
-		metafile     *os.File
-		metafileName = "/tmp/metafile" + strconv.Itoa(s.id)
-	)
+	cmd := []string{"isolate", "--cg", "-b", strconv.Itoa(i.ID), "--init"}
+	i.Logger.Info("✏️\trunning init", "cmd", cmd)
+	i.inited = true
+	i.OsFS = NewOsFS(filepath.Join(IsolateRoot, strconv.Itoa(i.ID), "box"))
+	return exec.Command(cmd[0], cmd[1:]...).Run()
+}
 
-	s.MapDir("/etc/alternatives", "/etc/alternatives", []string{}, true)
-	s.MapDir("/languages", "/languages", []string{"maybe"}, true)
-	splitted := strings.Split(args, " ")
-	s.argv = append([]string{"--cg", "--cg-timing", "-b", strconv.Itoa(s.id), "-M", metafileName}, s.argv...)
-	s.argv = append(s.argv, "--run", "--")
-	s.argv = append(s.argv, splitted...)
-	defer s.ClearArguments()
-
-	s.logger.Print("Running isolate with args ", s.argv)
-
-	pb := NewPrefixBuffer(s.stderr, 2048)
-
-	cmd = exec.Command("isolate", s.argv...)
-	cmd.Stdin = s.stdin
-	cmd.Stdout = s.stdout
-	cmd.Stderr = pb
-	cmd.Dir = s.wdir
-
-	if err = cmd.Run(); err != nil {
-		s.logger.Print("Command exited with non-zero exit code: ", err)
-
-		if !needStatus {
-			return s.st, err
-		}
-
-		str, st := string(pb.Prefix()), -1
-		if strings.Contains(str, "Caught fatal signal") {
-			fmt.Sscanf(str, "Caught fatal signal %d", &st)
-		} else if strings.Contains(str, "Exited with error status") {
-			fmt.Sscanf(str[strings.Index(str, "Exited with error status"):], "Exited with error status %d", &st)
-		} else {
-			s.logger.Print("unknown error status format: ", str)
-		}
-
-		if st == -1 {
-			s.st.Verdict = language.VerdictXX
-		} else { //eg. signal 8/136?? -> division by zero
-			s.st.Verdict = language.VerdictRE
-		}
+func (i *Isolate) buildArgs(config RunConfig) ([]string, error) {
+	args := []string{"isolate", "--cg", "-b", strconv.Itoa(i.ID)}
+	if config.MaxProcesses > 0 {
+		args = append(args, fmt.Sprintf("--processes=%d", config.MaxProcesses))
 	} else {
-		s.logger.Print("Command exited successfully")
-		s.logger.Printf("stderr of process: %q", string(pb.Prefix()))
-
-		s.st.Verdict = language.VerdictOK
+		args = append(args, "--processes=100")
+	}
+	if config.InheritEnv {
+		args = append(args, "--full-env")
+	}
+	for ind := range config.Env {
+		args = append(args, fmt.Sprintf("--env=%s", config.Env[ind]))
+	}
+	for _, rule := range config.DirectoryMaps {
+		arg := fmt.Sprintf("--dir=%s=%s", rule.Inside, rule.Outside)
+		for _, opt := range rule.Options {
+			arg += ":" + string(opt)
+		}
+		args = append(args, arg)
+	}
+	if config.TimeLimit > 0 {
+		ms := config.TimeLimit / time.Millisecond
+		args = append(args, fmt.Sprintf("--time=%d.%d", ms/1000, ms%1000))
+		args = append(args, fmt.Sprintf("--wall-time=%d.%d", (2*ms+1000)/1000, (2*ms+1000)%1000)) // TODO?
+	}
+	if config.MemoryLimit > 0 {
+		args = append(args, "--cg-mem="+strconv.Itoa(int(config.MemoryLimit/memory.KiB)))
+	}
+	for _, arg := range config.Args {
+		args = append(args, arg)
 	}
 
-	if !needStatus {
-		return s.st, nil
+	return args, nil
+}
+
+func (i *Isolate) Run(_ context.Context, config RunConfig, toRun string, toRunArgs ...string) (*Status, error) {
+	if !i.inited {
+		return nil, ErrorSandboxNotInitialized
 	}
 
-	memorySum := 0
-
-	if metafile, err = os.Open(metafileName); err != nil {
-		s.st.Verdict = language.VerdictXX
-		s.logger.Print("Can't open metafile ", metafileName, " error is: ", err)
-
-		return s.st, err
+	logger := i.Logger
+	if config.RunID != "" {
+		logger = i.Logger.With("run_id", config.RunID)
 	}
-	defer metafile.Close()
 
-	s.logger.Print("Parsing metafile")
+	args, err := i.buildArgs(config)
+	if err != nil {
+		return nil, fmt.Errorf("failed to build isolate command: %w", err)
+	}
+	metafile, err := os.CreateTemp(os.TempDir(), IsolateMetafilePattern)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create metafile: %w", err)
+	}
+	defer func(metafile *os.File) {
+		_ = metafile.Close()
+		_ = os.Remove(filepath.Join(os.TempDir(), metafile.Name()))
+	}(metafile)
 
+	args = append(args, fmt.Sprintf("--meta=%s", metafile.Name()))
+
+	args = append(args, "--run", "-s", "--", toRun)
+	args = append(args, toRunArgs...)
+
+	logger.Info("🛠️\tbuilt args", "args", args)
+
+	cmd := exec.Command(args[0], args[1:]...)
+	cmd.Stdin = config.Stdin
+	cmd.Stdout = config.Stdout
+	cmd.Stderr = config.Stderr
+	cmd.Dir = config.WorkingDirectory
+	_ = cmd.Run()
+
+	st := Status{
+		Verdict: VerdictOK,
+	}
 	sc := bufio.NewScanner(metafile)
 	for sc.Scan() {
-		s.logger.Print(sc.Text())
-
 		lst := strings.Split(sc.Text(), ":")
-
-		if lst[0] == "max-rss" || lst[0] == "cg-mem" {
-			s.st.Memory, _ = strconv.Atoi(lst[1])
-			memorySum += s.st.Memory
-		} else if lst[0] == "time" {
+		switch lst[0] {
+		case "max-rss":
+		case "cg-mem":
+			mem, _ := strconv.Atoi(lst[1])
+			st.Memory += memory.Amount(mem) * memory.KiB
+		case "time":
 			tmp, _ := strconv.ParseFloat(lst[1], 32)
-			s.st.Time = time.Duration(tmp*1000) * time.Millisecond
-		} else if lst[0] == "status" {
+			st.Time = time.Duration(tmp*1000) * time.Millisecond
+		case "status":
 			switch lst[1] {
 			case "TO":
-				s.st.Verdict = language.VerdictTL
+				st.Verdict = VerdictTL
+			case "RE":
+				st.Verdict = VerdictRE
 			case "SG":
-				s.st.Verdict = language.VerdictRE
+				st.Verdict = VerdictRE
+			case "XX":
+				st.Verdict = VerdictXX
 			}
+		case "exitcode":
+			st.ExitCode, _ = strconv.Atoi(lst[1])
 		}
 	}
-
 	if err = sc.Err(); err != nil {
-		s.st.Verdict = language.VerdictXX
-		s.logger.Print("Error scanning metafile", err)
-
-		return s.st, err
+		return nil, fmt.Errorf("failed to scan metafile: %w", err)
 	}
 
-	s.logger.Print("Calculated memory usage ", memorySum, "KiB")
-	s.st.Memory = memorySum
-
-	return s.st, nil
+	logger.Info("🧾\tresult status", "status", st)
+	return &st, nil
 }
 
-func (s *Isolate) Cleanup() error {
-	args := []string{"--cg", "-b", strconv.Itoa(s.id), "--cleanup"}
+func (i *Isolate) Cleanup(_ context.Context) error {
+	cmd := []string{"isolate", "--cg", "-b", strconv.Itoa(i.ID), "--cleanup"}
 
-	s.logger.Print("Executing cleanup with args ", args)
-
-	return exec.Command("isolate", args...).Run()
+	i.Logger.Info("🗑️\trunning cleanup", "cmd", cmd)
+	i.inited = false
+	i.OsFS = OsFS{}
+	return exec.Command(cmd[0], cmd[1:]...).Run()
 }

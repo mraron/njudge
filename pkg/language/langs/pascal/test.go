@@ -1,23 +1,28 @@
 package pascal
 
 import (
+	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/mraron/njudge/pkg/language/sandbox"
+	"testing"
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
 )
 
-const print = `begin
+const TestCodeHelloWorld = `begin
     writeln('Hello world');
 end.
 `
 
-func (p pascal) Test(s language.Sandbox) error {
-	for _, test := range []language.LanguageTest{
-		{p, print, language.VerdictOK, "", "Hello world\n", 1 * time.Second, 128 * 1024 * 1024},
+func (p Pascal) Test(t *testing.T, s sandbox.Sandbox) error {
+	for _, test := range []language.Test{
+		{Name: p.ID() + "_print", Language: p, Source: TestCodeHelloWorld, ExpectedVerdict: sandbox.VerdictOK, ExpectedOutput: "Hello world\n", TimeLimit: 1 * time.Second, MemoryLimit: 128 * memory.MiB},
 	} {
-		if err := test.Run(s); err != nil {
-			return err
-		}
+		t.Run(test.Name, func(t *testing.T) {
+			if err := test.Run(s); err != nil {
+				t.Error(err)
+			}
+		})
 	}
 
 	return nil

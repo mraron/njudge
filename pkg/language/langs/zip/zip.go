@@ -1,42 +1,37 @@
 package zip
 
 import (
+	"context"
+	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/mraron/njudge/pkg/language/sandbox"
 	"io"
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
 )
 
-type zip struct{}
+type Zip struct{}
 
-func (zip) Id() string {
+func (Zip) ID() string {
 	return "zip"
 }
 
-func (zip) Name() string {
+func (Zip) DisplayName() string {
 	return "ZIP archívum"
 }
 
-func (zip) DefaultFileName() string {
+func (Zip) DefaultFilename() string {
 	return "main.zip"
 }
 
-func (zip) InsecureCompile(s string, r io.Reader, w1 io.Writer, w2 io.Writer) error {
-	return nil
+func (Zip) Compile(_ context.Context, _ sandbox.Sandbox, f sandbox.File, _ io.Writer, _ []sandbox.File) (*sandbox.File, error) {
+	return &f, nil
 }
 
-func (zip) Compile(s language.Sandbox, src language.File, bin io.Writer, cerr io.Writer, extras []language.File) error {
-	return nil
-}
-
-func (zip) Run(s language.Sandbox, binary io.Reader, stdin io.Reader, stdout io.Writer, tl time.Duration, mem int) (language.Status, error) {
-	return language.Status{}, nil
-}
-
-func (zip) Test(language.Sandbox) error {
-	return nil
+func (Zip) Run(_ context.Context, _ sandbox.Sandbox, _ sandbox.File, _ io.Reader, _ io.Writer, _ time.Duration, _ memory.Amount) (*sandbox.Status, error) {
+	return &sandbox.Status{}, nil
 }
 
 func init() {
-	language.DefaultStore.Register("zip", zip{})
+	language.DefaultStore.Register("zip", Zip{})
 }

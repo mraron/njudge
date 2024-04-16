@@ -9,7 +9,7 @@ import (
 )
 
 type Users struct {
-	sync.Mutex
+	mutex  sync.Mutex
 	nextId int
 	data   []njudge.User
 
@@ -25,8 +25,8 @@ func NewUsers() *Users {
 }
 
 func (m *Users) Get(ctx context.Context, ID int) (*njudge.User, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	for ind := range m.data {
 		if m.data[ind].ID == ID {
 			res := m.data[ind]
@@ -49,8 +49,8 @@ func (m *Users) getByName(ctx context.Context, name string) (*njudge.User, error
 }
 
 func (m *Users) GetByName(ctx context.Context, name string) (*njudge.User, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	return m.getByName(ctx, name)
 }
 
@@ -66,14 +66,14 @@ func (m *Users) getByEmail(ctx context.Context, email string) (*njudge.User, err
 }
 
 func (m *Users) GetByEmail(ctx context.Context, email string) (*njudge.User, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	return m.getByEmail(ctx, email)
 }
 
 func (m *Users) Insert(ctx context.Context, u njudge.User) (*njudge.User, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 
 	if _, err := m.getByName(ctx, u.Name); err == nil {
 		return nil, njudge.ErrorSameName
@@ -91,8 +91,8 @@ func (m *Users) Insert(ctx context.Context, u njudge.User) (*njudge.User, error)
 }
 
 func (m *Users) Delete(ctx context.Context, ID int) error {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	for ind := range m.data {
 		if m.data[ind].ID == ID {
 			m.data[ind] = m.data[len(m.data)-1]
@@ -105,8 +105,8 @@ func (m *Users) Delete(ctx context.Context, ID int) error {
 }
 
 func (m *Users) Update(ctx context.Context, user *njudge.User, fields []string) error {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	for ind := range m.data {
 		if m.data[ind].ID == user.ID {
 			if slices.Contains(fields, njudge.UserFields.Name) {

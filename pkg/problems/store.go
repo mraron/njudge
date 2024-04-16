@@ -14,15 +14,15 @@ import (
 
 var ErrorProblemNotFound = errors.New("problem not found")
 
-type ProblemNotFoundError struct {
+type NotFoundError struct {
 	Name string
 }
 
-func (perr ProblemNotFoundError) Error() string {
-	return "problem not found: " + perr.Name
+func (err NotFoundError) Error() string {
+	return "problem not found: " + err.Name
 }
 
-func (perr ProblemNotFoundError) Is(target error) bool {
+func (err NotFoundError) Is(target error) bool {
 	return target == ErrorProblemNotFound
 }
 
@@ -33,21 +33,21 @@ type ProblemParseError struct {
 	Problems []string
 }
 
-func (perr ProblemParseError) Error() string {
-	return fmt.Sprintf("can't parse problems: %v", perr.Errors)
+func (err ProblemParseError) Error() string {
+	return fmt.Sprintf("can't parse problems: %v", err.Errors)
 }
 
-func (perr ProblemParseError) Is(target error) bool {
+func (ProblemParseError) Is(target error) bool {
 	return target == ErrorProblemParse
 }
 
 // Store is an interface which is used to access a bunch of problems for example from the filesystem
 type Store interface {
-	List() ([]string, error)
-	Has(string) (bool, error)
-	Get(string) (Problem, error)
-	MustGet(string) Problem
-	Update() error
+	ListProblems() ([]string, error)
+	HasProblem(string) (bool, error)
+	GetProblem(string) (Problem, error)
+	MustGetProblem(string) Problem
+	UpdateProblems() error
 	UpdateProblem(path string, id string) error
 }
 
@@ -106,7 +106,7 @@ func NewFsStore(root string, options ...FsStoreOptions) *FsStore {
 	return fsStore
 }
 
-func (s *FsStore) List() ([]string, error) {
+func (s *FsStore) ListProblems() ([]string, error) {
 	s.RLock()
 	defer s.RUnlock()
 
@@ -116,15 +116,15 @@ func (s *FsStore) List() ([]string, error) {
 	return lst, nil
 }
 
-func (s *FsStore) Has(p string) (bool, error) {
-	if _, err := s.Get(p); err != nil {
+func (s *FsStore) HasProblem(p string) (bool, error) {
+	if _, err := s.GetProblem(p); err != nil && errors.Is(err, ErrorProblemNotFound) {
 		return false, nil
 	}
 
 	return true, nil
 }
 
-func (s *FsStore) Get(p string) (Problem, error) {
+func (s *FsStore) GetProblem(p string) (Problem, error) {
 	s.RLock()
 	defer s.RUnlock()
 
@@ -138,11 +138,11 @@ func (s *FsStore) Get(p string) (Problem, error) {
 		}
 	}
 
-	return nil, ProblemNotFoundError{p}
+	return nil, NotFoundError{p}
 }
 
-func (s *FsStore) MustGet(p string) Problem {
-	res, err := s.Get(p)
+func (s *FsStore) MustGetProblem(p string) Problem {
+	res, err := s.GetProblem(p)
 	if err != nil {
 		panic(err)
 	}
@@ -150,7 +150,7 @@ func (s *FsStore) MustGet(p string) Problem {
 	return res
 }
 
-func (s *FsStore) Update() error {
+func (s *FsStore) UpdateProblems() error {
 	errs := ProblemParseError{Errors: make([]error, 0), Problems: make([]string, 0)}
 	lst := make([]string, 0)
 

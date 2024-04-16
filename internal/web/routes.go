@@ -88,35 +88,35 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	if s.DB != nil {
 		v1 := e.Group("/api/v1")
 
-		problemRelDataProvider := api.ProblemRelDataProvider{DB: s.DB.DB}
+		problemRelDataProvider := api.ProblemRelDataProvider{DB: s.DB}
 		v1.GET("/problem_rels", api.GetList[models.ProblemRel](problemRelDataProvider))
 		v1.POST("/problem_rels", api.Post[models.ProblemRel](problemRelDataProvider))
 		v1.GET("/problem_rels/:id", api.Get[models.ProblemRel](problemRelDataProvider))
 		v1.PUT("/problem_rels/:id", api.Put[models.ProblemRel](problemRelDataProvider))
 		v1.DELETE("/problem_rels/:id", api.Delete[models.ProblemRel](problemRelDataProvider))
 
-		partialDataProvider := api.PartialDataProvider{DB: s.DB.DB}
+		partialDataProvider := api.PartialDataProvider{DB: s.DB}
 		v1.GET("/partials", api.GetList[models.Partial](partialDataProvider))
 		v1.POST("/partials", api.Post[models.Partial](partialDataProvider))
 		v1.GET("/partials/:name", api.Get[models.Partial](partialDataProvider))
 		v1.PUT("/partials/:name", api.Put[models.Partial](partialDataProvider))
 		v1.DELETE("/partials/:name", api.Delete[models.Partial](partialDataProvider))
 
-		judgeDataProvider := api.JudgeDataProvider{DB: s.DB.DB}
-		v1.GET("/judges", api.GetList[helpers.Judge](judgeDataProvider))
-		v1.POST("/judges", api.Post[helpers.Judge](judgeDataProvider))
-		v1.GET("/judges/:id", api.Get[helpers.Judge](judgeDataProvider))
-		v1.PUT("/judges/:id", api.Put[helpers.Judge](judgeDataProvider))
-		v1.DELETE("/judges/:id", api.Delete[helpers.Judge](judgeDataProvider))
+		judgeDataProvider := api.JudgeDataProvider{DB: s.DB}
+		v1.GET("/judges", api.GetList[models.Judge](judgeDataProvider))
+		v1.POST("/judges", api.Post[models.Judge](judgeDataProvider))
+		v1.GET("/judges/:id", api.Get[models.Judge](judgeDataProvider))
+		v1.PUT("/judges/:id", api.Put[models.Judge](judgeDataProvider))
+		v1.DELETE("/judges/:id", api.Delete[models.Judge](judgeDataProvider))
 
-		userDataProvider := api.UserDataProvider{DB: s.DB.DB}
+		userDataProvider := api.UserDataProvider{DB: s.DB}
 		v1.GET("/users", api.GetList[models.User](userDataProvider))
 		v1.POST("/users", api.Post[models.User](userDataProvider))
 		v1.GET("/users/:id", api.Get[models.User](userDataProvider))
 		v1.PUT("/users/:id", api.Put[models.User](userDataProvider))
 		v1.DELETE("/users/:id", api.Delete[models.User](userDataProvider))
 
-		submissionDataProvider := api.SubmissionDataProvider{DB: s.DB.DB}
+		submissionDataProvider := api.SubmissionDataProvider{DB: s.DB}
 		v1.GET("/submissions", api.GetList[models.Submission](submissionDataProvider))
 		v1.POST("/submissions", api.Post[models.Submission](submissionDataProvider))
 		v1.GET("/submissions/:id", api.Get[models.Submission](submissionDataProvider))

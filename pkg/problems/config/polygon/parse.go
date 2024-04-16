@@ -1,6 +1,7 @@
 package polygon
 
 import (
+	"context"
 	"encoding/xml"
 	"errors"
 	"os"
@@ -80,7 +81,7 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 					// problem-properties.json might be outdated. problem.xml should take priority
 					jsonStmt.InputFile, jsonStmt.OutputFile = p.InputOutputFiles()
 					jsonStmt.TimeLimit = p.TimeLimit()
-					jsonStmt.MemoryLimit = p.MemoryLimit()
+					jsonStmt.MemoryLimit = int(p.MemoryLimit())
 
 					p.JSONStatementList = append(p.JSONStatementList, *jsonStmt)
 
@@ -114,12 +115,19 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 			if checkerPath == "" {
 				checkerPath = "check.cpp"
 			}
-			if err := cpp.AutoCompile(fs, sandbox.NewDummy(), workingDirectory, filepath.Join(p.Path, checkerPath), filepath.Join(p.Path, "check")); err != nil {
+
+			s, _ := sandbox.NewDummy()
+			if err := cpp.AutoCompile(context.TODO(), fs, s, workingDirectory, filepath.Join(p.Path, checkerPath), filepath.Join(p.Path, "check")); err != nil {
 				return nil, err
 			}
 
 			if p.Assets.Interactor.Source.Path != "" {
-				if err := cpp.AutoCompile(fs, sandbox.NewDummy(), workingDirectory, filepath.Join(p.Path, p.Assets.Interactor.Source.Path), filepath.Join(p.Path, "files/interactor")); err != nil {
+				s, _ := sandbox.NewDummy()
+				if err := cpp.AutoCompile(context.TODO(), fs, s, workingDirectory, filepath.Join(p.Path, p.Assets.Interactor.Source.Path), filepath.Join(p.Path, "files/interactor")); err != nil {
+					return nil, err
+				}
+				p.Assets.Interactor.binary, err = os.ReadFile(filepath.Join(p.Path, "files/interactor"))
+				if err != nil {
 					return nil, err
 				}
 			}

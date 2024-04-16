@@ -8,7 +8,7 @@ import (
 )
 
 type Tags struct {
-	sync.Mutex
+	mutex  sync.Mutex
 	nextId int
 	data   []njudge.Tag
 }
@@ -21,8 +21,8 @@ func NewTags() *Tags {
 }
 
 func (m *Tags) Get(ctx context.Context, ID int) (*njudge.Tag, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	for ind := range m.data {
 		if m.data[ind].ID == ID {
 			res := m.data[ind]
@@ -34,8 +34,8 @@ func (m *Tags) Get(ctx context.Context, ID int) (*njudge.Tag, error) {
 }
 
 func (m *Tags) GetAll(ctx context.Context) ([]njudge.Tag, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	res := make([]njudge.Tag, len(m.data))
 	copy(res, m.data)
 
@@ -43,8 +43,8 @@ func (m *Tags) GetAll(ctx context.Context) ([]njudge.Tag, error) {
 }
 
 func (m *Tags) GetByName(ctx context.Context, name string) (*njudge.Tag, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	for ind := range m.data {
 		if m.data[ind].Name == name {
 			res := m.data[ind]
@@ -56,8 +56,8 @@ func (m *Tags) GetByName(ctx context.Context, name string) (*njudge.Tag, error) 
 }
 
 func (m *Tags) Insert(ctx context.Context, u njudge.Tag) (*njudge.Tag, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	u.ID = m.nextId
 	m.nextId++
 	m.data = append(m.data, u)
@@ -67,8 +67,8 @@ func (m *Tags) Insert(ctx context.Context, u njudge.Tag) (*njudge.Tag, error) {
 }
 
 func (m *Tags) Delete(ctx context.Context, ID int) error {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	for ind := range m.data {
 		if m.data[ind].ID == ID {
 			m.data[ind] = m.data[len(m.data)-1]
@@ -81,8 +81,8 @@ func (m *Tags) Delete(ctx context.Context, ID int) error {
 }
 
 func (m *Tags) Update(ctx context.Context, user njudge.Tag) error {
-	m.Lock()
-	defer m.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	for ind := range m.data {
 		if m.data[ind].ID == user.ID {
 			m.data[ind] = user

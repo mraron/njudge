@@ -44,7 +44,7 @@ var MigrateCmd = &cobra.Command{
 
 		server := web.Server{Server: cfg}
 		server.ConnectToDB()
-		driver, err := postgres.WithInstance(server.DB.DB, &postgres.Config{})
+		driver, err := postgres.WithInstance(server.DB, &postgres.Config{})
 		if err != nil {
 			return err
 		}

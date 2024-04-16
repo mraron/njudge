@@ -14,17 +14,17 @@ func TestExtractHeaderNames(t *testing.T) {
 #include<kaki>
 #include<iostream>
 #include <halo.h>`)
-	afero.WriteFile(fs, "main.cpp", src, 0644)
+	_ = afero.WriteFile(fs, "main.cpp", src, 0644)
 
-	fs.MkdirAll("headers", 0755)
-	afero.WriteFile(fs, "headers/abc.h", []byte(""), 0644)
-	afero.WriteFile(fs, "headers/halo.h", []byte(""), 0644)
+	_ = fs.MkdirAll("headers", 0755)
+	_ = afero.WriteFile(fs, "headers/abc.h", []byte(""), 0644)
+	_ = afero.WriteFile(fs, "headers/halo.h", []byte(""), 0644)
 
-	fs.MkdirAll("viccelek1", 0755)
-	afero.WriteFile(fs, "viccelek1/kaki", []byte(""), 0644)
+	_ = fs.MkdirAll("viccelek1", 0755)
+	_ = afero.WriteFile(fs, "viccelek1/kaki", []byte(""), 0644)
 
-	fs.MkdirAll("viccelek2", 0755)
-	afero.WriteFile(fs, "viccelek2/iostream", []byte(""), 0644)
+	_ = fs.MkdirAll("viccelek2", 0755)
+	_ = afero.WriteFile(fs, "viccelek2/iostream", []byte(""), 0644)
 
 	if res := cpp.ExtractHeaderNames(fs, "./", src); len(res) != 0 {
 		t.Errorf("0 != %d: %v", len(res), res)

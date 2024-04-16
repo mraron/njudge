@@ -2,6 +2,7 @@ package web
 
 import (
 	"context"
+	"database/sql"
 	_ "mime"
 
 	"github.com/mraron/njudge/internal/njudge"
@@ -10,7 +11,6 @@ import (
 	"github.com/mraron/njudge/internal/web/helpers/config"
 	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
 	"github.com/mraron/njudge/pkg/problems"
@@ -18,15 +18,15 @@ import (
 	_ "github.com/mraron/njudge/pkg/problems/config/polygon"
 	_ "github.com/mraron/njudge/pkg/problems/config/problem_yaml"
 	_ "github.com/mraron/njudge/pkg/problems/config/task_yaml"
-	_ "github.com/mraron/njudge/pkg/problems/tasktype/batch"
-	_ "github.com/mraron/njudge/pkg/problems/tasktype/communication"
-	_ "github.com/mraron/njudge/pkg/problems/tasktype/output_only"
-	_ "github.com/mraron/njudge/pkg/problems/tasktype/stub"
+	_ "github.com/mraron/njudge/pkg/problems/evaluation/batch"
+	_ "github.com/mraron/njudge/pkg/problems/evaluation/communication"
+	_ "github.com/mraron/njudge/pkg/problems/evaluation/output_only"
+	_ "github.com/mraron/njudge/pkg/problems/evaluation/stub"
 )
 
 type Server struct {
 	config.Server
-	DB *sqlx.DB
+	DB *sql.DB
 
 	ProblemStore  problems.Store
 	MailService   email.Service

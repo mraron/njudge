@@ -1,74 +1,61 @@
 package cython3
 
 import (
-	"bytes"
-	"errors"
+	"context"
+	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/mraron/njudge/pkg/language/sandbox"
 	"io"
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
 )
 
-type cython3 struct {
+type Cython3 struct {
 }
 
-func (c cython3) Id() string {
+func (c Cython3) ID() string {
 	return "cython3"
 }
 
-func (c cython3) Name() string {
+func (c Cython3) DisplayName() string {
 	return "Cython3"
 }
 
-func (c cython3) DefaultFileName() string {
+func (c Cython3) DefaultFilename() string {
 	return "main.py"
 }
 
-func (c cython3) InsecureCompile(wd string, r io.Reader, w io.Writer, e io.Writer) error {
-	return errors.New("not supported")
+func (c Cython3) Compile(ctx context.Context, s sandbox.Sandbox, f sandbox.File, stderr io.Writer, extras []sandbox.File) (*sandbox.File, error) {
+	err := sandbox.CreateFile(s, f)
+	if err != nil {
+		return nil, err
+	}
+
+	rc := sandbox.RunConfig{
+		MaxProcesses:     200,
+		InheritEnv:       true,
+		TimeLimit:        10 * time.Second,
+		MemoryLimit:      256 * memory.MiB,
+		Stdout:           stderr,
+		Stderr:           stderr,
+		WorkingDirectory: s.Pwd(),
+	}
+	if _, err := s.Run(ctx, rc, "/usr/bin/cython3", sandbox.SplitArgs("-3 --embed -o main.c "+f.Name)...); err != nil {
+		return nil, err
+	}
+
+	if _, err := s.Run(ctx, rc, "/usr/bin/gcc", sandbox.SplitArgs("-O2 -I/usr/include/python3.8 main.c -lpython3.8 -lpthread -lm -lutil -ldl")...); err != nil {
+		return nil, err
+	}
+
+	return sandbox.ExtractFile(s, "a.out")
 }
 
-func (c cython3) Compile(s language.Sandbox, r language.File, w io.Writer, e io.Writer, extras []language.File) error {
-	err := s.CreateFile("main.py", r.Source)
-	if err != nil {
-		return err
-	}
+func (Cython3) Run(ctx context.Context, s sandbox.Sandbox, binary sandbox.File, stdin io.Reader, stdout io.Writer, tl time.Duration, ml memory.Amount) (*sandbox.Status, error) {
+	return sandbox.RunBinary(ctx, s, binary, stdin, stdout, tl, ml)
 
-	errorStream := &bytes.Buffer{}
-	if _, err := s.SetMaxProcesses(200).Env().TimeLimit(10*time.Second).MemoryLimit(2560000).Stdout(errorStream).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/cython3 -3 --embed -o main.c main.py", false); err != nil {
-		e.Write(errorStream.Bytes())
-		return err
-	}
-
-	if _, err := s.SetMaxProcesses(200).Env().TimeLimit(10*time.Second).MemoryLimit(2560000).Stdout(errorStream).Stderr(e).WorkingDirectory(s.Pwd()).Run("/usr/bin/gcc -O2 -I/usr/include/python3.8 -o main main.c -lpython3.8 -lpthread -lm -lutil -ldl", false); err != nil {
-		e.Write(errorStream.Bytes())
-		return err
-	}
-
-	bin, err := s.GetFile("main")
-	if err != nil {
-		return err
-	}
-
-	_, err = io.Copy(w, bin)
-	return err
-}
-
-func (cython3) Run(s language.Sandbox, binary, stdin io.Reader, stdout io.Writer, tl time.Duration, ml int) (language.Status, error) {
-	stat := language.Status{}
-	stat.Verdict = language.VerdictXX
-
-	if err := s.CreateFile("a.out", binary); err != nil {
-		return stat, err
-	}
-
-	if err := s.MakeExecutable("a.out"); err != nil {
-		return stat, err
-	}
-
-	return s.Stdin(stdin).Stdout(stdout).TimeLimit(tl).MemoryLimit(ml/1024).Run("a.out", true)
 }
 
 func init() {
-	language.DefaultStore.Register("cython3", cython3{})
+	language.DefaultStore.Register("cython3", Cython3{})
 }

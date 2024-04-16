@@ -2,8 +2,13 @@ package feladat_txt
 
 import (
 	"bufio"
+	"context"
 	"errors"
 	"fmt"
+	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/mraron/njudge/pkg/problems/evaluation"
+	"github.com/mraron/njudge/pkg/problems/evaluation/batch"
+	"github.com/mraron/njudge/pkg/problems/executable/checker"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -16,7 +21,6 @@ import (
 
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
-	"github.com/mraron/njudge/pkg/problems/checker"
 )
 
 type Problem struct {
@@ -47,8 +51,8 @@ func (p Problem) Statements() problems.Contents {
 	return p.StatementList
 }
 
-func (p Problem) MemoryLimit() int {
-	return 1024 * p.MemoryLimitKB
+func (p Problem) MemoryLimit() memory.Amount {
+	return memory.Amount(p.MemoryLimitKB) * memory.KiB
 }
 
 func (p Problem) TimeLimit() int {
@@ -60,7 +64,7 @@ func (p Problem) InputOutputFiles() (string, string) {
 }
 
 func (p Problem) Languages() []language.Language {
-	return language.StoreAllExcept(language.DefaultStore, []string{"zip"})
+	return language.ListExcept(language.DefaultStore, []string{"zip"})
 }
 
 func (p Problem) Attachments() problems.Attachments {
@@ -135,17 +139,15 @@ func (p Problem) Checker() problems.Checker {
 	return checker.NewEllen(filepath.Join(p.Path, "ellen"), p.Path, p.TestCount, p.Points)
 }
 
-func (p Problem) Files() []problems.File {
-	return make([]problems.File, 0)
+func (p Problem) EvaluationFiles() []problems.EvaluationFile {
+	return make([]problems.EvaluationFile, 0)
 }
 
 func (p Problem) GetTaskType() problems.TaskType {
-	tt, err := problems.GetTaskType("batch")
-	if err != nil {
-		panic(err)
-	}
-
-	return tt
+	return batch.New(evaluation.CompileCheckSupported{
+		List:         p.Languages(),
+		NextCompiler: evaluation.Compile{},
+	}, evaluation.BasicRunnerWithChecker(p.Checker()))
 }
 
 func Parse(fs afero.Fs, path string) (problems.Problem, error) {
@@ -229,7 +231,8 @@ func Parse(fs afero.Fs, path string) (problems.Problem, error) {
 	}
 	p.StatementList = append(p.StatementList, problems.BytesData{Loc: "hungarian", Val: feladat_pdf, Typ: "application/pdf"})
 
-	if err := cpp.AutoCompile(fs, sandbox.NewDummy(), path, filepath.Join(path, "ellen.cpp"), filepath.Join(path, "ellen")); err != nil {
+	box, _ := sandbox.NewDummy()
+	if err := cpp.AutoCompile(context.TODO(), fs, box, path, filepath.Join(path, "ellen.cpp"), filepath.Join(path, "ellen")); err != nil {
 		return nil, err
 	}
 

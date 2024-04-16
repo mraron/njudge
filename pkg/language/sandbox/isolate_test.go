@@ -1,41 +1,65 @@
 package sandbox_test
 
 import (
+	"context"
 	"flag"
-	_ "github.com/mraron/njudge/internal/web"
-	"github.com/mraron/njudge/pkg/language"
-	"github.com/mraron/njudge/pkg/language/langs/cpp"
+	"github.com/mraron/njudge/pkg/internal/testutils"
 	"github.com/mraron/njudge/pkg/language/sandbox"
+	"github.com/stretchr/testify/assert"
+	"log/slog"
 	"testing"
+	"time"
 )
 
-var isolateInstalled = flag.Bool("isolate", false, "run isolate tests")
-var allLanguages = flag.Bool("all_languages", false, "run all languaegs")
+var verbose = flag.Bool("verbose", false, "log sandbox")
 
-func TestIsolateWithCpp17(t *testing.T) {
-	if !*isolateInstalled {
-		t.Skip("-isolate is not set	")
-	}
-
-	s := sandbox.NewIsolate(555)
-	if err := cpp.Std17.Test(s); err != nil {
-		t.Error(err)
-	}
-}
-
-func TestIsolateWithAllLanguages(t *testing.T) {
-	if !*isolateInstalled {
+func TestIsolate_Run(t *testing.T) {
+	if !*testutils.UseIsolate {
 		t.Skip("-isolate is not set")
 	}
-	if !*allLanguages {
-		t.Skip("-all_languages is not set")
+
+	testcases := []struct {
+		name        string
+		config      sandbox.RunConfig
+		command     []string
+		wantVerdict sandbox.Verdict
+	}{
+		{
+			name: "sh_echo",
+			config: sandbox.RunConfig{
+				RunID: "sh_echo",
+			},
+			command:     []string{"/bin/sh", "-c", "echo \"nigga\""},
+			wantVerdict: sandbox.VerdictOK,
+		},
+		{
+			name: "sh_yes",
+			config: sandbox.RunConfig{
+				RunID:     "sh_yes",
+				TimeLimit: 50 * time.Millisecond,
+			},
+			command:     []string{"/bin/sh", "-c", "yes"},
+			wantVerdict: sandbox.VerdictTL,
+		},
 	}
 
-	s := sandbox.NewIsolate(556)
-	for _, lang := range language.DefaultStore.List() {
-		t.Logf("Running %s", lang.Id())
-		if err := lang.Test(s); err != nil {
-			t.Error(err)
-		}
+	var opts []sandbox.IsolateOption
+	if *verbose {
+		opts = append(opts, sandbox.IsolateOptionUseLogger(slog.Default()))
+	}
+	s, err := sandbox.NewIsolate(558, opts...)
+	assert.Nil(t, err)
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := s.Init(context.Background())
+			assert.Nil(t, err)
+
+			st, err := s.Run(context.Background(), tc.config, tc.command[0], tc.command[1:]...)
+			assert.Nil(t, err)
+
+			assert.Equal(t, tc.wantVerdict, st.Verdict)
+			err = s.Cleanup(context.Background())
+			assert.Nil(t, err)
+		})
 	}
 }

@@ -1,20 +1,25 @@
 package julia
 
 import (
+	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/mraron/njudge/pkg/language/sandbox"
+	"testing"
 	"time"
 
 	"github.com/mraron/njudge/pkg/language"
 )
 
-const print = `println("Hello world")`
+const TestCodeHelloWorld = `println("Hello world")`
 
-func (j julia) Test(s language.Sandbox) error {
-	for _, test := range []language.LanguageTest{
-		{j, print, language.VerdictOK, "", "Hello world\n", 1 * time.Second, 128 * 1024 * 1024},
+func (j julia) Test(t *testing.T, s sandbox.Sandbox) error {
+	for _, test := range []language.Test{
+		{Name: j.ID() + "_print", Language: j, Source: TestCodeHelloWorld, ExpectedVerdict: sandbox.VerdictOK, ExpectedOutput: "Hello world\n", TimeLimit: 1 * time.Second, MemoryLimit: 128 * memory.MiB},
 	} {
-		if err := test.Run(s); err != nil {
-			return err
-		}
+		t.Run(test.Name, func(t *testing.T) {
+			if err := test.Run(s); err != nil {
+				t.Error(err)
+			}
+		})
 	}
 
 	return nil

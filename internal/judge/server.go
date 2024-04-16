@@ -1,288 +1,195 @@
 package judge
 
 import (
-	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
-	"log"
-	"net/http"
-	"strconv"
-	"strings"
-	"sync"
-	"time"
-
 	"github.com/labstack/echo/v4"
-	"github.com/shirou/gopsutil/load"
-	"go.uber.org/multierr"
-	"go.uber.org/zap"
-
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/problems"
 	_ "github.com/mraron/njudge/pkg/problems/config/feladat_txt"
 	_ "github.com/mraron/njudge/pkg/problems/config/polygon"
-	_ "github.com/mraron/njudge/pkg/problems/tasktype/batch"
-	_ "github.com/mraron/njudge/pkg/problems/tasktype/communication"
-	_ "github.com/mraron/njudge/pkg/problems/tasktype/stub"
+	_ "github.com/mraron/njudge/pkg/problems/config/problem_yaml"
+	_ "github.com/mraron/njudge/pkg/problems/config/task_yaml"
+	slogecho "github.com/samber/slog-echo"
+	"log/slog"
+	"net/http"
+	"time"
 
-	"encoding/json"
-
-	"github.com/labstack/echo/v4/middleware"
-	_ "github.com/mraron/njudge/pkg/language/langs/cpp"
-	_ "github.com/mraron/njudge/pkg/language/langs/csharp"
-	_ "github.com/mraron/njudge/pkg/language/langs/golang"
-	_ "github.com/mraron/njudge/pkg/language/langs/java"
-	_ "github.com/mraron/njudge/pkg/language/langs/julia"
-	_ "github.com/mraron/njudge/pkg/language/langs/nim"
-	_ "github.com/mraron/njudge/pkg/language/langs/pascal"
-	_ "github.com/mraron/njudge/pkg/language/langs/pypy3"
 	_ "github.com/mraron/njudge/pkg/language/langs/python3"
-	_ "github.com/mraron/njudge/pkg/language/langs/zip"
 )
 
-type ServerConfig struct {
-	HTTPConfig  `mapstructure:",squash"`
-	SandboxIds  string `json:"sandbox_ids" mapstructure:"sandbox_ids"`
-	WorkerCount int    `json:"worker_count" mapstructure:"worker_count"`
-	ProblemsDir string `json:"problems_dir" mapstructure:"problems_dir"`
-	Mode        string `json:"mode" mapstructure:"mode"`
+type Submission struct {
+	ID       string `json:"id"`
+	Problem  string `json:"problem"`
+	Language string `json:"language"`
+	Source   []byte `json:"source"`
+	//TODO add status skeleton here?
+}
+
+type Result struct {
+	Index  int              `json:"index"`
+	Test   string           `json:"test"`
+	Status *problems.Status `json:"status"`
+	Error  string           `json:"error"`
 }
 
 type Server struct {
-	ServerConfig
+	Logger       *slog.Logger
+	Judger       Judger
+	ProblemStore problems.Store
 
-	problemStore problems.Store
-	httpServer   *HTTPServer
-
-	queue  *Queue
-	logger *zap.Logger
+	Config struct {
+		Port string
+	}
 }
 
-func NewServer(cfg ServerConfig) (*Server, error) {
-	s := &Server{ServerConfig: cfg}
+type ServerOption func(*Server)
 
-	var err error
-	if s.Mode == "development" {
-		s.logger, err = zap.NewDevelopment()
-	} else {
-		s.logger, err = zap.NewProduction()
+func WithPortServerOption(port int) ServerOption {
+	return func(server *Server) {
+		server.Config.Port = fmt.Sprintf("%d", port)
 	}
-
-	if err != nil {
-		return nil, err
-	}
-
-	minSandboxId, maxSandboxId := -1, -1
-	if s.SandboxIds == "" {
-		minSandboxId = 100
-		maxSandboxId = 999
-	} else {
-		splitted := strings.Split(s.SandboxIds, "-")
-		if len(splitted) != 2 {
-			return nil, fmt.Errorf("sandbox_ids wrong format")
-		}
-
-		var err1, err2 error
-		minSandboxId, err1 = strconv.Atoi(splitted[0])
-		maxSandboxId, err2 = strconv.Atoi(splitted[1])
-		if err1 != nil || err2 != nil {
-			return nil, multierr.Combine(err1, err2)
-		}
-	}
-
-	s.logger.Info("initializing workers")
-	wp, err := NewIsolateWorkerProvider(minSandboxId, maxSandboxId, cfg.WorkerCount)
-	if err != nil {
-		return nil, err
-	}
-
-	s.problemStore = problems.NewFsStore(cfg.ProblemsDir)
-	if err = s.problemStore.Update(); err != nil {
-		s.logger.Info("failed to initialize problems", zap.Error(err))
-	}
-
-	ls := language.DefaultStore
-
-	s.logger.Info("initializing the queue")
-	s.queue, err = NewQueue(s.logger, s.problemStore, ls, wp)
-	if err != nil {
-		return nil, err
-	}
-
-	s.logger.Info("initializing the http server")
-	s.httpServer = NewHTTPServer(s.HTTPConfig, s.queue, s.logger)
-
-	return s, nil
 }
 
-func (s *Server) Run() {
+func NewServer(logger *slog.Logger, judger Judger, problemStore problems.Store, opts ...ServerOption) Server {
+	res := Server{Logger: logger, Judger: judger, ProblemStore: problemStore}
+	res.Config.Port = "8080"
+	for _, opt := range opts {
+		opt(&res)
+	}
+	return res
+}
+
+func (s Server) PostJudgeHandler() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		sub := Submission{}
+		if err := c.Bind(&sub); err != nil {
+			return err
+		}
+
+		inited := false
+		initResponse := func(statusCode int) {
+			if inited {
+				return
+			}
+			inited = true
+			c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+			c.Response().WriteHeader(statusCode)
+		}
+		enc := json.NewEncoder(c.Response().Writer)
+
+		st, err := s.Judger.Judge(c.Request().Context(), sub, func(result Result) error {
+			initResponse(http.StatusOK)
+			return enc.Encode(result)
+		})
+		res := Result{
+			Status: st,
+		}
+		if err != nil {
+			res.Error = err.Error()
+			if errors.Is(err, problems.ErrorProblemNotFound) || errors.Is(err, language.ErrorLanguageNotFound) {
+				initResponse(http.StatusBadRequest)
+				return enc.Encode(res)
+			}
+			if st == nil {
+				initResponse(http.StatusInternalServerError)
+				return enc.Encode(res)
+			}
+		}
+		initResponse(http.StatusOK)
+		return enc.Encode(res)
+	}
+}
+
+func (s Server) Run() error {
 	go func() {
 		for {
-			if err := s.problemStore.Update(); err != nil {
-				s.logger.Error("updating problems", zap.Error(err))
+			if err := s.ProblemStore.UpdateProblems(); err != nil {
+				s.Logger.Error("failed to update problemStore", err)
 			}
-
-			time.Sleep(20 * time.Second)
+			time.Sleep(30 * time.Second)
 		}
 	}()
-
-	s.logger.Info("starting the queue")
-	go s.queue.Run()
-
-	s.logger.Info("starting the http server")
-	s.httpServer.Run()
-}
-
-type HTTPConfig struct {
-	Host string `json:"host" mapstructure:"host"`
-	Port string `json:"port" mapstructure:"port"`
-}
-
-type HTTPServer struct {
-	HTTPConfig
-	Enqueuer
-
-	status      ServerStatus
-	statusMutex sync.RWMutex
-
-	start  time.Time
-	logger *zap.Logger
-}
-
-func NewHTTPServer(cfg HTTPConfig, j Enqueuer, logger *zap.Logger) *HTTPServer {
-	s := HTTPServer{HTTPConfig: cfg, Enqueuer: j, logger: logger}
-	s.start = time.Now()
-
-	return &s
-}
-
-func (s *HTTPServer) Run() error {
-	if err := s.init(); err != nil {
-		return err
-	}
 
 	e := echo.New()
-	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
-		LogMethod:   true,
-		LogURI:      true,
-		LogStatus:   true,
-		LogHost:     true,
-		LogRemoteIP: true,
-		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
-			s.logger.Info("request",
-				zap.String("method", v.Method),
-				zap.String("URI", v.URI),
-				zap.String("host", v.Host),
-				zap.String("remoteip", v.RemoteIP),
-				zap.Int("status", v.Status),
-			)
+	e.Use(slogecho.New(s.Logger))
+	e.Use(middleware.Recover())
 
-			return nil
-		},
-	}))
+	e.POST("/judge", s.PostJudgeHandler())
 
-	e.GET("/status", s.getStatus)
-	e.POST("/judge", s.postJudge)
-
-	go s.runUpdate()
-
-	return e.Start(":" + s.Port)
+	return e.Start(":" + s.Config.Port)
 }
 
-func (s *HTTPServer) init() error {
-	s.status.Host = s.Host
-	s.status.Port = s.Port
-	s.status.Url = "http://" + s.Host + ":" + s.Port
+/*
+func main() {
+	s1, _ := sandbox.NewIsolate(104)
+	s2, _ := sandbox.NewIsolate(105)
+	provider := sandbox.NewProvider().Put(s1).Put(s2)
 
-	return nil
-}
+	problemStore := problems.NewFsStore("/home/aron/Projects/njudge/njudge_problems_git")
+	_ = problemStore.UpdateProblems()
+	languageStore := language.DefaultStore
 
-func (s *HTTPServer) runUpdate() {
-	go func() {
-		for {
-			l, err := load.Avg()
-
-			if err != nil {
-				log.Print("Error while getting load: ", err)
-			} else {
-				s.statusMutex.Lock()
-				s.status.Load = l.Load1
-				s.statusMutex.Unlock()
-			}
-
-			time.Sleep(60 * time.Second)
-		}
-	}()
-
-	go func() {
-		for {
-			s.statusMutex.Lock()
-			s.status.LanguageList, _ = s.Enqueuer.SupportedLanguages()
-			s.status.ProblemList, _ = s.Enqueuer.SupportedProblems()
-			s.statusMutex.Unlock()
-
-			time.Sleep(20 * time.Second)
-		}
-	}()
-
-	for {
-		s.statusMutex.Lock()
-		s.status.Uptime = time.Since(s.start)
-		s.statusMutex.Unlock()
-		time.Sleep(1 * time.Second)
-	}
-}
-
-func (s *HTTPServer) getStatus(c echo.Context) error {
-	s.statusMutex.RLock()
-	defer s.statusMutex.RUnlock()
-	return c.JSON(http.StatusOK, s.status)
-}
-
-func (s *HTTPServer) postJudge(c echo.Context) error {
-	sub := Submission{}
-	if err := c.Bind(&sub); err != nil {
-		log.Print("getJudge error binding:", err)
-		return c.String(http.StatusBadRequest, "Parse error")
+	judge := Judge{
+		SandboxProvider: provider,
+		ProblemStore:    problemStore,
+		LanguageStore:   languageStore,
+		RateLimit:       5 * time.Second,
 	}
 
-	if sub.Stream {
-		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-		c.Response().WriteHeader(http.StatusOK)
-
-		callback := NewWriterCallback(c.Response(), func() {
-			c.Response().Flush()
-		})
-
-		res, err := s.Enqueue(c.Request().Context(), sub)
-		if err != nil {
-			return err
-		}
-		for resp := range res {
-			if err := callback.Callback(resp); err != nil {
-				return err
-			}
-		}
-
-		return nil
-	} else {
-		callback := NewHTTPCallback(sub.CallbackUrl)
-		res, err := s.Enqueue(context.Background(), sub)
-		if err != nil {
-			return err
-		}
+	server := NewServer(slog.Default(), &judge, problemStore, WithPortServerOption(8081))
+	go func() {
+		fmt.Println("start sleep")
+		time.Sleep(5 * time.Second)
+		ctx, cancel := context.WithCancel(context.Background())
 		go func() {
-			for resp := range res {
-				err := callback.Callback(resp)
-				if err != nil {
-					s.logger.Error("error calling back", zap.Error(err))
-				}
-			}
+			time.Sleep(10 * time.Second)
+			cancel()
 		}()
+		client := NewClient("http://localhost:8081")
+		res, err := client.Judge(ctx, Submission{
+			Problem:  "KK24_csoki2",
+			Language: "python3",
+			Source:   []byte(`while True: pass`),
+		}, func(result Result) error {
+			for _, tc := range result.Status.Feedback[0].Testcases() {
+				fmt.Print(tc.VerdictName)
+			}
+			fmt.Println("")
+			return nil
+		})
+		fmt.Println("ends: ", res, err)
+	}()
+	panic(server.Run())
+	/*
+	   	fmt.Println(judge.Judge(context.Background(), Submission{
+	   		ID:       "",
+	   		Problem:  "KK24_csoki22",
+	   		Language: "python3",
+	   		Source: []byte(`// @check-accepted: examples N=0 no-limits
 
-		return c.String(http.StatusOK, "queued")
-	}
-}
+	   #include <fstream>
+	   #include <iostream>
+	   #include <vector>
 
-func (s *HTTPServer) ToString() (string, error) {
-	val, err := json.Marshal(s)
-	return string(val), err
+	   using namespace std;
+
+	   int main() {
+	       int M, N, K;
+
+	       cin >> M >> N >> K;
+
+	       if ( (N+M)%K == 0 ) {
+	           cout << "IGEN" << endl;
+	       } else {
+	           cout << "NEM" << endl;
+	         }
+
+	       return 0;
+	   }
+	   `),
+	   	}, nil))
 }
+*/
