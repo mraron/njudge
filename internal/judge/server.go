@@ -17,7 +17,14 @@ import (
 	"net/http"
 	"time"
 
+	_ "github.com/mraron/njudge/pkg/language/langs/csharp"
+	_ "github.com/mraron/njudge/pkg/language/langs/golang"
+	_ "github.com/mraron/njudge/pkg/language/langs/java"
+	_ "github.com/mraron/njudge/pkg/language/langs/julia"
+	_ "github.com/mraron/njudge/pkg/language/langs/pascal"
+	_ "github.com/mraron/njudge/pkg/language/langs/pypy3"
 	_ "github.com/mraron/njudge/pkg/language/langs/python3"
+	_ "github.com/mraron/njudge/pkg/language/langs/zip"
 )
 
 type Submission struct {
