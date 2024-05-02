@@ -211,7 +211,15 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 
 		if len(testsLeft) == 1 {
 			if !isSum {
-				tc.MaxScore = float64(p.ScoreTypeParameters[subtask][0].(int))
+				v := p.ScoreTypeParameters[subtask][0]
+				switch v.(type) {
+				case float64:
+					tc.MaxScore = v.(float64)
+				case int:
+					tc.MaxScore = float64(v.(int))
+				default:
+					return nil, errors.New("task_yaml: wrong score format")
+				}
 			}
 			subtask++
 			testsLeft = testsLeft[1:]
