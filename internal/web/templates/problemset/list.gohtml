@@ -1,7 +1,6 @@
 {{template "header" .}}
 
-<script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
-<link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
+
 
 <div class="accordion" id="filterAccordion">
     <div class="card">
@@ -22,15 +21,20 @@
                 </div>
                 <div class="form-group">
                     <label for="categoryFilter">{{Tr "Category"}}</label>
-                    <select name="category" class="custom-select" id="categoryFilter">
+                    <select name="category" class="custom-select" id="categoryFilter" class="form-control">
                     {{range $i := .Data.CategoryFilterOptions}}
-                    <option value="{{$i.Value}}"{{if $i.Selected}} selected{{end}}>{{$i.Name}}</option>
+                        <option value="{{$i.Value}}"{{if $i.Selected}} selected{{end}}>{{$i.Name}}</option>
                     {{end}}
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="tagsFilter">{{Tr "Tags"}}</label>
-                    <input name="tags" value="{{.Data.TagsFilter}}" class="form-control" id="tagsFilter">
+                    <select class="form-control" id="tagsFilter" multiple data-allow-clear="1">
+                        {{range $tag := tags}}
+                            <option value="{{$tag.Name}}">{{$tag.Name}}</option>
+                        {{end}}
+                    </select>
+                    <input name="tags" value="{{.Data.TagsFilter}}" class="form-control" id="tagsFilterHidden" type="hidden">
                 </div>
                 <button type="submit" class="btn btn-primary">{{Tr "Filter"}}</button>
                 {{if .Data.Filtered}}<a class="btn btn-danger" href=".">{{Tr "Clear"}}</a>{{end}}
@@ -39,21 +43,30 @@
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    $(function () {
+        $('#categoryFilter').select2({
+            theme: 'bootstrap4',
+        });
 
-<script>
-var input = document.querySelector("input[name=tags]");
-var tagify = new Tagify(input, {
-    whitelist: [{{range $tag := tags}}'{{$tag.Name}}',{{end}}],
-    originalInputValueFormat: valuesArr => valuesArr.map(item => item.value).join(','),
-    enforceWhitelist: true,
-    dropdown: {
-        maxItems: 20,
-        enabled : 0,
-    },
-    editTags: false,
-});
+        let previousValues = $('#tagsFilterHidden').val().split(',');
+        console.log(previousValues);
+        $('#tagsFilter').val(previousValues);
+
+        $('#tagsFilter').select2({
+            theme: 'bootstrap4',
+            allowClear: true,
+            closeOnSelect: false,
+            placeholder: ""
+        })
+
+        $('#tagsFilter').on('change', function() {
+            let selectedValues = $(this).val(); // Get selected values as an array
+            let formattedValues = selectedValues.join(','); // Join array elements with a comma
+            $('#tagsFilterHidden').val(formattedValues); // Update hidden input value
+        })
+    });
 </script>
-
 <br>
 {{template "pagination" .Data.Pages}}
 

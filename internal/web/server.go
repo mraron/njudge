@@ -1,18 +1,16 @@
 package web
 
 import (
-	"context"
 	"database/sql"
+	"github.com/mraron/njudge/internal/web/templates"
 	_ "mime"
 
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/njudge/email"
 
-	"github.com/mraron/njudge/internal/web/helpers/config"
-	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
-
 	"github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
+	"github.com/mraron/njudge/internal/web/helpers/config"
 	"github.com/mraron/njudge/pkg/problems"
 	_ "github.com/mraron/njudge/pkg/problems/config/feladat_txt"
 	_ "github.com/mraron/njudge/pkg/problems/config/polygon"
@@ -30,7 +28,7 @@ type Server struct {
 
 	ProblemStore  problems.Store
 	MailService   email.Service
-	PartialsStore partials.Store
+	PartialsStore templates.Store
 
 	Categories          njudge.Categories
 	Tags                njudge.Tags
@@ -59,19 +57,4 @@ func (s *Server) Run() {
 	s.setupEcho()
 
 	panic(s.e.Start(":" + s.Port))
-}
-
-func (s *Server) Submit(uid int, problemset, problem, language string, source []byte) (int, error) {
-	sub, err := s.SubmitService.Submit(context.Background(), njudge.SubmitRequest{
-		UserID:     uid,
-		Problemset: problemset,
-		Problem:    problem,
-		Language:   language,
-		Source:     source,
-	})
-
-	if err != nil {
-		return -1, err
-	}
-	return sub.ID, nil
 }

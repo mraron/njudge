@@ -1,4 +1,4 @@
-package pagination
+package templates
 
 import (
 	"net/url"
@@ -9,7 +9,7 @@ func TestLinks(t *testing.T) {
 	qu := url.Values{}
 	qu.Set("njudge", "yes")
 
-	removeErr := func(l []Link, err error) []Link {
+	removeErr := func(l []PaginationLink, err error) []PaginationLink {
 		if err != nil {
 			t.Error(err)
 		}
@@ -17,12 +17,12 @@ func TestLinks(t *testing.T) {
 	}
 
 	var tests = []struct {
-		got      []Link
-		expected []Link
+		got      []PaginationLink
+		expected []PaginationLink
 	}{
 		{
 			got: removeErr(Links(2, 1, 3, qu)),
-			expected: []Link{
+			expected: []PaginationLink{
 				{Name: "&laquo;", Active: false, Disabled: false, Url: "?njudge=yes&page=1"},
 				{Name: "1", Active: false, Disabled: false, Url: "?njudge=yes&page=1"},
 				{Name: "2", Active: true, Disabled: true, Url: "?njudge=yes&page=2"},
@@ -32,7 +32,7 @@ func TestLinks(t *testing.T) {
 		},
 		{
 			got: removeErr(Links(1, 1, 3, qu)),
-			expected: []Link{
+			expected: []PaginationLink{
 				{Name: "&laquo;", Active: false, Disabled: true, Url: "#"},
 				{Name: "1", Active: true, Disabled: true, Url: "?njudge=yes&page=1"},
 				{Name: "2", Active: false, Disabled: false, Url: "?njudge=yes&page=2"},
@@ -42,7 +42,7 @@ func TestLinks(t *testing.T) {
 		},
 		{
 			got: removeErr(LinksWithCountLimit(50, 1, 100, qu, 2)),
-			expected: []Link{
+			expected: []PaginationLink{
 				{Name: "&laquo;", Active: false, Disabled: false, Url: "?njudge=yes&page=49"},
 				{Name: "1", Active: false, Disabled: false, Url: "?njudge=yes&page=1"},
 				{Name: "...", Active: false, Disabled: true, Url: "#"},
@@ -58,7 +58,7 @@ func TestLinks(t *testing.T) {
 		},
 		{
 			got: removeErr(LinksWithCountLimit(3, 1, 100, qu, 2)),
-			expected: []Link{
+			expected: []PaginationLink{
 				{Name: "&laquo;", Active: false, Disabled: false, Url: "?njudge=yes&page=2"},
 				{Name: "1", Active: false, Disabled: false, Url: "?njudge=yes&page=1"},
 				{Name: "2", Active: false, Disabled: false, Url: "?njudge=yes&page=2"},
@@ -72,7 +72,7 @@ func TestLinks(t *testing.T) {
 		},
 		{
 			got: removeErr(LinksWithCountLimit(3, 1, 100, qu, 1)),
-			expected: []Link{
+			expected: []PaginationLink{
 				{Name: "&laquo;", Active: false, Disabled: false, Url: "?njudge=yes&page=2"},
 				{Name: "1", Active: false, Disabled: false, Url: "?njudge=yes&page=1"},
 				{Name: "2", Active: false, Disabled: false, Url: "?njudge=yes&page=2"},

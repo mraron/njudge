@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/mraron/njudge/internal/web/templates"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"html/template"
 	"math"
@@ -16,10 +17,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/mraron/njudge/internal/njudge"
-	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/helpers/roles"
-	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
 	"github.com/mraron/njudge/pkg/problems"
 	"golang.org/x/text/message"
 )
@@ -52,7 +51,7 @@ func contextFuncs(c echo.Context) template.FuncMap {
 			return &val.Value
 		},
 		"getFlash": func(name string) interface{} {
-			return helpers.GetFlash(c, name)
+			return templates.GetFlash(c, name)
 		},
 		"csrf": func() string {
 			return c.Get(middleware.DefaultCSRFConfig.ContextKey).(string)
@@ -66,7 +65,7 @@ func contextFuncs(c echo.Context) template.FuncMap {
 	}
 }
 
-func statelessFuncs(store problems.Store, users njudge.Users, ps njudge.Problems, tags njudge.Tags, store2 partials.Store) template.FuncMap {
+func statelessFuncs(store problems.Store, users njudge.Users, ps njudge.Problems, tags njudge.Tags, store2 templates.Store) template.FuncMap {
 	return template.FuncMap{
 		"translateContent": i18n.TranslateContent,
 		"problem":          store.GetProblem,

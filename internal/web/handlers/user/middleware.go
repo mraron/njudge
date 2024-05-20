@@ -5,6 +5,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/web/helpers"
+	"github.com/mraron/njudge/internal/web/templates"
 )
 
 func currentUser(c echo.Context, us njudge.Users) (*njudge.User, error) {
@@ -31,7 +32,7 @@ func SetUserMiddleware(us njudge.Users) func(echo.HandlerFunc) echo.HandlerFunc 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			user, err := currentUser(c, us)
-			c.Set("user", user)
+			c.Set(templates.UserContextKey, user)
 
 			if user != nil {
 				c.Set("userID", user.ID)

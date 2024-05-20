@@ -3,13 +3,13 @@ package user
 import (
 	"bytes"
 	"errors"
+	"github.com/mraron/njudge/internal/web/templates"
 	"net/http"
 	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/njudge/email"
-	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/mraron/njudge/internal/web/helpers/config"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 )
@@ -20,10 +20,10 @@ func GetForgottenPassword() echo.HandlerFunc {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		if u := c.Get("user").(*njudge.User); u != nil {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
+			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
-		helpers.DeleteFlash(c, "ForgottenPasswordMessage")
+		templates.DeleteFlash(c, "ForgottenPasswordMessage")
 
 		return c.Render(http.StatusOK, "user/forgotten_password", nil)
 	}
@@ -37,7 +37,7 @@ func PostForgottenPassword(cfg config.Server, users njudge.Users, mailService em
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		if u := c.Get("user").(*njudge.User); u != nil {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
+			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
 		data := request{}
@@ -81,7 +81,7 @@ func PostForgottenPassword(cfg config.Server, users njudge.Users, mailService em
 
 		}
 
-		helpers.SetFlash(c, "ForgottenPasswordMessage", tr.Translate("An email with further instructions was sent to the given address (if it's registered in our system)."))
+		templates.SetFlash(c, "ForgottenPasswordMessage", tr.Translate("An email with further instructions was sent to the given address (if it's registered in our system)."))
 
 		return c.Redirect(http.StatusFound, c.Echo().Reverse("GetForgottenPassword"))
 	}
@@ -97,7 +97,7 @@ func GetForgottenPasswordForm() echo.HandlerFunc {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		if u := c.Get("user").(*njudge.User); u != nil {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
+			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
 		data := request{}
@@ -105,7 +105,7 @@ func GetForgottenPasswordForm() echo.HandlerFunc {
 			return err
 		}
 
-		helpers.DeleteFlash(c, "ForgottenPasswordFormMessage")
+		templates.DeleteFlash(c, "ForgottenPasswordFormMessage")
 
 		return c.Render(http.StatusOK, "user/forgotten_password_form", struct {
 			Name string
@@ -126,7 +126,7 @@ func PostForgottenPasswordForm(users njudge.Users) echo.HandlerFunc {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		if u := c.Get("user").(*njudge.User); u != nil {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
+			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
 		data := request{}
@@ -140,16 +140,16 @@ func PostForgottenPasswordForm(users njudge.Users) echo.HandlerFunc {
 		}
 
 		if u.ForgottenPasswordKey == nil || u.ForgottenPasswordKey.Key != data.Key || !u.ForgottenPasswordKey.IsValid() {
-			helpers.SetFlash(c, "ForgottenPasswordFormMessage", tr.Translate("Invalid key provided."))
+			templates.SetFlash(c, "ForgottenPasswordFormMessage", tr.Translate("Invalid key provided."))
 		} else {
 			if data.Password1 != data.Password2 {
-				helpers.SetFlash(c, "ForgottenPasswordFormMessage", tr.Translate("The two passwords don't match."))
+				templates.SetFlash(c, "ForgottenPasswordFormMessage", tr.Translate("The two passwords don't match."))
 			} else {
 				u.ForgottenPasswordKey = nil
 				u.SetPassword(data.Password1)
 
 				if err := users.Update(c.Request().Context(), u, njudge.Fields(njudge.UserFields.ForgottenPasswordKey, njudge.UserFields.Password)); err == nil {
-					helpers.SetFlash(c, "ForgottenPasswordFormMessage", tr.Translate("Password changed succesfully! You can login with your new password."))
+					templates.SetFlash(c, "ForgottenPasswordFormMessage", tr.Translate("Password changed succesfully! You can login with your new password."))
 				} else {
 					return err
 				}

@@ -1,0 +1,159 @@
+package templates
+
+
+func title(ctx context.Context) string {
+    if s, ok := ctx.Value(TitleContextKey).(string); ok {
+        return s + " :: njudge"
+    }
+    return "njudge"
+}
+
+templ pageHead() {
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" href="/static/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
+    <link rel="manifest" href="/static/site.webmanifest">
+
+    <meta name="title" content={title(ctx)}>
+    <meta name="description" content="">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://njudge.hu/"> <!-- TODO -->
+    <meta property="og:title" content={title(ctx)}>
+    <meta property="og:description" content="">
+    <meta property="og:image" content="/static/apple-touch-icon.png">
+
+    <link rel="stylesheet" href="/static/css/main.min.css">
+    <link rel="stylesheet" href="/static/katex/katex.min.css" defer>
+    <link rel="stylesheet" href="/static/bootstrap-icons/font/bootstrap-icons.min.css">
+    <script src="/static/js/jquery.slim.min.js"></script>
+
+    @templ.Raw(partial(ctx, CustomHeadPartial))
+}
+
+templ navbarItem(href templ.SafeURL, translateKey string) {
+    <li class="nav-item">
+        <a class="nav-link" href={href}>{Tr(ctx, translateKey)}</a>
+    </li>
+}
+
+templ navbarUser() {
+  if user := userContext(ctx); user != nil {
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {user.Name}
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+              <a class="dropdown-item" href={templ.SafeURL("/user/profile/" + user.Name +"/")}>{Tr(ctx, "Profile")}</a>
+              <a class="dropdown-item" href={templ.SafeURL("/user/profile/" + user.Name +"/settings/")}>{Tr(ctx, "Settings")}</a>
+              if user.Role == "admin" {
+                 <a class="dropdown-item" href="/admin">{Tr(ctx, "Admin")}</a>
+              }
+              <a class="dropdown-item" href="/user/logout">{Tr(ctx, "Logout")}</a>
+          </div>
+        </li>
+    }else {
+        @navbarItem("/user/login", "Login")
+        @navbarItem("/user/register", "Register")
+    }
+}
+
+templ pageNavbar() {
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="/">njudge</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarItems" aria-controls="navbarItems" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarItems">
+            <ul class="navbar-nav mr-auto">
+                @navbarItem("/", "Home")
+                @navbarItem("/task_archive", "Archive")
+                @navbarItem("/problemset/status/", "Submissions")
+                @navbarItem("/problemset/main/", "Problems")
+                @templ.Raw(partial(ctx,  CustomMenuPartial))
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                @navbarUser()
+            </ul>
+        </div>
+    </nav>
+}
+
+templ pageFooter() {
+    <footer class="footer">
+        <div class="container">
+
+            <div class="text-muted">
+                <span>njudge<sup>v0</sup></span> {Tr(ctx, "source")}: <a href="https://github.com/mraron/njudge"><i class="bi bi-github"></i> Github</a>
+            </div>
+            <div class="text-muted">
+                {Tr(ctx, "language")}: <a href="?lang=en-US">english</a> <a href="?lang=hu-HU">magyar</a>
+            </div>
+
+        </div>
+    </footer>
+
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/katex/katex.min.js"></script>
+    <script src="/static/katex/contrib/auto-render.min.js"></script>
+    <script src="/static/js/select2.min.js" defer></script>
+
+    <script>
+    renderMathInElement(document.body,{delimiters: [
+        {left: "$", right: "$", display: false},
+        {left: "\\(", right: "\\)", display: false},
+        {left: "$$", right: "$$", display: true}]
+    });
+    </script>
+    @templ.Raw(partial(ctx, CustomFooterPartial))
+}
+
+templ pageTopMessage(x any) {
+    if msg, ok := x.(string); ok {
+        <div class="alert alert-secondary" role="alert">
+            {msg}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+}
+
+templ Page() {
+    <!doctype html>
+    <html lang={Tr(ctx, "en")}>
+    <head>
+        <title>{title(ctx)}</title>
+        @pageHead()
+    </head>
+    <body>
+        @pageNavbar()
+        <div class="container-fluid">
+            <div class="row justify-content-md-center">
+                <div class="col col-xl-9">
+                    <br>
+                    @pageTopMessage(ctx.Value(TopMessageContextKey))
+                    { children... }
+                </div>
+            </div>
+        </div>
+        <br><br><br><br><br>
+        @pageFooter()
+    </body>
+    </html>
+}
+
+templ Home(news string) {
+    @Page() {
+        @templ.Raw(news)
+    }
+}
+
+templ Error(message string) {
+    <div class="alert alert-danger" role="alert">
+        {message}
+    </div>
+}

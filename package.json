@@ -3,8 +3,13 @@
   "version": "0.1.0",
   "author": "Áron Noszály",
   "dependencies": {
+    "@ttskch/select2-bootstrap4-theme": "^1.5.2",
     "bootstrap": "^4.6.0",
-    "ng-admin": "*"
+    "bootstrap-icons": "^1.11.3",
+    "jquery": "^3.7.1",
+    "katex": "^0.16.10",
+    "ng-admin": "*",
+    "select2": "^4.0.13"
   },
   "devDependencies": {
     "gulp": "^4.0.2",

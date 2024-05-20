@@ -1,14 +1,20 @@
-package partials
+package templates
 
 import (
 	"context"
 	"database/sql"
-	"errors"
+	"fmt"
 	"time"
 
 	"github.com/mraron/njudge/internal/njudge/db/models"
 
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
+)
+
+const (
+	CustomHeadPartial   = "custom_head"
+	CustomFooterPartial = "custom_footer"
+	CustomMenuPartial   = "custom_menu"
 )
 
 type Store interface {
@@ -50,5 +56,5 @@ func (pc *Cached) Get(name string) (string, error) {
 type Empty struct{}
 
 func (e Empty) Get(name string) (string, error) {
-	return "", errors.New("unknown")
+	return "", fmt.Errorf("no such partial: %s", name)
 }

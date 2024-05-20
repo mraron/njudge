@@ -1,13 +1,8 @@
 package config
 
 import (
-	"crypto/rsa"
-	"crypto/x509"
 	"database/sql"
-	"encoding/pem"
-	"errors"
 	"fmt"
-	"io/ioutil"
 	"log/slog"
 	"time"
 )
@@ -86,59 +81,4 @@ type Server struct {
 	} `json:"smtp" mapstructure:"smtp"`
 
 	Database `json:"database" mapstructure:"database"`
-
-	Keys Keys
-}
-
-type Keys struct {
-	PrivateKeyLocation string `json:"private_key" mapstructure:"private_key"`
-	PublicKeyLocation  string `json:"public_key" mapstructure:"public_key"`
-	PrivateKey         *rsa.PrivateKey
-	PublicKey          *rsa.PublicKey
-}
-
-func (k *Keys) Parse() error {
-	if k.PrivateKeyLocation != "" {
-		if k.PublicKeyLocation == "" {
-			return errors.New("private key filled, public not")
-		}
-
-		privateKeyContents, err := ioutil.ReadFile(k.PrivateKeyLocation)
-		if err != nil {
-			return err
-		}
-
-		block, _ := pem.Decode(privateKeyContents)
-		if block == nil {
-			return fmt.Errorf("can't parse pem private key file: %s", k.PrivateKeyLocation)
-		}
-
-		var pKey any
-		if pKey, err = x509.ParsePKCS8PrivateKey(block.Bytes); err != nil {
-			return err
-		}
-		k.PrivateKey = pKey.(*rsa.PrivateKey)
-
-		publicKeyContents, err := ioutil.ReadFile(k.PublicKeyLocation)
-		if err != nil {
-			return err
-		}
-
-		block, _ = pem.Decode(publicKeyContents)
-		if block == nil {
-			return fmt.Errorf("can't parse pem public key file: %s", k.PrivateKeyLocation)
-		}
-
-		if k.PublicKey, err = x509.ParsePKCS1PublicKey(block.Bytes); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (k *Keys) MustParse() {
-	if err := k.Parse(); err != nil {
-		panic(err)
-	}
 }

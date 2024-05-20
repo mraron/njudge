@@ -3,11 +3,10 @@ package api
 import (
 	"context"
 	"database/sql"
+	"github.com/mraron/njudge/internal/web/templates"
 	"strconv"
 
 	"github.com/mraron/njudge/internal/njudge/db/models"
-	"github.com/mraron/njudge/internal/web/helpers/pagination"
-
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
@@ -24,7 +23,7 @@ func (ProblemRelDataProvider) Identifier() string {
 	return "id"
 }
 
-func (dp ProblemRelDataProvider) List(data *pagination.Data) ([]*models.ProblemRel, error) {
+func (dp ProblemRelDataProvider) List(data *templates.PaginationData) ([]*models.ProblemRel, error) {
 	qms := make([]QueryMod, 0)
 	if data.SortField != "" {
 		qms = append(qms, OrderBy(data.SortField+" "+data.SortDir))

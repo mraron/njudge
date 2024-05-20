@@ -1,12 +1,17 @@
-package helpers
+package templates
 
 import (
 	"encoding/base64"
 	"encoding/json"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/labstack/echo/v4"
+)
+
+const (
+	TopMessageContextKey = "_top_message"
 )
 
 func SetFlash(c echo.Context, name string, value interface{}) {
@@ -44,10 +49,24 @@ func GetFlash(c echo.Context, name string) interface{} {
 	return res
 }
 
-func ClearTemporaryFlashes() echo.MiddlewareFunc {
+func MoveFlashesToContextMiddleware() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			DeleteFlash(c, "TopMessage")
+			for _, cookie := range c.Cookies() {
+				if strings.HasPrefix(cookie.Name, "flash") {
+					without, _ := strings.CutPrefix(cookie.Name, "flash")
+					c.Set(without, GetFlash(c, without))
+				}
+			}
+			return next(c)
+		}
+	}
+}
+
+func ClearTemporaryFlashesMiddleware() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			DeleteFlash(c, TopMessageContextKey)
 			return next(c)
 		}
 	}

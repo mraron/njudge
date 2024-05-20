@@ -1,6 +1,7 @@
 package web
 
 import (
+	"github.com/mraron/njudge/internal/web/templates"
 	"strings"
 
 	"github.com/labstack/echo/v4/middleware"
@@ -14,7 +15,6 @@ import (
 	"github.com/mraron/njudge/internal/web/handlers/taskarchive"
 	"github.com/mraron/njudge/internal/web/handlers/user"
 	"github.com/mraron/njudge/internal/web/handlers/user/profile"
-	"github.com/mraron/njudge/internal/web/helpers"
 )
 
 func (s *Server) prepareRoutes(e *echo.Echo) {
@@ -27,9 +27,11 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	}))
 	e.Use(i18n.SetTranslatorMiddleware())
 	e.Use(user.SetUserMiddleware(s.Users))
-	e.Use(helpers.ClearTemporaryFlashes())
+	e.Use(templates.MoveFlashesToContextMiddleware())
+	e.Use(templates.ClearTemporaryFlashesMiddleware())
+	e.Use(templates.Middleware(s.Users, s.Problems, s.ProblemStore, s.PartialsStore))
 
-	e.GET("/", handlers.GetHome())
+	e.GET("/", handlers.GetHome(s.PartialsStore))
 	e.GET("/page/:page", handlers.GetPage(s.PartialsStore))
 
 	e.Static("/static", "static")
@@ -39,7 +41,7 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	e.GET("/task_archive", taskarchive.Get(s.Categories, s.ProblemQuery, s.SolvedStatusQuery, s.ProblemStore))
 
 	ps := e.Group("/problemset", problemset.SetNameMiddleware())
-	ps.GET("/:name/", problemset.GetProblemList(s.ProblemStore, s.Problems, s.Categories, s.ProblemListQuery, s.ProblemInfoQuery))
+	ps.GET("/:name/", problemset.GetProblemList(s.ProblemStore, s.Problems, s.Categories, s.ProblemListQuery, s.ProblemInfoQuery, s.Tags))
 	ps.POST("/:name/submit", problemset.PostSubmit(s.SubmitService), user.RequireLoginMiddleware())
 	ps.GET("/status/", problemset.GetStatus(s.SubmissionListQuery)).Name = "getProblemsetStatus"
 
@@ -123,6 +125,6 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 		v1.PUT("/submissions/:id", api.Put[models.Submission](submissionDataProvider))
 		v1.DELETE("/submissions/:id", api.Delete[models.Submission](submissionDataProvider))
 
-		e.GET("/admin", handlers.GetAdmin(s.Server), user.RequireLoginMiddleware())
+		e.GET("/admin", handlers.GetAdmin(), user.RequireLoginMiddleware())
 	}
 }

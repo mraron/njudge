@@ -17,7 +17,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/web/helpers/config"
-	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
 	"github.com/mraron/njudge/pkg/problems"
 )
 
@@ -28,12 +27,12 @@ type Renderer struct {
 	users         njudge.Users
 	problems      njudge.Problems
 	tags          njudge.Tags
-	partialsStore partials.Store
+	partialsStore templates.Store
 
 	sync.RWMutex
 }
 
-func New(cfg config.Server, problemStore problems.Store, users njudge.Users, ps njudge.Problems, tags njudge.Tags, partialsStore partials.Store) *Renderer {
+func New(cfg config.Server, problemStore problems.Store, users njudge.Users, ps njudge.Problems, tags njudge.Tags, partialsStore templates.Store) *Renderer {
 	renderer := &Renderer{
 		templates:     make(map[string]*template.Template),
 		cfg:           cfg,

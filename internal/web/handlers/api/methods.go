@@ -1,13 +1,12 @@
 package api
 
 import (
+	"github.com/mraron/njudge/internal/web/templates"
 	"net/http"
 	"net/url"
 	"strconv"
 
 	"github.com/mraron/njudge/internal/njudge"
-	"github.com/mraron/njudge/internal/web/helpers"
-	"github.com/mraron/njudge/internal/web/helpers/pagination"
 	"github.com/mraron/njudge/internal/web/helpers/roles"
 
 	"github.com/labstack/echo/v4"
@@ -18,7 +17,7 @@ type Provider[T any] interface {
 
 	Identifier() string
 
-	List(*pagination.Data) ([]*T, error)
+	List(*templates.PaginationData) ([]*T, error)
 	Count() (int64, error)
 	Get(string) (*T, error)
 }
@@ -36,10 +35,10 @@ func GetList[T any](dp Provider[T]) echo.HandlerFunc {
 		u := c.Get("user").(*njudge.User)
 
 		if !roles.Can(roles.Role(u.Role), roles.ActionView, roles.Entity(dp.EndpointURL())) {
-			return helpers.UnauthorizedError(c)
+			return c.NoContent(http.StatusUnauthorized)
 		}
 
-		data, err := pagination.Parse(c)
+		data, err := templates.ParsePaginationData(c)
 		if err != nil {
 			return err
 		}
@@ -67,7 +66,7 @@ func Get[T any](dp Provider[T]) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		u := c.Get("user").(*njudge.User)
 		if !roles.Can(roles.Role(u.Role), roles.ActionView, roles.Entity(dp.EndpointURL())) {
-			return helpers.UnauthorizedError(c)
+			return c.NoContent(http.StatusUnauthorized)
 		}
 
 		id, err := url.QueryUnescape(c.Param(dp.Identifier()))
@@ -88,7 +87,7 @@ func Post[T any](dp WritableProvider[T]) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		u := c.Get("user").(*njudge.User)
 		if !roles.Can(roles.Role(u.Role), roles.ActionCreate, roles.Entity(dp.EndpointURL())) {
-			return helpers.UnauthorizedError(c)
+			return c.NoContent(http.StatusUnauthorized)
 		}
 
 		elem := new(T)
@@ -108,7 +107,7 @@ func Put[T any](dp WritableProvider[T]) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		u := c.Get("user").(*njudge.User)
 		if !roles.Can(roles.Role(u.Role), roles.ActionEdit, roles.Entity(dp.EndpointURL())) {
-			return helpers.UnauthorizedError(c)
+			return c.NoContent(http.StatusUnauthorized)
 		}
 
 		id, err := url.QueryUnescape(c.Param(dp.Identifier()))
@@ -136,7 +135,7 @@ func Delete[T any](dp WritableProvider[T]) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		u := c.Get("user").(*njudge.User)
 		if !roles.Can(roles.Role(u.Role), roles.ActionDelete, roles.Entity(dp.EndpointURL())) {
-			return helpers.UnauthorizedError(c)
+			return c.NoContent(http.StatusUnauthorized)
 		}
 
 		id, err := url.QueryUnescape(c.Param(dp.Identifier()))

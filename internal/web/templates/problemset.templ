@@ -1,0 +1,181 @@
+package templates
+
+import "github.com/mraron/njudge/internal/njudge"
+import "github.com/mraron/njudge/pkg/problems"
+
+type CategoryFilterOption struct {
+	Name     string
+	Value    string
+	Selected bool
+}
+
+type ProblemListProblem struct {
+    Name string
+    Titles problems.Contents
+
+    Visible bool
+    UserInfo *njudge.ProblemUserInfo
+
+    ShowTags bool
+    Tags []njudge.Tag
+    SolverCount int
+
+	CategoryLink Link
+}
+
+type ProblemListViewModel struct {
+	Pages        []PaginationLink
+	Problems     []ProblemListProblem
+	SolverSorter SortColumn
+
+	Filtered bool
+
+    Tags []njudge.Tag
+	TitleFilter           string
+	TagsFilter            string
+	CategoryFilterOptions []CategoryFilterOption
+}
+
+templ tagList(tags []njudge.Tag) {
+    for _, tag := range tags {
+        <span class="badge badge-secondary">{tag.Name}</span>&nbsp
+    }
+}
+
+templ solvedStatus(ss njudge.SolvedStatus) {
+    switch ss {
+        case njudge.Solved:
+            <i class="bi bi-check-lg text-success"></i>
+        case njudge.Attempted:
+            <i class="bi bi-x-lg text-danger"></i>
+    }
+}
+
+templ problemListFilter(vm ProblemListViewModel) {
+    <div class="accordion" id="filterAccordion">
+        <div class="card">
+            <div class="card-header" id="filterHeading">
+                <h2 class="mb-0">
+                    <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#filter" aria-expanded="true" aria-controls="filterAccordion">
+                        <i class="bi bi-funnel-fill"></i> {Tr(ctx, "Filter")}
+                    </button>
+                </h2>
+            </div>
+
+            <div id="filter" class={"collapse" + iif(vm.Filtered," show","")} aria-labelledby="filterHeading" data-parent="#filterAccordion">
+                <div class="card-body">
+                <form action="" method="get">
+                    <div class="form-group">
+                        <label for="titleFilter">{Tr(ctx, "Title")}</label>
+                        <input name="title" value={vm.TitleFilter} class="form-control" id="titleFilter">
+                    </div>
+                    <div class="form-group">
+                        <label for="categoryFilter">{Tr(ctx, "Category")}</label>
+                        <select name="category" class="custom-select" id="categoryFilter" class="form-control">
+                        for _, filterOption := range vm.CategoryFilterOptions {
+                            <option value={filterOption.Value} selected?={ filterOption.Selected }>{filterOption.Name}</option>
+                        }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tagsFilter">{Tr(ctx, "Tags")}</label>
+                        <select class="form-control" id="tagsFilter" multiple data-allow-clear="1">
+                            for _, tag := range vm.Tags {
+                                <option value={tag.Name}>{tag.Name}</option>
+                            }
+                        </select>
+                        <input name="tags" value={vm.TagsFilter} class="form-control" id="tagsFilterHidden" type="hidden">
+                    </div>
+                    <button type="submit" class="btn btn-primary">{Tr(ctx, "Filter")}</button>
+                    if vm.Filtered {
+                        <a class="btn btn-danger" href=".">{Tr(ctx,  "Clear")}</a>
+                    }
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            $('#categoryFilter').select2({
+                theme: 'bootstrap4',
+            });
+
+            let previousValues = $('#tagsFilterHidden').val().split(',');
+            console.log(previousValues);
+            $('#tagsFilter').val(previousValues);
+
+            $('#tagsFilter').select2({
+                theme: 'bootstrap4',
+                allowClear: true,
+                closeOnSelect: false,
+                placeholder: ""
+            })
+
+            $('#tagsFilter').on('change', function() {
+                let selectedValues = $(this).val(); // Get selected values as an array
+                let formattedValues = selectedValues.join(','); // Join array elements with a comma
+                $('#tagsFilterHidden').val(formattedValues); // Update hidden input value
+            })
+        });
+    </script>
+}
+
+templ ProblemList(vm ProblemListViewModel) {
+    @Page() {
+        @problemListFilter(vm)
+        <br>
+        @Pagination(vm.Pages)
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col">{Tr(ctx, "Identifier")}</th>
+                        <th scope="col">{Tr(ctx, "Title")}</th>
+                        <th scope="col">{Tr(ctx, "Category")}</th>
+                        <th scope="col">{Tr(ctx, "Tags")}</th>
+                        <th scope="col">
+                            <a href={templ.SafeURL(vm.SolverSorter.Href)}>
+                            switch vm.SolverSorter.Order {
+                                case "":
+                                    <i class="bi bi-dash"></i>
+                                case njudge.SortASC:
+                                    <i class="bi bi-sort-numeric-down"></i>
+                                case njudge.SortDESC:
+                                    <i class="bi bi-sort-numeric-up-alt"></i>
+                            }
+                            {Tr(ctx, "Solvers")}
+                            </a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                for _, p := range vm.Problems {
+                     <tr class={iif(p.Visible, "", "table-warning")}>
+                        <td class="text-center">
+                            if p.UserInfo != nil {
+                                @solvedStatus(p.UserInfo.SolvedStatus)
+                            }
+                        </td>
+                        <td>{p.Name}</td>
+                        <td><a href={templ.SafeURL(p.Name+"/")}>{TrCs(ctx, p.Titles)}</a></td>
+                        <td>
+                            if len(p.CategoryLink.Text) > 0 {
+                                <a href={p.CategoryLink.Href}>{p.CategoryLink.Text}</a>
+                            }
+                        </td>
+                        <td>
+                        if p.ShowTags {
+                            @tagList(p.Tags)
+                        }
+                        </td>
+                        <td><a href={templ.SafeURL(p.Name+"/status?ac=1")}><i class="bi bi-person-fill"></i> {d(p.SolverCount)}</a></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+}

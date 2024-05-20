@@ -3,6 +3,7 @@ package user
 import (
 	"bytes"
 	"errors"
+	"github.com/mraron/njudge/internal/web/templates"
 	"net/http"
 	"unicode"
 
@@ -149,7 +150,7 @@ func GetActivateInfo() echo.HandlerFunc {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		if u := c.Get("user").(*njudge.User); u != nil {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
+			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
 		return c.Render(http.StatusOK, "user/activate.gohtml", nil)
@@ -170,7 +171,7 @@ func Activate(users njudge.Users) echo.HandlerFunc {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		if u := c.Get("user").(*njudge.User); u != nil {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
+			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
 		user, err := users.GetByName(c.Request().Context(), data.Name)

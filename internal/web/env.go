@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/mraron/njudge/internal/njudge/cached"
+	templates2 "github.com/mraron/njudge/internal/web/templates"
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
 	"log"
 	"net/http"
@@ -23,7 +24,6 @@ import (
 	"github.com/mraron/njudge/internal/njudge/email"
 	"github.com/mraron/njudge/internal/njudge/memory"
 	"github.com/mraron/njudge/internal/web/helpers/templates"
-	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/quasoft/memstore"
 	"github.com/volatiletech/sqlboiler/v4/boil"
@@ -34,7 +34,7 @@ func (s *Server) SetupDataAccess() {
 	_ = s.ProblemStore.UpdateProblems()
 
 	if s.Mode == "demo" {
-		s.PartialsStore = partials.Empty{}
+		s.PartialsStore = templates2.Empty{}
 
 		s.Categories = memory.NewCategories()
 		s.Tags = memory.NewTags()
@@ -79,10 +79,11 @@ func (s *Server) SetupDataAccess() {
 		sub.Verdict = njudge.VerdictAC
 		sdata, _ := prob.WithStoredData(s.ProblemStore)
 		ss, _ := sdata.StatusSkeleton("")
+		ss.Compiled = true
 		sub.Status = *ss
 		sub, _ = s.Submissions.Insert(context.Background(), *sub)
 	} else {
-		s.PartialsStore = partials.NewCached(s.DB, 1*time.Minute)
+		s.PartialsStore = templates2.NewCached(s.DB, 1*time.Minute)
 
 		s.Categories = db.NewCategories(s.DB)
 		s.Tags = db.NewTags(s.DB)
@@ -128,7 +129,6 @@ func (s *Server) SetupEnvironment() {
 	}
 
 	s.SetupDataAccess()
-	s.Keys.MustParse()
 
 	if s.SMTP.Enabled {
 		port, err := strconv.Atoi(s.SMTP.MailServerPort)
@@ -228,6 +228,9 @@ func (s *Server) setupEcho() {
 	s.e.Use(middleware.Logger())
 	s.e.Use(middleware.Recover())
 	s.e.Use(session.Middleware(store))
+	s.e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
+		Level: 5,
+	}))
 
 	s.prepareRoutes(s.e)
 

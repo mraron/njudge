@@ -2,13 +2,12 @@ package user
 
 import (
 	"errors"
+	"github.com/mraron/njudge/internal/web/templates"
 	"net/http"
 
 	"github.com/markbates/goth/gothic"
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
-
-	"github.com/mraron/njudge/internal/web/helpers"
 
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
@@ -38,22 +37,22 @@ func loginUserHandler(auth Authenticator) echo.HandlerFunc {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		if u := c.Get("user").(*njudge.User); u != nil {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
+			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
 		user, err := auth(c)
 		if err != nil {
 			if errors.Is(err, ErrorLogin) {
-				helpers.SetFlash(c, "LoginMessage", err.(LoginErrorWithMessage).TranslatedMessage)
+				templates.SetFlash(c, "LoginMessage", err.(LoginErrorWithMessage).TranslatedMessage)
 				return c.Redirect(http.StatusFound, c.Echo().Reverse("getUserLogin"))
 			} else {
 				return err
 			}
 		}
-		defer helpers.DeleteFlash(c, "LoginRedirect")
+		defer templates.DeleteFlash(c, "LoginRedirect")
 
 		if !user.ActivationInfo.Activated {
-			helpers.SetFlash(c, "LoginMessage", tr.Translate("The account is not activated. Check your emails!"))
+			templates.SetFlash(c, "LoginMessage", tr.Translate("The account is not activated. Check your emails!"))
 			return c.Redirect(http.StatusFound, "/user/login")
 		}
 
@@ -64,14 +63,14 @@ func loginUserHandler(auth Authenticator) echo.HandlerFunc {
 			return err
 		}
 
-		c.Set("user", user)
+		c.Set(templates.UserContextKey, user)
 
 		to := "/"
-		if val, ok := helpers.GetFlash(c, "LoginRedirect").(string); ok {
+		if val, ok := templates.GetFlash(c, "LoginRedirect").(string); ok {
 			to = val
 		}
 
-		helpers.SetFlash(c, "TopMessage", tr.Translate("Successful login!"))
+		templates.SetFlash(c, templates.TopMessageContextKey, tr.Translate("Successful login!"))
 		return c.Redirect(http.StatusFound, to)
 	}
 }
@@ -81,7 +80,7 @@ func BeginOAuth() echo.HandlerFunc {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		if u := c.Get("user").(*njudge.User); u != nil {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
+			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
 		gothic.BeginAuthHandler(c.Response(), c.Request())
@@ -94,16 +93,16 @@ func GetLogin() echo.HandlerFunc {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		if u := c.Get("user").(*njudge.User); u != nil {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
+			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
-		helpers.DeleteFlash(c, "LoginMessage")
+		templates.DeleteFlash(c, "LoginMessage")
 
 		to := "/"
 		if val := c.QueryParams().Get("next"); val != "" {
 			to = val
 		}
-		helpers.SetFlash(c, "LoginRedirect", to)
+		templates.SetFlash(c, "LoginRedirect", to)
 
 		return c.Render(http.StatusOK, "user/login", nil)
 	}
