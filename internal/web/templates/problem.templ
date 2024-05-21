@@ -1,0 +1,339 @@
+package templates
+
+import "github.com/mraron/njudge/pkg/language/memory"
+import "github.com/mraron/njudge/pkg/language"
+import "github.com/mraron/njudge/internal/njudge"
+import "time"
+import "github.com/mraron/njudge/pkg/problems"
+
+templ problemMenu(curr string) {
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class={"nav-link"+iif(curr=="problem", " active", "")} href="./problem">{Tr(ctx, "Statement")}</a>
+        </li>
+        <li class="nav-item">
+            <a class={"nav-link"+iif(curr=="submit", " active", "")} href="./submit">{Tr(ctx, "Submit")}</a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class={"nav-link dropdown-toggle"+iif(curr=="status", " active", "")} data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{Tr(ctx, "Submissions")}</a>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="./status">{Tr(ctx, "all")}</a>
+                <a class="dropdown-item" href="./status?ac=1">{Tr(ctx, "accepted")}</a>
+            </div>
+        </li>
+        <li class="nav-item">
+            <a class={"nav-link"+iif(curr=="ranklist", " active", "")} href="./ranklist">{Tr(ctx, "Ranklist")}</a>
+        </li>
+    </ul>
+    <br>
+}
+
+type ProblemViewModel struct {
+    Title string
+    Problemset string
+    Name string
+    DisplayLimits bool
+    TimeLimit int
+    MemoryLimit memory.Amount
+    ShowTags bool
+    CanAddTags bool
+    Tags []njudge.Tag
+    TaskTypeName string
+
+    Languages []language.Language
+    UserInfo *njudge.ProblemUserInfo
+
+    Statements problems.Contents
+
+    TagsToAdd []njudge.Tag
+}
+
+templ tagListProblem(tags []njudge.Tag, add bool) {
+    for _, tag := range tags {
+        <span class="badge badge-secondary">
+            {tag.Name}
+            if add {
+                <a href={templ.SafeURL("delete_tag/"+d(tag.ID))} style="color:#fff;">&times;</a>
+            }
+        </span>
+        &#32;
+    }
+}
+
+templ problemInfoCard(vm ProblemViewModel) {
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-info-circle"></i>
+            {Tr(ctx, "Information")}
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-6">{Tr(ctx, "Identifier")}:</div>
+                <div class="col-6">{vm.Name}</div>
+                <div class="col-6">{Tr(ctx, "Title")}:</div>
+                <div class="col-6">{vm.Title}</div>
+                if vm.DisplayLimits {
+                    <div class="col-6">{Tr(ctx, "Time limit")}:</div>
+                    <div class="col-6">{d(vm.TimeLimit)} ms</div>
+                    <div class="col-6">{Tr(ctx, "Memory limit")}:</div>
+                    <div class="col-6">{memMiB(vm.MemoryLimit)} MiB</div>
+                }
+                if vm.ShowTags {
+                    <div class="col-6">{Tr(ctx, "Tags")}:</div>
+                    <div class="col-6">
+                        @tagListProblem(vm.Tags, vm.CanAddTags)
+                        if vm.CanAddTags {
+                            <span class="badge badge-secondary">
+                                <a href="#" class="text-reset text-decoration-none" data-toggle="modal" data-target="#tagModal">+</a>
+                            </span>
+                        }
+                    </div>
+                }
+                <div class="col-6">{Tr(ctx, "Task type")}:</div>
+                <div class="col-6">{vm.TaskTypeName}</div>
+            </div>
+        </div>
+    </div>
+}
+
+templ toSubmitLoginOrRegister() {
+    Beküldéshez <a href={"/user/login?next="+ctx.Value(URLPathContextKey).(templ.SafeURL)}>lépj be</a>
+    vagy <a href="/user/register">regisztrálj</a>!
+}
+
+templ languageSelect(lastLanguage string, languages []language.Language) {
+    <select name="language" class="custom-select form-control" id="languagesList">
+        for _, l := range languages {
+            <option value={l.ID()} selected?={lastLanguage == l.ID()}>{l.DisplayName()}</option>
+        }
+    </select>
+}
+
+templ problemSubmitCard(vm ProblemViewModel) {
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-send"></i> {Tr(ctx, "Submit solution")}
+        </div>
+        <div class="card-body">
+            if u := userContext(ctx); u != nil {
+                <form action={templ.SafeURL("/problemset/"+vm.Problemset+"/submit")} method="post" enctype="multipart/form-data">
+                <input type="hidden" name="problem" value={vm.Name}>
+                <input type="file" name="source" id="fileInput">
+                <br>
+                @languageSelect(vm.UserInfo.LastLanguage, vm.Languages)
+                <br><br>
+                @CSRFHidden()
+
+                <input type="submit" class="btn btn-primary" value={Tr(ctx, "Submit")}>
+                </form>
+            }else {
+                @toSubmitLoginOrRegister()
+            }
+        </div>
+    </div>
+}
+
+templ problemLastSubmissions(vm ProblemViewModel) {
+    if vm.UserInfo != nil {
+        <div class="card table-responsive">
+            <div class="card-header" style="border-bottom: 0px;">
+                <i class="bi bi-clock-history"></i> {Tr(ctx, "Last submissions")}
+            </div>
+            <table class="card-body table" style="margin: 0px;">
+                for _, s := range vm.UserInfo.Submissions {
+                    <tr>
+                        <td><a href={templ.SafeURL("/submissions/"+d(s.ID))}>{d(s.ID)}</a></td>
+                        <td>{s.Submitted.Local().Format(time.DateTime)}</td>
+                        <td>
+                            @SubmissionStatusText(s)
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    }
+}
+
+//TODO create dropdown, inline html, delete stuff
+templ problemStatement(vm ProblemViewModel) {
+    if htmls := vm.Statements.FilterByType(problems.DataTypeHTML); len(htmls)>0 {
+        @templ.Raw(TrCs(ctx, htmls).String())
+    }else if pdfs := vm.Statements.FilterByType(problems.DataTypePDF); len(pdfs)>0 {
+        <embed src={"pdf/"+TrCs(ctx, pdfs).Locale()+"/"} width="100%" height="800px"/>
+    }
+}
+
+templ problemAddTag(vm ProblemViewModel) {
+    <div class="modal fade" id="tagModal" tabindex="-1" aria-labelledby="tagModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="tagModalLabel">{Tr(ctx, "Add a tag to problem %q", vm.Title)}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form action="tags" method="post" id="addTag">
+            <select class="form-control" name="tagID">
+                for _, tag := range vm.TagsToAdd {
+                    <option value={d(tag.ID)}>{tag.Name}</option>
+                }
+            </select>
+            @CSRFHidden()
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">{Tr(ctx, "Cancel")}</button>
+            <button type="submit" class="btn btn-primary" form="addTag">{Tr(ctx, "Add")}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+}
+
+templ problemPage(name string) {
+    @Page() {
+        @problemMenu(name)
+        { children... }
+    }
+}
+
+templ Problem(vm ProblemViewModel) {
+    @problemPage("problem") {
+        @problemAddTag(vm)
+        <div class="row">
+            <div class="col-12 col-lg-9">
+                @problemStatement(vm)
+            </div>
+            <div class="col-12 col-lg-3">
+                @problemInfoCard(vm)
+                <br>
+                @problemSubmitCard(vm)
+                <br>
+                @problemLastSubmissions(vm)
+            </div>
+        </div>
+    }
+}
+
+type ProblemRanklistRow struct {
+    ID int
+    Name string
+    Score float64
+}
+
+type ProblemRanklistViewModel struct {
+    MaxScore float64
+    Rows []ProblemRanklistRow
+}
+
+templ ProblemRanklist(vm ProblemRanklistViewModel) {
+    @problemPage("ranklist") {
+        <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">{Tr(ctx, "Name")}</th>
+                <th scope="col">{Tr(ctx, "Points")}</th>
+            </tr>
+        </thead>
+        for _, row := range vm.Rows {
+            <tr>
+                <td><a href={templ.SafeURL("/user/profile/"+row.Name)}>{row.Name}</a></td>
+                <td><a href={templ.SafeURL("/submission/"+d(row.ID))}>{f(row.Score)}/{f(vm.MaxScore)}</a></td>
+            </tr>
+        }
+        </table>
+    }
+}
+
+templ ProblemStatus(vm SubmissionsViewModel) {
+    @problemPage("status") {
+        @Submissions(vm)
+    }
+}
+
+type ProblemSubmitViewModel struct {
+    Problemset string
+    Name string
+    Title string
+    UserInfo *njudge.ProblemUserInfo
+    Languages []language.Language
+}
+
+templ ProblemSubmit(vm ProblemSubmitViewModel) {
+    @problemPage("submit") {
+        if vm.UserInfo != nil {
+            <form action={templ.SafeURL("/problemset/"+vm.Problemset+"/submit")} method="post" >
+            <div class="form-group">
+                <label for="problem" class="font-weight-bold">{Tr(ctx, "Problem")}</label>
+                <input type="hidden" name="problem" value={vm.Name}>
+                <div id="problem">{vm.Title}</div>
+            </div>
+            <div class="form-group">
+                <label for="submissionCode" class="font-weight-bolder">{Tr(ctx, "Code")}</label>
+                <textarea class="form-control" id="submissionCode" rows="30" name="submissionCode"></textarea>
+                <div id="editor"></div>
+            </div>
+            <div class="form-group">
+                <label for="languagesList" class="font-weight-bolder">{Tr(ctx, "Language")}</label>
+                @languageSelect(vm.UserInfo.LastLanguage, vm.Languages)
+            </div>
+            @CSRFHidden()
+            <button type="submit" class="btn btn-primary">{Tr(ctx, "Submit")}</button>
+            </form>
+            <style>
+                textarea[name="submissionCode"] {
+                    display: none;
+                }
+                #editor {
+                    width: 100%;
+                    height: 500px;
+                }
+            </style>
+
+            <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.22.0/src-min-noconflict/ace.min.js "></script>
+            <link href="https://cdn.jsdelivr.net/npm/ace-builds@1.22.0/css/ace.min.css " rel="stylesheet">
+            <script>
+                const editor = ace.edit("editor", {
+                    "mode": "ace/mode/c_cpp"
+                });
+                const textarea = document.querySelector('textarea[name="submissionCode"]');
+
+                editor.getSession().setValue(textarea.value);
+                editor.getSession().on('change', function(){
+                    textarea.value = editor.getSession().getValue();
+                });
+
+                const languagesList = document.querySelector('#languagesList');
+                const convertLang = {
+                    "cpp11": "c_cpp",
+                    "cpp14": "c_cpp",
+                    "cpp17": "c_cpp",
+                    "csharp": "csharp",
+                    "golang": "golang",
+                    "java": "java",
+                    "julia": "julia",
+                    "nim": "nim",
+                    "pascal": "pascal",
+                    "pypy3": "python",
+                    "python3": "python"
+                };
+
+                const updateLanguage = function() {
+                    let langCode = "text";
+                    if(languagesList.value in convertLang)
+                        langCode = convertLang[languagesList.value];
+
+                    editor.getSession().setMode({
+                        path: "ace/mode/"+langCode
+                    });
+                }
+                window.onload = updateLanguage;
+                languagesList.onchange = updateLanguage;
+            </script>
+        }else {
+            @toSubmitLoginOrRegister()
+        }
+    }
+}

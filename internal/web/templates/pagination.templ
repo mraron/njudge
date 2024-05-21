@@ -3,7 +3,7 @@ package templates
 templ Pagination(links []PaginationLink) {
     <ul class="pagination">
         for _, link := range links {
-            <li class={"page-item" + iif(link.Disabled, "disabled", "") + iif(link.Active, "active", "")}>
+            <li class={"page-item" + iif(link.Disabled, " disabled", "") + iif(link.Active, " active", "")}>
                 <a class="page-link" href={templ.SafeURL(link.Url)}>
                     @templ.Raw(link.Name)
                 </a>

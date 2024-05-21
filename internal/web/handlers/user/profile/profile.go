@@ -1,8 +1,12 @@
 package profile
 
 import (
+	"crypto/md5"
+	"fmt"
+	"github.com/a-h/templ"
 	"github.com/mraron/njudge/internal/web/templates"
 	"net/http"
+	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -11,7 +15,11 @@ import (
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 )
 
-func GetProfile(sublist njudge.SubmissionListQuery) echo.HandlerFunc {
+func gravatarHash(user njudge.User) string {
+	return fmt.Sprintf("%x", md5.Sum([]byte(strings.ToLower(strings.TrimSpace(user.Email)))))
+}
+
+func GetProfile(sublist njudge.SubmissionListQuery, ps njudge.Problems) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
@@ -27,12 +35,36 @@ func GetProfile(sublist njudge.SubmissionListQuery) echo.HandlerFunc {
 			return err
 		}
 
+		vm := templates.ProfileViewModel{
+			Name:              templ.SafeURL(u.Name),
+			GravatarHash:      gravatarHash(*u),
+			Points:            float64(u.Points),
+			SolvedProblems:    nil,
+			AttemptedProblems: nil,
+		}
+
+		pass := func(from *[]njudge.Submission, to *[]templates.ProfileSubmission) error {
+			for _, sub := range *from {
+				p, err := ps.Get(c.Request().Context(), sub.ProblemID)
+				if err != nil {
+					return err
+				}
+				*to = append(*to, templates.ProfileSubmission{
+					ID:          sub.ID,
+					ProblemName: p.Problem,
+				})
+			}
+			return nil
+		}
+		if err := pass(&solved.Submissions, &vm.SolvedProblems); err != nil {
+			return err
+		}
+		if err := pass(&attempted.Submissions, &vm.AttemptedProblems); err != nil {
+			return err
+		}
+
 		c.Set("title", tr.Translate("%s's profile", u.Name))
-		return c.Render(http.StatusOK, "user/profile/main", struct {
-			User                       *njudge.User
-			SolvedProblems             []njudge.Submission
-			AttemptedNotSolvedProblems []njudge.Submission
-		}{u, solved.Submissions, attempted.Submissions})
+		return templates.Render(c, http.StatusOK, templates.Profile(vm))
 	}
 }
 
@@ -79,10 +111,10 @@ func GetSubmissions(sublist njudge.SubmissionListQuery) echo.HandlerFunc {
 		}
 
 		c.Set("title", tr.Translate("%s's submissions", u.Name))
-		return c.Render(http.StatusOK, "user/profile/submissions", struct {
-			User       *njudge.User
-			StatusPage templates.SubmissionsViewModel
-		}{u, result})
+		return templates.Render(c, http.StatusOK, templates.ProfileSubmissions(templates.ProfileSubmissionsViewModel{
+			Name:                 templ.SafeURL(u.Name),
+			SubmissionsViewModel: result,
+		}))
 	}
 }
 
@@ -90,10 +122,11 @@ func GetSettings() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		u := c.Get("user").(*njudge.User)
 
-		templates.DeleteFlash(c, "ChangePassword")
-		return c.Render(http.StatusOK, "user/profile/settings", struct {
-			User *njudge.User
-		}{u})
+		templates.DeleteFlash(c, templates.ChangePasswordContextKey)
+		return templates.Render(c, http.StatusOK, templates.ProfileSettings(templates.ProfileSettingsViewModel{
+			Name:                templ.SafeURL(u.Name),
+			ShowTagsForUnsolved: u.Settings.ShowUnsolvedTags,
+		}))
 	}
 }
 
@@ -113,17 +146,17 @@ func PostSettingsChangePassword(us njudge.Users) echo.HandlerFunc {
 		}
 
 		if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(data.PasswordOld)); err != nil {
-			templates.SetFlash(c, "ChangePassword", tr.Translate("Wrong old password."))
+			templates.SetFlash(c, templates.ChangePasswordContextKey, tr.Translate("Wrong old password."))
 			return c.Redirect(http.StatusFound, "../")
 		}
 
 		if len(data.PasswordNew1) == 0 {
-			templates.SetFlash(c, "ChangePassword", tr.Translate("It's required to give a new password."))
+			templates.SetFlash(c, templates.ChangePasswordContextKey, tr.Translate("It's required to give a new password."))
 			return c.Redirect(http.StatusFound, "../")
 		}
 
 		if data.PasswordNew1 != data.PasswordNew2 {
-			templates.SetFlash(c, "ChangePassword", tr.Translate("The two given passwords doesn't match."))
+			templates.SetFlash(c, templates.ChangePasswordContextKey, tr.Translate("The two given passwords doesn't match."))
 			return c.Redirect(http.StatusFound, "../")
 		}
 

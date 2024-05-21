@@ -14,8 +14,8 @@ function adminJS() {
 function mainCSS() {
     return src("src/css/*.css").pipe(src('node_modules/bootstrap/dist/css/bootstrap.min.css')).pipe(purgeCSS({
         content: [
-            'internal/web/templates/*.gohtml',
-            'internal/web/templates/**/*.gohtml'
+            'internal/web/templates/*.templ',
+            'internal/web/templates/**/*.templ'
         ],
         safelist: {
             deep: [/^modal/]
@@ -53,7 +53,11 @@ function mainFavicon() {
     return src("src/favicon.ico").pipe(src("src/*.png")).pipe(src("src/site.webmanifest")).pipe(dest("static"))
 }
 
+function popperJS() {
+    return src('node_modules/popper.js/dist/umd/popper.min.js', {sourcemaps: true}).pipe(dest('static/js', {sourcemaps: '.'}))
+}
+
 const admin = parallel(adminCSS, adminJS)
-const main = parallel(mainCSS, mainJS, mainFavicon, bootstrapJS, selectJS, jqueryJS, katex, bootstrapIcons)
+const main = parallel(mainCSS, mainJS, mainFavicon, bootstrapJS, selectJS, jqueryJS, katex, bootstrapIcons, popperJS)
 
 exports.default = parallel(admin, main)

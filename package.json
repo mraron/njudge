@@ -9,6 +9,7 @@
     "jquery": "^3.7.1",
     "katex": "^0.16.10",
     "ng-admin": "*",
+    "popper.js": "^1.16.1",
     "select2": "^4.0.13"
   },
   "devDependencies": {

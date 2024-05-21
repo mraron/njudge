@@ -13,8 +13,12 @@ import (
 )
 
 const (
-	UserContextKey  = "user"
-	TitleContextKey = "_njudge_title"
+	CSRFTokenContextKey = "_csrf"
+	CSRFTokenLookup     = "form:" + CSRFTokenContextKey
+
+	UserContextKey    = "user"
+	URLPathContextKey = "_url_path"
+	TitleContextKey   = "_njudge_title"
 
 	UsersContextKey         = "_njudge_users"
 	ProblemsContextKey      = "_njudge_problems"
@@ -25,6 +29,7 @@ const (
 func Middleware(users njudge.Users, ps njudge.Problems, problemStore problems.Store, partialsStore Store) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
+			c.Set(URLPathContextKey, templ.SafeURL(c.Request().URL.Path))
 			c.Set(UsersContextKey, users)
 			c.Set(ProblemsContextKey, ps)
 			c.Set(ProblemsStoreContextKey, problemStore)
@@ -92,6 +97,10 @@ func memKib(a memory.Amount) string {
 	return d(int(a / memory.KiB))
 }
 
+func memMiB(a memory.Amount) string {
+	return d(int(a / memory.MiB))
+}
+
 func iif[T any](b bool, i, e T) T {
 	if b {
 		return i
@@ -99,9 +108,9 @@ func iif[T any](b bool, i, e T) T {
 	return e
 }
 
-func TrCs(ctx context.Context, cs problems.Contents) string {
+func TrCs(ctx context.Context, cs problems.Contents) problems.LocalizedData {
 	tr := ctx.Value(i18n.TranslatorContextKey).(i18n.Translator)
-	return tr.TranslateContent(cs).String()
+	return tr.TranslateContent(cs)
 }
 
 func Tr(ctx context.Context, key string, args ...any) string {

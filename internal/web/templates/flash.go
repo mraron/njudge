@@ -11,7 +11,12 @@ import (
 )
 
 const (
-	TopMessageContextKey = "_top_message"
+	TopMessageContextKey                 = "_top_message"
+	LoginMessageContextKey               = "_login_message"
+	LoginRedirectContextKey              = "_login_redirect"
+	ForgotPasswordEmailMessageContextKey = "_forgot_password_email_message"
+	ForgotPasswordFormMessageContextKey  = "_forgot_password_form_message"
+	ChangePasswordContextKey             = "_change_password"
 )
 
 func SetFlash(c echo.Context, name string, value interface{}) {

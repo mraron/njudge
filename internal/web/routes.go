@@ -19,7 +19,8 @@ import (
 
 func (s *Server) prepareRoutes(e *echo.Echo) {
 	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
-		TokenLookup: "form:_csrf",
+		ContextKey:  templates.CSRFTokenContextKey,
+		TokenLookup: templates.CSRFTokenLookup,
 		Skipper: func(c echo.Context) bool {
 			return strings.HasPrefix(c.Request().URL.Path, "/api") || strings.HasPrefix(c.Request().URL.Path, "/admin")
 		},
@@ -47,11 +48,11 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 
 	psProb := ps.Group("/:name/:problem", problemset.RenameProblemMiddleware(s.ProblemStore),
 		problemset.SetProblemMiddleware(s.ProblemStore, s.ProblemQuery, s.ProblemInfoQuery), problemset.VisibilityMiddleware())
-	psProb.GET("/", problemset.GetProblem()).Name = "getProblemMain"
-	psProb.GET("/problem", problemset.GetProblem())
+	psProb.GET("/", problemset.GetProblem(s.Tags)).Name = "getProblemMain"
+	psProb.GET("/problem", problemset.GetProblem(s.Tags))
 	psProb.GET("/status", problemset.GetProblemStatus(s.SubmissionListQuery, s.ProblemStore))
 	psProb.GET("/submit", problemset.GetProblemSubmit())
-	psProb.GET("/ranklist", problemset.GetProblemRanklist(s.SubmissionListQuery))
+	psProb.GET("/ranklist", problemset.GetProblemRanklist(s.SubmissionListQuery, s.Users))
 
 	psProb.POST("/tags", problemset.PostProblemTag(s.TagsService))
 	psProb.GET("/delete_tag/:id", problemset.DeleteProblemTag(s.TagsService))
@@ -69,17 +70,16 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	u.POST("/login", user.PostLogin(s.Users))
 	u.GET("/logout", user.Logout())
 	u.GET("/register", user.GetRegister())
-	u.POST("/register", user.Register(s.Server, s.RegisterService, s.MailService))
-	u.GET("/activate", user.GetActivateInfo())
+	u.POST("/register", user.PostRegister(s.Server, s.RegisterService, s.MailService))
 	u.GET("/activate/:name/:key", user.Activate(s.Users))
 
-	u.GET("/forgotten_password", user.GetForgottenPassword()).Name = "GetForgottenPassword"
-	u.POST("/forgotten_password", user.PostForgottenPassword(s.Server, s.Users, s.MailService))
-	u.GET("/forgotten_password_form/:name/:key", user.GetForgottenPasswordForm()).Name = "GetForgottenPasswordForm"
-	u.POST("/forgotten_password_form", user.PostForgottenPasswordForm(s.Users)).Name = "PostForgottenPasswordForm"
+	u.GET("/forgot_password", user.GetForgotPassword()).Name = "GetForgotPassword"
+	u.POST("/forgot_password", user.PostForgotPassword(s.Server, s.Users, s.MailService))
+	u.GET("/forgot_password_form/:name/:key", user.GetForgotPasswordForm()).Name = "GetForgotPasswordForm"
+	u.POST("/forgot_password_form", user.PostForgotPasswordForm(s.Users)).Name = "PostForgoTPasswordForm"
 
 	pr := u.Group("/profile", profile.SetProfileMiddleware(s.Users))
-	pr.GET("/:name/", profile.GetProfile(s.SubmissionListQuery))
+	pr.GET("/:name/", profile.GetProfile(s.SubmissionListQuery, s.Problems))
 	pr.GET("/:name/submissions/", profile.GetSubmissions(s.SubmissionListQuery))
 
 	prs := pr.Group("/:name/settings", user.RequireLoginMiddleware(), profile.PrivateMiddleware())

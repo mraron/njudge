@@ -299,7 +299,7 @@ func userLink(id int) templ.Component {
 func problemTitle(ctx context.Context, id int) string {
 	withStored := problemWithStored(ctx, problem(ctx, id))
 	if withStored != nil {
-		return TrCs(ctx, (*withStored).Titles())
+		return TrCs(ctx, (*withStored).Titles()).String()
 	}
 	return ""
 }
@@ -333,9 +333,9 @@ func problemLink(id int) templ.Component {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var18 string
-				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(TrCs(ctx, (*pp).Titles()))
+				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(TrCs(ctx, (*pp).Titles()).String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 89, Col: 110}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 89, Col: 119}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 				if templ_7745c5c3_Err != nil {

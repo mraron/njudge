@@ -53,7 +53,7 @@ type Problem struct {
 	SolverCount int
 	Visible     bool
 
-	Tags []ProblemTag
+	Tags ProblemTags
 }
 
 func NewProblem(problemset, problem string) Problem {

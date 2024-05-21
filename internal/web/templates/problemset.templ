@@ -30,7 +30,7 @@ type ProblemListViewModel struct {
 
 	Filtered bool
 
-    Tags []njudge.Tag
+    Tags                  []njudge.Tag
 	TitleFilter           string
 	TagsFilter            string
 	CategoryFilterOptions []CategoryFilterOption
@@ -38,7 +38,7 @@ type ProblemListViewModel struct {
 
 templ tagList(tags []njudge.Tag) {
     for _, tag := range tags {
-        <span class="badge badge-secondary">{tag.Name}</span>&nbsp
+        <span class="badge badge-secondary">{tag.Name}</span>&#32;
     }
 }
 
@@ -160,7 +160,7 @@ templ ProblemList(vm ProblemListViewModel) {
                             }
                         </td>
                         <td>{p.Name}</td>
-                        <td><a href={templ.SafeURL(p.Name+"/")}>{TrCs(ctx, p.Titles)}</a></td>
+                        <td><a href={templ.SafeURL(p.Name+"/")}>{TrCs(ctx, p.Titles).String()}</a></td>
                         <td>
                             if len(p.CategoryLink.Text) > 0 {
                                 <a href={p.CategoryLink.Href}>{p.CategoryLink.Text}</a>

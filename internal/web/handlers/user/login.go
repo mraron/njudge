@@ -43,16 +43,16 @@ func loginUserHandler(auth Authenticator) echo.HandlerFunc {
 		user, err := auth(c)
 		if err != nil {
 			if errors.Is(err, ErrorLogin) {
-				templates.SetFlash(c, "LoginMessage", err.(LoginErrorWithMessage).TranslatedMessage)
+				templates.SetFlash(c, templates.LoginMessageContextKey, err.(LoginErrorWithMessage).TranslatedMessage)
 				return c.Redirect(http.StatusFound, c.Echo().Reverse("getUserLogin"))
 			} else {
 				return err
 			}
 		}
-		defer templates.DeleteFlash(c, "LoginRedirect")
+		defer templates.DeleteFlash(c, templates.LoginRedirectContextKey)
 
 		if !user.ActivationInfo.Activated {
-			templates.SetFlash(c, "LoginMessage", tr.Translate("The account is not activated. Check your emails!"))
+			templates.SetFlash(c, templates.LoginMessageContextKey, tr.Translate("The account is not activated. Check your emails!"))
 			return c.Redirect(http.StatusFound, "/user/login")
 		}
 
@@ -66,7 +66,7 @@ func loginUserHandler(auth Authenticator) echo.HandlerFunc {
 		c.Set(templates.UserContextKey, user)
 
 		to := "/"
-		if val, ok := templates.GetFlash(c, "LoginRedirect").(string); ok {
+		if val, ok := templates.GetFlash(c, templates.LoginRedirectContextKey).(string); ok {
 			to = val
 		}
 
@@ -96,28 +96,32 @@ func GetLogin() echo.HandlerFunc {
 			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
-		templates.DeleteFlash(c, "LoginMessage")
+		templates.DeleteFlash(c, templates.LoginMessageContextKey)
 
 		to := "/"
 		if val := c.QueryParams().Get("next"); val != "" {
 			to = val
 		}
-		templates.SetFlash(c, "LoginRedirect", to)
+		templates.SetFlash(c, templates.LoginRedirectContextKey, to)
 
-		return c.Render(http.StatusOK, "user/login", nil)
+		vm := templates.LoginViewModel{
+			GoogleAuthEnabled:  false,
+			ValidationMessages: nil,
+		}
+		return templates.Render(c, http.StatusOK, templates.Login(vm))
 	}
 }
 
-func PostLogin(us njudge.Users) echo.HandlerFunc {
-	type request struct {
-		Name     string `form:"name"`
-		Password string `form:"password"`
-	}
+type PostLoginRequest struct {
+	Name     string `form:"name"`
+	Password string `form:"password"`
+}
 
+func PostLogin(us njudge.Users) echo.HandlerFunc {
 	return loginUserHandler(func(c echo.Context) (*njudge.User, error) {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		data := request{}
+		data := PostLoginRequest{}
 		if err := c.Bind(&data); err != nil {
 			return nil, err
 		}
@@ -158,7 +162,7 @@ func Logout() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 		if u := c.Get("user").(*njudge.User); u == nil {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate("Can't logout if you've not logged in."))
+			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate("Can't logout if you've not logged in.")))
 		}
 
 		storage, _ := session.Get("user", c)

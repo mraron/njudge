@@ -73,7 +73,7 @@ func tagList(tags []njudge.Tag) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span>&nbsp")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span>&#32;")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -541,9 +541,9 @@ func ProblemList(vm ProblemListViewModel) templ.Component {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var31 string
-				templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(TrCs(ctx, p.Titles))
+				templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(TrCs(ctx, p.Titles).String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `problemset.templ`, Line: 163, Col: 84}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `problemset.templ`, Line: 163, Col: 93}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 				if templ_7745c5c3_Err != nil {

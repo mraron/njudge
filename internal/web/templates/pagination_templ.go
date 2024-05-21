@@ -28,7 +28,7 @@ func Pagination(links []PaginationLink) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		for _, link := range links {
-			var templ_7745c5c3_Var2 = []any{"page-item" + iif(link.Disabled, "disabled", "") + iif(link.Active, "active", "")}
+			var templ_7745c5c3_Var2 = []any{"page-item" + iif(link.Disabled, " disabled", "") + iif(link.Active, " active", "")}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

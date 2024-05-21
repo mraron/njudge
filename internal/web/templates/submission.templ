@@ -78,7 +78,7 @@ templ userLink(id int) {
 func problemTitle(ctx context.Context, id int) string {
     withStored := problemWithStored(ctx, problem(ctx, id))
     if withStored != nil {
-        return TrCs(ctx, (*withStored).Titles())
+        return TrCs(ctx, (*withStored).Titles()).String()
     }
     return ""
 }
@@ -86,7 +86,7 @@ func problemTitle(ctx context.Context, id int) string {
 templ problemLink(id int) {
     if p := problem(ctx, id); p != nil {
         if pp := problemWithStored(ctx, p); pp != nil {
-             <a href={templ.SafeURL("/problemset/"+p.Problemset+"/"+p.Problem)+"/"}>{TrCs(ctx, (*pp).Titles())}</a>
+             <a href={templ.SafeURL("/problemset/"+p.Problemset+"/"+p.Problem)+"/"}>{TrCs(ctx, (*pp).Titles()).String()}</a>
         }
     }
 }

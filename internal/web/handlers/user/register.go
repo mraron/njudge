@@ -15,39 +15,37 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type RegistrationPageData struct {
-	ErrorStrings []string
-	Name         string
-	Email        string
-}
-
 func GetRegister() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		if u := c.Get("user").(*njudge.User); u != nil {
-			return c.Render(http.StatusOK, "error", "Már be vagy lépve...")
-		}
-
-		return c.Render(http.StatusOK, "user/register", RegistrationPageData{})
-	}
-}
-
-func Register(cfg config.Server, registerService njudge.RegisterService, mailService email.Service) echo.HandlerFunc {
-	type request struct {
-		Name      string `form:"name"`
-		Email     string `form:"email"`
-		Password  string `form:"password"`
-		Password2 string `form:"password2"`
-	}
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		data := request{}
+		if u := c.Get("user").(*njudge.User); u != nil {
+			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
+		}
+
+		vm := templates.RegisterViewModel{}
+		return templates.Render(c, http.StatusOK, templates.Register(vm))
+	}
+}
+
+type PostRegisterRequest struct {
+	Name      string `form:"name"`
+	Email     string `form:"email"`
+	Password  string `form:"password"`
+	Password2 string `form:"password2"`
+}
+
+func PostRegister(cfg config.Server, registerService njudge.RegisterService, mailService email.Service) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
+
+		data := PostRegisterRequest{}
 		if err := c.Bind(&data); err != nil {
 			return err
 		}
 
 		if u := c.Get("user").(*njudge.User); u != nil {
-			return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
+			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
 		register := func() ([]string, error) {
@@ -132,28 +130,17 @@ func Register(cfg config.Server, registerService njudge.RegisterService, mailSer
 		}
 
 		if errMessages, err := register(); err == nil && len(errMessages) > 0 {
-			return c.Render(http.StatusOK, "user/register", RegistrationPageData{
-				ErrorStrings: errMessages,
-				Name:         data.Name,
-				Email:        data.Email,
-			})
+			vm := templates.RegisterViewModel{
+				ValidationMessages: errMessages,
+				TempName:           data.Name,
+				TempEmail:          data.Email,
+			}
+			return templates.Render(c, http.StatusOK, templates.Register(vm))
 		} else if err != nil {
 			return err
 		}
 
-		return c.Redirect(http.StatusFound, "/user/activate")
-	}
-}
-
-func GetActivateInfo() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
-
-		if u := c.Get("user").(*njudge.User); u != nil {
-			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
-		}
-
-		return c.Render(http.StatusOK, "user/activate.gohtml", nil)
+		return templates.Render(c, http.StatusOK, templates.Info(tr.Translate("Thank you for registering! We've sent you an email with further instructions about finishing your registration.")))
 	}
 }
 
@@ -180,11 +167,11 @@ func Activate(users njudge.Users) echo.HandlerFunc {
 		}
 
 		if user.ActivationInfo.Activated {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate("This account has already been activated."))
+			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate("This account has already been activated.")))
 		}
 
 		if user.ActivationInfo.Key != data.Key {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate("Wrong activation key. Are you sure you've clicked on the right link?"))
+			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate("Wrong activation key. Are you sure you've clicked on the right link?")))
 		}
 
 		user.Activate()
@@ -192,6 +179,6 @@ func Activate(users njudge.Users) echo.HandlerFunc {
 			return err
 		}
 
-		return c.Render(http.StatusOK, "message.gohtml", tr.Translate("Successful activation. You can login now!"))
+		return templates.Render(c, http.StatusOK, templates.Error(tr.Translate("Successful activation. You can login now!")))
 	}
 }

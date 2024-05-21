@@ -3,11 +3,14 @@ package web
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/mraron/njudge/internal/njudge/cached"
 	templates2 "github.com/mraron/njudge/internal/web/templates"
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
+	slogecho "github.com/samber/slog-echo"
 	"log"
+	"log/slog"
 	"net/http"
 	"strconv"
 	"time"
@@ -194,14 +197,12 @@ func (s *Server) setupEcho() {
 	} else {
 		s.e.HTTPErrorHandler = func(err error, c echo.Context) {
 			code := http.StatusInternalServerError
-			if he, ok := err.(*echo.HTTPError); ok {
+			var he *echo.HTTPError
+			if errors.As(err, &he) {
 				code = he.Code
 			}
 
-			if err := c.Render(code, "error.gohtml", "Hiba történt"); err != nil {
-				c.Logger().Error(err)
-			}
-
+			templates2.Render(c, code, templates2.Error("Hiba történt."))
 			c.Logger().Error(err)
 		}
 	}
@@ -225,7 +226,7 @@ func (s *Server) setupEcho() {
 		)
 	}
 
-	s.e.Use(middleware.Logger())
+	s.e.Use(slogecho.New(slog.Default()))
 	s.e.Use(middleware.Recover())
 	s.e.Use(session.Middleware(store))
 	s.e.Use(middleware.GzipWithConfig(middleware.GzipConfig{

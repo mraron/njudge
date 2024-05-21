@@ -14,7 +14,7 @@ import (
 	"github.com/mraron/njudge/internal/web/helpers/i18n"
 )
 
-func GetForgottenPassword() echo.HandlerFunc {
+func GetForgotPassword() echo.HandlerFunc {
 	return func(c echo.Context) error {
 
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
@@ -23,13 +23,13 @@ func GetForgottenPassword() echo.HandlerFunc {
 			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
-		templates.DeleteFlash(c, "ForgottenPasswordMessage")
+		templates.DeleteFlash(c, templates.ForgotPasswordEmailMessageContextKey)
 
-		return c.Render(http.StatusOK, "user/forgotten_password", nil)
+		return templates.Render(c, http.StatusOK, templates.ForgotPasswordEmail())
 	}
 }
 
-func PostForgottenPassword(cfg config.Server, users njudge.Users, mailService email.Service) echo.HandlerFunc {
+func PostForgotPassword(cfg config.Server, users njudge.Users, mailService email.Service) echo.HandlerFunc {
 	type request struct {
 		Email string `form:"email"`
 	}
@@ -81,18 +81,18 @@ func PostForgottenPassword(cfg config.Server, users njudge.Users, mailService em
 
 		}
 
-		templates.SetFlash(c, "ForgottenPasswordMessage", tr.Translate("An email with further instructions was sent to the given address (if it's registered in our system)."))
+		templates.SetFlash(c, templates.ForgotPasswordEmailMessageContextKey, tr.Translate("An email with further instructions was sent to the given address (if it's registered in our system)."))
 
-		return c.Redirect(http.StatusFound, c.Echo().Reverse("GetForgottenPassword"))
+		return c.Redirect(http.StatusFound, c.Echo().Reverse("GetForgotPassword"))
 	}
 }
 
-func GetForgottenPasswordForm() echo.HandlerFunc {
-	type request struct {
-		Name string `param:"name"`
-		Key  string `param:"key"`
-	}
+type GetForgotPasswordFormRequest struct {
+	Name string `param:"name"`
+	Key  string `param:"key"`
+}
 
+func GetForgotPasswordForm() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
@@ -100,28 +100,30 @@ func GetForgottenPasswordForm() echo.HandlerFunc {
 			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
-		data := request{}
+		data := GetForgotPasswordFormRequest{}
 		if err := c.Bind(&data); err != nil {
 			return err
 		}
 
-		templates.DeleteFlash(c, "ForgottenPasswordFormMessage")
+		templates.DeleteFlash(c, templates.ForgotPasswordFormMessageContextKey)
 
-		return c.Render(http.StatusOK, "user/forgotten_password_form", struct {
-			Name string
-			Key  string
-		}{data.Name, data.Key})
+		vm := templates.ForgotPasswordFormViewModel{
+			Name: data.Name,
+			Key:  data.Key,
+		}
+		return templates.Render(c, http.StatusOK, templates.ForgotPasswordForm(vm))
 	}
 }
 
-func PostForgottenPasswordForm(users njudge.Users) echo.HandlerFunc {
-	type request struct {
-		Password1 string `form:"password1"`
-		Password2 string `form:"password1"`
+type PostForgotPasswordFormRequest struct {
+	Password1 string `form:"password1"`
+	Password2 string `form:"password1"`
 
-		Name string `form:"name"`
-		Key  string `form:"key"`
-	}
+	Name string `form:"name"`
+	Key  string `form:"key"`
+}
+
+func PostForgotPasswordForm(users njudge.Users) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
@@ -129,7 +131,7 @@ func PostForgottenPasswordForm(users njudge.Users) echo.HandlerFunc {
 			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
-		data := request{}
+		data := PostForgotPasswordFormRequest{}
 		if err := c.Bind(&data); err != nil {
 			return err
 		}
@@ -140,22 +142,22 @@ func PostForgottenPasswordForm(users njudge.Users) echo.HandlerFunc {
 		}
 
 		if u.ForgottenPasswordKey == nil || u.ForgottenPasswordKey.Key != data.Key || !u.ForgottenPasswordKey.IsValid() {
-			templates.SetFlash(c, "ForgottenPasswordFormMessage", tr.Translate("Invalid key provided."))
+			templates.SetFlash(c, templates.ForgotPasswordFormMessageContextKey, tr.Translate("Invalid key provided."))
 		} else {
 			if data.Password1 != data.Password2 {
-				templates.SetFlash(c, "ForgottenPasswordFormMessage", tr.Translate("The two passwords don't match."))
+				templates.SetFlash(c, templates.ForgotPasswordFormMessageContextKey, tr.Translate("The two passwords don't match."))
 			} else {
 				u.ForgottenPasswordKey = nil
 				u.SetPassword(data.Password1)
 
 				if err := users.Update(c.Request().Context(), u, njudge.Fields(njudge.UserFields.ForgottenPasswordKey, njudge.UserFields.Password)); err == nil {
-					templates.SetFlash(c, "ForgottenPasswordFormMessage", tr.Translate("Password changed succesfully! You can login with your new password."))
+					templates.SetFlash(c, templates.ForgotPasswordFormMessageContextKey, tr.Translate("Password changed succesfully! You can login with your new password."))
 				} else {
 					return err
 				}
 			}
 		}
 
-		return c.Redirect(http.StatusFound, c.Echo().Reverse("GetForgottenPasswordForm", data.Name, data.Key))
+		return c.Redirect(http.StatusFound, c.Echo().Reverse("GetForgotPasswordForm", data.Name, data.Key))
 	}
 }

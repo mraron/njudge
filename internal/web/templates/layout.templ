@@ -96,6 +96,7 @@ templ pageFooter() {
         </div>
     </footer>
 
+    <script src="/static/js/popper.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
     <script src="/static/katex/katex.min.js"></script>
     <script src="/static/katex/contrib/auto-render.min.js"></script>
@@ -153,7 +154,27 @@ templ Home(news string) {
 }
 
 templ Error(message string) {
-    <div class="alert alert-danger" role="alert">
-        {message}
-    </div>
+    @Page() {
+        <div class="alert alert-danger" role="alert">
+            {message}
+        </div>
+    }
+}
+
+templ Info(message string) {
+    @Page() {
+        <div class="alert alert-info" role="alert">
+            {message}
+        </div>
+    }
+}
+
+templ CSRFHidden() {
+    <input type="hidden" name={CSRFTokenContextKey} value={ctx.Value(CSRFTokenContextKey).(string)}>
+}
+
+templ PageWithContent(content string) {
+    @Page() {
+        @templ.Raw(content)
+    }
 }

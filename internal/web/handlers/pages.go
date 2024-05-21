@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"github.com/mraron/njudge/internal/web/templates"
-	"html/template"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -36,8 +35,6 @@ func GetPage(store templates.Store) echo.HandlerFunc {
 			return err
 		}
 
-		return c.Render(http.StatusOK, "page.gohtml", struct {
-			Contents template.HTML
-		}{template.HTML(contents)})
+		return templates.Render(c, http.StatusOK, templates.PageWithContent(contents))
 	}
 }

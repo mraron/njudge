@@ -86,7 +86,7 @@ func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categori
 		}
 
 		u := *c.Request().URL
-		links, err := templates.Links(problemList.PaginationData.Page, problemList.PaginationData.PerPage, int64(problemList.PaginationData.Count), u.Query())
+		links, err := templates.LinksWithCountLimit(problemList.PaginationData.Page, problemList.PaginationData.PerPage, int64(problemList.PaginationData.Count), u.Query(), 10)
 		if err != nil {
 			return err
 		}
@@ -146,12 +146,8 @@ func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categori
 				Visible:     p.Visible,
 				UserInfo:    info.UserInfo,
 				ShowTags:    true,
-				Tags:        nil,
+				Tags:        p.Tags.ToTags(),
 				SolverCount: p.SolverCount,
-			}
-
-			for _, tag := range p.Tags {
-				curr.Tags = append(curr.Tags, tag.Tag)
 			}
 
 			if u := c.Get(templates.UserContextKey).(*njudge.User); u != nil {

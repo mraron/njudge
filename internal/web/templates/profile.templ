@@ -1,0 +1,147 @@
+package templates
+
+import "math"
+
+templ profileMenu(page string, userName templ.SafeURL) {
+    <ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class={"nav-link" + iif(page=="profile", " active", "")} href={"/user/profile/"+userName+"/"}>{string(userName)}</a>
+    </li>
+    <li class="nav-item">
+        <a class={"nav-link" + iif(page=="submissions", " active", "")} href={"/user/profile/"+userName+"/submissions/"}>{Tr(ctx, "Submissions")}</a>
+    </li>
+    if u := userContext(ctx); u != nil && u.Name == string(userName) {
+        <li class="nav-item ml-auto">
+            <a class={"nav-link" + iif(page=="settings", " active", "")}  href={"/user/profile/"+userName+"/settings/"}>{Tr(ctx, "Settings")}</a>
+        </li>
+    }
+    </ul>
+    <br>
+}
+
+type ProfileSubmission struct {
+    ID int
+    ProblemName string
+}
+
+type ProfileViewModel struct {
+    Name templ.SafeURL
+    GravatarHash string
+    Points float64
+    SolvedProblems             []ProfileSubmission
+    AttemptedProblems          []ProfileSubmission
+}
+
+templ profileSubmissionList(subs []ProfileSubmission) {
+    for _, sub := range subs {
+        <a href={templ.SafeURL("/submission/"+d(sub.ID))}>
+            {sub.ProblemName}
+        </a>&#32;
+    }
+}
+
+templ Profile(vm ProfileViewModel) {
+    @Page() {
+        @profileMenu("profile", vm.Name)
+        <div class="container p-0 m-0">
+            <div class="row">
+                <div class="col-md-auto col-12">
+                    <img src={"https://www.gravatar.com/avatar/"+vm.GravatarHash+"?d=identicon&s=128"} width="96px" height="96px" alt=""><br>
+                    <br>
+                    <b>{Tr(ctx, "Points")}</b>: {f(math.Round(vm.Points*100)/100)}
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="bi bi-check-lg"></i>
+                            {Tr(ctx, "Solved problems")} ({d(len(vm.SolvedProblems))})
+                        </div>
+                        <div class="card-body">
+                            @profileSubmissionList(vm.SolvedProblems)
+                        </div>
+                    </div>
+                    <br>
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="bi bi-x-lg"></i>
+                            {Tr(ctx, "Attempted problems")} ({d(len(vm.AttemptedProblems))})
+                        </div>
+                        <div class="card-body">
+                            @profileSubmissionList(vm.AttemptedProblems)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+type ProfileSubmissionsViewModel struct {
+    Name templ.SafeURL
+    SubmissionsViewModel SubmissionsViewModel
+}
+
+templ ProfileSubmissions(vm ProfileSubmissionsViewModel) {
+    @Page() {
+        @profileMenu("submissions", vm.Name)
+        @Submissions(vm.SubmissionsViewModel)
+    }
+}
+
+templ profileSettingsChangePasswordForm() {
+    if msg, ok := ctx.Value(ChangePasswordContextKey).(string); ok {
+        <div class="alert alert-danger" role="alert">
+            {msg}
+        </div>
+    }
+
+    <form action="change_password/" method="post">
+        <div class="form-group">
+            <label for="passwordOld">{Tr(ctx, "Old password")}</label>
+            <input type="password" class="form-control" id="passwordOld" name="passwordOld">
+        </div>
+        <div class="form-group">
+            <label for="passwordNew1">{Tr(ctx, "New password")}</label>
+            <input type="password" class="form-control" id="passwordNew1" name="passwordNew1">
+        </div>
+        <div class="form-group">
+            <label for="passwordNew2">{Tr(ctx, "New password again")}</label>
+            <input type="password" class="form-control" id="passwordNew2" name="passwordNew2">
+        </div>
+        @CSRFHidden()
+        <button type="submit" class="btn btn-primary">{Tr(ctx, "Change")}</button>
+    </form>
+}
+
+templ profileSettingsMiscForm(showTagsForUnsolved bool) {
+    <form action="misc/" method="post">
+        <div class="form-group">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="true" id="showTagsForUnsolved" name="showTagsForUnsolved" checked?={showTagsForUnsolved}>
+                <label class="form-check-label" for="showTagsForUnsolved">
+                    {Tr(ctx, "Show tags for unsolved problems")}
+                </label>
+
+            </div>
+        </div>
+        @CSRFHidden()
+        <button type="submit" class="btn btn-primary">{Tr(ctx, "Save")}</button>
+    </form>
+}
+
+type ProfileSettingsViewModel struct {
+    Name templ.SafeURL
+    ShowTagsForUnsolved bool
+}
+
+templ ProfileSettings(vm ProfileSettingsViewModel) {
+    @Page() {
+        @profileMenu("settings", vm.Name)
+
+        <h3>Beállítások</h3>
+        <h4>Jelszó változtatás</h4>
+        @profileSettingsChangePasswordForm()
+        <h4>Egyéb</h4>
+        @profileSettingsMiscForm(vm.ShowTagsForUnsolved)
+    }
+}
