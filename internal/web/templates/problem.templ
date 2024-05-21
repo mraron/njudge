@@ -142,7 +142,7 @@ templ problemLastSubmissions(vm ProblemViewModel) {
             <table class="card-body table" style="margin: 0px;">
                 for _, s := range vm.UserInfo.Submissions {
                     <tr>
-                        <td><a href={templ.SafeURL("/submissions/"+d(s.ID))}>{d(s.ID)}</a></td>
+                        <td><a href={templ.SafeURL("/submission/"+d(s.ID))}>{d(s.ID)}</a></td>
                         <td>{s.Submitted.Local().Format(time.DateTime)}</td>
                         <td>
                             @SubmissionStatusText(s)

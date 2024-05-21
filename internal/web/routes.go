@@ -2,6 +2,7 @@ package web
 
 import (
 	"github.com/mraron/njudge/internal/web/templates"
+	"net/http"
 	"strings"
 
 	"github.com/labstack/echo/v4/middleware"
@@ -34,6 +35,34 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 
 	e.GET("/", handlers.GetHome(s.PartialsStore))
 	e.GET("/page/:page", handlers.GetPage(s.PartialsStore))
+	e.GET("/submissionRowUpdate/:id", func(c echo.Context) error {
+		type request struct {
+			ID int `param:"id"`
+		}
+		data := &request{}
+		if err := c.Bind(data); err != nil {
+			return err
+		}
+		sub, err := s.Submissions.Get(c.Request().Context(), data.ID)
+		if err != nil {
+			return err
+		}
+		return templates.Render(c, http.StatusOK, templates.SubmissionRowUpdate(*sub))
+	})
+	e.GET("/submissionFeedbackUpdate/:id", func(c echo.Context) error {
+		type request struct {
+			ID int `param:"id"`
+		}
+		data := &request{}
+		if err := c.Bind(data); err != nil {
+			return err
+		}
+		sub, err := s.Submissions.Get(c.Request().Context(), data.ID)
+		if err != nil {
+			return err
+		}
+		return templates.Render(c, http.StatusOK, templates.SubmissionFeedbackUpdate(*sub))
+	})
 
 	e.Static("/static", "static")
 

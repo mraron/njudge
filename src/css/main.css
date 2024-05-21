@@ -19,3 +19,19 @@ body {
     position: relative;
     top: 15px;
 }
+
+.ball {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    margin-right: 5px;
+    background-color: #5a6268;
+    border-radius: 50%;
+    animation: bounce 0.6s infinite alternate;
+}
+
+@keyframes bounce {
+    from {
+        transform: translateY(-16px);
+    }
+}

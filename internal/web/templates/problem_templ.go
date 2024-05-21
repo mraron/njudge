@@ -736,7 +736,7 @@ func problemLastSubmissions(vm ProblemViewModel) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var44 templ.SafeURL = templ.SafeURL("/submissions/" + d(s.ID))
+				var templ_7745c5c3_Var44 templ.SafeURL = templ.SafeURL("/submission/" + d(s.ID))
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var44)))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -748,7 +748,7 @@ func problemLastSubmissions(vm ProblemViewModel) templ.Component {
 				var templ_7745c5c3_Var45 string
 				templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinStringErrs(d(s.ID))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `problem.templ`, Line: 145, Col: 85}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `problem.templ`, Line: 145, Col: 84}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var45))
 				if templ_7745c5c3_Err != nil {

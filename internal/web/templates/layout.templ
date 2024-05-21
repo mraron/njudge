@@ -30,7 +30,10 @@ templ pageHead() {
     <link rel="stylesheet" href="/static/katex/katex.min.css" defer>
     <link rel="stylesheet" href="/static/bootstrap-icons/font/bootstrap-icons.min.css">
     <script src="/static/js/jquery.slim.min.js"></script>
-
+    <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
+    <script>
+        htmx.config.useTemplateFragments=true;
+    </script>
     @templ.Raw(partial(ctx, CustomHeadPartial))
 }
 
