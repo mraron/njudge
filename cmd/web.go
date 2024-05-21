@@ -4,8 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"io/ioutil"
+	"github.com/mraron/njudge/internal/njudge"
 	"log"
+	"os"
 
 	"github.com/mraron/njudge/internal/njudge/db/models"
 	"github.com/mraron/njudge/internal/web"
@@ -64,7 +65,7 @@ var SubmitCmd = &cobra.Command{
 		}
 
 		s := web.Server{Server: cfg}
-		src, err := ioutil.ReadFile(SubmitCmdArgs.File)
+		src, err := os.ReadFile(SubmitCmdArgs.File)
 		if err != nil {
 			return err
 		}
@@ -74,12 +75,18 @@ var SubmitCmd = &cobra.Command{
 			return err
 		}
 
-		id, err := s.Submit(SubmitCmdArgs.User, SubmitCmdArgs.Problemset, SubmitCmdArgs.Problem, SubmitCmdArgs.Language, src)
+		sub, err := s.SubmitService.Submit(cmd.Context(), njudge.SubmitRequest{
+			UserID:     SubmitCmdArgs.User,
+			Problemset: SubmitCmdArgs.Problem,
+			Problem:    SubmitCmdArgs.Problem,
+			Language:   SubmitCmdArgs.Language,
+			Source:     src,
+		})
 		if err != nil {
 			return err
 		}
 
-		log.Print("submission received with id ", id)
+		log.Print("submission received with id ", sub.ID)
 		return nil
 	},
 }
