@@ -42,7 +42,7 @@ var SubmissionFields = struct {
 	Score:     "score",
 }
 
-var SubmissionRejudgeFields = []string{SubmissionFields.Judged, SubmissionFields.Started, SubmissionFields.Status}
+var SubmissionRejudgeFields = []string{SubmissionFields.Judged, SubmissionFields.Started, SubmissionFields.Status, SubmissionFields.Verdict}
 
 type Submission struct {
 	ID int
@@ -91,6 +91,7 @@ func (s *Submission) MarkForRejudge() {
 	s.Judged.Valid = false
 	s.Started = false
 	s.Status = problems.Status{}
+	s.Verdict = VerdictUP
 }
 
 func (s *Submission) GetUser(ctx context.Context, us Users) (*User, error) {

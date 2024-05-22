@@ -45,11 +45,12 @@ templ SubmissionStatusText(s njudge.Submission) {
         }
     }else {
         if s.Verdict == njudge.VerdictUP {
+            <div class="ball"></div>
             <span class="text-muted">{Tr(ctx, "Uploaded")}</span>
         }else if s.Verdict == njudge.VerdictXX {
             <span class="text-danger">{Tr(ctx, "Internal error")}</span>
         }else {
-            <div class="ball"></div>
+            <div class="ball ball-animated"></div>
             <span class="text-info">
                 {Tr(ctx, "Running")}
                 if s.Ontest.Valid && s.Status.FeedbackType == problems.FeedbackCF {
