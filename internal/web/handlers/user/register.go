@@ -4,16 +4,14 @@ import (
 	"bytes"
 	"errors"
 	"github.com/mraron/njudge/internal/web/templates"
+	"github.com/mraron/njudge/internal/web/templates/i18n"
 	"github.com/mraron/njudge/internal/web/templates/mail"
 	"net/http"
 	"unicode"
 
+	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/njudge/email"
-	"github.com/mraron/njudge/internal/web/helpers/config"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
-
-	"github.com/labstack/echo/v4"
 )
 
 func GetRegister() echo.HandlerFunc {
@@ -36,7 +34,7 @@ type PostRegisterRequest struct {
 	Password2 string `form:"password2"`
 }
 
-func PostRegister(cfg config.Server, registerService njudge.RegisterService, mailService email.Service) echo.HandlerFunc {
+func PostRegister(url string, registerService njudge.RegisterService, mailService email.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
@@ -111,7 +109,7 @@ func PostRegister(cfg config.Server, registerService njudge.RegisterService, mai
 			message := &bytes.Buffer{}
 			vm := mail.ActivationViewModel{
 				Name:          c.FormValue("name"),
-				URL:           cfg.Url,
+				URL:           url,
 				ActivationKey: u.ActivationInfo.Key,
 			}
 			if err = vm.Execute(message); err != nil {

@@ -1,22 +1,11 @@
 package cmd
 
 import (
-	"log"
-	"os"
-
-	"github.com/golang-migrate/migrate/v4/source/iofs"
-	"github.com/mraron/njudge/internal/njudge/db/migrations"
-	"github.com/mraron/njudge/internal/web"
-	"github.com/mraron/njudge/internal/web/helpers/config"
-
-	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
+/*
 type migrateLogger struct {
 	*log.Logger
 	verbose bool
@@ -35,14 +24,14 @@ var MigrateCmdArgs struct {
 var MigrateCmd = &cobra.Command{
 	Use: "migrate",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cfg := config.Server{}
+		cfg := web.Config{}
 
 		err := viper.Unmarshal(&cfg)
 		if err != nil {
 			return err
 		}
 
-		server := web.Server{Server: cfg}
+		server := web.Server{Config: cfg}
 		server.ConnectToDB()
 		driver, err := postgres.WithInstance(server.DB, &postgres.Config{})
 		if err != nil {
@@ -89,3 +78,4 @@ func init() {
 
 	WebCmd.AddCommand(MigrateCmd)
 }
+*/

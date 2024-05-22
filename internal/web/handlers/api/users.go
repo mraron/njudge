@@ -7,7 +7,6 @@ import (
 	"strconv"
 
 	"github.com/mraron/njudge/internal/njudge/db/models"
-	"github.com/mraron/njudge/internal/web/helpers"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
@@ -41,7 +40,7 @@ func (dp UserDataProvider) List(data *templates.PaginationData) ([]*models.User,
 	}
 
 	for i := 0; i < len(res); i++ {
-		helpers.CensorUserPassword(res[i])
+		res[i].Password = "***CENSORED***"
 	}
 
 	return res, nil
@@ -57,7 +56,7 @@ func (dp UserDataProvider) Get(id string) (*models.User, error) {
 		return nil, err
 	}
 
-	helpers.CensorUserPassword(elem)
+	elem.Password = "***CENSORED***"
 	return elem, nil
 }
 

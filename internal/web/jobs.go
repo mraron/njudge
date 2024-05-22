@@ -15,18 +15,14 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
-func (s *Server) StartBackgroundJobs() {
-	go s.runUpdateProblems()
-	//Just a temporary solution
-	if s.DB != nil {
-		go s.runStatisticsUpdate()
-	}
+func (s *Server) StartBackgroundJobs(ctx context.Context) {
+	go s.runUpdateProblems(ctx)
 }
 
-func (s *Server) runUpdateProblems() {
+func (s *Server) runUpdateProblems(ctx context.Context) {
 	for {
 		if err := s.ProblemStore.UpdateProblems(); err != nil {
-			log.Print(err)
+			s.Logger.ErrorContext(ctx, "error updating problems", err)
 		}
 
 		time.Sleep(20 * time.Second)

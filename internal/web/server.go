@@ -2,16 +2,9 @@ package web
 
 import (
 	"database/sql"
-	"github.com/mraron/njudge/internal/web/templates"
-	_ "mime"
-
-	"github.com/mraron/njudge/internal/njudge"
-	"github.com/mraron/njudge/internal/njudge/email"
-
+	"errors"
 	"github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
-	"github.com/mraron/njudge/internal/web/helpers/config"
-	"github.com/mraron/njudge/pkg/problems"
 	_ "github.com/mraron/njudge/pkg/problems/config/feladat_txt"
 	_ "github.com/mraron/njudge/pkg/problems/config/polygon"
 	_ "github.com/mraron/njudge/pkg/problems/config/problem_yaml"
@@ -20,42 +13,47 @@ import (
 	_ "github.com/mraron/njudge/pkg/problems/evaluation/communication"
 	_ "github.com/mraron/njudge/pkg/problems/evaluation/output_only"
 	_ "github.com/mraron/njudge/pkg/problems/evaluation/stub"
+	"golang.org/x/net/context"
+	"log/slog"
+	_ "mime"
+	"net"
+	"net/http"
 )
 
 type Server struct {
-	config.Server
+	Logger *slog.Logger
+	Config
+	DataAccess
 	DB *sql.DB
-
-	ProblemStore  problems.Store
-	MailService   email.Service
-	PartialsStore templates.Store
-
-	Categories          njudge.Categories
-	Tags                njudge.Tags
-	Problems            njudge.Problems
-	Users               njudge.Users
-	Submissions         njudge.Submissions
-	SolvedStatusQuery   njudge.SolvedStatusQuery
-	ProblemInfoQuery    njudge.ProblemInfoQuery
-	ProblemQuery        njudge.ProblemQuery
-	ProblemListQuery    njudge.ProblemListQuery
-	SubmissionListQuery njudge.SubmissionListQuery
-
-	RegisterService    njudge.RegisterService
-	SubmitService      njudge.SubmitService
-	TagsService        njudge.TagsService
-	TaskArchiveService njudge.TaskArchiveService
-
-	e *echo.Echo
 }
 
-func (s *Server) Run() {
-	s.e = echo.New()
+func NewServer(logger *slog.Logger, cfg Config, dataAccess DataAccess, db *sql.DB) (*Server, error) {
+	res := Server{
+		Logger:     logger,
+		Config:     cfg,
+		DataAccess: dataAccess,
+		DB:         db,
+	}
+	if cfg.Mode.UsesDB() && db == nil {
+		return nil, errors.New("db connection is required")
+	}
+	return &res, nil
+}
 
-	s.SetupEnvironment()
-	s.StartBackgroundJobs()
+func (s *Server) Run(ctx context.Context) error {
+	e := echo.New()
+	if err := s.SetupEnvironment(ctx); err != nil {
+		return err
+	}
 
-	s.setupEcho()
+	s.StartBackgroundJobs(ctx)
+	s.SetupEcho(ctx, e)
 
-	panic(s.e.Start(":" + s.Port))
+	s.Logger.Info("listening on 0.0.0.0:" + s.Port)
+	server := http.Server{
+		Addr:    net.JoinHostPort("0.0.0.0", s.Port),
+		Handler: e,
+	}
+	// todo graceful shutdown
+	return server.ListenAndServe()
 }

@@ -20,11 +20,17 @@ func BindEnvs(iface interface{}, parts ...string) {
 		if !ok {
 			continue
 		}
+		squash := strings.Contains(tv, ",squash")
+		tv = strings.Split(tv, ",")[0]
 		switch v.Kind() {
 		case reflect.Struct:
-			BindEnvs(v.Interface(), append(parts, tv)...)
+			if squash {
+				BindEnvs(v.Interface(), parts...)
+			} else {
+				BindEnvs(v.Interface(), append(parts, tv)...)
+			}
 		default:
-			viper.BindEnv(strings.Join(append(parts, tv), "."))
+			viper.MustBindEnv(strings.Join(append(parts, tv), "."))
 		}
 	}
 }

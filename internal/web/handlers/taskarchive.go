@@ -3,8 +3,8 @@ package handlers
 import (
 	"github.com/a-h/templ"
 	"github.com/mraron/njudge/internal/njudge"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/internal/web/templates"
+	"github.com/mraron/njudge/internal/web/templates/i18n"
 	"net/http"
 	"strconv"
 

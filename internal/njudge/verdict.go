@@ -1,7 +1,7 @@
 package njudge
 
 import (
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
+	"github.com/mraron/njudge/internal/web/templates/i18n"
 	"github.com/mraron/njudge/pkg/problems"
 )
 

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"github.com/mraron/njudge/internal/web/templates"
+	"github.com/mraron/njudge/internal/web/templates/i18n"
 	"github.com/mraron/njudge/pkg/problems/evaluation/output_only"
 	"io"
 	"mime"
@@ -13,7 +14,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/njudge"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/pkg/problems"
 )
 

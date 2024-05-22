@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/a-h/templ"
 	"github.com/mraron/njudge/internal/web/templates"
+	"github.com/mraron/njudge/internal/web/templates/i18n"
 	"net/http"
 	"strings"
 
@@ -12,7 +13,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/njudge"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
 )
 
 func gravatarHash(user njudge.User) string {

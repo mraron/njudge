@@ -1,37 +1,29 @@
 package web
 
 import (
-	"github.com/mraron/njudge/internal/web/templates"
-	"net/http"
-	"strings"
-
-	"github.com/labstack/echo/v4/middleware"
+	"errors"
+	"github.com/antonlindstrom/pgstore"
+	"github.com/gorilla/sessions"
+	"github.com/labstack/echo-contrib/session"
 	"github.com/mraron/njudge/internal/njudge/db/models"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
-
-	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/web/handlers"
 	"github.com/mraron/njudge/internal/web/handlers/api"
 	"github.com/mraron/njudge/internal/web/handlers/problemset"
-	"github.com/mraron/njudge/internal/web/handlers/user"
 	"github.com/mraron/njudge/internal/web/handlers/user/profile"
+	"github.com/mraron/njudge/internal/web/templates"
+	"github.com/mraron/njudge/internal/web/templates/i18n"
+	"github.com/quasoft/memstore"
+	slogecho "github.com/samber/slog-echo"
+	"golang.org/x/net/context"
+	"net/http"
+	"strings"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/mraron/njudge/internal/web/handlers/user"
 )
 
-func (s *Server) prepareRoutes(e *echo.Echo) {
-	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
-		ContextKey:  templates.CSRFTokenContextKey,
-		TokenLookup: templates.CSRFTokenLookup,
-		Skipper: func(c echo.Context) bool {
-			return strings.HasPrefix(c.Request().URL.Path, "/api") || strings.HasPrefix(c.Request().URL.Path, "/admin")
-		},
-		CookiePath: "/",
-	}))
-	e.Use(i18n.SetTranslatorMiddleware())
-	e.Use(user.SetUserMiddleware(s.Users))
-	e.Use(templates.MoveFlashesToContextMiddleware())
-	e.Use(templates.ClearTemporaryFlashesMiddleware())
-	e.Use(templates.Middleware(s.Users, s.Problems, s.ProblemStore, s.PartialsStore))
-
+func (s *Server) routes(e *echo.Echo) {
 	e.GET("/", handlers.GetHome(s.PartialsStore))
 	e.GET("/page/:page", handlers.GetPage(s.PartialsStore))
 	e.GET("/submissionRowUpdate/:id", func(c echo.Context) error {
@@ -98,11 +90,11 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	u.POST("/login", user.PostLogin(s.Users))
 	u.GET("/logout", user.Logout())
 	u.GET("/register", user.GetRegister())
-	u.POST("/register", user.PostRegister(s.Server, s.RegisterService, s.MailService))
+	u.POST("/register", user.PostRegister(s.Config.Url, s.RegisterService, s.MailService))
 	u.GET("/activate/:name/:key", user.Activate(s.Users))
 
 	u.GET("/forgot_password", user.GetForgotPassword()).Name = "GetForgotPassword"
-	u.POST("/forgot_password", user.PostForgotPassword(s.Server, s.Users, s.MailService))
+	u.POST("/forgot_password", user.PostForgotPassword(s.Config.Url, s.Users, s.MailService))
 	u.GET("/forgot_password_form/:name/:key", user.GetForgotPasswordForm()).Name = "GetForgotPasswordForm"
 	u.POST("/forgot_password_form", user.PostForgotPasswordForm(s.Users)).Name = "PostForgoTPasswordForm"
 
@@ -155,4 +147,60 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 
 		e.GET("/admin", handlers.GetAdmin(), user.RequireLoginMiddleware())
 	}
+}
+
+func (s *Server) SetupEcho(ctx context.Context, e *echo.Echo) {
+	if s.Mode == ModeDemo || s.Mode == ModeDebug || s.Mode == ModeDevelopment {
+		e.Debug = true
+	} else {
+		e.HTTPErrorHandler = func(err error, c echo.Context) {
+			code := http.StatusInternalServerError
+			var he *echo.HTTPError
+			if errors.As(err, &he) {
+				code = he.Code
+			}
+
+			_ = templates.Render(c, code, templates.Error("Hiba történt."))
+			c.Logger().Error(err)
+		}
+	}
+
+	var (
+		store sessions.Store
+		err   error
+	)
+
+	if s.Mode.UsesDB() {
+		store, err = pgstore.NewPGStoreFromPool(s.DB, []byte(s.CookieSecret))
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		store = memstore.NewMemStore(
+			[]byte("authkey123"),
+			[]byte("enckey12341234567890123456789012"),
+		)
+	}
+
+	e.Use(slogecho.New(s.Logger))
+	e.Use(middleware.Recover())
+	e.Use(session.Middleware(store))
+	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
+		Level: 5,
+	}))
+	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
+		ContextKey:  templates.CSRFTokenContextKey,
+		TokenLookup: templates.CSRFTokenLookup,
+		Skipper: func(c echo.Context) bool {
+			return strings.HasPrefix(c.Request().URL.Path, "/api") || strings.HasPrefix(c.Request().URL.Path, "/admin")
+		},
+		CookiePath: "/",
+	}))
+	e.Use(i18n.SetTranslatorMiddleware())
+	e.Use(user.SetUserMiddleware(s.Users))
+	e.Use(templates.MoveFlashesToContextMiddleware())
+	e.Use(templates.ClearTemporaryFlashesMiddleware())
+	e.Use(templates.Middleware(s.Users, s.Problems, s.ProblemStore, s.PartialsStore))
+
+	s.routes(e)
 }

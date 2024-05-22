@@ -3,14 +3,13 @@ package user
 import (
 	"errors"
 	"github.com/mraron/njudge/internal/web/templates"
+	"github.com/mraron/njudge/internal/web/templates/i18n"
 	"net/http"
-
-	"github.com/markbates/goth/gothic"
-	"github.com/mraron/njudge/internal/njudge"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
 
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
+	"github.com/markbates/goth/gothic"
+	"github.com/mraron/njudge/internal/njudge"
 	"golang.org/x/crypto/bcrypt"
 )
 

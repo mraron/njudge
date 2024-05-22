@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/a-h/templ"
 	"github.com/mraron/njudge/internal/web/templates"
+	"github.com/mraron/njudge/internal/web/templates/i18n"
 	"io"
 	"net/http"
 	"sort"
@@ -12,7 +13,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/njudge"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/pkg/problems"
 )
 

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"github.com/mraron/njudge/internal/web/templates"
+	"github.com/mraron/njudge/internal/web/templates/i18n"
 	"github.com/mraron/njudge/internal/web/templates/mail"
 	"net/http"
 	"time"
@@ -11,8 +12,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/njudge/email"
-	"github.com/mraron/njudge/internal/web/helpers/config"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
 )
 
 func GetForgotPassword() echo.HandlerFunc {
@@ -30,7 +29,7 @@ func GetForgotPassword() echo.HandlerFunc {
 	}
 }
 
-func PostForgotPassword(cfg config.Server, users njudge.Users, mailService email.Service) echo.HandlerFunc {
+func PostForgotPassword(url string, users njudge.Users, mailService email.Service) echo.HandlerFunc {
 	type request struct {
 		Email string `form:"email"`
 	}
@@ -63,7 +62,7 @@ func PostForgotPassword(cfg config.Server, users njudge.Users, mailService email
 				message := &bytes.Buffer{}
 				vm := mail.ForgotPasswordViewModel{
 					Name: u.Name,
-					URL:  cfg.Url,
+					URL:  url,
 					Key:  u.ForgottenPasswordKey.Key,
 				}
 				if err = vm.Execute(message); err != nil {

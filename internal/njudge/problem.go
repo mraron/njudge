@@ -3,13 +3,13 @@ package njudge
 import (
 	"context"
 	"errors"
+	"github.com/mraron/njudge/internal/web/templates/i18n"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/config/polygon"
 )
