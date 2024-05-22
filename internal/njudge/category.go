@@ -39,6 +39,7 @@ var (
 )
 
 type Categories interface {
+	Get(ctx context.Context, id int) (*Category, error)
 	GetAll(ctx context.Context) ([]Category, error)
 	GetAllWithParent(ctx context.Context, parentID int) ([]Category, error)
 	Insert(ctx context.Context, c Category) (*Category, error)
@@ -83,12 +84,12 @@ type TaskArchiveNode struct {
 	Visible      bool
 }
 
-func (t TaskArchiveNode) Search(f func(node TaskArchiveNode) bool) {
+func (t *TaskArchiveNode) Search(f func(node *TaskArchiveNode) bool) {
 	if f(t) {
 		return
 	}
-	for _, child := range t.Children {
-		child.Search(f)
+	for ind := range t.Children {
+		t.Children[ind].Search(f)
 	}
 }
 
@@ -123,7 +124,10 @@ func (tas TaskArchiveService) problemNode(ctx context.Context, p Problem, u *Use
 	return curr, nil
 }
 
-func (tas TaskArchiveService) categoryNode(ctx context.Context, c Category, u *User) (*TaskArchiveNode, error) {
+func (tas TaskArchiveService) categoryNode(ctx context.Context, c Category, u *User, limit int) (*TaskArchiveNode, error) {
+	if limit == 0 {
+		return nil, nil
+	}
 	if !c.Visible && (u == nil || u.Role != "admin") {
 		return nil, nil
 	}
@@ -158,16 +162,20 @@ func (tas TaskArchiveService) categoryNode(ctx context.Context, c Category, u *U
 		return subCategories[i].Name < subCategories[j].Name
 	})
 	for _, category := range subCategories {
-		if cat, err := tas.categoryNode(ctx, category, u); err != nil {
+		if cat, err := tas.categoryNode(ctx, category, u, limit-1); err != nil {
 			return nil, err
-		} else {
+		} else if cat != nil {
 			curr.Children = append(curr.Children, *cat)
 		}
 	}
 	return curr, nil
 }
 
-func (tas TaskArchiveService) Create(ctx context.Context, categories []Category, u *User) (*TaskArchiveNode, error) {
+func (tas TaskArchiveService) CreateWithCategory(ctx context.Context, category Category, u *User) (*TaskArchiveNode, error) {
+	return tas.categoryNode(ctx, category, u, 999)
+}
+
+func (tas TaskArchiveService) CreateWithRoot(ctx context.Context, categories []Category, u *User, limit int) (*TaskArchiveNode, error) {
 	root := &TaskArchiveNode{
 		ID:      0,
 		Type:    TaskArchiveNodeRoot,
@@ -175,9 +183,9 @@ func (tas TaskArchiveService) Create(ctx context.Context, categories []Category,
 	}
 
 	for _, cat := range categories {
-		if curr, err := tas.categoryNode(ctx, cat, u); err != nil {
+		if curr, err := tas.categoryNode(ctx, cat, u, limit); err != nil {
 			return nil, err
-		} else {
+		} else if curr != nil {
 			root.Children = append(root.Children, *curr)
 		}
 	}
@@ -185,10 +193,10 @@ func (tas TaskArchiveService) Create(ctx context.Context, categories []Category,
 	return root, nil
 }
 
-func (tas TaskArchiveService) CreateFromAllTopLevel(ctx context.Context, u *User) (*TaskArchiveNode, error) {
+func (tas TaskArchiveService) CreateTopLevel(ctx context.Context, u *User) (*TaskArchiveNode, error) {
 	categories, err := tas.Categories.GetAllWithParent(ctx, 0)
 	if err != nil {
 		return nil, err
 	}
-	return tas.Create(ctx, categories, u)
+	return tas.CreateWithRoot(ctx, categories, u, 1)
 }

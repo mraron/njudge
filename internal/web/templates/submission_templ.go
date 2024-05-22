@@ -164,14 +164,14 @@ func SubmissionStatusText(s njudge.Submission) templ.Component {
 			}
 		} else {
 			if s.Verdict == njudge.VerdictUP {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"ball\"></div><!--<div class=\"spinner-grow spinner-grow-sm text-muted\"></div>&#32;--> <span class=\"text-muted\">")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"ball\"></div><span class=\"text-muted\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(Tr(ctx, "Uploaded"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 50, Col: 57}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 49, Col: 57}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
@@ -189,7 +189,7 @@ func SubmissionStatusText(s njudge.Submission) templ.Component {
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(Tr(ctx, "Internal error"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 52, Col: 64}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 51, Col: 64}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
@@ -200,14 +200,14 @@ func SubmissionStatusText(s njudge.Submission) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"ball ball-animated\"></div><!--<div class=\"spinner-border spinner-border-sm text-info\"></div>&#32;--> <span class=\"text-info\">")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"ball ball-animated\"></div><span class=\"text-info\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(Tr(ctx, "Running"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 57, Col: 35}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 55, Col: 35}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -221,7 +221,7 @@ func SubmissionStatusText(s njudge.Submission) templ.Component {
 					var templ_7745c5c3_Var12 string
 					templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(Tr(ctx, "on test %s", s.Ontest.String))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 59, Col: 59}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 57, Col: 59}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 					if templ_7745c5c3_Err != nil {
@@ -290,7 +290,7 @@ func userLink(id int) templ.Component {
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(u.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 82, Col: 19}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 80, Col: 19}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
@@ -347,7 +347,7 @@ func problemLink(id int) templ.Component {
 				var templ_7745c5c3_Var18 string
 				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(TrCs(ctx, (*pp).Titles()).String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 98, Col: 119}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 96, Col: 119}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 				if templ_7745c5c3_Err != nil {
@@ -395,7 +395,7 @@ func submissionRowInner(s njudge.Submission) templ.Component {
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(d(s.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 104, Col: 64}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 102, Col: 64}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
@@ -408,7 +408,7 @@ func submissionRowInner(s njudge.Submission) templ.Component {
 		var templ_7745c5c3_Var22 string
 		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(s.Submitted.Local().Format(time.DateTime))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 105, Col: 50}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 103, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 		if templ_7745c5c3_Err != nil {
@@ -437,7 +437,7 @@ func submissionRowInner(s njudge.Submission) templ.Component {
 		var templ_7745c5c3_Var23 string
 		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(s.Language)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 112, Col: 19}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 110, Col: 19}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 		if templ_7745c5c3_Err != nil {
@@ -459,7 +459,7 @@ func submissionRowInner(s njudge.Submission) templ.Component {
 			var templ_7745c5c3_Var24 string
 			templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(s.Status.Feedback[0].MaxTimeSpent().String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 118, Col: 57}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 116, Col: 57}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 			if templ_7745c5c3_Err != nil {
@@ -474,7 +474,7 @@ func submissionRowInner(s njudge.Submission) templ.Component {
 			var templ_7745c5c3_Var25 string
 			templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(memKib(s.Status.Feedback[0].MaxMemoryUsage()))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 123, Col: 58}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 121, Col: 58}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 			if templ_7745c5c3_Err != nil {
@@ -517,7 +517,7 @@ func SubmissionRow(s njudge.Submission) templ.Component {
 			var templ_7745c5c3_Var27 string
 			templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs("submissionRow" + d(s.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 130, Col: 41}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 128, Col: 41}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 			if templ_7745c5c3_Err != nil {
@@ -543,7 +543,7 @@ func SubmissionRow(s njudge.Submission) templ.Component {
 			var templ_7745c5c3_Var28 string
 			templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs("submissionRow" + d(s.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 134, Col: 40}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 132, Col: 40}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 			if templ_7745c5c3_Err != nil {
@@ -556,7 +556,7 @@ func SubmissionRow(s njudge.Submission) templ.Component {
 			var templ_7745c5c3_Var29 string
 			templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs("/submissionRowUpdate/" + d(s.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 134, Col: 81}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 132, Col: 81}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 			if templ_7745c5c3_Err != nil {
@@ -604,7 +604,7 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 				var templ_7745c5c3_Var31 string
 				templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(Tr(ctx, "Compilation error"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 144, Col: 123}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 142, Col: 123}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 				if templ_7745c5c3_Err != nil {
@@ -617,7 +617,7 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 				var templ_7745c5c3_Var32 string
 				templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(s.Status.CompilerOutput)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 146, Col: 75}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 144, Col: 75}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 				if templ_7745c5c3_Err != nil {
@@ -640,7 +640,7 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 				var templ_7745c5c3_Var33 string
 				templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(Tr(ctx, "Subtask"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 156, Col: 83}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 154, Col: 83}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 				if templ_7745c5c3_Err != nil {
@@ -653,7 +653,7 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 				var templ_7745c5c3_Var34 string
 				templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(Tr(ctx, "Sum"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 157, Col: 67}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 155, Col: 67}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 				if templ_7745c5c3_Err != nil {
@@ -666,7 +666,7 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 				var templ_7745c5c3_Var35 string
 				templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(Tr(ctx, "Test"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 158, Col: 48}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 156, Col: 48}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 				if templ_7745c5c3_Err != nil {
@@ -679,7 +679,7 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 				var templ_7745c5c3_Var36 string
 				templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(Tr(ctx, "Verdict"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 159, Col: 63}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 157, Col: 63}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 				if templ_7745c5c3_Err != nil {
@@ -692,7 +692,7 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 				var templ_7745c5c3_Var37 string
 				templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(Tr(ctx, "Time"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 160, Col: 48}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 158, Col: 48}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 				if templ_7745c5c3_Err != nil {
@@ -705,7 +705,7 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 				var templ_7745c5c3_Var38 string
 				templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(Tr(ctx, "Memory"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 161, Col: 50}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 159, Col: 50}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 				if templ_7745c5c3_Err != nil {
@@ -724,7 +724,7 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 						var templ_7745c5c3_Var39 string
 						templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(d(len(g.Testcases) + 1))
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 167, Col: 99}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 165, Col: 99}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 						if templ_7745c5c3_Err != nil {
@@ -752,7 +752,7 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 						var templ_7745c5c3_Var40 string
 						templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(d(len(g.Testcases) + 1))
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 174, Col: 99}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 172, Col: 99}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 						if templ_7745c5c3_Err != nil {
@@ -765,7 +765,7 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 						var templ_7745c5c3_Var41 string
 						templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(g.Name)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 175, Col: 43}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 173, Col: 43}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 						if templ_7745c5c3_Err != nil {
@@ -778,7 +778,7 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 						var templ_7745c5c3_Var42 string
 						templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(d(len(g.Testcases) + 1))
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 177, Col: 99}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 175, Col: 99}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
 						if templ_7745c5c3_Err != nil {
@@ -804,7 +804,7 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 							var templ_7745c5c3_Var43 string
 							templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(d(t.Index))
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 183, Col: 51}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 181, Col: 51}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
 							if templ_7745c5c3_Err != nil {
@@ -817,7 +817,7 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 							var templ_7745c5c3_Var44 string
 							templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinStringErrs(iif(g.Scoring != problems.ScoringSum, "2", ""))
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 184, Col: 93}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 182, Col: 93}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
 							if templ_7745c5c3_Err != nil {
@@ -852,7 +852,7 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 							var templ_7745c5c3_Var47 string
 							templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.JoinStringErrs(Tr(ctx, njudge.VerdictFromProblemsVerdictName(t.VerdictName).String()))
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 186, Col: 115}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 184, Col: 115}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var47))
 							if templ_7745c5c3_Err != nil {
@@ -870,7 +870,7 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 								var templ_7745c5c3_Var48 string
 								templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.JoinStringErrs(f(math.Round(t.Score*100) / 100))
 								if templ_7745c5c3_Err != nil {
-									return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 191, Col: 75}
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 189, Col: 75}
 								}
 								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var48))
 								if templ_7745c5c3_Err != nil {
@@ -883,7 +883,7 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 								var templ_7745c5c3_Var49 string
 								templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.JoinStringErrs(f(t.MaxScore))
 								if templ_7745c5c3_Err != nil {
-									return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 191, Col: 91}
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 189, Col: 91}
 								}
 								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var49))
 								if templ_7745c5c3_Err != nil {
@@ -901,7 +901,7 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 							var templ_7745c5c3_Var50 string
 							templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.JoinStringErrs(t.TimeSpent.String())
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 194, Col: 61}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 192, Col: 61}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var50))
 							if templ_7745c5c3_Err != nil {
@@ -914,7 +914,7 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 							var templ_7745c5c3_Var51 string
 							templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.JoinStringErrs(memKib(t.MemoryUsed))
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 195, Col: 61}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 193, Col: 61}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var51))
 							if templ_7745c5c3_Err != nil {
@@ -961,7 +961,7 @@ func SubmissionFeedback(s njudge.Submission) templ.Component {
 			var templ_7745c5c3_Var53 string
 			templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.JoinStringErrs("submissionFeedback" + d(s.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 208, Col: 48}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 206, Col: 48}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var53))
 			if templ_7745c5c3_Err != nil {
@@ -987,7 +987,7 @@ func SubmissionFeedback(s njudge.Submission) templ.Component {
 			var templ_7745c5c3_Var54 string
 			templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.JoinStringErrs("submissionFeedback" + d(s.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 212, Col: 45}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 210, Col: 45}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var54))
 			if templ_7745c5c3_Err != nil {
@@ -1000,7 +1000,7 @@ func SubmissionFeedback(s njudge.Submission) templ.Component {
 			var templ_7745c5c3_Var55 string
 			templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.JoinStringErrs("/submissionFeedbackUpdate/" + d(s.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 212, Col: 91}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 210, Col: 91}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var55))
 			if templ_7745c5c3_Err != nil {
@@ -1110,7 +1110,7 @@ func Submission(vm SubmissionViewModel) templ.Component {
 				var templ_7745c5c3_Var61 string
 				templ_7745c5c3_Var61, templ_7745c5c3_Err = templ.JoinStringErrs(Tr(ctx, "Rejudge"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 230, Col: 73}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 228, Col: 73}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var61))
 				if templ_7745c5c3_Err != nil {
@@ -1163,7 +1163,7 @@ func Submission(vm SubmissionViewModel) templ.Component {
 				var templ_7745c5c3_Var64 string
 				templ_7745c5c3_Var64, templ_7745c5c3_Err = templ.JoinStringErrs(string(vm.Submission.Source))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 250, Col: 53}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 248, Col: 53}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var64))
 				if templ_7745c5c3_Err != nil {
@@ -1227,7 +1227,7 @@ func Submissions(vm SubmissionsViewModel) templ.Component {
 		var templ_7745c5c3_Var66 string
 		templ_7745c5c3_Var66, templ_7745c5c3_Err = templ.JoinStringErrs(Tr(ctx, "Date"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 276, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 274, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var66))
 		if templ_7745c5c3_Err != nil {
@@ -1240,7 +1240,7 @@ func Submissions(vm SubmissionsViewModel) templ.Component {
 		var templ_7745c5c3_Var67 string
 		templ_7745c5c3_Var67, templ_7745c5c3_Err = templ.JoinStringErrs(Tr(ctx, "User"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 277, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 275, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var67))
 		if templ_7745c5c3_Err != nil {
@@ -1253,7 +1253,7 @@ func Submissions(vm SubmissionsViewModel) templ.Component {
 		var templ_7745c5c3_Var68 string
 		templ_7745c5c3_Var68, templ_7745c5c3_Err = templ.JoinStringErrs(Tr(ctx, "Problem"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 278, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 276, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var68))
 		if templ_7745c5c3_Err != nil {
@@ -1266,7 +1266,7 @@ func Submissions(vm SubmissionsViewModel) templ.Component {
 		var templ_7745c5c3_Var69 string
 		templ_7745c5c3_Var69, templ_7745c5c3_Err = templ.JoinStringErrs(Tr(ctx, "Language"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 279, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 277, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var69))
 		if templ_7745c5c3_Err != nil {
@@ -1279,7 +1279,7 @@ func Submissions(vm SubmissionsViewModel) templ.Component {
 		var templ_7745c5c3_Var70 string
 		templ_7745c5c3_Var70, templ_7745c5c3_Err = templ.JoinStringErrs(Tr(ctx, "Verdict"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 280, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 278, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var70))
 		if templ_7745c5c3_Err != nil {
@@ -1292,7 +1292,7 @@ func Submissions(vm SubmissionsViewModel) templ.Component {
 		var templ_7745c5c3_Var71 string
 		templ_7745c5c3_Var71, templ_7745c5c3_Err = templ.JoinStringErrs(Tr(ctx, "Time"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 281, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 279, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var71))
 		if templ_7745c5c3_Err != nil {
@@ -1305,7 +1305,7 @@ func Submissions(vm SubmissionsViewModel) templ.Component {
 		var templ_7745c5c3_Var72 string
 		templ_7745c5c3_Var72, templ_7745c5c3_Err = templ.JoinStringErrs(Tr(ctx, "Memory"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 282, Col: 42}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `submission.templ`, Line: 280, Col: 42}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var72))
 		if templ_7745c5c3_Err != nil {
