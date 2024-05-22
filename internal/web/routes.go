@@ -68,7 +68,7 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 
 	e.GET("/submission/:id", handlers.GetSubmission(s.Submissions)).Name = "getSubmission"
 	e.GET("/submission/rejudge/:id", handlers.RejudgeSubmission(s.Submissions), user.RequireLoginMiddleware()).Name = "rejudgeSubmission"
-	e.GET("/task_archive", taskarchive.Get(s.Categories, s.ProblemQuery, s.SolvedStatusQuery, s.ProblemStore))
+	e.GET("/task_archive", taskarchive.Get(s.TaskArchiveService))
 
 	ps := e.Group("/problemset", problemset.SetNameMiddleware())
 	ps.GET("/:name/", problemset.GetProblemList(s.ProblemStore, s.Problems, s.Categories, s.ProblemListQuery, s.ProblemInfoQuery, s.Tags))

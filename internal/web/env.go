@@ -85,6 +85,14 @@ func (s *Server) SetupDataAccess() {
 		ss.Compiled = true
 		sub.Status = *ss
 		sub, _ = s.Submissions.Insert(context.Background(), *sub)
+
+		s.TaskArchiveService = njudge.TaskArchiveService{
+			Categories:        s.Categories,
+			Problems:          s.Problems,
+			SolvedStatusQuery: s.SolvedStatusQuery,
+			ProblemQuery:      s.ProblemQuery,
+			ProblemStore:      s.ProblemStore,
+		}
 	} else {
 		s.PartialsStore = templates2.NewCached(s.DB, 1*time.Minute)
 
@@ -106,6 +114,14 @@ func (s *Server) SetupDataAccess() {
 		s.RegisterService = njudge.NewRegisterService(s.Users)
 		s.SubmitService = memory.NewSubmitService(s.Submissions, s.Users, s.ProblemQuery, s.ProblemStore)
 		s.TagsService = memory.NewTagsService(s.Tags, s.Problems, s.ProblemInfoQuery)
+
+		s.TaskArchiveService = njudge.TaskArchiveService{
+			Categories:        s.Categories,
+			Problems:          s.Problems,
+			SolvedStatusQuery: s.SolvedStatusQuery,
+			ProblemQuery:      s.ProblemQuery,
+			ProblemStore:      s.ProblemStore,
+		}
 	}
 }
 

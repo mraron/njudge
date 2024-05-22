@@ -1,0 +1,41 @@
+package templates
+
+import "github.com/mraron/njudge/internal/njudge"
+
+type TaskArchiveViewModel struct {
+    Root njudge.TaskArchiveNode
+    ProblemLinks map[int]Link
+}
+
+templ taskArchiveProblem(vm TaskArchiveViewModel, node njudge.TaskArchiveNode) {
+    <a href={vm.ProblemLinks[node.ID].Href}>
+        {vm.ProblemLinks[node.ID].Text}
+    </a>
+}
+
+templ taskArchiveCategory(vm TaskArchiveViewModel, node njudge.TaskArchiveNode) {
+    {node.Category.Name}
+    <ul>
+        for _, child := range node.Children {
+            <li>
+                if child.Type == njudge.TaskArchiveNodeProblem {
+                    @taskArchiveProblem(vm, child)
+                }else {
+                    @taskArchiveCategory(vm, child)
+                }
+            </li>
+        }
+    </ul>
+}
+
+templ TaskArchive(vm TaskArchiveViewModel) {
+    @Page() {
+        <ul>
+            for _, bigCat := range vm.Root.Children {
+                <li>
+                    @taskArchiveCategory(vm, bigCat)
+                </li>
+            }
+        </ul>
+    }
+}

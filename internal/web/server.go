@@ -41,9 +41,10 @@ type Server struct {
 	ProblemListQuery    njudge.ProblemListQuery
 	SubmissionListQuery njudge.SubmissionListQuery
 
-	RegisterService njudge.RegisterService
-	SubmitService   njudge.SubmitService
-	TagsService     njudge.TagsService
+	RegisterService    njudge.RegisterService
+	SubmitService      njudge.SubmitService
+	TagsService        njudge.TagsService
+	TaskArchiveService njudge.TaskArchiveService
 
 	e *echo.Echo
 }
