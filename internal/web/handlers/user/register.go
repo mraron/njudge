@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"github.com/mraron/njudge/internal/web/templates"
+	"github.com/mraron/njudge/internal/web/templates/mail"
 	"net/http"
 	"unicode"
 
@@ -108,16 +109,12 @@ func PostRegister(cfg config.Server, registerService njudge.RegisterService, mai
 			m.Subject = tr.Translate("Activate your account")
 
 			message := &bytes.Buffer{}
-			err = c.Echo().Renderer.Render(message, "mail/activation", struct {
-				Name          string
-				URL           string
-				ActivationKey string
-			}{
-				c.FormValue("name"),
-				cfg.Url,
-				u.ActivationInfo.Key,
-			}, nil)
-			if err != nil {
+			vm := mail.ActivationViewModel{
+				Name:          c.FormValue("name"),
+				URL:           cfg.Url,
+				ActivationKey: u.ActivationInfo.Key,
+			}
+			if err = vm.Execute(message); err != nil {
 				return errMessages, err
 			}
 			m.Message = message.String()
@@ -179,6 +176,6 @@ func Activate(users njudge.Users) echo.HandlerFunc {
 			return err
 		}
 
-		return templates.Render(c, http.StatusOK, templates.Error(tr.Translate("Successful activation. You can login now!")))
+		return templates.Render(c, http.StatusOK, templates.Info(tr.Translate("Successful activation. You can login now!")))
 	}
 }

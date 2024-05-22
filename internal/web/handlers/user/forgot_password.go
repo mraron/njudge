@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"github.com/mraron/njudge/internal/web/templates"
+	"github.com/mraron/njudge/internal/web/templates/mail"
 	"net/http"
 	"time"
 
@@ -60,15 +61,12 @@ func PostForgotPassword(cfg config.Server, users njudge.Users, mailService email
 				m.Subject = tr.Translate("Password reset")
 
 				message := &bytes.Buffer{}
-				if err := c.Echo().Renderer.Render(message, "mail/forgotten_password", struct {
-					Name string
-					URL  string
-					Key  string
-				}{
-					u.Name,
-					cfg.Url,
-					u.ForgottenPasswordKey.Key,
-				}, nil); err != nil {
+				vm := mail.ForgotPasswordViewModel{
+					Name: u.Name,
+					URL:  cfg.Url,
+					Key:  u.ForgottenPasswordKey.Key,
+				}
+				if err = vm.Execute(message); err != nil {
 					return err
 				}
 				m.Message = message.String()
