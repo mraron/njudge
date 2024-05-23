@@ -36,6 +36,7 @@ func GetProblem(tags njudge.Tags) echo.HandlerFunc {
 			TaskTypeName: storedData.GetTaskType().Name(),
 			Languages:    storedData.Languages(),
 			Statements:   storedData.Statements(),
+			Attachments:  storedData.Attachments(),
 		}
 		if storedData.GetTaskType().Name() != output_only.Name {
 			vm.DisplayLimits = true

@@ -43,6 +43,7 @@ type ProblemViewModel struct {
     Languages []language.Language
     UserInfo *njudge.ProblemUserInfo
 
+    Attachments problems.Attachments
     Statements problems.Contents
 
     TagsToAdd []njudge.Tag
@@ -134,7 +135,7 @@ templ problemSubmitCard(vm ProblemViewModel) {
 }
 
 templ problemLastSubmissions(vm ProblemViewModel) {
-    if vm.UserInfo != nil {
+    if vm.UserInfo != nil && len(vm.UserInfo.Submissions)>0 {
         <div class="card table-responsive">
             <div class="card-header" style="border-bottom: 0px;">
                 <i class="bi bi-clock-history"></i> {Tr(ctx, "Last submissions")}
@@ -192,6 +193,33 @@ templ problemAddTag(vm ProblemViewModel) {
     </div>
 }
 
+templ problemAttachments(vm ProblemViewModel) {
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-paperclip"></i> {Tr(ctx, "Attachments")}
+        </div>
+        <div class="card-body">
+            for _, a := range vm.Attachments {
+                <a href={templ.SafeURL("attachment/"+a.Name()+"/")}>
+                    <i class="bi bi-file-earmark-text-fill"></i>
+                    {Tr(ctx, "File")} ({a.Name()})
+                </a>
+                <br>
+            }
+            if pdfs := vm.Statements.FilterByType(problems.DataTypePDF); len(pdfs)>0 {
+                for _, s := range pdfs {
+                    <a href={templ.SafeURL("pdf/"+s.Locale()+"/")}>
+                        <i class="bi bi-file-earmark-pdf-fill"></i>
+                        {Tr(ctx, "Statement")} ({s.Locale()})
+                    </a>
+                    <br>
+                }
+            }
+
+        </div>
+    </div>
+}
+
 templ problemPage(name string) {
     @Page() {
         @problemMenu(name)
@@ -212,6 +240,8 @@ templ Problem(vm ProblemViewModel) {
                 @problemSubmitCard(vm)
                 <br>
                 @problemLastSubmissions(vm)
+                <br>
+                @problemAttachments(vm)
             </div>
         </div>
     }
