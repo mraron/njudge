@@ -123,6 +123,22 @@ type SubmissionsQuery struct {
 	submissions njudge.Submissions
 }
 
+func (s *SubmissionsQuery) GetACSubmissionsOf(ctx context.Context, problemID int) ([]njudge.Submission, error) {
+	submissions, err := s.submissions.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	res := make([]njudge.Submission, 0)
+	for ind := range submissions {
+		if submissions[ind].ProblemID == problemID {
+			res = append(res, submissions[ind])
+		}
+	}
+
+	return res, nil
+}
+
 func NewSubmissionsQuery(submissions njudge.Submissions) *SubmissionsQuery {
 	return &SubmissionsQuery{
 		submissions: submissions,

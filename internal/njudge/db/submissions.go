@@ -79,12 +79,12 @@ func (ss *Submissions) toNjudge(ctx context.Context, s *models.Submission) (*nju
 }
 
 func (ss *Submissions) Get(ctx context.Context, ID int) (*njudge.Submission, error) {
-	dbobj, err := models.Submissions(models.SubmissionWhere.ID.EQ(ID)).One(ctx, ss.db)
+	obj, err := models.Submissions(models.SubmissionWhere.ID.EQ(ID)).One(ctx, ss.db)
 	if err != nil {
 		return nil, MaskNotFoundError(err, njudge.ErrorSubmissionNotFound)
 	}
 
-	res, err := ss.toNjudge(ctx, dbobj)
+	res, err := ss.toNjudge(ctx, obj)
 	if err != nil {
 		return nil, err
 	}
@@ -93,15 +93,15 @@ func (ss *Submissions) Get(ctx context.Context, ID int) (*njudge.Submission, err
 }
 
 func (ss *Submissions) getAll(ctx context.Context, mods ...qm.QueryMod) ([]njudge.Submission, error) {
-	dbobjs, err := models.Submissions(mods...).All(ctx, ss.db)
+	objs, err := models.Submissions(mods...).All(ctx, ss.db)
 	if err != nil {
 		return nil, err
 	}
 
-	res := make([]njudge.Submission, len(dbobjs))
-	for ind := range dbobjs {
+	res := make([]njudge.Submission, len(objs))
+	for ind := range objs {
 		var curr *njudge.Submission
-		curr, err = ss.toNjudge(ctx, dbobjs[ind])
+		curr, err = ss.toNjudge(ctx, objs[ind])
 		if err != nil {
 			return nil, err
 		}
@@ -136,7 +136,7 @@ func (ss *Submissions) Delete(ctx context.Context, ID int) error {
 }
 
 func (ss *Submissions) Update(ctx context.Context, s njudge.Submission, fields []string) error {
-	whitelist := []string{}
+	var whitelist []string
 	for _, field := range fields {
 		switch field {
 		case njudge.SubmissionFields.UserID:
@@ -177,18 +177,15 @@ func (ss *Submissions) Update(ctx context.Context, s njudge.Submission, fields [
 }
 
 func (ss *Submissions) GetUnstarted(ctx context.Context, limit int) ([]njudge.Submission, error) {
-	objs, err := models.Submissions(models.SubmissionWhere.Started.EQ(false), qm.Limit(limit)).All(ctx, ss.db)
-	if err != nil {
-		return nil, err
-	}
-	res := make([]njudge.Submission, len(objs))
-	for ind := range objs {
-		var curr *njudge.Submission
-		if curr, err = ss.toNjudge(ctx, objs[ind]); err != nil {
-			return nil, err
-		}
-		res[ind] = *curr
-	}
+	return ss.getAll(ctx,
+		models.SubmissionWhere.Started.EQ(false),
+		qm.Limit(limit),
+	)
+}
 
-	return res, nil
+func (ss *Submissions) GetACSubmissionsOf(ctx context.Context, problemID int) ([]njudge.Submission, error) {
+	return ss.getAll(ctx,
+		models.SubmissionWhere.ProblemID.EQ(problemID),
+		models.SubmissionWhere.Verdict.EQ(NjudgeVerdictToDatabase(njudge.VerdictAC)),
+	)
 }

@@ -114,6 +114,7 @@ type Submissions interface {
 
 type SubmissionsQuery interface {
 	GetUnstarted(ctx context.Context, limit int) ([]Submission, error)
+	GetACSubmissionsOf(ctx context.Context, problemID int) ([]Submission, error)
 }
 
 var ErrorUnsupportedLanguage = errors.New("njudge: unsupported language")
