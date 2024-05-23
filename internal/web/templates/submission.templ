@@ -145,7 +145,30 @@ templ submissionFeedbackInner(s njudge.Submission) {
                 </div>
             </div>
         }else if s.Status.FeedbackType == problems.FeedbackCF {
-            CF
+            for _, testset := range s.Status.Feedback {
+                for _, g := range testset.Groups {
+                    for _, t := range g.Testcases {
+                        <div class="card">
+                            <div class={"card-header" + iif(t.VerdictName == problems.VerdictAC, " text-success", " text-info")}>
+                                <span class={"bi"+iif(t.VerdictName == problems.VerdictAC, " bi-check-lg", " bi-x-lg")}></span>
+                                {d(t.Index)} - {Tr(ctx, njudge.VerdictFromProblemsVerdictName(t.VerdictName).String())}
+                            </div>
+                            <div class="card-body">
+                                <span class="bi bi-memory"></span> {Tr(ctx, "Memory")}: {memKib(t.MemoryUsed)}KiB <br>
+                                <span class="bi bi-clock"></span> {Tr(ctx, "Time")}: {t.TimeSpent.String()}<br><br>
+                                {Tr(ctx, "Program's output")}:
+                                <pre><code class="nohighlight">{t.Output}</code></pre>
+                                {Tr(ctx, "Expected output")}:
+                                <pre><code class="nohighlight">{t.ExpectedOutput}</code></pre>
+                                {Tr(ctx, "Checker output")}:
+                                <pre><code class="nohighlight">{t.CheckerOutput}</code></pre>
+                            </div>
+                        </div>
+                        <br>
+                    }
+                }
+            }
+
         }else if s.Status.FeedbackType == problems.FeedbackIOI || s.Status.FeedbackType == problems.FeedbackLazyIOI {
             <div class="table-responsive">
                 <table class="table table-bordered table-sm">

@@ -31,6 +31,8 @@ models: ## updates internal/njudge/db/models from sqlboiler.toml
 	sqlboiler psql
 test: ## run tests
 	go test ./...
+templ:
+	templ generate
 
 up: build ## builds and runs docker-compose up
 	COMPOSE_PROJECT_NAME="$(PROJECT_NAME)" docker-compose up
