@@ -34,7 +34,7 @@ type PostRegisterRequest struct {
 	Password2 string `form:"password2"`
 }
 
-func PostRegister(url string, registerService njudge.RegisterService, mailService email.Service) echo.HandlerFunc {
+func PostRegister(url string, users njudge.Users, mailService email.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
@@ -83,10 +83,27 @@ func PostRegister(url string, registerService njudge.RegisterService, mailServic
 				return errMessages, nil
 			}
 
-			u, err := registerService.Register(c.Request().Context(), njudge.RegisterRequest{
+			_, err = njudge.RegisterUser(c.Request().Context(), users, njudge.RegisterRequest{
 				Name:     data.Name,
 				Email:    data.Email,
 				Password: data.Password,
+			}, func(user *njudge.User) error {
+				m := email.Mail{}
+				m.Recipients = []string{c.FormValue("email")}
+				m.Subject = tr.Translate("Activate your account")
+
+				message := &bytes.Buffer{}
+				vm := mail.ActivationViewModel{
+					Name:          user.Name,
+					URL:           url,
+					ActivationKey: user.ActivationInfo.Key,
+				}
+				if err = vm.Execute(message); err != nil {
+					return err
+				}
+				m.Message = message.String()
+
+				return mailService.Send(c.Request().Context(), m)
 			})
 
 			if errors.Is(err, njudge.ErrorSameName) {
@@ -96,32 +113,10 @@ func PostRegister(url string, registerService njudge.RegisterService, mailServic
 				errMessages = append(errMessages, tr.Translate("The email is already registered."))
 			}
 			if len(errMessages) > 0 {
-				return errMessages, nil
-			}
-			if err != nil {
-				return nil, err
-			}
-
-			m := email.Mail{}
-			m.Recipients = []string{c.FormValue("email")}
-			m.Subject = tr.Translate("Activate your account")
-
-			message := &bytes.Buffer{}
-			vm := mail.ActivationViewModel{
-				Name:          c.FormValue("name"),
-				URL:           url,
-				ActivationKey: u.ActivationInfo.Key,
-			}
-			if err = vm.Execute(message); err != nil {
-				return errMessages, err
-			}
-			m.Message = message.String()
-
-			if err = mailService.Send(c.Request().Context(), m); err != nil {
 				return errMessages, err
 			}
 
-			return nil, nil
+			return nil, err
 		}
 
 		if errMessages, err := register(); err == nil && len(errMessages) > 0 {

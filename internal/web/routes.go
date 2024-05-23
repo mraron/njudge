@@ -63,7 +63,7 @@ func (s *Server) routes(e *echo.Echo) {
 
 	ps := e.Group("/problemset", problemset.SetNameMiddleware())
 	ps.GET("/:name/", problemset.GetProblemList(s.ProblemStore, s.Problems, s.Categories, s.ProblemListQuery, s.ProblemInfoQuery, s.Tags))
-	ps.POST("/:name/submit", problemset.PostSubmit(s.SubmitService), user.RequireLoginMiddleware())
+	ps.POST("/:name/submit", problemset.PostSubmit(s.Submissions, s.SubmitService), user.RequireLoginMiddleware())
 	ps.GET("/status/", problemset.GetStatus(s.SubmissionListQuery)).Name = "getProblemsetStatus"
 
 	psProb := ps.Group("/:name/:problem", problemset.RenameProblemMiddleware(s.ProblemStore),
@@ -90,7 +90,7 @@ func (s *Server) routes(e *echo.Echo) {
 	u.POST("/login", user.PostLogin(s.Users))
 	u.GET("/logout", user.Logout())
 	u.GET("/register", user.GetRegister())
-	u.POST("/register", user.PostRegister(s.Config.Url, s.RegisterService, s.MailService))
+	u.POST("/register", user.PostRegister(s.Config.Url, s.Users, s.MailService))
 	u.GET("/activate/:name/:key", user.Activate(s.Users))
 
 	u.GET("/forgot_password", user.GetForgotPassword()).Name = "GetForgotPassword"

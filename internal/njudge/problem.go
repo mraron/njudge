@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/mraron/njudge/internal/web/templates/i18n"
+	"github.com/mraron/njudge/pkg/language"
 	"io"
 	"os"
 	"path/filepath"
@@ -75,10 +76,10 @@ func (p *Problem) SetCategory(c Category) {
 func (p *Problem) WithStoredData(store problems.Store) (ProblemStoredData, error) {
 	pp, err := store.GetProblem(p.Problem)
 	if err != nil {
-		return nil, err
+		return ProblemStoredData{}, err
 	}
 
-	return &problemStoredData{pp}, nil
+	return ProblemStoredData{pp}, nil
 }
 
 func (p *Problem) HasTag(t Tag) bool {
@@ -129,19 +130,20 @@ type Problems interface {
 	Update(ctx context.Context, p Problem, fields []string) error
 }
 
-type ProblemStoredData interface {
-	problems.Problem
-
-	GetPDF(lang Language) (io.ReadCloser, error)
-	GetFile(filename string) (string, error)
-	GetAttachment(name string) (problems.NamedData, error)
-}
-
-type problemStoredData struct {
+type ProblemStoredData struct {
 	problems.Problem
 }
 
-func (p *problemStoredData) GetPDF(lang Language) (io.ReadCloser, error) {
+func (p *ProblemStoredData) GetLanguage(id string) language.Language {
+	for _, lang := range p.Languages() {
+		if lang.ID() == id {
+			return lang
+		}
+	}
+	return nil
+}
+
+func (p *ProblemStoredData) GetPDF(lang Language) (io.ReadCloser, error) {
 	if len(p.Statements().FilterByType(problems.DataTypePDF)) == 0 {
 		return nil, ErrorStatementNotFound
 	}
@@ -149,7 +151,7 @@ func (p *problemStoredData) GetPDF(lang Language) (io.ReadCloser, error) {
 	return i18n.TranslateContent(string(lang), p.Statements().FilterByType(problems.DataTypePDF)).ValueReader()
 }
 
-func (p *problemStoredData) GetFile(file string) (fileLoc string, err error) {
+func (p *ProblemStoredData) GetFile(file string) (fileLoc string, err error) {
 	switch p := p.Problem.(problems.ProblemWrapper).Problem.(type) {
 	case polygon.Problem:
 		if len(p.Statements().FilterByType(problems.DataTypeHTML)) == 0 || strings.HasSuffix(file, ".tex") || strings.HasSuffix(file, ".json") {
@@ -167,7 +169,7 @@ func (p *problemStoredData) GetFile(file string) (fileLoc string, err error) {
 	return
 }
 
-func (p *problemStoredData) GetAttachment(attachment string) (problems.NamedData, error) {
+func (p *ProblemStoredData) GetAttachment(attachment string) (problems.NamedData, error) {
 	for _, val := range p.Attachments() {
 		if val.Name() == attachment {
 			return val, nil

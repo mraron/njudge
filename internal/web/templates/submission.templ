@@ -85,7 +85,7 @@ templ userLink(id int) {
 func problemTitle(ctx context.Context, id int) string {
     withStored := problemWithStored(ctx, problem(ctx, id))
     if withStored != nil {
-        return TrCs(ctx, (*withStored).Titles()).String()
+        return TrCs(ctx, withStored.Titles()).String()
     }
     return ""
 }

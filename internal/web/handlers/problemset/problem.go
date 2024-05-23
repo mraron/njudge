@@ -29,14 +29,16 @@ func GetProblem(tags njudge.Tags) echo.HandlerFunc {
 		c.Set("title", tr.Translate("Statement - %s (%s)", title, name))
 		vm := templates.ProblemViewModel{
 			Title:        title,
+			Problemset:   prob.Problemset,
 			Name:         name,
-			UserInfo:     info.UserInfo,
 			ShowTags:     true,
 			Tags:         prob.Tags.ToTags(),
 			TaskTypeName: storedData.GetTaskType().Name(),
 			Languages:    storedData.Languages(),
-			Statements:   storedData.Statements(),
+			UserInfo:     info.UserInfo,
 			Attachments:  storedData.Attachments(),
+			Statements:   storedData.Statements(),
+			TagsToAdd:    nil,
 		}
 		if storedData.GetTaskType().Name() != output_only.Name {
 			vm.DisplayLimits = true

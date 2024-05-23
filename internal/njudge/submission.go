@@ -112,6 +112,10 @@ type Submissions interface {
 	Update(ctx context.Context, s Submission, fields []string) error
 }
 
+type SubmissionsQuery interface {
+	GetUnstarted(ctx context.Context, limit int) ([]Submission, error)
+}
+
 var ErrorUnsupportedLanguage = errors.New("njudge: unsupported language")
 
 type SubmitRequest struct {
@@ -122,10 +126,48 @@ type SubmitRequest struct {
 	Source     []byte
 }
 
-type SubmitService interface {
-	Submit(ctx context.Context, subRequest SubmitRequest) (*Submission, error)
+type SubmitService struct {
+	users        Users
+	problemQuery ProblemQuery
+	problemStore problems.Store
 }
 
-type SubmissionsQuery interface {
-	GetUnstarted(ctx context.Context, limit int) ([]Submission, error)
+func NewSubmitService(users Users, problemQuery ProblemQuery, problemStore problems.Store) *SubmitService {
+	return &SubmitService{
+		users:        users,
+		problemQuery: problemQuery,
+		problemStore: problemStore,
+	}
+}
+
+func (s *SubmitService) Submit(ctx context.Context, req SubmitRequest) (*Submission, error) {
+	pr, err := s.problemQuery.GetProblem(ctx, req.Problemset, req.Problem)
+	if err != nil {
+		return nil, err
+	}
+
+	storedData, err := pr.WithStoredData(s.problemStore)
+	if err != nil {
+		return nil, err
+	}
+
+	var lang language.Language
+	if lang = storedData.GetLanguage(req.Language); lang == nil {
+		return nil, ErrorUnsupportedLanguage
+	}
+
+	u, err := s.users.Get(ctx, req.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	sub, err := NewSubmission(*u, *pr, lang)
+	if err != nil {
+		return nil, err
+	}
+
+	sub.SetSource(req.Source)
+	sub.Verdict = VerdictUP
+
+	return sub, nil
 }

@@ -290,7 +290,7 @@ func GetStatus(subList njudge.SubmissionListQuery) echo.HandlerFunc {
 	}
 }
 
-func PostSubmit(subService njudge.SubmitService) echo.HandlerFunc {
+func PostSubmit(submissions njudge.Submissions, subService *njudge.SubmitService) echo.HandlerFunc {
 	type request struct {
 		Problemset     string `param:"name"`
 		ProblemName    string `form:"problem"`
@@ -335,6 +335,10 @@ func PostSubmit(subService njudge.SubmitService) echo.HandlerFunc {
 			Language:   data.LanguageName,
 			Source:     []byte(code),
 		})
+		if err != nil {
+			return err
+		}
+		sub, err = submissions.Insert(c.Request().Context(), *sub)
 		if err != nil {
 			return err
 		}

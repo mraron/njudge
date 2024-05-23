@@ -149,6 +149,32 @@ func NewUser(name, email, role string) (*User, error) {
 	}, nil
 }
 
+type RegisterRequest struct {
+	Name     string
+	Email    string
+	Password string
+}
+
+func RegisterUser(ctx context.Context, users Users, req RegisterRequest, postRegisterFunc func(*User) error) (*User, error) {
+	u, err := NewUser(req.Name, req.Email, "user")
+	if err != nil {
+		return nil, err
+	}
+
+	if err := u.SetPassword(req.Password); err != nil {
+		return nil, err
+	}
+
+	u, err = users.Insert(ctx, *u)
+	if err != nil {
+		return nil, err
+	}
+	if err = postRegisterFunc(u); err != nil {
+		return u, err
+	}
+	return u, nil
+}
+
 func (u *User) SetPassword(password string) error {
 	if len(password) == 0 {
 		return ErrorFieldRequired

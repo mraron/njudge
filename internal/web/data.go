@@ -31,8 +31,7 @@ type DataAccess struct {
 	ProblemListQuery    njudge.ProblemListQuery
 	SubmissionListQuery njudge.SubmissionListQuery
 
-	RegisterService    njudge.RegisterService
-	SubmitService      njudge.SubmitService
+	SubmitService      *njudge.SubmitService
 	TagsService        njudge.TagsService
 	TaskArchiveService njudge.TaskArchiveService
 }
@@ -58,8 +57,7 @@ func NewDemoDataAccess(ctx context.Context, ps problems.Store, ms email.Service)
 	s.ProblemListQuery = memory.NewProblemListQuery(s.ProblemStore, s.Problems, s.Tags, s.Categories)
 	s.SubmissionListQuery = memory.NewSubmissionListQuery(s.Submissions, s.Problems)
 
-	s.RegisterService = njudge.NewRegisterService(s.Users)
-	s.SubmitService = memory.NewSubmitService(s.Submissions, s.Users, s.ProblemQuery, s.ProblemStore)
+	s.SubmitService = njudge.NewSubmitService(s.Users, s.ProblemQuery, s.ProblemStore)
 	s.TagsService = memory.NewTagsService(s.Tags, s.Problems, s.ProblemInfoQuery)
 
 	// Create dummy category NT1/2021
@@ -178,8 +176,7 @@ func NewDBDataAccess(ctx context.Context, ps problems.Store, DB *sql.DB, ms emai
 	s.ProblemListQuery = memory.NewProblemListQuery(s.ProblemStore, s.Problems, s.Tags, s.Categories)
 	s.SubmissionListQuery = db.NewSubmissionListQuery(DB)
 
-	s.RegisterService = njudge.NewRegisterService(s.Users)
-	s.SubmitService = memory.NewSubmitService(s.Submissions, s.Users, s.ProblemQuery, s.ProblemStore)
+	s.SubmitService = njudge.NewSubmitService(s.Users, s.ProblemQuery, s.ProblemStore)
 	s.TagsService = memory.NewTagsService(s.Tags, s.Problems, s.ProblemInfoQuery)
 
 	s.TaskArchiveService = njudge.TaskArchiveService{
