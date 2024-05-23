@@ -45,7 +45,9 @@ func main() {
 	out := fs.String("out", "catalog.go", "output file to write to")
 	srcLang := fs.String("srclang", "en-US", "the source-code language")
 	trFunc := fs.String("trfunc", "Tr", "name of translate method which is used in templates")
-	fs.Parse(os.Args[1:])
+	if err := fs.Parse(os.Args[1:]); err != nil {
+		log.Fatal(err)
+	}
 
 	config := Config{
 		Dir:               *dir,

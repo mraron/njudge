@@ -32,7 +32,7 @@ func (CSharp) Compile(ctx context.Context, s sandbox.Sandbox, f sandbox.File, st
 
 	rc := sandbox.RunConfig{
 		InheritEnv:    true,
-		DirectoryMaps: []sandbox.DirectoryMap{{"/etc", "/etc", nil}},
+		DirectoryMaps: []sandbox.DirectoryMap{{Inside: "/etc", Outside: "/etc"}},
 		MaxProcesses:  -1,
 		TimeLimit:     10 * time.Second,
 		MemoryLimit:   1 * memory.GiB,

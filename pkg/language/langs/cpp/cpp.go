@@ -101,8 +101,6 @@ var Std11 = New("cpp11", "C++ 11", WithCompileArgs(append(DefaultCompileArgs, "-
 var Std14 = New("cpp14", "C++ 14", WithCompileArgs(append(DefaultCompileArgs, "-std=c++14")))
 var Std17 = New("cpp17", "C++ 17", WithCompileArgs(append(DefaultCompileArgs, "-std=c++17")))
 
-var latest = Std17
-
 func init() {
 	language.DefaultStore.Register("cpp11", Std11)
 	language.DefaultStore.Register("cpp14", Std14)

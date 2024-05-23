@@ -104,9 +104,7 @@ func (i *Isolate) buildArgs(config RunConfig) ([]string, error) {
 	if config.MemoryLimit > 0 {
 		args = append(args, "--cg-mem="+strconv.Itoa(int(config.MemoryLimit/memory.KiB)))
 	}
-	for _, arg := range config.Args {
-		args = append(args, arg)
-	}
+	args = append(args, config.Args...)
 
 	return args, nil
 }

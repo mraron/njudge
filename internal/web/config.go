@@ -102,7 +102,7 @@ type Config struct {
 
 	Sendgrid SendgridConfig `yaml:"sendgrid" mapstructure:"sendgrid"`
 
-	SMTP SMTPConfig `yaml"smtp" mapstructure:"smtp"`
+	SMTP SMTPConfig `yaml:"smtp" mapstructure:"smtp"`
 
 	DatabaseConfig `yaml:"db" mapstructure:"db"`
 }

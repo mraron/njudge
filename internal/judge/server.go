@@ -114,7 +114,7 @@ func (s Server) Run() error {
 	go func() {
 		for {
 			if err := s.ProblemStore.UpdateProblems(); err != nil {
-				s.Logger.Error("failed to update problemStore", err)
+				s.Logger.Error("failed to update problemStore", "error", err.Error())
 			}
 			time.Sleep(30 * time.Second)
 		}

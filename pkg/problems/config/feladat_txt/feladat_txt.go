@@ -257,5 +257,5 @@ func Identify(fs afero.Fs, path string) bool {
 }
 
 func init() {
-	problems.RegisterConfigType("feladat_txt", Parse, Identify)
+	_ = problems.RegisterConfigType("feladat_txt", Parse, Identify)
 }

@@ -164,6 +164,9 @@ func (r *BasicRunner) setOutputExpectedOutput(s sandbox.Sandbox, testcase *probl
 	}
 
 	outputFile, err := s.Open(filepath.Base(testcase.OutputPath))
+	if err != nil {
+		return err
+	}
 	if output, err = r.getReadCloserPrefix(outputFile); err != nil {
 		return err
 	}

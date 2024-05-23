@@ -145,9 +145,11 @@ func PostForgotPasswordForm(users njudge.Users) echo.HandlerFunc {
 				templates.SetFlash(c, templates.ForgotPasswordFormMessageContextKey, tr.Translate("The two passwords don't match."))
 			} else {
 				u.ForgottenPasswordKey = nil
-				u.SetPassword(data.Password1)
+				if err = u.SetPassword(data.Password1); err != nil {
+					return err
+				}
 
-				if err := users.Update(c.Request().Context(), u, njudge.Fields(njudge.UserFields.ForgottenPasswordKey, njudge.UserFields.Password)); err == nil {
+				if err = users.Update(c.Request().Context(), u, njudge.Fields(njudge.UserFields.ForgottenPasswordKey, njudge.UserFields.Password)); err == nil {
 					templates.SetFlash(c, templates.ForgotPasswordFormMessageContextKey, tr.Translate("Password changed successfully! You can login with your new password."))
 				} else {
 					return err

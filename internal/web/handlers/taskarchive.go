@@ -19,7 +19,7 @@ func GetTaskArchive(tas njudge.TaskArchiveService) echo.HandlerFunc {
 
 		var (
 			rootStr = c.QueryParam("root")
-			root    = 0
+			root    int
 
 			res *njudge.TaskArchiveNode
 			cat *njudge.Category

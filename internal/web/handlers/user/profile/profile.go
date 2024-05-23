@@ -160,7 +160,9 @@ func PostSettingsChangePassword(us njudge.Users) echo.HandlerFunc {
 			return c.Redirect(http.StatusFound, "../")
 		}
 
-		u.SetPassword(data.PasswordNew1)
+		if err := u.SetPassword(data.PasswordNew1); err != nil {
+			return err
+		}
 		if err := us.Update(c.Request().Context(), u, njudge.Fields(njudge.UserFields.Password)); err != nil {
 			return err
 		}

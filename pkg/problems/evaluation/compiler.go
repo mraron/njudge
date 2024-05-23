@@ -64,7 +64,10 @@ func (c Compile) CompileWithExtras(ctx context.Context, solution problems.Soluti
 		return nil, err
 	}
 
-	stderr, res := &bytes.Buffer{}, &sandbox.File{}
+	var (
+		stderr = &bytes.Buffer{}
+		res    *sandbox.File
+	)
 	stderrTruncated := iotest.TruncateWriter(stderr, 1<<16)
 	if res, err = lang.Compile(ctx, s, sandbox.File{
 		Name:   lang.DefaultFilename(),

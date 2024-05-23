@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/executable"
+	"golang.org/x/net/context"
 	"io"
 	"testing"
 )
@@ -133,7 +134,7 @@ func TestTaskYAML_Check(t1 *testing.T) {
 				path: tt.fields.path,
 				exec: tt.fields.executable,
 			}
-			if err := t.Check(nil, tt.tc); (err != nil) != tt.wantErr {
+			if err := t.Check(context.TODO(), tt.tc); (err != nil) != tt.wantErr {
 				t1.Errorf("task_yaml.Check() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if tt.tc.VerdictName != tt.wantVerdictName {

@@ -66,23 +66,17 @@ func (pe *ParallelEvaluator) Evaluate(ctx context.Context, skeleton problems.Sta
 			var updateStatusError error
 			go func() {
 				mxInd := -1
-				for {
-					select {
-					case testcase, ok := <-testcaseChan:
-						if !ok {
-							groupDone <- struct{}{}
-							return
-						}
-						ans.Feedback[tsInd].Groups[gInd].Testcases[testcase.tcInd] = testcase.tc
-						if testcase.tc.Index > mxInd {
-							mxInd = testcase.tc.Index
-						}
+				for testcase := range testcaseChan {
+					ans.Feedback[tsInd].Groups[gInd].Testcases[testcase.tcInd] = testcase.tc
+					if testcase.tc.Index > mxInd {
+						mxInd = testcase.tc.Index
+					}
 
-						if err := statusUpdater.UpdateStatus(ctx, strconv.Itoa(mxInd), ans); err != nil {
-							updateStatusError = errors.Join(updateStatusError, err)
-						}
+					if err := statusUpdater.UpdateStatus(ctx, strconv.Itoa(mxInd), ans); err != nil {
+						updateStatusError = errors.Join(updateStatusError, err)
 					}
 				}
+				groupDone <- struct{}{}
 			}()
 
 			for tcInd := range group.Testcases {

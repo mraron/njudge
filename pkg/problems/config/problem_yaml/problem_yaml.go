@@ -349,5 +349,5 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 
 func init() {
 	parser, identifier := ParserAndIdentifier()
-	problems.RegisterConfigType("problem_yaml", parser, identifier)
+	_ = problems.RegisterConfigType("problem_yaml", parser, identifier)
 }

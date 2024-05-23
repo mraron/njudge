@@ -80,7 +80,7 @@ func NewDemoDataAccess(ctx context.Context, ps problems.Store, ms email.Service)
 	}
 
 	t2 := njudge.NewTag("dp")
-	t2, err = s.Tags.Insert(ctx, *t2)
+	_, err = s.Tags.Insert(ctx, *t2)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +134,7 @@ func NewDemoDataAccess(ctx context.Context, ps problems.Store, ms email.Service)
 	}
 	ss.Compiled = true
 	sub.Status = *ss
-	sub, err = s.Submissions.Insert(ctx, *sub)
+	_, err = s.Submissions.Insert(ctx, *sub)
 	if err != nil {
 		return nil, err
 	}
