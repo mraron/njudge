@@ -1,11 +1,11 @@
 package judge
 
 import (
+	"context"
 	"errors"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/evaluation"
-	"golang.org/x/net/context"
 	"golang.org/x/sync/errgroup"
 	"log/slog"
 	"strconv"

@@ -12,12 +12,12 @@ import (
 )
 
 type DatabaseConfig struct {
-	User     string `mapstructure:"user" yaml:"user" json:"user"`
-	Password string `mapstructure:"password" yaml:"password" json:"password"`
-	Host     string `mapstructure:"host" yaml:"host" json:"host"`
-	Name     string `mapstructure:"name" yaml:"name" json:"name"`
-	Port     int    `mapstructure:"port" yaml:"port" json:"port"`
-	SSLMode  bool   `mapstructure:"ssl_mode" yaml:"ssl_mode" json:"ssl_mode"`
+	User     string `mapstructure:"user" yaml:"user"`
+	Password string `mapstructure:"password" yaml:"password"`
+	Host     string `mapstructure:"host" yaml:"host"`
+	Name     string `mapstructure:"name" yaml:"name"`
+	Port     int    `mapstructure:"port" yaml:"port"`
+	SSLMode  bool   `mapstructure:"ssl_mode" yaml:"ssl_mode"`
 }
 
 func (db DatabaseConfig) Connect() (*sql.DB, error) {

@@ -212,7 +212,7 @@ func (s *FsStore) UpdateProblems() error {
 				errs.Errors = append(errs.Errors, fmt.Errorf("%s: %w", info.Name(), err))
 				errs.Problems = append(errs.Problems, info.Name())
 
-				if err == ErrorNoMatch {
+				if errors.Is(err, ErrorNoMatch) {
 					return nil
 				} else {
 					return filepath.SkipDir

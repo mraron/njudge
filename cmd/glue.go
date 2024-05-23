@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/mraron/njudge/internal/glue"
@@ -8,7 +9,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	"golang.org/x/net/context"
 	"io/fs"
 	"log/slog"
 	"strings"

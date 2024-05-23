@@ -1,6 +1,7 @@
 package web
 
 import (
+	"context"
 	"errors"
 	"github.com/antonlindstrom/pgstore"
 	"github.com/gorilla/sessions"
@@ -14,7 +15,6 @@ import (
 	"github.com/mraron/njudge/internal/web/templates/i18n"
 	"github.com/quasoft/memstore"
 	slogecho "github.com/samber/slog-echo"
-	"golang.org/x/net/context"
 	"net/http"
 	"strings"
 

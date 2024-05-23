@@ -1,6 +1,7 @@
 package web
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"github.com/labstack/echo/v4"
@@ -13,7 +14,6 @@ import (
 	_ "github.com/mraron/njudge/pkg/problems/evaluation/communication"
 	_ "github.com/mraron/njudge/pkg/problems/evaluation/output_only"
 	_ "github.com/mraron/njudge/pkg/problems/evaluation/stub"
-	"golang.org/x/net/context"
 	"log/slog"
 	_ "mime"
 	"net"

@@ -1,10 +1,10 @@
 package checker
 
 import (
+	"context"
 	"errors"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/executable"
-	"golang.org/x/net/context"
 	"io"
 	"testing"
 )

@@ -1,7 +1,7 @@
 package web
 
 import (
-	"golang.org/x/net/context"
+	"context"
 	"time"
 
 	"github.com/markbates/goth"

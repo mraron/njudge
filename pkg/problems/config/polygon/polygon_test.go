@@ -1,6 +1,7 @@
 package polygon
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/mraron/njudge/pkg/problems"
@@ -22,7 +23,7 @@ func TestDummyParsing(t *testing.T) {
 	handleError(cs.Register("polygon", parser, identifier))
 	handleError(memFs.Mkdir("testproblem", 0700))
 
-	if p, err := cs.Parse(memFs, "testproblem/"); p != nil || err != problems.ErrorNoMatch {
+	if p, err := cs.Parse(memFs, "testproblem/"); p != nil || !errors.Is(err, problems.ErrorNoMatch) {
 		t.Error("no problem.xml but found it")
 	}
 

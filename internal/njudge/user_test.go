@@ -1,9 +1,9 @@
 package njudge_test
 
 import (
+	"context"
 	"errors"
 	"github.com/mraron/njudge/internal/njudge/memory"
-	"golang.org/x/net/context"
 	"testing"
 
 	"github.com/mraron/njudge/internal/njudge"
