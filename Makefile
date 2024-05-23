@@ -18,6 +18,19 @@ build_glue: ## builds njudge-glue
 build_judge:  ## builds njudge-judge
 	docker build --build-arg="PROJECT_NAME=$(PROJECT_NAME)" -t $(PROJECT_NAME)-judge -f judge.Dockerfile .
 
+gulp: ## run gulp
+	npx gulp
+lint: ## run golangci-lint linter
+	golangci-lint run
+generate: ## updates out.gotext.json translation files from source code (runs go generate)
+	go generate ./...
+translations: ## copies the out.gotext.json to the messages.gotext.json
+	cp internal/web/translations/locales/en-US/out.gotext.json internal/web/translations/locales/en-US/messages.gotext.json
+	cp internal/web/translations/locales/hu-HU/out.gotext.json internal/web/translations/locales/hu-HU/messages.gotext.json
+models: ## updates internal/njudge/db/models from sqlboiler.toml
+	sqlboiler psql
+
+
 up: build ## builds an runs docker-compose up
 	COMPOSE_PROJECT_NAME="$(PROJECT_NAME)" docker-compose up
 

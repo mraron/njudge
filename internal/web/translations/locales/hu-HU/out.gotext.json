@@ -77,17 +77,22 @@
             ]
         },
         {
-            "id": "Statement - {String} ({Name})",
-            "message": "Statement - {String} ({Name})",
-            "translation": "Leírás - {String} ({Name})",
+            "id": "Archive",
+            "message": "Archive",
+            "translation": "Archívum"
+        },
+        {
+            "id": "Statement - {Title} ({Name})",
+            "message": "Statement - {Title} ({Name})",
+            "translation": "",
             "placeholders": [
                 {
-                    "id": "String",
+                    "id": "Title",
                     "string": "%[1]s",
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 1,
-                    "expr": "tr.TranslateContent(prob.Titles()).String()"
+                    "expr": "title"
                 },
                 {
                     "id": "Name",
@@ -95,7 +100,7 @@
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 2,
-                    "expr": "prob.Name()"
+                    "expr": "name"
                 }
             ]
         },
@@ -110,7 +115,7 @@
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 1,
-                    "expr": "tr.TranslateContent(prob.Titles()).String()"
+                    "expr": "tr.TranslateContent(storedData.Titles()).String()"
                 },
                 {
                     "id": "Name",
@@ -118,22 +123,22 @@
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 2,
-                    "expr": "prob.Name()"
+                    "expr": "storedData.Name()"
                 }
             ]
         },
         {
-            "id": "Submit - {String} ({Name})",
-            "message": "Submit - {String} ({Name})",
-            "translation": "Beküld - {String} ({Name})",
+            "id": "Submit - {Title} ({Name})",
+            "message": "Submit - {Title} ({Name})",
+            "translation": "",
             "placeholders": [
                 {
-                    "id": "String",
+                    "id": "Title",
                     "string": "%[1]s",
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 1,
-                    "expr": "tr.TranslateContent(prob.Titles()).String()"
+                    "expr": "title"
                 },
                 {
                     "id": "Name",
@@ -141,7 +146,7 @@
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 2,
-                    "expr": "prob.Name()"
+                    "expr": "storedData.Name()"
                 }
             ]
         },
@@ -156,7 +161,7 @@
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 1,
-                    "expr": "tr.TranslateContent(prob.Titles()).String()"
+                    "expr": "tr.TranslateContent(storedData.Titles()).String()"
                 },
                 {
                     "id": "Name",
@@ -164,7 +169,7 @@
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 2,
-                    "expr": "prob.Name()"
+                    "expr": "storedData.Name()"
                 }
             ]
         },
@@ -182,11 +187,6 @@
             "id": "Submissions",
             "message": "Submissions",
             "translation": "Beküldések"
-        },
-        {
-            "id": "Archive",
-            "message": "Archive",
-            "translation": "Archívum"
         },
         {
             "id": "Password reset",
@@ -209,9 +209,9 @@
             "translation": "A két megadott jelszó nem egyezik meg."
         },
         {
-            "id": "Password changed succesfully! You can login with your new password.",
-            "message": "Password changed succesfully! You can login with your new password.",
-            "translation": "Jelszó sikeresen megváltoztatva! Beléphetsz az új jelszavaddal."
+            "id": "Password changed successfully! You can login with your new password.",
+            "message": "Password changed successfully! You can login with your new password.",
+            "translation": ""
         },
         {
             "id": [
@@ -242,24 +242,9 @@
             "translation": "Hibás authentikációs token."
         },
         {
-            "id": "Your email is not associated with any registered account.",
-            "message": "Your email is not associated with any registered account.",
-            "translation": "Az email címed nem tartozik egy regisztrált fiókhoz sem."
-        },
-        {
             "id": "Can't logout if you've not logged in.",
             "message": "Can't logout if you've not logged in.",
             "translation": "A kilépéshez előbb lépj be."
-        },
-        {
-            "id": "The nickname is already registered.",
-            "message": "The nickname is already registered.",
-            "translation": "Ez a név már foglalt."
-        },
-        {
-            "id": "The email is already registered.",
-            "message": "The email is already registered.",
-            "translation": "Ez az email cím már foglalt."
         },
         {
             "id": "The nickname field is required.",
@@ -290,6 +275,21 @@
             "id": "Activate your account",
             "message": "Activate your account",
             "translation": "Aktiváld a fiókod"
+        },
+        {
+            "id": "The nickname is already registered.",
+            "message": "The nickname is already registered.",
+            "translation": "Ez a név már foglalt."
+        },
+        {
+            "id": "The email is already registered.",
+            "message": "The email is already registered.",
+            "translation": "Ez az email cím már foglalt."
+        },
+        {
+            "id": "Thank you for registering! We've sent you an email with further instructions about finishing your registration.",
+            "message": "Thank you for registering! We've sent you an email with further instructions about finishing your registration.",
+            "translation": ""
         },
         {
             "id": "This account has already been activated.",
@@ -352,11 +352,6 @@
             "translation": "A két megadott jelszó nem egyezik meg."
         },
         {
-            "id": "Home",
-            "message": "Home",
-            "translation": "Főoldal"
-        },
-        {
             "id": "Profile",
             "message": "Profile",
             "translation": "Profil"
@@ -377,16 +372,6 @@
             "translation": "Kilépés"
         },
         {
-            "id": "Login",
-            "message": "Login",
-            "translation": "Belépés"
-        },
-        {
-            "id": "Register",
-            "message": "Register",
-            "translation": "Regisztráció"
-        },
-        {
             "id": "source",
             "message": "source",
             "translation": "forráskód"
@@ -397,84 +382,9 @@
             "translation": "nyelv"
         },
         {
-            "id": "%s on test %d",
-            "message": "%s on test %d",
-            "translation": "%s a(z) %d. teszteseten"
-        },
-        {
-            "id": "on test %s",
-            "message": "on test %s",
-            "translation": "a(z) %d. tesztesten"
-        },
-        {
-            "id": "Date",
-            "message": "Date",
-            "translation": "Dátum"
-        },
-        {
-            "id": "User",
-            "message": "User",
-            "translation": "Felhasználó"
-        },
-        {
-            "id": "Problem",
-            "message": "Problem",
-            "translation": "Feladat"
-        },
-        {
-            "id": "Language",
-            "message": "Language",
-            "translation": "Nyelv"
-        },
-        {
-            "id": "Verdict",
-            "message": "Verdict",
-            "translation": "Verdikt"
-        },
-        {
-            "id": "Time",
-            "message": "Time",
-            "translation": "Idő"
-        },
-        {
-            "id": "Memory",
-            "message": "Memory",
-            "translation": "Memória"
-        },
-        {
-            "id": "Filter",
-            "message": "Filter",
-            "translation": "Szűrés"
-        },
-        {
-            "id": "Title",
-            "message": "Title",
-            "translation": "Cím"
-        },
-        {
-            "id": "Category",
-            "message": "Category",
-            "translation": "Kategória"
-        },
-        {
-            "id": "Tags",
-            "message": "Tags",
-            "translation": "Tagek"
-        },
-        {
-            "id": "Clear",
-            "message": "Clear",
-            "translation": "Töröl"
-        },
-        {
-            "id": "Identifier",
-            "message": "Identifier",
-            "translation": "Azonosító"
-        },
-        {
-            "id": "Solvers",
-            "message": "Solvers",
-            "translation": "Megoldók"
+            "id": "en",
+            "message": "en",
+            "translation": ""
         },
         {
             "id": "Statement",
@@ -502,24 +412,19 @@
             "translation": "Eredmények"
         },
         {
-            "id": "Add a tag to problem %q",
-            "message": "Add a tag to problem %q",
-            "translation": "Tag hozzáadása a %q feladathoz"
-        },
-        {
-            "id": "Cancel",
-            "message": "Cancel",
-            "translation": "Mégse"
-        },
-        {
-            "id": "Add",
-            "message": "Add",
-            "translation": "Hozzáad"
-        },
-        {
             "id": "Information",
             "message": "Information",
             "translation": "Információk"
+        },
+        {
+            "id": "Identifier",
+            "message": "Identifier",
+            "translation": "Azonosító"
+        },
+        {
+            "id": "Title",
+            "message": "Title",
+            "translation": "Cím"
         },
         {
             "id": "Time limit",
@@ -530,6 +435,11 @@
             "id": "Memory limit",
             "message": "Memory limit",
             "translation": "Memórialimit"
+        },
+        {
+            "id": "Tags",
+            "message": "Tags",
+            "translation": "Tagek"
         },
         {
             "id": "Task type",
@@ -545,6 +455,31 @@
             "id": "Last submissions",
             "message": "Last submissions",
             "translation": "Utolsó beküldések"
+        },
+        {
+            "id": "Add a tag to problem {Title}",
+            "message": "Add a tag to problem {Title}",
+            "translation": "",
+            "placeholders": [
+                {
+                    "id": "Title",
+                    "string": "%[1]q",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "vm.Title"
+                }
+            ]
+        },
+        {
+            "id": "Cancel",
+            "message": "Cancel",
+            "translation": "Mégse"
+        },
+        {
+            "id": "Add",
+            "message": "Add",
+            "translation": "Hozzáad"
         },
         {
             "id": "Attachments",
@@ -567,74 +502,39 @@
             "translation": "Pontok"
         },
         {
+            "id": "Problem",
+            "message": "Problem",
+            "translation": "Feladat"
+        },
+        {
             "id": "Code",
             "message": "Code",
             "translation": "Kód"
         },
         {
-            "id": "Rejudge",
-            "message": "Rejudge",
-            "translation": "Újraértékel"
+            "id": "Language",
+            "message": "Language",
+            "translation": "Nyelv"
         },
         {
-            "id": "Program's output",
-            "message": "Program's output",
-            "translation": "Program kimenete"
+            "id": "Filter",
+            "message": "Filter",
+            "translation": "Szűrés"
         },
         {
-            "id": "Expected output",
-            "message": "Expected output",
-            "translation": "Elvárt kimenet"
+            "id": "Category",
+            "message": "Category",
+            "translation": "Kategória"
         },
         {
-            "id": "Checker output",
-            "message": "Checker output",
-            "translation": "Ellenőrző kimenet"
+            "id": "Clear",
+            "message": "Clear",
+            "translation": "Töröl"
         },
         {
-            "id": "Subtask",
-            "message": "Subtask",
-            "translation": "Részfeladat"
-        },
-        {
-            "id": "Sum",
-            "message": "Sum",
-            "translation": "Összpont"
-        },
-        {
-            "id": "Test",
-            "message": "Test",
-            "translation": "Teszt"
-        },
-        {
-            "id": "Email",
-            "message": "Email",
-            "translation": "Email"
-        },
-        {
-            "id": "Reset password",
-            "message": "Reset password",
-            "translation": "Jelszó megváltoztatása"
-        },
-        {
-            "id": "Password",
-            "message": "Password",
-            "translation": "Jelszó"
-        },
-        {
-            "id": "Password again",
-            "message": "Password again",
-            "translation": "Jelszó mégegyszer"
-        },
-        {
-            "id": "We found the following problems",
-            "message": "We found the following problems",
-            "translation": "A következő problémákat találtuk"
-        },
-        {
-            "id": "Nickname",
-            "message": "Nickname",
-            "translation": "Felhasználónév"
+            "id": "Solvers",
+            "message": "Solvers",
+            "translation": "Megoldók"
         },
         {
             "id": "Solved problems",
@@ -675,6 +575,116 @@
             "id": "Save",
             "message": "Save",
             "translation": "Ment"
+        },
+        {
+            "id": "on test {String}",
+            "message": "on test {String}",
+            "translation": "",
+            "placeholders": [
+                {
+                    "id": "String",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "s.Ontest.String"
+                }
+            ]
+        },
+        {
+            "id": "Subtask",
+            "message": "Subtask",
+            "translation": "Részfeladat"
+        },
+        {
+            "id": "Sum",
+            "message": "Sum",
+            "translation": "Összpont"
+        },
+        {
+            "id": "Test",
+            "message": "Test",
+            "translation": "Teszt"
+        },
+        {
+            "id": "Verdict",
+            "message": "Verdict",
+            "translation": "Verdikt"
+        },
+        {
+            "id": "Time",
+            "message": "Time",
+            "translation": "Idő"
+        },
+        {
+            "id": "Memory",
+            "message": "Memory",
+            "translation": "Memória"
+        },
+        {
+            "id": "Rejudge",
+            "message": "Rejudge",
+            "translation": "Újraértékel"
+        },
+        {
+            "id": "Date",
+            "message": "Date",
+            "translation": "Dátum"
+        },
+        {
+            "id": "User",
+            "message": "User",
+            "translation": "Felhasználó"
+        },
+        {
+            "id": "We found the following problems",
+            "message": "We found the following problems",
+            "translation": "A következő problémákat találtuk"
+        },
+        {
+            "id": "Nickname",
+            "message": "Nickname",
+            "translation": "Felhasználónév"
+        },
+        {
+            "id": "Password",
+            "message": "Password",
+            "translation": "Jelszó"
+        },
+        {
+            "id": "Forgot password?",
+            "message": "Forgot password?",
+            "translation": ""
+        },
+        {
+            "id": "Login",
+            "message": "Login",
+            "translation": "Belépés"
+        },
+        {
+            "id": "Password again",
+            "message": "Password again",
+            "translation": "Jelszó mégegyszer"
+        },
+        {
+            "id": "Email",
+            "message": "Email",
+            "translation": "Email"
+        },
+        {
+            "id": "Register",
+            "message": "Register",
+            "translation": "Regisztráció"
+        },
+        {
+            "id": "Reset password",
+            "message": "Reset password",
+            "translation": "Jelszó megváltoztatása"
+        },
+        {
+            "id": "Home",
+            "message": "Home",
+            "translation": "Főoldal"
         }
     ]
 }

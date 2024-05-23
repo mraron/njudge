@@ -148,7 +148,7 @@ func PostForgotPasswordForm(users njudge.Users) echo.HandlerFunc {
 				u.SetPassword(data.Password1)
 
 				if err := users.Update(c.Request().Context(), u, njudge.Fields(njudge.UserFields.ForgottenPasswordKey, njudge.UserFields.Password)); err == nil {
-					templates.SetFlash(c, templates.ForgotPasswordFormMessageContextKey, tr.Translate("Password changed succesfully! You can login with your new password."))
+					templates.SetFlash(c, templates.ForgotPasswordFormMessageContextKey, tr.Translate("Password changed successfully! You can login with your new password."))
 				} else {
 					return err
 				}
