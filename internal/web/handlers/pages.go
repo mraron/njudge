@@ -11,7 +11,6 @@ import (
 
 func GetHome(store templates.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		c.Set(templates.TitleContextKey, "")
 		res, _ := store.Get("home")
 		return templates.Render(c, http.StatusOK, templates.Home(res))
 	}

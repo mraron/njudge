@@ -118,6 +118,10 @@ func Tr(ctx context.Context, key string, args ...any) string {
 	return tr.Translate(key, args...)
 }
 
+func trLocale(ctx context.Context) string {
+	return ctx.Value(i18n.TranslatorContextKey).(i18n.Translator).LocaleName
+}
+
 type echoContextWrapper struct {
 	echo.Context
 }
