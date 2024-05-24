@@ -1,0 +1,27 @@
+<link href="problem-statement.css" rel="stylesheet" type="text/css"><div class="problem-statement">
+    <div class="header">
+        <div class="title">{{.Name}}</div>
+        <div class="time-limit"><div class="property-title">tesztenkénti időlimit</div> {{.TimeLimit}} ms</DIV>
+        <div class="memory-limit"><div class="property-title">tesztenkénti memórialimit</div> {{div .MemoryLimit 1048576}} MiB</div>
+        <div class="input-file"><div class="property-title">inputfájl</div>{{if .InputFile}} {{.InputFile}} {{else}} stdin {{end}}</div>
+        <div class="output-file"><div class="property-title">outputfájl</div>{{if .OutputFile}} {{.OutputFile}} {{else}} stdout {{end}}</div>
+    </div><p></p><p></p>
+    {{if needSection .Legend}}<div class="legend">{{.Legend}}</div><p></p><p></p>{{end}}
+    {{if needSection .Input}}<div class="input-specification"><div class="section-title">Bemenet</div> {{.Input}}</div><p></p><p></p>{{end}}
+    {{if needSection .Output}}<div class="input-specification"><div class="section-title">Kimenet</div> {{.Output}}</div><p></p><p></p>{{end}}
+    {{if needSection .Scoring}}<div class="input-specification"><div class="section-title">Pontozás</div> {{.Scoring}}</div><p></p><p></p>{{end}}
+    {{if .SampleTests}}
+        <div class="sample-tests">
+            <div class="section-title">Példák</div>
+            {{range $ind, $i := .SampleTests}}
+                <div class="sample-test">
+                    <div class="input"><div class="title">Bemenet <div title="Copy" class="input-output-copier" data-target="input{{$ind}}">Másol</div></div><pre class="content" id="input{{$ind}}">{{$i.Input}}</pre></div>
+                    <div class="output"><div class="title">Kimenet <div title="Copy" class="input-output-copier" data-target="output{{$ind}}">Másol</div></div><pre class="content" id="output{{$ind}}">{{$i.Output}}</pre></div>
+                </div>
+                <p></p><p></p>
+            {{end}}
+        </div>
+    {{end}}
+
+    {{if needSection .Notes}}<div class="section-title">Megjegyzések</div> {{.Notes}}<p></p><p></p>{{end}}
+</div>

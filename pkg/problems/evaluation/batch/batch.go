@@ -5,9 +5,11 @@ import (
 	"github.com/mraron/njudge/pkg/problems/evaluation"
 )
 
+const Name = "batch"
+
 func New(compiler problems.Compiler, options ...evaluation.BasicRunnerOption) problems.TaskType {
 	return problems.NewTaskType(
-		"batch",
+		Name,
 		compiler,
 		evaluation.NewLinearEvaluator(evaluation.NewBasicRunner(options...)),
 	)

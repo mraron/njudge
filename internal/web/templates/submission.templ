@@ -37,7 +37,7 @@ templ SubmissionStatusText(s njudge.Submission) {
                 if s.Status.FeedbackType == problems.FeedbackIOI || s.Status.FeedbackType == problems.FeedbackLazyIOI {
                     @score(&s.Status.Feedback[0])
                 }else if s.Status.FeedbackType == problems.FeedbackCF {
-                     if s.Ontest.Valid && s.Status.FeedbackType == problems.FeedbackCF {
+                     if s.Ontest.Valid {
                         {Tr(ctx, "on test %s", s.Ontest.String)}
                     }
                 }

@@ -6,11 +6,47 @@ import "github.com/mraron/njudge/internal/njudge"
 import "time"
 import "github.com/mraron/njudge/pkg/problems"
 
-templ problemMenu(curr string) {
+templ localeEmoji(locale string) {
+    switch locale {
+        case "hungarian":
+            🇭🇺
+        case "english":
+            🇺🇸
+        case "russian":
+            🇷🇺
+        default:
+            🗺️
+    }
+}
+
+templ problemMenu(curr string, statements problems.Contents) {
     <ul class="nav nav-tabs">
-        <li class="nav-item">
-            <a class={"nav-link"+iif(curr=="problem", " active", "")} href="./problem">{Tr(ctx, "Statement")}</a>
-        </li>
+        if curr != "problem" || len(statements)==0 {
+            <li class="nav-item">
+                <a class={"nav-link"+iif(curr=="problem", " active", "")} href="./problem">
+                    {Tr(ctx, "Statement")}
+                </a>
+            </li>
+        }else {
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle active" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                    {Tr(ctx, "Statement")}
+                </a>
+                <div class="dropdown-menu" hx-boost="true">
+                    for _, st := range statements {
+                        if st.Type() == problems.DataTypeHTML {
+                            <a href={templ.SafeURL("?type=html&locale="+st.Locale())} class="dropdown-item">
+                                @localeEmoji(st.Locale()) HTML {st.Locale()}
+                            </a>
+                        }else if st.Type() == problems.DataTypePDF {
+                            <a href={templ.SafeURL("?type=pdf&locale="+st.Locale())} class="dropdown-item">
+                                @localeEmoji(st.Locale()) PDF {st.Locale()}
+                            </a>
+                         }
+                    }
+                </div>
+            </li>
+        }
         <li class="nav-item">
             <a class={"nav-link"+iif(curr=="submit", " active", "")} href="./submit">{Tr(ctx, "Submit")}</a>
         </li>
@@ -45,6 +81,7 @@ type ProblemViewModel struct {
 
     Attachments problems.Attachments
     Statements problems.Contents
+    Statement *problems.LocalizedData
 
     TagsToAdd []njudge.Tag
 }
@@ -155,12 +192,13 @@ templ problemLastSubmissions(vm ProblemViewModel) {
     }
 }
 
-//TODO create dropdown, inline html, delete stuff
 templ problemStatement(vm ProblemViewModel) {
-    if htmls := vm.Statements.FilterByType(problems.DataTypeHTML); len(htmls)>0 {
-        @templ.Raw(TrCs(ctx, htmls).String())
-    }else if pdfs := vm.Statements.FilterByType(problems.DataTypePDF); len(pdfs)>0 {
-        <embed src={"pdf/"+TrCs(ctx, pdfs).Locale()+"/"} width="100%" height="800px"/>
+    if vm.Statement != nil {
+        if (*vm.Statement).Type() == problems.DataTypeHTML {
+            @templ.Raw((*vm.Statement).String())
+        }else if (*vm.Statement).Type() == problems.DataTypePDF {
+            <embed src={"pdf/"+(*vm.Statement).Locale()+"/"} width="100%" height="800px"/>
+        }
     }
 }
 
@@ -220,15 +258,15 @@ templ problemAttachments(vm ProblemViewModel) {
     </div>
 }
 
-templ problemPage(name string) {
+templ problemPage(name string, statements problems.Contents) {
     @Page() {
-        @problemMenu(name)
+        @problemMenu(name, statements)
         { children... }
     }
 }
 
 templ Problem(vm ProblemViewModel) {
-    @problemPage("problem") {
+    @problemPage("problem", vm.Statements) {
         @problemAddTag(vm)
         <div class="row">
             <div class="col-12 col-lg-9">
@@ -259,7 +297,7 @@ type ProblemRanklistViewModel struct {
 }
 
 templ ProblemRanklist(vm ProblemRanklistViewModel) {
-    @problemPage("ranklist") {
+    @problemPage("ranklist", nil) {
         <table class="table table-sm table-bordered">
         <thead>
             <tr>
@@ -278,7 +316,7 @@ templ ProblemRanklist(vm ProblemRanklistViewModel) {
 }
 
 templ ProblemStatus(vm SubmissionsViewModel) {
-    @problemPage("status") {
+    @problemPage("status", nil) {
         @Submissions(vm)
     }
 }
@@ -292,7 +330,7 @@ type ProblemSubmitViewModel struct {
 }
 
 templ ProblemSubmit(vm ProblemSubmitViewModel) {
-    @problemPage("submit") {
+    @problemPage("submit", nil) {
         if vm.UserInfo != nil {
             <form action={templ.SafeURL("/problemset/"+vm.Problemset+"/submit")} method="post" >
             <div class="form-group">

@@ -145,7 +145,7 @@ func SubmissionStatusText(s njudge.Submission) templ.Component {
 						return templ_7745c5c3_Err
 					}
 				} else if s.Status.FeedbackType == problems.FeedbackCF {
-					if s.Ontest.Valid && s.Status.FeedbackType == problems.FeedbackCF {
+					if s.Ontest.Valid {
 						var templ_7745c5c3_Var8 string
 						templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(Tr(ctx, "on test %s", s.Ontest.String))
 						if templ_7745c5c3_Err != nil {

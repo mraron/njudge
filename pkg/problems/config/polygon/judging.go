@@ -3,6 +3,7 @@ package polygon
 import (
 	"fmt"
 	"github.com/mraron/njudge/pkg/language/memory"
+	"github.com/mraron/njudge/pkg/problems/evaluation/output_only"
 	"github.com/mraron/njudge/pkg/problems/executable/checker"
 	"path/filepath"
 	"time"
@@ -153,7 +154,7 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	}
 
 	feedback := []problems.Testset{testset.Testset(p.Path)}
-	if p.TaskType == "outputonly" {
+	if p.TaskType == output_only.Name {
 		for _, tc := range feedback[0].Testcases() {
 			tc.OutputPath = filepath.Base(tc.AnswerPath)
 		}

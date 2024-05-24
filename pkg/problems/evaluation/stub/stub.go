@@ -5,9 +5,11 @@ import (
 	"github.com/mraron/njudge/pkg/problems/evaluation"
 )
 
+const Name = "stub"
+
 func New(stubCompiler *evaluation.CompileWithStubs, options ...evaluation.BasicRunnerOption) problems.TaskType {
 	return problems.NewTaskType(
-		"stub",
+		Name,
 		stubCompiler,
 		evaluation.NewLinearEvaluator(evaluation.NewBasicRunner(options...)),
 	)

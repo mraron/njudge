@@ -79,7 +79,6 @@ func (s *Server) routes(e *echo.Echo) {
 
 	psProb.GET("/pdf/:language/", problemset.GetProblemPDF())
 	psProb.GET("/attachment/:attachment/", problemset.GetProblemAttachment())
-	psProb.GET("/:file", problemset.GetProblemFile())
 
 	u := e.Group("/user")
 

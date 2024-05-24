@@ -6,13 +6,9 @@ import (
 	"github.com/mraron/njudge/internal/web/templates/i18n"
 	"github.com/mraron/njudge/pkg/language"
 	"io"
-	"os"
-	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/mraron/njudge/pkg/problems"
-	"github.com/mraron/njudge/pkg/problems/config/polygon"
 )
 
 var (
@@ -149,24 +145,6 @@ func (p *ProblemStoredData) GetPDF(lang Language) (io.ReadCloser, error) {
 	}
 
 	return i18n.TranslateContent(string(lang), p.Statements().FilterByType(problems.DataTypePDF)).ValueReader()
-}
-
-func (p *ProblemStoredData) GetFile(file string) (fileLoc string, err error) {
-	switch p := p.Problem.(problems.ProblemWrapper).Problem.(type) {
-	case polygon.Problem:
-		if len(p.Statements().FilterByType(problems.DataTypeHTML)) == 0 || strings.HasSuffix(file, ".tex") || strings.HasSuffix(file, ".json") {
-			err = ErrorFileNotFound
-		}
-
-		fileLoc = filepath.Join(p.Path, "statements", ".html", p.HTMLStatements()[0].Locale(), file)
-		if _, err := os.Stat(fileLoc); err != nil {
-			fileLoc = filepath.Join(p.Path, "statements", p.HTMLStatements()[0].Locale(), file)
-		}
-	default:
-		err = ErrorFileNotFound
-	}
-
-	return
 }
 
 func (p *ProblemStoredData) GetAttachment(attachment string) (problems.NamedData, error) {

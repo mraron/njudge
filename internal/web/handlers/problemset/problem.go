@@ -18,6 +18,15 @@ import (
 )
 
 func GetProblem(tags njudge.Tags) echo.HandlerFunc {
+	dataType := func(t string) string {
+		switch t {
+		case "pdf":
+			return problems.DataTypePDF
+		case "html":
+			return problems.DataTypeHTML
+		}
+		return ""
+	}
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 		prob := c.Get("problem").(njudge.Problem)
@@ -37,9 +46,36 @@ func GetProblem(tags njudge.Tags) echo.HandlerFunc {
 			Languages:    storedData.Languages(),
 			UserInfo:     info.UserInfo,
 			Attachments:  storedData.Attachments(),
-			Statements:   storedData.Statements(),
+			Statements:   nil,
 			TagsToAdd:    nil,
 		}
+		for _, st := range storedData.Statements() {
+			if st.IsHTML() || st.IsPDF() {
+				vm.Statements = append(vm.Statements, st)
+			}
+		}
+		statementType := c.QueryParam("type")
+		locale := c.QueryParam("locale")
+		poss := vm.Statements
+		if statementType != "" {
+			poss = poss.FilterByType(dataType(statementType))
+		}
+		if locale != "" {
+			poss = poss.FilterByLocale(locale)
+		}
+		if len(poss) > 0 {
+			s := tr.TranslateContent(poss)
+			vm.Statement = &s
+		} else { // prefer html then pdf
+			if HTMLs := vm.Statements.FilterByLocale(problems.DataTypeHTML); len(HTMLs) > 0 {
+				s := tr.TranslateContent(HTMLs)
+				vm.Statement = &s
+			} else if PDFs := vm.Statements.FilterByLocale(problems.DataTypePDF); len(PDFs) > 0 {
+				s := tr.TranslateContent(PDFs)
+				vm.Statement = &s
+			}
+		}
+
 		if storedData.GetTaskType().Name() != output_only.Name {
 			vm.DisplayLimits = true
 			vm.TimeLimit = storedData.TimeLimit()
@@ -80,21 +116,6 @@ func GetProblemPDF() echo.HandlerFunc {
 		}
 
 		return c.Blob(http.StatusOK, "application/pdf", data)
-	}
-}
-
-func GetProblemFile() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		storedData := c.Get("problemStoredData").(njudge.ProblemStoredData)
-
-		fileLoc, err := storedData.GetFile(c.Param("file"))
-		if errors.Is(err, njudge.ErrorFileNotFound) {
-			return echo.NewHTTPError(http.StatusNotFound, err)
-		} else if err != nil {
-			return err
-		}
-
-		return c.File(fileLoc)
 	}
 }
 
