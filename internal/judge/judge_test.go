@@ -114,6 +114,7 @@ print(a+b)
 	})
 	assert.NoError(t, err)
 	assert.NotNil(t, res)
+	assert.Equal(t, problems.AfterCompilation, res.CompilationStatus)
 	assert.True(t, res.Compiled)
 
 }

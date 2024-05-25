@@ -25,6 +25,7 @@ const (
 	VerdictDR      VerdictName = "DR"
 	VerdictPC      VerdictName = "PC"
 	VerdictPE      VerdictName = "PE"
+	VerdictSK      VerdictName = "SK"
 )
 
 func (v *VerdictName) UnmarshalJSON(i []byte) error {
@@ -47,6 +48,8 @@ func (v *VerdictName) UnmarshalJSON(i []byte) error {
 		*v = VerdictPC
 	case "8", fmt.Sprintf("%q", VerdictPE):
 		*v = VerdictPE
+	case fmt.Sprintf("%q", VerdictSK):
+		*v = VerdictSK
 	case "null":
 	default:
 		return fmt.Errorf("unknown VerdictName: %q", i)
@@ -375,14 +378,23 @@ func (g *Group) MaxTimeSpent() time.Duration {
 	return mx
 }
 
+type CompilationStatus int
+
+const (
+	BeforeCompilation CompilationStatus = 0
+	DuringCompilation CompilationStatus = 1
+	AfterCompilation  CompilationStatus = 2
+)
+
 // A Status represents the status of a submission after judging
 // It contains the information about compilation and the feedback
 // The main Testset is always the first one in Feedback.
 type Status struct {
-	Compiled       bool
-	CompilerOutput string
-	FeedbackType   FeedbackType
-	Feedback       []Testset
+	CompilationStatus CompilationStatus
+	Compiled          bool
+	CompilerOutput    string
+	FeedbackType      FeedbackType
+	Feedback          []Testset
 }
 
 func (v *Status) Value() (driver.Value, error) {

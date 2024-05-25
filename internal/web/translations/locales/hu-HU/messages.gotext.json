@@ -47,6 +47,11 @@
             "translation": "Prezentációs hiba"
         },
         {
+            "id": "Skipped",
+            "message": "Skipped",
+            "translation": "Kihagyva"
+        },
+        {
             "id": "Compilation error",
             "message": "Compilation error",
             "translation": "Forditási hiba"
@@ -372,16 +377,6 @@
             "translation": "Kilépés"
         },
         {
-            "id": "source",
-            "message": "source",
-            "translation": "forráskód"
-        },
-        {
-            "id": "language",
-            "message": "language",
-            "translation": "nyelv"
-        },
-        {
             "id": "en",
             "message": "en",
             "translation": "hu"
@@ -577,17 +572,17 @@
             "translation": "Ment"
         },
         {
-            "id": "on test {String}",
-            "message": "on test {String}",
-            "translation": "a {String} teszten",
+            "id": "on test {Dind}",
+            "message": "on test {Dind}",
+            "translation": "a {Dind}. teszten",
             "placeholders": [
                 {
-                    "id": "String",
+                    "id": "Dind",
                     "string": "%[1]s",
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 1,
-                    "expr": "s.Ontest.String"
+                    "expr": "d(ind)"
                 }
             ]
         },
@@ -700,6 +695,16 @@
             "id": "Home",
             "message": "Home",
             "translation": "Főoldal"
+        },
+        {
+            "id": "source",
+            "message": "source",
+            "translation": "forráskód"
+        },
+        {
+            "id": "language",
+            "message": "language",
+            "translation": "nyelv"
         }
     ]
 }

@@ -37,8 +37,8 @@ templ SubmissionStatusText(s njudge.Submission) {
                 if s.Status.FeedbackType == problems.FeedbackIOI || s.Status.FeedbackType == problems.FeedbackLazyIOI {
                     @score(&s.Status.Feedback[0])
                 }else if s.Status.FeedbackType == problems.FeedbackCF {
-                     if s.Ontest.Valid {
-                        {Tr(ctx, "on test %s", s.Ontest.String)}
+                    if ind := s.Status.Feedback[0].FirstNonAC(); ind != -1 {
+                        {Tr(ctx, "on test %s", d(ind))}
                     }
                 }
             </span>
@@ -135,9 +135,27 @@ templ SubmissionRow(s njudge.Submission) {
     }
 }
 
+func submissionFeedbackIOIVerdictTextClass(v problems.VerdictName) string {
+    switch v {
+        case problems.VerdictAC:
+            return "text-success"
+        case problems.VerdictSK, problems.VerdictDR:
+            return "text-muted"
+        default:
+            return "text-info"
+    }
+}
+
+templ submissionFeedbackIOIVerdictText(v problems.VerdictName) {
+    <span class={submissionFeedbackIOIVerdictTextClass(v)}>
+        {Tr(ctx, njudge.VerdictFromProblemsVerdictName(v).String())}
+    </span>
+}
+
 templ submissionFeedbackInner(s njudge.Submission) {
    if s.Started {
-        if !s.Status.Compiled{
+        if s.Status.CompilationStatus == problems.BeforeCompilation || s.Status.CompilationStatus == problems.DuringCompilation {
+        }else if !s.Status.Compiled {
              <div class="card">
                 <div class="card-header bg-warning"><i class="bi bi-exclamation-triangle"></i> {Tr(ctx,"Compilation error")}</div>
                 <div class="card-body">
@@ -148,23 +166,25 @@ templ submissionFeedbackInner(s njudge.Submission) {
             for _, testset := range s.Status.Feedback {
                 for _, g := range testset.Groups {
                     for _, t := range g.Testcases {
-                        <div class="card">
-                            <div class={"card-header" + iif(t.VerdictName == problems.VerdictAC, " text-success", " text-info")}>
-                                <span class={"bi"+iif(t.VerdictName == problems.VerdictAC, " bi-check-lg", " bi-x-lg")}></span>
-                                {d(t.Index)} - {Tr(ctx, njudge.VerdictFromProblemsVerdictName(t.VerdictName).String())}
+                        if t.VerdictName != problems.VerdictSK {
+                            <div class="card">
+                                <div class={"card-header" + iif(t.VerdictName == problems.VerdictAC, " text-success", " text-info")}>
+                                    <span class={"bi"+iif(t.VerdictName == problems.VerdictAC, " bi-check-lg", " bi-x-lg")}></span>
+                                    {d(t.Index)} - {Tr(ctx, njudge.VerdictFromProblemsVerdictName(t.VerdictName).String())}
+                                </div>
+                                <div class="card-body">
+                                    <span class="bi bi-memory"></span> {Tr(ctx, "Memory")}: {memKib(t.MemoryUsed)}KiB <br>
+                                    <span class="bi bi-clock"></span> {Tr(ctx, "Time")}: {t.TimeSpent.String()}<br><br>
+                                    {Tr(ctx, "Program's output")}:
+                                    <pre><code class="nohighlight">{t.Output}</code></pre>
+                                    {Tr(ctx, "Expected output")}:
+                                    <pre><code class="nohighlight">{t.ExpectedOutput}</code></pre>
+                                    {Tr(ctx, "Checker output")}:
+                                    <pre><code class="nohighlight">{t.CheckerOutput}</code></pre>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <span class="bi bi-memory"></span> {Tr(ctx, "Memory")}: {memKib(t.MemoryUsed)}KiB <br>
-                                <span class="bi bi-clock"></span> {Tr(ctx, "Time")}: {t.TimeSpent.String()}<br><br>
-                                {Tr(ctx, "Program's output")}:
-                                <pre><code class="nohighlight">{t.Output}</code></pre>
-                                {Tr(ctx, "Expected output")}:
-                                <pre><code class="nohighlight">{t.ExpectedOutput}</code></pre>
-                                {Tr(ctx, "Checker output")}:
-                                <pre><code class="nohighlight">{t.CheckerOutput}</code></pre>
-                            </div>
-                        </div>
-                        <br>
+                            <br>
+                        }
                     }
                 }
             }
@@ -203,9 +223,7 @@ templ submissionFeedbackInner(s njudge.Submission) {
                                 <tr>
                                     <td>{d(t.Index)}</td>
                                     <td colspan={iif(g.Scoring!=problems.ScoringSum, "2", "")}>
-                                        <span class={iif(t.VerdictName == problems.VerdictAC, "text-success", "text-info")}>
-                                            {Tr(ctx, njudge.VerdictFromProblemsVerdictName(t.VerdictName).String())}
-                                        </span>
+                                        @submissionFeedbackIOIVerdictText(t.VerdictName)
                                     </td>
                                     if g.Scoring == problems.ScoringSum {
                                         <td>

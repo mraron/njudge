@@ -448,6 +448,7 @@ func TestVerdictName_UnmarshalJSON(t *testing.T) {
 		{"dr", "\"DR\"", VerdictDR, assert.NoError},
 		{"pc", "\"PC\"", VerdictPC, assert.NoError},
 		{"pe", "\"PE\"", VerdictPE, assert.NoError},
+		{"sk", "\"SK\"", VerdictSK, assert.NoError},
 		{"other", "\"shalal\"", VerdictUnknown, assert.Error},
 	}
 

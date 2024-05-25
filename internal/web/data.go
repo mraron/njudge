@@ -132,6 +132,7 @@ func NewDemoDataAccess(ctx context.Context, ps problems.Store, ms email.Service)
 	if err != nil {
 		return nil, err
 	}
+	ss.CompilationStatus = problems.AfterCompilation
 	ss.Compiled = true
 	sub.Status = *ss
 	_, err = s.Submissions.Insert(ctx, *sub)

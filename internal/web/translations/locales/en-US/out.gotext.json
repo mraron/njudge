@@ -65,6 +65,13 @@
             "fuzzy": true
         },
         {
+            "id": "Skipped",
+            "message": "Skipped",
+            "translation": "Skipped",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Compilation error",
             "message": "Compilation error",
             "translation": "Compilation error",
@@ -747,18 +754,18 @@
             "fuzzy": true
         },
         {
-            "id": "on test {String}",
-            "message": "on test {String}",
-            "translation": "on test {String}",
+            "id": "on test {Dind}",
+            "message": "on test {Dind}",
+            "translation": "on test {Dind}",
             "translatorComment": "Copied from source.",
             "placeholders": [
                 {
-                    "id": "String",
+                    "id": "Dind",
                     "string": "%[1]s",
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 1,
-                    "expr": "s.Ontest.String"
+                    "expr": "d(ind)"
                 }
             ],
             "fuzzy": true

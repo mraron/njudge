@@ -3,6 +3,7 @@ package glue
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/mraron/njudge/internal/judge"
 	"github.com/mraron/njudge/internal/njudge/db"
@@ -116,6 +117,9 @@ func (g *Glue) ProcessSubmission(ctx context.Context, sub njudge.Submission) err
 		verdict problems.VerdictName
 		score   float32 = 0.0
 	)
+	if status.CompilationStatus != problems.AfterCompilation {
+		return errors.New("invalid compilation status after judging submission")
+	}
 	if !status.Compiled {
 		verdict = problems.VerdictName(njudge.VerdictCE)
 	} else {
