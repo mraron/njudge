@@ -778,6 +778,41 @@
             "fuzzy": true
         },
         {
+            "id": "Memory",
+            "message": "Memory",
+            "translation": "Memory",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Time",
+            "message": "Time",
+            "translation": "Time",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Program's output",
+            "message": "Program's output",
+            "translation": "Program's output",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Expected output",
+            "message": "Expected output",
+            "translation": "Expected output",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Checker output",
+            "message": "Checker output",
+            "translation": "Checker output",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Subtask",
             "message": "Subtask",
             "translation": "Subtask",
@@ -802,20 +837,6 @@
             "id": "Verdict",
             "message": "Verdict",
             "translation": "Verdict",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Time",
-            "message": "Time",
-            "translation": "Time",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Memory",
-            "message": "Memory",
-            "translation": "Memory",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },

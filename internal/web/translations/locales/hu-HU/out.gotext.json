@@ -84,7 +84,7 @@
         {
             "id": "Statement - {Title} ({Name})",
             "message": "Statement - {Title} ({Name})",
-            "translation": "",
+            "translation": "Leírás - {Title} ({Name})",
             "placeholders": [
                 {
                     "id": "Title",
@@ -130,7 +130,7 @@
         {
             "id": "Submit - {Title} ({Name})",
             "message": "Submit - {Title} ({Name})",
-            "translation": "",
+            "translation": "Beküldés - {Title} ({Name})",
             "placeholders": [
                 {
                     "id": "Title",
@@ -211,7 +211,7 @@
         {
             "id": "Password changed successfully! You can login with your new password.",
             "message": "Password changed successfully! You can login with your new password.",
-            "translation": ""
+            "translation": "A jelszó sikeresen megváltoztatva! Mostmár beléphetsz az új jelszavaddal."
         },
         {
             "id": [
@@ -289,7 +289,7 @@
         {
             "id": "Thank you for registering! We've sent you an email with further instructions about finishing your registration.",
             "message": "Thank you for registering! We've sent you an email with further instructions about finishing your registration.",
-            "translation": ""
+            "translation": "Köszönjük a regisztrációt! A megadott email címre elküldtük a regisztráció befejezéséhez szükséges végső lépéseket."
         },
         {
             "id": "This account has already been activated.",
@@ -372,19 +372,9 @@
             "translation": "Kilépés"
         },
         {
-            "id": "source",
-            "message": "source",
-            "translation": "forráskód"
-        },
-        {
-            "id": "language",
-            "message": "language",
-            "translation": "nyelv"
-        },
-        {
             "id": "en",
             "message": "en",
-            "translation": ""
+            "translation": "hu"
         },
         {
             "id": "Statement",
@@ -459,7 +449,7 @@
         {
             "id": "Add a tag to problem {Title}",
             "message": "Add a tag to problem {Title}",
-            "translation": "",
+            "translation": "Címke hozzáadása a {Title} feladathoz",
             "placeholders": [
                 {
                     "id": "Title",
@@ -579,7 +569,7 @@
         {
             "id": "on test {String}",
             "message": "on test {String}",
-            "translation": "",
+            "translation": "a {String} teszten",
             "placeholders": [
                 {
                     "id": "String",
@@ -590,6 +580,31 @@
                     "expr": "s.Ontest.String"
                 }
             ]
+        },
+        {
+            "id": "Memory",
+            "message": "Memory",
+            "translation": "Memória"
+        },
+        {
+            "id": "Time",
+            "message": "Time",
+            "translation": "Idő"
+        },
+        {
+            "id": "Program's output",
+            "message": "Program's output",
+            "translation": "Program kimenete"
+        },
+        {
+            "id": "Expected output",
+            "message": "Expected output",
+            "translation": "Elvárt kimenet"
+        },
+        {
+            "id": "Checker output",
+            "message": "Checker output",
+            "translation": "Ellenőrző kimenete"
         },
         {
             "id": "Subtask",
@@ -610,16 +625,6 @@
             "id": "Verdict",
             "message": "Verdict",
             "translation": "Verdikt"
-        },
-        {
-            "id": "Time",
-            "message": "Time",
-            "translation": "Idő"
-        },
-        {
-            "id": "Memory",
-            "message": "Memory",
-            "translation": "Memória"
         },
         {
             "id": "Rejudge",
@@ -654,7 +659,7 @@
         {
             "id": "Forgot password?",
             "message": "Forgot password?",
-            "translation": ""
+            "translation": "Elfelejtett jelszó?"
         },
         {
             "id": "Login",
@@ -685,6 +690,16 @@
             "id": "Home",
             "message": "Home",
             "translation": "Főoldal"
+        },
+        {
+            "id": "source",
+            "message": "source",
+            "translation": "forráskód"
+        },
+        {
+            "id": "language",
+            "message": "language",
+            "translation": "nyelv"
         }
     ]
 }

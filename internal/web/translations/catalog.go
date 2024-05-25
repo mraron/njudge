@@ -43,83 +43,86 @@ var messageKeyToIndex = map[string]int{
 	"%s's submissions":        45,
 	"Accepted":                0,
 	"Activate your account":   37,
-	"Add":                     72,
-	"Add a tag to problem %q": 70,
+	"Add":                     70,
+	"Add a tag to problem %q": 68,
 	"Admin":                   51,
 	"An email with further instructions was sent to the given address (if it's registered in our system).": 22,
 	"Archive":                               13,
-	"Attachments":                           73,
-	"Attempted problems":                    85,
+	"Attachments":                           71,
+	"Attempted problems":                    83,
 	"Can't logout if you've not logged in.": 31,
-	"Cancel":                                71,
-	"Category":                              81,
-	"Change":                                89,
-	"Clear":                                 82,
-	"Code":                                  78,
+	"Cancel":                                69,
+	"Category":                              79,
+	"Change":                                87,
+	"Checker output":                        95,
+	"Clear":                                 80,
+	"Code":                                  76,
 	"Compilation error":                     9,
-	"Date":                                  100,
+	"Date":                                  101,
 	"Didn't run":                            6,
-	"Email":                                 108,
-	"File":                                  74,
-	"Filter":                                80,
-	"Forgot password?":                      105,
-	"Home":                                  111,
-	"Identifier":                            62,
-	"Information":                           61,
+	"Email":                                 109,
+	"Expected output":                       94,
+	"File":                                  72,
+	"Filter":                                78,
+	"Forgot password?":                      106,
+	"Home":                                  112,
+	"Identifier":                            60,
+	"Information":                           59,
 	"Internal error":                        5,
 	"Invalid authentication token.":         30,
 	"Invalid key provided.":                 23,
 	"It's required to give a new password.": 47,
-	"Language":                              79,
-	"Last submissions":                      69,
-	"Login":                                 106,
+	"Language":                              77,
+	"Last submissions":                      67,
+	"Login":                                 107,
 	"Logout":                                52,
-	"Memory":                                98,
-	"Memory limit":                          65,
+	"Memory":                                91,
+	"Memory limit":                          63,
 	"Memory limit exceeded":                 4,
-	"Name":                                  75,
-	"New password":                          87,
-	"New password again":                    88,
-	"Nickname":                              103,
+	"Name":                                  73,
+	"New password":                          85,
+	"New password again":                    86,
+	"Nickname":                              104,
 	"No category":                           18,
-	"Old password":                          86,
+	"Old password":                          84,
 	"Partially correct":                     7,
-	"Password":                              104,
-	"Password again":                        107,
+	"Password":                              105,
+	"Password again":                        108,
 	"Password changed successfully! You can login with your new password.": 25,
 	"Password reset":                  21,
-	"Points":                          76,
+	"Points":                          74,
 	"Presentation error":              8,
-	"Problem":                         77,
+	"Problem":                         75,
 	"Problems":                        19,
 	"Profile":                         49,
-	"Ranklist":                        60,
-	"Register":                        109,
-	"Rejudge":                         99,
-	"Reset password":                  110,
+	"Program's output":                93,
+	"Ranklist":                        58,
+	"Register":                        110,
+	"Rejudge":                         100,
+	"Reset password":                  111,
 	"Results - %s (%s)":               15,
 	"Running":                         10,
 	"Runtime error":                   2,
-	"Save":                            91,
+	"Save":                            89,
 	"Settings":                        50,
-	"Show tags for unsolved problems": 90,
-	"Solved problems":                 84,
-	"Solvers":                         83,
-	"Statement":                       56,
+	"Show tags for unsolved problems": 88,
+	"Solved problems":                 82,
+	"Solvers":                         81,
+	"Statement":                       54,
 	"Statement - %s (%s)":             14,
 	"Submission #%d":                  12,
 	"Submissions":                     20,
 	"Submissions - %s (%s)":           17,
-	"Submit":                          57,
+	"Submit":                          55,
 	"Submit - %s (%s)":                16,
-	"Submit solution":                 68,
-	"Subtask":                         93,
+	"Submit solution":                 66,
+	"Subtask":                         96,
 	"Successful activation. You can login now!": 43,
 	"Successful login!":                         28,
-	"Sum":                                       94,
-	"Tags":                                      66,
-	"Task type":                                 67,
-	"Test":                                      95,
+	"Sum":                                       97,
+	"Tags":                                      64,
+	"Task type":                                 65,
+	"Test":                                      98,
 	"Thank you for registering! We've sent you an email with further instructions about finishing your registration.": 40,
 	"The account is not activated. Check your emails!":                                                                27,
 	"The email field is required.":     35,
@@ -132,28 +135,28 @@ var messageKeyToIndex = map[string]int{
 	"The two given passwords doesn't match.":       48,
 	"The two passwords don't match.":               24,
 	"This account has already been activated.":     41,
-	"Time":                            97,
-	"Time limit":                      64,
+	"Time":                            92,
+	"Time limit":                      62,
 	"Time limit exceeded":             3,
-	"Title":                           63,
+	"Title":                           61,
 	"Uploaded":                        11,
-	"User":                            101,
-	"Verdict":                         96,
-	"We found the following problems": 102,
+	"User":                            102,
+	"Verdict":                         99,
+	"We found the following problems": 103,
 	"Wrong activation key. Are you sure you've clicked on the right link?": 42,
 	"Wrong answer":                1,
 	"Wrong credentials.":          29,
 	"Wrong old password.":         46,
 	"You're already logged in...": 26,
-	"accepted":                    59,
-	"all":                         58,
-	"en":                          55,
-	"language":                    54,
-	"on test %s":                  92,
-	"source":                      53,
+	"accepted":                    57,
+	"all":                         56,
+	"en":                          53,
+	"language":                    114,
+	"on test %s":                  90,
+	"source":                      113,
 }
 
-var en_USIndex = []uint32{ // 113 elements
+var en_USIndex = []uint32{ // 116 elements
 	// Entry 0 - 1F
 	0x00000000, 0x00000009, 0x00000016, 0x00000024,
 	0x00000038, 0x0000004e, 0x0000005d, 0x00000068,
@@ -169,27 +172,27 @@ var en_USIndex = []uint32{ // 113 elements
 	0x0000045d, 0x000004cd, 0x000004f6, 0x0000053b,
 	0x00000565, 0x00000575, 0x00000589, 0x0000059d,
 	0x000005c3, 0x000005ea, 0x000005f2, 0x000005fb,
-	0x00000601, 0x00000608, 0x0000060f, 0x00000618,
-	0x0000061b, 0x00000625, 0x0000062c, 0x00000630,
-	0x00000639, 0x00000642, 0x0000064e, 0x00000659,
+	0x00000601, 0x00000608, 0x0000060b, 0x00000615,
+	0x0000061c, 0x00000620, 0x00000629, 0x00000632,
+	0x0000063e, 0x00000649, 0x0000064f, 0x0000065a,
 	// Entry 40 - 5F
-	0x0000065f, 0x0000066a, 0x00000677, 0x0000067c,
-	0x00000686, 0x00000696, 0x000006a7, 0x000006c2,
-	0x000006c9, 0x000006cd, 0x000006d9, 0x000006de,
-	0x000006e3, 0x000006ea, 0x000006f2, 0x000006f7,
-	0x00000700, 0x00000707, 0x00000710, 0x00000716,
-	0x0000071e, 0x0000072e, 0x00000741, 0x0000074e,
-	0x0000075b, 0x0000076e, 0x00000775, 0x00000795,
-	0x0000079a, 0x000007a8, 0x000007b0, 0x000007b4,
+	0x00000667, 0x0000066c, 0x00000676, 0x00000686,
+	0x00000697, 0x000006b2, 0x000006b9, 0x000006bd,
+	0x000006c9, 0x000006ce, 0x000006d3, 0x000006da,
+	0x000006e2, 0x000006e7, 0x000006f0, 0x000006f7,
+	0x00000700, 0x00000706, 0x0000070e, 0x0000071e,
+	0x00000731, 0x0000073e, 0x0000074b, 0x0000075e,
+	0x00000765, 0x00000785, 0x0000078a, 0x00000798,
+	0x0000079f, 0x000007a4, 0x000007b5, 0x000007c5,
 	// Entry 60 - 7F
-	0x000007b9, 0x000007c1, 0x000007c6, 0x000007cd,
-	0x000007d5, 0x000007da, 0x000007df, 0x000007ff,
-	0x00000808, 0x00000811, 0x00000822, 0x00000828,
-	0x00000837, 0x0000083d, 0x00000846, 0x00000855,
-	0x0000085a,
-} // Size: 476 bytes
+	0x000007d4, 0x000007dc, 0x000007e0, 0x000007e5,
+	0x000007ed, 0x000007f5, 0x000007fa, 0x000007ff,
+	0x0000081f, 0x00000828, 0x00000831, 0x00000842,
+	0x00000848, 0x00000857, 0x0000085d, 0x00000866,
+	0x00000875, 0x0000087a, 0x00000881, 0x0000088a,
+} // Size: 488 bytes
 
-const en_USData string = "" + // Size: 2138 bytes
+const en_USData string = "" + // Size: 2186 bytes
 	"\x02Accepted\x02Wrong answer\x02Runtime error\x02Time limit exceeded\x02" +
 	"Memory limit exceeded\x02Internal error\x02Didn't run\x02Partially corre" +
 	"ct\x02Presentation error\x02Compilation error\x02Running\x02Uploaded\x02" +
@@ -213,86 +216,93 @@ const en_USData string = "" + // Size: 2138 bytes
 	"ou've clicked on the right link?\x02Successful activation. You can login" +
 	" now!\x02%[1]s's profile\x02%[1]s's submissions\x02Wrong old password." +
 	"\x02It's required to give a new password.\x02The two given passwords doe" +
-	"sn't match.\x02Profile\x02Settings\x02Admin\x02Logout\x02source\x02langu" +
-	"age\x02en\x02Statement\x02Submit\x02all\x02accepted\x02Ranklist\x02Infor" +
-	"mation\x02Identifier\x02Title\x02Time limit\x02Memory limit\x02Tags\x02T" +
-	"ask type\x02Submit solution\x02Last submissions\x02Add a tag to problem " +
-	"%[1]q\x02Cancel\x02Add\x02Attachments\x02File\x02Name\x02Points\x02Probl" +
-	"em\x02Code\x02Language\x02Filter\x02Category\x02Clear\x02Solvers\x02Solv" +
-	"ed problems\x02Attempted problems\x02Old password\x02New password\x02New" +
-	" password again\x02Change\x02Show tags for unsolved problems\x02Save\x02" +
-	"on test %[1]s\x02Subtask\x02Sum\x02Test\x02Verdict\x02Time\x02Memory\x02" +
-	"Rejudge\x02Date\x02User\x02We found the following problems\x02Nickname" +
-	"\x02Password\x02Forgot password?\x02Login\x02Password again\x02Email\x02" +
-	"Register\x02Reset password\x02Home"
+	"sn't match.\x02Profile\x02Settings\x02Admin\x02Logout\x02en\x02Statement" +
+	"\x02Submit\x02all\x02accepted\x02Ranklist\x02Information\x02Identifier" +
+	"\x02Title\x02Time limit\x02Memory limit\x02Tags\x02Task type\x02Submit s" +
+	"olution\x02Last submissions\x02Add a tag to problem %[1]q\x02Cancel\x02A" +
+	"dd\x02Attachments\x02File\x02Name\x02Points\x02Problem\x02Code\x02Langua" +
+	"ge\x02Filter\x02Category\x02Clear\x02Solvers\x02Solved problems\x02Attem" +
+	"pted problems\x02Old password\x02New password\x02New password again\x02C" +
+	"hange\x02Show tags for unsolved problems\x02Save\x02on test %[1]s\x02Mem" +
+	"ory\x02Time\x02Program's output\x02Expected output\x02Checker output\x02" +
+	"Subtask\x02Sum\x02Test\x02Verdict\x02Rejudge\x02Date\x02User\x02We found" +
+	" the following problems\x02Nickname\x02Password\x02Forgot password?\x02L" +
+	"ogin\x02Password again\x02Email\x02Register\x02Reset password\x02Home" +
+	"\x02source\x02language"
 
-var hu_HUIndex = []uint32{ // 113 elements
+var hu_HUIndex = []uint32{ // 116 elements
 	// Entry 0 - 1F
 	0x00000000, 0x0000000a, 0x00000019, 0x00000026,
 	0x0000003c, 0x00000056, 0x00000062, 0x0000006d,
 	0x0000007d, 0x00000091, 0x000000a1, 0x000000a5,
-	0x000000b0, 0x000000c2, 0x000000cc, 0x000000cc,
-	0x000000e8, 0x000000e8, 0x00000105, 0x00000116,
-	0x00000120, 0x0000012d, 0x00000141, 0x000001b8,
-	0x000001c9, 0x000001f2, 0x000001f2, 0x00000209,
-	0x0000024f, 0x00000262, 0x0000028b, 0x000002aa,
+	0x000000b0, 0x000000c2, 0x000000cc, 0x000000e5,
+	0x00000101, 0x0000011c, 0x00000139, 0x0000014a,
+	0x00000154, 0x00000161, 0x00000175, 0x000001ec,
+	0x000001fd, 0x00000226, 0x00000275, 0x0000028c,
+	0x000002d2, 0x000002e5, 0x0000030e, 0x0000032d,
 	// Entry 20 - 3F
-	0x000002ca, 0x000002ef, 0x00000317, 0x0000034d,
-	0x00000374, 0x00000409, 0x0000041d, 0x00000435,
-	0x00000454, 0x00000454, 0x00000474, 0x000004ca,
-	0x000004f6, 0x00000505, 0x00000518, 0x00000531,
-	0x00000552, 0x0000057b, 0x00000582, 0x00000591,
-	0x00000597, 0x000005a1, 0x000005ad, 0x000005b3,
-	0x000005b3, 0x000005bc, 0x000005c4, 0x000005cc,
-	0x000005d7, 0x000005e3, 0x000005f1, 0x000005fd,
+	0x0000034d, 0x00000372, 0x0000039a, 0x000003d0,
+	0x000003f7, 0x0000048c, 0x000004a0, 0x000004b8,
+	0x000004d7, 0x0000055d, 0x0000057d, 0x000005d3,
+	0x000005ff, 0x0000060e, 0x00000621, 0x0000063a,
+	0x0000065b, 0x00000684, 0x0000068b, 0x0000069a,
+	0x000006a0, 0x000006aa, 0x000006ad, 0x000006b6,
+	0x000006be, 0x000006c6, 0x000006d1, 0x000006dd,
+	0x000006eb, 0x000006f7, 0x000006fc, 0x00000706,
 	// Entry 40 - 5F
-	0x00000602, 0x0000060c, 0x0000061a, 0x00000620,
-	0x00000627, 0x0000063d, 0x00000652, 0x00000652,
-	0x00000659, 0x00000662, 0x0000066f, 0x00000675,
-	0x0000067a, 0x00000681, 0x00000689, 0x0000068e,
-	0x00000694, 0x0000069d, 0x000006a8, 0x000006b0,
-	0x000006ba, 0x000006ce, 0x000006e5, 0x000006f3,
-	0x000006ff, 0x00000717, 0x00000722, 0x0000074a,
-	0x0000074f, 0x0000074f, 0x0000075c, 0x00000766,
+	0x00000714, 0x0000071a, 0x00000721, 0x00000737,
+	0x0000074c, 0x00000773, 0x0000077a, 0x00000783,
+	0x00000790, 0x00000796, 0x0000079b, 0x000007a2,
+	0x000007aa, 0x000007af, 0x000007b5, 0x000007be,
+	0x000007c9, 0x000007d1, 0x000007db, 0x000007ef,
+	0x00000806, 0x00000814, 0x00000820, 0x00000838,
+	0x00000843, 0x0000086b, 0x00000870, 0x00000880,
+	0x00000889, 0x0000088e, 0x0000089f, 0x000008af,
 	// Entry 60 - 7F
-	0x0000076c, 0x00000774, 0x00000779, 0x00000782,
-	0x00000791, 0x00000798, 0x000007a6, 0x000007cc,
-	0x000007de, 0x000007e6, 0x000007e6, 0x000007f0,
-	0x00000804, 0x0000080a, 0x00000819, 0x00000833,
-	0x0000083c,
-} // Size: 476 bytes
+	0x000008c4, 0x000008d1, 0x000008db, 0x000008e1,
+	0x000008e9, 0x000008f8, 0x000008ff, 0x0000090d,
+	0x00000933, 0x00000945, 0x0000094d, 0x00000962,
+	0x0000096c, 0x00000980, 0x00000986, 0x00000995,
+	0x000009af, 0x000009b8, 0x000009c4, 0x000009ca,
+} // Size: 488 bytes
 
-const hu_HUData string = "" + // Size: 2108 bytes
+const hu_HUData string = "" + // Size: 2506 bytes
 	"\x02Elfogadva\x02Hibás válasz\x02Futási hiba\x02Időlimit túllépés\x02Mem" +
 	"órialimit túllépés\x02Belső hiba\x02Nem futott\x02Részben helyes\x02Pre" +
 	"zentációs hiba\x02Forditási hiba\x02Fut\x02Feltöltve\x02Beküldés #%[1]d" +
-	"\x02Archívum\x02Eredmények - %[1]s (%[2]s)\x02Beküldések - %[1]s (%[2]s)" +
-	"\x02Nincs kategória\x02Feladatok\x02Beküldések\x02Elfelejtett jelszó\x02" +
-	"Megküldtük a szükséges további intézkedéseket a megadott email címre (ha" +
-	" regisztrálva van a rendszerünkben).\x02Helytelen kulcs.\x02A két megado" +
-	"tt jelszó nem egyezik meg.\x02Már be vagy lépve...\x02Ez a felhasználó f" +
-	"iók nincs aktiválva. Ellenőrízd az emailjeid!\x02Sikeres belépés!\x02Hib" +
-	"ás felhasználónév-jelszó páros!\x02Hibás authentikációs token.\x02A kil" +
-	"épéshez előbb lépj be.\x02A név mező kitöltése kötelező.\x02A jelszó me" +
-	"ző kitöltése kötelező.\x02A jelszó megerősítő mező kitöltése kötelező." +
-	"\x02Az email mező kitöltése kötelező.\x02A név csak alfanumerikus karakt" +
-	"erekből állhat, azaz: betűkből (beleértve a nem latin karaktereket is, p" +
-	"l. 'á' vagy 'ű') és számjegyekből.\x02Aktiváld a fiókod\x02Ez a név már " +
-	"foglalt.\x02Ez az email cím már foglalt.\x02Ez a fiók már aktiválva van." +
-	"\x02Helytelen aktiválási kulcs. Biztos vagy benne hogy megfelelő linkre " +
-	"kattintottál?\x02Sikeres aktiválás. Most már beléphetsz!\x02%[1]s profil" +
-	"ja\x02%[1]s beküldései\x02Helytelen régi jelszó.\x02Egy új jelszót meg k" +
-	"ell adnod.\x02A két megadott jelszó nem egyezik meg.\x02Profil\x02Beállí" +
-	"tások\x02Admin\x02Kilépés\x02forráskód\x02nyelv\x02Leírás\x02Beküld\x02ö" +
-	"sszes\x02elfogadott\x02Eredmények\x02Információk\x02Azonosító\x02Cím\x02" +
-	"Időlimit\x02Memórialimit\x02Tagek\x02Típus\x02Megoldás beküldése\x02Utol" +
-	"só beküldések\x02Mégse\x02Hozzáad\x02Mellékletek\x02Fájl\x02Név\x02Ponto" +
-	"k\x02Feladat\x02Kód\x02Nyelv\x02Szűrés\x02Kategória\x02Töröl\x02Megoldók" +
-	"\x02Megoldott feladatok\x02Megpróbált feladatok\x02Régi jelszó\x02Új jel" +
-	"szó\x02Új jelszó mégegyszer\x02Változtat\x02Mutasd a megoldatlan feladat" +
-	"ok tag-jeit\x02Ment\x02Részfeladat\x02Összpont\x02Teszt\x02Verdikt\x02Id" +
-	"ő\x02Memória\x02Újraértékel\x02Dátum\x02Felhasználó\x02A következő prob" +
-	"lémákat találtuk\x02Felhasználónév\x02Jelszó\x02Belépés\x02Jelszó mégegy" +
-	"szer\x02Email\x02Regisztráció\x02Jelszó megváltoztatása\x02Főoldal"
+	"\x02Archívum\x02Leírás - %[1]s (%[2]s)\x02Eredmények - %[1]s (%[2]s)\x02" +
+	"Beküldés - %[1]s (%[2]s)\x02Beküldések - %[1]s (%[2]s)\x02Nincs kategóri" +
+	"a\x02Feladatok\x02Beküldések\x02Elfelejtett jelszó\x02Megküldtük a szüks" +
+	"éges további intézkedéseket a megadott email címre (ha regisztrálva van" +
+	" a rendszerünkben).\x02Helytelen kulcs.\x02A két megadott jelszó nem egy" +
+	"ezik meg.\x02A jelszó sikeresen megváltoztatva! Mostmár beléphetsz az új" +
+	" jelszavaddal.\x02Már be vagy lépve...\x02Ez a felhasználó fiók nincs ak" +
+	"tiválva. Ellenőrízd az emailjeid!\x02Sikeres belépés!\x02Hibás felhaszná" +
+	"lónév-jelszó páros!\x02Hibás authentikációs token.\x02A kilépéshez előbb" +
+	" lépj be.\x02A név mező kitöltése kötelező.\x02A jelszó mező kitöltése k" +
+	"ötelező.\x02A jelszó megerősítő mező kitöltése kötelező.\x02Az email me" +
+	"ző kitöltése kötelező.\x02A név csak alfanumerikus karakterekből állhat," +
+	" azaz: betűkből (beleértve a nem latin karaktereket is, pl. 'á' vagy 'ű'" +
+	") és számjegyekből.\x02Aktiváld a fiókod\x02Ez a név már foglalt.\x02Ez " +
+	"az email cím már foglalt.\x02Köszönjük a regisztrációt! A megadott email" +
+	" címre elküldtük a regisztráció befejezéséhez szükséges végső lépéseket." +
+	"\x02Ez a fiók már aktiválva van.\x02Helytelen aktiválási kulcs. Biztos v" +
+	"agy benne hogy megfelelő linkre kattintottál?\x02Sikeres aktiválás. Most" +
+	" már beléphetsz!\x02%[1]s profilja\x02%[1]s beküldései\x02Helytelen régi" +
+	" jelszó.\x02Egy új jelszót meg kell adnod.\x02A két megadott jelszó nem " +
+	"egyezik meg.\x02Profil\x02Beállítások\x02Admin\x02Kilépés\x02hu\x02Leírá" +
+	"s\x02Beküld\x02összes\x02elfogadott\x02Eredmények\x02Információk\x02Azon" +
+	"osító\x02Cím\x02Időlimit\x02Memórialimit\x02Tagek\x02Típus\x02Megoldás b" +
+	"eküldése\x02Utolsó beküldések\x02Címke hozzáadása a %[1]q feladathoz\x02" +
+	"Mégse\x02Hozzáad\x02Mellékletek\x02Fájl\x02Név\x02Pontok\x02Feladat\x02K" +
+	"ód\x02Nyelv\x02Szűrés\x02Kategória\x02Töröl\x02Megoldók\x02Megoldott fe" +
+	"ladatok\x02Megpróbált feladatok\x02Régi jelszó\x02Új jelszó\x02Új jelszó" +
+	" mégegyszer\x02Változtat\x02Mutasd a megoldatlan feladatok tag-jeit\x02M" +
+	"ent\x02a %[1]s teszten\x02Memória\x02Idő\x02Program kimenete\x02Elvárt k" +
+	"imenet\x02Ellenőrző kimenete\x02Részfeladat\x02Összpont\x02Teszt\x02Verd" +
+	"ikt\x02Újraértékel\x02Dátum\x02Felhasználó\x02A következő problémákat ta" +
+	"láltuk\x02Felhasználónév\x02Jelszó\x02Elfelejtett jelszó?\x02Belépés\x02" +
+	"Jelszó mégegyszer\x02Email\x02Regisztráció\x02Jelszó megváltoztatása\x02" +
+	"Főoldal\x02forráskód\x02nyelv"
 
-	// Total table size 5198 bytes (5KiB); checksum: 5FE43E91
+	// Total table size 5668 bytes (5KiB); checksum: 2944B0F1

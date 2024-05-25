@@ -592,6 +592,31 @@
             ]
         },
         {
+            "id": "Memory",
+            "message": "Memory",
+            "translation": "Memória"
+        },
+        {
+            "id": "Time",
+            "message": "Time",
+            "translation": "Idő"
+        },
+        {
+            "id": "Program's output",
+            "message": "Program's output",
+            "translation": "Program kimenete"
+        },
+        {
+            "id": "Expected output",
+            "message": "Expected output",
+            "translation": "Elvárt kimenet"
+        },
+        {
+            "id": "Checker output",
+            "message": "Checker output",
+            "translation": "Ellenőrző kimenete"
+        },
+        {
             "id": "Subtask",
             "message": "Subtask",
             "translation": "Részfeladat"
@@ -610,16 +635,6 @@
             "id": "Verdict",
             "message": "Verdict",
             "translation": "Verdikt"
-        },
-        {
-            "id": "Time",
-            "message": "Time",
-            "translation": "Idő"
-        },
-        {
-            "id": "Memory",
-            "message": "Memory",
-            "translation": "Memória"
         },
         {
             "id": "Rejudge",
