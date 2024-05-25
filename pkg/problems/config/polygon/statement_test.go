@@ -23,11 +23,14 @@ func TestJSONStatement_Html(t *testing.T) {
 		want          string
 		wantErr       bool
 	}{
-		{name: "empty", jsonStatement: polygon.JSONStatement{
-			Locale:      "hungarian",
-			Name:        "teszt",
-			TimeLimit:   0,
-			MemoryLimit: 0, InputFile: "stdin", OutputFile: "stdout"},
+		{
+			name: "empty",
+			jsonStatement: polygon.JSONStatement{
+				Locale:      "hungarian",
+				Name:        "teszt",
+				TimeLimit:   0,
+				MemoryLimit: 0, InputFile: "stdin", OutputFile: "stdout",
+			},
 			want: `<link href="problem-statement.css" rel="stylesheet" type="text/css"><div class="problem-statement">
 <div class="header">
 	<div class="title">teszt</div>
@@ -41,7 +44,7 @@ func TestJSONStatement_Html(t *testing.T) {
 </div>`, wantErr: false},
 	}
 	remSpaces := func(s string) string {
-		return strings.ReplaceAll(strings.ReplaceAll(s, " ", ""), "\n", "")
+		return strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(s, " ", ""), "\n", ""), "\t", "")
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

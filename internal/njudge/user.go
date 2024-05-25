@@ -185,9 +185,23 @@ func (u *User) SetPassword(password string) error {
 	return err
 }
 
+var ErrorAlreadyActivated = errors.New("njudge: user already activated")
+var ErrorWrongActivationKey = errors.New("njudge: wrong activation key")
+
 func (u *User) Activate() {
 	u.ActivationInfo.Activated = true
 	u.ActivationInfo.Key = ""
+}
+
+func (u *User) ActivateWithKey(key string) error {
+	if u.ActivationInfo.Activated {
+		return ErrorAlreadyActivated
+	}
+	if key != u.ActivationInfo.Key {
+		return ErrorWrongActivationKey
+	}
+	u.Activate()
+	return nil
 }
 
 func (u *User) SetForgottenPasswordKey(fpkey ForgottenPasswordKey) {

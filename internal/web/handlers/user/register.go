@@ -156,16 +156,18 @@ func Activate(users njudge.Users) echo.HandlerFunc {
 			return err
 		}
 
-		if user.ActivationInfo.Activated {
-			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate("This account has already been activated.")))
+		err = user.ActivateWithKey(data.Key)
+		if err != nil {
+			if errors.Is(err, njudge.ErrorAlreadyActivated) {
+				return templates.Render(c, http.StatusOK, templates.Error(tr.Translate("This account has already been activated.")))
+			} else if errors.Is(err, njudge.ErrorWrongActivationKey) {
+				return templates.Render(c, http.StatusOK, templates.Error(tr.Translate("Wrong activation key. Are you sure you've clicked on the right link?")))
+			} else {
+				return err
+			}
 		}
 
-		if user.ActivationInfo.Key != data.Key {
-			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate("Wrong activation key. Are you sure you've clicked on the right link?")))
-		}
-
-		user.Activate()
-		if err := users.Update(c.Request().Context(), user, njudge.Fields(njudge.UserFields.ActivationInfo)); err != nil {
+		if users.Update(c.Request().Context(), user, njudge.Fields(njudge.UserFields.ActivationInfo)); err != nil {
 			return err
 		}
 
