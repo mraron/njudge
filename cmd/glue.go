@@ -93,7 +93,3 @@ func NewGlueCmd(v *viper.Viper) *cobra.Command {
 
 	return cmd
 }
-
-func init() {
-	RootCmd.AddCommand(NewGlueCmd(viper.GetViper()))
-}

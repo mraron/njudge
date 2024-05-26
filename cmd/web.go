@@ -119,6 +119,8 @@ func NewWebCmd(v *viper.Viper) *cobra.Command {
 	cmd.Flags().StringVar(&cfg.DatabaseConfig.Name, "db.name", DefaultWebConfig.DatabaseConfig.Name, "database name")
 	cmd.Flags().IntVar(&cfg.DatabaseConfig.Port, "db.port", DefaultWebConfig.DatabaseConfig.Port, "database port")
 	cmd.Flags().BoolVar(&cfg.DatabaseConfig.SSLMode, "db.ssl_mode", DefaultWebConfig.DatabaseConfig.SSLMode, "database sslmode")
+
+	cmd.AddCommand(NewMigrateCommand(v))
 	return cmd
 }
 
@@ -296,7 +298,7 @@ func NewWebCmd(v *viper.Viper) *cobra.Command {
 	}
 */
 func init() {
-	RootCmd.AddCommand(NewWebCmd(viper.GetViper()))
+
 	/*	RootCmd.AddCommand(WebCmd)
 
 		SubmitCmd.Flags().IntVar(&SubmitCmdArgs.User, "user", 0, "ID of user on behalf we make the submission")

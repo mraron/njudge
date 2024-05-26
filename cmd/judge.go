@@ -138,7 +138,3 @@ func NewJudgeCmd(v *viper.Viper) *cobra.Command {
 
 	return cmd
 }
-
-func init() {
-	RootCmd.AddCommand(NewJudgeCmd(viper.GetViper()))
-}

@@ -22,9 +22,8 @@ gulp: ## run gulp
 	npx gulp
 lint: ## run golangci-lint linter
 	golangci-lint run
-generate: ## updates out.gotext.json translation files from source code (runs go generate)
-	go generate ./...
-translations: ## copies the out.gotext.json to the messages.gotext.json
+translations: ## generates and copies the out.gotext.json to the messages.gotext.json
+	go generate ./internal/web/translations
 	cp internal/web/translations/locales/en-US/out.gotext.json internal/web/translations/locales/en-US/messages.gotext.json
 	cp internal/web/translations/locales/hu-HU/out.gotext.json internal/web/translations/locales/hu-HU/messages.gotext.json
 models: ## updates internal/njudge/db/models from sqlboiler.toml

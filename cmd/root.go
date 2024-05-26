@@ -37,11 +37,16 @@ func BindEnvs(iface interface{}, parts ...string) {
 
 var RootCmd = &cobra.Command{
 	Use:     "njudge",
-	Version: "v0.3.1",
+	Version: "v0.4.0",
 	Long:    "cli tool to manage njudge instance",
 }
 
 func Execute() {
+	RootCmd.AddCommand(NewWebCmd(viper.GetViper()))
+	RootCmd.AddCommand(NewJudgeCmd(viper.GetViper()))
+	RootCmd.AddCommand(NewGlueCmd(viper.GetViper()))
+	RootCmd.AddCommand(NewTestProblemCmd())
+
 	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
