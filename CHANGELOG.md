@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2024-05-26
+
+# Added
+ - Added nicer language selector.
+ - Added submission status automatic update with htmx.
+ - Add skipped verdict and CompilationStatus to problems.Feedback.
+# Changed
+ - Rewritten all the frontend to templ.
+ - Changed task archive.
+ - Refactored how web is started.
+ - Now we serve most of our frontend dependencies (bootstrap, jquery, katex, etc.)
+ - Now we don't serve files for problems. We inline images and stylesheets onto the HTML and serve only that.   
+
 ## [0.4.0] - 2024-05-26
 
 # Fixed
@@ -123,7 +136,8 @@ The previous two changes are from 65ec4f to 19c523
 - Crash when admin panel is visited without logging in
 - Workflow
 
-[unreleased]: https://github.com/mraron/njudge/compare/v0.4.0...HEAD
+[unreleased]: https://github.com/mraron/njudge/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/mraron/njudge/releases/tag/v0.5.0
 [0.4.0]: https://github.com/mraron/njudge/releases/tag/v0.4.0
 [0.3.1]: https://github.com/mraron/njudge/releases/tag/v0.3.1
 [0.3.0]: https://github.com/mraron/njudge/releases/tag/v0.3.0
