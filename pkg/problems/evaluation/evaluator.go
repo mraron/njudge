@@ -19,6 +19,7 @@ func NewLinearEvaluator(runner problems.Runner) *LinearEvaluator {
 
 func DeepCopyStatus(skeleton problems.Status) (ans problems.Status) {
 	ans.CompilerOutput = skeleton.CompilerOutput
+	ans.CompilationStatus = skeleton.CompilationStatus
 	ans.Compiled = skeleton.Compiled
 	ans.FeedbackType = skeleton.FeedbackType
 	for _, ts := range skeleton.Feedback {
@@ -61,6 +62,7 @@ func (le *LinearEvaluator) Evaluate(ctx context.Context, skeleton problems.Statu
 
 	ans = DeepCopyStatus(skeleton)
 	ans.Compiled = true
+	ans.CompilationStatus = problems.AfterCompilation
 	ans.FeedbackType = skeleton.FeedbackType
 
 	for tsInd := range ans.Feedback {
@@ -79,8 +81,11 @@ func (le *LinearEvaluator) Evaluate(ctx context.Context, skeleton problems.Statu
 					continue
 				}
 
-				if ans.FeedbackType == problems.FeedbackLazyIOI && !currAC {
-					continue
+				if ans.FeedbackType == problems.FeedbackLazyIOI || ans.FeedbackType == problems.FeedbackCF || ans.FeedbackType == problems.FeedbackACM {
+					if !currAC {
+						tc.VerdictName = problems.VerdictSK
+						continue
+					}
 				}
 
 				if dependenciesOK(group.Dependencies) {
@@ -96,6 +101,7 @@ func (le *LinearEvaluator) Evaluate(ctx context.Context, skeleton problems.Statu
 						continue
 					}
 				} else {
+					tc.VerdictName = problems.VerdictSK
 					currAC = false
 					continue
 				}

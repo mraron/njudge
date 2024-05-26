@@ -4,7 +4,8 @@ import (
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/njudge"
-	"github.com/mraron/njudge/internal/web/helpers"
+	"github.com/mraron/njudge/internal/web/templates"
+	"net/http"
 )
 
 func currentUser(c echo.Context, us njudge.Users) (*njudge.User, error) {
@@ -31,7 +32,7 @@ func SetUserMiddleware(us njudge.Users) func(echo.HandlerFunc) echo.HandlerFunc 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			user, err := currentUser(c, us)
-			c.Set("user", user)
+			c.Set(templates.UserContextKey, user)
 
 			if user != nil {
 				c.Set("userID", user.ID)
@@ -52,7 +53,12 @@ func RequireLoginMiddleware() func(echo.HandlerFunc) echo.HandlerFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			if c.Get("user").(*njudge.User) == nil {
-				return helpers.LoginRequired(c)
+				templates.SetFlash(c, "LoginMessage", "A kért oldal megtekintéséhez belépés szükséges!")
+				to := ""
+				if c.Request().Method == "GET" {
+					to = "?next=" + c.Request().URL.Path
+				}
+				return c.Redirect(http.StatusFound, "/user/login"+to)
 			}
 
 			return next(c)

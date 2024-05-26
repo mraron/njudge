@@ -120,16 +120,18 @@ func (ts *TagsService) Add(ctx context.Context, tagID int, problemID int, userID
 		return nil
 	}
 
-	pinfo, err := ts.problemInfoQuery.GetProblemData(ctx, p.ID, userID)
+	problemInfo, err := ts.problemInfoQuery.GetProblemData(ctx, p.ID, userID)
 	if err != nil {
 		return err
 	}
 
-	if pinfo.UserInfo.SolvedStatus != njudge.Solved {
+	if problemInfo.UserInfo.SolvedStatus != njudge.Solved {
 		return njudge.ErrorUnableToModifyProblemTags
 	}
 
-	p.AddTag(*t, userID)
+	if err = p.AddTag(*t, userID); err != nil {
+		return err
+	}
 	return ts.problems.Update(ctx, *p, njudge.Fields(njudge.ProblemFields.Tags))
 }
 

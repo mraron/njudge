@@ -1,12 +1,12 @@
 package glue
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"github.com/mraron/njudge/internal/judge"
 	"github.com/mraron/njudge/internal/njudge/db/models"
 	"github.com/mraron/njudge/pkg/problems"
-	"golang.org/x/net/context"
 	"log/slog"
 	"math/rand"
 	"sync"

@@ -1,6 +1,7 @@
 package polygon
 
 import (
+	"errors"
 	"github.com/mraron/njudge/pkg/language/langs/zip"
 	"github.com/mraron/njudge/pkg/language/memory"
 	"github.com/mraron/njudge/pkg/problems/evaluation"
@@ -59,8 +60,6 @@ type Assets struct {
 }
 
 type Problem struct {
-	config *config
-
 	Path                   string
 	JSONStatementList      []JSONStatement
 	AttachmentsList        problems.Attachments
@@ -80,6 +79,22 @@ type Problem struct {
 	} `xml:"tags>tag"`
 }
 
+func (p Problem) Valid() error {
+	switch p.TaskType {
+	case batch.Name:
+	case communication.Name:
+	case output_only.Name:
+	case stub.Name:
+	case "":
+	default:
+		return errors.New("unknown task type")
+	}
+	if problems.FeedbackTypeFromShortString(p.FeedbackType) == problems.FeedbackUnknown {
+		return errors.New("unknown feedback type")
+	}
+	return nil
+}
+
 func (p Problem) Name() string {
 	return p.ShortName
 }
@@ -87,7 +102,7 @@ func (p Problem) Name() string {
 func (p Problem) Titles() problems.Contents {
 	ans := make(problems.Contents, len(p.Names))
 	for i := 0; i < len(p.Names); i++ {
-		ans[i] = problems.BytesData{Loc: p.Names[i].Language, Val: []byte(p.Names[i].Value), Typ: "text"}
+		ans[i] = problems.BytesData{Loc: p.Names[i].Language, Val: []byte(p.Names[i].Value), Typ: problems.DataTypeText}
 	}
 
 	return ans
@@ -131,7 +146,7 @@ func (p Problem) Tags() (lst []string) {
 }
 
 func (p Problem) Languages() []language.Language {
-	if p.TaskType == "outputonly" {
+	if p.TaskType == output_only.Name {
 		return []language.Language{zip.Zip{}}
 	}
 
@@ -158,10 +173,10 @@ func (p Problem) GetTaskType() problems.TaskType {
 			NextCompiler: evaluation.Compile{},
 		}, p.Assets.Interactor.binary, p.Checker())
 	}
-	if p.TaskType == "outputonly" {
+	if p.TaskType == output_only.Name {
 		return output_only.New(p.Checker())
 	}
-	if p.TaskType == "stub" {
+	if p.TaskType == stub.Name {
 		compiler := evaluation.NewCompilerWithStubs()
 		for _, lang := range p.Languages() {
 			for _, file := range p.EvaluationFiles() {

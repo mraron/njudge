@@ -65,6 +65,13 @@
             "fuzzy": true
         },
         {
+            "id": "Skipped",
+            "message": "Skipped",
+            "translation": "Skipped",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Compilation error",
             "message": "Compilation error",
             "translation": "Compilation error",
@@ -103,18 +110,25 @@
             "fuzzy": true
         },
         {
-            "id": "Statement - {String} ({Name})",
-            "message": "Statement - {String} ({Name})",
-            "translation": "Statement - {String} ({Name})",
+            "id": "Archive",
+            "message": "Archive",
+            "translation": "Archive",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Statement - {Title} ({Name})",
+            "message": "Statement - {Title} ({Name})",
+            "translation": "Statement - {Title} ({Name})",
             "translatorComment": "Copied from source.",
             "placeholders": [
                 {
-                    "id": "String",
+                    "id": "Title",
                     "string": "%[1]s",
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 1,
-                    "expr": "tr.TranslateContent(prob.Titles()).String()"
+                    "expr": "title"
                 },
                 {
                     "id": "Name",
@@ -122,7 +136,7 @@
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 2,
-                    "expr": "prob.Name()"
+                    "expr": "name"
                 }
             ],
             "fuzzy": true
@@ -139,7 +153,7 @@
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 1,
-                    "expr": "tr.TranslateContent(prob.Titles()).String()"
+                    "expr": "tr.TranslateContent(storedData.Titles()).String()"
                 },
                 {
                     "id": "Name",
@@ -147,24 +161,24 @@
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 2,
-                    "expr": "prob.Name()"
+                    "expr": "storedData.Name()"
                 }
             ],
             "fuzzy": true
         },
         {
-            "id": "Submit - {String} ({Name})",
-            "message": "Submit - {String} ({Name})",
-            "translation": "Submit - {String} ({Name})",
+            "id": "Submit - {Title} ({Name})",
+            "message": "Submit - {Title} ({Name})",
+            "translation": "Submit - {Title} ({Name})",
             "translatorComment": "Copied from source.",
             "placeholders": [
                 {
-                    "id": "String",
+                    "id": "Title",
                     "string": "%[1]s",
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 1,
-                    "expr": "tr.TranslateContent(prob.Titles()).String()"
+                    "expr": "title"
                 },
                 {
                     "id": "Name",
@@ -172,7 +186,7 @@
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 2,
-                    "expr": "prob.Name()"
+                    "expr": "storedData.Name()"
                 }
             ],
             "fuzzy": true
@@ -189,7 +203,7 @@
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 1,
-                    "expr": "tr.TranslateContent(prob.Titles()).String()"
+                    "expr": "tr.TranslateContent(storedData.Titles()).String()"
                 },
                 {
                     "id": "Name",
@@ -197,7 +211,7 @@
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 2,
-                    "expr": "prob.Name()"
+                    "expr": "storedData.Name()"
                 }
             ],
             "fuzzy": true
@@ -220,13 +234,6 @@
             "id": "Submissions",
             "message": "Submissions",
             "translation": "Submissions",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Archive",
-            "message": "Archive",
-            "translation": "Archive",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -259,9 +266,9 @@
             "fuzzy": true
         },
         {
-            "id": "Password changed succesfully! You can login with your new password.",
-            "message": "Password changed succesfully! You can login with your new password.",
-            "translation": "Password changed succesfully! You can login with your new password.",
+            "id": "Password changed successfully! You can login with your new password.",
+            "message": "Password changed successfully! You can login with your new password.",
+            "translation": "Password changed successfully! You can login with your new password.",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -304,30 +311,9 @@
             "fuzzy": true
         },
         {
-            "id": "Your email is not associated with any registered account.",
-            "message": "Your email is not associated with any registered account.",
-            "translation": "Your email is not associated with any registered account.",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
             "id": "Can't logout if you've not logged in.",
             "message": "Can't logout if you've not logged in.",
             "translation": "Can't logout if you've not logged in.",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "The nickname is already registered.",
-            "message": "The nickname is already registered.",
-            "translation": "The nickname is already registered.",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "The email is already registered.",
-            "message": "The email is already registered.",
-            "translation": "The email is already registered.",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -370,6 +356,27 @@
             "id": "Activate your account",
             "message": "Activate your account",
             "translation": "Activate your account",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "The nickname is already registered.",
+            "message": "The nickname is already registered.",
+            "translation": "The nickname is already registered.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "The email is already registered.",
+            "message": "The email is already registered.",
+            "translation": "The email is already registered.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Thank you for registering! We've sent you an email with further instructions about finishing your registration.",
+            "message": "Thank you for registering! We've sent you an email with further instructions about finishing your registration.",
+            "translation": "Thank you for registering! We've sent you an email with further instructions about finishing your registration.",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -450,13 +457,6 @@
             "fuzzy": true
         },
         {
-            "id": "Home",
-            "message": "Home",
-            "translation": "Home",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
             "id": "Profile",
             "message": "Profile",
             "translation": "Profile",
@@ -485,142 +485,9 @@
             "fuzzy": true
         },
         {
-            "id": "Login",
-            "message": "Login",
-            "translation": "Login",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Register",
-            "message": "Register",
-            "translation": "Register",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "source",
-            "message": "source",
-            "translation": "source",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "language",
-            "message": "language",
-            "translation": "language",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "%s on test %d",
-            "message": "%s on test %d",
-            "translation": "%s on test %d",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "on test %s",
-            "message": "on test %s",
-            "translation": "on test %s",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Date",
-            "message": "Date",
-            "translation": "Date",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "User",
-            "message": "User",
-            "translation": "User",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Problem",
-            "message": "Problem",
-            "translation": "Problem",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Language",
-            "message": "Language",
-            "translation": "Language",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Verdict",
-            "message": "Verdict",
-            "translation": "Verdict",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Time",
-            "message": "Time",
-            "translation": "Time",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Memory",
-            "message": "Memory",
-            "translation": "Memory",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Filter",
-            "message": "Filter",
-            "translation": "Filter",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Title",
-            "message": "Title",
-            "translation": "Title",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Category",
-            "message": "Category",
-            "translation": "Category",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Tags",
-            "message": "Tags",
-            "translation": "Tags",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Clear",
-            "message": "Clear",
-            "translation": "Clear",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Identifier",
-            "message": "Identifier",
-            "translation": "Identifier",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Solvers",
-            "message": "Solvers",
-            "translation": "Solvers",
+            "id": "en",
+            "message": "en",
+            "translation": "en",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -660,30 +527,23 @@
             "fuzzy": true
         },
         {
-            "id": "Add a tag to problem %q",
-            "message": "Add a tag to problem %q",
-            "translation": "Add a tag to problem %q",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Cancel",
-            "message": "Cancel",
-            "translation": "Cancel",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Add",
-            "message": "Add",
-            "translation": "Add",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
             "id": "Information",
             "message": "Information",
             "translation": "Information",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Identifier",
+            "message": "Identifier",
+            "translation": "Identifier",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Title",
+            "message": "Title",
+            "translation": "Title",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -698,6 +558,13 @@
             "id": "Memory limit",
             "message": "Memory limit",
             "translation": "Memory limit",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Tags",
+            "message": "Tags",
+            "translation": "Tags",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -719,6 +586,37 @@
             "id": "Last submissions",
             "message": "Last submissions",
             "translation": "Last submissions",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Add a tag to problem {Title}",
+            "message": "Add a tag to problem {Title}",
+            "translation": "Add a tag to problem {Title}",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "Title",
+                    "string": "%[1]q",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "vm.Title"
+                }
+            ],
+            "fuzzy": true
+        },
+        {
+            "id": "Cancel",
+            "message": "Cancel",
+            "translation": "Cancel",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Add",
+            "message": "Add",
+            "translation": "Add",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -751,6 +649,13 @@
             "fuzzy": true
         },
         {
+            "id": "Problem",
+            "message": "Problem",
+            "translation": "Problem",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Code",
             "message": "Code",
             "translation": "Code",
@@ -758,93 +663,37 @@
             "fuzzy": true
         },
         {
-            "id": "Rejudge",
-            "message": "Rejudge",
-            "translation": "Rejudge",
+            "id": "Language",
+            "message": "Language",
+            "translation": "Language",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
         {
-            "id": "Program's output",
-            "message": "Program's output",
-            "translation": "Program's output",
+            "id": "Filter",
+            "message": "Filter",
+            "translation": "Filter",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
         {
-            "id": "Expected output",
-            "message": "Expected output",
-            "translation": "Expected output",
+            "id": "Category",
+            "message": "Category",
+            "translation": "Category",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
         {
-            "id": "Checker output",
-            "message": "Checker output",
-            "translation": "Checker output",
+            "id": "Clear",
+            "message": "Clear",
+            "translation": "Clear",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
         {
-            "id": "Subtask",
-            "message": "Subtask",
-            "translation": "Subtask",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Sum",
-            "message": "Sum",
-            "translation": "Sum",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Test",
-            "message": "Test",
-            "translation": "Test",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Email",
-            "message": "Email",
-            "translation": "Email",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Reset password",
-            "message": "Reset password",
-            "translation": "Reset password",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Password",
-            "message": "Password",
-            "translation": "Password",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Password again",
-            "message": "Password again",
-            "translation": "Password again",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "We found the following problems",
-            "message": "We found the following problems",
-            "translation": "We found the following problems",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Nickname",
-            "message": "Nickname",
-            "translation": "Nickname",
+            "id": "Solvers",
+            "message": "Solvers",
+            "translation": "Solvers",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -901,6 +750,191 @@
             "id": "Save",
             "message": "Save",
             "translation": "Save",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "on test {Dind}",
+            "message": "on test {Dind}",
+            "translation": "on test {Dind}",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "Dind",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "d(ind)"
+                }
+            ],
+            "fuzzy": true
+        },
+        {
+            "id": "Memory",
+            "message": "Memory",
+            "translation": "Memory",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Time",
+            "message": "Time",
+            "translation": "Time",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Program's output",
+            "message": "Program's output",
+            "translation": "Program's output",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Expected output",
+            "message": "Expected output",
+            "translation": "Expected output",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Checker output",
+            "message": "Checker output",
+            "translation": "Checker output",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Subtask",
+            "message": "Subtask",
+            "translation": "Subtask",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Sum",
+            "message": "Sum",
+            "translation": "Sum",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Test",
+            "message": "Test",
+            "translation": "Test",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Verdict",
+            "message": "Verdict",
+            "translation": "Verdict",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Rejudge",
+            "message": "Rejudge",
+            "translation": "Rejudge",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Date",
+            "message": "Date",
+            "translation": "Date",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "User",
+            "message": "User",
+            "translation": "User",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "We found the following problems",
+            "message": "We found the following problems",
+            "translation": "We found the following problems",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Nickname",
+            "message": "Nickname",
+            "translation": "Nickname",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Password",
+            "message": "Password",
+            "translation": "Password",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Forgot password?",
+            "message": "Forgot password?",
+            "translation": "Forgot password?",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Login",
+            "message": "Login",
+            "translation": "Login",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Password again",
+            "message": "Password again",
+            "translation": "Password again",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Email",
+            "message": "Email",
+            "translation": "Email",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Register",
+            "message": "Register",
+            "translation": "Register",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Reset password",
+            "message": "Reset password",
+            "translation": "Reset password",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Home",
+            "message": "Home",
+            "translation": "Home",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "source",
+            "message": "source",
+            "translation": "source",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "language",
+            "message": "language",
+            "translation": "language",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         }

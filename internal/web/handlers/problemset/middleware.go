@@ -61,11 +61,11 @@ func SetProblemMiddleware(store problems.Store, ps njudge.ProblemQuery, pinfo nj
 			}
 			c.Set("problemInfo", *info)
 
-			sdata, err := p.WithStoredData(store)
+			storedData, err := p.WithStoredData(store)
 			if err != nil {
 				return err
 			}
-			c.Set("problemStoredData", sdata)
+			c.Set("problemStoredData", storedData)
 
 			return next(c)
 		}

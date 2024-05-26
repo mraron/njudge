@@ -1,44 +1,74 @@
 package profile
 
 import (
+	"crypto/md5"
+	"fmt"
+	"github.com/a-h/templ"
+	"github.com/mraron/njudge/internal/web/templates"
+	"github.com/mraron/njudge/internal/web/templates/i18n"
 	"net/http"
+	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/njudge"
-	"github.com/mraron/njudge/internal/web/handlers/problemset"
-	"github.com/mraron/njudge/internal/web/helpers"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
-	"github.com/mraron/njudge/internal/web/helpers/pagination"
 )
 
-func GetProfile(slist njudge.SubmissionListQuery) echo.HandlerFunc {
+func gravatarHash(user njudge.User) string {
+	return fmt.Sprintf("%x", md5.Sum([]byte(strings.ToLower(strings.TrimSpace(user.Email)))))
+}
+
+func GetProfile(sublist njudge.SubmissionListQuery, ps njudge.Problems) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		u := c.Get("profile").(*njudge.User)
 
-		solved, err := slist.GetSolvedSubmissionList(c.Request().Context(), u.ID)
+		solved, err := sublist.GetSolvedSubmissionList(c.Request().Context(), u.ID)
 		if err != nil {
 			return err
 		}
 
-		attempted, err := slist.GetAttemptedSubmissionList(c.Request().Context(), u.ID)
+		attempted, err := sublist.GetAttemptedSubmissionList(c.Request().Context(), u.ID)
 		if err != nil {
+			return err
+		}
+
+		vm := templates.ProfileViewModel{
+			Name:              templ.SafeURL(u.Name),
+			GravatarHash:      gravatarHash(*u),
+			Points:            float64(u.Points),
+			SolvedProblems:    nil,
+			AttemptedProblems: nil,
+		}
+
+		pass := func(from *[]njudge.Submission, to *[]templates.ProfileSubmission) error {
+			for _, sub := range *from {
+				p, err := ps.Get(c.Request().Context(), sub.ProblemID)
+				if err != nil {
+					return err
+				}
+				*to = append(*to, templates.ProfileSubmission{
+					ID:          sub.ID,
+					ProblemName: p.Problem,
+				})
+			}
+			return nil
+		}
+		if err := pass(&solved.Submissions, &vm.SolvedProblems); err != nil {
+			return err
+		}
+		if err := pass(&attempted.Submissions, &vm.AttemptedProblems); err != nil {
 			return err
 		}
 
 		c.Set("title", tr.Translate("%s's profile", u.Name))
-		return c.Render(http.StatusOK, "user/profile/main", struct {
-			User                       *njudge.User
-			SolvedProblems             []njudge.Submission
-			AttemptedNotSolvedProblems []njudge.Submission
-		}{u, solved.Submissions, attempted.Submissions})
+		return templates.Render(c, http.StatusOK, templates.Profile(vm))
 	}
 }
 
-func GetSubmissions(slist njudge.SubmissionListQuery) echo.HandlerFunc {
+func GetSubmissions(sublist njudge.SubmissionListQuery) echo.HandlerFunc {
 	type request struct {
 		Page int `query:"page"`
 	}
@@ -64,27 +94,27 @@ func GetSubmissions(slist njudge.SubmissionListQuery) echo.HandlerFunc {
 			UserID:    u.ID,
 		}
 
-		submissionList, err := slist.GetPagedSubmissionList(c.Request().Context(), statusReq)
+		submissionList, err := sublist.GetPagedSubmissionList(c.Request().Context(), statusReq)
 		if err != nil {
 			return err
 		}
 
 		qu := (*c.Request().URL).Query()
-		links, err := pagination.Links(submissionList.PaginationData.Page, submissionList.PaginationData.PerPage, int64(submissionList.PaginationData.Count), qu)
+		links, err := templates.Links(submissionList.PaginationData.Page, submissionList.PaginationData.PerPage, int64(submissionList.PaginationData.Count), qu)
 		if err != nil {
 			return err
 		}
 
-		result := problemset.StatusPage{
+		result := templates.SubmissionsViewModel{
 			Submissions: submissionList.Submissions,
 			Pages:       links,
 		}
 
 		c.Set("title", tr.Translate("%s's submissions", u.Name))
-		return c.Render(http.StatusOK, "user/profile/submissions", struct {
-			User       *njudge.User
-			StatusPage problemset.StatusPage
-		}{u, result})
+		return templates.Render(c, http.StatusOK, templates.ProfileSubmissions(templates.ProfileSubmissionsViewModel{
+			Name:                 templ.SafeURL(u.Name),
+			SubmissionsViewModel: result,
+		}))
 	}
 }
 
@@ -92,10 +122,11 @@ func GetSettings() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		u := c.Get("user").(*njudge.User)
 
-		helpers.DeleteFlash(c, "ChangePassword")
-		return c.Render(http.StatusOK, "user/profile/settings", struct {
-			User *njudge.User
-		}{u})
+		templates.DeleteFlash(c, templates.ChangePasswordContextKey)
+		return templates.Render(c, http.StatusOK, templates.ProfileSettings(templates.ProfileSettingsViewModel{
+			Name:                templ.SafeURL(u.Name),
+			ShowTagsForUnsolved: u.Settings.ShowUnsolvedTags,
+		}))
 	}
 }
 
@@ -115,21 +146,23 @@ func PostSettingsChangePassword(us njudge.Users) echo.HandlerFunc {
 		}
 
 		if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(data.PasswordOld)); err != nil {
-			helpers.SetFlash(c, "ChangePassword", tr.Translate("Wrong old password."))
+			templates.SetFlash(c, templates.ChangePasswordContextKey, tr.Translate("Wrong old password."))
 			return c.Redirect(http.StatusFound, "../")
 		}
 
 		if len(data.PasswordNew1) == 0 {
-			helpers.SetFlash(c, "ChangePassword", tr.Translate("It's required to give a new password."))
+			templates.SetFlash(c, templates.ChangePasswordContextKey, tr.Translate("It's required to give a new password."))
 			return c.Redirect(http.StatusFound, "../")
 		}
 
 		if data.PasswordNew1 != data.PasswordNew2 {
-			helpers.SetFlash(c, "ChangePassword", tr.Translate("The two given passwords doesn't match."))
+			templates.SetFlash(c, templates.ChangePasswordContextKey, tr.Translate("The two given passwords doesn't match."))
 			return c.Redirect(http.StatusFound, "../")
 		}
 
-		u.SetPassword(data.PasswordNew1)
+		if err := u.SetPassword(data.PasswordNew1); err != nil {
+			return err
+		}
 		if err := us.Update(c.Request().Context(), u, njudge.Fields(njudge.UserFields.Password)); err != nil {
 			return err
 		}

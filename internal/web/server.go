@@ -3,17 +3,9 @@ package web
 import (
 	"context"
 	"database/sql"
-	_ "mime"
-
-	"github.com/mraron/njudge/internal/njudge"
-	"github.com/mraron/njudge/internal/njudge/email"
-
-	"github.com/mraron/njudge/internal/web/helpers/config"
-	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
-
+	"errors"
 	"github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
-	"github.com/mraron/njudge/pkg/problems"
 	_ "github.com/mraron/njudge/pkg/problems/config/feladat_txt"
 	_ "github.com/mraron/njudge/pkg/problems/config/polygon"
 	_ "github.com/mraron/njudge/pkg/problems/config/problem_yaml"
@@ -22,56 +14,46 @@ import (
 	_ "github.com/mraron/njudge/pkg/problems/evaluation/communication"
 	_ "github.com/mraron/njudge/pkg/problems/evaluation/output_only"
 	_ "github.com/mraron/njudge/pkg/problems/evaluation/stub"
+	"log/slog"
+	_ "mime"
+	"net"
+	"net/http"
 )
 
 type Server struct {
-	config.Server
+	Logger *slog.Logger
+	Config
+	DataAccess
 	DB *sql.DB
-
-	ProblemStore  problems.Store
-	MailService   email.Service
-	PartialsStore partials.Store
-
-	Categories          njudge.Categories
-	Tags                njudge.Tags
-	Problems            njudge.Problems
-	Users               njudge.Users
-	Submissions         njudge.Submissions
-	SolvedStatusQuery   njudge.SolvedStatusQuery
-	ProblemInfoQuery    njudge.ProblemInfoQuery
-	ProblemQuery        njudge.ProblemQuery
-	ProblemListQuery    njudge.ProblemListQuery
-	SubmissionListQuery njudge.SubmissionListQuery
-
-	RegisterService njudge.RegisterService
-	SubmitService   njudge.SubmitService
-	TagsService     njudge.TagsService
-
-	e *echo.Echo
 }
 
-func (s *Server) Run() {
-	s.e = echo.New()
-
-	s.SetupEnvironment()
-	s.StartBackgroundJobs()
-
-	s.setupEcho()
-
-	panic(s.e.Start(":" + s.Port))
-}
-
-func (s *Server) Submit(uid int, problemset, problem, language string, source []byte) (int, error) {
-	sub, err := s.SubmitService.Submit(context.Background(), njudge.SubmitRequest{
-		UserID:     uid,
-		Problemset: problemset,
-		Problem:    problem,
-		Language:   language,
-		Source:     source,
-	})
-
-	if err != nil {
-		return -1, err
+func NewServer(logger *slog.Logger, cfg Config, dataAccess DataAccess, db *sql.DB) (*Server, error) {
+	res := Server{
+		Logger:     logger,
+		Config:     cfg,
+		DataAccess: dataAccess,
+		DB:         db,
 	}
-	return sub.ID, nil
+	if cfg.Mode.UsesDB() && db == nil {
+		return nil, errors.New("db connection is required")
+	}
+	return &res, nil
+}
+
+func (s *Server) Run(ctx context.Context) error {
+	e := echo.New()
+	if err := s.SetupEnvironment(ctx); err != nil {
+		return err
+	}
+
+	s.StartBackgroundJobs(ctx)
+	s.SetupEcho(ctx, e)
+
+	s.Logger.Info("listening on 0.0.0.0:" + s.Port)
+	server := http.Server{
+		Addr:    net.JoinHostPort("0.0.0.0", s.Port),
+		Handler: e,
+	}
+	// todo graceful shutdown
+	return server.ListenAndServe()
 }

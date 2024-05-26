@@ -24,7 +24,7 @@ func (ssq *SolvedStatusQuery) GetSolvedStatus(ctx context.Context, problemID, us
 
 	val, err := ssq.solvedStatusQuery.GetSolvedStatus(ctx, problemID, userID)
 	if err != nil {
-		return 0, nil
+		return njudge.Unknown, nil
 	}
 
 	ssq.cache.Set(key, val, imcache.WithDefaultExpiration())

@@ -164,6 +164,9 @@ func (r *BasicRunner) setOutputExpectedOutput(s sandbox.Sandbox, testcase *probl
 	}
 
 	outputFile, err := s.Open(filepath.Base(testcase.OutputPath))
+	if err != nil {
+		return err
+	}
 	if output, err = r.getReadCloserPrefix(outputFile); err != nil {
 		return err
 	}
@@ -568,4 +571,41 @@ func (r *InteractiveRunner) Run(ctx context.Context, sandboxProvider sandbox.Pro
 		return nil
 	}
 	return r.checker.Check(ctx, testcase)
+}
+
+type CachedRunner struct {
+	cache sync.Map
+	inner problems.Runner
+}
+
+func NewCachedRunner(inner problems.Runner) *CachedRunner {
+	return &CachedRunner{
+		inner: inner,
+	}
+}
+
+func (c *CachedRunner) SetSolution(ctx context.Context, solution problems.Solution) error {
+	return c.inner.SetSolution(ctx, solution)
+}
+
+func (c *CachedRunner) Run(ctx context.Context, sandboxProvider sandbox.Provider, testcase *problems.Testcase) error {
+	if res, ok := c.cache.Load(testcase.InputPath); ok {
+		cached := res.(problems.Testcase)
+		if cached.MaxScore > 0 {
+			tmpIndex, tmpGroup := testcase.Index, testcase.Group
+			oldMaxScore := testcase.MaxScore
+			*testcase = cached
+			testcase.Index = tmpIndex
+			testcase.Group = tmpGroup
+			testcase.Score = oldMaxScore * cached.Score / cached.MaxScore
+			testcase.MaxScore = oldMaxScore
+			return nil
+		}
+	}
+
+	if err := c.inner.Run(ctx, sandboxProvider, testcase); err != nil {
+		return err
+	}
+	c.cache.Store(testcase.InputPath, *testcase)
+	return nil
 }

@@ -74,8 +74,9 @@ func TestGlue_ProcessSubmission(t *testing.T) {
 				Judge: TestJudger{
 					f: func(ctx context.Context, sub judge.Submission, callback judge.ResultCallback) (*problems.Status, error) {
 						return &problems.Status{
-							Compiled:       false,
-							CompilerOutput: "compilation error",
+							Compiled:          false,
+							CompilationStatus: problems.AfterCompilation,
+							CompilerOutput:    "compilation error",
 						}, nil
 					},
 				},
@@ -101,9 +102,10 @@ func TestGlue_ProcessSubmission(t *testing.T) {
 						Index: 1,
 						Test:  "test1",
 						Status: &problems.Status{
-							Compiled:       true,
-							CompilerOutput: "",
-							FeedbackType:   problems.FeedbackIOI,
+							Compiled:          true,
+							CompilationStatus: problems.AfterCompilation,
+							CompilerOutput:    "",
+							FeedbackType:      problems.FeedbackIOI,
 							Feedback: []problems.Testset{
 								{
 									Name: "tests",
@@ -151,9 +153,10 @@ func TestGlue_ProcessSubmission(t *testing.T) {
 			fields: fields{
 				Judge: TestJudger{f: func(ctx context.Context, sub judge.Submission, callback judge.ResultCallback) (*problems.Status, error) {
 					return &problems.Status{
-						Compiled:       true,
-						CompilerOutput: "",
-						FeedbackType:   problems.FeedbackIOI,
+						Compiled:          true,
+						CompilationStatus: problems.AfterCompilation,
+						CompilerOutput:    "",
+						FeedbackType:      problems.FeedbackIOI,
 						Feedback: []problems.Testset{
 							{
 								Name: "tests",

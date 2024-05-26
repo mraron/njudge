@@ -1,11 +1,11 @@
 package njudge
 
-type SolvedStatus int
+type SolvedStatus string
 
 const (
-	Unattempted SolvedStatus = iota
-	Attempted
-	PartiallySolved
-	Solved
-	Unknown
+	Unattempted     SolvedStatus = "Unattempted"
+	Attempted       SolvedStatus = "Attempted"
+	PartiallySolved SolvedStatus = "PartiallySolved"
+	Solved          SolvedStatus = "Solved"
+	Unknown         SolvedStatus = "Unknown"
 )

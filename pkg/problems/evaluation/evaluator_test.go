@@ -130,7 +130,7 @@ func TestLinearEvaluator_Evaluate(t *testing.T) {
 				sandboxProvider:  sandbox.NewProvider().Put(s),
 				statusUpdater:    evaluation.IgnoreStatusUpdate{},
 			},
-			want:    []problems.VerdictName{problems.VerdictWA, problems.VerdictWA, problems.VerdictWA},
+			want:    []problems.VerdictName{problems.VerdictWA, problems.VerdictSK, problems.VerdictSK},
 			wantErr: assert.NoError,
 		},
 		{

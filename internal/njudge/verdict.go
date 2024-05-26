@@ -1,7 +1,7 @@
 package njudge
 
 import (
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
+	"github.com/mraron/njudge/internal/web/templates/i18n"
 	"github.com/mraron/njudge/pkg/problems"
 )
 
@@ -18,6 +18,7 @@ const (
 	VerdictDR      = Verdict(problems.VerdictDR)
 	VerdictPC      = Verdict(problems.VerdictPC)
 	VerdictPE      = Verdict(problems.VerdictPE)
+	VerdictSK      = Verdict(problems.VerdictSK)
 
 	VerdictCE Verdict = "CE"
 	VerdictRU Verdict = "RU"
@@ -48,6 +49,8 @@ func (v Verdict) String() string {
 		return "Partially correct"
 	case VerdictPE:
 		return "Presentation error"
+	case VerdictSK:
+		return "Skipped"
 	case VerdictCE:
 		return "Compilation error"
 	case VerdictRU:
@@ -79,6 +82,8 @@ func (v Verdict) Translate(t i18n.Translator) string {
 		return t.Translate("Partially correct")
 	case VerdictPE:
 		return t.Translate("Presentation error")
+	case VerdictSK:
+		return t.Translate("Skipped")
 	case VerdictCE:
 		return t.Translate("Compilation error")
 	case VerdictRU:

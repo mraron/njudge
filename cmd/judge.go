@@ -13,6 +13,7 @@ import (
 	"io/fs"
 	"log/slog"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -30,7 +31,7 @@ type JudgeConfig struct {
 
 var DefaultJudgeConfig = JudgeConfig{
 	Port:                   8080,
-	ProblemsDir:            "/problems",
+	ProblemsDir:            "/njudge_problems",
 	Isolate:                true,
 	IsolateSandboxRange:    []int{400, 444},
 	UpdateStatusLimitEvery: 5 * time.Second,
@@ -38,22 +39,17 @@ var DefaultJudgeConfig = JudgeConfig{
 }
 
 func NewJudgeCmd(v *viper.Viper) *cobra.Command {
-	cfg := JudgeConfig{}
+	cfg := DefaultJudgeConfig
 	cmd := &cobra.Command{
 		Use:   "judge",
-		Short: "start judge server",
+		Short: "Run the judge server",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			v.SetConfigFile("judge.yaml")
 			v.AddConfigPath(".")
 
-			v.SetDefault("port", DefaultJudgeConfig.Port)
-			v.SetDefault("problems_dir", DefaultJudgeConfig.ProblemsDir)
-			v.SetDefault("isolate", DefaultJudgeConfig.Isolate)
-			v.SetDefault("isolate_sandbox_range", DefaultJudgeConfig.IsolateSandboxRange)
-			v.SetDefault("update_status_limit_every", DefaultJudgeConfig.UpdateStatusLimitEvery)
-
-			v.AutomaticEnv()
 			v.SetEnvPrefix("njudge")
+			v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+			BindEnvs(JudgeConfig{})
 
 			if err := v.ReadInConfig(); err != nil {
 				var res *fs.PathError
@@ -74,6 +70,10 @@ func NewJudgeCmd(v *viper.Viper) *cobra.Command {
 		},
 
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := v.Unmarshal(&cfg); err != nil {
+				return err
+			}
+
 			log := slog.Default()
 
 			store := problems.NewFsStore(cfg.ProblemsDir)
@@ -129,16 +129,12 @@ func NewJudgeCmd(v *viper.Viper) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().IntVar(&cfg.Port, "port", DefaultJudgeConfig.Port, "port to listen on")
-	cmd.Flags().StringVar(&cfg.ProblemsDir, "problems_dir", DefaultJudgeConfig.ProblemsDir, "directory of the problems")
+	cmd.Flags().IntVar(&cfg.Port, "port", DefaultJudgeConfig.Port, "Port to listen on")
+	cmd.Flags().StringVar(&cfg.ProblemsDir, "problems_dir", DefaultJudgeConfig.ProblemsDir, "directory of problems")
 	cmd.Flags().BoolVar(&cfg.Isolate, "isolate", DefaultJudgeConfig.Isolate, "use isolate (otherwise dummy sandboxes are used which are NOT secure)")
 	cmd.Flags().IntSliceVar(&cfg.IsolateSandboxRange, "isolate_sandbox_range", DefaultJudgeConfig.IsolateSandboxRange, "inclusive interval of isolate sandbox IDs")
 	cmd.Flags().DurationVar(&cfg.UpdateStatusLimitEvery, "updateStatus_limit_every", DefaultJudgeConfig.UpdateStatusLimitEvery, "the rate of status updates for the clients")
 	cmd.Flags().IntVar(&cfg.Concurrency, "concurrency", DefaultJudgeConfig.Concurrency, "the maximum number of concurrently executed testcase")
 
 	return cmd
-}
-
-func init() {
-	RootCmd.AddCommand(NewJudgeCmd(viper.GetViper()))
 }

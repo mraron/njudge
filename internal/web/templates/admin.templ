@@ -1,0 +1,138 @@
+package templates
+
+templ Admin() {
+    <!doctype html>
+    <html lang="en">
+    <head>
+        <title>njudge admin</title>
+        <link rel="stylesheet" href="/static/css/ng-admin.min.css">
+    </head>
+    <body ng-app="njudge">
+    <div ui-view="ng-admin"></div>
+    <script src="/static/js/ng-admin.min.js"></script>
+    <script type="text/javascript">
+        const njudge = angular.module('njudge', ['ng-admin']);
+        njudge.config(['NgAdminConfigurationProvider', function(NgAdminConfigurationProvider) {
+            const nga = NgAdminConfigurationProvider;
+            const admin = nga.application('njudge admin').baseApiUrl("/api/v1/");
+
+            const problem_rel = nga.entity('problem_rels').identifier(nga.field('id'));
+            problem_rel.listView().fields([
+                nga.field('id'),
+                nga.field('problemset'),
+                nga.field('problem')
+            ]).listActions(['edit']);
+
+            problem_rel.creationView().fields([
+                nga.field('problemset').validation({ required: true }),
+                nga.field('problem').validation({ required: true })
+            ]);
+
+            problem_rel.editionView().fields(problem_rel.creationView().fields());
+
+            const partial = nga.entity('partials').identifier(nga.field('name'));
+            partial.listView().fields([
+                nga.field('name'),
+                nga.field('html', 'wysiwyg'),
+            ]).listActions(['show', 'edit']).sortField('name');
+
+            partial.creationView().fields([
+                nga.field('name').validation({ required: true }),
+                nga.field('html', 'wysiwyg').validation({ required: true })
+            ]);
+
+            partial.editionView().fields([
+                nga.field('html', 'wysiwyg').validation({ required: true })
+            ]);
+
+            partial.showView().fields(partial.listView().fields());
+
+
+            const judge = nga.entity("judges").identifier(nga.field('id'));
+            judge.listView().fields([
+                nga.field('id'),
+                nga.field('url'),
+                nga.field('online'),
+            ]).listActions(['edit','show']);
+
+            judge.creationView().fields([
+                nga.field('url').validation({ required: true })
+            ]);
+
+            judge.editionView().fields(judge.creationView().fields());
+
+
+            judge.showView().fields([
+                nga.field('id'),
+                nga.field('url'),
+                nga.field('online'),
+                nga.field('problem_list', 'json'),
+                nga.field('language_list', 'json'),
+            ]).actions(['list', 'delete', 'edit']);
+
+            const user = nga.entity("users").identifier(nga.field('id'));
+            user.listView().fields([
+                nga.field('id'),
+                nga.field('name'),
+                nga.field('email'),
+                nga.field('role'),
+            ]).listActions(['edit','show']);
+
+            user.creationView().fields([
+                nga.field('name').validation({ required: true }),
+                nga.field('password').validation({ required: true }),
+                nga.field('email').validation({ required: true }),
+                nga.field('role').validation({requiered: true}),
+            ]);
+
+            user.editionView().fields(user.creationView().fields());
+
+            user.showView().fields([
+                nga.field('id'),
+                nga.field('name'),
+                nga.field('email'),
+                nga.field('activation_key'),
+                nga.field('role'),
+            ]).actions(['list', 'delete', 'edit']);
+
+
+            const submission = nga.entity("submissions").identifier(nga.field('id'));
+            submission.listView().fields([
+                nga.field('id'),
+                nga.field('user_id', 'reference').targetEntity(user).label('Felhasználó').targetField(nga.field('name')),
+                nga.field('problem_id', 'reference').targetEntity(problem_rel).label('Feladat').targetField(nga.field('problem')),
+                nga.field('language'),
+                nga.field('score'),
+                nga.field('verdict'),
+            ]).listActions(['show']);
+
+            submission.showView().fields([
+                nga.field('id'),
+                nga.field('user_id', 'reference').targetEntity(user).label('Felhasználó').targetField(nga.field('name')),
+                nga.field('problem_id', 'reference').targetEntity(problem_rel).label('Feladat').targetField(nga.field('problem')),
+                nga.field('language'),
+                nga.field('ontest'),
+                nga.field('verdict'),
+                nga.field('status'),
+            ]).actions(['list']);
+
+            admin.addEntity(problem_rel);
+            admin.addEntity(partial);
+            admin.addEntity(judge);
+            admin.addEntity(user);
+            admin.addEntity(submission);
+
+            admin.menu(nga.menu()
+                    .addChild(nga.menu(problem_rel).title('Problem relations').icon('<span class="glyphicon glyphicon-link"></span>'))
+                    .addChild(nga.menu(judge).title('Judges').icon('<span class="glyphicon glyphicon-wrench"></span>'))
+                    .addChild(nga.menu(user).title('Users').icon('<span class="glyphicon glyphicon-user"></span>'))
+                    .addChild(nga.menu(submission).title('Submissions').icon('<span class="glyphicon glyphicon-upload"></span>'))
+                    .addChild(nga.menu(partial).title('Partials').icon('<span class="glyphicon glyphicon-folder-open"></span>'))
+            );
+
+            nga.configure(admin);
+        }]);
+    </script>
+    </body>
+    </html>
+}

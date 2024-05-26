@@ -1,0 +1,348 @@
+package templates
+
+import "github.com/mraron/njudge/internal/njudge"
+import "github.com/mraron/njudge/pkg/problems"
+import "math"
+import "time"
+
+type SubmissionViewModel struct {
+    CanRejudge bool
+	DisplaySource bool
+
+	Submission njudge.Submission
+}
+
+type scorer interface {
+    Score() float64
+    MaxScore() float64
+}
+templ score(s scorer) {
+    {f(math.Round(s.Score()*100)/100)}/{f(s.MaxScore())}
+}
+
+templ SubmissionStatusText(s njudge.Submission) {
+    if s.Judged.Valid {
+        if s.Verdict == njudge.VerdictAC {
+            <span class="text-success">
+                {Tr(ctx, "Accepted")}
+                if s.Status.FeedbackType == problems.FeedbackIOI || s.Status.FeedbackType == problems.FeedbackLazyIOI {
+                    @score(&s.Status.Feedback[0])
+                }
+            </span>
+        }else if s.Verdict == njudge.VerdictCE {
+            {Tr(ctx, "Compilation error")}
+        }else {
+            <span class="text-info">
+                {Tr(ctx, s.Verdict.String())}
+                if s.Status.FeedbackType == problems.FeedbackIOI || s.Status.FeedbackType == problems.FeedbackLazyIOI {
+                    @score(&s.Status.Feedback[0])
+                }else if s.Status.FeedbackType == problems.FeedbackCF {
+                    if ind := s.Status.Feedback[0].FirstNonAC(); ind != -1 {
+                        {Tr(ctx, "on test %s", d(ind))}
+                    }
+                }
+            </span>
+        }
+    }else {
+        if s.Verdict == njudge.VerdictUP {
+            <div class="ball"></div>
+            <span class="text-muted">{Tr(ctx, "Uploaded")}</span>
+        }else if s.Verdict == njudge.VerdictXX {
+            <span class="text-danger">{Tr(ctx, "Internal error")}</span>
+        }else {
+            <div class="ball ball-animated"></div>
+            <span class="text-info">
+                {Tr(ctx, "Running")}
+                if s.Ontest.Valid && s.Status.FeedbackType == problems.FeedbackCF {
+                    {Tr(ctx, "on test %s", s.Ontest.String)}
+                }
+                if s.Status.FeedbackType == problems.FeedbackIOI || s.Status.FeedbackType == problems.FeedbackLazyIOI {
+                    if len(s.Status.Feedback)>0 {
+                        @score(&s.Status.Feedback[0])
+                    }
+                }
+            </span>
+        }
+    }
+
+}
+
+func username(ctx context.Context, id int) string {
+    if u := user(ctx, id); u != nil {
+        return u.Name
+    }
+    return ""
+}
+
+templ userLink(id int) {
+    if u := user(ctx, id); u != nil {
+        <a href={templ.SafeURL("/user/profile/"+u.Name+"/")}>
+            {u.Name}
+        </a>
+    }
+}
+
+func problemTitle(ctx context.Context, id int) string {
+    withStored := problemWithStored(ctx, problem(ctx, id))
+    if withStored != nil {
+        return TrCs(ctx, withStored.Titles()).String()
+    }
+    return ""
+}
+
+templ problemLink(id int) {
+    if p := problem(ctx, id); p != nil {
+        if pp := problemWithStored(ctx, p); pp != nil {
+             <a href={templ.SafeURL("/problemset/"+p.Problemset+"/"+p.Problem)+"/"}>{TrCs(ctx, (*pp).Titles()).String()}</a>
+        }
+    }
+}
+
+templ submissionRowInner(s njudge.Submission) {
+    <td><a href={templ.SafeURL("/submission/"+d(s.ID))}>{d(s.ID)}</a></td>
+    <td>{s.Submitted.Local().Format(time.DateTime)}</td>
+    <td>
+        @userLink(s.UserID)
+    </td>
+    <td>
+        @problemLink(s.ProblemID)
+    </td>
+    <td>{s.Language}</td>
+    <td>
+        @SubmissionStatusText(s)
+    </td>
+    <td>
+        if s.Judged.Valid && len(s.Status.Feedback)>0 {
+            {s.Status.Feedback[0].MaxTimeSpent().String()}
+        }
+    </td>
+    <td>
+        if s.Judged.Valid && len(s.Status.Feedback)>0 {
+            {memKib(s.Status.Feedback[0].MaxMemoryUsage())} KiB
+        }
+    </td>
+}
+
+templ SubmissionRow(s njudge.Submission) {
+    if s.Judged.Valid {
+        <tr id={"submissionRow" + d(s.ID)}>
+            @submissionRowInner(s)
+        </tr>
+    }else {
+       <tr id={"submissionRow" + d(s.ID)} hx-get={"/submissionRowUpdate/"+d(s.ID)} hx-trigger="every 1s" hx-swap="outerHTML">
+           @submissionRowInner(s)
+       </tr>
+    }
+}
+
+func submissionFeedbackIOIVerdictTextClass(v problems.VerdictName) string {
+    switch v {
+        case problems.VerdictAC:
+            return "text-success"
+        case problems.VerdictSK, problems.VerdictDR:
+            return "text-muted"
+        default:
+            return "text-info"
+    }
+}
+
+templ submissionFeedbackIOIVerdictText(v problems.VerdictName) {
+    <span class={submissionFeedbackIOIVerdictTextClass(v)}>
+        {Tr(ctx, njudge.VerdictFromProblemsVerdictName(v).String())}
+    </span>
+}
+
+templ submissionFeedbackInner(s njudge.Submission) {
+   if s.Started {
+        if s.Status.CompilationStatus == problems.BeforeCompilation || s.Status.CompilationStatus == problems.DuringCompilation {
+        }else if !s.Status.Compiled {
+             <div class="card">
+                <div class="card-header bg-warning"><i class="bi bi-exclamation-triangle"></i> {Tr(ctx,"Compilation error")}</div>
+                <div class="card-body">
+                    <pre><code class="nohighlight">{s.Status.CompilerOutput}</code></pre>
+                </div>
+            </div>
+        }else if s.Status.FeedbackType == problems.FeedbackCF {
+            for _, testset := range s.Status.Feedback {
+                for _, g := range testset.Groups {
+                    for _, t := range g.Testcases {
+                        if t.VerdictName != problems.VerdictSK {
+                            <div class="card">
+                                <div class={"card-header" + iif(t.VerdictName == problems.VerdictAC, " text-success", " text-info")}>
+                                    <span class={"bi"+iif(t.VerdictName == problems.VerdictAC, " bi-check-lg", " bi-x-lg")}></span>
+                                    {d(t.Index)} - {Tr(ctx, njudge.VerdictFromProblemsVerdictName(t.VerdictName).String())}
+                                </div>
+                                <div class="card-body">
+                                    <span class="bi bi-memory"></span> {Tr(ctx, "Memory")}: {memKib(t.MemoryUsed)}KiB <br>
+                                    <span class="bi bi-clock"></span> {Tr(ctx, "Time")}: {t.TimeSpent.String()}<br><br>
+                                    {Tr(ctx, "Program's output")}:
+                                    <pre><code class="nohighlight">{t.Output}</code></pre>
+                                    {Tr(ctx, "Expected output")}:
+                                    <pre><code class="nohighlight">{t.ExpectedOutput}</code></pre>
+                                    {Tr(ctx, "Checker output")}:
+                                    <pre><code class="nohighlight">{t.CheckerOutput}</code></pre>
+                                </div>
+                            </div>
+                            <br>
+                        }
+                    }
+                }
+            }
+
+        }else if s.Status.FeedbackType == problems.FeedbackIOI || s.Status.FeedbackType == problems.FeedbackLazyIOI {
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm">
+                    <thead>
+                        <tr>
+                            <th class="text-center" colspan="2">{Tr(ctx, "Subtask")}</th>
+                            <th class="text-center">{Tr(ctx, "Sum")}</th>
+                            <th>{Tr(ctx, "Test")}</th>
+                            <th colspan="2">{Tr(ctx, "Verdict")}</th>
+                            <th>{Tr(ctx, "Time")}</th>
+                            <th>{Tr(ctx, "Memory")}</th>
+                        </tr>
+                    </thead>
+                    for _, testset := range s.Status.Feedback {
+                        for _, g := range testset.Groups {
+                            <tr>
+                                <td class="align-middle text-center" rowspan={d(len(g.Testcases)+1)}>
+                                    if g.IsAC() {
+                                        <i class="bi bi-check-lg text-success"></i>
+                                    }else {
+                                        <i class="bi bi-x-lg text-danger"></i>
+                                    }
+                                </td>
+                                <td class="align-middle text-center" rowspan={d(len(g.Testcases)+1)}>
+                                    {g.Name}
+                                </td>
+                                <td class="align-middle text-center" rowspan={d(len(g.Testcases)+1)}>
+                                    @score(&g)
+                                </td>
+                            </tr>
+                            for _, t := range g.Testcases {
+                                <tr>
+                                    <td>{d(t.Index)}</td>
+                                    <td colspan={iif(g.Scoring!=problems.ScoringSum, "2", "")}>
+                                        @submissionFeedbackIOIVerdictText(t.VerdictName)
+                                    </td>
+                                    if g.Scoring == problems.ScoringSum {
+                                        <td>
+                                            {f(math.Round(t.Score*100)/100)}/{f(t.MaxScore)}
+                                        </td>
+                                    }
+                                    <td>{t.TimeSpent.String()}</td>
+                                    <td>{memKib(t.MemoryUsed)} KiB</td>
+                                </tr>
+                            }
+                        }
+                    }
+                </table>
+            </div>
+        }
+    }
+}
+
+templ SubmissionFeedback(s njudge.Submission) {
+    if s.Judged.Valid {
+         <div id={"submissionFeedback" + d(s.ID)}>
+             @submissionFeedbackInner(s)
+         </div>
+     }else {
+        <div id={"submissionFeedback"+d(s.ID)} hx-get={"/submissionFeedbackUpdate/"+d(s.ID)} hx-trigger="every 1s" hx-swap="outerHTML">
+            @submissionFeedbackInner(s)
+        </div>
+     }
+}
+
+templ SubmissionRowUpdate(s njudge.Submission) {
+    @SubmissionRow(s)
+}
+
+templ SubmissionFeedbackUpdate(s njudge.Submission) {
+    @SubmissionFeedback(s)
+}
+
+templ Submission(vm SubmissionViewModel) {
+    @Page() {
+        if vm.CanRejudge {
+            <a class="btn btn-secondary" href={templ.SafeURL("/submission/rejudge/" + d(vm.Submission.ID))}>
+                <i class="bi bi-arrow-clockwise"></i> {Tr(ctx, "Rejudge")}
+            </a>
+        }
+
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <tbody>
+                    @SubmissionRow(vm.Submission)
+                </tbody>
+            </table>
+        </div>
+
+        if vm.DisplaySource {
+             <div class="source-block">
+                <div class="source-actions">
+                    <button id="source-expand" class="btn" data-target="source-code"><i class="bi bi-arrows-expand"></i></button>
+                    <button id="source-copy" class="btn" data-target="source-code"><i class="bi bi-copy"></i></button>
+                </div>
+                <pre id="source-code" style="max-height: 400px;" data-expanded="false">
+                    <code class={vm.Submission.Language}>
+                        {string(vm.Submission.Source)}
+                    </code>
+                </pre>
+            </div>
+        }
+
+        @SubmissionFeedback(vm.Submission)
+
+        <script src="/static/js/submission.js" defer></script>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+    }
+}
+
+type SubmissionsViewModel struct {
+	Pages       []PaginationLink
+	Submissions []njudge.Submission
+}
+
+templ Submissions(vm SubmissionsViewModel) {
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <td>Id</td>
+                    <td>{Tr(ctx, "Date")}</td>
+                    <td>{Tr(ctx, "User")}</td>
+                    <td>{Tr(ctx, "Problem")}</td>
+                    <td>{Tr(ctx, "Language")}</td>
+                    <td>{Tr(ctx, "Verdict")}</td>
+                    <td>{Tr(ctx, "Time")}</td>
+                    <td>{Tr(ctx, "Memory")}</td>
+                </tr>
+            </thead>
+            <tbody>
+                for _, submission := range vm.Submissions {
+                    @SubmissionRow(submission)
+                }
+            </tbody>
+        </table>
+        @Pagination(vm.Pages)
+    </div>
+
+}
+
+templ Status(vm SubmissionsViewModel) {
+    @Page() {
+        @Submissions(vm)
+        <script>
+            if(window.location.hash) {
+                let hash = window.location.hash.substring(1);
+                let row = document.getElementById(hash);
+                if(row !== null) {
+                    row.classList.toggle("table-active");
+                }
+            }
+        </script>
+    }
+}

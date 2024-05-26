@@ -80,24 +80,24 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	ans.Feedback = append(ans.Feedback, problems.Testset{Name: "tests"})
 	testset := &ans.Feedback[len(ans.Feedback)-1]
 
-	tcbygroup := make(map[string][]problems.Testcase)
+	testcaseByGroup := make(map[string][]problems.Testcase)
 	for ind := 0; ind < p.TestCount; ind++ {
 		tc := problems.Testcase{}
 		tc.InputPath, tc.AnswerPath = fmt.Sprintf(p.InputPathPattern, ind+1), fmt.Sprintf(p.AnswerPathPattern, ind+1)
 		tc.Index = ind + 1
 
-		points_sum := 0.0
+		pointSum := 0.0
 		for x := 0; x < p.SubtaskCount; x++ {
-			points_sum = points_sum + float64(p.Points[x*p.TestCount+ind])
+			pointSum = pointSum + float64(p.Points[x*p.TestCount+ind])
 		}
 
-		tc.MaxScore = points_sum
+		tc.MaxScore = pointSum
 
-		if len(tcbygroup[tc.Group]) == 0 {
-			tcbygroup[tc.Group] = make([]problems.Testcase, 0)
+		if len(testcaseByGroup[tc.Group]) == 0 {
+			testcaseByGroup[tc.Group] = make([]problems.Testcase, 0)
 		}
 
-		tcbygroup[tc.Group] = append(tcbygroup[tc.Group], tc)
+		testcaseByGroup[tc.Group] = append(testcaseByGroup[tc.Group], tc)
 	}
 
 	idx := 1
@@ -108,7 +108,7 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	group.Name = "base"
 	group.Scoring = problems.ScoringSum
 
-	for _, tc := range tcbygroup[""] {
+	for _, tc := range testcaseByGroup[""] {
 		testcase := problems.Testcase{
 			Index:          idx,
 			InputPath:      tc.InputPath,
@@ -257,5 +257,5 @@ func Identify(fs afero.Fs, path string) bool {
 }
 
 func init() {
-	problems.RegisterConfigType("feladat_txt", Parse, Identify)
+	_ = problems.RegisterConfigType("feladat_txt", Parse, Identify)
 }

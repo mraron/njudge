@@ -6,7 +6,7 @@ import (
 
 type SortDirection string
 
-var (
+const (
 	SortASC  SortDirection = "ASC"
 	SortDESC SortDirection = "DESC"
 )

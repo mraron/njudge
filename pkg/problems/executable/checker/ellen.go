@@ -3,9 +3,7 @@ package checker
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -59,16 +57,20 @@ func (Ellen) Name() string {
 
 func (f Ellen) Check(ctx context.Context, testcase *problems.Testcase) error {
 	tc := testcase
-	testind := strconv.Itoa(tc.Index)
+	testIndex := strconv.Itoa(tc.Index)
 
-	dir, err := ioutil.TempDir("/tmp", "feladat_txt_checker")
+	dir, err := os.MkdirTemp("/tmp", "feladat_txt_checker")
 	if err != nil {
 		return err
 	}
+	defer func(path string) {
+		_ = os.RemoveAll(path)
+	}(dir)
 
-	pout_tmp := filepath.Join(dir, filepath.Base(tc.AnswerPath))
+	requiredName := filepath.Base(tc.AnswerPath) // for example in.5
+	participantOutput := filepath.Join(dir, requiredName)
 
-	err = os.Symlink(tc.OutputPath, pout_tmp)
+	err = os.Symlink(tc.OutputPath, participantOutput)
 	if err != nil {
 		return err
 	}
@@ -76,7 +78,7 @@ func (f Ellen) Check(ctx context.Context, testcase *problems.Testcase) error {
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 
-	args := []string{f.ellenPath, f.testcaseDir, dir, testind}
+	args := []string{f.ellenPath, f.testcaseDir, dir, testIndex}
 	cmd := exec.Command("/bin/sh", "-c", "ulimit -s unlimited && "+strings.Join(args, " "))
 	cmd.Stdout = stdout
 	cmd.Stderr = stderr
@@ -86,22 +88,22 @@ func (f Ellen) Check(ctx context.Context, testcase *problems.Testcase) error {
 	str := stdout.String()
 	tc.CheckerOutput = problems.Truncate(str)
 	if err == nil || strings.HasPrefix(err.Error(), "exit status") {
-		var spltd []string
+		var splitted []string
 		if strings.Contains(str, ":") {
-			spltd = strings.Split(strings.TrimSpace(str), ":")
+			splitted = strings.Split(strings.TrimSpace(str), ":")
 		} else {
-			spltd = strings.Split(strings.TrimSpace(str), "\n")
+			splitted = strings.Split(strings.TrimSpace(str), "\n")
 		}
 
 		score := 0.0
 		allOk := true
-		for i := 0; i < len(spltd); i++ {
-			spltd[i] = strings.TrimSpace(spltd[i])
-			if len(spltd[i]) == 0 {
+		for i := 0; i < len(splitted); i++ {
+			splitted[i] = strings.TrimSpace(splitted[i])
+			if len(splitted[i]) == 0 {
 				continue
 			}
 
-			curr := strings.Split(spltd[i], ";")
+			curr := strings.Split(splitted[i], ";")
 			if len(curr) < 2 {
 				return fmt.Errorf("wrong format for ellen output: %q %v", str, curr)
 			}
@@ -123,11 +125,8 @@ func (f Ellen) Check(ctx context.Context, testcase *problems.Testcase) error {
 		}
 
 		return nil
-	} else if err != nil {
-		tc.VerdictName = problems.VerdictXX
-		return err
 	}
 
 	tc.VerdictName = problems.VerdictXX
-	return errors.New("process state is not success")
+	return err
 }

@@ -1,44 +1,39 @@
 package handlers
 
 import (
-	"html/template"
+	"github.com/mraron/njudge/internal/web/templates"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/njudge"
-	"github.com/mraron/njudge/internal/web/helpers/config"
 	"github.com/mraron/njudge/internal/web/helpers/roles"
-	"github.com/mraron/njudge/internal/web/helpers/templates/partials"
 )
 
-func GetHome() echo.HandlerFunc {
+func GetHome(store templates.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		return c.Render(http.StatusOK, "home.gohtml", nil)
+		res, _ := store.Get("home")
+		return templates.Render(c, http.StatusOK, templates.Home(res))
 	}
 }
 
-func GetAdmin(cfg config.Server) echo.HandlerFunc {
+func GetAdmin() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		u := c.Get("user").(*njudge.User)
 		if !roles.Can(roles.Role(u.Role), roles.ActionView, "admin_panel") {
-			return c.Render(http.StatusUnauthorized, "error.gohtml", "Engedély megtagadva.")
+			return echo.NotFoundHandler(c)
 		}
 
-		return c.Render(http.StatusOK, "admin.gohtml", struct {
-			Url string
-		}{cfg.Url})
+		return templates.Render(c, http.StatusOK, templates.Admin())
 	}
 }
 
-func GetPage(store partials.Store) echo.HandlerFunc {
+func GetPage(store templates.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		contents, err := store.Get("page_" + c.Param("page"))
 		if err != nil {
 			return err
 		}
 
-		return c.Render(http.StatusOK, "page.gohtml", struct {
-			Contents template.HTML
-		}{template.HTML(contents)})
+		return templates.Render(c, http.StatusOK, templates.PageWithContent(contents))
 	}
 }

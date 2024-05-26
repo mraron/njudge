@@ -35,6 +35,16 @@ type ProblemTag struct {
 	Added     time.Time
 }
 
+type ProblemTags []ProblemTag
+
+func (p ProblemTags) ToTags() []Tag {
+	tags := make([]Tag, len(p))
+	for i := range p {
+		tags[i] = p[i].Tag
+	}
+	return tags
+}
+
 var (
 	ErrorUnableToModifyProblemTags = errors.New("njudge: user can't modify tags")
 )

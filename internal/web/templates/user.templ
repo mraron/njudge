@@ -1,0 +1,142 @@
+package templates
+
+type LoginViewModel struct {
+    GoogleAuthEnabled bool
+    ValidationMessages []string
+}
+
+templ validationMessages(validationMessages []string) {
+    if len(validationMessages) > 0 {
+        <div class="alert alert-danger" role="alert">
+            {Tr(ctx, "We found the following problems")}:
+            <ul>
+                for _, msg := range validationMessages {
+                    <li><b>{msg}</b></li>
+                }
+            </ul>
+        </div>
+    }
+}
+
+templ Login(vm LoginViewModel) {
+    @Page() {
+        <form method="post" action="/user/login">
+            if msg, ok := ctx.Value(LoginMessageContextKey).(string); ok {
+                <div class="alert alert-info" role="alert">
+                    {msg}
+                </div>
+            }
+
+            @validationMessages(vm.ValidationMessages)
+
+            if vm.GoogleAuthEnabled {
+                <a class="btn btn-danger" href="/user/auth?provider=google"><i class="bi bi-google"></i> Google</a>
+                <br>
+                <br>
+            }
+            <div class="form-group">
+                <label for="loginName">{Tr(ctx, "Nickname")}: </label>
+                <input type="text" name="name" id="loginName" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">{Tr(ctx, "Password")}: </label>
+                <input type="password" name="password" id="loginPassword" class="form-control">
+            </div>
+            @CSRFHidden()
+            <a href="/user/forgot_password">{Tr(ctx, "Forgot password?")}</a><br><br>
+            <input type="submit" value={Tr(ctx, "Login")} class="btn btn-primary">
+        </form>
+    }
+}
+
+type RegisterViewModel struct {
+    ValidationMessages []string
+
+    TempName string
+    TempEmail string
+}
+
+templ Register(vm RegisterViewModel)  {
+    @Page() {
+        <form action="/user/register" method="post">
+            @validationMessages(vm.ValidationMessages)
+            <div class="form-group">
+                <label for="registerName">{Tr(ctx,"Nickname")}: </label>
+                <input type="text" name="name" class="form-control" id="registerName" value={vm.TempName}>
+            </div>
+            <div class="form-group">
+                <label for="registerPassword">{Tr(ctx, "Password")}: </label>
+                <input type="password" name="password" class="form-control" id="registerPassword">
+            </div>
+            <div class="form-group">
+                <label for="registerPassword2">{Tr(ctx, "Password again")}: </label>
+                <input type="password" name="password2" class="form-control" id="registerPassword2">
+            </div>
+            <div class="form-group">
+                <label for="registerEmail">{Tr(ctx, "Email")}: </label>
+                <input type="email" name="email" class="form-control" id="registerEmail" value={vm.TempEmail}>
+            </div>
+            @CSRFHidden()
+            <input type="submit" value={Tr(ctx, "Register")} class="btn btn-primary">
+        </form>
+
+    }
+}
+
+templ ForgotPasswordEmail() {
+    @Page() {
+        if msg, ok := ctx.Value(ForgotPasswordEmailMessageContextKey).(string); ok {
+            <div class="alert alert-info" role="alert">
+                {msg}
+            </div>
+        }
+
+        <form method="post" action="/user/forgot_password">
+            <div class="form-group">
+                <label for="email">
+                    {Tr(ctx, "Email")}:
+                </label>
+                <input type="email" id="email" name="email" class="form-control">
+            </div>
+            @CSRFHidden()
+
+            <input type="submit" value={Tr(ctx, "Reset password")} class="btn btn-danger">
+        </form>
+    }
+}
+
+type ForgotPasswordFormViewModel struct {
+    Name string
+    Key string
+}
+
+templ ForgotPasswordForm(vm ForgotPasswordFormViewModel) {
+    @Page() {
+        if msg, ok := ctx.Value(ForgotPasswordFormMessageContextKey).(string); ok {
+            <div class="alert alert-info" role="alert">
+                {msg}
+            </div>
+        }
+        <form method="post" action="/user/forgot_password_form">
+            <div class="form-group">
+                <label for="password1">
+                    {Tr(ctx, "Password")}:
+                </label>
+                <input type="password" id="password1" name="password1" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="password2">
+                    {Tr(ctx, "Password again")}:
+                </label>
+                <input type="password" id="password2" name="password2" class="form-control">
+            </div>
+
+            <input type="hidden" name="name" value={vm.Name}>
+            <input type="hidden" name="key" value={vm.Key}>
+
+            @CSRFHidden()
+
+            <input type="submit" value={Tr(ctx, "Reset password")} class="btn btn-danger">
+        </form>
+    }
+}

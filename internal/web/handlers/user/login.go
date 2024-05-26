@@ -2,16 +2,14 @@ package user
 
 import (
 	"errors"
+	"github.com/mraron/njudge/internal/web/templates"
+	"github.com/mraron/njudge/internal/web/templates/i18n"
 	"net/http"
-
-	"github.com/markbates/goth/gothic"
-	"github.com/mraron/njudge/internal/njudge"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
-
-	"github.com/mraron/njudge/internal/web/helpers"
 
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
+	"github.com/markbates/goth/gothic"
+	"github.com/mraron/njudge/internal/njudge"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -38,22 +36,22 @@ func loginUserHandler(auth Authenticator) echo.HandlerFunc {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		if u := c.Get("user").(*njudge.User); u != nil {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
+			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
 		user, err := auth(c)
 		if err != nil {
 			if errors.Is(err, ErrorLogin) {
-				helpers.SetFlash(c, "LoginMessage", err.(LoginErrorWithMessage).TranslatedMessage)
+				templates.SetFlash(c, templates.LoginMessageContextKey, err.(LoginErrorWithMessage).TranslatedMessage)
 				return c.Redirect(http.StatusFound, c.Echo().Reverse("getUserLogin"))
 			} else {
 				return err
 			}
 		}
-		defer helpers.DeleteFlash(c, "LoginRedirect")
+		defer templates.DeleteFlash(c, templates.LoginRedirectContextKey)
 
 		if !user.ActivationInfo.Activated {
-			helpers.SetFlash(c, "LoginMessage", tr.Translate("The account is not activated. Check your emails!"))
+			templates.SetFlash(c, templates.LoginMessageContextKey, tr.Translate("The account is not activated. Check your emails!"))
 			return c.Redirect(http.StatusFound, "/user/login")
 		}
 
@@ -64,14 +62,14 @@ func loginUserHandler(auth Authenticator) echo.HandlerFunc {
 			return err
 		}
 
-		c.Set("user", user)
+		c.Set(templates.UserContextKey, user)
 
 		to := "/"
-		if val, ok := helpers.GetFlash(c, "LoginRedirect").(string); ok {
+		if val, ok := templates.GetFlash(c, templates.LoginRedirectContextKey).(string); ok {
 			to = val
 		}
 
-		helpers.SetFlash(c, "TopMessage", tr.Translate("Successful login!"))
+		templates.SetFlash(c, templates.TopMessageContextKey, tr.Translate("Successful login!"))
 		return c.Redirect(http.StatusFound, to)
 	}
 }
@@ -81,7 +79,7 @@ func BeginOAuth() echo.HandlerFunc {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		if u := c.Get("user").(*njudge.User); u != nil {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
+			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
 		gothic.BeginAuthHandler(c.Response(), c.Request())
@@ -94,31 +92,35 @@ func GetLogin() echo.HandlerFunc {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		if u := c.Get("user").(*njudge.User); u != nil {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
+			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
-		helpers.DeleteFlash(c, "LoginMessage")
+		templates.DeleteFlash(c, templates.LoginMessageContextKey)
 
 		to := "/"
 		if val := c.QueryParams().Get("next"); val != "" {
 			to = val
 		}
-		helpers.SetFlash(c, "LoginRedirect", to)
+		templates.SetFlash(c, templates.LoginRedirectContextKey, to)
 
-		return c.Render(http.StatusOK, "user/login", nil)
+		vm := templates.LoginViewModel{
+			GoogleAuthEnabled:  false,
+			ValidationMessages: nil,
+		}
+		return templates.Render(c, http.StatusOK, templates.Login(vm))
 	}
 }
 
-func PostLogin(us njudge.Users) echo.HandlerFunc {
-	type request struct {
-		Name     string `form:"name"`
-		Password string `form:"password"`
-	}
+type PostLoginRequest struct {
+	Name     string `form:"name"`
+	Password string `form:"password"`
+}
 
+func PostLogin(us njudge.Users) echo.HandlerFunc {
 	return loginUserHandler(func(c echo.Context) (*njudge.User, error) {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		data := request{}
+		data := PostLoginRequest{}
 		if err := c.Bind(&data); err != nil {
 			return nil, err
 		}
@@ -159,7 +161,7 @@ func Logout() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 		if u := c.Get("user").(*njudge.User); u == nil {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate("Can't logout if you've not logged in."))
+			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate("Can't logout if you've not logged in.")))
 		}
 
 		storage, _ := session.Get("user", c)

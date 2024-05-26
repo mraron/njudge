@@ -3,12 +3,10 @@ package api
 import (
 	"context"
 	"database/sql"
+	"github.com/mraron/njudge/internal/web/templates"
 	"strconv"
 
 	"github.com/mraron/njudge/internal/njudge/db/models"
-	"github.com/mraron/njudge/internal/web/helpers"
-	"github.com/mraron/njudge/internal/web/helpers/pagination"
-
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
@@ -25,7 +23,7 @@ func (UserDataProvider) Identifier() string {
 	return "id"
 }
 
-func (dp UserDataProvider) List(data *pagination.Data) ([]*models.User, error) {
+func (dp UserDataProvider) List(data *templates.PaginationData) ([]*models.User, error) {
 	qms := make([]QueryMod, 0)
 	if data.SortField != "" {
 		qms = append(qms, OrderBy(data.SortField+" "+data.SortDir))
@@ -42,7 +40,7 @@ func (dp UserDataProvider) List(data *pagination.Data) ([]*models.User, error) {
 	}
 
 	for i := 0; i < len(res); i++ {
-		helpers.CensorUserPassword(res[i])
+		res[i].Password = "***CENSORED***"
 	}
 
 	return res, nil
@@ -58,7 +56,7 @@ func (dp UserDataProvider) Get(id string) (*models.User, error) {
 		return nil, err
 	}
 
-	helpers.CensorUserPassword(elem)
+	elem.Password = "***CENSORED***"
 	return elem, nil
 }
 

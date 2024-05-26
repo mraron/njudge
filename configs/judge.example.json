@@ -1,9 +1,0 @@
-{
-  "id": "default",
-  "host": "192.168.4.128",
-  "port": "8888",
-  "problems_dir": "/home/aron/njudge_problems",
-  "public_key": "",
-  "log_dir":"/home/aron/njudge_logs",
-  "sandbox_ids": [0,1,2]
-}

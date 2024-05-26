@@ -1,6 +1,7 @@
 package task_yaml
 
 import (
+	"errors"
 	"strings"
 	"testing"
 
@@ -132,7 +133,7 @@ gen_rand.py 100000 100000 20000000 0.94 0.4 1
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			testCount, subtasks, err := parseGen(strings.NewReader(test.gen))
-			if err != test.err {
+			if !errors.Is(err, test.err) {
 				t.Fatalf("err %v != %v", err, test.err)
 			}
 

@@ -93,22 +93,22 @@ func (us *Users) GetByEmail(ctx context.Context, email string) (*njudge.User, er
 	return us.get(ctx, models.UserWhere.Email.EQ(email))
 }
 
-// inserts a njudge.User to the database with a possible forgotten password key
+// Insert a njudge.User to the database with a possible forgotten password key
 func (us *Users) Insert(ctx context.Context, u njudge.User) (*njudge.User, error) {
-	dbobj := us.toModel(u)
+	dbObj := us.toModel(u)
 	tx, err := us.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := dbobj.Insert(ctx, tx, boil.Infer()); err != nil {
-		pgerr := &pq.Error{}
-		if errors.As(err, &pgerr) {
-			if pgerr.Code == "23505" {
-				if pgerr.Constraint == "users_name_unique" {
+	if err := dbObj.Insert(ctx, tx, boil.Infer()); err != nil {
+		pgErr := &pq.Error{}
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == "23505" {
+				if pgErr.Constraint == "users_name_unique" {
 					return nil, errors.Join(njudge.ErrorSameName, err, tx.Rollback())
 				}
-				if pgerr.Constraint == "users_email_unique" {
+				if pgErr.Constraint == "users_email_unique" {
 					return nil, errors.Join(njudge.ErrorSameEmail, err, tx.Rollback())
 				}
 			}
@@ -122,7 +122,7 @@ func (us *Users) Insert(ctx context.Context, u njudge.User) (*njudge.User, error
 			Valid: u.ForgottenPasswordKey.ValidUntil,
 		}
 
-		if err := dbobj.SetForgottenPasswordKey(ctx, tx, true, key); err != nil {
+		if err := dbObj.SetForgottenPasswordKey(ctx, tx, true, key); err != nil {
 			return nil, errors.Join(err, tx.Rollback())
 		}
 	}
@@ -135,9 +135,9 @@ func (us *Users) Delete(ctx context.Context, ID int) error {
 	return err
 }
 
-// updates the user's given fields
+// Update the njudge.User's given fields
 func (us *Users) Update(ctx context.Context, u *njudge.User, fields []string) error {
-	dbobj := us.toModel(*u)
+	dbObj := us.toModel(*u)
 	tx, err := us.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
@@ -164,7 +164,7 @@ func (us *Users) Update(ctx context.Context, u *njudge.User, fields []string) er
 	}
 
 	if len(whitelist) > 0 {
-		if _, err := dbobj.Update(ctx, tx, boil.Whitelist(whitelist...)); err != nil {
+		if _, err := dbObj.Update(ctx, tx, boil.Whitelist(whitelist...)); err != nil {
 			return errors.Join(err, tx.Rollback())
 		}
 	}
@@ -176,7 +176,7 @@ func (us *Users) Update(ctx context.Context, u *njudge.User, fields []string) er
 				Valid: u.ForgottenPasswordKey.ValidUntil,
 			}
 
-			if err := dbobj.SetForgottenPasswordKey(ctx, tx, false, key); err != nil {
+			if err := dbObj.SetForgottenPasswordKey(ctx, tx, false, key); err != nil {
 				return errors.Join(err, tx.Rollback())
 			}
 		} else {
@@ -185,7 +185,7 @@ func (us *Users) Update(ctx context.Context, u *njudge.User, fields []string) er
 				Valid: u.ForgottenPasswordKey.ValidUntil,
 			}
 
-			if err := dbobj.SetForgottenPasswordKey(ctx, tx, true, key); err != nil {
+			if err := dbObj.SetForgottenPasswordKey(ctx, tx, true, key); err != nil {
 				return errors.Join(err, tx.Rollback())
 			}
 

@@ -20,22 +20,33 @@ func BindEnvs(iface interface{}, parts ...string) {
 		if !ok {
 			continue
 		}
+		squash := strings.Contains(tv, ",squash")
+		tv = strings.Split(tv, ",")[0]
 		switch v.Kind() {
 		case reflect.Struct:
-			BindEnvs(v.Interface(), append(parts, tv)...)
+			if squash {
+				BindEnvs(v.Interface(), parts...)
+			} else {
+				BindEnvs(v.Interface(), append(parts, tv)...)
+			}
 		default:
-			viper.BindEnv(strings.Join(append(parts, tv), "."))
+			viper.MustBindEnv(strings.Join(append(parts, tv), "."))
 		}
 	}
 }
 
 var RootCmd = &cobra.Command{
 	Use:     "njudge",
-	Version: "v0.3.1",
+	Version: "v0.5.0",
 	Long:    "cli tool to manage njudge instance",
 }
 
 func Execute() {
+	RootCmd.AddCommand(NewWebCmd(viper.GetViper()))
+	RootCmd.AddCommand(NewJudgeCmd(viper.GetViper()))
+	RootCmd.AddCommand(NewGlueCmd(viper.GetViper()))
+	RootCmd.AddCommand(NewTestProblemCmd())
+
 	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)

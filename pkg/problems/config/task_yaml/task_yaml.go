@@ -212,11 +212,11 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 		if len(testsLeft) == 1 {
 			if !isSum {
 				v := p.ScoreTypeParameters[subtask][0]
-				switch v.(type) {
+				switch v := v.(type) {
 				case float64:
-					tc.MaxScore = v.(float64)
+					tc.MaxScore = v
 				case int:
-					tc.MaxScore = float64(v.(int))
+					tc.MaxScore = float64(v)
 				default:
 					return nil, errors.New("task_yaml: wrong score format")
 				}
@@ -551,5 +551,5 @@ func Identifier(fs afero.Fs, path string) bool {
 }
 
 func init() {
-	problems.RegisterConfigType("task_yaml", Parser, Identifier)
+	_ = problems.RegisterConfigType("task_yaml", Parser, Identifier)
 }

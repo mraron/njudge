@@ -3,50 +3,48 @@ package user
 import (
 	"bytes"
 	"errors"
+	"github.com/mraron/njudge/internal/web/templates"
+	"github.com/mraron/njudge/internal/web/templates/i18n"
+	"github.com/mraron/njudge/internal/web/templates/mail"
 	"net/http"
 	"unicode"
 
+	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/njudge/email"
-	"github.com/mraron/njudge/internal/web/helpers/config"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
-
-	"github.com/labstack/echo/v4"
 )
-
-type RegistrationPageData struct {
-	ErrorStrings []string
-	Name         string
-	Email        string
-}
 
 func GetRegister() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
+
 		if u := c.Get("user").(*njudge.User); u != nil {
-			return c.Render(http.StatusOK, "error", "Már be vagy lépve...")
+			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
-		return c.Render(http.StatusOK, "user/register", RegistrationPageData{})
+		vm := templates.RegisterViewModel{}
+		return templates.Render(c, http.StatusOK, templates.Register(vm))
 	}
 }
 
-func Register(cfg config.Server, registerService njudge.RegisterService, mailService email.Service) echo.HandlerFunc {
-	type request struct {
-		Name      string `form:"name"`
-		Email     string `form:"email"`
-		Password  string `form:"password"`
-		Password2 string `form:"password2"`
-	}
+type PostRegisterRequest struct {
+	Name      string `form:"name"`
+	Email     string `form:"email"`
+	Password  string `form:"password"`
+	Password2 string `form:"password2"`
+}
+
+func PostRegister(url string, users njudge.Users, mailService email.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		data := request{}
+		data := PostRegisterRequest{}
 		if err := c.Bind(&data); err != nil {
 			return err
 		}
 
 		if u := c.Get("user").(*njudge.User); u != nil {
-			return c.Render(http.StatusOK, "error.gohtml", "Már be vagy lépve...")
+			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
 		register := func() ([]string, error) {
@@ -85,10 +83,27 @@ func Register(cfg config.Server, registerService njudge.RegisterService, mailSer
 				return errMessages, nil
 			}
 
-			u, err := registerService.Register(c.Request().Context(), njudge.RegisterRequest{
+			_, err = njudge.RegisterUser(c.Request().Context(), users, njudge.RegisterRequest{
 				Name:     data.Name,
 				Email:    data.Email,
 				Password: data.Password,
+			}, func(user *njudge.User) error {
+				m := email.Mail{}
+				m.Recipients = []string{c.FormValue("email")}
+				m.Subject = tr.Translate("Activate your account")
+
+				message := &bytes.Buffer{}
+				vm := mail.ActivationViewModel{
+					Name:          user.Name,
+					URL:           url,
+					ActivationKey: user.ActivationInfo.Key,
+				}
+				if err = vm.Execute(message); err != nil {
+					return err
+				}
+				m.Message = message.String()
+
+				return mailService.Send(c.Request().Context(), m)
 			})
 
 			if errors.Is(err, njudge.ErrorSameName) {
@@ -98,61 +113,24 @@ func Register(cfg config.Server, registerService njudge.RegisterService, mailSer
 				errMessages = append(errMessages, tr.Translate("The email is already registered."))
 			}
 			if len(errMessages) > 0 {
-				return errMessages, nil
-			}
-			if err != nil {
-				return nil, err
-			}
-
-			m := email.Mail{}
-			m.Recipients = []string{c.FormValue("email")}
-			m.Subject = tr.Translate("Activate your account")
-
-			message := &bytes.Buffer{}
-			err = c.Echo().Renderer.Render(message, "mail/activation", struct {
-				Name          string
-				URL           string
-				ActivationKey string
-			}{
-				c.FormValue("name"),
-				cfg.Url,
-				u.ActivationInfo.Key,
-			}, nil)
-			if err != nil {
-				return errMessages, err
-			}
-			m.Message = message.String()
-
-			if err = mailService.Send(c.Request().Context(), m); err != nil {
 				return errMessages, err
 			}
 
-			return nil, nil
+			return nil, err
 		}
 
 		if errMessages, err := register(); err == nil && len(errMessages) > 0 {
-			return c.Render(http.StatusOK, "user/register", RegistrationPageData{
-				ErrorStrings: errMessages,
-				Name:         data.Name,
-				Email:        data.Email,
-			})
+			vm := templates.RegisterViewModel{
+				ValidationMessages: errMessages,
+				TempName:           data.Name,
+				TempEmail:          data.Email,
+			}
+			return templates.Render(c, http.StatusOK, templates.Register(vm))
 		} else if err != nil {
 			return err
 		}
 
-		return c.Redirect(http.StatusFound, "/user/activate")
-	}
-}
-
-func GetActivateInfo() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
-
-		if u := c.Get("user").(*njudge.User); u != nil {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
-		}
-
-		return c.Render(http.StatusOK, "user/activate.gohtml", nil)
+		return templates.Render(c, http.StatusOK, templates.Info(tr.Translate("Thank you for registering! We've sent you an email with further instructions about finishing your registration.")))
 	}
 }
 
@@ -170,7 +148,7 @@ func Activate(users njudge.Users) echo.HandlerFunc {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		if u := c.Get("user").(*njudge.User); u != nil {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate(alreadyLoggedInMessage))
+			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
 		user, err := users.GetByName(c.Request().Context(), data.Name)
@@ -178,19 +156,21 @@ func Activate(users njudge.Users) echo.HandlerFunc {
 			return err
 		}
 
-		if user.ActivationInfo.Activated {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate("This account has already been activated."))
+		err = user.ActivateWithKey(data.Key)
+		if err != nil {
+			if errors.Is(err, njudge.ErrorAlreadyActivated) {
+				return templates.Render(c, http.StatusOK, templates.Error(tr.Translate("This account has already been activated.")))
+			} else if errors.Is(err, njudge.ErrorWrongActivationKey) {
+				return templates.Render(c, http.StatusOK, templates.Error(tr.Translate("Wrong activation key. Are you sure you've clicked on the right link?")))
+			} else {
+				return err
+			}
 		}
 
-		if user.ActivationInfo.Key != data.Key {
-			return c.Render(http.StatusOK, "error.gohtml", tr.Translate("Wrong activation key. Are you sure you've clicked on the right link?"))
-		}
-
-		user.Activate()
-		if err := users.Update(c.Request().Context(), user, njudge.Fields(njudge.UserFields.ActivationInfo)); err != nil {
+		if users.Update(c.Request().Context(), user, njudge.Fields(njudge.UserFields.ActivationInfo)); err != nil {
 			return err
 		}
 
-		return c.Render(http.StatusOK, "message.gohtml", tr.Translate("Successful activation. You can login now!"))
+		return templates.Render(c, http.StatusOK, templates.Info(tr.Translate("Successful activation. You can login now!")))
 	}
 }

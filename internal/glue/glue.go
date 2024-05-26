@@ -3,11 +3,13 @@ package glue
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/mraron/njudge/internal/judge"
 	"github.com/mraron/njudge/internal/njudge/db"
 	"io"
 	"log/slog"
+	"math"
 	"strconv"
 	"time"
 
@@ -22,6 +24,7 @@ type Glue struct {
 
 	Logger *slog.Logger
 
+	Users            njudge.Users
 	Submissions      njudge.Submissions
 	Problems         njudge.Problems
 	SubmissionsQuery njudge.SubmissionsQuery
@@ -34,6 +37,7 @@ func WithDatabaseOption(conn *sql.DB) Option {
 		if err := conn.Ping(); err != nil {
 			return err
 		}
+		glue.Users = db.NewUsers(conn)
 		glue.Submissions = db.NewSubmissions(conn)
 		glue.Problems = db.NewProblems(conn, db.NewSolvedStatusQuery(conn))
 		glue.SubmissionsQuery = glue.Submissions.(njudge.SubmissionsQuery)
@@ -43,7 +47,7 @@ func WithDatabaseOption(conn *sql.DB) Option {
 
 func WithLogger(logger *slog.Logger) Option {
 	return func(glue *Glue) error {
-		glue.Logger = logger.With("service", "glue")
+		glue.Logger = logger
 		return nil
 	}
 }
@@ -113,6 +117,9 @@ func (g *Glue) ProcessSubmission(ctx context.Context, sub njudge.Submission) err
 		verdict problems.VerdictName
 		score   float32 = 0.0
 	)
+	if status.CompilationStatus != problems.AfterCompilation {
+		return errors.New("invalid compilation status after judging submission")
+	}
 	if !status.Compiled {
 		verdict = problems.VerdictName(njudge.VerdictCE)
 	} else {
@@ -138,6 +145,68 @@ func (g *Glue) ProcessSubmission(ctx context.Context, sub njudge.Submission) err
 }
 
 func (g *Glue) Start(ctx context.Context) {
+	go func() {
+		for {
+			var (
+				problemList []njudge.Problem
+				subs        []njudge.Submission
+				err         error
+			)
+
+			g.Logger.Info("🖩\tcalculating user points")
+			problemList, err = g.Problems.GetAll(ctx)
+			if err != nil {
+				g.Logger.ErrorContext(ctx, err.Error())
+				continue
+			}
+			g.Logger.Info(fmt.Sprintf("🔎\tfound %d problems", len(problemList)))
+			userPoints := make(map[int]float64)
+			for _, problem := range problemList {
+				subs, err = g.SubmissionsQuery.GetACSubmissionsOf(ctx, problem.ID)
+				if err != nil {
+					break
+				}
+				userSolved := make(map[int]struct{})
+				users := make([]int, 0)
+				for _, sub := range subs {
+					userSolved[sub.UserID] = struct{}{}
+					users = append(users, sub.UserID)
+				}
+				solvedBy := len(users)
+				if solvedBy > 0 {
+					points := math.Sqrt(1.0 / float64(solvedBy))
+
+					for _, uid := range users {
+						userPoints[uid] += points
+					}
+				}
+
+				problem.SolverCount = solvedBy
+				if err = g.Problems.Update(ctx, problem, njudge.Fields(njudge.ProblemFields.SolverCount)); err != nil {
+					break
+				}
+			}
+			if err != nil {
+				g.Logger.ErrorContext(ctx, err.Error())
+				continue
+			}
+			g.Logger.Info(fmt.Sprintf("👨\tassigning %d users points", len(userPoints)))
+			for uid, points := range userPoints {
+				user := njudge.User{ID: uid}
+				user.Points = float32(points)
+				if err = g.Users.Update(ctx, &user, njudge.Fields(njudge.UserFields.Points)); err != nil {
+					break
+				}
+			}
+			if err != nil {
+				g.Logger.ErrorContext(ctx, err.Error())
+				continue
+			}
+			g.Logger.Info("✔️\tsuccessfully assigned solver count and user points")
+			time.Sleep(5 * time.Minute)
+		}
+	}()
+
 	for {
 		g.Logger.Info("🔎\tlooking for submissions")
 		subs, err := g.SubmissionsQuery.GetUnstarted(ctx, 20)
@@ -149,17 +218,13 @@ func (g *Glue) Start(ctx context.Context) {
 		for _, s := range subs {
 			s := s
 			go func() {
-				// create some kind of token system
-				// and also a collection of judges
+				// TODO create some kind of token system and also a collection of judges
 				err := g.ProcessSubmission(ctx, s)
 				if err != nil {
 					g.Logger.Error("‼️\tprocessing submission", "submission_id", s.ID, "error", err)
 
 					s.Verdict = njudge.VerdictXX
-					s.Judged = null.NewTime(time.Time{}, false)
-					s.Status = problems.Status{
-						Compiled: true,
-					}
+					s.Judged = null.NewTime(time.Now(), true)
 					_ = g.Submissions.Update(ctx, s, njudge.Fields(njudge.SubmissionFields.Verdict, njudge.SubmissionFields.Judged, njudge.SubmissionFields.Status))
 					return
 				}

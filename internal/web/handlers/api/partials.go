@@ -3,10 +3,9 @@ package api
 import (
 	"context"
 	"database/sql"
+	"github.com/mraron/njudge/internal/web/templates"
 
 	"github.com/mraron/njudge/internal/njudge/db/models"
-	"github.com/mraron/njudge/internal/web/helpers/pagination"
-
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
@@ -23,7 +22,7 @@ func (PartialDataProvider) Identifier() string {
 	return "name"
 }
 
-func (dp PartialDataProvider) List(data *pagination.Data) ([]*models.Partial, error) {
+func (dp PartialDataProvider) List(data *templates.PaginationData) ([]*models.Partial, error) {
 	qms := make([]QueryMod, 0)
 	if data.SortField != "" {
 		qms = append(qms, OrderBy("name "+data.SortDir))

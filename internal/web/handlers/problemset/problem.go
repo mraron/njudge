@@ -3,6 +3,9 @@ package problemset
 import (
 	"bytes"
 	"errors"
+	"github.com/mraron/njudge/internal/web/templates"
+	"github.com/mraron/njudge/internal/web/templates/i18n"
+	"github.com/mraron/njudge/pkg/problems/evaluation/output_only"
 	"io"
 	"mime"
 	"net/http"
@@ -11,37 +14,98 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/njudge"
-	"github.com/mraron/njudge/internal/web/helpers"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
-	"github.com/mraron/njudge/internal/web/helpers/pagination"
 	"github.com/mraron/njudge/pkg/problems"
 )
 
-func GetProblem() echo.HandlerFunc {
+func GetProblem(tags njudge.Tags) echo.HandlerFunc {
+	dataType := func(t string) string {
+		switch t {
+		case "pdf":
+			return problems.DataTypePDF
+		case "html":
+			return problems.DataTypeHTML
+		}
+		return ""
+	}
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 		prob := c.Get("problem").(njudge.Problem)
 		info := c.Get("problemInfo").(njudge.ProblemInfo)
-		sdata := c.Get("problemStoredData").(njudge.ProblemStoredData)
+		storedData := c.Get("problemStoredData").(njudge.ProblemStoredData)
 
-		c.Set("title", tr.Translate("Statement - %s (%s)",
-			tr.TranslateContent(sdata.Titles()).String(), sdata.Name()))
+		title := tr.TranslateContent(storedData.Titles()).String()
+		name := storedData.Name()
+		c.Set("title", tr.Translate("Statement - %s (%s)", title, name))
+		vm := templates.ProblemViewModel{
+			Title:        title,
+			Problemset:   prob.Problemset,
+			Name:         name,
+			ShowTags:     true,
+			Tags:         prob.Tags.ToTags(),
+			TaskTypeName: storedData.GetTaskType().Name(),
+			Languages:    storedData.Languages(),
+			UserInfo:     info.UserInfo,
+			Attachments:  storedData.Attachments(),
+			Statements:   nil,
+			TagsToAdd:    nil,
+		}
+		for _, st := range storedData.Statements() {
+			if st.IsHTML() || st.IsPDF() {
+				vm.Statements = append(vm.Statements, st)
+			}
+		}
+		statementType := c.QueryParam("type")
+		locale := c.QueryParam("locale")
+		poss := vm.Statements
+		if statementType != "" {
+			poss = poss.FilterByType(dataType(statementType))
+		}
+		if locale != "" {
+			poss = poss.FilterByLocale(locale)
+		}
+		if len(poss) > 0 {
+			s := tr.TranslateContent(poss)
+			vm.Statement = &s
+		} else { // prefer html then pdf
+			if HTMLs := vm.Statements.FilterByLocale(problems.DataTypeHTML); len(HTMLs) > 0 {
+				s := tr.TranslateContent(HTMLs)
+				vm.Statement = &s
+			} else if PDFs := vm.Statements.FilterByLocale(problems.DataTypePDF); len(PDFs) > 0 {
+				s := tr.TranslateContent(PDFs)
+				vm.Statement = &s
+			}
+		}
 
-		return c.Render(http.StatusOK, "problemset/problem/problem", struct {
-			njudge.Problem
-			njudge.ProblemStoredData
-			njudge.ProblemInfo
-		}{Problem: prob, ProblemStoredData: sdata, ProblemInfo: info})
+		if storedData.GetTaskType().Name() != output_only.Name {
+			vm.DisplayLimits = true
+			vm.TimeLimit = storedData.TimeLimit()
+			vm.MemoryLimit = storedData.MemoryLimit()
+		}
+		if info.UserInfo != nil {
+			if info.UserInfo.SolvedStatus == njudge.Solved {
+				vm.CanAddTags = true
+			} else {
+				if u := c.Get("user").(*njudge.User); u != nil && !u.Settings.ShowUnsolvedTags {
+					vm.ShowTags = false
+				}
+			}
+		}
+		var err error
+		if vm.TagsToAdd, err = tags.GetAll(c.Request().Context()); err != nil {
+			return err
+		}
+
+		return templates.Render(c, http.StatusOK, templates.Problem(vm))
 	}
 }
 
 func GetProblemPDF() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		sdata := c.Get("problemStoredData").(njudge.ProblemStoredData)
+		storedData := c.Get("problemStoredData").(njudge.ProblemStoredData)
 
 		lang := c.Param("language")
 
-		r, err := sdata.GetPDF(njudge.Language(lang))
+		r, err := storedData.GetPDF(njudge.Language(lang))
 		if err != nil {
 			return err
 		}
@@ -55,27 +119,12 @@ func GetProblemPDF() echo.HandlerFunc {
 	}
 }
 
-func GetProblemFile() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		sdata := c.Get("problemStoredData").(njudge.ProblemStoredData)
-
-		fileLoc, err := sdata.GetFile(c.Param("file"))
-		if errors.Is(err, njudge.ErrorFileNotFound) {
-			return echo.NewHTTPError(http.StatusNotFound, err)
-		} else if err != nil {
-			return err
-		}
-
-		return c.File(fileLoc)
-	}
-}
-
 func GetProblemAttachment() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		sdata := c.Get("problemStoredData").(njudge.ProblemStoredData)
+		storedData := c.Get("problemStoredData").(njudge.ProblemStoredData)
 		attachment := c.Param("attachment")
 
-		val, err := sdata.GetAttachment(attachment)
+		val, err := storedData.GetAttachment(attachment)
 		if errors.Is(err, njudge.ErrorFileNotFound) {
 			return echo.NewHTTPError(http.StatusNotFound, err)
 		} else if err != nil {
@@ -100,15 +149,14 @@ func GetProblemAttachment() echo.HandlerFunc {
 	}
 }
 
-func GetProblemRanklist(slist njudge.SubmissionListQuery) echo.HandlerFunc {
+func GetProblemRanklist(subList njudge.SubmissionListQuery, users njudge.Users) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		problemset, problemName := c.Param("name"), c.Param("problem")
-		prob := c.Get("problem").(njudge.Problem)
-		sdata := c.Get("problemStoredData").(njudge.ProblemStoredData)
+		storedData := c.Get("problemStoredData").(njudge.ProblemStoredData)
 
-		submissions, err := slist.GetSubmissionList(c.Request().Context(), njudge.SubmissionListRequest{
+		submissions, err := subList.GetSubmissionList(c.Request().Context(), njudge.SubmissionListRequest{
 			Problemset: problemset,
 			Problem:    problemName,
 			SortDir:    njudge.SortDESC,
@@ -118,23 +166,34 @@ func GetProblemRanklist(slist njudge.SubmissionListQuery) echo.HandlerFunc {
 			return err
 		}
 
+		ss, err := storedData.StatusSkeleton("")
+		if err != nil {
+			return err
+		}
+
 		hadUser := make(map[int]bool)
-		res := make([]njudge.Submission, 0)
+		vm := templates.ProblemRanklistViewModel{
+			MaxScore: ss.Feedback[0].MaxScore(),
+			Rows:     nil,
+		}
 		for ind := range submissions.Submissions {
 			if _, ok := hadUser[submissions.Submissions[ind].UserID]; ok {
 				continue
 			}
-
-			res = append(res, submissions.Submissions[ind])
+			u, err := users.Get(c.Request().Context(), submissions.Submissions[ind].UserID)
+			if err != nil {
+				return err
+			}
+			vm.Rows = append(vm.Rows, templates.ProblemRanklistRow{
+				ID:    submissions.Submissions[ind].ID,
+				Name:  u.Name,
+				Score: float64(submissions.Submissions[ind].Score),
+			})
 			hadUser[submissions.Submissions[ind].UserID] = true
 		}
 
-		c.Set("title", tr.Translate("Results - %s (%s)", tr.TranslateContent(sdata.Titles()).String(), sdata.Name()))
-		return c.Render(http.StatusOK, "problemset/problem/ranklist", struct {
-			Problem           njudge.Problem
-			ProblemStoredData njudge.ProblemStoredData
-			Submissions       []njudge.Submission
-		}{prob, sdata, res})
+		c.Set("title", tr.Translate("Results - %s (%s)", tr.TranslateContent(storedData.Titles()).String(), storedData.Name()))
+		return templates.Render(c, http.StatusOK, templates.ProblemRanklist(vm))
 	}
 }
 
@@ -143,37 +202,44 @@ func GetProblemSubmit() echo.HandlerFunc {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		p := c.Get("problem").(njudge.Problem)
-		prob := c.Get("problemStoredData").(njudge.ProblemStoredData)
+		storedData := c.Get("problemStoredData").(njudge.ProblemStoredData)
 		info := c.Get("problemInfo").(njudge.ProblemInfo)
 
-		c.Set("title", tr.Translate("Submit - %s (%s)", tr.TranslateContent(prob.Titles()).String(), prob.Name()))
-		return c.Render(http.StatusOK, "problemset/problem/submit", struct {
-			njudge.Problem
-			njudge.ProblemStoredData
-			njudge.ProblemInfo
-		}{Problem: p, ProblemStoredData: prob, ProblemInfo: info})
+		title := tr.TranslateContent(storedData.Titles()).String()
+		vm := templates.ProblemSubmitViewModel{
+			Problemset: p.Problemset,
+			Name:       p.Problem,
+			Title:      title,
+			UserInfo:   info.UserInfo,
+			Languages:  storedData.Languages(),
+		}
+
+		c.Set("title", tr.Translate("Submit - %s (%s)", title, storedData.Name()))
+
+		return templates.Render(c, http.StatusOK, templates.ProblemSubmit(vm))
 	}
 }
 
-func GetProblemStatus(slist njudge.SubmissionListQuery, pstore problems.Store) echo.HandlerFunc {
-	type request struct {
-		AC     string `query:"ac"`
-		UserID int    `query:"user_id"`
-		Page   int    `query:"page"`
+type GetProblemStatusRequest struct {
+	AC     string `query:"ac"`
+	UserID int    `query:"user_id"`
+	Page   int    `query:"page"`
 
-		Problemset string `param:"name"`
-		Problem    string `param:"problem"`
-	}
+	Problemset string `param:"name"`
+	Problem    string `param:"problem"`
+}
+
+func GetProblemStatus(subList njudge.SubmissionListQuery, probList problems.Store) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		prob := c.Get("problem").(njudge.Problem)
-		sdata, err := prob.WithStoredData(pstore)
+		storedData, err := prob.WithStoredData(probList)
 		if err != nil {
 			return err
 		}
 
-		data := request{}
+		data := GetProblemStatusRequest{}
 		if err := c.Bind(&data); err != nil {
 			return err
 		}
@@ -183,7 +249,6 @@ func GetProblemStatus(slist njudge.SubmissionListQuery, pstore problems.Store) e
 		}
 
 		statusReq := njudge.SubmissionListRequest{
-
 			Page:      data.Page,
 			PerPage:   20,
 			SortDir:   njudge.SortDESC,
@@ -200,24 +265,24 @@ func GetProblemStatus(slist njudge.SubmissionListQuery, pstore problems.Store) e
 			statusReq.Verdict = &ac
 		}
 
-		submissionList, err := slist.GetPagedSubmissionList(c.Request().Context(), statusReq)
+		submissionList, err := subList.GetPagedSubmissionList(c.Request().Context(), statusReq)
 		if err != nil {
 			return err
 		}
 
 		qu := (*c.Request().URL).Query()
-		links, err := pagination.LinksWithCountLimit(submissionList.PaginationData.Page, submissionList.PaginationData.PerPage, int64(submissionList.PaginationData.Count), qu, 5)
+		links, err := templates.LinksWithCountLimit(submissionList.PaginationData.Page, submissionList.PaginationData.PerPage, int64(submissionList.PaginationData.Count), qu, 5)
 		if err != nil {
 			return err
 		}
 
-		result := StatusPage{
+		result := templates.SubmissionsViewModel{
 			Submissions: submissionList.Submissions,
 			Pages:       links,
 		}
 
-		c.Set("title", tr.Translate("Submissions - %s (%s)", tr.TranslateContent(sdata.Titles()).String(), sdata.Name()))
-		return c.Render(http.StatusOK, "problemset/problem/status", result)
+		c.Set("title", tr.Translate("Submissions - %s (%s)", tr.TranslateContent(storedData.Titles()).String(), storedData.Name()))
+		return templates.Render(c, http.StatusOK, templates.ProblemStatus(result))
 	}
 }
 
@@ -233,7 +298,7 @@ func PostProblemTag(tgs njudge.TagsService) echo.HandlerFunc {
 
 		u := c.Get("user").(*njudge.User)
 		if u == nil {
-			return helpers.UnauthorizedError(c)
+			return c.NoContent(http.StatusUnauthorized)
 		}
 
 		pr := c.Get("problem").(njudge.Problem)
@@ -257,7 +322,7 @@ func DeleteProblemTag(tgs njudge.TagsService) echo.HandlerFunc {
 
 		u := c.Get("user").(*njudge.User)
 		if u == nil {
-			return helpers.UnauthorizedError(c)
+			return c.NoContent(http.StatusUnauthorized)
 		}
 
 		pr := c.Get("problem").(njudge.Problem)

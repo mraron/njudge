@@ -49,7 +49,7 @@ func (s BytesData) Type() string {
 }
 
 var (
-	DataTypeText = "text"
+	DataTypeText = "text/plain"
 	DataTypeHTML = "text/html"
 	DataTypePDF  = "application/pdf"
 )

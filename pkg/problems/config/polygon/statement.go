@@ -2,47 +2,38 @@ package polygon
 
 import (
 	"bytes"
+	"embed"
 	"encoding/json"
+	"github.com/spf13/afero"
 	"html"
+	"io"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"text/template"
-
-	"github.com/spf13/afero"
 )
 
-const htmlTemplate = `<link href="problem-statement.css" rel="stylesheet" type="text/css"><div class="problem-statement">
-<div class="header">
-	<div class="title">{{.Name}}</div>
-	<div class="time-limit"><div class="property-title">tesztenkénti időlimit</div> {{.TimeLimit}} ms</DIV>
-	<div class="memory-limit"><div class="property-title">tesztenkénti memórialimit</div> {{div .MemoryLimit 1048576}} MiB</div>
-	<div class="input-file"><div class="property-title">inputfájl</div> {{if .InputFile}} {{.InputFile}} {{else}} stdin {{end}}</div>
-	<div class="output-file"><div class="property-title">outputfájl</div> {{if .OutputFile}} {{.OutputFile}} {{else}} stdout {{end}} </div>
-</div><p></p><p></p>
-{{if .Legend}}<div class="legend">{{.Legend}}</div><p></p><p></p>{{end}}
-{{if .Input}}<div class="input-specification"><div class="section-title">Bemenet</div> {{.Input}}</div><p></p><p></p>{{end}}
-{{if .Output}}<div class="input-specification"><div class="section-title">Kimenet</div> {{.Output}}</div><p></p><p></p>{{end}}
-{{if .Scoring}}<div class="input-specification"><div class="section-title">Pontozás</div> {{.Scoring}}</div><p></p><p></p>{{end}}
-{{if .SampleTests}}
-<div class="sample-tests">
-	<div class="section-title">Példák</div>
-	{{range $i := .SampleTests}}
-		<div class="sample-test">
-			<div class="input"><div class="title">Bemenet</div><pre class="content">{{$i.Input}}</pre></div>
-			<div class="output"><div class="title">Kimenet</div><pre class="content">{{$i.Output}}</pre></div>
-		</div>
-		<p></p><p></p>
-	{{end}}
-</div>
-{{end}}
+var (
+	//go:embed statements/*
+	statementTemplates embed.FS
 
-{{if .Notes}}<div class="section-title">Megjegyzések</div> {{.Notes}}<p></p><p></p>{{end}}
-</div>`
+	defaultLocale  = "english"
+	templates      map[string]*template.Template
+	statementFuncs = template.FuncMap{
+		"div": func(a, b int) int {
+			return a / b
+		},
+		"needSection": func(s *string) bool {
 
-var htmlTmpl *template.Template
+			return s != nil && strings.TrimSpace(*s) != ""
+		},
+	}
+)
 
 func convertPandoc(str *string) (err error) {
+	if str == nil {
+		return nil
+	}
 	buf := &bytes.Buffer{}
 
 	cmd := exec.Command("pandoc", "--mathjax", "-f", "latex", "-t", "html")
@@ -63,26 +54,23 @@ type SampleTest struct {
 }
 
 type JSONStatement struct {
+	Locale string `json:"-"`
+
 	Name        string
 	TimeLimit   int
 	MemoryLimit int
 	InputFile   string
 	OutputFile  string
-	Legend      string
-	Input       string
-	Interaction string
-	Output      string
-	Scoring     string
+	Legend      *string `json:"legend"`
+	Input       *string `json:"input"`
+	Interaction *string `json:"interaction"`
+	Output      *string `json:"output"`
+	Scoring     *string `json:"scoring"`
 	SampleTests []SampleTest
-	Notes       string
+	Notes       *string `json:"notes"`
 }
 
-func ParseJSONStatement(fs afero.Fs, path string) (*JSONStatement, error) {
-	var (
-		stmt JSONStatement
-		err  error
-	)
-
+func ParseJSONStatement(fs afero.Fs, path string, locale string) (*JSONStatement, error) {
 	problemProps := filepath.Join(path, "problem-properties.json")
 	if exists, err := afero.Exists(fs, problemProps); !exists || err != nil {
 		return nil, err
@@ -92,17 +80,27 @@ func ParseJSONStatement(fs afero.Fs, path string) (*JSONStatement, error) {
 	if err != nil {
 		return nil, err
 	}
+	return NewJSONStatement(propsFile, locale)
+}
 
-	defer func() {
-		err = propsFile.Close()
-	}()
+func NewJSONStatement(r io.ReadCloser, locale string) (*JSONStatement, error) {
+	var (
+		stmt JSONStatement
+		err  error
+	)
 
-	dec := json.NewDecoder(propsFile)
+	dec := json.NewDecoder(r)
+	defer r.Close()
 	if err = dec.Decode(&stmt); err != nil {
 		return nil, err
 	}
 
-	for _, elem := range []*string{&stmt.Legend, &stmt.Input, &stmt.Output, &stmt.Notes, &stmt.Scoring, &stmt.Interaction} {
+	if _, ok := templates[locale]; !ok {
+		locale = defaultLocale
+	}
+
+	stmt.Locale = locale
+	for _, elem := range []*string{stmt.Legend, stmt.Input, stmt.Output, stmt.Notes, stmt.Scoring, stmt.Interaction} {
 		if err == nil {
 			err = convertPandoc(elem)
 		}
@@ -113,7 +111,7 @@ func ParseJSONStatement(fs afero.Fs, path string) (*JSONStatement, error) {
 
 func (j JSONStatement) Html() ([]byte, error) {
 	buf := bytes.Buffer{}
-	if err := htmlTmpl.Execute(&buf, j); err != nil {
+	if err := templates[j.Locale].Execute(&buf, j); err != nil {
 		return nil, err
 	}
 
@@ -121,9 +119,16 @@ func (j JSONStatement) Html() ([]byte, error) {
 }
 
 func init() {
-	if tmpl, err := template.New("polygonHtmlTemplate").Funcs(template.FuncMap{"div": func(a, b int) int { return a / b }}).Parse(htmlTemplate); err != nil {
+	elems, err := statementTemplates.ReadDir("statements")
+	if err != nil {
 		panic(err)
-	} else {
-		htmlTmpl = tmpl
+	}
+	templates = make(map[string]*template.Template)
+	for _, elem := range elems {
+
+		if !elem.IsDir() && filepath.Ext(elem.Name()) == ".gohtml" {
+			name := strings.TrimSuffix(filepath.Base(elem.Name()), ".gohtml")
+			templates[name] = template.Must(template.New(elem.Name()).Funcs(statementFuncs).ParseFS(statementTemplates, filepath.Join("statements", elem.Name())))
+		}
 	}
 }

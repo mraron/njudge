@@ -1,0 +1,69 @@
+package templates
+
+import "github.com/mraron/njudge/internal/njudge"
+
+type TaskArchiveViewModel struct {
+    Root njudge.TaskArchiveNode
+    ProblemLinks map[int]Link
+}
+
+templ taskArchiveProblem(vm TaskArchiveViewModel, node njudge.TaskArchiveNode) {
+    <a href={vm.ProblemLinks[node.ID].Href}>
+        if !node.Problem.Visible {
+            <i class="bi bi-eye-slash"></i>
+        }
+        {vm.ProblemLinks[node.ID].Text}
+    </a>
+    if node.SolvedStatus == njudge.Solved {
+        <i class="bi bi-check-lg text-success"></i>
+    }else if node.SolvedStatus == njudge.Attempted {
+        <i class="bi bi-x-lg text-danger"></i>
+    }
+}
+
+
+templ taskArchiveCategoryCollapse(vm TaskArchiveViewModel, node njudge.TaskArchiveNode, collapsed bool) {
+    <a href={templ.SafeURL("#category"+d(node.ID))} class={"problemCategory collapse-toggle " + iif(collapsed, "collapsed", "")} data-toggle="collapse">
+        if !node.Category.Visible {
+           <i class="bi bi-eye-slash"></i>
+        }
+        {node.Category.Name}
+    </a>
+    <ul id={"category" + d(node.ID)} class={"collapse problemCategoryList"+iif(collapsed,""," show")}>
+        for _, child := range node.Children {
+            <li>
+                if child.Type == njudge.TaskArchiveNodeProblem {
+                    @taskArchiveProblem(vm, child)
+                }else {
+                    @taskArchiveCategoryCollapse(vm, child, false)
+                }
+            </li>
+        }
+    </ul>
+}
+
+templ TaskArchive(vm TaskArchiveViewModel) {
+    @Page() {
+        if vm.Root.Type == njudge.TaskArchiveNodeCategory {
+            <h4>{vm.Root.Category.Name}</h4>
+            @templ.Raw(partial(ctx, "category_intro_" + d(vm.Root.Category.ID)))
+        }
+        <ul class="list-group" hx-boost={iif(vm.Root.Type == njudge.TaskArchiveNodeRoot, "true", "false")}>
+            for _, bigCat := range vm.Root.Children {
+                <li class="list-group-item">
+                    if vm.Root.Type == njudge.TaskArchiveNodeRoot {
+                        <a href={templ.SafeURL("?root="+d(bigCat.ID))}>
+                            if !bigCat.Category.Visible {
+                               <i class="bi bi-eye-slash"></i>
+                            }
+                            {bigCat.Category.Name}
+                        </a>
+                    }else {
+                        @taskArchiveCategoryCollapse(vm, bigCat, true)
+                    }
+
+                </li>
+            }
+        </ul>
+    }
+}

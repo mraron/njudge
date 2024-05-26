@@ -47,7 +47,7 @@ func New(className string, opts ...Option) *Java {
 	return java
 }
 
-var classRegexp = regexp.MustCompile("public +class +(\\w+)")
+var classRegexp = regexp.MustCompile(`public +class +(\w+)`)
 
 func (j *Java) Rename(source sandbox.File) (*sandbox.File, string, error) {
 	if !j.autoClassName {
@@ -104,7 +104,7 @@ func (j *Java) Compile(ctx context.Context, s sandbox.Sandbox, f sandbox.File, s
 	rc := sandbox.RunConfig{
 		MaxProcesses: -1,
 		DirectoryMaps: []sandbox.DirectoryMap{
-			{"/etc", "/etc", nil},
+			{Inside: "/etc", Outside: "/etc"},
 		},
 		InheritEnv:       true,
 		TimeLimit:        10 * time.Second,
@@ -138,7 +138,7 @@ func (j *Java) Run(ctx context.Context, s sandbox.Sandbox, binary sandbox.File, 
 	rc := sandbox.RunConfig{
 		MaxProcesses: -1,
 		DirectoryMaps: []sandbox.DirectoryMap{
-			{"/etc", "/etc", nil},
+			{Inside: "/etc", Outside: "/etc"},
 		},
 		InheritEnv:       true,
 		Stdin:            stdin,

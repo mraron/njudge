@@ -61,6 +61,7 @@ func (j *Judge) Judge(ctx context.Context, sub Submission, callback ResultCallba
 		return nil, err
 	}
 	taskType := problem.GetTaskType()
+	res.CompilationStatus = problems.DuringCompilation // this has no real effect
 	compilationResult, err := taskType.Compile(ctx, evaluation.NewByteSolution(lang, sub.Source), compileSandbox)
 	j.SandboxProvider.Put(compileSandbox)
 	if err != nil {
@@ -69,6 +70,7 @@ func (j *Judge) Judge(ctx context.Context, sub Submission, callback ResultCallba
 
 	if compilationResult.CompiledFile == nil {
 		res.Compiled = false
+		res.CompilationStatus = problems.AfterCompilation
 		res.CompilerOutput = compilationResult.CompilationMessage
 		return &res, nil
 	}
@@ -102,10 +104,10 @@ func (j *Judge) Judge(ctx context.Context, sub Submission, callback ResultCallba
 	}()
 
 	eval := taskType.Evaluator
-	if j.Tokens != nil {
+	if j.Tokens != nil && (st.FeedbackType == problems.FeedbackIOI || st.FeedbackType == problems.FeedbackLazyIOI) {
 		j.Logger.Info("🔀\tusing parallel evaluation", "submission_id", sub.ID)
 		eval = &ParallelEvaluator{
-			Runner: taskType.Evaluator.(*evaluation.LinearEvaluator).Runner,
+			Runner: evaluation.NewCachedRunner(taskType.Evaluator.(*evaluation.LinearEvaluator).Runner),
 			Tokens: j.Tokens,
 			Logger: j.Logger.With("submission_id", sub.ID),
 		}

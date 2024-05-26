@@ -1,11 +1,11 @@
 package judge
 
 import (
+	"context"
 	"errors"
 	"github.com/mraron/njudge/pkg/language/sandbox"
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/evaluation"
-	"golang.org/x/net/context"
 	"golang.org/x/sync/errgroup"
 	"log/slog"
 	"strconv"
@@ -48,6 +48,7 @@ func (pe *ParallelEvaluator) Evaluate(ctx context.Context, skeleton problems.Sta
 
 	ans = evaluation.DeepCopyStatus(skeleton)
 	ans.Compiled = true
+	ans.CompilationStatus = problems.AfterCompilation
 	ans.FeedbackType = skeleton.FeedbackType
 
 	for tsInd := range skeleton.Feedback {
@@ -66,27 +67,23 @@ func (pe *ParallelEvaluator) Evaluate(ctx context.Context, skeleton problems.Sta
 			var updateStatusError error
 			go func() {
 				mxInd := -1
-				for {
-					select {
-					case testcase, ok := <-testcaseChan:
-						if !ok {
-							groupDone <- struct{}{}
-							return
-						}
-						ans.Feedback[tsInd].Groups[gInd].Testcases[testcase.tcInd] = testcase.tc
-						if testcase.tc.Index > mxInd {
-							mxInd = testcase.tc.Index
-						}
+				for testcase := range testcaseChan {
+					ans.Feedback[tsInd].Groups[gInd].Testcases[testcase.tcInd] = testcase.tc
+					if testcase.tc.Index > mxInd {
+						mxInd = testcase.tc.Index
+					}
 
-						if err := statusUpdater.UpdateStatus(ctx, strconv.Itoa(mxInd), ans); err != nil {
-							updateStatusError = errors.Join(updateStatusError, err)
-						}
+					if err := statusUpdater.UpdateStatus(ctx, strconv.Itoa(mxInd), ans); err != nil {
+						updateStatusError = errors.Join(updateStatusError, err)
 					}
 				}
+				groupDone <- struct{}{}
 			}()
 
+			var startToken = make(chan struct{}, 1)
 			for tcInd := range group.Testcases {
 				tcInd := tcInd
+				startToken <- struct{}{} //ensures that lazyioi, cf and acm is consistent
 				executionGroup.Go(func() error {
 					<-pe.Tokens
 					pe.Logger.Info("▫️\tstarted test", "testcase_ind", tcInd)
@@ -94,14 +91,19 @@ func (pe *ParallelEvaluator) Evaluate(ctx context.Context, skeleton problems.Sta
 						pe.Tokens <- struct{}{}
 					}()
 
-					if groupCtx.Err() != nil {
-						return groupCtx.Err()
-					}
-
 					tc := group.Testcases[tcInd]
 					if tc.VerdictName != problems.VerdictDR {
+						<-startToken
 						return nil
 					}
+
+					if groupCtx.Err() != nil {
+						tc.VerdictName = problems.VerdictSK
+						testcaseChan <- statusUpdateInfo{tc: tc, tcInd: tcInd}
+						<-startToken
+						return groupCtx.Err()
+					}
+					<-startToken
 
 					if dependenciesOK(group.Dependencies) {
 						err := pe.Runner.Run(ctx, sandboxProvider, &tc)
@@ -116,6 +118,8 @@ func (pe *ParallelEvaluator) Evaluate(ctx context.Context, skeleton problems.Sta
 						}
 						testcaseChan <- statusUpdateInfo{tc: tc, tcInd: tcInd}
 					} else {
+						tc.VerdictName = problems.VerdictSK
+						testcaseChan <- statusUpdateInfo{tc: tc, tcInd: tcInd}
 						groupCancel()
 					}
 					return nil

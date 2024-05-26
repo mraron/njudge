@@ -1,62 +1,84 @@
 package web
 
 import (
-	"strings"
-
-	"github.com/labstack/echo/v4/middleware"
+	"context"
+	"errors"
+	"github.com/antonlindstrom/pgstore"
+	"github.com/gorilla/sessions"
+	"github.com/labstack/echo-contrib/session"
 	"github.com/mraron/njudge/internal/njudge/db/models"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
-
-	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/web/handlers"
 	"github.com/mraron/njudge/internal/web/handlers/api"
 	"github.com/mraron/njudge/internal/web/handlers/problemset"
-	"github.com/mraron/njudge/internal/web/handlers/taskarchive"
-	"github.com/mraron/njudge/internal/web/handlers/user"
 	"github.com/mraron/njudge/internal/web/handlers/user/profile"
-	"github.com/mraron/njudge/internal/web/helpers"
+	"github.com/mraron/njudge/internal/web/templates"
+	"github.com/mraron/njudge/internal/web/templates/i18n"
+	"github.com/quasoft/memstore"
+	slogecho "github.com/samber/slog-echo"
+	"net/http"
+	"strings"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/mraron/njudge/internal/web/handlers/user"
 )
 
-func (s *Server) prepareRoutes(e *echo.Echo) {
-	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
-		TokenLookup: "form:_csrf",
-		Skipper: func(c echo.Context) bool {
-			return strings.HasPrefix(c.Request().URL.Path, "/api") || strings.HasPrefix(c.Request().URL.Path, "/admin")
-		},
-		CookiePath: "/",
-	}))
-	e.Use(i18n.SetTranslatorMiddleware())
-	e.Use(user.SetUserMiddleware(s.Users))
-	e.Use(helpers.ClearTemporaryFlashes())
-
-	e.GET("/", handlers.GetHome())
+func (s *Server) routes(e *echo.Echo) {
+	e.GET("/", handlers.GetHome(s.PartialsStore))
 	e.GET("/page/:page", handlers.GetPage(s.PartialsStore))
+	e.GET("/submissionRowUpdate/:id", func(c echo.Context) error {
+		type request struct {
+			ID int `param:"id"`
+		}
+		data := &request{}
+		if err := c.Bind(data); err != nil {
+			return err
+		}
+		sub, err := s.Submissions.Get(c.Request().Context(), data.ID)
+		if err != nil {
+			return err
+		}
+		return templates.Render(c, http.StatusOK, templates.SubmissionRowUpdate(*sub))
+	})
+	e.GET("/submissionFeedbackUpdate/:id", func(c echo.Context) error {
+		type request struct {
+			ID int `param:"id"`
+		}
+		data := &request{}
+		if err := c.Bind(data); err != nil {
+			return err
+		}
+		sub, err := s.Submissions.Get(c.Request().Context(), data.ID)
+		if err != nil {
+			return err
+		}
+		return templates.Render(c, http.StatusOK, templates.SubmissionFeedbackUpdate(*sub))
+	})
 
 	e.Static("/static", "static")
 
 	e.GET("/submission/:id", handlers.GetSubmission(s.Submissions)).Name = "getSubmission"
 	e.GET("/submission/rejudge/:id", handlers.RejudgeSubmission(s.Submissions), user.RequireLoginMiddleware()).Name = "rejudgeSubmission"
-	e.GET("/task_archive", taskarchive.Get(s.Categories, s.ProblemQuery, s.SolvedStatusQuery, s.ProblemStore))
+	e.GET("/task_archive", handlers.GetTaskArchive(s.TaskArchiveService))
 
 	ps := e.Group("/problemset", problemset.SetNameMiddleware())
-	ps.GET("/:name/", problemset.GetProblemList(s.ProblemStore, s.Problems, s.Categories, s.ProblemListQuery, s.ProblemInfoQuery))
-	ps.POST("/:name/submit", problemset.PostSubmit(s.SubmitService), user.RequireLoginMiddleware())
+	ps.GET("/:name/", problemset.GetProblemList(s.ProblemStore, s.Problems, s.Categories, s.ProblemListQuery, s.ProblemInfoQuery, s.Tags))
+	ps.POST("/:name/submit", problemset.PostSubmit(s.Submissions, s.SubmitService), user.RequireLoginMiddleware())
 	ps.GET("/status/", problemset.GetStatus(s.SubmissionListQuery)).Name = "getProblemsetStatus"
 
 	psProb := ps.Group("/:name/:problem", problemset.RenameProblemMiddleware(s.ProblemStore),
 		problemset.SetProblemMiddleware(s.ProblemStore, s.ProblemQuery, s.ProblemInfoQuery), problemset.VisibilityMiddleware())
-	psProb.GET("/", problemset.GetProblem()).Name = "getProblemMain"
-	psProb.GET("/problem", problemset.GetProblem())
+	psProb.GET("/", problemset.GetProblem(s.Tags)).Name = "getProblemMain"
+	psProb.GET("/problem", problemset.GetProblem(s.Tags))
 	psProb.GET("/status", problemset.GetProblemStatus(s.SubmissionListQuery, s.ProblemStore))
 	psProb.GET("/submit", problemset.GetProblemSubmit())
-	psProb.GET("/ranklist", problemset.GetProblemRanklist(s.SubmissionListQuery))
+	psProb.GET("/ranklist", problemset.GetProblemRanklist(s.SubmissionListQuery, s.Users))
 
 	psProb.POST("/tags", problemset.PostProblemTag(s.TagsService))
 	psProb.GET("/delete_tag/:id", problemset.DeleteProblemTag(s.TagsService))
 
 	psProb.GET("/pdf/:language/", problemset.GetProblemPDF())
 	psProb.GET("/attachment/:attachment/", problemset.GetProblemAttachment())
-	psProb.GET("/:file", problemset.GetProblemFile())
 
 	u := e.Group("/user")
 
@@ -67,17 +89,16 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 	u.POST("/login", user.PostLogin(s.Users))
 	u.GET("/logout", user.Logout())
 	u.GET("/register", user.GetRegister())
-	u.POST("/register", user.Register(s.Server, s.RegisterService, s.MailService))
-	u.GET("/activate", user.GetActivateInfo())
+	u.POST("/register", user.PostRegister(s.Config.Url, s.Users, s.MailService))
 	u.GET("/activate/:name/:key", user.Activate(s.Users))
 
-	u.GET("/forgotten_password", user.GetForgottenPassword()).Name = "GetForgottenPassword"
-	u.POST("/forgotten_password", user.PostForgottenPassword(s.Server, s.Users, s.MailService))
-	u.GET("/forgotten_password_form/:name/:key", user.GetForgottenPasswordForm()).Name = "GetForgottenPasswordForm"
-	u.POST("/forgotten_password_form", user.PostForgottenPasswordForm(s.Users)).Name = "PostForgottenPasswordForm"
+	u.GET("/forgot_password", user.GetForgotPassword()).Name = "GetForgotPassword"
+	u.POST("/forgot_password", user.PostForgotPassword(s.Config.Url, s.Users, s.MailService))
+	u.GET("/forgot_password_form/:name/:key", user.GetForgotPasswordForm()).Name = "GetForgotPasswordForm"
+	u.POST("/forgot_password_form", user.PostForgotPasswordForm(s.Users)).Name = "PostForgoTPasswordForm"
 
 	pr := u.Group("/profile", profile.SetProfileMiddleware(s.Users))
-	pr.GET("/:name/", profile.GetProfile(s.SubmissionListQuery))
+	pr.GET("/:name/", profile.GetProfile(s.SubmissionListQuery, s.Problems))
 	pr.GET("/:name/submissions/", profile.GetSubmissions(s.SubmissionListQuery))
 
 	prs := pr.Group("/:name/settings", user.RequireLoginMiddleware(), profile.PrivateMiddleware())
@@ -123,6 +144,62 @@ func (s *Server) prepareRoutes(e *echo.Echo) {
 		v1.PUT("/submissions/:id", api.Put[models.Submission](submissionDataProvider))
 		v1.DELETE("/submissions/:id", api.Delete[models.Submission](submissionDataProvider))
 
-		e.GET("/admin", handlers.GetAdmin(s.Server), user.RequireLoginMiddleware())
+		e.GET("/admin", handlers.GetAdmin(), user.RequireLoginMiddleware())
 	}
+}
+
+func (s *Server) SetupEcho(ctx context.Context, e *echo.Echo) {
+	if s.Mode == ModeDemo || s.Mode == ModeDebug || s.Mode == ModeDevelopment {
+		e.Debug = true
+	} else {
+		e.HTTPErrorHandler = func(err error, c echo.Context) {
+			code := http.StatusInternalServerError
+			var he *echo.HTTPError
+			if errors.As(err, &he) {
+				code = he.Code
+			}
+
+			_ = templates.Render(c, code, templates.Error("Hiba történt."))
+			c.Logger().Error(err)
+		}
+	}
+
+	var (
+		store sessions.Store
+		err   error
+	)
+
+	if s.Mode.UsesDB() {
+		store, err = pgstore.NewPGStoreFromPool(s.DB, []byte(s.CookieSecret))
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		store = memstore.NewMemStore(
+			[]byte("authkey123"),
+			[]byte("enckey12341234567890123456789012"),
+		)
+	}
+
+	e.Use(slogecho.New(s.Logger))
+	e.Use(middleware.Recover())
+	e.Use(session.Middleware(store))
+	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
+		Level: 5,
+	}))
+	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
+		ContextKey:  templates.CSRFTokenContextKey,
+		TokenLookup: templates.CSRFTokenLookup,
+		Skipper: func(c echo.Context) bool {
+			return strings.HasPrefix(c.Request().URL.Path, "/api") || strings.HasPrefix(c.Request().URL.Path, "/admin")
+		},
+		CookiePath: "/",
+	}))
+	e.Use(i18n.SetTranslatorMiddleware())
+	e.Use(user.SetUserMiddleware(s.Users))
+	e.Use(templates.MoveFlashesToContextMiddleware())
+	e.Use(templates.ClearTemporaryFlashesMiddleware())
+	e.Use(templates.Middleware(s.Users, s.Problems, s.ProblemStore, s.PartialsStore))
+
+	s.routes(e)
 }

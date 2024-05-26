@@ -47,6 +47,16 @@ func (cs *Categories) toModel(c njudge.Category) *models.ProblemCategory {
 	}
 }
 
+func (cs *Categories) Get(ctx context.Context, id int) (*njudge.Category, error) {
+	dbObj, err := models.ProblemCategories(qm.Where("id=?", id)).One(ctx, cs.db)
+	if err != nil {
+		return nil, MaskNotFoundError(err, njudge.ErrorCategoryNotFound)
+	}
+
+	res := cs.toNjudge(dbObj)
+	return &res, nil
+}
+
 func (cs *Categories) getAll(ctx context.Context, mods ...qm.QueryMod) ([]njudge.Category, error) {
 	dbobjs, err := models.ProblemCategories(mods...).All(ctx, cs.db)
 	if err != nil {

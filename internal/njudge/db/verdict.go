@@ -2,6 +2,7 @@ package db
 
 import "github.com/mraron/njudge/internal/njudge"
 
+// NjudgeVerdictToDatabase
 // TODO do a migration to strings in db
 func NjudgeVerdictToDatabase(verdict njudge.Verdict) int {
 	switch verdict {
@@ -21,8 +22,8 @@ func NjudgeVerdictToDatabase(verdict njudge.Verdict) int {
 		return 6
 	case njudge.VerdictPC:
 		return 7
-	case njudge.VerdictPE:
-		return 8
+	case njudge.VerdictSK:
+		return 9
 	case njudge.VerdictCE:
 		return 998
 	case njudge.VerdictRU:
@@ -53,6 +54,8 @@ func DatabaseVerdictToNjudge(verdict int) njudge.Verdict {
 		return njudge.VerdictPC
 	case 8:
 		return njudge.VerdictPE
+	case 9:
+		return njudge.VerdictSK
 	case 998:
 		return njudge.VerdictCE
 	case 999:

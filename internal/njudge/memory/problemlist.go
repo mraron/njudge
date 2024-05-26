@@ -2,12 +2,12 @@ package memory
 
 import (
 	"context"
+	"github.com/mraron/njudge/internal/web/templates/i18n"
 	"sort"
 	"strings"
 	"unicode"
 
 	"github.com/mraron/njudge/internal/njudge"
-	"github.com/mraron/njudge/internal/web/helpers/i18n"
 	"github.com/mraron/njudge/pkg/problems"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"

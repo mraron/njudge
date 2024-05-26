@@ -20,7 +20,9 @@ func main() {
 			log.Fatal(err)
 		}
 
-		pprof.StartCPUProfile(f)
+		if err = pprof.StartCPUProfile(f); err != nil {
+			log.Fatal(err)
+		}
 
 		c := make(chan os.Signal, 1)
 		signal.Notify(c, os.Interrupt)

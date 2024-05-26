@@ -1,36 +1,30 @@
 package cmd
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/mraron/njudge/internal/glue"
-	"github.com/mraron/njudge/internal/web/helpers/config"
+	"github.com/mraron/njudge/internal/web"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	"golang.org/x/net/context"
 	"io/fs"
 	"log/slog"
+	"strings"
 	"time"
 )
 
 type GlueConfig struct {
-	Database config.Database
+	Database web.DatabaseConfig `mapstructure:"db"`
 }
 
 var DefaultGlueConfig = GlueConfig{
-	Database: config.Database{
-		User:     "postgres",
-		Password: "postgres",
-		Host:     "db",
-		Name:     "postgres",
-		Port:     5432,
-		SSLMode:  false,
-	},
+	Database: _dockerDatabaseConfig,
 }
 
 func NewGlueCmd(v *viper.Viper) *cobra.Command {
-	cfg := GlueConfig{}
+	cfg := DefaultGlueConfig
 	cmd := &cobra.Command{
 		Use:   "glue",
 		Short: "start glue service",
@@ -39,15 +33,9 @@ func NewGlueCmd(v *viper.Viper) *cobra.Command {
 			v.SetConfigFile("glue.yaml")
 			v.AddConfigPath(".")
 
-			v.SetDefault("db.user", DefaultGlueConfig.Database.User)
-			v.SetDefault("db.password", DefaultGlueConfig.Database.Password)
-			v.SetDefault("db.host", DefaultGlueConfig.Database.Host)
-			v.SetDefault("db.name", DefaultGlueConfig.Database.Name)
-			v.SetDefault("db.port", DefaultGlueConfig.Database.Port)
-			v.SetDefault("db.ssl_mode", DefaultGlueConfig.Database.SSLMode)
-
-			v.AutomaticEnv()
 			v.SetEnvPrefix("njudge")
+			v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+			BindEnvs(GlueConfig{})
 
 			if err := v.ReadInConfig(); err != nil {
 				var res *fs.PathError
@@ -68,6 +56,10 @@ func NewGlueCmd(v *viper.Viper) *cobra.Command {
 		},
 
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := v.Unmarshal(&cfg); err != nil {
+				return err
+			}
+
 			conn, err := cfg.Database.ConnectAndPing(slog.Default())
 			if err != nil {
 				return err
@@ -100,8 +92,4 @@ func NewGlueCmd(v *viper.Viper) *cobra.Command {
 	cmd.Flags().BoolVar(&cfg.Database.SSLMode, "db.ssl_mode", DefaultGlueConfig.Database.SSLMode, "database sslmode")
 
 	return cmd
-}
-
-func init() {
-	RootCmd.AddCommand(NewGlueCmd(viper.GetViper()))
 }
