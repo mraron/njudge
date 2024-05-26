@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2024-05-26
+
 # Fixed
 - User registration (8a00521)
 - Sorting was ignored for submission lists (6833e08)
@@ -121,7 +123,8 @@ The previous two changes are from 65ec4f to 19c523
 - Crash when admin panel is visited without logging in
 - Workflow
 
-[unreleased]: https://github.com/mraron/njudge/compare/v0.3.1...HEAD
+[unreleased]: https://github.com/mraron/njudge/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/mraron/njudge/releases/tag/v0.4.0
 [0.3.1]: https://github.com/mraron/njudge/releases/tag/v0.3.1
 [0.3.0]: https://github.com/mraron/njudge/releases/tag/v0.3.0
 [0.2.0]: https://github.com/mraron/njudge/releases/tag/v0.2.0
