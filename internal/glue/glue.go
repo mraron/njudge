@@ -224,10 +224,7 @@ func (g *Glue) Start(ctx context.Context) {
 					g.Logger.Error("‼️\tprocessing submission", "submission_id", s.ID, "error", err)
 
 					s.Verdict = njudge.VerdictXX
-					s.Judged = null.NewTime(time.Time{}, false)
-					s.Status = problems.Status{
-						Compiled: true,
-					}
+					s.Judged = null.NewTime(time.Now(), true)
 					_ = g.Submissions.Update(ctx, s, njudge.Fields(njudge.SubmissionFields.Verdict, njudge.SubmissionFields.Judged, njudge.SubmissionFields.Status))
 					return
 				}
