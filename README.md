@@ -1,9 +1,9 @@
 # njudge
 
+[![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/YYQSeeUweY)
 [![Tests](https://github.com/mraron/njudge/actions/workflows/tests.yml/badge.svg)](https://github.com/mraron/njudge/actions/workflows/tests.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/mraron/njudge.svg)](https://pkg.go.dev/github.com/mraron/njudge)
 [![Go Report Card](https://goreportcard.com/badge/github.com/mraron/njudge)](https://goreportcard.com/report/github.com/mraron/njudge)
-[![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/YYQSeeUweY)
 
 Online Judge system written in golang. A running version can be found [here](https://njudge.hu).
 
@@ -12,7 +12,7 @@ It consists of two main parts:
 * A web based online judge system, located in `internal/`. 
 
 
-## How to run the online judge
+## How to run
 
 ### Via docker
  
@@ -94,9 +94,9 @@ WIP. It's a mode to run njudge without a database.
 ## Development
 
 Use make to run and/or generate stuff.
-* `make gulp` generates css and js (required `npm install`)
-* `make lint` runs golangci-lint (requires [https://github.com/golangci/golangci-lint](golangci-lint) installed)
+* `make gulp` generates css and js (requires `npm install`)
+* `make lint` runs golangci-lint (requires [golangci-lint](https://github.com/golangci/golangci-lint) installed)
 * `make translations` generates translation files
-* `make models` generates models (requires [https://github.com/volatiletech/sqlboiler](sqlboiler) installed)
+* `make models` generates models (requires [sqlboiler](https://github.com/volatiletech/sqlboiler) installed)
 * `make test` runs tests
-* `make templ` generates templates (requires [https://github.com/a-h/templ/](templ) installed)
+* `make templ` generates templates (requires [templ](https://github.com/a-h/templ/) installed)
