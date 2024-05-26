@@ -29,7 +29,7 @@ type WebConfig struct {
 }
 
 var DefaultWebConfig = WebConfig{
-	ProblemsDir: "/problems",
+	ProblemsDir: "/njudge_problems",
 	Config: web.Config{
 		Mode:           web.ModeDevelopment,
 		Url:            "http://localhost:5555",

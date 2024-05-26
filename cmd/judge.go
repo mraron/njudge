@@ -31,7 +31,7 @@ type JudgeConfig struct {
 
 var DefaultJudgeConfig = JudgeConfig{
 	Port:                   8080,
-	ProblemsDir:            "/problems",
+	ProblemsDir:            "/njudge_problems",
 	Isolate:                true,
 	IsolateSandboxRange:    []int{400, 444},
 	UpdateStatusLimitEvery: 5 * time.Second,
