@@ -65,5 +65,25 @@ templ TaskArchive(vm TaskArchiveViewModel) {
                 </li>
             }
         </ul>
+        if vm.Root.Type == njudge.TaskArchiveNodeCategory {
+            <script>
+                if(window.location.hash)
+                {
+                    let elem = $(window.location.hash);
+                    elem.siblings('a').addClass('bg-info text-light');
+                    while(1) {
+                        let par = elem.parent().closest('ul.problemCategoryList');
+                        if(par.length == 0) break ;
+                        /*par.find('li > ul.problemCategoryList').each(function() {
+                            $(this).removeClass('show');
+                        });*/
+                        elem.addClass('show');
+                        elem = par;
+                    }
+                    elem.addClass('show');
+                    elem.scrollIntoView();
+                }
+            </script>
+        }
     }
 }

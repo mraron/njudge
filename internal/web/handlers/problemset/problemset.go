@@ -168,7 +168,7 @@ func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categori
 
 				curr.CategoryLink = templates.Link{
 					Text: categoryNameByID[cid],
-					Href: templ.SafeURL(fmt.Sprintf("/task_archive#category%d", p.Category.ID)),
+					Href: templ.SafeURL(fmt.Sprintf("/task_archive?root=%d#category%d", cid, p.Category.ID)),
 				}
 			}
 
