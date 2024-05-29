@@ -322,6 +322,12 @@ func TaskArchive(vm TaskArchiveViewModel) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+			if vm.Root.Type == njudge.TaskArchiveNodeCategory {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<script>\n                if(window.location.hash)\n                {\n                    let elem = $(window.location.hash);\n                    elem.siblings('a').addClass('bg-info text-light');\n                    while(1) {\n                        let par = elem.parent().closest('ul.problemCategoryList');\n                        if(par.length == 0) break ;\n                        /*par.find('li > ul.problemCategoryList').each(function() {\n                            $(this).removeClass('show');\n                        });*/\n                        elem.addClass('show');\n                        elem = par;\n                    }\n                    elem.addClass('show');\n                    elem.scrollIntoView();\n                }\n            </script>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
 			if !templ_7745c5c3_IsBuffer {
 				_, templ_7745c5c3_Err = io.Copy(templ_7745c5c3_W, templ_7745c5c3_Buffer)
 			}
