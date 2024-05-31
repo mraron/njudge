@@ -169,8 +169,10 @@ func (g *Glue) Start(ctx context.Context) {
 				userSolved := make(map[int]struct{})
 				users := make([]int, 0)
 				for _, sub := range subs {
-					userSolved[sub.UserID] = struct{}{}
-					users = append(users, sub.UserID)
+					if _, ok := userSolved[sub.UserID]; !ok {
+						userSolved[sub.UserID] = struct{}{}
+						users = append(users, sub.UserID)
+					}
 				}
 				solvedBy := len(users)
 				if solvedBy > 0 {

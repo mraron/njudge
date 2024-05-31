@@ -308,7 +308,7 @@ func (p Problem) GetTaskType() problems.TaskType {
 	} else if p.tasktype == "batch" {
 		return batch.New(p.makeCompiler(), evaluation.BasicRunnerWithChecker(p.Checker()))
 	} else if p.tasktype == "stub" {
-		return stub.New(p.makeCompiler().(*evaluation.CompileWithStubs))
+		return stub.New(p.makeCompiler().(*evaluation.CompileWithStubs), evaluation.BasicRunnerWithChecker(p.Checker()))
 	} else if p.tasktype == "outputonly" {
 		return output_only.New(p.Checker())
 	}

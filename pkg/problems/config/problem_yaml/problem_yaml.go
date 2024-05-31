@@ -40,18 +40,36 @@ type Attachment struct {
 }
 
 type Subtask struct {
-	TestCount     int      `yaml:"test_count"`
-	InputList     []string `yaml:"input_list"`
-	OutputList    []string `yaml:"output_list"`
-	InputPattern  string   `yaml:"input_pattern"`
-	OutputPattern string   `yaml:"output_pattern"`
-	Scoring       string   `yaml:"scoring"`
-	MaxScore      float64  `yaml:"max_score"`
+	TestCount          int      `yaml:"test_count"`
+	InputList          []string `yaml:"input_list"`
+	OutputList         []string `yaml:"output_list"`
+	InputPattern       string   `yaml:"input_pattern"`
+	OutputPattern      string   `yaml:"output_pattern"`
+	ZeroIndexedPattern bool     `yaml:"zero_indexed_pattern"`
+	Scoring            string   `yaml:"scoring"`
+	MaxScore           float64  `yaml:"max_score"`
 }
 
 type Checker struct {
 	Type string `yaml:"type"`
 	Path string `yaml:"path"`
+}
+
+type Tests struct {
+	TaskType           string    `yaml:"task_type"`
+	InputFile          string    `yaml:"input_file"`
+	OutputFile         string    `yaml:"output_file"`
+	MemoryLimit        int       `yaml:"memory_limit"`
+	TimeLimit          float64   `yaml:"time_limit"`
+	TestCount          int       `yaml:"test_count"`
+	InputPattern       string    `yaml:"input_pattern"`
+	OutputPattern      string    `yaml:"output_pattern"`
+	InputList          []string  `yaml:"input_list"`
+	OutputList         []string  `yaml:"output_list"`
+	ZeroIndexedPattern bool      `yaml:"zero_indexed_pattern"`
+	Checker            Checker   `yaml:"checker"`
+	FeedbackType       string    `yaml:"feedback_type"`
+	Subtasks           []Subtask `yaml:"subtasks"`
 }
 
 type Problem struct {
@@ -64,21 +82,7 @@ type Problem struct {
 	StatementList  []Statement  `yaml:"statements"`
 	AttachmentInfo []Attachment `yaml:"attachments"`
 
-	Tests struct {
-		TaskType      string    `yaml:"task_type"`
-		InputFile     string    `yaml:"input_file"`
-		OutputFile    string    `yaml:"output_file"`
-		MemoryLimit   int       `yaml:"memory_limit"`
-		TimeLimit     float64   `yaml:"time_limit"`
-		TestCount     int       `yaml:"test_count"`
-		InputPattern  string    `yaml:"input_pattern"`
-		OutputPattern string    `yaml:"output_pattern"`
-		InputList     []string  `yaml:"input_list"`
-		OutputList    []string  `yaml:"output_list"`
-		Checker       Checker   `yaml:"checker"`
-		FeedbackType  string    `yaml:"feedback_type"`
-		Subtasks      []Subtask `yaml:"subtasks"`
-	} `yaml:"tests"`
+	Tests Tests `yaml:"tests"`
 }
 
 func (p Problem) Name() string {
@@ -130,11 +134,19 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 	ans := problems.Status{Compiled: false, CompilerOutput: "status skeleton", FeedbackType: problems.FeedbackTypeFromShortString(p.Tests.FeedbackType), Feedback: make([]problems.Testset, 0)}
 	ans.Feedback = append(ans.Feedback, problems.Testset{Name: "tests"})
 
-	getIthIO := func(typ string, index int, pattern string, gindex int, gpattern string, list []string) (string, error) {
+	getIthIO := func(typ string, index int, pattern string, gindex int, gpattern string, list []string, tests *Tests, subtask *Subtask) (string, error) {
 		if pattern != "" {
-			return fmt.Sprintf(filepath.Join(p.Path, "tests", pattern), index+1), nil
+			ind := index
+			if subtask == nil || !subtask.ZeroIndexedPattern {
+				ind += 1
+			}
+			return fmt.Sprintf(filepath.Join(p.Path, "tests", pattern), ind), nil
 		} else if gpattern != "" {
-			return fmt.Sprintf(filepath.Join(p.Path, "tests", gpattern), gindex+1), nil
+			ind := gindex
+			if !tests.ZeroIndexedPattern {
+				ind += 1
+			}
+			return fmt.Sprintf(filepath.Join(p.Path, "tests", gpattern), ind), nil
 		} else {
 			if index < len(list) {
 				return filepath.Join(p.Path, "tests", list[index]), nil
@@ -159,10 +171,10 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 			tc := problems.Testcase{}
 			tc.VerdictName = problems.VerdictDR
 
-			if tc.InputPath, err = getIthIO("input", i, p.Tests.InputPattern, -1, "", p.Tests.InputList); err != nil {
+			if tc.InputPath, err = getIthIO("input", i, p.Tests.InputPattern, -1, "", p.Tests.InputList, nil, nil); err != nil {
 				return nil, err
 			}
-			if tc.AnswerPath, err = getIthIO("output", i, p.Tests.OutputPattern, -1, "", p.Tests.OutputList); err != nil {
+			if tc.AnswerPath, err = getIthIO("output", i, p.Tests.OutputPattern, -1, "", p.Tests.OutputList, nil, nil); err != nil {
 				return nil, err
 			}
 			if p.Tests.TaskType == "outputonly" {
@@ -195,10 +207,28 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 				tc := problems.Testcase{}
 				tc.VerdictName = problems.VerdictDR
 
-				if tc.InputPath, err = getIthIO("input", i, p.Tests.Subtasks[s].InputPattern, globalIdx, p.Tests.InputPattern, p.Tests.Subtasks[s].InputList); err != nil {
+				if tc.InputPath, err = getIthIO(
+					"input",
+					i,
+					p.Tests.Subtasks[s].InputPattern,
+					globalIdx,
+					p.Tests.InputPattern,
+					p.Tests.Subtasks[s].InputList,
+					&p.Tests,
+					&p.Tests.Subtasks[s],
+				); err != nil {
 					return nil, err
 				}
-				if tc.AnswerPath, err = getIthIO("output", i, p.Tests.Subtasks[s].OutputPattern, globalIdx, p.Tests.OutputPattern, p.Tests.Subtasks[s].OutputList); err != nil {
+				if tc.AnswerPath, err = getIthIO(
+					"output",
+					i,
+					p.Tests.Subtasks[s].OutputPattern,
+					globalIdx,
+					p.Tests.OutputPattern,
+					p.Tests.Subtasks[s].OutputList,
+					&p.Tests,
+					&p.Tests.Subtasks[s],
+				); err != nil {
 					return nil, err
 				}
 				if p.Tests.TaskType == "outputonly" {
@@ -207,7 +237,9 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 
 				if ans.Feedback[0].Groups[s].Scoring == problems.ScoringSum {
 					tc.MaxScore = p.Tests.Subtasks[s].MaxScore / float64(p.Tests.Subtasks[s].TestCount)
-				} else if i == 0 {
+				} else if i == 0 && ans.Feedback[0].Groups[s].Scoring == problems.ScoringGroup {
+					tc.MaxScore = p.Tests.Subtasks[s].MaxScore
+				} else if ans.Feedback[0].Groups[s].Scoring == problems.ScoringMin {
 					tc.MaxScore = p.Tests.Subtasks[s].MaxScore
 				}
 

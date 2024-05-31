@@ -48,8 +48,10 @@ func (t Testlib) Check(ctx context.Context, testcase *problems.Testcase) error {
 				} else if status.ExitStatus() == 7 { //only support quitp
 					tc.VerdictName = problems.VerdictPC
 
-					rel := 0
-					fmt.Sscanf(output.String(), "points %d", &rel)
+					rel := 0.0
+					if _, err = fmt.Sscanf(output.String(), "points %f", &rel); err != nil {
+						return err
+					}
 
 					tc.Score = float64(rel) / 100.0 * tc.MaxScore
 				} else { //3 -> fail
