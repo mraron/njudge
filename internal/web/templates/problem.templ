@@ -96,7 +96,13 @@ templ tagListProblem(tags []njudge.Tag, add bool) {
         </span>
         &#32;
     }
+    if add {
+        <span class="badge badge-secondary">
+            <a href="#" class="text-reset text-decoration-none" data-toggle="modal" data-target="#tagModal">+</a>
+        </span>
+    }
 }
+
 
 templ problemInfoCard(vm ProblemViewModel) {
     <div class="card">
@@ -116,17 +122,17 @@ templ problemInfoCard(vm ProblemViewModel) {
                     <div class="col-6">{Tr(ctx, "Memory limit")}:</div>
                     <div class="col-6">{memMiB(vm.MemoryLimit)} MiB</div>
                 }
-                if vm.ShowTags {
-                    <div class="col-6">{Tr(ctx, "Tags")}:</div>
-                    <div class="col-6">
+                <div class="col-6">{Tr(ctx, "Tags")}:</div>
+                <div class="col-6">
+                    if !vm.ShowTags {
+                        <details>
+                        <summary>{Tr(ctx, "show")}</summary>
+                            @tagListProblem(vm.Tags, vm.CanAddTags)
+                        </details>
+                    }else {
                         @tagListProblem(vm.Tags, vm.CanAddTags)
-                        if vm.CanAddTags {
-                            <span class="badge badge-secondary">
-                                <a href="#" class="text-reset text-decoration-none" data-toggle="modal" data-target="#tagModal">+</a>
-                            </span>
-                        }
-                    </div>
-                }
+                    }
+                </div>
                 <div class="col-6">{Tr(ctx, "Task type")}:</div>
                 <div class="col-6">{vm.TaskTypeName}</div>
             </div>
