@@ -313,7 +313,7 @@ templ ProblemRanklist(vm ProblemRanklistViewModel) {
         </thead>
         for _, row := range vm.Rows {
             <tr>
-                <td><a href={templ.SafeURL("/user/profile/"+row.Name)}>{row.Name}</a></td>
+                <td><a href={templ.SafeURL("/user/profile/"+row.Name+"/")}>{row.Name}</a></td>
                 <td><a href={templ.SafeURL("/submission/"+d(row.ID))}>{f(row.Score)}/{f(vm.MaxScore)}</a></td>
             </tr>
         }
