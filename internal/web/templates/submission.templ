@@ -159,7 +159,7 @@ templ submissionFeedbackInner(s njudge.Submission) {
              <div class="card">
                 <div class="card-header bg-warning"><i class="bi bi-exclamation-triangle"></i> {Tr(ctx,"Compilation error")}</div>
                 <div class="card-body">
-                    <pre><code class="nohighlight">{s.Status.CompilerOutput}</code></pre>
+                    <pre><code class="nohighlight">{s.Status.CompilerOutput.String()}</code></pre>
                 </div>
             </div>
         }else if s.Status.FeedbackType == problems.FeedbackCF {
@@ -176,11 +176,11 @@ templ submissionFeedbackInner(s njudge.Submission) {
                                     <span class="bi bi-memory"></span> {Tr(ctx, "Memory")}: {memKib(t.MemoryUsed)}KiB <br>
                                     <span class="bi bi-clock"></span> {Tr(ctx, "Time")}: {t.TimeSpent.String()}<br><br>
                                     {Tr(ctx, "Program's output")}:
-                                    <pre><code class="nohighlight">{t.Output}</code></pre>
+                                    <pre><code class="nohighlight">{t.Output.String()}</code></pre>
                                     {Tr(ctx, "Expected output")}:
-                                    <pre><code class="nohighlight">{t.ExpectedOutput}</code></pre>
+                                    <pre><code class="nohighlight">{t.ExpectedOutput.String()}</code></pre>
                                     {Tr(ctx, "Checker output")}:
-                                    <pre><code class="nohighlight">{t.CheckerOutput}</code></pre>
+                                    <pre><code class="nohighlight">{t.CheckerOutput.String()}</code></pre>
                                 </div>
                             </div>
                             <br>

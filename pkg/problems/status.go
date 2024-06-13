@@ -3,6 +3,7 @@ package problems
 import (
 	"bytes"
 	"database/sql/driver"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -141,6 +142,27 @@ func (s *ScoringType) UnmarshalJSON(i []byte) error {
 	return nil
 }
 
+// Base64String is used to store certain specific characters (null bytes and such) in DBMS like PostgreSQL which might
+// sometimes be produced by faulty programs.
+type Base64String string
+
+func (b *Base64String) UnmarshalJSON(i []byte) error {
+	res, err := base64.StdEncoding.DecodeString(string(i))
+	if err != nil {
+		return err
+	}
+	*b = Base64String(res)
+	return nil
+}
+
+func (b *Base64String) MarshalJSON() ([]byte, error) {
+	return []byte(base64.StdEncoding.EncodeToString([]byte(*b))), nil
+}
+
+func (b *Base64String) String() string {
+	return string(*b)
+}
+
 // Testcase represents a testcase in the status of a submission.
 type Testcase struct {
 	Index          int
@@ -152,9 +174,9 @@ type Testcase struct {
 	VerdictName    VerdictName
 	Score          float64
 	MaxScore       float64
-	Output         string
-	ExpectedOutput string
-	CheckerOutput  string
+	Output         Base64String
+	ExpectedOutput Base64String
+	CheckerOutput  Base64String
 	TimeSpent      time.Duration
 	MemoryUsed     memory.Amount
 	TimeLimit      time.Duration
@@ -392,7 +414,7 @@ const (
 type Status struct {
 	CompilationStatus CompilationStatus
 	Compiled          bool
-	CompilerOutput    string
+	CompilerOutput    Base64String
 	FeedbackType      FeedbackType
 	Feedback          []Testset
 }

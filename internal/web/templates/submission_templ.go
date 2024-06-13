@@ -682,9 +682,9 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var36 string
-				templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(s.Status.CompilerOutput)
+				templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(s.Status.CompilerOutput.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/submission.templ`, Line: 162, Col: 75}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/submission.templ`, Line: 162, Col: 84}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 				if templ_7745c5c3_Err != nil {
@@ -839,9 +839,9 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 									return templ_7745c5c3_Err
 								}
 								var templ_7745c5c3_Var48 string
-								templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.JoinStringErrs(t.Output)
+								templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.JoinStringErrs(t.Output.String())
 								if templ_7745c5c3_Err != nil {
-									return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/submission.templ`, Line: 179, Col: 76}
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/submission.templ`, Line: 179, Col: 85}
 								}
 								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var48))
 								if templ_7745c5c3_Err != nil {
@@ -865,9 +865,9 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 									return templ_7745c5c3_Err
 								}
 								var templ_7745c5c3_Var50 string
-								templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.JoinStringErrs(t.ExpectedOutput)
+								templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.JoinStringErrs(t.ExpectedOutput.String())
 								if templ_7745c5c3_Err != nil {
-									return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/submission.templ`, Line: 181, Col: 84}
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/submission.templ`, Line: 181, Col: 93}
 								}
 								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var50))
 								if templ_7745c5c3_Err != nil {
@@ -891,9 +891,9 @@ func submissionFeedbackInner(s njudge.Submission) templ.Component {
 									return templ_7745c5c3_Err
 								}
 								var templ_7745c5c3_Var52 string
-								templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.JoinStringErrs(t.CheckerOutput)
+								templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.JoinStringErrs(t.CheckerOutput.String())
 								if templ_7745c5c3_Err != nil {
-									return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/submission.templ`, Line: 183, Col: 83}
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/submission.templ`, Line: 183, Col: 92}
 								}
 								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var52))
 								if templ_7745c5c3_Err != nil {

@@ -86,7 +86,7 @@ func (f Ellen) Check(ctx context.Context, testcase *problems.Testcase) error {
 	err = cmd.Run()
 
 	str := stdout.String()
-	tc.CheckerOutput = problems.Truncate(str)
+	tc.CheckerOutput = problems.Base64String(problems.Truncate(str))
 	if err == nil || strings.HasPrefix(err.Error(), "exit status") {
 		var splitted []string
 		if strings.Contains(str, ":") {

@@ -71,7 +71,7 @@ func (j *Judge) Judge(ctx context.Context, sub Submission, callback ResultCallba
 	if compilationResult.CompiledFile == nil {
 		res.Compiled = false
 		res.CompilationStatus = problems.AfterCompilation
-		res.CompilerOutput = compilationResult.CompilationMessage
+		res.CompilerOutput = problems.Base64String(compilationResult.CompilationMessage)
 		return &res, nil
 	}
 
@@ -113,7 +113,7 @@ func (j *Judge) Judge(ctx context.Context, sub Submission, callback ResultCallba
 		}
 	}
 	res, err = eval.Evaluate(ctx, *st, evaluation.NewByteSolution(lang, binary), j.SandboxProvider, updater)
-	res.CompilerOutput = compilationResult.CompilationMessage
+	res.CompilerOutput = problems.Base64String(compilationResult.CompilationMessage)
 	<-done
 	j.Logger.Info("🏁\tdone", "submission_id", sub.ID)
 	return &res, err
