@@ -40,7 +40,7 @@ func GetProblem(tags njudge.Tags) echo.HandlerFunc {
 			Title:        title,
 			Problemset:   prob.Problemset,
 			Name:         name,
-			ShowTags:     true,
+			ShowTags:     false,
 			Tags:         prob.Tags.ToTags(),
 			TaskTypeName: storedData.GetTaskType().Name(),
 			Languages:    storedData.Languages(),
@@ -84,9 +84,10 @@ func GetProblem(tags njudge.Tags) echo.HandlerFunc {
 		if info.UserInfo != nil {
 			if info.UserInfo.SolvedStatus == njudge.Solved {
 				vm.CanAddTags = true
+				vm.ShowTags = true
 			} else {
-				if u := c.Get("user").(*njudge.User); u != nil && !u.Settings.ShowUnsolvedTags {
-					vm.ShowTags = false
+				if u := c.Get("user").(*njudge.User); u != nil && u.Settings.ShowUnsolvedTags {
+					vm.ShowTags = true
 				}
 			}
 		}
