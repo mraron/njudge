@@ -87,7 +87,7 @@ func BeginOAuth() echo.HandlerFunc {
 	}
 }
 
-func GetLogin() echo.HandlerFunc {
+func GetLogin(googleAuth bool) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
@@ -104,7 +104,7 @@ func GetLogin() echo.HandlerFunc {
 		templates.SetFlash(c, templates.LoginRedirectContextKey, to)
 
 		vm := templates.LoginViewModel{
-			GoogleAuthEnabled:  false,
+			GoogleAuthEnabled:  googleAuth,
 			ValidationMessages: nil,
 		}
 		return templates.Render(c, http.StatusOK, templates.Login(vm))
