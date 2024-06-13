@@ -11,7 +11,6 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"io/fs"
-	"log/slog"
 	"runtime"
 	"strings"
 	"time"
@@ -26,7 +25,8 @@ type JudgeConfig struct {
 
 	UpdateStatusLimitEvery time.Duration `mapstructure:"update_status_limit_every" yaml:"update_status_limit_every"`
 
-	Concurrency int `mapstructure:"concurrency" yaml:"concurrency"`
+	Concurrency       int    `mapstructure:"concurrency" yaml:"concurrency"`
+	DiscordWebhookURL string `mapstructure:"discord_webhook_url" yaml:"discord_webhook_url"`
 }
 
 var DefaultJudgeConfig = JudgeConfig{
@@ -74,14 +74,14 @@ func NewJudgeCmd(v *viper.Viper) *cobra.Command {
 				return err
 			}
 
-			log := slog.Default()
+			logger := getHookedLogger(cfg.DiscordWebhookURL)
 
 			store := problems.NewFsStore(cfg.ProblemsDir)
 			provider := sandbox.NewProvider()
 			sandboxCount := 0
 			if cfg.Isolate {
 				for i := cfg.IsolateSandboxRange[0]; i <= cfg.IsolateSandboxRange[1]; i++ {
-					s, err := sandbox.NewIsolate(i, sandbox.IsolateOptionUseLogger(slog.Default()))
+					s, err := sandbox.NewIsolate(i, sandbox.IsolateOptionUseLogger(logger))
 					if err != nil {
 						return err
 					}
@@ -90,7 +90,7 @@ func NewJudgeCmd(v *viper.Viper) *cobra.Command {
 				}
 			} else {
 				for i := 0; i < 10; i++ {
-					s, err := sandbox.NewDummy(sandbox.DummyWithLogger(slog.Default()))
+					s, err := sandbox.NewDummy(sandbox.DummyWithLogger(logger))
 					if err != nil {
 						return err
 					}
@@ -100,10 +100,10 @@ func NewJudgeCmd(v *viper.Viper) *cobra.Command {
 			}
 
 			if 2*cfg.Concurrency > sandboxCount {
-				log.Warn("sandbox count is low for concurrency")
+				logger.Warn("sandbox count is low for concurrency")
 			}
 			if cfg.Concurrency > runtime.GOMAXPROCS(0) {
-				log.Warn("concurrency is higher than GOMAXPROCS")
+				logger.Warn("concurrency is higher than GOMAXPROCS")
 			}
 
 			tokens := make(chan struct{}, cfg.Concurrency)
@@ -112,14 +112,14 @@ func NewJudgeCmd(v *viper.Viper) *cobra.Command {
 			}
 
 			server := judge.NewServer(
-				log,
+				logger,
 				&judge.Judge{
 					SandboxProvider: provider,
 					ProblemStore:    store,
 					LanguageStore:   language.DefaultStore,
 					RateLimit:       cfg.UpdateStatusLimitEvery,
 					Tokens:          tokens,
-					Logger:          log,
+					Logger:          logger,
 				},
 				store,
 				judge.WithPortServerOption(cfg.Port),

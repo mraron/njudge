@@ -9,7 +9,6 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"io/fs"
-	"log/slog"
 	"strings"
 )
 
@@ -23,7 +22,8 @@ var _dockerDatabaseConfig = web.DatabaseConfig{
 }
 
 type WebConfig struct {
-	ProblemsDir string `mapstructure:"problems_dir" yaml:"problems_dir"`
+	ProblemsDir       string `mapstructure:"problems_dir" yaml:"problems_dir"`
+	DiscordWebhookURL string `mapstructure:"discord_webhook_url" yaml:"discord_webhook_url"`
 
 	web.Config `mapstructure:",squash"`
 }
@@ -75,14 +75,15 @@ func NewWebCmd(v *viper.Viper) *cobra.Command {
 		},
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			logger := slog.Default()
-
 			if err := v.Unmarshal(&cfg); err != nil {
 				return err
 			}
 			if err := cfg.Valid(); err != nil {
 				return err
 			}
+
+			logger := getHookedLogger(cfg.DiscordWebhookURL)
+
 			emailService := cfg.EmailService()
 			db, err := cfg.ConnectAndPing(logger)
 			if err != nil {
@@ -298,7 +299,6 @@ func NewWebCmd(v *viper.Viper) *cobra.Command {
 	}
 */
 func init() {
-
 	/*	RootCmd.AddCommand(WebCmd)
 
 		SubmitCmd.Flags().IntVar(&SubmitCmdArgs.User, "user", 0, "ID of user on behalf we make the submission")
