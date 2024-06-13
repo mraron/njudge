@@ -163,6 +163,7 @@ func (s *Server) SetupEcho(ctx context.Context, e *echo.Echo) {
 			}
 
 			_ = templates.Render(c, code, templates.Error("Hiba történt."))
+			c.Logger().Error(err)
 		}
 	}
 
