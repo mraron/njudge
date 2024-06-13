@@ -11,6 +11,10 @@ import (
 func SetProfileMiddleware(u njudge.Users) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
+			if c.Param("name") == "" {
+				return next(c)
+			}
+
 			name, err := url.QueryUnescape(c.Param("name"))
 			if err != nil {
 				return err

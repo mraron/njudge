@@ -153,6 +153,9 @@ func (s *Server) SetupEcho(ctx context.Context, e *echo.Echo) {
 		e.Debug = true
 	} else {
 		e.HTTPErrorHandler = func(err error, c echo.Context) {
+			if c.Response().Committed {
+				return
+			}
 			code := http.StatusInternalServerError
 			var he *echo.HTTPError
 			if errors.As(err, &he) {
@@ -160,7 +163,6 @@ func (s *Server) SetupEcho(ctx context.Context, e *echo.Echo) {
 			}
 
 			_ = templates.Render(c, code, templates.Error("Hiba történt."))
-			c.Logger().Error(err)
 		}
 	}
 
