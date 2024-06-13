@@ -85,7 +85,7 @@ func (s *Server) routes(e *echo.Echo) {
 	u.GET("/auth/callback", user.OAuthCallback(s.Users))
 	u.GET("/auth", user.BeginOAuth())
 
-	u.GET("/login", user.GetLogin()).Name = "getUserLogin"
+	u.GET("/login", user.GetLogin(s.GoogleAuth.Enabled)).Name = "getUserLogin"
 	u.POST("/login", user.PostLogin(s.Users))
 	u.GET("/logout", user.Logout())
 	u.GET("/register", user.GetRegister())
