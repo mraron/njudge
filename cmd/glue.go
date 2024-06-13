@@ -16,7 +16,8 @@ import (
 )
 
 type GlueConfig struct {
-	Database web.DatabaseConfig `mapstructure:"db"`
+	Database          web.DatabaseConfig `mapstructure:"db"`
+	DiscordWebhookURL string             `mapstructure:"discord_webhook_url" yaml:"discord_webhook_url"`
 }
 
 var DefaultGlueConfig = GlueConfig{
@@ -64,7 +65,8 @@ func NewGlueCmd(v *viper.Viper) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			judges := glue.NewJudges(conn, slog.Default())
+			logger := getHookedLogger(cfg.DiscordWebhookURL)
+			judges := glue.NewJudges(conn, logger)
 			go func() {
 				for {
 					judges.Update(context.Background())
@@ -74,7 +76,7 @@ func NewGlueCmd(v *viper.Viper) *cobra.Command {
 			g, err := glue.New(
 				judges,
 				glue.WithDatabaseOption(conn),
-				glue.WithLogger(slog.Default()),
+				glue.WithLogger(logger),
 			)
 			if err != nil {
 				return err
