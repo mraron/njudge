@@ -6,6 +6,7 @@ import (
 	"github.com/antonlindstrom/pgstore"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
+	"github.com/markbates/goth/gothic"
 	"github.com/mraron/njudge/internal/njudge/db/models"
 	"github.com/mraron/njudge/internal/web/handlers"
 	"github.com/mraron/njudge/internal/web/handlers/api"
@@ -183,8 +184,10 @@ func (s *Server) SetupEcho(ctx context.Context, e *echo.Echo) {
 			[]byte("enckey12341234567890123456789012"),
 		)
 	}
+	gothic.Store = store
 
 	e.Use(slogecho.New(s.Logger))
+	e.Use(i18n.SetTranslatorMiddleware()) // because we need translation on the error page
 	e.Use(middleware.Recover())
 	e.Use(session.Middleware(store))
 	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
@@ -198,7 +201,6 @@ func (s *Server) SetupEcho(ctx context.Context, e *echo.Echo) {
 		},
 		CookiePath: "/",
 	}))
-	e.Use(i18n.SetTranslatorMiddleware())
 	e.Use(user.SetUserMiddleware(s.Users))
 	e.Use(templates.MoveFlashesToContextMiddleware())
 	e.Use(templates.ClearTemporaryFlashesMiddleware())

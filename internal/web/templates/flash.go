@@ -35,7 +35,7 @@ func GetFlash(c echo.Context, name string) interface{} {
 	}
 
 	encodedJson, err := base64.URLEncoding.DecodeString(val.Value)
-	if err != nil {
+	if err != nil || len(encodedJson) == 0 {
 		return nil
 	}
 
@@ -44,7 +44,7 @@ func GetFlash(c echo.Context, name string) interface{} {
 	case '[':
 		res = []string{}
 	default:
-		res = string("")
+		res = ""
 	}
 
 	if err := json.Unmarshal(encodedJson, &res); err != nil {
