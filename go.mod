@@ -88,3 +88,4 @@ require (
 )
 
 replace github.com/karrick/gobls v1.3.5 => github.com/mraron/gobls v0.0.0-20240125210852-e9cc54e22010
+replace github.com/golang-migrate/migrate/v4 v4.17.1 => github.com/mraron/migrate/v4 v4.16.0

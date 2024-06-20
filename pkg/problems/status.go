@@ -147,7 +147,13 @@ func (s *ScoringType) UnmarshalJSON(i []byte) error {
 type Base64String string
 
 func (b *Base64String) UnmarshalJSON(i []byte) error {
-	res, err := base64.StdEncoding.DecodeString(string(i))
+	if len(i) < 2 {
+		return errors.New("Base64String too short")
+	}
+	if i[0] != '"' || i[len(i)-1] != '"' {
+		return errors.New("Base64String not quoted")
+	}
+	res, err := base64.StdEncoding.DecodeString(string(i[1 : len(i)-1]))
 	if err != nil {
 		return err
 	}
@@ -156,7 +162,8 @@ func (b *Base64String) UnmarshalJSON(i []byte) error {
 }
 
 func (b *Base64String) MarshalJSON() ([]byte, error) {
-	return []byte(base64.StdEncoding.EncodeToString([]byte(*b))), nil
+	res := "\"" + base64.StdEncoding.EncodeToString([]byte(*b)) + "\""
+	return []byte(res), nil
 }
 
 func (b *Base64String) String() string {

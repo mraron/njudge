@@ -2,32 +2,19 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"github.com/golang-migrate/migrate/v4/source/iofs"
 	_ "github.com/lib/pq"
 	"github.com/mraron/njudge/internal/njudge/db/migrations"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"log"
 	"log/slog"
-	"os"
 )
 
-type migrateLogger struct {
-	*log.Logger
-	verbose bool
-}
-
-func (m migrateLogger) Verbose() bool {
-	return m.verbose
-}
-
 type MigrateCmdArgs struct {
-	Up    bool
-	Down  bool
-	Steps int
+	Up           bool
+	Down         bool
+	Steps        int
+	ForceVersion int
 }
 
 func NewMigrateCommand(v *viper.Viper) *cobra.Command {
@@ -46,22 +33,8 @@ func NewMigrateCommand(v *viper.Viper) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			driver, err := postgres.WithInstance(db, &postgres.Config{})
-			if err != nil {
-				return err
-			}
 
-			d, err := iofs.New(migrations.FS, ".")
-			if err != nil {
-				return err
-			}
-
-			m, err := migrate.NewWithInstance("iofs", d, "postgres", driver)
-			if err != nil {
-				return err
-			}
-
-			m.Log = &migrateLogger{log.New(os.Stdout, "[migrate]", 0), false}
+			m, err := migrations.NewMigrate(db, true)
 
 			if migrateArgs.Up {
 				err = m.Up()
@@ -84,6 +57,14 @@ func NewMigrateCommand(v *viper.Viper) *cobra.Command {
 				if err != nil {
 					return err
 				}
+			} else if migrateArgs.ForceVersion >= 0 {
+				err = m.Force(migrateArgs.ForceVersion)
+				if err != nil {
+					return err
+				}
+			} else {
+				v, dirty, err := m.Version()
+				fmt.Println("version:", v, "dirty:", dirty, "err:", err)
 			}
 
 			return nil
@@ -93,5 +74,6 @@ func NewMigrateCommand(v *viper.Viper) *cobra.Command {
 	cmd.Flags().BoolVar(&migrateArgs.Up, "up", false, "runs up migrations")
 	cmd.Flags().BoolVar(&migrateArgs.Down, "down", false, "runs down migrations")
 	cmd.Flags().IntVar(&migrateArgs.Steps, "steps", 0, "runs `x` up/down migrations depending on the positivity")
+	cmd.Flags().IntVar(&migrateArgs.ForceVersion, "force", -1, "forces version in the db and resets dirty")
 	return cmd
 }
