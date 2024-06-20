@@ -167,7 +167,7 @@ func Activate(users njudge.Users) echo.HandlerFunc {
 			}
 		}
 
-		if users.Update(c.Request().Context(), user, njudge.Fields(njudge.UserFields.ActivationInfo)); err != nil {
+		if err := users.Update(c.Request().Context(), user, njudge.Fields(njudge.UserFields.ActivationInfo)); err != nil {
 			return err
 		}
 

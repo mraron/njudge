@@ -49,6 +49,7 @@ func GetProblem(tags njudge.Tags) echo.HandlerFunc {
 			Statements:   nil,
 			TagsToAdd:    nil,
 		}
+		vm.InputFile, vm.OutputFile = storedData.InputOutputFiles()
 		for _, st := range storedData.Statements() {
 			if st.IsHTML() || st.IsPDF() {
 				vm.Statements = append(vm.Statements, st)
