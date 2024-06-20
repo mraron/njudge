@@ -3,6 +3,7 @@ package problem_yaml
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"github.com/mraron/njudge/pkg/language"
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
@@ -12,6 +13,7 @@ import (
 	"github.com/mraron/njudge/pkg/problems"
 	"github.com/mraron/njudge/pkg/problems/evaluation"
 	"github.com/mraron/njudge/pkg/problems/evaluation/batch"
+	"github.com/mraron/njudge/pkg/problems/evaluation/communication"
 	"github.com/mraron/njudge/pkg/problems/evaluation/output_only"
 	"github.com/mraron/njudge/pkg/problems/executable/checker"
 	"github.com/spf13/afero"
@@ -40,14 +42,15 @@ type Attachment struct {
 }
 
 type Subtask struct {
-	TestCount          int      `yaml:"test_count"`
-	InputList          []string `yaml:"input_list"`
-	OutputList         []string `yaml:"output_list"`
-	InputPattern       string   `yaml:"input_pattern"`
-	OutputPattern      string   `yaml:"output_pattern"`
-	ZeroIndexedPattern bool     `yaml:"zero_indexed_pattern"`
-	Scoring            string   `yaml:"scoring"`
-	MaxScore           float64  `yaml:"max_score"`
+	TestCount          int       `yaml:"test_count"`
+	InputList          []string  `yaml:"input_list"`
+	OutputList         []string  `yaml:"output_list"`
+	InputPattern       string    `yaml:"input_pattern"`
+	OutputPattern      string    `yaml:"output_pattern"`
+	ZeroIndexedPattern bool      `yaml:"zero_indexed_pattern"`
+	Scoring            string    `yaml:"scoring"`
+	MaxScore           float64   `yaml:"max_score"`
+	Scores             []float64 `yaml:"scores"`
 }
 
 type Checker struct {
@@ -55,8 +58,16 @@ type Checker struct {
 	Path string `yaml:"path"`
 }
 
+type Stub struct {
+	Lang string `yaml:"lang"`
+	Path string `yaml:"path"`
+}
+
 type Tests struct {
-	TaskType           string    `yaml:"task_type"`
+	TaskType           string   `yaml:"task_type"`
+	TaskTypeArgs       []string `yaml:"task_type_args"`
+	interactorBinary   []byte
+	Stubs              []Stub    `yaml:"stubs"`
 	InputFile          string    `yaml:"input_file"`
 	OutputFile         string    `yaml:"output_file"`
 	MemoryLimit        int       `yaml:"memory_limit"`
@@ -69,6 +80,7 @@ type Tests struct {
 	ZeroIndexedPattern bool      `yaml:"zero_indexed_pattern"`
 	Checker            Checker   `yaml:"checker"`
 	FeedbackType       string    `yaml:"feedback_type"`
+	Scores             []float64 `yaml:"scores"`
 	Subtasks           []Subtask `yaml:"subtasks"`
 }
 
@@ -117,6 +129,23 @@ func (p Problem) InputOutputFiles() (string, string) {
 func (p Problem) Languages() []language.Language {
 	if p.Tests.TaskType == "outputonly" {
 		return []language.Language{zip.Zip{}}
+	}
+	if len(p.Tests.Stubs) > 0 {
+		var res []language.Language
+		for _, lang := range language.ListExcept(language.DefaultStore, []string{"zip"}) {
+			for _, stub := range p.Tests.Stubs {
+				file := problems.EvaluationFile{
+					Name: filepath.Base(stub.Path),
+					Role: "stub_" + stub.Lang,
+					Path: filepath.Join(p.Path, stub.Path),
+				}
+				if file.StubOf(lang) {
+					res = append(res, lang)
+					break
+				}
+			}
+		}
+		return res
 	}
 
 	return language.ListExcept(language.DefaultStore, []string{"zip"})
@@ -180,7 +209,12 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 			if p.Tests.TaskType == "outputonly" {
 				tc.OutputPath = filepath.Base(tc.AnswerPath)
 			}
-
+			if len(p.Tests.Scores) > 0 {
+				if i >= len(p.Tests.Scores) {
+					return nil, errors.New("too few scores")
+				}
+				tc.MaxScore = p.Tests.Scores[i]
+			}
 			tc.Index = i + 1
 			tc.Group = "base"
 
@@ -235,7 +269,12 @@ func (p Problem) StatusSkeleton(name string) (*problems.Status, error) {
 					tc.OutputPath = filepath.Base(tc.AnswerPath)
 				}
 
-				if ans.Feedback[0].Groups[s].Scoring == problems.ScoringSum {
+				if len(p.Tests.Subtasks[s].Scores) > 0 {
+					if i >= len(p.Tests.Subtasks[s].Scores) {
+						return nil, errors.New("too few scores")
+					}
+					tc.MaxScore = p.Tests.Subtasks[s].Scores[i]
+				} else if ans.Feedback[0].Groups[s].Scoring == problems.ScoringSum {
 					tc.MaxScore = p.Tests.Subtasks[s].MaxScore / float64(p.Tests.Subtasks[s].TestCount)
 				} else if i == 0 && ans.Feedback[0].Groups[s].Scoring == problems.ScoringGroup {
 					tc.MaxScore = p.Tests.Subtasks[s].MaxScore
@@ -279,10 +318,41 @@ func (p Problem) GetTaskType() problems.TaskType {
 		return output_only.New(p.Checker())
 	}
 
+	var compiler problems.Compiler = evaluation.Compile{}
+	if len(p.Tests.Stubs) > 0 {
+		stubCompiler := evaluation.NewCompilerWithStubs()
+		for _, stub := range p.Tests.Stubs {
+			file := problems.EvaluationFile{Name: filepath.Base(stub.Path), Role: "stub_" + stub.Lang, Path: filepath.Join(p.Path, stub.Path)}
+			for _, lang := range p.Languages() {
+				if file.StubOf(lang) {
+					stubCompiler.AddStub(lang, file)
+				}
+			}
+		}
+		compiler = stubCompiler
+	}
+
+	if p.Tests.TaskType == "communication" {
+		switch p.Tests.TaskTypeArgs[0] { // interactor type
+		case "task_yaml":
+			eval := &evaluation.TaskYAMLUserInteractorExecute{}
+			return communication.New(compiler, p.Tests.interactorBinary, eval, evaluation.InteractiveRunnerWithExecutor(eval))
+		case "polygon":
+			return communication.New(evaluation.CompileCheckSupported{
+				List:         p.Languages(),
+				NextCompiler: evaluation.Compile{},
+			}, p.Tests.interactorBinary, p.Checker())
+		}
+	}
+
+	opts := []evaluation.BasicRunnerOption{evaluation.BasicRunnerWithChecker(p.Checker())}
+	if i, o := p.InputOutputFiles(); i != "" || o != "" {
+		opts = append(opts, evaluation.BasicRunnerWithFiles(i, o))
+	}
 	return batch.New(evaluation.CompileCheckSupported{
 		List:         p.Languages(),
-		NextCompiler: evaluation.Compile{},
-	}, evaluation.BasicRunnerWithChecker(p.Checker()))
+		NextCompiler: compiler,
+	}, opts...)
 }
 
 type config struct {
@@ -366,6 +436,26 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 			}
 
 			p.Tests.Checker.Path = binaryName
+		}
+
+		if p.Tests.TaskType == "communication" {
+			if len(p.Tests.TaskTypeArgs) < 2 {
+				return nil, errors.New("too few task_type_arguments for communication task")
+			}
+			interactorPath := &p.Tests.TaskTypeArgs[1]
+			if strings.HasSuffix(*interactorPath, ".cpp") {
+				binaryName := strings.TrimSuffix(*interactorPath, filepath.Ext(*interactorPath))
+				s, _ := sandbox.NewDummy()
+				if err := cpp.AutoCompile(context.TODO(), fs, s, path, filepath.Join(path, *interactorPath), filepath.Join(path, binaryName)); err != nil {
+					return nil, err
+				}
+
+				*interactorPath = binaryName
+			}
+			p.Tests.interactorBinary, err = os.ReadFile(*interactorPath)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		return p, nil
