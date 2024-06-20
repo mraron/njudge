@@ -3,6 +3,13 @@ package memory
 import "github.com/mraron/njudge/internal/njudge"
 
 func Paginate[T any](data []T, page, perPage int) ([]T, njudge.PaginationData) {
+	minPage, maxPage := 1, (len(data)+perPage-1)/perPage
+	if page > maxPage {
+		page = maxPage
+	}
+	if page < minPage {
+		page = minPage
+	}
 	start, end := (page-1)*perPage, page*perPage
 	if end >= len(data) {
 		end = len(data)
@@ -17,6 +24,6 @@ func Paginate[T any](data []T, page, perPage int) ([]T, njudge.PaginationData) {
 		Page:    page,
 		PerPage: perPage,
 		Count:   len(data),
-		Pages:   (len(data) + perPage - 1) / perPage,
+		Pages:   maxPage,
 	}
 }

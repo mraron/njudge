@@ -28,4 +28,10 @@ func TestPaginate(t *testing.T) {
 	assert.Equal(t, pdata.Page, 2)
 	assert.Equal(t, pdata.Pages, 2)
 	assert.Equal(t, pdata.PerPage, 10)
+
+	res, pdata = memory.Paginate(nums, 100, 10)
+	assert.Len(t, res, 5)
+
+	res, pdata = memory.Paginate(nums, -100, 10)
+	assert.Len(t, res, 10)
 }
