@@ -70,6 +70,8 @@ type ProblemViewModel struct {
     Name string
     DisplayLimits bool
     TimeLimit int
+    InputFile string
+    OutputFile string
     MemoryLimit memory.Amount
     ShowTags bool
     CanAddTags bool
@@ -121,6 +123,22 @@ templ problemInfoCard(vm ProblemViewModel) {
                     <div class="col-6">{d(vm.TimeLimit)} ms</div>
                     <div class="col-6">{Tr(ctx, "Memory limit")}:</div>
                     <div class="col-6">{memMiB(vm.MemoryLimit)} MiB</div>
+                }
+                if vm.InputFile != "" ||  vm.OutputFile != ""  {
+                    <div class="col-6">{Tr(ctx, "IO files")}:</div>
+                    <div class="col-6">
+                        if vm.InputFile != "" {
+                            <b>{vm.InputFile}</b>
+                        }else {
+                            stdin
+                        }
+                        /
+                        if vm.OutputFile != "" {
+                            <b>{vm.OutputFile}</b>
+                        }else {
+                            stdout
+                        }
+                    </div>
                 }
                 <div class="col-6">{Tr(ctx, "Tags")}:</div>
                 <div class="col-6">

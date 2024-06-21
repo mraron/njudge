@@ -432,9 +432,19 @@
             "translation": "Memórialimit"
         },
         {
+            "id": "IO files",
+            "message": "IO files",
+            "translation": "IO fájlok"
+        },
+        {
             "id": "Tags",
             "message": "Tags",
             "translation": "Tagek"
+        },
+        {
+            "id": "show",
+            "message": "show",
+            "translation": "mutasd"
         },
         {
             "id": "Task type",

@@ -562,9 +562,23 @@
             "fuzzy": true
         },
         {
+            "id": "IO files",
+            "message": "IO files",
+            "translation": "IO files",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Tags",
             "message": "Tags",
             "translation": "Tags",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "show",
+            "message": "show",
+            "translation": "show",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
