@@ -45,7 +45,7 @@ func (ss *Submissions) toModel(ctx context.Context, s njudge.Submission) (*model
 		err         error
 	)
 
-	if statusBytes, err = json.Marshal(s.Status); err != nil {
+	if statusBytes, err = json.Marshal(&s.Status); err != nil {
 		return nil, err
 	}
 	res.Status = string(statusBytes)

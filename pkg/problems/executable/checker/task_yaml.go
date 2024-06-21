@@ -51,6 +51,6 @@ func (t *TaskYAML) Check(ctx context.Context, testcase *problems.Testcase) error
 
 	tc.Score *= tc.MaxScore
 
-	tc.CheckerOutput = stderr.String()
+	tc.CheckerOutput = problems.Base64String(stderr.String())
 	return nil
 }

@@ -514,3 +514,21 @@ func TestScoringType_UnmarshalJSON(t *testing.T) {
 		})
 	}
 }
+
+func TestBase64String(t *testing.T) {
+	str := Base64String("hello world")
+	s, err := str.MarshalJSON()
+	assert.NoError(t, err)
+	assert.Equal(t, `"aGVsbG8gd29ybGQ="`, string(s))
+	assert.NoError(t, str.UnmarshalJSON(s))
+	assert.Equal(t, Base64String("hello world"), str)
+}
+
+func TestStatusCompilerOutput(t *testing.T) {
+	st := Status{
+		CompilerOutput: "status skeleton",
+	}
+	res, err := json.Marshal(&st)
+	assert.NoError(t, err)
+	assert.Contains(t, string(res), "c3RhdHVzIHNrZWxldG9u")
+}

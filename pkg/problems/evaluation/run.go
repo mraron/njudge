@@ -171,8 +171,8 @@ func (r *BasicRunner) setOutputExpectedOutput(s sandbox.Sandbox, testcase *probl
 		return err
 	}
 
-	testcase.ExpectedOutput = string(expectedOutput)
-	testcase.Output = string(output)
+	testcase.ExpectedOutput = problems.Base64String(expectedOutput)
+	testcase.Output = problems.Base64String(output)
 	return nil
 }
 
@@ -416,7 +416,7 @@ func (t *TaskYAMLUserInteractorExecute) Check(ctx context.Context, testcase *pro
 		return errors.New("index not found in forChecker")
 	}
 	res := val.(*interactorOutput)
-	testcase.CheckerOutput = res.checkerMessage.String()
+	testcase.CheckerOutput = problems.Base64String(res.checkerMessage.String())
 
 	mul := 0.0
 	n, err := fmt.Fscanf(res.scoreMul, "%f", &mul)

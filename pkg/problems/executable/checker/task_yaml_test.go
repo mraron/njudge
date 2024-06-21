@@ -22,7 +22,7 @@ func TestTaskYAML_Check(t1 *testing.T) {
 		wantVerdictName   problems.VerdictName
 		wantScore         float64
 		wantErr           bool
-		wantCheckerOutput string
+		wantCheckerOutput problems.Base64String
 	}{
 		{
 			name: "wrong answer",

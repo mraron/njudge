@@ -37,7 +37,7 @@ func (t Testlib) Check(ctx context.Context, testcase *problems.Testcase) error {
 
 	err := cmd.Run()
 
-	tc.CheckerOutput = problems.Truncate(output.String())
+	tc.CheckerOutput = problems.Base64String(problems.Truncate(output.String()))
 	if err != nil {
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			if status, ok := exitErr.Sys().(syscall.WaitStatus); ok {
