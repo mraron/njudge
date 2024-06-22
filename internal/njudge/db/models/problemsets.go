@@ -58,15 +58,26 @@ var ProblemsetWhere = struct {
 
 // ProblemsetRels is where relationship names are stored.
 var ProblemsetRels = struct {
-}{}
+	ProblemRels string
+}{
+	ProblemRels: "ProblemRels",
+}
 
 // problemsetR is where relationships are stored.
 type problemsetR struct {
+	ProblemRels ProblemRelSlice `boil:"ProblemRels" json:"ProblemRels" toml:"ProblemRels" yaml:"ProblemRels"`
 }
 
 // NewStruct creates a new relationship struct
 func (*problemsetR) NewStruct() *problemsetR {
 	return &problemsetR{}
+}
+
+func (r *problemsetR) GetProblemRels() ProblemRelSlice {
+	if r == nil {
+		return nil
+	}
+	return r.ProblemRels
 }
 
 // problemsetL is where Load methods for each relationship are stored.
@@ -403,6 +414,195 @@ func (q problemsetQuery) Exists(ctx context.Context, exec boil.ContextExecutor) 
 	}
 
 	return count > 0, nil
+}
+
+// ProblemRels retrieves all the problem_rel's ProblemRels with an executor.
+func (o *Problemset) ProblemRels(mods ...qm.QueryMod) problemRelQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"problem_rels\".\"problemset\"=?", o.Name),
+	)
+
+	return ProblemRels(queryMods...)
+}
+
+// LoadProblemRels allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (problemsetL) LoadProblemRels(ctx context.Context, e boil.ContextExecutor, singular bool, maybeProblemset interface{}, mods queries.Applicator) error {
+	var slice []*Problemset
+	var object *Problemset
+
+	if singular {
+		var ok bool
+		object, ok = maybeProblemset.(*Problemset)
+		if !ok {
+			object = new(Problemset)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeProblemset)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeProblemset))
+			}
+		}
+	} else {
+		s, ok := maybeProblemset.(*[]*Problemset)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeProblemset)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeProblemset))
+			}
+		}
+	}
+
+	args := make(map[interface{}]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &problemsetR{}
+		}
+		args[object.Name] = struct{}{}
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &problemsetR{}
+			}
+			args[obj.Name] = struct{}{}
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]interface{}, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`problem_rels`),
+		qm.WhereIn(`problem_rels.problemset in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load problem_rels")
+	}
+
+	var resultSlice []*ProblemRel
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice problem_rels")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on problem_rels")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for problem_rels")
+	}
+
+	if len(problemRelAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.ProblemRels = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &problemRelR{}
+			}
+			foreign.R.ProblemRelProblemset = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.Name == foreign.Problemset {
+				local.R.ProblemRels = append(local.R.ProblemRels, foreign)
+				if foreign.R == nil {
+					foreign.R = &problemRelR{}
+				}
+				foreign.R.ProblemRelProblemset = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// AddProblemRelsG adds the given related objects to the existing relationships
+// of the problemset, optionally inserting them as new records.
+// Appends related to o.R.ProblemRels.
+// Sets related.R.ProblemRelProblemset appropriately.
+// Uses the global database handle.
+func (o *Problemset) AddProblemRelsG(ctx context.Context, insert bool, related ...*ProblemRel) error {
+	return o.AddProblemRels(ctx, boil.GetContextDB(), insert, related...)
+}
+
+// AddProblemRels adds the given related objects to the existing relationships
+// of the problemset, optionally inserting them as new records.
+// Appends related to o.R.ProblemRels.
+// Sets related.R.ProblemRelProblemset appropriately.
+func (o *Problemset) AddProblemRels(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*ProblemRel) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.Problemset = o.Name
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"problem_rels\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"problemset"}),
+				strmangle.WhereClause("\"", "\"", 2, problemRelPrimaryKeyColumns),
+			)
+			values := []interface{}{o.Name, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.Problemset = o.Name
+		}
+	}
+
+	if o.R == nil {
+		o.R = &problemsetR{
+			ProblemRels: related,
+		}
+	} else {
+		o.R.ProblemRels = append(o.R.ProblemRels, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &problemRelR{
+				ProblemRelProblemset: o,
+			}
+		} else {
+			rel.R.ProblemRelProblemset = o
+		}
+	}
+	return nil
 }
 
 // Problemsets retrieves all the records using an executor.

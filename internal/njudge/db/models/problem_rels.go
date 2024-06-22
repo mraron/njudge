@@ -30,6 +30,7 @@ type ProblemRel struct {
 	CategoryID  null.Int `boil:"category_id" json:"category_id,omitempty" toml:"category_id" yaml:"category_id,omitempty"`
 	SolverCount int      `boil:"solver_count" json:"solver_count" toml:"solver_count" yaml:"solver_count"`
 	Visible     bool     `boil:"visible" json:"visible" toml:"visible" yaml:"visible"`
+	Author      string   `boil:"author" json:"author" toml:"author" yaml:"author"`
 
 	R *problemRelR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L problemRelL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -42,6 +43,7 @@ var ProblemRelColumns = struct {
 	CategoryID  string
 	SolverCount string
 	Visible     string
+	Author      string
 }{
 	Problemset:  "problemset",
 	Problem:     "problem",
@@ -49,6 +51,7 @@ var ProblemRelColumns = struct {
 	CategoryID:  "category_id",
 	SolverCount: "solver_count",
 	Visible:     "visible",
+	Author:      "author",
 }
 
 var ProblemRelTableColumns = struct {
@@ -58,6 +61,7 @@ var ProblemRelTableColumns = struct {
 	CategoryID  string
 	SolverCount string
 	Visible     string
+	Author      string
 }{
 	Problemset:  "problem_rels.problemset",
 	Problem:     "problem_rels.problem",
@@ -65,6 +69,7 @@ var ProblemRelTableColumns = struct {
 	CategoryID:  "problem_rels.category_id",
 	SolverCount: "problem_rels.solver_count",
 	Visible:     "problem_rels.visible",
+	Author:      "problem_rels.author",
 }
 
 // Generated where
@@ -76,6 +81,7 @@ var ProblemRelWhere = struct {
 	CategoryID  whereHelpernull_Int
 	SolverCount whereHelperint
 	Visible     whereHelperbool
+	Author      whereHelperstring
 }{
 	Problemset:  whereHelperstring{field: "\"problem_rels\".\"problemset\""},
 	Problem:     whereHelperstring{field: "\"problem_rels\".\"problem\""},
@@ -83,24 +89,28 @@ var ProblemRelWhere = struct {
 	CategoryID:  whereHelpernull_Int{field: "\"problem_rels\".\"category_id\""},
 	SolverCount: whereHelperint{field: "\"problem_rels\".\"solver_count\""},
 	Visible:     whereHelperbool{field: "\"problem_rels\".\"visible\""},
+	Author:      whereHelperstring{field: "\"problem_rels\".\"author\""},
 }
 
 // ProblemRelRels is where relationship names are stored.
 var ProblemRelRels = struct {
-	Category           string
-	ProblemProblemTags string
-	ProblemSubmissions string
+	Category             string
+	ProblemRelProblemset string
+	ProblemProblemTags   string
+	ProblemSubmissions   string
 }{
-	Category:           "Category",
-	ProblemProblemTags: "ProblemProblemTags",
-	ProblemSubmissions: "ProblemSubmissions",
+	Category:             "Category",
+	ProblemRelProblemset: "ProblemRelProblemset",
+	ProblemProblemTags:   "ProblemProblemTags",
+	ProblemSubmissions:   "ProblemSubmissions",
 }
 
 // problemRelR is where relationships are stored.
 type problemRelR struct {
-	Category           *ProblemCategory `boil:"Category" json:"Category" toml:"Category" yaml:"Category"`
-	ProblemProblemTags ProblemTagSlice  `boil:"ProblemProblemTags" json:"ProblemProblemTags" toml:"ProblemProblemTags" yaml:"ProblemProblemTags"`
-	ProblemSubmissions SubmissionSlice  `boil:"ProblemSubmissions" json:"ProblemSubmissions" toml:"ProblemSubmissions" yaml:"ProblemSubmissions"`
+	Category             *ProblemCategory `boil:"Category" json:"Category" toml:"Category" yaml:"Category"`
+	ProblemRelProblemset *Problemset      `boil:"ProblemRelProblemset" json:"ProblemRelProblemset" toml:"ProblemRelProblemset" yaml:"ProblemRelProblemset"`
+	ProblemProblemTags   ProblemTagSlice  `boil:"ProblemProblemTags" json:"ProblemProblemTags" toml:"ProblemProblemTags" yaml:"ProblemProblemTags"`
+	ProblemSubmissions   SubmissionSlice  `boil:"ProblemSubmissions" json:"ProblemSubmissions" toml:"ProblemSubmissions" yaml:"ProblemSubmissions"`
 }
 
 // NewStruct creates a new relationship struct
@@ -113,6 +123,13 @@ func (r *problemRelR) GetCategory() *ProblemCategory {
 		return nil
 	}
 	return r.Category
+}
+
+func (r *problemRelR) GetProblemRelProblemset() *Problemset {
+	if r == nil {
+		return nil
+	}
+	return r.ProblemRelProblemset
 }
 
 func (r *problemRelR) GetProblemProblemTags() ProblemTagSlice {
@@ -133,9 +150,9 @@ func (r *problemRelR) GetProblemSubmissions() SubmissionSlice {
 type problemRelL struct{}
 
 var (
-	problemRelAllColumns            = []string{"problemset", "problem", "id", "category_id", "solver_count", "visible"}
+	problemRelAllColumns            = []string{"problemset", "problem", "id", "category_id", "solver_count", "visible", "author"}
 	problemRelColumnsWithoutDefault = []string{"problemset", "problem"}
-	problemRelColumnsWithDefault    = []string{"id", "category_id", "solver_count", "visible"}
+	problemRelColumnsWithDefault    = []string{"id", "category_id", "solver_count", "visible", "author"}
 	problemRelPrimaryKeyColumns     = []string{"id"}
 	problemRelGeneratedColumns      = []string{}
 )
@@ -476,6 +493,17 @@ func (o *ProblemRel) Category(mods ...qm.QueryMod) problemCategoryQuery {
 	return ProblemCategories(queryMods...)
 }
 
+// ProblemRelProblemset pointed to by the foreign key.
+func (o *ProblemRel) ProblemRelProblemset(mods ...qm.QueryMod) problemsetQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("\"name\" = ?", o.Problemset),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	return Problemsets(queryMods...)
+}
+
 // ProblemProblemTags retrieves all the problem_tag's ProblemTags with an executor via problem_id column.
 func (o *ProblemRel) ProblemProblemTags(mods ...qm.QueryMod) problemTagQuery {
 	var queryMods []qm.QueryMod
@@ -620,6 +648,126 @@ func (problemRelL) LoadCategory(ctx context.Context, e boil.ContextExecutor, sin
 					foreign.R = &problemCategoryR{}
 				}
 				foreign.R.CategoryProblemRels = append(foreign.R.CategoryProblemRels, local)
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadProblemRelProblemset allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for an N-1 relationship.
+func (problemRelL) LoadProblemRelProblemset(ctx context.Context, e boil.ContextExecutor, singular bool, maybeProblemRel interface{}, mods queries.Applicator) error {
+	var slice []*ProblemRel
+	var object *ProblemRel
+
+	if singular {
+		var ok bool
+		object, ok = maybeProblemRel.(*ProblemRel)
+		if !ok {
+			object = new(ProblemRel)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeProblemRel)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeProblemRel))
+			}
+		}
+	} else {
+		s, ok := maybeProblemRel.(*[]*ProblemRel)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeProblemRel)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeProblemRel))
+			}
+		}
+	}
+
+	args := make(map[interface{}]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &problemRelR{}
+		}
+		args[object.Problemset] = struct{}{}
+
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &problemRelR{}
+			}
+
+			args[obj.Problemset] = struct{}{}
+
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]interface{}, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`problemsets`),
+		qm.WhereIn(`problemsets.name in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load Problemset")
+	}
+
+	var resultSlice []*Problemset
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice Problemset")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for problemsets")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for problemsets")
+	}
+
+	if len(problemsetAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.ProblemRelProblemset = foreign
+		if foreign.R == nil {
+			foreign.R = &problemsetR{}
+		}
+		foreign.R.ProblemRels = append(foreign.R.ProblemRels, object)
+		return nil
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if local.Problemset == foreign.Name {
+				local.R.ProblemRelProblemset = foreign
+				if foreign.R == nil {
+					foreign.R = &problemsetR{}
+				}
+				foreign.R.ProblemRels = append(foreign.R.ProblemRels, local)
 				break
 			}
 		}
@@ -947,6 +1095,61 @@ func (o *ProblemRel) RemoveCategory(ctx context.Context, exec boil.ContextExecut
 		related.R.CategoryProblemRels = related.R.CategoryProblemRels[:ln-1]
 		break
 	}
+	return nil
+}
+
+// SetProblemRelProblemsetG of the problemRel to the related item.
+// Sets o.R.ProblemRelProblemset to related.
+// Adds o to related.R.ProblemRels.
+// Uses the global database handle.
+func (o *ProblemRel) SetProblemRelProblemsetG(ctx context.Context, insert bool, related *Problemset) error {
+	return o.SetProblemRelProblemset(ctx, boil.GetContextDB(), insert, related)
+}
+
+// SetProblemRelProblemset of the problemRel to the related item.
+// Sets o.R.ProblemRelProblemset to related.
+// Adds o to related.R.ProblemRels.
+func (o *ProblemRel) SetProblemRelProblemset(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Problemset) error {
+	var err error
+	if insert {
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	}
+
+	updateQuery := fmt.Sprintf(
+		"UPDATE \"problem_rels\" SET %s WHERE %s",
+		strmangle.SetParamNames("\"", "\"", 1, []string{"problemset"}),
+		strmangle.WhereClause("\"", "\"", 2, problemRelPrimaryKeyColumns),
+	)
+	values := []interface{}{related.Name, o.ID}
+
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, values)
+	}
+	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	o.Problemset = related.Name
+	if o.R == nil {
+		o.R = &problemRelR{
+			ProblemRelProblemset: related,
+		}
+	} else {
+		o.R.ProblemRelProblemset = related
+	}
+
+	if related.R == nil {
+		related.R = &problemsetR{
+			ProblemRels: ProblemRelSlice{o},
+		}
+	} else {
+		related.R.ProblemRels = append(related.R.ProblemRels, o)
+	}
+
 	return nil
 }
 

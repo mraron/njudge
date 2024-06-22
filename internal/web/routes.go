@@ -71,6 +71,8 @@ func (s *Server) routes(e *echo.Echo) {
 		problemset.SetProblemMiddleware(s.ProblemStore, s.ProblemQuery, s.ProblemInfoQuery), problemset.VisibilityMiddleware())
 	psProb.GET("/", problemset.GetProblem(s.Tags)).Name = "getProblemMain"
 	psProb.GET("/problem", problemset.GetProblem(s.Tags))
+	psProb.GET("/edit", problemset.GetProblemEdit(s.Users, s.Categories), user.RequireLoginMiddleware())
+	psProb.POST("/edit", problemset.PostProblemEdit(s.Problems, s.Categories), user.RequireLoginMiddleware())
 	psProb.GET("/status", problemset.GetProblemStatus(s.SubmissionListQuery, s.ProblemStore))
 	psProb.GET("/submit", problemset.GetProblemSubmit())
 	psProb.GET("/ranklist", problemset.GetProblemRanklist(s.SubmissionListQuery, s.Users))

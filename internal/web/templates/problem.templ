@@ -74,9 +74,12 @@ type ProblemViewModel struct {
     OutputFile string
     MemoryLimit memory.Amount
     ShowTags bool
-    CanAddTags bool
     Tags []njudge.Tag
+    Author string
     TaskTypeName string
+
+    CanEdit bool
+    CanAddTags bool
 
     Languages []language.Language
     UserInfo *njudge.ProblemUserInfo
@@ -153,6 +156,10 @@ templ problemInfoCard(vm ProblemViewModel) {
                 </div>
                 <div class="col-6">{Tr(ctx, "Task type")}:</div>
                 <div class="col-6">{vm.TaskTypeName}</div>
+                if vm.Author != "" {
+                    <div class="col-6">{Tr(ctx, "Author")}:</div>
+                    <div class="col-6">{vm.Author}</div>
+                }
             </div>
         </div>
     </div>
@@ -282,21 +289,38 @@ templ problemAttachments(vm ProblemViewModel) {
     </div>
 }
 
-templ problemPage(name string, statements problems.Contents) {
+templ problemPage(name string, vm *ProblemViewModel) {
     @Page() {
-        @problemMenu(name, statements)
+        if vm==nil {
+            @problemMenu(name, nil)
+        }else {
+            @problemMenu(name, vm.Statements)
+        }
         { children... }
     }
 }
 
+templ problemEditCard(vm ProblemViewModel) {
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-gear"></i>
+            <a href="./edit">{Tr(ctx, "Edit")}</a>
+        </div>
+    </div>
+}
+
 templ Problem(vm ProblemViewModel) {
-    @problemPage("problem", vm.Statements) {
+    @problemPage("problem", &vm) {
         @problemAddTag(vm)
         <div class="row">
             <div class="col-12 col-lg-9">
                 @problemStatement(vm)
             </div>
             <div class="col-12 col-lg-3">
+                if vm.CanEdit {
+                    @problemEditCard(vm)
+                    <br>
+                }
                 @problemInfoCard(vm)
                 <br>
                 @problemSubmitCard(vm)
@@ -427,5 +451,70 @@ templ ProblemSubmit(vm ProblemSubmitViewModel) {
         }else {
             @toSubmitLoginOrRegister()
         }
+    }
+}
+
+type ProblemTag struct {
+    Name string
+    User string
+    Added time.Time
+}
+
+type ProblemEditViewModel struct {
+    Categories []CategoryFilterOption
+    Visible bool
+    Author string
+    Tags []ProblemTag
+}
+
+templ ProblemEdit(vm ProblemEditViewModel) {
+    @problemPage("edit", nil) {
+        <form method="post" action="./edit">
+            <div class="form-group">
+                <label for="categoryFilter">
+                    {Tr(ctx, "Category")}:
+                </label>
+                <select name="category" class="custom-select" id="categoryFilter" class="form-control">
+                    for _, category := range vm.Categories {
+                        <option value={category.Value} selected?={ category.Selected }>{category.Name}</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="author">
+                    {Tr(ctx, "Author")}:
+                </label>
+                <input type="text" name="author" id="author" class="form-control" value={vm.Author}>
+            </div>
+            <div class="form-group form-check">
+                <input type="checkbox" checked?={vm.Visible} name="visible" id="visible" class="form-check-input">
+                <label for="visible">
+                    {Tr(ctx, "Visible")}
+                </label>
+            </div>
+            @CSRFHidden()
+            <button type="submit" class="btn btn-outline-warning">
+                {Tr(ctx, "Edit")}
+            </button>
+        </form>
+        <br>
+        {Tr(ctx, "Tags")}:
+        <ul>
+        for _, tag := range vm.Tags {
+            <li>
+                <span class="badge badge-secondary">{tag.Name}</span> by
+                <a href={templ.SafeURL("/user/profile/"+tag.User+"/")}>{tag.User}</a>
+                at {tag.Added.Format(time.DateTime)}
+            </li>
+        }
+        </ul>
+
+         <script type="text/javascript">
+                $(function () {
+                   $('#categoryFilter').select2({
+                       theme: 'bootstrap4',
+                   });
+                });
+         </script>
     }
 }

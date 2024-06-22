@@ -57,6 +57,7 @@ func (ps *Problems) toNjudge(p *models.ProblemRel) (*njudge.Problem, error) {
 		Category:    ps.catToNjudge(p.R.Category),
 		SolverCount: p.SolverCount,
 		Visible:     p.Visible,
+		Author:      p.Author,
 		Tags:        ps.problemTagsToNjudge(p.R.ProblemProblemTags),
 	}, nil
 }
@@ -68,6 +69,7 @@ func (ps *Problems) toModel(p njudge.Problem) (*models.ProblemRel, error) {
 		Problem:     p.Problem,
 		SolverCount: p.SolverCount,
 		Visible:     p.Visible,
+		Author:      p.Author,
 	}
 
 	if p.Category != nil {
@@ -156,6 +158,10 @@ func (ps *Problems) Update(ctx context.Context, p njudge.Problem, fields []strin
 			whitelist = append(whitelist, models.ProblemRelColumns.CategoryID)
 		case njudge.ProblemFields.SolverCount:
 			whitelist = append(whitelist, models.ProblemRelColumns.SolverCount)
+		case njudge.ProblemFields.Visible:
+			whitelist = append(whitelist, models.ProblemRelColumns.Visible)
+		case njudge.ProblemFields.Author:
+			whitelist = append(whitelist, models.ProblemRelColumns.Author)
 		case njudge.ProblemFields.Tags:
 			updateTags = true
 		}
