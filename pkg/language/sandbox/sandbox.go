@@ -32,6 +32,12 @@ type FS interface {
 
 // CreateFile is a convenience method for creating a file inside a sandbox with the given content.
 func CreateFile(fs FS, c File) error {
+	type createFiler interface {
+		CreateFile(c File) error
+	}
+	if can, ok := fs.(createFiler); ok {
+		return can.CreateFile(c)
+	}
 	if err := syscall.Unlink(filepath.Join(fs.Pwd(), c.Name)); err != nil && !errors.Is(err, os.ErrNotExist) {
 		return err
 	}

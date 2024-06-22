@@ -49,6 +49,16 @@ func GetProblem(tags njudge.Tags) echo.HandlerFunc {
 			TagsToAdd:    nil,
 			Author:       prob.Author,
 		}
+		for _, lang := range storedData.Languages() {
+			res, err := extractCompileAndRunCommand(c.Request().Context(), storedData.GetTaskType(), lang)
+			if err != nil {
+				return err
+			}
+			vm.LanguageCompileCommands = append(vm.LanguageCompileCommands, templates.LanguageCompileCommand{
+				Name:    lang.DisplayName(),
+				Command: res,
+			})
+		}
 		vm.InputFile, vm.OutputFile = storedData.InputOutputFiles()
 		for _, st := range storedData.Statements() {
 			if st.IsHTML() || st.IsPDF() {
