@@ -50,3 +50,18 @@ func makeCacheKey(cols boil.Columns, nzDefaults []string) string {
 	strmangle.PutBuffer(buf)
 	return str
 }
+
+// Enum values for CodeVisibility
+const (
+	CodeVisibilityPrivate string = "private"
+	CodeVisibilitySolved  string = "solved"
+	CodeVisibilityPublic  string = "public"
+)
+
+func AllCodeVisibility() []string {
+	return []string{
+		CodeVisibilityPrivate,
+		CodeVisibilitySolved,
+		CodeVisibilityPublic,
+	}
+}

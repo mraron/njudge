@@ -30,6 +30,7 @@ type DataAccess struct {
 	ProblemQuery        njudge.ProblemQuery
 	ProblemListQuery    njudge.ProblemListQuery
 	SubmissionListQuery njudge.SubmissionListQuery
+	Problemsets         njudge.Problemsets
 
 	SubmitService      *njudge.SubmitService
 	TagsService        njudge.TagsService
@@ -56,6 +57,7 @@ func NewDemoDataAccess(ctx context.Context, ps problems.Store, ms email.Service)
 	s.ProblemInfoQuery = memory.NewProblemInfoQuery(s.Submissions)
 	s.ProblemListQuery = memory.NewProblemListQuery(s.ProblemStore, s.Problems, s.Tags, s.Categories)
 	s.SubmissionListQuery = memory.NewSubmissionListQuery(s.Submissions, s.Problems)
+	s.Problemsets = memory.NewProblemsets()
 
 	s.SubmitService = njudge.NewSubmitService(s.Users, s.ProblemQuery, s.ProblemStore)
 	s.TagsService = memory.NewTagsService(s.Tags, s.Problems, s.ProblemInfoQuery)
@@ -85,6 +87,10 @@ func NewDemoDataAccess(ctx context.Context, ps problems.Store, ms email.Service)
 		return nil, err
 	}
 
+	err = s.Problemsets.Insert(ctx, njudge.Problemset{Name: "main", CodeVisibility: njudge.CodeVisibilityPublic})
+	if err != nil {
+		return nil, err
+	}
 	// Create NT21_Atvagas in problemset main, setting its category
 	p := njudge.NewProblem("main", "NT21_Atvagas")
 	err = p.AddTag(*t, 1)
@@ -176,6 +182,7 @@ func NewDBDataAccess(ctx context.Context, ps problems.Store, DB *sql.DB, ms emai
 	s.ProblemInfoQuery = s.Problems.(*db.Problems)
 	s.ProblemListQuery = memory.NewProblemListQuery(s.ProblemStore, s.Problems, s.Tags, s.Categories)
 	s.SubmissionListQuery = db.NewSubmissionListQuery(DB)
+	s.Problemsets = db.NewProblemsets(DB)
 
 	s.SubmitService = njudge.NewSubmitService(s.Users, s.ProblemQuery, s.ProblemStore)
 	s.TagsService = memory.NewTagsService(s.Tags, s.Problems, s.ProblemInfoQuery)

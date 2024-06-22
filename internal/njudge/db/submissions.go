@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/njudge/db/models"
 	"github.com/volatiletech/null/v8"
@@ -48,7 +47,7 @@ func (ss *Submissions) toModel(ctx context.Context, s njudge.Submission) (*model
 	if statusBytes, err = json.Marshal(&s.Status); err != nil {
 		return nil, err
 	}
-	res.Status = string(statusBytes)
+	res.Status = statusBytes
 
 	return res, nil
 }

@@ -19,13 +19,14 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"github.com/volatiletech/sqlboiler/v4/queries/qmhelper"
+	"github.com/volatiletech/sqlboiler/v4/types"
 	"github.com/volatiletech/strmangle"
 )
 
 // Submission is an object representing the database table.
 type Submission struct {
 	ID        int          `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Status    string       `boil:"status" json:"status" toml:"status" yaml:"status"`
+	Status    types.JSON   `boil:"status" json:"status" toml:"status" yaml:"status"`
 	Ontest    null.String  `boil:"ontest" json:"ontest,omitempty" toml:"ontest" yaml:"ontest,omitempty"`
 	UserID    int          `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
 	Language  string       `boil:"language" json:"language" toml:"language" yaml:"language"`
@@ -103,6 +104,27 @@ var SubmissionTableColumns = struct {
 }
 
 // Generated where
+
+type whereHelpertypes_JSON struct{ field string }
+
+func (w whereHelpertypes_JSON) EQ(x types.JSON) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.EQ, x)
+}
+func (w whereHelpertypes_JSON) NEQ(x types.JSON) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.NEQ, x)
+}
+func (w whereHelpertypes_JSON) LT(x types.JSON) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpertypes_JSON) LTE(x types.JSON) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpertypes_JSON) GT(x types.JSON) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpertypes_JSON) GTE(x types.JSON) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
 
 type whereHelpernull_String struct{ field string }
 
@@ -227,7 +249,7 @@ func (w whereHelpernull_Float32) IsNotNull() qm.QueryMod { return qmhelper.Where
 
 var SubmissionWhere = struct {
 	ID        whereHelperint
-	Status    whereHelperstring
+	Status    whereHelpertypes_JSON
 	Ontest    whereHelpernull_String
 	UserID    whereHelperint
 	Language  whereHelperstring
@@ -241,7 +263,7 @@ var SubmissionWhere = struct {
 	ProblemID whereHelperint
 }{
 	ID:        whereHelperint{field: "\"submissions\".\"id\""},
-	Status:    whereHelperstring{field: "\"submissions\".\"status\""},
+	Status:    whereHelpertypes_JSON{field: "\"submissions\".\"status\""},
 	Ontest:    whereHelpernull_String{field: "\"submissions\".\"ontest\""},
 	UserID:    whereHelperint{field: "\"submissions\".\"user_id\""},
 	Language:  whereHelperstring{field: "\"submissions\".\"language\""},
