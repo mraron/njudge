@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2024-06-23
+
+# Changed
+- Put tags in \<details\> on the problem page by default 
+- Now a testcase's checker output, output and answer is stored in base64 (along the compiler output) 
+- Vendored golang-migrate/migrate with go function migrations
+
+# Added
+
+- Zero indexed patterns in problem_yaml
+- task_yaml stub, communication, explicit scores support
+- Discord webhook on errors
+- Show non-standard IO files on problem page
+- Problemset table
+- Edit interface for problems
+- Problem author column
+- Perfectly accurate compilation commands to the problem page
+- top 5 solutions to the problem ranklist by time, mem, size
+- Problemset ranklist 
+
+# Fixed
+
+- Category links in problemset
+- glue solver count calculation
+- testlib checker points calculation 
+- Google auth
+- Profile link on problem ranklist
+- Fixed common errors on production (mostly triggered by search bots)
+
 ## [0.5.0] - 2024-05-26
 
 # Added
@@ -136,7 +165,8 @@ The previous two changes are from 65ec4f to 19c523
 - Crash when admin panel is visited without logging in
 - Workflow
 
-[unreleased]: https://github.com/mraron/njudge/compare/v0.5.0...HEAD
+[unreleased]: https://github.com/mraron/njudge/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/mraron/njudge/releases/tag/v0.6.0
 [0.5.0]: https://github.com/mraron/njudge/releases/tag/v0.5.0
 [0.4.0]: https://github.com/mraron/njudge/releases/tag/v0.4.0
 [0.3.1]: https://github.com/mraron/njudge/releases/tag/v0.3.1
