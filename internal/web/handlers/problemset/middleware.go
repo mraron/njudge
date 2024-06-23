@@ -12,10 +12,14 @@ import (
 	"github.com/mraron/njudge/pkg/problems"
 )
 
-func SetNameMiddleware() func(echo.HandlerFunc) echo.HandlerFunc {
+func SetMiddleware(ps njudge.Problemsets) func(echo.HandlerFunc) echo.HandlerFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			c.Set("problemset", c.Param("name"))
+			if r, err := ps.GetByName(c.Request().Context(), c.Param("name")); err != nil {
+				return err
+			} else {
+				c.Set("problemset", r)
+			}
 			return next(c)
 		}
 	}

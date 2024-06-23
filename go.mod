@@ -31,7 +31,7 @@ require (
 
 require (
 	github.com/PuerkitoBio/goquery v1.9.2
-	github.com/a-h/templ v0.2.697
+	github.com/a-h/templ v0.2.707
 	github.com/antonlindstrom/pgstore v0.0.0-20220421113606-e3a6e3fed12a
 	github.com/erni27/imcache v1.2.0
 	github.com/karrick/gobls v1.3.5
@@ -88,4 +88,5 @@ require (
 )
 
 replace github.com/karrick/gobls v1.3.5 => github.com/mraron/gobls v0.0.0-20240125210852-e9cc54e22010
+
 replace github.com/golang-migrate/migrate/v4 v4.17.1 => github.com/mraron/migrate/v4 v4.16.0

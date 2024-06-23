@@ -14,7 +14,7 @@ type GetSubmissionRequest struct {
 	ID int `param:"id"`
 }
 
-func GetSubmission(s njudge.Submissions) echo.HandlerFunc {
+func GetSubmission(s njudge.Submissions, probs njudge.Problems, psets njudge.Problemsets, solvedStatus njudge.SolvedStatusQuery) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		u := c.Get("user").(*njudge.User)
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
@@ -36,7 +36,33 @@ func GetSubmission(s njudge.Submissions) echo.HandlerFunc {
 			vm.CanRejudge = true
 		}
 		if sub.Language != "zip" {
-			vm.DisplaySource = true
+			p, err := sub.GetProblem(c.Request().Context(), probs)
+			if err != nil {
+				return err
+			}
+			pset, err := psets.GetByName(c.Request().Context(), p.Problemset)
+			if err != nil {
+				return err
+			}
+			if u != nil && (u.Role == "admin" || u.ID == sub.UserID) {
+				vm.DisplaySource = true
+			} else {
+				switch pset.CodeVisibility {
+				case njudge.CodeVisibilityPrivate:
+				case njudge.CodeVisibilitySolved:
+					if u != nil {
+						ss, err := solvedStatus.GetSolvedStatus(c.Request().Context(), p.ID, u.ID)
+						if err != nil {
+							return err
+						}
+						if ss == njudge.Solved {
+							vm.DisplaySource = true
+						}
+					}
+				case njudge.CodeVisibilityPublic:
+					vm.DisplaySource = true
+				}
+			}
 		}
 
 		c.Set(templates.TitleContextKey, tr.Translate("Submission #%d", data.ID))

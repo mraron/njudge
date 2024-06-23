@@ -19,7 +19,7 @@ func gravatarHash(user njudge.User) string {
 	return fmt.Sprintf("%x", md5.Sum([]byte(strings.ToLower(strings.TrimSpace(user.Email)))))
 }
 
-func GetProfile(sublist njudge.SubmissionListQuery, ps njudge.Problems) echo.HandlerFunc {
+func GetProfile(sublist njudge.SubmissionListQuery, ps njudge.Problems, rs njudge.ProblemsetRanklistService) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
@@ -41,7 +41,13 @@ func GetProfile(sublist njudge.SubmissionListQuery, ps njudge.Problems) echo.Han
 			Points:            float64(u.Points),
 			SolvedProblems:    nil,
 			AttemptedProblems: nil,
+			RanklistPosition:  0,
 		}
+		pos, err := njudge.GetUserPlaceInProblemsetRanklist(c.Request().Context(), "main", u.ID, rs)
+		if err != nil {
+			return err
+		}
+		vm.RanklistPosition = pos
 
 		pass := func(from *[]njudge.Submission, to *[]templates.ProfileSubmission) error {
 			for _, sub := range *from {

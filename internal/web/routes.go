@@ -58,19 +58,22 @@ func (s *Server) routes(e *echo.Echo) {
 
 	e.Static("/static", "static")
 
-	e.GET("/submission/:id", handlers.GetSubmission(s.Submissions)).Name = "getSubmission"
+	e.GET("/submission/:id", handlers.GetSubmission(s.Submissions, s.Problems, s.Problemsets, s.SolvedStatusQuery)).Name = "getSubmission"
 	e.GET("/submission/rejudge/:id", handlers.RejudgeSubmission(s.Submissions), user.RequireLoginMiddleware()).Name = "rejudgeSubmission"
 	e.GET("/task_archive", handlers.GetTaskArchive(s.TaskArchiveService))
+	e.GET("/ranklist/", problemset.GetRanklist(s.ProblemsetRanklistService))
 
-	ps := e.Group("/problemset", problemset.SetNameMiddleware())
+	ps := e.Group("/problemset", problemset.SetMiddleware(s.Problemsets))
 	ps.GET("/:name/", problemset.GetProblemList(s.ProblemStore, s.Problems, s.Categories, s.ProblemListQuery, s.ProblemInfoQuery, s.Tags))
 	ps.POST("/:name/submit", problemset.PostSubmit(s.Submissions, s.SubmitService), user.RequireLoginMiddleware())
-	ps.GET("/status/", problemset.GetStatus(s.SubmissionListQuery)).Name = "getProblemsetStatus"
+	e.GET("/problemset/status/", problemset.GetStatus(s.SubmissionListQuery)).Name = "getProblemsetStatus"
 
 	psProb := ps.Group("/:name/:problem", problemset.RenameProblemMiddleware(s.ProblemStore),
 		problemset.SetProblemMiddleware(s.ProblemStore, s.ProblemQuery, s.ProblemInfoQuery), problemset.VisibilityMiddleware())
 	psProb.GET("/", problemset.GetProblem(s.Tags)).Name = "getProblemMain"
 	psProb.GET("/problem", problemset.GetProblem(s.Tags))
+	psProb.GET("/edit", problemset.GetProblemEdit(s.Users, s.Categories), user.RequireLoginMiddleware())
+	psProb.POST("/edit", problemset.PostProblemEdit(s.Problems, s.Categories), user.RequireLoginMiddleware())
 	psProb.GET("/status", problemset.GetProblemStatus(s.SubmissionListQuery, s.ProblemStore))
 	psProb.GET("/submit", problemset.GetProblemSubmit())
 	psProb.GET("/ranklist", problemset.GetProblemRanklist(s.SubmissionListQuery, s.Users))
@@ -99,7 +102,7 @@ func (s *Server) routes(e *echo.Echo) {
 	u.POST("/forgot_password_form", user.PostForgotPasswordForm(s.Users)).Name = "PostForgoTPasswordForm"
 
 	pr := u.Group("/profile", profile.SetProfileMiddleware(s.Users))
-	pr.GET("/:name/", profile.GetProfile(s.SubmissionListQuery, s.Problems))
+	pr.GET("/:name/", profile.GetProfile(s.SubmissionListQuery, s.Problems, s.ProblemsetRanklistService))
 	pr.GET("/:name/submissions/", profile.GetSubmissions(s.SubmissionListQuery))
 
 	prs := pr.Group("/:name/settings", user.RequireLoginMiddleware(), profile.PrivateMiddleware())

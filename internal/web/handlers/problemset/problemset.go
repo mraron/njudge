@@ -49,8 +49,45 @@ func NewProblemListRequest(c echo.Context) (*ProblemListRequest, error) {
 	return &data, nil
 }
 
-func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categories, problemListQuery njudge.ProblemListQuery, pinfo njudge.ProblemInfoQuery, tags njudge.Tags) echo.HandlerFunc {
+func makeCategoryFilterOptions(tr i18n.Translator, categories []njudge.Category, selected int, categoryNameByID map[int]string, par map[int]int) []templates.CategoryFilterOption {
+	var res []templates.CategoryFilterOption
+	var getCategoryNameRec func(int) string
+	getCategoryNameRec = func(id int) string {
+		if _, ok := par[id]; !ok {
+			return categoryNameByID[id]
+		} else {
+			return getCategoryNameRec(par[id]) + " -- " + categoryNameByID[id]
+		}
+	}
 
+	for ind := range categories {
+		curr := templates.CategoryFilterOption{
+			Name:     getCategoryNameRec(categories[ind].ID),
+			Value:    strconv.Itoa(categories[ind].ID),
+			Selected: false,
+		}
+
+		if categories[ind].ID == selected {
+			curr.Selected = true
+		}
+
+		res = append(res, curr)
+	}
+
+	sort.Slice(res, func(i, j int) bool {
+		return res[i].Name < res[j].Name
+	})
+	res = append([]templates.CategoryFilterOption{
+		{
+			Name:     tr.Translate("No category"),
+			Value:    "-1",
+			Selected: selected == -1,
+		},
+	}, res...)
+	return res
+}
+
+func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categories, problemListQuery njudge.ProblemListQuery, pinfo njudge.ProblemInfoQuery, tags njudge.Tags) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 		data, err := NewProblemListRequest(c)
@@ -96,6 +133,7 @@ func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categori
 			return err
 		}
 		result := templates.ProblemListViewModel{
+			Name:  data.Problemset,
 			Pages: links,
 			Tags:  tagsList,
 		}
@@ -115,15 +153,6 @@ func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categori
 		categoryNameByID := make(map[int]string)
 		for ind := range categories {
 			categoryNameByID[categories[ind].ID] = categories[ind].Name
-		}
-
-		var getCategoryNameRec func(int) string
-		getCategoryNameRec = func(id int) string {
-			if _, ok := par[id]; !ok {
-				return categoryNameByID[id]
-			} else {
-				return getCategoryNameRec(par[id]) + " -- " + categoryNameByID[id]
-			}
 		}
 
 		for ind := range problemList.Problems {
@@ -200,33 +229,8 @@ func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categori
 			{Name: "-"},
 		}
 
-		emptySelected := false
-		if data.CategoryFilter == -1 {
-			emptySelected = true
-		}
-		result.CategoryFilterOptions = append(result.CategoryFilterOptions, templates.CategoryFilterOption{
-			Name:     tr.Translate("No category"),
-			Value:    "-1",
-			Selected: emptySelected,
-		})
-
-		for ind := range categories {
-			curr := templates.CategoryFilterOption{
-				Name:     getCategoryNameRec(categories[ind].ID),
-				Value:    strconv.Itoa(categories[ind].ID),
-				Selected: false,
-			}
-
-			if strconv.Itoa(categories[ind].ID) == c.QueryParam("category") {
-				curr.Selected = true
-			}
-
-			result.CategoryFilterOptions = append(result.CategoryFilterOptions, curr)
-		}
-
-		sort.Slice(result.CategoryFilterOptions, func(i, j int) bool {
-			return result.CategoryFilterOptions[i].Name < result.CategoryFilterOptions[j].Name
-		})
+		result.CategoryFilterOptions = append(result.CategoryFilterOptions,
+			makeCategoryFilterOptions(tr, categories, data.CategoryFilter, categoryNameByID, par)...)
 
 		c.Set("title", tr.Translate("Problems"))
 		return templates.Render(c, http.StatusOK, templates.ProblemList(result))
@@ -344,5 +348,49 @@ func PostSubmit(submissions njudge.Submissions, subService *njudge.SubmitService
 		}
 
 		return c.Redirect(http.StatusFound, c.Echo().Reverse("getProblemsetStatus")+"#submission"+strconv.Itoa(sub.ID))
+	}
+}
+
+func GetRanklist(rs njudge.ProblemsetRanklistService) echo.HandlerFunc {
+	type request struct {
+		Problemset string `query:"problemset"`
+		Page       int    `query:"page"`
+	}
+	return func(c echo.Context) error {
+		req := request{}
+		if err := c.Bind(&req); err != nil {
+			return err
+		}
+		if req.Problemset == "" {
+			req.Problemset = "main"
+		}
+		if req.Page <= 0 {
+			req.Page = 1
+		}
+		res, err := rs.GetRanklist(c.Request().Context(), njudge.ProblemsetRanklistRequest{
+			Name:        req.Problemset,
+			Page:        req.Page,
+			PerPage:     50,
+			FilterAdmin: true,
+		})
+		if err != nil {
+			return err
+		}
+		qu := (*c.Request().URL).Query()
+		links, err := templates.LinksWithCountLimit(req.Page, 50, int64(res.PaginationData.Count), qu, 5)
+		if err != nil {
+			return err
+		}
+		vm := templates.ProblemsetRanklistViewModel{
+			Pages: links,
+		}
+		for _, row := range res.Rows {
+			vm.Rows = append(vm.Rows, templates.ProblemsetRanklistRow{
+				Place:  row.Place,
+				Name:   row.Name,
+				Points: strconv.FormatFloat(row.Score, 'f', 2, 64),
+			})
+		}
+		return templates.Render(c, http.StatusOK, templates.ProblemsetRanklist(vm))
 	}
 }

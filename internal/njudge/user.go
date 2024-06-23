@@ -227,6 +227,7 @@ var (
 
 type Users interface {
 	Get(ctx context.Context, ID int) (*User, error)
+	GetAll(ctx context.Context) ([]User, error)
 	GetByName(ctx context.Context, name string) (*User, error)
 	GetByEmail(ctx context.Context, email string) (*User, error)
 	Insert(ctx context.Context, u User) (*User, error)

@@ -10,6 +10,7 @@ var TableNames = struct {
 	ProblemCategories     string
 	ProblemRels           string
 	ProblemTags           string
+	Problemsets           string
 	Submissions           string
 	Tags                  string
 	Users                 string
@@ -20,6 +21,7 @@ var TableNames = struct {
 	ProblemCategories:     "problem_categories",
 	ProblemRels:           "problem_rels",
 	ProblemTags:           "problem_tags",
+	Problemsets:           "problemsets",
 	Submissions:           "submissions",
 	Tags:                  "tags",
 	Users:                 "users",

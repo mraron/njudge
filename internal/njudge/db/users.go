@@ -39,13 +39,14 @@ func (us *Users) toNjudge(ctx context.Context, u *models.User) (*njudge.User, er
 			ShowUnsolvedTags: u.ShowUnsolvedTags,
 		},
 	}
-
-	if key := u.R.ForgottenPasswordKey; key != nil {
-		res.ForgottenPasswordKey = &njudge.ForgottenPasswordKey{
-			ID:         key.ID,
-			UserID:     u.ID,
-			Key:        key.Key,
-			ValidUntil: key.Valid,
+	if u.R != nil {
+		if key := u.R.ForgottenPasswordKey; key != nil {
+			res.ForgottenPasswordKey = &njudge.ForgottenPasswordKey{
+				ID:         key.ID,
+				UserID:     u.ID,
+				Key:        key.Key,
+				ValidUntil: key.Valid,
+			}
 		}
 	}
 
@@ -83,6 +84,22 @@ func (us *Users) get(ctx context.Context, mods ...qm.QueryMod) (*njudge.User, er
 
 func (us *Users) Get(ctx context.Context, ID int) (*njudge.User, error) {
 	return us.get(ctx, models.UserWhere.ID.EQ(ID))
+}
+
+func (us *Users) GetAll(ctx context.Context) ([]njudge.User, error) {
+	dbobjs, err := models.Users().All(ctx, us.db)
+	if err != nil {
+		return nil, err
+	}
+	res := make([]njudge.User, len(dbobjs))
+	for i := range dbobjs {
+		curr, err := us.toNjudge(ctx, dbobjs[i])
+		if err != nil {
+			return nil, err
+		}
+		res[i] = *curr
+	}
+	return res, nil
 }
 
 func (us *Users) GetByName(ctx context.Context, name string) (*njudge.User, error) {
