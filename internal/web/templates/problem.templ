@@ -366,33 +366,121 @@ templ Problem(vm ProblemViewModel) {
 }
 
 type ProblemRanklistRow struct {
-    ID int
+    SubmissionID int
     Name string
-    Score float64
+    Text string
+    Solved bool
+
+    SortKey int64 //sort by (SortKey, SubmissionID)
 }
 
 type ProblemRanklistViewModel struct {
-    MaxScore float64
-    Rows []ProblemRanklistRow
+    ScoredProblem bool
+    TimeRows []ProblemRanklistRow
+    MemRows []ProblemRanklistRow
+    SizeRows []ProblemRanklistRow
+    ScoresRows []ProblemRanklistRow
 }
 
 templ ProblemRanklist(vm ProblemRanklistViewModel) {
-    @problemPage("ranklist", nil) {
-        <table class="table table-sm table-bordered">
-        <thead>
-            <tr>
-                <th scope="col">{Tr(ctx, "Name")}</th>
-                <th scope="col">{Tr(ctx, "Points")}</th>
-            </tr>
-        </thead>
-        for _, row := range vm.Rows {
-            <tr>
-                <td><a href={templ.SafeURL("/user/profile/"+row.Name+"/")}>{row.Name}</a></td>
-                <td><a href={templ.SafeURL("/submission/"+d(row.ID))}>{f(row.Score)}/{f(vm.MaxScore)}</a></td>
-            </tr>
-        }
-        </table>
-    }
+   @problemPage("ranklist", nil) {
+   <div class="container p-0">
+      <div class="row m-0">
+         <div class="col-4">
+            <h3><i class="bi bi-clock"></i> Leggyorsabb</h3>
+            <table class="table table-sm table-bordered">
+               <thead>
+                  <tr>
+                     <th scope="col"></th>
+                     <th scope="col">{Tr(ctx, "Name")}</th>
+                     <th scope="col">{Tr(ctx, "Result")}</th>
+                  </tr>
+               </thead>
+               for ind, row := range vm.TimeRows {
+               <tr>
+                  <td>{d(ind+1)}.</td>
+                  <td><a href={templ.SafeURL("/user/profile/"+row.Name+"/")}>{row.Name}</a></td>
+                  <td>
+                     <a href={templ.SafeURL("/submission/"+d(row.SubmissionID))}>{row.Text}</a>
+                  </td>
+               </tr>
+               }
+            </table>
+         </div>
+         <div class="col-4">
+            <h3><i class="bi bi-memory"></i> Legkevesebb memória</h3>
+            <table class="table table-sm table-bordered">
+                <thead>
+                  <tr>
+                     <th scope="col"></th>
+                     <th scope="col">{Tr(ctx, "Name")}</th>
+                     <th scope="col">{Tr(ctx, "Result")}</th>
+                  </tr>
+               </thead>
+               for ind, row := range vm.MemRows {
+               <tr>
+                  <td>{d(ind+1)}.</td>
+                  <td><a href={templ.SafeURL("/user/profile/"+row.Name+"/")}>{row.Name}</a></td>
+                  <td>
+                     <a href={templ.SafeURL("/submission/"+d(row.SubmissionID))}>{row.Text}</a>
+                  </td>
+               </tr>
+               }
+            </table>
+         </div>
+         <div class="col-4">
+            <h3><i class="bi bi-journal-code"></i> Legkisebb</h3>
+            <table class="table table-sm table-bordered">
+                <thead>
+                  <tr>
+                     <th scope="col"></th>
+                     <th scope="col">{Tr(ctx, "Name")}</th>
+                     <th scope="col">{Tr(ctx, "Result")}</th>
+                  </tr>
+               </thead>
+               for ind, row := range vm.SizeRows {
+               <tr>
+                  <td>{d(ind+1)}.</td>
+                  <td><a href={templ.SafeURL("/user/profile/"+row.Name+"/")}>{row.Name}</a></td>
+                  <td>
+                     <a href={templ.SafeURL("/submission/"+d(row.SubmissionID))}>{row.Text}</a>
+                  </td>
+               </tr>
+               }
+            </table>
+         </div>
+         <div class="col-12">
+            <h3><i class="bi bi-list"></i> Eredmények</h3>
+            <table class="table table-sm table-bordered">
+               <thead>
+                  <tr>
+                     <th scope="col">{Tr(ctx, "Name")}</th>
+                     <th scope="col">{Tr(ctx, "Result")}</th>
+                  </tr>
+               </thead>
+               for _, row := range vm.ScoresRows {
+               <tr>
+                  <td><a href={templ.SafeURL("/user/profile/"+row.Name+"/")}>{row.Name}</a></td>
+                  <td>
+                     <a href={templ.SafeURL("/submission/"+d(row.SubmissionID))}>
+                     if vm.ScoredProblem {
+                        {row.Text}
+                     }else {
+                        if row.Solved {
+                            <i class="bi bi-check-lg text-success"></i>
+                        }else {
+                            <i class="bi bi-x-lg text-danger"></i>
+                        }
+                     }
+                     </a>
+                  </td>
+               </tr>
+               }
+            </table>
+         </div>
+      </div>
+   </div>
+   }
 }
 
 templ ProblemStatus(vm SubmissionsViewModel) {
