@@ -1660,7 +1660,7 @@ func ProblemRanklist(vm ProblemRanklistViewModel) templ.Component {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"container p-0\"><div class=\"row m-0\"><div class=\"col-4\"><h3><i class=\"bi bi-clock\"></i> Leggyorsabb</h3><table class=\"table table-sm table-bordered\"><thead><tr><th scope=\"col\"></th><th scope=\"col\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"container p-0\"><div class=\"row m-0\"><div class=\"col-md-4\"><h3><i class=\"bi bi-clock\"></i> Leggyorsabb</h3><table class=\"table table-sm table-bordered\"><thead><tr><th scope=\"col\"></th><th scope=\"col\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1753,7 +1753,7 @@ func ProblemRanklist(vm ProblemRanklistViewModel) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</table></div><div class=\"col-4\"><h3><i class=\"bi bi-memory\"></i> Legkevesebb memória</h3><table class=\"table table-sm table-bordered\"><thead><tr><th scope=\"col\"></th><th scope=\"col\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</table></div><div class=\"col-md-4\"><h3><i class=\"bi bi-memory\"></i> Legkevesebb memória</h3><table class=\"table table-sm table-bordered\"><thead><tr><th scope=\"col\"></th><th scope=\"col\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1846,7 +1846,7 @@ func ProblemRanklist(vm ProblemRanklistViewModel) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</table></div><div class=\"col-4\"><h3><i class=\"bi bi-journal-code\"></i> Legkisebb</h3><table class=\"table table-sm table-bordered\"><thead><tr><th scope=\"col\"></th><th scope=\"col\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</table></div><div class=\"col-md-4\"><h3><i class=\"bi bi-journal-code\"></i> Legkisebb</h3><table class=\"table table-sm table-bordered\"><thead><tr><th scope=\"col\"></th><th scope=\"col\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
