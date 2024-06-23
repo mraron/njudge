@@ -26,12 +26,13 @@ type ProblemListRequest struct {
 	PerPage        int
 	TitleFilter    string
 	TagFilter      []string
+	AuthorFilter   *string
 	CategoryFilter CategoryFilter
 	User           *User
 }
 
 func (r ProblemListRequest) IsFiltered() bool {
-	return r.TitleFilter != "" || len(r.TagFilter) > 0 || r.CategoryFilter.Type != CategoryFilterNone
+	return r.TitleFilter != "" || len(r.TagFilter) > 0 || r.CategoryFilter.Type != CategoryFilterNone || r.AuthorFilter != nil
 }
 
 type ProblemList struct {

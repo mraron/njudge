@@ -35,6 +35,8 @@ type ProblemListViewModel struct {
 	TitleFilter           string
 	TagsFilter            string
 	CategoryFilterOptions []CategoryFilterOption
+	FilterAuthor bool
+	AuthorFilter string
 }
 
 templ tagList(tags []njudge.Tag) {
@@ -86,6 +88,18 @@ templ problemListFilter(vm ProblemListViewModel) {
                             }
                         </select>
                         <input name="tags" value={vm.TagsFilter} class="form-control" id="tagsFilterHidden" type="hidden">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-2">
+                            <div class="form-check">
+                                <input type="checkbox" name="filterAuthor" id="filterAuthor" class="form-check-input" checked?={vm.FilterAuthor}>
+                                <label for="filterAuthor">{Tr(ctx, "Filter author?")}</label>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-10">
+                            <label for="author">{Tr(ctx, "Author")}</label>
+                            <input type="text" id="author" name="author" class="form-control" value={vm.AuthorFilter} onkeydown="$('#filterAuthor').prop('checked', true);">
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-primary">{Tr(ctx, "Filter")}</button>
                     if vm.Filtered {

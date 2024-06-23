@@ -572,6 +572,11 @@
             "translation": "Szűrés"
         },
         {
+            "id": "Filter author?",
+            "message": "Filter author?",
+            "translation": "Szerzőre szűrés?"
+        },
+        {
             "id": "Clear",
             "message": "Clear",
             "translation": "Töröl"
@@ -747,6 +752,11 @@
             "translation": "Jelszó megváltoztatása"
         },
         {
+            "id": "Home",
+            "message": "Home",
+            "translation": "Főoldal"
+        },
+        {
             "id": "source",
             "message": "source",
             "translation": "forráskód"
@@ -755,11 +765,6 @@
             "id": "language",
             "message": "language",
             "translation": "nyelv"
-        },
-        {
-            "id": "Home",
-            "message": "Home",
-            "translation": "Főoldal"
         }
     ]
 }

@@ -26,6 +26,8 @@ type ProblemListRequest struct {
 	TitleFilter    string `query:"title"`
 	CategoryFilter int    `query:"category"`
 	TagFilter      string `query:"tags"`
+	FilterAuthor   string `query:"filterAuthor"`
+	Author         string `query:"author"`
 
 	Problemset string `param:"name"`
 }
@@ -103,6 +105,10 @@ func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categori
 			SortField:   data.By,
 			TitleFilter: data.TitleFilter,
 			User:        c.Get("user").(*njudge.User),
+		}
+
+		if data.FilterAuthor == "on" {
+			listRequest.AuthorFilter = &data.Author
 		}
 
 		if data.TagFilter != "" {
@@ -228,6 +234,8 @@ func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categori
 		result.CategoryFilterOptions = []templates.CategoryFilterOption{
 			{Name: "-"},
 		}
+		result.FilterAuthor = data.FilterAuthor == "on"
+		result.AuthorFilter = data.Author
 
 		result.CategoryFilterOptions = append(result.CategoryFilterOptions,
 			makeCategoryFilterOptions(tr, categories, data.CategoryFilter, categoryNameByID, par)...)

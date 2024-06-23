@@ -132,6 +132,13 @@ func (p *ProblemListQuery) filterInvisible(ctx context.Context, req njudge.Probl
 	return true, nil
 }
 
+func (p *ProblemListQuery) filterAuthor(ctx context.Context, req njudge.ProblemListRequest, pr njudge.Problem) (bool, error) {
+	if req.AuthorFilter != nil {
+		return strings.Contains(pr.Author, *req.AuthorFilter), nil
+	}
+	return true, nil
+}
+
 func (p *ProblemListQuery) GetProblemList(ctx context.Context, req njudge.ProblemListRequest) (*njudge.ProblemList, error) {
 	allProblems, err := p.ps.GetAll(ctx)
 	if err != nil {
@@ -144,6 +151,7 @@ func (p *ProblemListQuery) GetProblemList(ctx context.Context, req njudge.Proble
 		p.filterTitle,
 		p.filterCategory,
 		p.filterInvisible,
+		p.filterAuthor,
 	}
 
 	problems := make([]njudge.Problem, 0)

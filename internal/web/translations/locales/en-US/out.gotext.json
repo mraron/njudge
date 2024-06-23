@@ -754,6 +754,13 @@
             "fuzzy": true
         },
         {
+            "id": "Filter author?",
+            "message": "Filter author?",
+            "translation": "Filter author?",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Clear",
             "message": "Clear",
             "translation": "Clear",
@@ -995,6 +1002,13 @@
             "fuzzy": true
         },
         {
+            "id": "Home",
+            "message": "Home",
+            "translation": "Home",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "source",
             "message": "source",
             "translation": "source",
@@ -1005,13 +1019,6 @@
             "id": "language",
             "message": "language",
             "translation": "language",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "Home",
-            "message": "Home",
-            "translation": "Home",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         }
