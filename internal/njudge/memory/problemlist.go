@@ -134,6 +134,9 @@ func (p *ProblemListQuery) filterInvisible(ctx context.Context, req njudge.Probl
 
 func (p *ProblemListQuery) filterAuthor(ctx context.Context, req njudge.ProblemListRequest, pr njudge.Problem) (bool, error) {
 	if req.AuthorFilter != nil {
+		if *req.AuthorFilter == "" { // special case, empty filter should filter empty author fields
+			return pr.Author == "", nil
+		}
 		return strings.Contains(pr.Author, *req.AuthorFilter), nil
 	}
 	return true, nil
