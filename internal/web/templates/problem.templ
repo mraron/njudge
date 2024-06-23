@@ -386,8 +386,9 @@ templ ProblemRanklist(vm ProblemRanklistViewModel) {
    @problemPage("ranklist", nil) {
    <div class="container p-0">
       <div class="row m-0">
+      if len(vm.TimeRows)>0 {
          <div class="col-md-4">
-            <h3><i class="bi bi-clock"></i> Leggyorsabb</h3>
+            <h3><i class="bi bi-clock"></i> {Tr(ctx, "Fastest")}</h3>
             <table class="table table-sm table-bordered">
                <thead>
                   <tr>
@@ -407,8 +408,10 @@ templ ProblemRanklist(vm ProblemRanklistViewModel) {
                }
             </table>
          </div>
+      }
+      if len(vm.MemRows)>0 {
          <div class="col-md-4">
-            <h3><i class="bi bi-memory"></i> Legkevesebb memória</h3>
+            <h3><i class="bi bi-memory"></i> {Tr(ctx, "Least memory")}</h3>
             <table class="table table-sm table-bordered">
                 <thead>
                   <tr>
@@ -428,8 +431,10 @@ templ ProblemRanklist(vm ProblemRanklistViewModel) {
                }
             </table>
          </div>
+      }
+      if len(vm.SizeRows)>0 {
          <div class="col-md-4">
-            <h3><i class="bi bi-journal-code"></i> Legkisebb</h3>
+            <h3><i class="bi bi-journal-code"></i> {Tr(ctx, "Smallest")}</h3>
             <table class="table table-sm table-bordered">
                 <thead>
                   <tr>
@@ -449,8 +454,9 @@ templ ProblemRanklist(vm ProblemRanklistViewModel) {
                }
             </table>
          </div>
+      }
          <div class="col-12">
-            <h3><i class="bi bi-list"></i> Eredmények</h3>
+            <h3><i class="bi bi-list"></i> {Tr(ctx, "Results")}</h3>
             <table class="table table-sm table-bordered">
                <thead>
                   <tr>

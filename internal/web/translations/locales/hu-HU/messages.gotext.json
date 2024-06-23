@@ -407,6 +407,11 @@
             "translation": "Eredmények"
         },
         {
+            "id": "Close",
+            "message": "Close",
+            "translation": "Bezár"
+        },
+        {
             "id": "Information",
             "message": "Information",
             "translation": "Információk"
@@ -450,6 +455,11 @@
             "id": "Task type",
             "message": "Task type",
             "translation": "Típus"
+        },
+        {
+            "id": "Author",
+            "message": "Author",
+            "translation": "Szerző"
         },
         {
             "id": "Submit solution",
@@ -497,14 +507,39 @@
             "translation": "Fájl"
         },
         {
+            "id": "Edit",
+            "message": "Edit",
+            "translation": "Szerkeszt"
+        },
+        {
+            "id": "Fastest",
+            "message": "Fastest",
+            "translation": "Leggyorsabb"
+        },
+        {
             "id": "Name",
             "message": "Name",
             "translation": "Név"
         },
         {
-            "id": "Points",
-            "message": "Points",
-            "translation": "Pontok"
+            "id": "Result",
+            "message": "Result",
+            "translation": "Eredmény"
+        },
+        {
+            "id": "Least memory",
+            "message": "Least memory",
+            "translation": "Legkevesebb memória"
+        },
+        {
+            "id": "Smallest",
+            "message": "Smallest",
+            "translation": "Legkisebb"
+        },
+        {
+            "id": "Results",
+            "message": "Results",
+            "translation": "Eredmények"
         },
         {
             "id": "Problem",
@@ -522,14 +557,19 @@
             "translation": "Nyelv"
         },
         {
-            "id": "Filter",
-            "message": "Filter",
-            "translation": "Szűrés"
-        },
-        {
             "id": "Category",
             "message": "Category",
             "translation": "Kategória"
+        },
+        {
+            "id": "Visible",
+            "message": "Visible",
+            "translation": "Látható"
+        },
+        {
+            "id": "Filter",
+            "message": "Filter",
+            "translation": "Szűrés"
         },
         {
             "id": "Clear",
@@ -540,6 +580,11 @@
             "id": "Solvers",
             "message": "Solvers",
             "translation": "Megoldók"
+        },
+        {
+            "id": "Points",
+            "message": "Points",
+            "translation": "Pontok"
         },
         {
             "id": "Solved problems",
@@ -702,11 +747,6 @@
             "translation": "Jelszó megváltoztatása"
         },
         {
-            "id": "Home",
-            "message": "Home",
-            "translation": "Főoldal"
-        },
-        {
             "id": "source",
             "message": "source",
             "translation": "forráskód"
@@ -715,6 +755,11 @@
             "id": "language",
             "message": "language",
             "translation": "nyelv"
+        },
+        {
+            "id": "Home",
+            "message": "Home",
+            "translation": "Főoldal"
         }
     ]
 }

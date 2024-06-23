@@ -527,6 +527,13 @@
             "fuzzy": true
         },
         {
+            "id": "Close",
+            "message": "Close",
+            "translation": "Close",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Information",
             "message": "Information",
             "translation": "Information",
@@ -590,6 +597,13 @@
             "fuzzy": true
         },
         {
+            "id": "Author",
+            "message": "Author",
+            "translation": "Author",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Submit solution",
             "message": "Submit solution",
             "translation": "Submit solution",
@@ -649,6 +663,20 @@
             "fuzzy": true
         },
         {
+            "id": "Edit",
+            "message": "Edit",
+            "translation": "Edit",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Fastest",
+            "message": "Fastest",
+            "translation": "Fastest",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Name",
             "message": "Name",
             "translation": "Name",
@@ -656,9 +684,30 @@
             "fuzzy": true
         },
         {
-            "id": "Points",
-            "message": "Points",
-            "translation": "Points",
+            "id": "Result",
+            "message": "Result",
+            "translation": "Result",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Least memory",
+            "message": "Least memory",
+            "translation": "Least memory",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Smallest",
+            "message": "Smallest",
+            "translation": "Smallest",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Results",
+            "message": "Results",
+            "translation": "Results",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -684,16 +733,23 @@
             "fuzzy": true
         },
         {
-            "id": "Filter",
-            "message": "Filter",
-            "translation": "Filter",
+            "id": "Category",
+            "message": "Category",
+            "translation": "Category",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
         {
-            "id": "Category",
-            "message": "Category",
-            "translation": "Category",
+            "id": "Visible",
+            "message": "Visible",
+            "translation": "Visible",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Filter",
+            "message": "Filter",
+            "translation": "Filter",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -708,6 +764,13 @@
             "id": "Solvers",
             "message": "Solvers",
             "translation": "Solvers",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Points",
+            "message": "Points",
+            "translation": "Points",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -932,13 +995,6 @@
             "fuzzy": true
         },
         {
-            "id": "Home",
-            "message": "Home",
-            "translation": "Home",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
             "id": "source",
             "message": "source",
             "translation": "source",
@@ -949,6 +1005,13 @@
             "id": "language",
             "message": "language",
             "translation": "language",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Home",
+            "message": "Home",
+            "translation": "Home",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         }
