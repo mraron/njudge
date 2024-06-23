@@ -353,18 +353,22 @@ func PostSubmit(submissions njudge.Submissions, subService *njudge.SubmitService
 
 func GetRanklist(rs njudge.ProblemsetRanklistService) echo.HandlerFunc {
 	type request struct {
-		Page int `query:"page"`
+		Problemset string `query:"problemset"`
+		Page       int    `query:"page"`
 	}
 	return func(c echo.Context) error {
 		req := request{}
 		if err := c.Bind(&req); err != nil {
 			return err
 		}
+		if req.Problemset == "" {
+			req.Problemset = "main"
+		}
 		if req.Page <= 0 {
 			req.Page = 1
 		}
 		res, err := rs.GetRanklist(c.Request().Context(), njudge.ProblemsetRanklistRequest{
-			Name:        c.Param("name"),
+			Name:        req.Problemset,
 			Page:        req.Page,
 			PerPage:     50,
 			FilterAdmin: true,

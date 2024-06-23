@@ -61,10 +61,10 @@ func (s *Server) routes(e *echo.Echo) {
 	e.GET("/submission/:id", handlers.GetSubmission(s.Submissions, s.Problems, s.Problemsets, s.SolvedStatusQuery)).Name = "getSubmission"
 	e.GET("/submission/rejudge/:id", handlers.RejudgeSubmission(s.Submissions), user.RequireLoginMiddleware()).Name = "rejudgeSubmission"
 	e.GET("/task_archive", handlers.GetTaskArchive(s.TaskArchiveService))
+	e.GET("/ranklist/", problemset.GetRanklist(s.ProblemsetRanklistService))
 
 	ps := e.Group("/problemset", problemset.SetMiddleware(s.Problemsets))
 	ps.GET("/:name/", problemset.GetProblemList(s.ProblemStore, s.Problems, s.Categories, s.ProblemListQuery, s.ProblemInfoQuery, s.Tags))
-	ps.GET("/:name/ranklist/", problemset.GetRanklist(s.ProblemsetRanklistService))
 	ps.POST("/:name/submit", problemset.PostSubmit(s.Submissions, s.SubmitService), user.RequireLoginMiddleware())
 	e.GET("/problemset/status/", problemset.GetStatus(s.SubmissionListQuery)).Name = "getProblemsetStatus"
 
