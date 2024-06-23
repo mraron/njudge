@@ -64,6 +64,7 @@ func (s *Server) routes(e *echo.Echo) {
 
 	ps := e.Group("/problemset", problemset.SetMiddleware(s.Problemsets))
 	ps.GET("/:name/", problemset.GetProblemList(s.ProblemStore, s.Problems, s.Categories, s.ProblemListQuery, s.ProblemInfoQuery, s.Tags))
+	ps.GET("/:name/ranklist/", problemset.GetRanklist(s.ProblemsetRanklistService))
 	ps.POST("/:name/submit", problemset.PostSubmit(s.Submissions, s.SubmitService), user.RequireLoginMiddleware())
 	e.GET("/problemset/status/", problemset.GetStatus(s.SubmissionListQuery)).Name = "getProblemsetStatus"
 
@@ -101,7 +102,7 @@ func (s *Server) routes(e *echo.Echo) {
 	u.POST("/forgot_password_form", user.PostForgotPasswordForm(s.Users)).Name = "PostForgoTPasswordForm"
 
 	pr := u.Group("/profile", profile.SetProfileMiddleware(s.Users))
-	pr.GET("/:name/", profile.GetProfile(s.SubmissionListQuery, s.Problems))
+	pr.GET("/:name/", profile.GetProfile(s.SubmissionListQuery, s.Problems, s.ProblemsetRanklistService))
 	pr.GET("/:name/submissions/", profile.GetSubmissions(s.SubmissionListQuery))
 
 	prs := pr.Group("/:name/settings", user.RequireLoginMiddleware(), profile.PrivateMiddleware())

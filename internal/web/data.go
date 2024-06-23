@@ -32,9 +32,10 @@ type DataAccess struct {
 	SubmissionListQuery njudge.SubmissionListQuery
 	Problemsets         njudge.Problemsets
 
-	SubmitService      *njudge.SubmitService
-	TagsService        njudge.TagsService
-	TaskArchiveService njudge.TaskArchiveService
+	SubmitService             *njudge.SubmitService
+	TagsService               njudge.TagsService
+	TaskArchiveService        njudge.TaskArchiveService
+	ProblemsetRanklistService njudge.ProblemsetRanklistService
 }
 
 // NewDemoDataAccess creates in-memory (internal/njudge/memory) "demo" data
@@ -153,6 +154,7 @@ func NewDemoDataAccess(ctx context.Context, ps problems.Store, ms email.Service)
 		ProblemQuery:      s.ProblemQuery,
 		ProblemStore:      s.ProblemStore,
 	}
+	s.ProblemsetRanklistService = memory.NewProblemsetRanklistService(s.Users)
 
 	return s, nil
 }
@@ -194,6 +196,7 @@ func NewDBDataAccess(ctx context.Context, ps problems.Store, DB *sql.DB, ms emai
 		ProblemQuery:      s.ProblemQuery,
 		ProblemStore:      s.ProblemStore,
 	}
+	s.ProblemsetRanklistService = memory.NewProblemsetRanklistService(s.Users)
 
 	return s, nil
 }

@@ -133,6 +133,7 @@ func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categori
 			return err
 		}
 		result := templates.ProblemListViewModel{
+			Name:  data.Problemset,
 			Pages: links,
 			Tags:  tagsList,
 		}
@@ -347,5 +348,45 @@ func PostSubmit(submissions njudge.Submissions, subService *njudge.SubmitService
 		}
 
 		return c.Redirect(http.StatusFound, c.Echo().Reverse("getProblemsetStatus")+"#submission"+strconv.Itoa(sub.ID))
+	}
+}
+
+func GetRanklist(rs njudge.ProblemsetRanklistService) echo.HandlerFunc {
+	type request struct {
+		Page int `query:"page"`
+	}
+	return func(c echo.Context) error {
+		req := request{}
+		if err := c.Bind(&req); err != nil {
+			return err
+		}
+		if req.Page <= 0 {
+			req.Page = 1
+		}
+		res, err := rs.GetRanklist(c.Request().Context(), njudge.ProblemsetRanklistRequest{
+			Name:        c.Param("name"),
+			Page:        req.Page,
+			PerPage:     50,
+			FilterAdmin: true,
+		})
+		if err != nil {
+			return err
+		}
+		qu := (*c.Request().URL).Query()
+		links, err := templates.LinksWithCountLimit(req.Page, 50, int64(res.PaginationData.Count), qu, 5)
+		if err != nil {
+			return err
+		}
+		vm := templates.ProblemsetRanklistViewModel{
+			Pages: links,
+		}
+		for _, row := range res.Rows {
+			vm.Rows = append(vm.Rows, templates.ProblemsetRanklistRow{
+				Place:  row.Place,
+				Name:   row.Name,
+				Points: strconv.FormatFloat(row.Score, 'f', 2, 64),
+			})
+		}
+		return templates.Render(c, http.StatusOK, templates.ProblemsetRanklist(vm))
 	}
 }

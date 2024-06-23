@@ -16,6 +16,15 @@ type Users struct {
 	nextForgottenPasswordKeyID int
 }
 
+func (m *Users) GetAll(ctx context.Context) ([]njudge.User, error) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	res := make([]njudge.User, len(m.data))
+	copy(res, m.data)
+
+	return res, nil
+}
+
 func NewUsers() *Users {
 	return &Users{
 		nextId:                     1,

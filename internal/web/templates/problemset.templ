@@ -24,6 +24,7 @@ type ProblemListProblem struct {
 }
 
 type ProblemListViewModel struct {
+    Name string
 	Pages        []PaginationLink
 	Problems     []ProblemListProblem
 	SolverSorter SortColumn
@@ -64,7 +65,7 @@ templ problemListFilter(vm ProblemListViewModel) {
 
             <div id="filter" class={"collapse" + iif(vm.Filtered," show","")} aria-labelledby="filterHeading" data-parent="#filterAccordion">
                 <div class="card-body">
-                <form action="" method="get">
+                <form action={templ.SafeURL("/problemset/" + vm.Name+"/")} method="get" hx-boost="true">
                     <div class="form-group">
                         <label for="titleFilter">{Tr(ctx, "Title")}</label>
                         <input name="title" value={vm.TitleFilter} class="form-control" id="titleFilter">
@@ -177,5 +178,42 @@ templ ProblemList(vm ProblemListViewModel) {
                 </tbody>
             </table>
         </div>
+    }
+}
+
+type ProblemsetRanklistRow struct {
+    Place int
+    Name string
+    Points string
+}
+
+type ProblemsetRanklistViewModel struct {
+    Rows []ProblemsetRanklistRow
+    Pages []PaginationLink
+}
+
+templ ProblemsetRanklist(vm ProblemsetRanklistViewModel) {
+    @Page() {
+        <h3>{Tr(ctx, "Ranklist")}</h3>
+        @Pagination(vm.Pages)
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">{Tr(ctx, "Name")}</th>
+              <th scope="col">{Tr(ctx, "Points")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            for _, row := range vm.Rows {
+                <tr>
+                  <th scope="row">{d(row.Place)}</th>
+                  <td><a href={templ.SafeURL("/user/profile/"+row.Name+"/")}>{row.Name}</a></td>
+                  <td>{row.Points}</td>
+                </tr>
+             }
+          </tbody>
+        </table>
+
     }
 }

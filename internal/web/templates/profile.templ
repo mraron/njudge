@@ -28,6 +28,7 @@ type ProfileViewModel struct {
     Name templ.SafeURL
     GravatarHash string
     Points float64
+    RanklistPosition int
     SolvedProblems             []ProfileSubmission
     AttemptedProblems          []ProfileSubmission
 }
@@ -49,6 +50,9 @@ templ Profile(vm ProfileViewModel) {
                     <img src={"https://www.gravatar.com/avatar/"+vm.GravatarHash+"?d=identicon&s=128"} width="96px" height="96px" alt=""><br>
                     <br>
                     <b>{Tr(ctx, "Points")}</b>: {f(math.Round(vm.Points*100)/100)}
+                    if vm.RanklistPosition > 0 {
+                        (#{d(vm.RanklistPosition)})
+                    }
                 </div>
                 <div class="col">
                     <div class="card">
