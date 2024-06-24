@@ -1,6 +1,6 @@
 ARG PROJECT_NAME
 
-FROM ubuntu:22.04 as judge_deps
+FROM debian:bookworm as judge_deps
 RUN apt-get update && apt-get install -y wget gcc g++ git build-essential libcap-dev
 WORKDIR /app
 RUN git clone --depth 1 --branch v1.10.1 https://github.com/ioi/isolate.git
@@ -9,6 +9,7 @@ RUN make isolate
 
 FROM ${PROJECT_NAME}-base
 
+RUN apt-get update && apt-get install -y openjdk-17-jdk mono-mcs fpc cython3 golang pandoc gccgo pypy3 python3-dev g++ gcc
 COPY --from=judge_deps /app/isolate /app/isolate
 WORKDIR /app/isolate
 RUN make install
@@ -19,5 +20,4 @@ RUN ln -s /usr/local/julia/bin/julia /usr/local/bin/julia
 
 WORKDIR /app
 COPY configs/docker/judge.yaml ./judge.yaml
-
 CMD ["./njudge", "judge"]

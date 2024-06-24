@@ -37,6 +37,10 @@ function bootstrapIcons() {
     return src('node_modules/bootstrap-icons/**/*').pipe(dest('static/bootstrap-icons'))
 }
 
+function selectCSS() {
+    return src('node_modules/select2/dist/css/select2.min.css').pipe(dest('static/css'))
+}
+
 function selectJS() {
     return src('node_modules/select2/dist/js/select2.min.js', {sourcemaps: true}).pipe(dest('static/js', {sourcemaps: '.'}))
 }
@@ -58,6 +62,6 @@ function popperJS() {
 }
 
 const admin = parallel(adminCSS, adminJS)
-const main = parallel(mainCSS, mainJS, mainFavicon, bootstrapJS, selectJS, jqueryJS, katex, bootstrapIcons, popperJS)
+const main = parallel(mainCSS, mainJS, mainFavicon, bootstrapJS, selectCSS, selectJS, jqueryJS, katex, bootstrapIcons, popperJS)
 
 exports.default = parallel(admin, main)

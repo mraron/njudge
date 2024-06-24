@@ -18,8 +18,8 @@ services:
     env_file:
       - web.env
     volumes:
-      - type: volume
-        source: problems
+      - type: bind
+        source: /home/aron/Projects/njudge/njudge_problems_git
         target: /njudge_problems
     networks:
       - default
@@ -29,8 +29,8 @@ services:
     env_file:
       - judge.env
     volumes:
-      - type: volume
-        source: problems
+      - type: bind
+        source: /home/aron/Projects/njudge/njudge_problems_git
         target: /njudge_problems
     networks:
       - default
