@@ -32,7 +32,7 @@ type WritableProvider[T any] interface {
 
 func GetList[T any](dp Provider[T]) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := c.Get("user").(*njudge.User)
+		u := c.Get(templates.UserContextKey).(*njudge.User)
 
 		if !roles.Can(roles.Role(u.Role), roles.ActionView, roles.Entity(dp.EndpointURL())) {
 			return c.NoContent(http.StatusUnauthorized)
@@ -64,7 +64,7 @@ func GetList[T any](dp Provider[T]) echo.HandlerFunc {
 
 func Get[T any](dp Provider[T]) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := c.Get("user").(*njudge.User)
+		u := c.Get(templates.UserContextKey).(*njudge.User)
 		if !roles.Can(roles.Role(u.Role), roles.ActionView, roles.Entity(dp.EndpointURL())) {
 			return c.NoContent(http.StatusUnauthorized)
 		}
@@ -85,7 +85,7 @@ func Get[T any](dp Provider[T]) echo.HandlerFunc {
 
 func Post[T any](dp WritableProvider[T]) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := c.Get("user").(*njudge.User)
+		u := c.Get(templates.UserContextKey).(*njudge.User)
 		if !roles.Can(roles.Role(u.Role), roles.ActionCreate, roles.Entity(dp.EndpointURL())) {
 			return c.NoContent(http.StatusUnauthorized)
 		}
@@ -105,7 +105,7 @@ func Post[T any](dp WritableProvider[T]) echo.HandlerFunc {
 
 func Put[T any](dp WritableProvider[T]) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := c.Get("user").(*njudge.User)
+		u := c.Get(templates.UserContextKey).(*njudge.User)
 		if !roles.Can(roles.Role(u.Role), roles.ActionEdit, roles.Entity(dp.EndpointURL())) {
 			return c.NoContent(http.StatusUnauthorized)
 		}
@@ -133,7 +133,7 @@ func Put[T any](dp WritableProvider[T]) echo.HandlerFunc {
 
 func Delete[T any](dp WritableProvider[T]) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := c.Get("user").(*njudge.User)
+		u := c.Get(templates.UserContextKey).(*njudge.User)
 		if !roles.Can(roles.Role(u.Role), roles.ActionDelete, roles.Entity(dp.EndpointURL())) {
 			return c.NoContent(http.StatusUnauthorized)
 		}

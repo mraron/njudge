@@ -3,6 +3,8 @@ package problemset
 import (
 	"errors"
 	"fmt"
+	"github.com/mraron/njudge/internal/web/handlers/user"
+	"github.com/mraron/njudge/internal/web/templates"
 	"net/http"
 	"slices"
 	"strings"
@@ -12,13 +14,20 @@ import (
 	"github.com/mraron/njudge/pkg/problems"
 )
 
+const (
+	ContextKey                  = "problemset"
+	ProblemContextKey           = "problem"
+	ProblemInfoContextKey       = "problemInfo"
+	ProblemStoredDataContextKey = "problemStoredData"
+)
+
 func SetMiddleware(ps njudge.Problemsets) func(echo.HandlerFunc) echo.HandlerFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			if r, err := ps.GetByName(c.Request().Context(), c.Param("name")); err != nil {
 				return err
 			} else {
-				c.Set("problemset", r)
+				c.Set(ContextKey, r)
 			}
 			return next(c)
 		}
@@ -57,19 +66,19 @@ func SetProblemMiddleware(store problems.Store, ps njudge.ProblemQuery, pinfo nj
 				}
 				return err
 			}
-			c.Set("problem", *p)
+			c.Set(ProblemContextKey, *p)
 
-			info, err := pinfo.GetProblemData(c.Request().Context(), p.ID, c.Get("userID").(int))
+			info, err := pinfo.GetProblemData(c.Request().Context(), p.ID, c.Get(user.IDContextKey).(int))
 			if err != nil {
 				return err
 			}
-			c.Set("problemInfo", *info)
+			c.Set(ProblemInfoContextKey, *info)
 
 			storedData, err := p.WithStoredData(store)
 			if err != nil {
 				return err
 			}
-			c.Set("problemStoredData", storedData)
+			c.Set(ProblemStoredDataContextKey, storedData)
 
 			return next(c)
 		}
@@ -79,9 +88,9 @@ func SetProblemMiddleware(store problems.Store, ps njudge.ProblemQuery, pinfo nj
 func VisibilityMiddleware() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			p := c.Get("problem").(njudge.Problem)
+			p := c.Get(ProblemContextKey).(njudge.Problem)
 			if !p.Visible {
-				u := c.Get("user").(*njudge.User)
+				u := c.Get(templates.UserContextKey).(*njudge.User)
 				if u == nil || u.Role != "admin" {
 					return c.JSON(http.StatusNotFound, njudge.ErrorProblemNotFound.Error())
 				}

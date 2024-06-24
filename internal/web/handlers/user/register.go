@@ -18,7 +18,7 @@ func GetRegister() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		if u := c.Get("user").(*njudge.User); u != nil {
+		if u := c.Get(templates.UserContextKey).(*njudge.User); u != nil {
 			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
@@ -43,7 +43,7 @@ func PostRegister(url string, users njudge.Users, mailService email.Service) ech
 			return err
 		}
 
-		if u := c.Get("user").(*njudge.User); u != nil {
+		if u := c.Get(templates.UserContextKey).(*njudge.User); u != nil {
 			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
@@ -147,7 +147,7 @@ func Activate(users njudge.Users) echo.HandlerFunc {
 
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		if u := c.Get("user").(*njudge.User); u != nil {
+		if u := c.Get(templates.UserContextKey).(*njudge.User); u != nil {
 			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 

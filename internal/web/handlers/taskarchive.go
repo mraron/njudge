@@ -15,7 +15,7 @@ func GetTaskArchive(tas njudge.TaskArchiveService) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		u := c.Get("user").(*njudge.User)
+		u := c.Get(templates.UserContextKey).(*njudge.User)
 
 		var (
 			rootStr = c.QueryParam("root")
@@ -55,7 +55,7 @@ func GetTaskArchive(tas njudge.TaskArchiveService) echo.HandlerFunc {
 			}
 			return false
 		})
-		c.Set("title", tr.Translate("Archive"))
+		c.Set(templates.TitleContextKey, tr.Translate("Archive"))
 		return templates.Render(c, http.StatusOK, templates.TaskArchive(vm))
 	}
 }

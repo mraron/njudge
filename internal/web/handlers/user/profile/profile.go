@@ -23,7 +23,7 @@ func GetProfile(sublist njudge.SubmissionListQuery, ps njudge.Problems, rs njudg
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		u := c.Get("profile").(*njudge.User)
+		u := c.Get(ContextKey).(*njudge.User)
 
 		solved, err := sublist.GetSolvedSubmissionList(c.Request().Context(), u.ID)
 		if err != nil {
@@ -69,7 +69,7 @@ func GetProfile(sublist njudge.SubmissionListQuery, ps njudge.Problems, rs njudg
 			return err
 		}
 
-		c.Set("title", tr.Translate("%s's profile", u.Name))
+		c.Set(templates.TitleContextKey, tr.Translate("%s's profile", u.Name))
 		return templates.Render(c, http.StatusOK, templates.Profile(vm))
 	}
 }
@@ -81,7 +81,7 @@ func GetSubmissions(sublist njudge.SubmissionListQuery) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		u := c.Get("profile").(*njudge.User)
+		u := c.Get(ContextKey).(*njudge.User)
 
 		data := request{}
 		if err := c.Bind(&data); err != nil {
@@ -116,7 +116,7 @@ func GetSubmissions(sublist njudge.SubmissionListQuery) echo.HandlerFunc {
 			Pages:       links,
 		}
 
-		c.Set("title", tr.Translate("%s's submissions", u.Name))
+		c.Set(templates.TitleContextKey, tr.Translate("%s's submissions", u.Name))
 		return templates.Render(c, http.StatusOK, templates.ProfileSubmissions(templates.ProfileSubmissionsViewModel{
 			Name:                 templ.SafeURL(u.Name),
 			SubmissionsViewModel: result,
@@ -126,7 +126,7 @@ func GetSubmissions(sublist njudge.SubmissionListQuery) echo.HandlerFunc {
 
 func GetSettings() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := c.Get("user").(*njudge.User)
+		u := c.Get(templates.UserContextKey).(*njudge.User)
 
 		templates.DeleteFlash(c, templates.ChangePasswordContextKey)
 		return templates.Render(c, http.StatusOK, templates.ProfileSettings(templates.ProfileSettingsViewModel{
@@ -143,8 +143,8 @@ func PostSettingsChangePassword(us njudge.Users) echo.HandlerFunc {
 		PasswordNew2 string `form:"passwordNew2"`
 	}
 	return func(c echo.Context) error {
-		tr := c.Get("translator").(i18n.Translator)
-		u := c.Get("user").(*njudge.User)
+		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
+		u := c.Get(templates.UserContextKey).(*njudge.User)
 
 		data := request{}
 		if err := c.Bind(&data); err != nil {
@@ -184,7 +184,7 @@ func PostSettingsMisc(us njudge.Users) echo.HandlerFunc {
 		ShowTagsForUnsolvedBool bool
 	}
 	return func(c echo.Context) error {
-		u := c.Get("user").(*njudge.User)
+		u := c.Get(templates.UserContextKey).(*njudge.User)
 
 		data := request{}
 		if err := c.Bind(&data); err != nil {

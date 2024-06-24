@@ -35,7 +35,7 @@ func loginUserHandler(auth Authenticator) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		if u := c.Get("user").(*njudge.User); u != nil {
+		if u := c.Get(templates.UserContextKey).(*njudge.User); u != nil {
 			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
@@ -78,7 +78,7 @@ func BeginOAuth() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		if u := c.Get("user").(*njudge.User); u != nil {
+		if u := c.Get(templates.UserContextKey).(*njudge.User); u != nil {
 			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
@@ -91,7 +91,7 @@ func GetLogin(googleAuth bool) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		if u := c.Get("user").(*njudge.User); u != nil {
+		if u := c.Get(templates.UserContextKey).(*njudge.User); u != nil {
 			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate(alreadyLoggedInMessage)))
 		}
 
@@ -160,7 +160,7 @@ func OAuthCallback(us njudge.Users) echo.HandlerFunc {
 func Logout() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
-		if u := c.Get("user").(*njudge.User); u == nil {
+		if u := c.Get(templates.UserContextKey).(*njudge.User); u == nil {
 			return templates.Render(c, http.StatusOK, templates.Error(tr.Translate("Can't logout if you've not logged in.")))
 		}
 

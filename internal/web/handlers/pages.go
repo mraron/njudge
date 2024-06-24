@@ -18,7 +18,7 @@ func GetHome(store templates.Store) echo.HandlerFunc {
 
 func GetAdmin() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := c.Get("user").(*njudge.User)
+		u := c.Get(templates.UserContextKey).(*njudge.User)
 		if !roles.Can(roles.Role(u.Role), roles.ActionView, "admin_panel") {
 			return echo.NotFoundHandler(c)
 		}

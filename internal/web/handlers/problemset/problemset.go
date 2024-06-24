@@ -3,6 +3,7 @@ package problemset
 import (
 	"fmt"
 	"github.com/a-h/templ"
+	"github.com/mraron/njudge/internal/web/handlers/user"
 	"github.com/mraron/njudge/internal/web/templates"
 	"github.com/mraron/njudge/internal/web/templates/i18n"
 	"io"
@@ -104,7 +105,7 @@ func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categori
 			SortDir:     data.Order,
 			SortField:   data.By,
 			TitleFilter: data.TitleFilter,
-			User:        c.Get("user").(*njudge.User),
+			User:        c.Get(templates.UserContextKey).(*njudge.User),
 		}
 
 		if data.FilterAuthor == "on" {
@@ -166,7 +167,7 @@ func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categori
 			if err != nil {
 				return err
 			}
-			info, err := pinfo.GetProblemData(c.Request().Context(), p.ID, c.Get("userID").(int))
+			info, err := pinfo.GetProblemData(c.Request().Context(), p.ID, c.Get(user.IDContextKey).(int))
 			if err != nil {
 				return err
 			}
@@ -240,7 +241,7 @@ func GetProblemList(store problems.Store, ps njudge.Problems, cs njudge.Categori
 		result.CategoryFilterOptions = append(result.CategoryFilterOptions,
 			makeCategoryFilterOptions(tr, categories, data.CategoryFilter, categoryNameByID, par)...)
 
-		c.Set("title", tr.Translate("Problems"))
+		c.Set(templates.TitleContextKey, tr.Translate("Problems"))
 		return templates.Render(c, http.StatusOK, templates.ProblemList(result))
 	}
 }
@@ -297,7 +298,7 @@ func GetStatus(subList njudge.SubmissionListQuery) echo.HandlerFunc {
 			Pages:       links,
 		}
 
-		c.Set("title", tr.Translate("Submissions"))
+		c.Set(templates.TitleContextKey, tr.Translate("Submissions"))
 		return templates.Render(c, http.StatusOK, templates.Status(result))
 	}
 }
@@ -310,7 +311,7 @@ func PostSubmit(submissions njudge.Submissions, subService *njudge.SubmitService
 		SubmissionCode string `form:"submissionCode"`
 	}
 	return func(c echo.Context) error {
-		u := c.Get("user").(*njudge.User)
+		u := c.Get(templates.UserContextKey).(*njudge.User)
 
 		data := request{}
 		if err := c.Bind(&data); err != nil {

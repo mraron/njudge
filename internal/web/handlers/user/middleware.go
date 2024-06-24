@@ -8,6 +8,8 @@ import (
 	"net/http"
 )
 
+const IDContextKey = "userID"
+
 func currentUser(c echo.Context, us njudge.Users) (*njudge.User, error) {
 	var (
 		u   *njudge.User
@@ -35,9 +37,9 @@ func SetUserMiddleware(us njudge.Users) func(echo.HandlerFunc) echo.HandlerFunc 
 			c.Set(templates.UserContextKey, user)
 
 			if user != nil {
-				c.Set("userID", user.ID)
+				c.Set(IDContextKey, user.ID)
 			} else {
-				c.Set("userID", 0)
+				c.Set(IDContextKey, 0)
 			}
 
 			if err != nil {
@@ -52,7 +54,7 @@ func SetUserMiddleware(us njudge.Users) func(echo.HandlerFunc) echo.HandlerFunc 
 func RequireLoginMiddleware() func(echo.HandlerFunc) echo.HandlerFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			if c.Get("user").(*njudge.User) == nil {
+			if c.Get(templates.UserContextKey).(*njudge.User) == nil {
 				templates.SetFlash(c, "LoginMessage", "A kért oldal megtekintéséhez belépés szükséges!")
 				to := ""
 				if c.Request().Method == "GET" {

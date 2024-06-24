@@ -33,13 +33,13 @@ func GetProblem(tags njudge.Tags) echo.HandlerFunc {
 	}
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
-		prob := c.Get("problem").(njudge.Problem)
-		info := c.Get("problemInfo").(njudge.ProblemInfo)
-		storedData := c.Get("problemStoredData").(njudge.ProblemStoredData)
+		prob := c.Get(ProblemContextKey).(njudge.Problem)
+		info := c.Get(ProblemInfoContextKey).(njudge.ProblemInfo)
+		storedData := c.Get(ProblemStoredDataContextKey).(njudge.ProblemStoredData)
 
 		title := tr.TranslateContent(storedData.Titles()).String()
 		name := storedData.Name()
-		c.Set("title", tr.Translate("Statement - %s (%s)", title, name))
+		c.Set(templates.TitleContextKey, tr.Translate("Statement - %s (%s)", title, name))
 		vm := templates.ProblemViewModel{
 			Title:        title,
 			Problemset:   prob.Problemset,
@@ -102,11 +102,11 @@ func GetProblem(tags njudge.Tags) echo.HandlerFunc {
 				vm.CanAddTags = true
 				vm.ShowTags = true
 			} else {
-				if u := c.Get("user").(*njudge.User); u != nil && u.Settings.ShowUnsolvedTags {
+				if u := c.Get(templates.UserContextKey).(*njudge.User); u != nil && u.Settings.ShowUnsolvedTags {
 					vm.ShowTags = true
 				}
 			}
-			if u := c.Get("user").(*njudge.User); u != nil && u.Role == "admin" {
+			if u := c.Get(templates.UserContextKey).(*njudge.User); u != nil && u.Role == "admin" {
 				vm.CanEdit = true
 			}
 		}
@@ -122,12 +122,10 @@ func GetProblem(tags njudge.Tags) echo.HandlerFunc {
 func GetProblemEdit(users njudge.Users, cs njudge.Categories) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
-		if u := c.Get("user").(*njudge.User); u.Role != "admin" {
+		if u := c.Get(templates.UserContextKey).(*njudge.User); u.Role != "admin" {
 			return echo.NotFoundHandler(c)
 		}
-		prob := c.Get("problem").(njudge.Problem)
-		//info := c.Get("problemInfo").(njudge.ProblemInfo)
-		//storedData := c.Get("problemStoredData").(njudge.ProblemStoredData)
+		prob := c.Get(ProblemContextKey).(njudge.Problem)
 
 		categories, err := cs.GetAll(c.Request().Context())
 		if err != nil {
@@ -179,7 +177,7 @@ func PostProblemEdit(ps njudge.Problems, cs njudge.Categories) echo.HandlerFunc 
 		Author   string `form:"author"`
 	}
 	return func(c echo.Context) error {
-		if u := c.Get("user").(*njudge.User); u.Role != "admin" {
+		if u := c.Get(templates.UserContextKey).(*njudge.User); u.Role != "admin" {
 			return echo.NotFoundHandler(c)
 		}
 		var (
@@ -189,7 +187,7 @@ func PostProblemEdit(ps njudge.Problems, cs njudge.Categories) echo.HandlerFunc 
 		if err := c.Bind(&data); err != nil {
 			return err
 		}
-		prob := c.Get("problem").(njudge.Problem)
+		prob := c.Get(ProblemContextKey).(njudge.Problem)
 		if data.Category == -1 {
 			prob.Category = nil
 		} else {
@@ -214,7 +212,7 @@ func PostProblemEdit(ps njudge.Problems, cs njudge.Categories) echo.HandlerFunc 
 
 func GetProblemPDF() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		storedData := c.Get("problemStoredData").(njudge.ProblemStoredData)
+		storedData := c.Get(ProblemStoredDataContextKey).(njudge.ProblemStoredData)
 
 		lang := c.Param("language")
 
@@ -234,7 +232,7 @@ func GetProblemPDF() echo.HandlerFunc {
 
 func GetProblemAttachment() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		storedData := c.Get("problemStoredData").(njudge.ProblemStoredData)
+		storedData := c.Get(ProblemStoredDataContextKey).(njudge.ProblemStoredData)
 		attachment := c.Param("attachment")
 
 		val, err := storedData.GetAttachment(attachment)
@@ -267,7 +265,7 @@ func GetProblemRanklist(subList njudge.SubmissionListQuery, users njudge.Users) 
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		problemset, problemName := c.Param("name"), c.Param("problem")
-		storedData := c.Get("problemStoredData").(njudge.ProblemStoredData)
+		storedData := c.Get(ProblemStoredDataContextKey).(njudge.ProblemStoredData)
 
 		submissions, err := subList.GetSubmissionList(c.Request().Context(), njudge.SubmissionListRequest{
 			Problemset: problemset,
@@ -379,7 +377,7 @@ func GetProblemRanklist(subList njudge.SubmissionListQuery, users njudge.Users) 
 		slices.SortFunc(vm.SizeRows, compareFunc)
 		vm.SizeRows = trimUsers(vm.SizeRows)
 
-		c.Set("title", tr.Translate("Results - %s (%s)", tr.TranslateContent(storedData.Titles()).String(), storedData.Name()))
+		c.Set(templates.TitleContextKey, tr.Translate("Results - %s (%s)", tr.TranslateContent(storedData.Titles()).String(), storedData.Name()))
 		return templates.Render(c, http.StatusOK, templates.ProblemRanklist(vm))
 	}
 }
@@ -388,9 +386,9 @@ func GetProblemSubmit() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		p := c.Get("problem").(njudge.Problem)
-		storedData := c.Get("problemStoredData").(njudge.ProblemStoredData)
-		info := c.Get("problemInfo").(njudge.ProblemInfo)
+		p := c.Get(ProblemContextKey).(njudge.Problem)
+		storedData := c.Get(ProblemStoredDataContextKey).(njudge.ProblemStoredData)
+		info := c.Get(ProblemInfoContextKey).(njudge.ProblemInfo)
 
 		title := tr.TranslateContent(storedData.Titles()).String()
 		vm := templates.ProblemSubmitViewModel{
@@ -401,7 +399,7 @@ func GetProblemSubmit() echo.HandlerFunc {
 			Languages:  storedData.Languages(),
 		}
 
-		c.Set("title", tr.Translate("Submit - %s (%s)", title, storedData.Name()))
+		c.Set(templates.TitleContextKey, tr.Translate("Submit - %s (%s)", title, storedData.Name()))
 
 		return templates.Render(c, http.StatusOK, templates.ProblemSubmit(vm))
 	}
@@ -420,7 +418,7 @@ func GetProblemStatus(subList njudge.SubmissionListQuery, probList problems.Stor
 	return func(c echo.Context) error {
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
-		prob := c.Get("problem").(njudge.Problem)
+		prob := c.Get(ProblemContextKey).(njudge.Problem)
 		storedData, err := prob.WithStoredData(probList)
 		if err != nil {
 			return err
@@ -468,7 +466,7 @@ func GetProblemStatus(subList njudge.SubmissionListQuery, probList problems.Stor
 			Pages:       links,
 		}
 
-		c.Set("title", tr.Translate("Submissions - %s (%s)", tr.TranslateContent(storedData.Titles()).String(), storedData.Name()))
+		c.Set(templates.TitleContextKey, tr.Translate("Submissions - %s (%s)", tr.TranslateContent(storedData.Titles()).String(), storedData.Name()))
 		return templates.Render(c, http.StatusOK, templates.ProblemStatus(result))
 	}
 }
@@ -483,12 +481,12 @@ func PostProblemTag(tgs njudge.TagsService) echo.HandlerFunc {
 			return err
 		}
 
-		u := c.Get("user").(*njudge.User)
+		u := c.Get(templates.UserContextKey).(*njudge.User)
 		if u == nil {
 			return c.NoContent(http.StatusUnauthorized)
 		}
 
-		pr := c.Get("problem").(njudge.Problem)
+		pr := c.Get(ProblemContextKey).(njudge.Problem)
 		if err := tgs.Add(c.Request().Context(), data.TagID, pr.ID, u.ID); err != nil {
 			return err
 		}
@@ -507,12 +505,12 @@ func DeleteProblemTag(tgs njudge.TagsService) echo.HandlerFunc {
 			return err
 		}
 
-		u := c.Get("user").(*njudge.User)
+		u := c.Get(templates.UserContextKey).(*njudge.User)
 		if u == nil {
 			return c.NoContent(http.StatusUnauthorized)
 		}
 
-		pr := c.Get("problem").(njudge.Problem)
+		pr := c.Get(ProblemContextKey).(njudge.Problem)
 		if err := tgs.Delete(c.Request().Context(), data.TagID, pr.ID, u.ID); err != nil {
 			return err
 		}

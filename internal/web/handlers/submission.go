@@ -16,7 +16,7 @@ type GetSubmissionRequest struct {
 
 func GetSubmission(s njudge.Submissions, probs njudge.Problems, psets njudge.Problemsets, solvedStatus njudge.SolvedStatusQuery) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := c.Get("user").(*njudge.User)
+		u := c.Get(templates.UserContextKey).(*njudge.User)
 		tr := c.Get(i18n.TranslatorContextKey).(i18n.Translator)
 
 		data := &GetSubmissionRequest{}
@@ -76,7 +76,7 @@ func RejudgeSubmission(s njudge.Submissions) echo.HandlerFunc {
 	}
 
 	return func(c echo.Context) error {
-		u := c.Get("user").(*njudge.User)
+		u := c.Get(templates.UserContextKey).(*njudge.User)
 		if !roles.Can(roles.Role(u.Role), roles.ActionCreate, "submissions/rejudge") {
 			return c.NoContent(http.StatusUnauthorized)
 		}
