@@ -301,7 +301,7 @@ func GetProblemRanklist(subList njudge.SubmissionListQuery, users njudge.Users) 
 			if b.Verdict == njudge.VerdictAC {
 				return 1
 			}
-			return cmp.Compare(a.ID, b.ID)
+			return -cmp.Compare(a.Score, b.Score)
 		})
 		for ind := range submissions.Submissions {
 			if _, ok := userCache[submissions.Submissions[ind].UserID]; !ok {
