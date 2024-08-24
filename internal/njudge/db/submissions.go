@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/njudge/db/models"
 	"github.com/volatiletech/null/v8"
@@ -94,7 +95,7 @@ func (ss *Submissions) Get(ctx context.Context, ID int) (*njudge.Submission, err
 func (ss *Submissions) getAll(ctx context.Context, mods ...qm.QueryMod) ([]njudge.Submission, error) {
 	objs, err := models.Submissions(mods...).All(ctx, ss.db)
 	if err != nil {
-		return nil, err
+		return nil, MaskNotFoundError(err, njudge.ErrorSubmissionNotFound)
 	}
 
 	res := make([]njudge.Submission, len(objs))
