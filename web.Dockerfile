@@ -9,6 +9,6 @@ RUN npx gulp
 
 FROM ${PROJECT_NAME}-base
 COPY configs/docker/web.yaml ./web.yaml
-COPY --from=frontend-builder static ./
+COPY --from=frontend-builder static ./static
 
 CMD ["./njudge", "web"]
