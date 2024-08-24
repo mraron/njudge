@@ -2,10 +2,13 @@ package memory
 
 import (
 	"context"
-	"github.com/mraron/njudge/internal/web/templates/i18n"
+	"database/sql"
+	"errors"
 	"sort"
 	"strings"
 	"unicode"
+
+	"github.com/mraron/njudge/internal/web/templates/i18n"
 
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/pkg/problems"
@@ -13,6 +16,14 @@ import (
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
+
+func MaskNotFoundError(err, mask error) error {
+	if errors.Is(err, sql.ErrNoRows) {
+		return mask
+	}
+
+	return err
+}
 
 type ProblemListQuery struct {
 	store problems.Store
@@ -145,7 +156,7 @@ func (p *ProblemListQuery) filterAuthor(ctx context.Context, req njudge.ProblemL
 func (p *ProblemListQuery) GetProblemList(ctx context.Context, req njudge.ProblemListRequest) (*njudge.ProblemList, error) {
 	allProblems, err := p.ps.GetAll(ctx)
 	if err != nil {
-		return nil, err
+		return nil, MaskNotFoundError(err, nil)
 	}
 
 	filters := []func(context.Context, njudge.ProblemListRequest, njudge.Problem) (bool, error){

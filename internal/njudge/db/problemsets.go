@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+
 	"github.com/mraron/njudge/internal/njudge"
 	"github.com/mraron/njudge/internal/njudge/db/models"
 	"golang.org/x/net/context"
@@ -25,7 +26,7 @@ func (p Problemsets) toNjudge(ps *models.Problemset) *njudge.Problemset {
 func (p Problemsets) GetByName(ctx context.Context, problemsetName string) (*njudge.Problemset, error) {
 	res, err := models.Problemsets(models.ProblemsetWhere.Name.EQ(problemsetName)).One(ctx, p.db)
 	if err != nil {
-		return nil, err
+		return nil, MaskNotFoundError(err, njudge.ErrorProblemsetNotFound)
 	}
 	return p.toNjudge(res), nil
 }
