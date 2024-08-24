@@ -25,7 +25,7 @@ func (s *Server) SetupEnvironment(ctx context.Context) error {
 
 	if s.GoogleAuth.Enabled {
 		goth.UseProviders(
-			google.New(s.GoogleAuth.ClientKey, s.GoogleAuth.Secret, s.Url+"/auth/callback?provider=google", "email", "profile"),
+			google.New(s.GoogleAuth.ClientKey, s.GoogleAuth.Secret, s.Url+"/user/auth/callback?provider=google", "email", "profile"),
 		)
 	} else {
 		s.Logger.Info("no google auth enabled")
