@@ -5,6 +5,7 @@ COPY package.json ./
 RUN npm install
 COPY src/ ./src
 COPY gulpfile.js ./
+COPY internal/web/templates/ ./internal/web/templates
 RUN npx gulp
 
 FROM ${PROJECT_NAME}-base
