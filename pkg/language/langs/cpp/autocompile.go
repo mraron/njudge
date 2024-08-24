@@ -5,10 +5,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/mraron/njudge/pkg/language/sandbox"
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/mraron/njudge/pkg/language/sandbox"
 
 	"github.com/spf13/afero"
 )
@@ -52,18 +53,18 @@ func AutoCompile(ctx context.Context, fs afero.Fs, s sandbox.Sandbox, workDir, s
 					Name:   filepath.Base(src),
 					Source: file,
 				}, &errorStream, headers); err != nil {
-					return errors.Join(err, binary.Close(), file.Close(), fmt.Errorf("compile error: %v", errorStream.String()))
+					return errors.Join(err, binary.Close(), fmt.Errorf("compile error: %v", errorStream.String()))
 				}
 
 				if _, err = io.Copy(binary, resBinary.Source); err != nil {
-					return errors.Join(err, binary.Close(), file.Close())
+					return errors.Join(err, binary.Close())
 				}
 
 				if err := fs.Chmod(dst, 0755); err != nil {
-					return errors.Join(err, binary.Close(), file.Close())
+					return errors.Join(err, binary.Close())
 				}
 
-				return errors.Join(binary.Close(), file.Close())
+				return binary.Close()
 			} else {
 				return errors.Join(err, binary.Close())
 			}
