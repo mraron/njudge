@@ -38,6 +38,7 @@ func (us *Users) toNjudge(ctx context.Context, u *models.User) (*njudge.User, er
 		Settings: njudge.UserSettings{
 			ShowUnsolvedTags: u.ShowUnsolvedTags,
 		},
+		Created: u.Registered.Time,
 	}
 	if u.R != nil {
 		if key := u.R.ForgottenPasswordKey; key != nil {
