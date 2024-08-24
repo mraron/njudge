@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"fmt"
+	"log/slog"
+
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 	"github.com/mraron/njudge/internal/njudge/db/migrations"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"log/slog"
 )
 
 type MigrateCmdArgs struct {
@@ -35,7 +36,9 @@ func NewMigrateCommand(v *viper.Viper) *cobra.Command {
 			}
 
 			m, err := migrations.NewMigrate(db, true)
-
+			if err != nil {
+				return err
+			}
 			if migrateArgs.Up {
 				err = m.Up()
 				if err != nil {

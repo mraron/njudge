@@ -26,7 +26,7 @@ func (s *Server) pruneUnactivatedUsers(ctx context.Context) {
 	for {
 		lst, err := s.Users.GetAll(ctx)
 		if err != nil {
-			s.Logger.ErrorContext(ctx, "error pruning unactivated users", err)
+			s.Logger.ErrorContext(ctx, "error pruning unactivated users", "error", err)
 		}
 		cnt := 0
 		for ind := range lst {
@@ -36,7 +36,7 @@ func (s *Server) pruneUnactivatedUsers(ctx context.Context) {
 			}
 		}
 		if err != nil {
-			s.Logger.ErrorContext(ctx, "error occured while pruning", err)
+			s.Logger.ErrorContext(ctx, "error occured while pruning", "error", err)
 		}else {
 			s.Logger.InfoContext(ctx, fmt.Sprintf("pruned %d inactive, unactivated accounts", cnt))
 		}
