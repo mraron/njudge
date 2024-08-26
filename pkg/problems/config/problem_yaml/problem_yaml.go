@@ -452,7 +452,7 @@ func ParserAndIdentifier(opts ...Option) (problems.ConfigParser, problems.Config
 
 				*interactorPath = binaryName
 			}
-			p.Tests.interactorBinary, err = os.ReadFile(*interactorPath)
+			p.Tests.interactorBinary, err = os.ReadFile(filepath.Join(p.Path, *interactorPath))
 			if err != nil {
 				return nil, err
 			}

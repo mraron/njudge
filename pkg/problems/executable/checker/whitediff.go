@@ -49,7 +49,7 @@ func (w Whitediff) Check(ctx context.Context, testcase *problems.Testcase) error
 
 	ans, err := w.answerFs.Open(tc.AnswerPath)
 	if err != nil {
-		return errors.Join(err, ans.Close())
+		return err
 	}
 	defer func(ans afero.File) {
 		_ = ans.Close()
@@ -57,7 +57,7 @@ func (w Whitediff) Check(ctx context.Context, testcase *problems.Testcase) error
 
 	out, err := w.outputFs.Open(tc.OutputPath)
 	if err != nil {
-		return errors.Join(err, out.Close())
+		return errors.Join(err, ans.Close())
 	}
 	defer func(out afero.File) {
 		_ = out.Close()

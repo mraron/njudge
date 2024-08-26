@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"github.com/mraron/njudge/pkg/language/memory"
 	"io"
 	"log/slog"
 	"os"
@@ -13,6 +12,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/mraron/njudge/pkg/language/memory"
 )
 
 // IsolateRoot is the root directory structure isolate is using.

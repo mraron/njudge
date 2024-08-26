@@ -14,6 +14,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -363,38 +364,81 @@ func (r *InteractiveRunner) getSandboxes(provider sandbox.Provider) (userSandbox
 	return
 }
 
-func (r *InteractiveRunner) prepareFIFO(dir string, name string) (*os.File, error) {
+func (r *InteractiveRunner) prepareFIFO(dir string, name string) (*os.File, *os.File, error) {
 	if err := syscall.Mkfifo(filepath.Join(dir, name), 0666); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if err := os.Chmod(filepath.Join(dir, name), 0666); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return os.OpenFile(filepath.Join(dir, name), os.O_RDWR, 0666)
+	var (
+		readFile   *os.File
+		writeFile  *os.File
+		err1, err2 error
+	)
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		readFile, err1 = os.OpenFile(filepath.Join(dir, name), os.O_RDONLY, os.ModeNamedPipe)
+		wg.Done()
+	}()
+	wg.Add(1)
+	go func() {
+		writeFile, err2 = os.OpenFile(filepath.Join(dir, name), os.O_WRONLY, os.ModeNamedPipe)
+		wg.Done()
+	}()
+	wg.Wait()
+	if err1 != nil || err2 != nil {
+		return nil, nil, errors.Join(err1, err2, readFile.Close(), writeFile.Close())
+	}
+	return readFile, writeFile, nil
 }
 
 type UserInteractorExecutor interface {
-	ExecuteUser(ctx context.Context, userSandbox sandbox.Sandbox, language language.Language, userBin sandbox.File, userStdin, userStdout *os.File, timeLimit time.Duration, memoryLimit memory.Amount) (*sandbox.Status, error)
-	ExecuteInteractor(ctx context.Context, interactorSandbox sandbox.Sandbox, userStdin, userStdout *os.File, testcase *problems.Testcase) (*sandbox.Status, error)
+	ExecuteUser(ctx context.Context, userSandbox sandbox.Sandbox, language language.Language, userBin sandbox.File, userStdin io.Reader, userStdout io.Writer, timeLimit time.Duration, memoryLimit memory.Amount) (*sandbox.Status, error)
+	ExecuteInteractor(ctx context.Context, interactorSandbox sandbox.Sandbox, userStdin io.Writer, userStdout io.Reader, testcase *problems.Testcase) (*sandbox.Status, error)
 }
 
 type PolygonUserInteractorExecute struct{}
 
-func (p PolygonUserInteractorExecute) ExecuteUser(ctx context.Context, userSandbox sandbox.Sandbox, language language.Language, userBin sandbox.File, userStdin, userStdout *os.File, timeLimit time.Duration, memoryLimit memory.Amount) (*sandbox.Status, error) {
-	return language.Run(ctx, userSandbox, userBin, userStdin, userStdout, timeLimit, memoryLimit)
+type sandboxWithErrorStream struct {
+	sandbox.Sandbox
+	ErrorStream io.Writer
 }
 
-func (p PolygonUserInteractorExecute) ExecuteInteractor(ctx context.Context, interactorSandbox sandbox.Sandbox, userStdin, userStdout *os.File, testcase *problems.Testcase) (*sandbox.Status, error) {
-	return interactorSandbox.Run(ctx, sandbox.RunConfig{
+func (s sandboxWithErrorStream) Run(ctx context.Context, config sandbox.RunConfig, toRun string, toRunArgs ...string) (*sandbox.Status, error) {
+	config.Stderr = s.ErrorStream
+	return s.Sandbox.Run(ctx, config, toRun, toRunArgs...)
+}
+
+func (p PolygonUserInteractorExecute) ExecuteUser(ctx context.Context, userSandbox sandbox.Sandbox, language language.Language, userBin sandbox.File, userStdin io.Reader, userStdout io.Writer, timeLimit time.Duration, memoryLimit memory.Amount) (*sandbox.Status, error) {
+	return language.Run(ctx, sandboxWithErrorStream{
+		userSandbox,
+		os.Stderr,
+	}, userBin, userStdin, userStdout, timeLimit, memoryLimit)
+}
+
+func (p PolygonUserInteractorExecute) ExecuteInteractor(ctx context.Context, interactorSandbox sandbox.Sandbox, userStdin io.Writer, userStdout io.Reader, testcase *problems.Testcase) (*sandbox.Status, error) {
+	interactorOutput := &bytes.Buffer{}
+	res, err := interactorSandbox.Run(ctx, sandbox.RunConfig{
 		RunID:            "interactor",
 		TimeLimit:        2 * testcase.TimeLimit,
 		MemoryLimit:      1 * memory.GiB,
 		Stdin:            userStdout,
 		Stdout:           userStdin,
-		Stderr:           io.Discard,
+		Stderr:           interactorOutput,
 		InheritEnv:       true,
 		WorkingDirectory: interactorSandbox.Pwd(),
 	}, "interactor", "input.txt", "output.txt")
+	if err != nil {
+		return res, err
+	}
+	if strings.Contains(interactorOutput.String(), "FAIL") {
+		res.Verdict = sandbox.VerdictXX
+	} else if res.Verdict == sandbox.VerdictRE && strings.Contains(interactorOutput.String(), "wrong answer") {
+		res.Verdict = sandbox.VerdictOK
+	}
+	return res, nil
 }
 
 type interactorOutput struct {
@@ -435,11 +479,11 @@ func (t *TaskYAMLUserInteractorExecute) Check(ctx context.Context, testcase *pro
 	return nil
 }
 
-func (t *TaskYAMLUserInteractorExecute) ExecuteUser(ctx context.Context, userSandbox sandbox.Sandbox, language language.Language, userBin sandbox.File, userStdin, userStdout *os.File, timeLimit time.Duration, memoryLimit memory.Amount) (*sandbox.Status, error) {
+func (t *TaskYAMLUserInteractorExecute) ExecuteUser(ctx context.Context, userSandbox sandbox.Sandbox, language language.Language, userBin sandbox.File, userStdin io.Reader, userStdout io.Writer, timeLimit time.Duration, memoryLimit memory.Amount) (*sandbox.Status, error) {
 	return language.Run(ctx, userSandbox, userBin, userStdin, userStdout, timeLimit, memoryLimit)
 }
 
-func (t *TaskYAMLUserInteractorExecute) ExecuteInteractor(ctx context.Context, interactorSandbox sandbox.Sandbox, userStdin, userStdout *os.File, testcase *problems.Testcase) (*sandbox.Status, error) {
+func (t *TaskYAMLUserInteractorExecute) ExecuteInteractor(ctx context.Context, interactorSandbox sandbox.Sandbox, userStdin io.Writer, userStdout io.Reader, testcase *problems.Testcase) (*sandbox.Status, error) {
 	inputFile, err := os.Open(filepath.Join(interactorSandbox.Pwd(), "input.txt"))
 	if err != nil {
 		return nil, err
@@ -449,6 +493,9 @@ func (t *TaskYAMLUserInteractorExecute) ExecuteInteractor(ctx context.Context, i
 	res.checkerMessage = &bytes.Buffer{}
 	res.scoreMul = &bytes.Buffer{}
 	t.forChecker.Store(testcase.Index, res)
+
+	userStdoutName := (userStdout).(*os.File).Name()
+	userStdinName := (userStdin).(*os.File).Name()
 
 	return interactorSandbox.Run(ctx, sandbox.RunConfig{
 		RunID:            "interactor",
@@ -468,7 +515,7 @@ func (t *TaskYAMLUserInteractorExecute) ExecuteInteractor(ctx context.Context, i
 				},
 			},
 		},
-	}, "interactor", userStdout.Name(), userStdin.Name())
+	}, "interactor", userStdoutName, userStdinName)
 }
 
 func (r *InteractiveRunner) Run(ctx context.Context, sandboxProvider sandbox.Provider, testcase *problems.Testcase) error {
@@ -522,20 +569,22 @@ func (r *InteractiveRunner) Run(ctx context.Context, sandboxProvider sandbox.Pro
 		return err
 	}
 
-	userStdin, err := r.prepareFIFO(dir, "fifo1")
+	userStdinRead, userStdinWrite, err := r.prepareFIFO(dir, "fifo1")
 	if err != nil {
 		return err
 	}
-	defer func(userStdin *os.File) {
-		_ = userStdin.Close()
-	}(userStdin)
-	userStdout, err := r.prepareFIFO(dir, "fifo2")
+	defer func(userStdinRead *os.File, userStdinWrite *os.File) {
+		_ = userStdinRead.Close()
+		_ = userStdinWrite.Close()
+	}(userStdinRead, userStdinWrite)
+	userStdoutRead, userStdoutWrite, err := r.prepareFIFO(dir, "fifo2")
 	if err != nil {
 		return err
 	}
-	defer func(userStdout *os.File) {
-		_ = userStdout.Close()
-	}(userStdout)
+	defer func(userStdoutRead *os.File, userStdoutWrite *os.File) {
+		_ = userStdoutRead.Close()
+		_ = userStdoutWrite.Close()
+	}(userStdoutRead, userStdoutWrite)
 
 	var (
 		userStatus, interactorStatus *sandbox.Status
@@ -547,11 +596,31 @@ func (r *InteractiveRunner) Run(ctx context.Context, sandboxProvider sandbox.Pro
 		userStatus, userError = r.executor.ExecuteUser(ctx, userSandbox, r.lang, sandbox.File{
 			Name:   r.userBinName,
 			Source: io.NopCloser(bytes.NewBuffer(r.userBin)),
-		}, userStdin, userStdout, testcase.TimeLimit, testcase.MemoryLimit)
+		}, userStdinRead, userStdoutWrite, testcase.TimeLimit, testcase.MemoryLimit)
+		_ = userStdoutWrite.Close()
+
+		buf := make([]byte, 8*1024)
+		for {
+			_, err := userStdinRead.Read(buf)
+			if err != nil {
+				break
+			}
+		}
+		_ = userStdinRead.Close()
+
 		done <- struct{}{}
 	}()
 
-	interactorStatus, interactorError = r.executor.ExecuteInteractor(ctx, interactorSandbox, userStdin, userStdout, testcase)
+	interactorStatus, interactorError = r.executor.ExecuteInteractor(ctx, interactorSandbox, userStdinWrite, userStdoutRead, testcase)
+	_ = userStdinWrite.Close()
+	buf := make([]byte, 8*1024)
+	for {
+		_, err := userStdoutRead.Read(buf)
+		if err != nil {
+			break
+		}
+	}
+	_ = userStdoutRead.Close()
 	<-done
 
 	testcase.OutputPath = filepath.Join(interactorSandbox.Pwd(), "output.txt")

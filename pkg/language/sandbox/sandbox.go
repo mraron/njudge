@@ -147,7 +147,7 @@ type RunConfig struct {
 
 // Sandbox is used to Run a command inside a secure sandbox.
 type Sandbox interface {
-	Id() string // Id should return an unique ID for sandboxes of the same type
+	Id() string // Id() should return an unique ID for sandboxes of the same type
 
 	Init(ctx context.Context) error
 	FS

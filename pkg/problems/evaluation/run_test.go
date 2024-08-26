@@ -5,6 +5,10 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"os"
+	"testing"
+	"time"
+
 	"github.com/mraron/njudge/pkg/internal/testutils"
 	"github.com/mraron/njudge/pkg/language/langs/cpp"
 	"github.com/mraron/njudge/pkg/language/langs/python3"
@@ -15,9 +19,6 @@ import (
 	"github.com/mraron/njudge/pkg/problems/executable/checker"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
-	"os"
-	"testing"
-	"time"
 )
 
 func TestBasicRunner_Run(t *testing.T) {
@@ -334,6 +335,7 @@ func TestInteractiveRunner_Run(t *testing.T) {
 	fs := afero.NewMemMapFs()
 	assert.NoError(t, afero.WriteFile(fs, "input", []byte("11 12\n"), 0644))
 	assert.NoError(t, afero.WriteFile(fs, "answer", []byte("23\n"), 0644))
+	assert.NoError(t, afero.WriteFile(fs, "empty", []byte("\n"), 0644))
 
 	assert.NoError(t, afero.WriteFile(fs, "input_multi", []byte("1\n11 12\n"), 0644))
 	assert.NoError(t, afero.WriteFile(fs, "manager.cpp", mustReadFile("testdata/taskyaml_manager.cpp"), 0644))
@@ -419,6 +421,54 @@ func TestInteractiveRunner_Run(t *testing.T) {
 			wantErr:     assert.NoError,
 			wantVerdict: problems.VerdictAC,
 			wantScore:   10.0,
+		},
+		{
+			name:     "printalot_polygon",
+			solution: evaluation.NewByteSolution(python3.Python3{}, mustReadFile("testdata/empty.py")),
+			ir: evaluation.NewInteractiveRunner(
+				mustReadFile("testdata/printalot.py"),
+				checker.NewWhitediff(checker.WhiteDiffWithFs(fs, afero.NewOsFs())),
+				evaluation.InteractiveRunnerWithFs(fs),
+			),
+			args: args{
+				ctx:             context.TODO(),
+				sandboxProvider: sandbox.NewProvider().Put(s1).Put(s2),
+				testcase: &problems.Testcase{
+					Index:      1,
+					InputPath:  "input",
+					OutputPath: "output",
+					AnswerPath: "empty",
+					MaxScore:   10.0,
+					TimeLimit:  1 * time.Second,
+				},
+			},
+			wantErr:     assert.NoError,
+			wantVerdict: problems.VerdictAC,
+			wantScore:   10.0,
+		},
+		{
+			name: "interactor_error",
+			solution: evaluation.NewByteSolution(python3.Python3{}, mustReadFile("testdata/empty.py")),
+			ir: evaluation.NewInteractiveRunner(
+				mustReadFile("testdata/error.py"),
+				checker.NewWhitediff(checker.WhiteDiffWithFs(fs, afero.NewOsFs())),
+				evaluation.InteractiveRunnerWithFs(fs),
+			),
+			args: args{
+				ctx:             context.TODO(),
+				sandboxProvider: sandbox.NewProvider().Put(s1).Put(s2),
+				testcase: &problems.Testcase{
+					Index:      1,
+					InputPath:  "input",
+					OutputPath: "output",
+					AnswerPath: "empty",
+					MaxScore:   10.0,
+					TimeLimit:  1 * time.Second,
+				},
+			},
+			wantErr:     assert.Error,
+			wantVerdict: problems.VerdictXX,
+			wantScore:   0.0,
 		},
 	}
 	for _, tt := range tests {
