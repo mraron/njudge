@@ -1,9 +1,11 @@
 package profile
 
 import (
-	"github.com/mraron/njudge/internal/web/templates"
+	"errors"
 	"net/http"
 	"net/url"
+
+	"github.com/mraron/njudge/internal/web/templates"
 
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/njudge"
@@ -27,6 +29,9 @@ func SetProfileMiddleware(u njudge.Users) echo.MiddlewareFunc {
 
 			user, err := u.GetByName(c.Request().Context(), name)
 			if err != nil {
+				if errors.Is(err,njudge.ErrorUserNotFound) {
+					return echo.NewHTTPError(http.StatusNotFound, err.Error() )
+				}
 				return err
 			}
 
