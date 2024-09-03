@@ -3,11 +3,12 @@ package problemset
 import (
 	"errors"
 	"fmt"
-	"github.com/mraron/njudge/internal/web/handlers/user"
-	"github.com/mraron/njudge/internal/web/templates"
 	"net/http"
 	"slices"
 	"strings"
+
+	"github.com/mraron/njudge/internal/web/handlers/user"
+	"github.com/mraron/njudge/internal/web/templates"
 
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/njudge"
@@ -25,6 +26,9 @@ func SetMiddleware(ps njudge.Problemsets) func(echo.HandlerFunc) echo.HandlerFun
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			if r, err := ps.GetByName(c.Request().Context(), c.Param("name")); err != nil {
+				if errors.Is(err,njudge.ErrorProblemsetNotFound) {
+					return echo.NewHTTPError(http.StatusNotFound, err.Error() )
+				}
 				return err
 			} else {
 				c.Set(ContextKey, r)
