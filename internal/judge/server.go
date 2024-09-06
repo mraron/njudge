@@ -4,6 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
+	"net/http"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/mraron/njudge/pkg/language"
@@ -13,9 +17,6 @@ import (
 	_ "github.com/mraron/njudge/pkg/problems/config/problem_yaml"
 	_ "github.com/mraron/njudge/pkg/problems/config/task_yaml"
 	slogecho "github.com/samber/slog-echo"
-	"log/slog"
-	"net/http"
-	"time"
 
 	_ "github.com/mraron/njudge/pkg/language/langs/csharp"
 	_ "github.com/mraron/njudge/pkg/language/langs/golang"
@@ -73,7 +74,7 @@ func (s Server) PostJudgeHandler() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		sub := Submission{}
 		if err := c.Bind(&sub); err != nil {
-			return err
+			return echo.NewHTTPError(http.StatusBadRequest,err.Error())
 		}
 
 		inited := false
