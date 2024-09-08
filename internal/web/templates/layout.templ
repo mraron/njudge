@@ -1,5 +1,6 @@
 package templates
 
+import "context"
 
 func title(ctx context.Context) string {
     if s, ok := ctx.Value(TitleContextKey).(string); ok {
