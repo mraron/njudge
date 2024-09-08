@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"errors"
+	"net/http"
+
 	"github.com/mraron/njudge/internal/web/templates"
 	"github.com/mraron/njudge/internal/web/templates/i18n"
-	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"github.com/mraron/njudge/internal/njudge"
@@ -26,6 +28,9 @@ func GetSubmission(s njudge.Submissions, probs njudge.Problems, psets njudge.Pro
 
 		sub, err := s.Get(c.Request().Context(), data.ID)
 		if err != nil {
+			if errors.Is(err, njudge.ErrorSubmissionNotFound){
+				return echo.NewHTTPError(http.StatusNotFound,err.Error())
+			}
 			return err
 		}
 
