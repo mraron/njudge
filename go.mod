@@ -25,7 +25,7 @@ require (
 	github.com/volatiletech/randomize v0.0.1 // indirect
 	github.com/volatiletech/sqlboiler/v4 v4.16.2
 	github.com/volatiletech/strmangle v0.0.6
-	golang.org/x/crypto v0.26.0
+	golang.org/x/crypto v0.31.0
 	golang.org/x/oauth2 v0.20.0 // indirect
 )
 
@@ -42,8 +42,8 @@ require (
 	github.com/yuin/goldmark v1.7.1
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9
 	golang.org/x/net v0.28.0
-	golang.org/x/sync v0.8.0
-	golang.org/x/text v0.17.0
+	golang.org/x/sync v0.10.0
+	golang.org/x/text v0.21.0
 	golang.org/x/time v0.5.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gopkg.in/yaml.v3 v3.0.1
@@ -80,7 +80,7 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/mod v0.20.0 // indirect
-	golang.org/x/sys v0.23.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/tools v0.24.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
